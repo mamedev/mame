@@ -52,6 +52,7 @@ protected:
 	virtual void send_key(UINT8 code);
 private:
 	int m_rbit;
+	int m_baud;
 	UINT8 m_curr_key;
 	bool m_key_valid;
 	devcb_resolved_write_line m_out_tx_func;

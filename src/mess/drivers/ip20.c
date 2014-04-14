@@ -21,8 +21,8 @@
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
 #include "machine/eepromser.h"
-#include "machine/scsibus.h"
-#include "machine/scsicd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "machine/wd33c93.h"
 
 struct HPC_t
@@ -51,13 +51,14 @@ public:
 		TIMER_RTC
 	};
 
-	ip20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_wd33c93(*this, "scsi:wd33c93"),
-	m_scc(*this, "scc"),
-	m_eeprom(*this, "eeprom"),
-	m_maincpu(*this, "maincpu") { }
-
+	ip20_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_wd33c93(*this, "wd33c93"),
+		m_scc(*this, "scc"),
+		m_eeprom(*this, "eeprom"),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	HPC_t m_HPC;
 	RTC_t m_RTC;
@@ -580,6 +581,11 @@ static const mips3_config config =
 };
 #endif
 
+static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+	MCFG_DEVICE_MODIFY( "cdda" )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^^mono", 1.0)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_CPU_ADD( "maincpu", R4600BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -604,13 +610,13 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)
-	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
-	MCFG_WD33C93_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, ip20_state, scsi_irq))      /* command completion IRQ */
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_6)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)
+	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_WD33C93_IRQ_CB(WRITELINE(ip20_state, scsi_irq))      /* command completion IRQ */
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 MACHINE_CONFIG_END

@@ -53,9 +53,9 @@
 #include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "machine/ram.h"
-#include "machine/scsibus.h"
-#include "machine/scsihd.h"
-#include "machine/scsicd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
+#include "bus/scsi/scsicd.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
 #include "sound/cdda.h"
@@ -972,11 +972,13 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
@@ -1064,11 +1066,14 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1116,12 +1121,14 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:cdrom1", SCSICD, SCSI_ID_4)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "cdrom", SCSICD, SCSI_ID_4)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1181,11 +1188,13 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1424,11 +1433,14 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("pds","pds030", mac_pds030_cards, NULL)
@@ -1490,11 +1502,13 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1573,11 +1587,13 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1770,11 +1786,13 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
-	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
+	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1859,13 +1877,15 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+
 	MCFG_DEVICE_ADD(MAC_539X_1_TAG, NCR539X, C7M)
-	MCFG_NCR539X_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, irq_539x_1_w))
-	MCFG_NCR539X_OUT_DRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, drq_539x_1_w))
-	
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_NCR539X_OUT_IRQ_CB(WRITELINE(mac_state, irq_539x_1_w))
+	MCFG_NCR539X_OUT_DRQ_CB(WRITELINE(mac_state, drq_539x_1_w))
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")

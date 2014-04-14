@@ -625,17 +625,6 @@ static I8274_INTERFACE( mpsc_intf )
 
 
 //-------------------------------------------------
-//  mm58274c_interface rtc_intf
-//-------------------------------------------------
-
-static const mm58274c_interface rtc_intf =
-{
-	0,  /*  mode 24*/
-	1   /*  first day of week */
-};
-
-
-//-------------------------------------------------
 //  cassette_interface compis_cassette_interface
 //-------------------------------------------------
 
@@ -745,7 +734,11 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
-	MCFG_MM58274C_ADD(MM58174A_TAG, rtc_intf)
+
+	MCFG_DEVICE_ADD(MM58174A_TAG, MM58274C, 0)
+	MCFG_MM58274C_MODE24(0) // 12 hour
+	MCFG_MM58274C_DAY1(1)   // monday
+
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 

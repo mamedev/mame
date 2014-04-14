@@ -686,12 +686,6 @@ WRITE_LINE_MEMBER( geneve_state::dbin_line )
 	m_mapper->dbin_in(state);
 }
 
-static const mm58274c_interface geneve_mm58274c_interface =
-{
-	1,  /*  mode 24*/
-	0   /*  first day of week */
-};
-
 DRIVER_INIT_MEMBER(geneve_state,geneve)
 {
 }
@@ -754,7 +748,9 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_GENEVE_READY_HANDLER( WRITELINE(geneve_state, mapper_ready) )
 
 	// Clock
-	MCFG_MM58274C_ADD(GCLOCK_TAG, geneve_mm58274c_interface)
+	MCFG_DEVICE_ADD(GCLOCK_TAG, MM58274C, 0)
+	MCFG_MM58274C_MODE24(1) // 24 hour
+	MCFG_MM58274C_DAY1(0)   // sunday
 
 	// Peripheral expansion box (Geneve composition)
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_GEN, 0)

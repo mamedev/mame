@@ -162,20 +162,6 @@ int wd33c93_device::get_xfer_count( void )
 	return count;
 }
 
-void wd33c93_device::read_data(int bytes, UINT8 *pData)
-{
-	UINT8 unit = getunit();
-
-	if ( devices[unit] )
-	{
-		devices[unit]->ReadData( pData, bytes );
-	}
-	else
-	{
-		logerror("wd33c93: request for unknown device SCSI ID %d\n", unit);
-	}
-}
-
 void wd33c93_device::complete_immediate( int status )
 {
 	/* reset our timer */
@@ -285,7 +271,7 @@ void wd33c93_device::select_cmd()
 	UINT8 newstatus;
 
 	/* see if we can select that device */
-	if ( devices[unit] )
+	if (select(unit))
 	{
 		/* device is available - signal selection done */
 		newstatus = CSR_SELECT;
@@ -321,19 +307,16 @@ void wd33c93_device::selectxfer_cmd()
 	UINT8 newstatus;
 
 	/* see if we can select that device */
-	if ( devices[unit] )
+	if (select(unit))
 	{
 		if ( regs[WD_COMMAND_PHASE] < 0x45 )
 		{
 			/* device is available */
-			int xfercount;
 			int phase;
 
 			/* do the request */
-			devices[unit]->SetCommand( &regs[WD_CDB_1], 12 );
-			devices[unit]->ExecCommand();
-			devices[unit]->GetLength( &xfercount );
-			devices[unit]->GetPhase( &phase );
+			send_command(&regs[WD_CDB_1], 12);
+			phase = get_phase();
 
 			/* set transfer count */
 			if ( get_xfer_count() > TEMP_INPUT_LEN )
@@ -357,7 +340,7 @@ void wd33c93_device::selectxfer_cmd()
 			if ( get_xfer_count() < len ) len = get_xfer_count();
 
 			memset( &temp_input[0], 0, TEMP_INPUT_LEN );
-			read_data( len, &temp_input[0] );
+			read_data(&temp_input[0], len);
 			temp_input_pos = 0;
 			read_pending = 0;
 		}
@@ -549,15 +532,13 @@ WRITE8_MEMBER(wd33c93_device::write)
 
 							case PHS_COMMAND:
 							{
-								UINT8 unit = getunit();
 								int xfercount;
 								int phase;
 
 								/* Execute the command. Depending on the command, we'll move to data in or out */
-								devices[unit]->SetCommand( &fifo[0], 12 );
-								devices[unit]->ExecCommand();
-								devices[unit]->GetLength( &xfercount );
-								devices[unit]->GetPhase( &phase );
+								send_command(&fifo[0], 12);
+								xfercount = get_length();
+								phase = get_phase();
 
 								/* reset fifo */
 								fifo_pos = 0;
@@ -586,7 +567,7 @@ WRITE8_MEMBER(wd33c93_device::write)
 							case PHS_DATA_OUT:
 							{
 								/* write data out to device */
-								write_data( fifo_pos, fifo );
+								write_data(fifo, fifo_pos);
 
 								/* reset fifo */
 								fifo_pos = 0;
@@ -683,7 +664,7 @@ READ8_MEMBER(wd33c93_device::read)
 						int len = TEMP_INPUT_LEN;
 
 						if ( (count+1) < len ) len = count+1;
-						read_data( len, &temp_input[0] );
+						read_data(&temp_input[0], len);
 						temp_input_pos = 0;
 						read_pending = 0;
 					}
@@ -741,16 +722,17 @@ READ8_MEMBER(wd33c93_device::read)
 	return 0;
 }
 
-wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock, "wd33c93", __FILE__),
-		m_irq_cb(*this)
+wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	legacy_scsi_host_adapter(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock, "wd33c93", __FILE__),
+	m_irq_cb(*this)
 {
 }
 
 void wd33c93_device::device_start()
 {
+	legacy_scsi_host_adapter::device_start();
+
 	memset(regs, 0, sizeof(regs));
-	memset(devices, 0, sizeof(devices));
 	memset(fifo, 0, sizeof(fifo));
 	memset(temp_input, 0, sizeof(temp_input));
 
@@ -761,15 +743,6 @@ void wd33c93_device::device_start()
 	identify = 0;
 	read_pending = 0;
 
-	// try to open the devices
-	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
-	{
-		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
-		if( scsidev != NULL )
-		{
-			devices[scsidev->GetDeviceID()] = scsidev;
-		}
-	}
 	m_irq_cb.resolve();
 
 	/* allocate a timer for commands */
@@ -788,7 +761,7 @@ void wd33c93_device::device_start()
 	save_item( NAME( read_pending ) );
 }
 
-void wd33c93_device::get_dma_data( int bytes, UINT8 *pData )
+void wd33c93_device::dma_read_data( int bytes, UINT8 *pData )
 {
 	int len = bytes;
 
@@ -813,18 +786,9 @@ void wd33c93_device::get_dma_data( int bytes, UINT8 *pData )
 	set_xfer_count(len);
 }
 
-void wd33c93_device::write_data(int bytes, UINT8 *pData)
+void wd33c93_device::dma_write_data(int bytes, UINT8 *pData)
 {
-	UINT8 unit = getunit();
-
-	if (devices[unit])
-	{
-		devices[unit]->WriteData( pData, bytes );
-	}
-	else
-	{
-		logerror("wd33c93: request for unknown device SCSI ID %d\n", unit);
-	}
+	write_data(pData, bytes);
 }
 
 void wd33c93_device::clear_dma()

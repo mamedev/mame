@@ -2,7 +2,7 @@
 
 #include "emu.h"
 #include "53c810.h"
-#include "machine/scsihle.h"
+#include "bus/scsi/scsihle.h"
 
 #define DMA_MAX_ICOUNT  512     /* Maximum number of DMA Scripts opcodes to run */
 #define DASM_OPCODES 0
@@ -104,6 +104,8 @@ void lsi53c810_device::dmaop_select()
 	}
 	else
 	{
+		select((dcmd>>16)&7);
+
 		/* initiator mode */
 		logerror("53c810: SELECT: our ID %d, target ID %d\n", scid&7, (dcmd>>16)&7);
 
@@ -616,12 +618,14 @@ void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate 
 }
 
 lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock, "lsi53c810", __FILE__)
+	: legacy_scsi_host_adapter(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock, "lsi53c810", __FILE__)
 {
 }
 
 void lsi53c810_device::device_start()
 {
+	legacy_scsi_host_adapter::device_start();
+
 	m_irq_cb.bind_relative_to(*owner());
 	m_dma_cb.bind_relative_to(*owner());
 	m_fetch_cb.bind_relative_to(*owner());
@@ -647,42 +651,6 @@ void lsi53c810_device::device_start()
 	add_opcode(0xc0, 0xfe, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_memory ), this));
 	add_opcode(0xe0, 0xed, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_store ), this));
 	add_opcode(0xe1, 0xed, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_load ), this));
-
-	memset(devices, 0, sizeof(devices));
-
-	// try to open the devices
-	for (device_t *device = owner()->first_subdevice(); device != NULL; device = device->next())
-	{
-		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
-		if (scsidev != NULL)
-		{
-			devices[scsidev->GetDeviceID()] = scsidev;
-		}
-	}
-}
-
-void lsi53c810_device::lsi53c810_read_data(int bytes, UINT8 *pData)
-{
-	if (devices[last_id])
-	{
-		devices[last_id]->ReadData( pData, bytes);
-	}
-	else
-	{
-		logerror("lsi53c810: read unknown device SCSI ID %d\n", last_id);
-	}
-}
-
-void lsi53c810_device::lsi53c810_write_data(int bytes, UINT8 *pData)
-{
-	if (devices[last_id])
-	{
-		devices[last_id]->WriteData( pData, bytes );
-	}
-	else
-	{
-		logerror("lsi53c810: write to unknown device SCSI ID %d\n", last_id);
-	}
 }
 
 /*************************************

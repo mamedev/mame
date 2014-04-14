@@ -59,27 +59,6 @@ adc12138_device::adc12138_device(const machine_config &mconfig, device_type type
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void adc12138_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const adc12138_interface *intf = reinterpret_cast<const adc12138_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<adc12138_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		input_callback_r = NULL;
-	}
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -96,7 +75,7 @@ void adc12138_device::device_start()
 	m_end_conv = 0;
 
 	/* resolve callbacks */
-	m_input_callback_r_func = input_callback_r;
+	m_ipt_read_cb.bind_relative_to(*owner());
 
 	/* register for state saving */
 	save_item(NAME(m_cycle));
@@ -144,7 +123,6 @@ WRITE8_MEMBER( adc12138_device::di_w )
 
 void adc12138_device::convert(int channel, int bits16, int lsbfirst)
 {
-	int i;
 	int bits;
 	int input_value;
 	double input = 0;
@@ -159,42 +137,42 @@ void adc12138_device::convert(int channel, int bits16, int lsbfirst)
 	{
 		case 0x8:       // H L L L - CH0 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 0);
+			input = m_ipt_read_cb(0);
 			break;
 		}
 		case 0xc:       // H H L L - CH1 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 1);
+			input = m_ipt_read_cb(1);
 			break;
 		}
 		case 0x9:       // H L L H - CH2 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 2);
+			input = m_ipt_read_cb(2);
 			break;
 		}
 		case 0xd:       // H H L H - CH3 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 3);
+			input = m_ipt_read_cb(3);
 			break;
 		}
 		case 0xa:       // H L H L - CH4 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 4);
+			input = m_ipt_read_cb(4);
 			break;
 		}
 		case 0xe:       // H H H L - CH5 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 5);
+			input = m_ipt_read_cb(5);
 			break;
 		}
 		case 0xb:       // H L H H - CH6 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 6);
+			input = m_ipt_read_cb(6);
 			break;
 		}
 		case 0xf:       // H H H H - CH7 (single-ended)
 		{
-			input = m_input_callback_r_func(this, 7);
+			input = m_ipt_read_cb(7);
 			break;
 		}
 		default:
@@ -216,9 +194,9 @@ void adc12138_device::convert(int channel, int bits16, int lsbfirst)
 
 	m_output_shift_reg = 0;
 
-	for (i=0; i < bits; i++)
+	for (int i = 0; i < bits; i++)
 	{
-		if (input_value & (1 << ((bits-1) - i)))
+		if (input_value & (1 << ((bits - 1) - i)))
 		{
 			m_output_shift_reg |= (1 << i);
 		}

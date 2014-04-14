@@ -400,9 +400,10 @@ Keyboard TX commands:
 #include "machine/i8251.h"
 
 #include "bus/scsi/s1410.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
+#include "machine/buffer.h"
+#include "machine/latch.h"
 
 #include "sound/beep.h"
 #include "sound/speaker.h"
@@ -445,7 +446,10 @@ public:
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
-		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_sasibus(*this, SASIBUS_TAG),
+		m_sasi_data_out(*this, "sasi_data_out"),
+		m_sasi_data_in(*this, "sasi_data_in"),
+		m_sasi_ctrl_in(*this, "sasi_ctrl_in"),
 		m_ide(*this, "ide"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
@@ -468,7 +472,10 @@ public:
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
-	optional_device<scsicb_device> m_sasibus;
+	optional_device<SCSI_PORT_DEVICE> m_sasibus;
+	optional_device<output_latch_device> m_sasi_data_out;
+	optional_device<input_buffer_device> m_sasi_data_in;
+	optional_device<input_buffer_device> m_sasi_ctrl_in;
 	optional_device<ata_interface_device> m_ide;
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
@@ -590,14 +597,13 @@ public:
 	UINT32 pc9801_286_a20(bool state);
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
-	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
-	DECLARE_READ8_MEMBER( sasi_status_r );
-	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
+	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
+	DECLARE_READ8_MEMBER(sasi_status_r);
+	DECLARE_WRITE8_MEMBER(sasi_ctrl_w);
 
-	struct{
-		UINT8 data_out;
-		UINT8 ctrl;
-	}m_sasi;
+	UINT8 m_sasi_data;
+	int m_sasi_data_enable;
+	UINT8 m_sasi_ctrl;
 
 	DECLARE_READ8_MEMBER(pc9801rs_wram_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_wram_w);
@@ -1723,23 +1729,27 @@ WRITE8_MEMBER(pc9801_state::pc9801_mouse_w)
 
 WRITE8_MEMBER( pc9801_state::sasi_data_w )
 {
-	m_sasi.data_out = data;
+	m_sasi_data = data;
 
-	if( !m_sasibus->scsi_io_r() )
+	if (m_sasi_data_enable)
 	{
-		m_sasibus->scsi_data_w( data );
+		m_sasi_data_out->write(m_sasi_data);
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801_state::sasi_io_w )
+WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
 {
-	if( !state )
+	m_sasi_ctrl_in->write_bit2(state);
+
+	m_sasi_data_enable = !state;
+
+	if (m_sasi_data_enable)
 	{
-		m_sasibus->scsi_data_w( m_sasi.data_out );
+		m_sasi_data_out->write(m_sasi_data);
 	}
 	else
 	{
-		m_sasibus->scsi_data_w( 0 );
+		m_sasi_data_out->write(0);
 	}
 }
 
@@ -1749,7 +1759,7 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 {
 	UINT8 res = 0;
 
-	if(m_sasi.ctrl & 0x40) // read status
+	if(m_sasi_ctrl & 0x40) // read status
 	{
 	/*
 	    x--- -.-- REQ
@@ -1760,13 +1770,7 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 	    ---- -x-- IO
 	    ---- ---x INT?
 	*/
-//      res |= m_sasibus->scsi_cd_r() << 0;
-		res |= m_sasibus->scsi_io_r() << 2;
-		res |= m_sasibus->scsi_cd_r() << 3;
-		res |= m_sasibus->scsi_msg_r() << 4;
-		res |= m_sasibus->scsi_bsy_r() << 5;
-		res |= m_sasibus->scsi_ack_r() << 6;
-		res |= m_sasibus->scsi_req_r() << 7;
+		res |= m_sasi_ctrl_in->read();
 	}
 	else // read drive info
 	{
@@ -1793,19 +1797,19 @@ WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 	    ---- ---x irq enable
 	*/
 
-	m_sasibus->scsi_sel_w(BIT(data, 5));
+	m_sasibus->write_sel(BIT(data, 5));
 
-	if(m_sasi.ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
+	if(m_sasi_ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
 	{
-		m_sasibus->scsi_rst_w(1);
+		m_sasibus->write_rst(1);
 //      m_timer_rst->adjust(attotime::from_nsec(100));
 	}
 	else
-		m_sasibus->scsi_rst_w(0); // TODO
+		m_sasibus->write_rst(0); // TODO
 
-	m_sasi.ctrl = data;
+	m_sasi_ctrl = data;
 
-//  m_sasibus->scsi_sel_w(BIT(data, 0));
+//  m_sasibus->write_sel(BIT(data, 0));
 }
 
 static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
@@ -1832,7 +1836,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,pc9801_70_w,0xffff) //display registers / i8253 pit
 //  AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
-	AM_RANGE(0x0080, 0x0081) AM_DEVREAD8(SASIBUS_TAG ":host", scsicb_device, scsi_data_r, 0x00ff) AM_WRITE8(sasi_data_w, 0x00ff)
+	AM_RANGE(0x0080, 0x0081) AM_DEVREAD8("scsi_data_in", input_buffer_device, read, 0x00ff) AM_WRITE8(sasi_data_w, 0x00ff)
 	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
@@ -3378,6 +3382,10 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 
 	m_ipl_rom = memregion("ipl")->base();
 	m_sound_bios = memregion("sound_bios")->base();
+
+	save_item(NAME(m_sasi_data));
+	save_item(NAME(m_sasi_data_enable));
+	save_item(NAME(m_sasi_ctrl));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -3583,10 +3591,20 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
-	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0) // TODO: correct one, perhaps ttl
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
-	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, pc9801_state, sasi_io_w))
+	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
+	MCFG_SCSI_IO_HANDLER(WRITELINE(pc9801_state, write_sasi_io)) // bit2
+	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4))
+	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit5))
+	MCFG_SCSI_ACK_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit6))
+	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit7))
+
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0) // TODO: correct one, perhaps ttl
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
+	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
+	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
 
 

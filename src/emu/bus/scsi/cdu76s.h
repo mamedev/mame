@@ -15,7 +15,7 @@
 #define __CDU76S_H__
 
 #include "scsicd.h"
-#include "t10mmc.h"
+#include "machine/t10mmc.h"
 
 class sony_cdu76s_device : public scsicd_device
 {

@@ -14,9 +14,8 @@
 #ifndef __SA1403D__
 #define __SA1403D__
 
-#include "emu.h"
+#include "scsihd.h"
 #include "imagedev/harddriv.h"
-#include "machine/scsihd.h"
 
 class sa1403d_device  : public scsihd_device
 {

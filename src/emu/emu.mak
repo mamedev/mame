@@ -171,6 +171,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/netlist.o     \
 	$(EMUMACHINE)/nvram.o       \
 	$(EMUMACHINE)/ram.o         \
+	$(EMUMACHINE)/legscsi.o     \
 	$(EMUMACHINE)/terminal.o    \
 
 EMUIMAGEDEVOBJS = \

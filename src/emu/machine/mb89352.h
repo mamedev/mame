@@ -7,7 +7,7 @@
 #ifndef MB89352_H_
 #define MB89352_H_
 
-#include "machine/scsihle.h"
+#include "legscsi.h"
 
 // SCSI lines readable via PSNS register (reg 5)
 #define MB89352_LINE_REQ 0x80
@@ -54,7 +54,7 @@
 #define MCFG_MB89352A_DRQ_CB(_devcb) \
 	devcb = &mb89352_device::set_drq_callback(*device, DEVCB2_##_devcb);
 
-class mb89352_device : public device_t
+class mb89352_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -87,8 +87,6 @@ private:
 	devcb2_write_line m_irq_cb;  /* irq callback */
 	devcb2_write_line m_drq_cb;  /* drq callback */
 
-	scsihle_device* m_SCSIdevices[8];
-
 	UINT8 m_phase;  // current SCSI phase
 	UINT8 m_target; // current SCSI target
 	UINT8 m_bdid;  // Bus device ID (SCSI ID of the bus?)
@@ -109,7 +107,6 @@ private:
 	UINT8 m_command_index;
 	UINT8 m_command[16];
 	UINT32 m_transfer_index;
-	int m_result_length;
 	UINT8 m_buffer[512];
 
 	emu_timer* m_transfer_timer;

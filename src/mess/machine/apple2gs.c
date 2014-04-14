@@ -1998,7 +1998,9 @@ MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 {
 	apple2gs_refresh_delegates();
-	apple2_init_common();
+
+	m_machinetype = APPLE_IIGS;
+	apple2eplus_init_common(NULL);
 
 	/* set up Apple IIgs vectoring */
 	g65816_set_read_vector_callback(m_maincpu, read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));

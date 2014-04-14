@@ -16,12 +16,9 @@
 
 #include "emu.h"
 #include "abcbus.h"
-#include "bus/scsi/s1410.h"
+#include "bus/scsi/scsi.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
 #include "machine/z80dma.h"
 
 
@@ -62,9 +59,11 @@ public:
 	DECLARE_READ8_MEMBER( io_read_byte );
 	DECLARE_WRITE8_MEMBER( io_write_byte );
 
-	DECLARE_WRITE_LINE_MEMBER( sasi_bsy_w );
-	DECLARE_WRITE_LINE_MEMBER( sasi_io_w );
-	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
 
 protected:
 	// device-level overrides
@@ -84,12 +83,18 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<scsicb_device> m_sasibus;
+	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
+	required_device<input_buffer_device> m_sasi_data_in;
 	required_ioport m_s1;
 
 	int m_cs;
 	int m_rdy;
-	int m_req;
+	int m_sasi_req;
+	int m_sasi_io;
+	int m_sasi_cd;
+	int m_sasi_msg;
+	int m_sasi_bsy;
 
 	UINT8 m_inp;
 	UINT8 m_out;

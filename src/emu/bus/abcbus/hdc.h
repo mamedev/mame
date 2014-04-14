@@ -18,9 +18,7 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsihd.h"
 
 
 
@@ -51,7 +49,6 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<scsibus_device> m_sasibus;
 };
 
 

@@ -3,7 +3,7 @@
 #ifndef __ACB4070__
 #define __ACB4070__
 
-#include "machine/scsihd.h"
+#include "scsihd.h"
 
 class acb4070_device : public scsihd_device
 {

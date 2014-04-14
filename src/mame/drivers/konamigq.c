@@ -53,8 +53,8 @@
 #include "machine/am53cf96.h"
 #include "machine/eepromser.h"
 #include "machine/mb89371.h"
-#include "machine/scsibus.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 
@@ -66,7 +66,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
-		m_am53cf96(*this, "scsi:am53cf96"),
+		m_am53cf96(*this, "am53cf96"),
 		m_k056800(*this, "k056800")
 	{
 	}
@@ -135,7 +135,7 @@ READ8_MEMBER(konamigq_state::pcmram_r)
 /* Video */
 
 static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f10001f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0x00ff00ff)
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE16(eeprom_w, 0x0000ffff)
 	AM_RANGE(0x1f198000, 0x1f198003) AM_WRITENOP            /* cabinet lamps? */
@@ -315,10 +315,12 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(konamigq_def_eeprom, 128)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:disk", SCSIHD, SCSI_ID_0)
-	MCFG_AM53CF96_ADD("scsi:am53cf96")
-	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin10))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+
+	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz)
@@ -433,7 +435,7 @@ ROM_START( cryptklr )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
-	DISK_REGION( "scsi:disk:image" )
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":harddisk:image" )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
 

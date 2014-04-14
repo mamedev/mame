@@ -1,6 +1,7 @@
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
+#include "machine/adc083x.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k055555.h"
@@ -29,6 +30,13 @@ public:
 		m_k056800(*this, "k056800"),
 		m_k054539_1(*this,"k054539_1"),
 		m_k054539_2(*this,"k054539_2"),
+		m_an0(*this, "AN0"),
+		m_an1(*this, "AN1"),
+		m_light0_x(*this, "LIGHT0_X"),
+		m_light0_y(*this, "LIGHT0_Y"),	
+		m_light1_x(*this, "LIGHT1_X"),
+		m_light1_y(*this, "LIGHT1_Y"),	
+		m_eepromout(*this, "EEPROMOUT"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -52,6 +60,7 @@ public:
 	optional_device<k056800_device> m_k056800;
 	optional_device<k054539_device> m_k054539_1;
 	optional_device<k054539_device> m_k054539_2;
+	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -119,6 +128,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
+	ADC083X_INPUT_CB(adc0834_callback);
 
 	void _gxcommoninitnosprites(running_machine &machine);
 	void _gxcommoninit(running_machine &machine);

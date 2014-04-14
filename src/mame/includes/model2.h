@@ -104,6 +104,7 @@ public:
 	UINT32 m_videocontrol;
 	UINT32 m_soundack;
 	void model2_check_irq_state();
+	void model2_check_irqack_state(UINT32 data);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
@@ -166,6 +167,7 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_sharc_buffer_w);
 	DECLARE_READ32_MEMBER(copro_tgp_buffer_r);
 	DECLARE_WRITE32_MEMBER(copro_tgp_buffer_w);
+	DECLARE_READ32_MEMBER(tgpid_r);
 	DECLARE_READ8_MEMBER(driveio_port_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	DECLARE_READ8_MEMBER(driveio_port_str_r);

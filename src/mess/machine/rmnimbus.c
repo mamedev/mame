@@ -65,7 +65,7 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
 #include "machine/6522via.h"
-#include "machine/scsibus.h"
+#include "bus/scsi/scsi.h"
 
 #include "includes/rmnimbus.h"
 
@@ -2205,8 +2205,7 @@ void rmnimbus_state::fdc_reset()
 	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
 
 	m_nimbus_drives.reg400=0;
-	m_nimbus_drives.reg410_in=0;
-	m_nimbus_drives.reg410_out=0;
+	m_scsi_ctrl_out->write(0);
 	m_nimbus_drives.int_ff=0;
 	fdc->set_pause_time(FDC_PAUSE);
 }
@@ -2292,16 +2291,17 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 			result = fdc->data_r(space, 0);
 			break;
 		case 0x10 :
-			m_nimbus_drives.reg410_in &= ~FDC_BITS_410;
-			m_nimbus_drives.reg410_in |= (FDC_MOTOR() ? FDC_MOTOR_MASKI : 0x00);
-			m_nimbus_drives.reg410_in |= (drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX) ? 0x00 : FDC_INDEX_MASK);
-			m_nimbus_drives.reg410_in |= (drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) ? FDC_READY_MASK : 0x00);
-
-			// Flip inverted bits
-			result=m_nimbus_drives.reg410_in ^ INV_BITS_410;
+			result |= !m_scsi_req << 7;
+			result |= !m_scsi_cd << 6;
+			result |= !m_scsi_io << 5;
+			result |= !m_scsi_bsy << 4;
+			result |= m_scsi_msg << 3;
+			result |= FDC_MOTOR() << 2;
+			result |= !drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX) << 1;
+			result |= drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 0;
 			break;
 		case 0x18 :
-			result = m_scsibus->scsi_data_r();
+			result = m_scsi_data_in->read();
 			hdc_post_rw();
 		default:
 			break;
@@ -2375,11 +2375,11 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 			fdc->data_w(space, 0, data);
 			break;
 		case 0x10 :
-			hdc_ctrl_write(data);
+			m_scsi_ctrl_out->write(data);
 			break;
 
 		case 0x18 :
-			m_scsibus->scsi_data_w(data);
+			m_scsi_data_out->write(data);
 			hdc_post_rw();
 			break;
 	}
@@ -2387,33 +2387,23 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 
 void rmnimbus_state::hdc_reset()
 {
-	m_nimbus_drives.reg410_in=0;
-	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_req_r() ? 0 : HDC_REQ_MASK);
-	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_cd_r()  ? 0 : HDC_CD_MASK);
-	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_io_r()  ? 0 : HDC_IO_MASK);
-	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_bsy_r() ? 0 : HDC_BSY_MASK);
-	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_msg_r() ? 0 : HDC_MSG_MASK);
-
 	m_nimbus_drives.drq_ff=0;
 }
 
-void rmnimbus_state::hdc_ctrl_write(UINT8 data)
+WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 {
+	int last = m_scsi_iena;
+	m_scsi_iena = state;
+
 	// If we enable the HDC interupt, and an interrupt is pending, go deal with it.
-	if(((data & HDC_IRQ_MASK) && (~m_nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
-		((~m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
+	if (m_scsi_iena && !last && !m_scsi_io && !m_scsi_cd && !m_scsi_req)
 		set_disk_int(1);
-
-	m_nimbus_drives.reg410_out=data;
-
-	m_scsibus->scsi_rst_w((data & HDC_RESET_MASK) ? 1 : 0);
-	m_scsibus->scsi_sel_w((data & HDC_SEL_MASK) ? 1 : 0);
 }
 
 void rmnimbus_state::hdc_post_rw()
 {
-	if((m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
-		m_scsibus->scsi_ack_w(1);
+	if(!m_scsi_req)
+		m_scsibus->write_ack(1);
 
 	m_nimbus_drives.drq_ff=0;
 }
@@ -2426,71 +2416,47 @@ void rmnimbus_state::hdc_drq()
 	}
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_bsy_w )
+WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
 {
-	nimbus_scsi_linechange( HDC_BSY_MASK, state );
+	m_scsi_bsy = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_cd_w )
+WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 {
-	nimbus_scsi_linechange( HDC_CD_MASK, state );
+	m_scsi_cd = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_io_w )
+WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 {
-	nimbus_scsi_linechange( HDC_IO_MASK, state );
-}
+	m_scsi_io = state;
 
-WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_msg_w )
-{
-	nimbus_scsi_linechange( HDC_MSG_MASK, state );
-}
-
-WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_req_w )
-{
-	nimbus_scsi_linechange( HDC_REQ_MASK, state );
-}
-
-void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
-{
-	UINT8   last = 0;
-
-	last=m_nimbus_drives.reg410_in & mask;
-
-	if(!state)
-		m_nimbus_drives.reg410_in|=mask;
-	else
-		m_nimbus_drives.reg410_in&=~mask;
-
-
-	if(HDC_IRQ_ENABLED() && ((~m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-		set_disk_int(1);
-	else
-		set_disk_int(0);
-
-	switch( mask )
+	if (m_scsi_io)
 	{
-	case HDC_REQ_MASK:
-		if (state)
-		{
-			if(((m_nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
-			{
-				m_nimbus_drives.drq_ff=1;
-				hdc_drq();
-			}
-		}
-		else
-		{
-			m_scsibus->scsi_ack_w(0);
-		}
-		break;
+		m_scsi_data_out->write(0);
+	}
+}
 
-	case HDC_IO_MASK:
-		if (state)
+WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
+{
+	m_scsi_msg = state;
+}
+
+WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
+{
+	int last = m_scsi_req;
+	m_scsi_req = state;
+
+	if (state)
+	{
+		if (m_scsi_cd && last)
 		{
-			m_scsibus->scsi_data_w(0);
+			m_nimbus_drives.drq_ff=1;
+			hdc_drq();
 		}
-		break;
+	}
+	else
+	{
+		m_scsibus->write_ack(0);
 	}
 }
 

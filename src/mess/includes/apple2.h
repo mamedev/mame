@@ -19,8 +19,16 @@
 #include "machine/kb3600.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+#include "bus/rs232/rs232.h"
+#include "machine/mos6551.h"
 
 #define AUXSLOT_TAG "auxbus"
+
+#define IIC_ACIA1_TAG "acia1"
+#define IIC_ACIA2_TAG "acia2"
+
+#define PRINTER_PORT_TAG "printer"
+#define MODEM_PORT_TAG "modem"
 
 /***************************************************************************
     SOFTSWITCH VALUES
@@ -68,7 +76,9 @@ enum machine_type_t
 {
 	APPLE_II,           // Apple II/II+
 	APPLE_IIE,          // Apple IIe with aux slots
-	APPLE_IIEPLUS,      // Apple IIc/IIgs/IIc+ with permanent aux memory
+	APPLE_IIGS,         // Apple IIgs
+	APPLE_IIC,			// Apple IIc
+	APPLE_IICPLUS,		// Apple IIc+
 	TK2000,             // Microdigital TK2000
 	LASER128,           // Laser 128/128EX/128EX2
 	SPACE84,            // "Space 84" with flipped text mode
@@ -125,7 +135,9 @@ public:
 		m_kbspecial(*this, "keyb_special"),
 		m_kbrepeat(*this, "keyb_repeat"),
 		m_resetdip(*this, "reset_dip"),
-		m_cassette(*this, "cassette")
+		m_cassette(*this, "cassette"),
+		m_acia1(*this, IIC_ACIA1_TAG),
+		m_acia2(*this, IIC_ACIA2_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -140,6 +152,8 @@ public:
 	optional_ioport m_kbrepeat;
 	optional_ioport m_resetdip;
 	optional_device<cassette_image_device> m_cassette;
+
+	optional_device<mos6551_device> m_acia1, m_acia2;
 
 	UINT32 m_flags, m_flags_mask;
 	INT32 m_a2_cnxx_slot;
@@ -294,18 +308,19 @@ public:
 	write8_delegate wd_inh_d000;
 	read8_delegate rd_inh_e000;
 	write8_delegate wd_inh_e000;
-	DECLARE_MACHINE_START(apple2);
-	DECLARE_MACHINE_START(apple2e);
-	DECLARE_VIDEO_START(apple2);
-	DECLARE_PALETTE_INIT(apple2);
 	DECLARE_MACHINE_START(apple2orig);
-	DECLARE_VIDEO_START(apple2p);
-	DECLARE_VIDEO_START(apple2e);
-	DECLARE_VIDEO_START(apple2c);
+	DECLARE_MACHINE_START(apple2e);
+	DECLARE_MACHINE_START(apple2c);
+	DECLARE_MACHINE_START(apple2cp);
 	DECLARE_MACHINE_START(tk2000);
 	DECLARE_MACHINE_START(laser128);
 	DECLARE_MACHINE_START(space84);
 	DECLARE_MACHINE_START(laba2p);
+	DECLARE_VIDEO_START(apple2);
+	DECLARE_PALETTE_INIT(apple2);
+	DECLARE_VIDEO_START(apple2p);
+	DECLARE_VIDEO_START(apple2e);
+	DECLARE_VIDEO_START(apple2c);
 	UINT32 screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	DECLARE_WRITE8_MEMBER(a2bus_irq_w);
@@ -334,6 +349,7 @@ public:
 	int apple2_fdc_has_525();
 	void apple2_iwm_setdiskreg(UINT8 data);
 	void apple2_init_common();
+	void apple2eplus_init_common(void *apple2cp_ce00_ram);
 	INT8 apple2_slotram_r(address_space &space, int slotnum, int offset);
 	int a2_no_ctrl_reset();
 };

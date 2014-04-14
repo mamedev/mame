@@ -101,9 +101,8 @@ static MACHINE_CONFIG_FRAGMENT( cmd_hd )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	//MCFG_RTC72421A_ADD(RTC72421A_TAG)
 
-	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
+	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 MACHINE_CONFIG_END
 
 
@@ -131,7 +130,7 @@ cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, CMD_HD, "HD", tag, owner, clock, "cmdhd", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
-		m_scsibus(*this, SCSIBUS_TAG":host")
+		m_scsibus(*this, SCSIBUS_TAG)
 {
 }
 

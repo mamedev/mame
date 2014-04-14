@@ -130,8 +130,8 @@
 #include "bus/x68k/x68kexp.h"
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
-#include "machine/scsibus.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
 #include "x68000.lh"
 
 
@@ -1275,7 +1275,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
@@ -1314,7 +1314,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w, 0xffffffff)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16(x68k_ppi_r, x68k_ppi_w,0xffffffff)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
@@ -1906,17 +1906,19 @@ static MACHINE_CONFIG_START( x68ksupr, x68k_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
-	MCFG_DEVICE_ADD("scsi:mb89352", MB89352A, 0)
-	MCFG_MB89352A_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_state, x68k_scsi_irq))
-	MCFG_MB89352A_DRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_state, x68k_scsi_drq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "harddisk", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
+
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(x68k_state, x68k_scsi_irq))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( x68kxvi, x68k_state )
@@ -1929,17 +1931,19 @@ static MACHINE_CONFIG_START( x68kxvi, x68k_state )
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
-	MCFG_DEVICE_ADD("scsi:mb89352", MB89352A, 0)
-	MCFG_MB89352A_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_state, x68k_scsi_irq))
-	MCFG_MB89352A_DRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_state, x68k_scsi_drq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "harddisk", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
+
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(x68k_state, x68k_scsi_irq))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( x68030, x68k_state )
@@ -1953,17 +1957,19 @@ static MACHINE_CONFIG_START( x68030, x68k_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram32")
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
-	MCFG_DEVICE_ADD("scsi:mb89352", MB89352A, 0)
-	MCFG_MB89352A_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_state, x68k_scsi_irq))
-	MCFG_MB89352A_DRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_state, x68k_scsi_drq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "harddisk", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
+
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(x68k_state, x68k_scsi_irq))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )

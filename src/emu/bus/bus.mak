@@ -1030,10 +1030,15 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/scsi/???.h,BUSES += SCSI
+#@src/emu/bus/scsi/scsi.h,BUSES += SCSI
 #-------------------------------------------------
 ifneq ($(filter SCSI,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/scsi
+BUSOBJS += $(BUSOBJ)/scsi/scsi.o
+BUSOBJS += $(BUSOBJ)/scsi/scsicd.o
+BUSOBJS += $(BUSOBJ)/scsi/scsihd.o
+BUSOBJS += $(BUSOBJ)/scsi/scsihle.o
+BUSOBJS += $(BUSOBJ)/scsi/cdu76s.o
 BUSOBJS += $(BUSOBJ)/scsi/acb4070.o
 BUSOBJS += $(BUSOBJ)/scsi/d9060hd.o
 BUSOBJS += $(BUSOBJ)/scsi/sa1403d.o

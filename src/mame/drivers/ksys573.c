@@ -451,6 +451,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dmx_output_callback );
 	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
 	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
+	ADC083X_INPUT_CB(analogue_inputs_callback);
 
 	void cdrom_dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
 	void cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
@@ -1680,10 +1681,9 @@ WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 /* punch mania */
 
 
-static double punchmania_inputs_callback( device_t *device, UINT8 input )
+ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
 {
-	ksys573_state *state = device->machine().driver_data<ksys573_state>();
-
+	ksys573_state *state = machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
 	int pads = state->m_pads->read();
 	for( int i = 0; i < 6; i++ )
@@ -1719,7 +1719,7 @@ static double punchmania_inputs_callback( device_t *device, UINT8 input )
 
 static MACHINE_CONFIG_FRAGMENT( punchmania_cassette_install )
 	MCFG_DEVICE_MODIFY( "adc0838" )
-	MCFG_ADC083X_INPUT_CALLBACK( punchmania_inputs_callback )
+	MCFG_ADC083X_INPUT_CB( konami573_cassette_xi_device, punchmania_inputs_callback )
 MACHINE_CONFIG_END
 
 
@@ -1987,20 +1987,18 @@ READ16_MEMBER( ksys573_state::gunmania_r )
 
 /* ADC0834 Interface */
 
-static double analogue_inputs_callback( device_t *device, UINT8 input )
+ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
 {
-	ksys573_state *state = device->machine().driver_data<ksys573_state>();
-
 	switch( input )
 	{
 	case ADC083X_CH0:
-		return (double)( 5 * state->m_analog0->read() ) / 255.0;
+		return (double)( 5 * m_analog0->read() ) / 255.0;
 	case ADC083X_CH1:
-		return (double)( 5 * state->m_analog1->read() ) / 255.0;
+		return (double)( 5 * m_analog1->read() ) / 255.0;
 	case ADC083X_CH2:
-		return (double)( 5 * state->m_analog2->read() ) / 255.0;
+		return (double)( 5 * m_analog2->read() ) / 255.0;
 	case ADC083X_CH3:
-		return (double)( 5 * state->m_analog3->read() ) / 255.0;
+		return (double)( 5 * m_analog3->read() ) / 255.0;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
@@ -2076,7 +2074,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_M48T58_ADD( "m48t58" )
 
 	MCFG_DEVICE_ADD( "adc0834", ADC0834, 0 )
-	MCFG_ADC083X_INPUT_CALLBACK( analogue_inputs_callback )
+	MCFG_ADC083X_INPUT_CB( ksys573_state, analogue_inputs_callback )
 MACHINE_CONFIG_END
 
 // Variants with additional digital sound board

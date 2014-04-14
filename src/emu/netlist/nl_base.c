@@ -496,7 +496,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 
 	if (USE_ADD_REMOVE_LIST)
 	{
-		m_list.insert(term);
+		m_list_active.insert(term);
 		//m_list.add(term);
 	}
 
@@ -534,7 +534,7 @@ ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 
 	if (USE_ADD_REMOVE_LIST)
 	{
-		m_list.remove(term);
+		m_list_active.remove(term);
 	}
 
 	if (USE_DEACTIVE_DEVICE)
@@ -548,10 +548,10 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 {
 	/* rebuild m_list */
 
-	m_list.clear();
-	for (int i=0; i < m_registered.count(); i++)
-		if (m_registered[i]->state() != netlist_input_t::STATE_INP_PASSIVE)
-			m_list.add(*m_registered[i]);
+	m_list_active.clear();
+	for (int i=0; i < m_core_terms.count(); i++)
+		if (m_core_terms[i]->state() != netlist_input_t::STATE_INP_PASSIVE)
+			m_list_active.add(*m_core_terms[i]);
 }
 
 ATTR_COLD void netlist_net_t::reset()
@@ -568,19 +568,16 @@ ATTR_COLD void netlist_net_t::reset()
 
 	/* rebuild m_list */
 
-	m_list.clear();
-	for (int i=0; i < m_registered.count(); i++)
-		m_list.add(*m_registered[i]);
+	m_list_active.clear();
+	for (int i=0; i < m_core_terms.count(); i++)
+		m_list_active.add(*m_core_terms[i]);
 
-	for (netlist_core_terminal_t *t = m_list.first(); t != NULL; t = m_list.next(t))
-	{
-		t->do_reset();
-	}
-	for (netlist_core_terminal_t *t = m_list.first(); t != NULL; t = m_list.next(t))
-	{
-		if (t->state() != netlist_input_t::STATE_INP_PASSIVE)
-			m_active++;
-	}
+    for (int i=0; i < m_core_terms.count(); i++)
+        m_core_terms[i]->do_reset();
+
+    for (int i=0; i < m_core_terms.count(); i++)
+        if (m_core_terms[i]->state() != netlist_input_t::STATE_INP_PASSIVE)
+            m_active++;
 }
 
 ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &aname)
@@ -625,15 +622,13 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 	}
 	else
 	{
-		netlist_core_terminal_t *p = othernet->m_list.first();
-		while (p != NULL)
+	    for (int i = 0; i < othernet->m_core_terms.count(); i++)
 		{
-			netlist_core_terminal_t *pn = othernet->m_list.next(p);
+	        netlist_core_terminal_t *p = othernet->m_core_terms[i];
 			register_con(*p);
-			p = pn;
 		}
 
-		othernet->m_list.clear(); // FIXME: othernet needs to be free'd from memory
+		othernet->m_core_terms.clear(); // FIXME: othernet needs to be free'd from memory
 	}
 }
 
@@ -641,7 +636,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 {
 	terminal.set_net(*this);
 
-	m_list.insert(terminal);
+	m_core_terms.add(&terminal);
 	m_num_cons++;
 
 	if (terminal.state() != netlist_input_t::STATE_INP_PASSIVE)
@@ -667,7 +662,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_last_Q  << 1) | m_new_Q ];
-	netlist_core_terminal_t *p = m_list.first();
+	netlist_core_terminal_t *p = m_list_active.first();
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
@@ -680,7 +675,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 		{
 		case 2:
 			update_dev(p, mask);
-			p = m_list.next(p);
+			p = m_list_active.next(p);
 			if (p == NULL) break;
 		case 1:
 			update_dev(p, mask);
@@ -689,7 +684,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 			while (p != NULL)
 			{
 				update_dev(p, mask);
-				p = m_list.next(p);
+				p = m_list_active.next(p);
 			}
 			break;
 		}
@@ -700,7 +695,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 		{
 		case 2:
 			update_dev(p, mask);
-			p = m_list.next(p);
+			p = m_list_active.next(p);
 		case 1:
 			update_dev(p, mask);
 			break;
@@ -708,7 +703,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 			do
 			{
 				update_dev(p, mask);
-				p = m_list.next(p);
+				p = m_list_active.next(p);
 			} while (p != NULL);
 			break;
 		}

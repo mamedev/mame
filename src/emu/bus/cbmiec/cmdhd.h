@@ -20,9 +20,7 @@
 #include "imagedev/harddriv.h"
 #include "machine/6522via.h"
 #include "machine/i8255.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsihd.h"
 
 
 
@@ -65,7 +63,7 @@ protected:
 	void cbm_iec_reset(int state);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<scsicb_device> m_scsibus;
+	required_device<SCSI_PORT_DEVICE> m_scsibus;
 };
 
 

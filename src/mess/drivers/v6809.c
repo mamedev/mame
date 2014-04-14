@@ -316,17 +316,6 @@ static SLOT_INTERFACE_START( v6809_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-//-------------------------------------------------
-//  mm58274c_interface rtc_intf
-//-------------------------------------------------
-
-// this is all guess
-static const mm58274c_interface rtc_intf =
-{
-	0,  /*  mode 24*/
-	1   /*  first day of week */
-};
-
 
 // *** Machine ****
 
@@ -379,7 +368,11 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v6809_state, write_acia_clock))
 
-	MCFG_MM58274C_ADD("rtc", rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
+// this is all guess
+	MCFG_MM58274C_MODE24(0) // 12 hour
+	MCFG_MM58274C_DAY1(1)   // monday
+
 	MCFG_MB8876x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

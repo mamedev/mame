@@ -239,6 +239,31 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 			write_outport(OPR ^ 0xff);
 		}
 
+		// timer driving any serial channels?
+		if (BIT(ACR, 7) == 1)
+		{
+			UINT8 csr = m_chanA->get_chan_CSR();
+
+			if ((csr & 0xf0) == 0xd0)	// tx is timer driven
+			{
+				m_chanA->tx_clock_w(half_period);
+			}
+			if ((csr & 0x0f) == 0x0d) 	// rx is timer driven
+			{
+				m_chanA->rx_clock_w(half_period);
+			}
+
+			csr = m_chanB->get_chan_CSR(); 
+			if ((csr & 0xf0) == 0xd0)	// tx is timer driven
+			{
+				m_chanB->tx_clock_w(half_period);
+			}
+			if ((csr & 0x0f) == 0x0d) 	// rx is timer driven
+			{
+				m_chanB->rx_clock_w(half_period);
+			}
+		}
+
 		if (!half_period)
 		{
 			ISR |= INT_COUNTER_READY;
@@ -594,7 +619,7 @@ int mc68681_device::calc_baud(int ch, UINT8 data)
 		baud_rate = baud_rate_ACR_1[data & 0x0f];
 	}
 
-	if ( baud_rate == 0 )
+	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
 	{
 		LOG(( "Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data ));
 	}
@@ -693,7 +718,7 @@ void mc68681_channel::rcv_complete()
 
 void mc68681_channel::tra_complete()
 {
-//  printf("%s ch %d Tx complete\n", tag(), m_ch);
+//	printf("%s ch %d Tx complete\n", tag(), m_ch);
 	tx_ready = 1;
 	SR |= STATUS_TRANSMITTER_READY;
 
@@ -1112,3 +1137,9 @@ void mc68681_channel::ACR_updated()
 {
 	write_chan_reg(1, CSR);
 }
+
+UINT8 mc68681_channel::get_chan_CSR()
+{
+	return CSR;
+}
+

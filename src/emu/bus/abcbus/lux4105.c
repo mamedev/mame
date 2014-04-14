@@ -10,9 +10,7 @@
 *********************************************************************/
 
 #include "lux4105.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsihd.h"
 #include "bus/scsi/s1410.h"
 
 
@@ -32,32 +30,43 @@
 const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::sasi_bsy_w )
+WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
 {
+	m_sasi_bsy = state;
+
 	if (state)
 	{
-		m_sasibus->scsi_sel_w(0);
+		m_sasibus->write_sel(0);
 	}
 }
 
-WRITE_LINE_MEMBER( luxor_4105_device::sasi_io_w )
+WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_io )
 {
-	if (!state)
+	m_sasi_io = state;
+
+	if (!m_sasi_io)
 	{
-		m_sasibus->scsi_data_w(m_data);
+		m_sasi_data_out->write(m_data);
 	}
 
 	update_trrq_int();
 }
 
-WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
+WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 {
-	if (state)
+	m_sasi_req = state;
+
+	if (m_sasi_req)
 	{
-		m_sasibus->scsi_ack_w(0);
+		m_sasibus->write_ack(0);
 	}
 
 	update_trrq_int();
+}
+
+WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
+{
+	m_sasi_cd = state;
 }
 
 
@@ -66,12 +75,16 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( luxor_4105 )
-	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
-	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_4105_device, sasi_bsy_w))
-	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_4105_device, sasi_io_w))
-	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_4105_device, sasi_req_w))
+	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
+	MCFG_SCSI_BSY_HANDLER(WRITELINE(luxor_4105_device, write_sasi_bsy))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(luxor_4105_device, write_sasi_req))
+	MCFG_SCSI_CD_HANDLER(WRITELINE(luxor_4105_device, write_sasi_cd))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(luxor_4105_device, write_sasi_io))
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
+	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
 
 
@@ -131,8 +144,8 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 
 inline void luxor_4105_device::update_trrq_int()
 {
-	int cd = !m_sasibus->scsi_cd_r();
-	int req = !m_sasibus->scsi_req_r();
+	int cd = !m_sasi_cd;
+	int req = !m_sasi_req;
 	int trrq = !(cd & !req);
 
 	if (BIT(m_dma, 5))
@@ -167,7 +180,9 @@ inline void luxor_4105_device::update_trrq_int()
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "lux4105", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
-		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_sasibus(*this, SASIBUS_TAG),
+		m_sasi_data_out(*this, "sasi_data_out"),
+		m_sasi_data_in(*this, "sasi_data_in"),
 		m_1e(*this, "1E"),
 		m_5e(*this, "5E")
 {
@@ -197,8 +212,8 @@ void luxor_4105_device::device_reset()
 	m_data = 0;
 	m_dma = 0;
 
-	m_sasibus->scsi_rst_w(1);
-	m_sasibus->scsi_rst_w(0);
+	m_sasibus->write_rst(1);
+	m_sasibus->write_rst(0);
 
 	m_slot->trrq_w(1);
 }
@@ -249,10 +264,10 @@ UINT8 luxor_4105_device::abcbus_stat()
 
 		*/
 
-		data = m_sasibus->scsi_bsy_r();
-		data |= m_sasibus->scsi_req_r() << 2;
-		data |= m_sasibus->scsi_cd_r() << 3;
-		data |= m_sasibus->scsi_io_r() << 6;
+		data = m_sasi_bsy;
+		data |= m_sasi_req << 2;
+		data |= m_sasi_cd << 3;
+		data |= m_sasi_io << 6;
 	}
 
 	return data;
@@ -269,19 +284,19 @@ UINT8 luxor_4105_device::abcbus_inp()
 
 	if (m_cs)
 	{
-		if (!m_sasibus->scsi_bsy_r())
+		if (!m_sasi_bsy)
 		{
 			data = m_1e->read();
 		}
 		else
 		{
-			if (m_sasibus->scsi_io_r())
+			if (m_sasi_io)
 			{
-				data = m_sasibus->scsi_data_r();
+				data = m_sasi_data_in->read();
 
-				if (m_sasibus->scsi_req_r())
+				if (m_sasi_req)
 				{
-					m_sasibus->scsi_ack_w(1);
+					m_sasibus->write_ack(1);
 				}
 			}
 		}
@@ -301,13 +316,13 @@ void luxor_4105_device::abcbus_out(UINT8 data)
 	{
 		m_data = data;
 
-		if (!m_sasibus->scsi_io_r())
+		if (!m_sasi_io)
 		{
-			m_sasibus->scsi_data_w(m_data);
+			m_sasi_data_out->write(m_data);
 
-			if (m_sasibus->scsi_req_r())
+			if (m_sasi_req)
 			{
-				m_sasibus->scsi_ack_w(1);
+				m_sasibus->write_ack(1);
 			}
 		}
 	}
@@ -322,7 +337,7 @@ void luxor_4105_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		m_sasibus->scsi_sel_w(1);
+		m_sasibus->write_sel(1);
 	}
 }
 
@@ -338,8 +353,8 @@ void luxor_4105_device::abcbus_c3(UINT8 data)
 		m_data = 0;
 		m_dma = 0;
 
-		m_sasibus->scsi_rst_w(1);
-		m_sasibus->scsi_rst_w(0);
+		m_sasibus->write_rst(1);
+		m_sasibus->write_rst(0);
 	}
 }
 

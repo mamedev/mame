@@ -8,16 +8,68 @@ Base class for HLE'd SCSI devices.
 
 */
 
-#include "machine/scsihle.h"
+#include "scsihle.h"
 
 scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	scsidev_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	scsi_port_interface(mconfig, *this),
+	m_scsi_id(*this, "SCSI_ID"),
+	m_input_data(0)
 {
+}
+
+static INPUT_PORTS_START(scsihle)
+	PORT_START("SCSI_ID")
+	PORT_CONFNAME(0x07, 0x07, "SCSI ID")
+	PORT_CONFSETTING( 0x00, "0")
+	PORT_CONFSETTING( 0x01, "1")
+	PORT_CONFSETTING( 0x02, "2")
+	PORT_CONFSETTING( 0x03, "3")
+	PORT_CONFSETTING( 0x04, "4")
+	PORT_CONFSETTING( 0x05, "5")
+	PORT_CONFSETTING( 0x06, "6")
+	PORT_CONFSETTING( 0x07, "7")
+INPUT_PORTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_0 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 0 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_1 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 1 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_2 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 2 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_3 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 3 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_4 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 4 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_5 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 5 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_6 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 6 )
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START( SCSI_ID_7 )
+	DEVICE_INPUT_DEFAULTS( "SCSI_ID", 7, 7 )
+DEVICE_INPUT_DEFAULTS_END
+
+ioport_constructor scsihle_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(scsihle);
 }
 
 void scsihle_device::device_start()
 {
-	scsidev_device::device_start();
 	t10_start(*this);
 
 	req_timer = timer_alloc(0);
@@ -27,18 +79,13 @@ void scsihle_device::device_start()
 
 void scsihle_device::device_reset()
 {
+	scsiID = m_scsi_id->read();
 	t10_reset();
 }
 
 int scsihle_device::GetDeviceID()
 {
 	return scsiID;
-}
-
-void scsihle_device::static_set_deviceid( device_t &device, int _scsiID )
-{
-	scsihle_device &scsidev = downcast<scsihle_device &>(device);
-	scsidev.scsiID = _scsiID;
 }
 
 #define BSY_DELAY_NS    50
@@ -49,7 +96,7 @@ static const char *const phasenames[] =
 	"data out", "data in", "command", "status", "none", "none", "message out", "message in", "bus free","select"
 };
 
-// scsidev
+// scsihle
 #define SCSI_CMD_BUFFER_WRITE ( 0x3b )
 #define SCSI_CMD_BUFFER_READ ( 0x3c )
 
@@ -74,6 +121,19 @@ static const char *const phasenames[] =
 #define LOGLEVEL            0
 
 #define LOG(level, ...)     if(LOGLEVEL>=level) logerror(__VA_ARGS__)
+
+void scsihle_device::data_out(UINT8 data)
+{
+//	printf( "%s data out %02x\n", tag(), data );
+	output_data0(BIT(data, 0));
+	output_data1(BIT(data, 1));
+	output_data2(BIT(data, 2));
+	output_data3(BIT(data, 3));
+	output_data4(BIT(data, 4));
+	output_data5(BIT(data, 5));
+	output_data6(BIT(data, 6));
+	output_data7(BIT(data, 7));
+}
 
 void scsihle_device::scsi_out_req_delay(UINT8 state)
 {
@@ -117,7 +177,7 @@ void scsihle_device::scsibus_read_data()
 		ReadData(buffer, data_last);
 		bytes_left-=data_last;
 
-		scsi_out( buffer[ data_idx++ ], SCSI_MASK_DATA );
+		data_out(buffer[ data_idx++ ]);
 	}
 }
 
@@ -126,7 +186,7 @@ void scsihle_device::scsibus_write_data()
 	if (data_last > 0)
 	{
 		WriteData(buffer, data_last);
-		bytes_left-=data_last;
+		bytes_left -= data_last;
 	}
 
 	data_idx=0;
@@ -134,33 +194,33 @@ void scsihle_device::scsibus_write_data()
 
 void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	switch( tid )
+	switch (tid)
 	{
 	case 0:
-		scsi_out(param ? SCSI_MASK_REQ : 0, SCSI_MASK_REQ);
+		output_req(param);
 		break;
 
 	case 1:
-		scsi_out(param ? SCSI_MASK_BSY : 0, SCSI_MASK_BSY);
+		output_bsy(param);
 		break;
 
 	case 2:
 		// Some drives, notably the ST225N and ST125N, accept fromat unit commands
 		// with flags set indicating that bad block data should be transfered but
 		// don't then implemnt a data in phase, this timeout it to catch these !
-		if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT) && (data_idx==0))
+		if (IS_COMMAND(SCSI_CMD_FORMAT_UNIT) && (data_idx==0))
 		{
 			scsi_change_phase(SCSI_PHASE_STATUS);
-	}
+		}
 		break;
-}
+	}
 }
 
 void scsihle_device::scsibus_exec_command()
 {
 	int command_local = 0;
 
-	if(LOGLEVEL)
+	if (LOGLEVEL)
 		dump_command_bytes();
 
 	//is_linked=command[cmd_idx-1] & 0x01;
@@ -173,7 +233,7 @@ void scsihle_device::scsibus_exec_command()
 		case SCSI_CMD_FORMAT_UNIT:
 			LOG(1,"SCSIBUS: format unit command[1]=%02X & 0x10\n",(command[1] & 0x10));
 			command_local=1;
-			if((command[1] & 0x10)==0x10)
+			if ((command[1] & 0x10)==0x10)
 				m_phase = SCSI_PHASE_DATAOUT;
 			else
 				m_phase = SCSI_PHASE_STATUS;
@@ -218,7 +278,7 @@ void scsihle_device::scsibus_exec_command()
 		case SCSI_CMD_BUFFER_READ:
 			LOG(1,"SCSIBUS: read_buffer\n");
 			command_local=1;
-			bytes_left=(command[7]<<8)+command[8];
+			bytes_left = (command[7]<<8) + command[8];
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			break;
@@ -227,7 +287,7 @@ void scsihle_device::scsibus_exec_command()
 
 	// Check for locally executed command, if not then pass it on
 	// to the disk driver
-	if(!command_local)
+	if (!command_local)
 	{
 		SetCommand(command, cmd_idx);
 		ExecCommand();
@@ -271,227 +331,245 @@ void scsihle_device::scsi_change_phase(UINT8 newphase)
 	switch(m_phase)
 	{
 		case SCSI_PHASE_BUS_FREE:
-			scsi_out( 0, SCSI_MASK_ALL );
+			output_bsy(0);
+			// sel
+			output_cd(0);
+			output_io(0);
+			output_msg(0);
+			output_req(0);
+			// ack
+			// atn
+			// rst
+			data_out(0);
 			LOG(1,"SCSIBUS: done\n\n");
 			break;
 
 		case SCSI_PHASE_COMMAND:
-			scsi_out( SCSI_MASK_CD, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
+			output_cd(1);
+			output_io(0);
+			output_msg(0);
+			scsi_out_req_delay(1);
+			data_out(0);
 			LOG(1,"\nSCSIBUS: Command begin\n");
-			scsi_out_req_delay( 1 );
 			break;
 
 		case SCSI_PHASE_DATAOUT:
-			scsi_out( 0, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
-			scsi_out_req_delay( 1 );
+			output_cd(0);
+			output_io(0);
+			output_msg(0);
+			scsi_out_req_delay(1);
+			data_out(0);
 			break;
 
 		case SCSI_PHASE_DATAIN:
-			scsi_out( SCSI_MASK_IO, SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
-			scsi_out_req_delay( 1 );
+			output_cd(0);
+			output_io(1);
+			output_msg(0);
+			scsi_out_req_delay(1);
 			break;
 
 		case SCSI_PHASE_STATUS:
-			scsi_out( m_status_code | SCSI_MASK_CD | SCSI_MASK_IO, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
-			scsi_out_req_delay( 1 );
+			output_cd(1);
+			output_io(1);
+			output_msg(0);
+			scsi_out_req_delay(1);
+			data_out(m_status_code);
 			break;
 
 		case SCSI_PHASE_MESSAGE_OUT:
-			scsi_out( SCSI_MASK_CD | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
-			scsi_out_req_delay( 1 );
+			output_cd(1);
+			output_io(0);
+			output_msg(1);
+			scsi_out_req_delay(1);
+			data_out(0);
 			break;
 
 		case SCSI_PHASE_MESSAGE_IN:
-			scsi_out( 0 | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );// no errors for the time being !
-			scsi_out_req_delay( 1 );
+			output_cd(1);
+			output_io(1);
+			output_msg(1);
+			scsi_out_req_delay(1);
+			data_out(0); // no errors for the time being !
 			break;
 	}
 }
 
-void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
+WRITE_LINE_MEMBER( scsihle_device::input_sel )
 {
-	// Reset aborts and returns to bus free
-	if( ( mask & SCSI_MASK_RST ) != 0 && ( data & SCSI_MASK_RST ) != 0 )
-	{
-		scsi_change_phase(SCSI_PHASE_BUS_FREE);
-		cmd_idx=0;
-		data_idx=0;
-		is_linked=0;
-
-		return;
-	}
-
+//	printf( "sel %d %d %02x\n", state, m_phase, m_input_data );
 	switch (m_phase)
 	{
-		case SCSI_PHASE_BUS_FREE:
-			// Note this assumes we only have one initiator and therefore
-			// only one line active.
-			if( ( mask & SCSI_MASK_SEL ) != 0 && scsibus_driveno(data & SCSI_MASK_DATA) == scsiID)
+	case SCSI_PHASE_BUS_FREE:
+		// Note this assumes we only have one initiator and therefore
+		// only one line active.
+		if (scsibus_driveno(m_input_data) == scsiID)
+		{
+			void *hdfile = NULL;
+			// Check to see if device had image file mounted, if not, do not set busy,
+			// and stay busfree.
+			GetDevice(&hdfile);
+			if (hdfile != NULL)
 			{
-				void *hdfile = NULL;
-				// Check to see if device had image file mounted, if not, do not set busy,
-				// and stay busfree.
-				GetDevice(&hdfile);
-				if(hdfile!=(void *)NULL)
+				if (!state)
 				{
-					if( ( data & SCSI_MASK_SEL ) == 0 )
-					{
-						scsi_change_phase(SCSI_PHASE_COMMAND);
-					}
-					else
-					{
-						sel_timer->adjust(attotime::from_nsec(BSY_DELAY_NS),1);
-					}
-				}
-			}
-			break;
-
-		case SCSI_PHASE_COMMAND:
-			if( ( mask & SCSI_MASK_ACK ) != 0 )
-			{
-				if( ( data & SCSI_MASK_ACK ) == 0 )
-				{
-					command[ cmd_idx++ ] = data & SCSI_MASK_DATA;
-
-					// If the command is ready go and execute it
-					if(cmd_idx==get_scsi_cmd_len(command[0]))
-					{
-						scsibus_exec_command();
-					}
-					else
-					{
-						scsi_out_req_delay( 1 );
-					}
+					scsi_change_phase(SCSI_PHASE_COMMAND);
 				}
 				else
 				{
-					scsi_out_req_delay( 0 );
+					sel_timer->adjust(attotime::from_nsec(BSY_DELAY_NS),1);
 				}
+			}
+		}
+		break;
+	}
+}
+
+WRITE_LINE_MEMBER( scsihle_device::input_ack )
+{
+	switch (m_phase)
+	{
+		case SCSI_PHASE_COMMAND:
+			if (!state)
+			{
+				command[ cmd_idx++ ] = m_input_data;
+
+				// If the command is ready go and execute it
+				if (cmd_idx == get_scsi_cmd_len(command[0]))
+				{
+					scsibus_exec_command();
+				}
+				else
+				{
+					scsi_out_req_delay(1);
+				}
+			}
+			else
+			{
+				scsi_out_req_delay(0);
 			}
 			break;
 
 		case SCSI_PHASE_DATAIN:
-			if( ( mask & SCSI_MASK_ACK ) != 0 )
+			if (!state)
 			{
-				if( ( data & SCSI_MASK_ACK ) == 0 )
+				// check to see if we have reached the end of the block buffer
+				// and that there is more data to read from the scsi disk
+				if (data_idx == m_sector_bytes && bytes_left > 0)
 				{
-					// check to see if we have reached the end of the block buffer
-					// and that there is more data to read from the scsi disk
-					if(data_idx == m_sector_bytes && bytes_left > 0)
-					{
-						scsibus_read_data();
-						scsi_out_req_delay( 1 );
-					}
-					else if(data_idx == data_last && bytes_left == 0)
-					{
-						scsi_change_phase(SCSI_PHASE_STATUS);
-					}
-					else
-					{
-						scsi_out( buffer[ data_idx++ ], SCSI_MASK_DATA );
-						scsi_out_req_delay( 1 );
-					}
+					scsibus_read_data();
+					scsi_out_req_delay(1);
+				}
+				else if (data_idx == data_last && bytes_left == 0)
+				{
+					scsi_change_phase(SCSI_PHASE_STATUS);
 				}
 				else
 				{
-					scsi_out_req_delay( 0 );
+					data_out(buffer[data_idx++]);
+					scsi_out_req_delay(1);
 				}
+			}
+			else
+			{
+				scsi_out_req_delay(0);
 			}
 			break;
 
 		case SCSI_PHASE_DATAOUT:
-			if( ( mask & SCSI_MASK_ACK ) != 0 )
+			if (!state)
 			{
-				if( ( data & SCSI_MASK_ACK ) == 0 )
+				//LOG(1,"SCSIBUS:bytes_left=%02X data_idx=%02X\n",bytes_left,data_idx);
+				buffer[data_idx++] = m_input_data;
+
+				if (IS_COMMAND(SCSI_CMD_FORMAT_UNIT))
 				{
-					//LOG(1,"SCSIBUS:bytes_left=%02X data_idx=%02X\n",bytes_left,data_idx);
-					buffer[data_idx++]=data & SCSI_MASK_DATA;
+					// If we have the first byte, then cancel the dataout timout
+					if (data_idx == 1)
+						dataout_timer->adjust(attotime::never);
 
-					if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT))
+					// When we have the first 3 bytes, calculate how many more are in the
+					// bad block list.
+					if (data_idx == 3)
 					{
-						// If we have the first byte, then cancel the dataout timout
-						if(data_idx==1)
-							dataout_timer->adjust(attotime::never);
-
-						// When we have the first 3 bytes, calculate how many more are in the
-						// bad block list.
-						if(data_idx==3)
-						{
-							bytes_left+=((buffer[2]<<8)+buffer[3]);
-							LOG(1,"format_unit reading an extra %d bytes\n",bytes_left-4);
-							dump_data_bytes(4);
-						}
+						bytes_left += ((buffer[2]<<8) + buffer[3]);
+						LOG(1, "format_unit reading an extra %d bytes\n", bytes_left - 4);
+						dump_data_bytes(4);
 					}
+				}
 
-					// If the data buffer is full flush it to the SCSI disk
+				// If the data buffer is full flush it to the SCSI disk
 
-					data_last = (bytes_left >= m_sector_bytes) ? m_sector_bytes : bytes_left;
+				data_last = (bytes_left >= m_sector_bytes) ? m_sector_bytes : bytes_left;
 
-					if(data_idx == data_last)
-						scsibus_write_data();
+				if (data_idx == data_last)
+					scsibus_write_data();
 
-					if(data_idx == 0 && bytes_left == 0)
-					{
-						scsi_change_phase(SCSI_PHASE_STATUS);
-					}
-					else
-					{
-						scsi_out_req_delay( 1 );
-					}
+				if (data_idx == 0 && bytes_left == 0)
+				{
+					scsi_change_phase(SCSI_PHASE_STATUS);
 				}
 				else
 				{
-					scsi_out_req_delay( 0 );
+					scsi_out_req_delay(1);
 				}
+			}
+			else
+			{
+				scsi_out_req_delay(0);
 			}
 			break;
 
 		case SCSI_PHASE_STATUS:
-			if( ( mask & SCSI_MASK_ACK ) != 0 )
+			if (!state)
 			{
-				if( ( data & SCSI_MASK_ACK ) == 0 )
+				if (cmd_idx > 0)
 				{
-					if(cmd_idx > 0)
-					{
-						scsi_change_phase(SCSI_PHASE_MESSAGE_IN);
-					}
-					else
-					{
-						scsi_out_req_delay( 1 );
-					}
+					scsi_change_phase(SCSI_PHASE_MESSAGE_IN);
 				}
 				else
 				{
-					cmd_idx++;
-					scsi_out_req_delay( 0 );
+					scsi_out_req_delay(1);
 				}
+			}
+			else
+			{
+				cmd_idx++;
+				scsi_out_req_delay(0);
 			}
 			break;
 
 		case SCSI_PHASE_MESSAGE_IN:
-			if( ( mask & SCSI_MASK_ACK ) != 0 )
+			if (!state)
 			{
-				if( ( data & SCSI_MASK_ACK ) == 0 )
+				if (cmd_idx > 0)
 				{
-					if(cmd_idx > 0)
-					{
-						if(is_linked)
-							scsi_change_phase(SCSI_PHASE_COMMAND);
-						else
-							scsi_change_phase(SCSI_PHASE_BUS_FREE);
-					}
+					if (is_linked)
+						scsi_change_phase(SCSI_PHASE_COMMAND);
 					else
-					{
-						scsi_out_req_delay( 1 );
-					}
+						scsi_change_phase(SCSI_PHASE_BUS_FREE);
 				}
 				else
 				{
-					cmd_idx++;
-					scsi_out_req_delay( 0 );
+					scsi_out_req_delay(1);
 				}
 			}
+			else
+			{
+				cmd_idx++;
+				scsi_out_req_delay(0);
+			}
 			break;
+	}
+}
+
+WRITE_LINE_MEMBER( scsihle_device::input_rst )
+{
+	if (state)
+	{
+		scsi_change_phase(SCSI_PHASE_BUS_FREE);
+		cmd_idx = 0;
+		data_idx = 0;
+		is_linked = 0;
 	}
 }
 

@@ -1,7 +1,7 @@
 #ifndef LSI53C810_H
 #define LSI53C810_H
 
-#include "machine/scsihle.h"
+#include "legscsi.h"
 
 typedef device_delegate<void (int state)> lsi53c810_irq_delegate;
 #define LSI53C810_IRQ_CB(name)  void name(int state)
@@ -13,7 +13,7 @@ typedef device_delegate<UINT32 (UINT32 dsp)> lsi53c810_fetch_delegate;
 #define LSI53C810_FETCH_CB(name)  UINT32 name(UINT32 dsp)
 
 
-class lsi53c810_device : public device_t
+class lsi53c810_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -67,7 +67,6 @@ private:
 	UINT32 lsi53c810_dasm_fetch(UINT32 pc);
 	unsigned lsi53c810_dasm(char *buf, UINT32 pc);
 
-	scsihle_device *devices[8]; /* SCSI IDs 0-7 */
 	UINT8 last_id;
 
 	UINT8 scntl0;

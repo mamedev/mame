@@ -50,9 +50,9 @@
 #include "video/newport.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
-#include "machine/scsibus.h"
-#include "machine/scsicd.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
+#include "bus/scsi/scsihd.h"
 #include "machine/wd33c93.h"
 
 struct RTC_t
@@ -97,19 +97,20 @@ public:
 		TIMER_IP22_MSEC
 	};
 
-	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_wd33c93(*this, "scsi:wd33c93"),
-	m_unkpbus0(*this, "unkpbus0"),
-	m_mainram(*this, "mainram"),
-	m_lpt0(*this, "lpt_0"),
-	m_pit(*this, "pit8254"),
-	m_sgi_mc(*this, "sgi_mc"),
-	m_newport(*this, "newport"),
-	m_dac(*this, "dac"),
-	m_kbdc8042(*this, "kbdc")
-	{ }
+	ip22_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_wd33c93(*this, "wd33c93"),
+		m_unkpbus0(*this, "unkpbus0"),
+		m_mainram(*this, "mainram"),
+		m_lpt0(*this, "lpt_0"),
+		m_pit(*this, "pit8254"),
+		m_sgi_mc(*this, "sgi_mc"),
+		m_newport(*this, "newport"),
+		m_dac(*this, "dac"),
+		m_kbdc8042(*this, "kbdc")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
@@ -1275,7 +1276,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 				if (words <= (512/4))
 				{
 					// one-shot
-					//m_wd33c93->get_dma_data(m_wd33c93->get_dma_count(), m_dma_buffer);
+					//m_wd33c93->dma_read_data(m_wd33c93->get_dma_count(), m_dma_buffer);
 
 					while (words)
 					{
@@ -1302,13 +1303,13 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 					}
 
 					words = m_wd33c93->get_dma_count();
-					m_wd33c93->write_data(words, m_dma_buffer);
+					m_wd33c93->dma_write_data(words, m_dma_buffer);
 				}
 				else
 				{
 					while (words)
 					{
-						//m_wd33c93->get_dma_data(512, m_dma_buffer);
+						//m_wd33c93->dma_read_data(512, m_dma_buffer);
 						twords = 512/4;
 						m_HPC3.nSCSI0Descriptor += 512;
 						dptr = 0;
@@ -1337,7 +1338,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 							twords--;
 						}
 
-						m_wd33c93->write_data(512, m_dma_buffer);
+						m_wd33c93->dma_write_data(512, m_dma_buffer);
 
 						words -= (512/4);
 					}
@@ -1416,7 +1417,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 				if (words <= (1024/4))
 				{
 					// one-shot
-					m_wd33c93->get_dma_data(m_wd33c93->get_dma_count(), m_dma_buffer);
+					m_wd33c93->dma_read_data(m_wd33c93->get_dma_count(), m_dma_buffer);
 
 					while (words)
 					{
@@ -1439,7 +1440,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 				{
 					while (words)
 					{
-						m_wd33c93->get_dma_data(512, m_dma_buffer);
+						m_wd33c93->dma_read_data(512, m_dma_buffer);
 						twords = 512/4;
 						sptr = 0;
 
@@ -1585,6 +1586,12 @@ static const mips3_config config =
 };
 #endif
 
+static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+	MCFG_DEVICE_MODIFY( "cdda" )
+	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -1622,15 +1629,14 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_ADD( "dac", DAC, 0 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
-	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
-	MCFG_WD33C93_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, ip22_state,scsi_irq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "cdrom", SCSICD, SCSI_ID_4)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^rspeaker", 1.0)
+	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_WD33C93_IRQ_CB(WRITELINE(ip22_state,scsi_irq))
 
 	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)

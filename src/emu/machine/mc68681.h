@@ -56,6 +56,8 @@ public:
 
 	void ACR_updated();
 
+	UINT8 get_chan_CSR();
+
 private:
 	/* Registers */
 	UINT8 CR;  /* Command register */

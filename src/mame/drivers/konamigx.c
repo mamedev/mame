@@ -102,7 +102,6 @@
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "includes/konamigx.h"
-#include "machine/adc083x.h"
 #include "rendlay.h"
 
 #define GX_DEBUG     0
@@ -463,7 +462,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 		  bit 0: eeprom data
 		*/
 
-		ioport("EEPROMOUT")->write(odata, 0xff);
+		m_eepromout->write(odata, 0xff);
 
 		konamigx_wrport1_0 = odata;
 	}
@@ -708,14 +707,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_hbinterrupt)
 
 /* National Semiconductor ADC0834 4-channel serial ADC emulation */
 
-static double adc0834_callback( device_t *device, UINT8 input )
+ADC083X_INPUT_CB(konamigx_state::adc0834_callback)
 {
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * device->machine().root_device().ioport("AN0")->read()) / 255.0; // steer
+		return (double)(5 * m_an0->read()) / 255.0; // steer
 	case ADC083X_CH1:
-		return (double)(5 * device->machine().root_device().ioport("AN1")->read()) / 255.0; // gas
+		return (double)(5 * m_an1->read()) / 255.0; // gas
 	case ADC083X_VREF:
 		return 5;
 	}
@@ -725,16 +724,16 @@ static double adc0834_callback( device_t *device, UINT8 input )
 
 READ32_MEMBER(konamigx_state::le2_gun_H_r)
 {
-	int p1x = ioport("LIGHT0_X")->read()*290/0xff+20;
-	int p2x = ioport("LIGHT1_X")->read()*290/0xff+20;
+	int p1x = m_light0_x->read()*290/0xff+20;
+	int p2x = m_light1_x->read()*290/0xff+20;
 
 	return (p1x<<16)|p2x;
 }
 
 READ32_MEMBER(konamigx_state::le2_gun_V_r)
 {
-	int p1y = ioport("LIGHT0_Y")->read()*224/0xff;
-	int p2y = ioport("LIGHT1_Y")->read()*224/0xff;
+	int p1y = m_light0_y->read()*224/0xff;
+	int p2y = m_light1_y->read()*224/0xff;
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;
@@ -1700,7 +1699,7 @@ static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
 
 	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CALLBACK(adc0834_callback)
+	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
@@ -1714,7 +1713,7 @@ static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
 
 	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CALLBACK(adc0834_callback)
+	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )

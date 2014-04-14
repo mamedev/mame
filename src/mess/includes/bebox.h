@@ -31,7 +31,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_ppc1(*this, "ppc1"),
 			m_ppc2(*this, "ppc2"),
-			m_lsi53c810(*this, "scsi:lsi53c810"),
+			m_lsi53c810(*this, "lsi53c810"),
 			m_dma8237_1(*this, "dma8237_1"),
 			m_dma8237_2(*this, "dma8237_2"),
 			m_pic8259_1(*this, "pic8259_1"),
