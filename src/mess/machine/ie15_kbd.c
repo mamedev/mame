@@ -19,6 +19,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device
 	, m_io_kbd2(*this, "TERM_LINE2")
 	, m_io_kbd3(*this, "TERM_LINE3")
 	, m_io_kbdc(*this, "TERM_LINEC")
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -29,6 +30,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const 
 	, m_io_kbd2(*this, "TERM_LINE2")
 	, m_io_kbd3(*this, "TERM_LINE3")
 	, m_io_kbdc(*this, "TERM_LINEC")
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -152,22 +154,9 @@ machine_config_constructor ie15_keyboard_device::device_mconfig_additions() cons
 
 void ie15_keyboard_device::device_start()
 {
-	m_keyboard_func.resolve(m_keyboard_cb, *this);
+	m_keyboard_cb.resolve_safe();
 	m_timer = timer_alloc();
 	m_rom = (UINT8*)memregion("ie15kbd")->base();
-}
-
-void ie15_keyboard_device::device_config_complete()
-{
-	const ie15_keyboard_interface *intf = reinterpret_cast<const ie15_keyboard_interface *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<ie15_keyboard_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_keyboard_cb, 0, sizeof(m_keyboard_cb));
-	}
 }
 
 void ie15_keyboard_device::device_reset()

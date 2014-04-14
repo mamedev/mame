@@ -56,6 +56,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_rs232(*this, "rs232"),
+		m_screen(*this, "screen"),
 		m_io_keyboard(*this, "keyboard")
 	{ }
 
@@ -127,6 +128,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<rs232_port_device> m_rs232;
+	required_device<screen_device> m_screen;
 	required_ioport m_io_keyboard;
 };
 
@@ -337,13 +339,13 @@ READ8_MEMBER( ie15_state::flag_r ) {
 	switch (offset)
 	{
 		case 0: // hsync pulse (not hblank)
-			ret = machine().first_screen()->hpos() < IE15_HORZ_START;
+			ret = m_screen->hpos() < IE15_HORZ_START;
 			break;
 		case 1: // marker scanline
-			ret = (machine().first_screen()->vpos() % 11) > 7;
+			ret = (m_screen->vpos() % 11) > 7;
 			break;
 		case 2: // vblank
-			ret = !machine().first_screen()->vblank();
+			ret = !m_screen->vblank();
 			break;
 		case 4:
 			ret = m_kb_ruslat;
@@ -438,11 +440,6 @@ WRITE16_MEMBER( ie15_state::kbd_put )
 	}
 }
 
-static IE15_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER16(ie15_state, kbd_put)
-};
-
 void ie15_state::machine_reset()
 {
 	memset(&m_video, 0, sizeof(m_video));
@@ -509,7 +506,7 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
 	UINT16 x, chr;
 
 	bg = 0; fg = 1; ra = scanline % 8;
-	blink = (machine().first_screen()->frame_number() % 10) > 4;
+	blink = (m_screen->frame_number() % 10) > 4;
 	red = m_io_keyboard->read() & IE_KB_RED;
 
 	for (x = offset; x < offset + 80; x++)
@@ -559,11 +556,11 @@ void ie15_state::update_leds()
 */
 TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
 {
-	UINT16 y = machine().first_screen()->vpos();
+	UINT16 y = m_screen->vpos();
 
 	DBG_LOG(3,"scanline_cb",
 		("addr %03x frame %" I64FMT "d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
-		m_video.ptr2, machine().first_screen()->frame_number(), machine().first_screen()->hpos(), y,
+		m_video.ptr2, m_screen->frame_number(), m_screen->hpos(), y,
 		y%11, m_video.enable, m_video.cursor, m_video.line25));
 
 	if (y < IE15_VERT_START) return;
@@ -625,7 +622,8 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_DEFAULT_LAYOUT( layout_ie15 )
 
 	/* Devices */
-	MCFG_IE15_KEYBOARD_ADD("keyboard", keyboard_intf)
+	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
+	MCFG_IE15_KEYBOARD_CB(WRITE16(ie15_state, kbd_put))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_state, serial_rx_callback))

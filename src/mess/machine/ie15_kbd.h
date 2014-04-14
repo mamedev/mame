@@ -24,36 +24,26 @@
 #define IE_KB_SI    0x0f
 #define IE_KB_SO    0x0e
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct ie15_keyboard_interface
-{
-	devcb_write16 m_keyboard_cb;
-};
-
-#define IE15_KEYBOARD_INTERFACE(name) const ie15_keyboard_interface (name) =
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_IE15_KEYBOARD_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, IE15_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_IE15_KEYBOARD_CB(_devcb) \
+	devcb = &ie15_keyboard_device::set_keyboard_callback(*device, DEVCB2_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 class ie15_keyboard_device :
-	public device_t,
-	public ie15_keyboard_interface
+	public device_t
 {
 public:
 	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<ie15_keyboard_device &>(device).m_keyboard_cb.set_callback(object); }
 
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -69,8 +59,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
-	virtual void send_key(UINT16 code) { m_keyboard_func(0, code); }
+	virtual void send_key(UINT16 code) { m_keyboard_cb((offs_t)0, code); }
 	emu_timer *m_timer;
 
 private:
@@ -81,7 +70,7 @@ private:
 	UINT8 m_ruslat;
 	UINT8 *m_rom;
 
-	devcb_resolved_write16 m_keyboard_func;
+	devcb2_write16 m_keyboard_cb;
 };
 
 extern const device_type IE15_KEYBOARD;
