@@ -732,7 +732,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 			{
 				assert(palette == m_screen->palette()->palette());
 				m_palclient.reset(global_alloc(palette_client(*palette)));
-				m_bcglookup.resize(palette->num_colors() * palette->num_groups());
+				m_bcglookup.resize(palette->max_index());
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
@@ -824,7 +824,7 @@ void render_container::recompute_lookups()
 	{
 		palette_t &palette = m_palclient->palette();
 		const rgb_t *adjusted_palette = palette.entry_list_adjusted();
-		int colors = palette.num_colors() * palette.num_groups();
+		int colors = palette.max_index();
 
 		for (int i = 0; i < colors; i++)
 		{
