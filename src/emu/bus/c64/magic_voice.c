@@ -185,20 +185,6 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_cb_w )
 	m_exrom = state;
 }
 
-static const tpi6525_interface tpi_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_irq_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_ca_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_cb_w),
-};
-
-
 //-------------------------------------------------
 //  t6721_interface
 //-------------------------------------------------
@@ -235,7 +221,14 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
-	MCFG_TPI6525_ADD(MOS6525_TAG, tpi_intf)
+	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
+	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_irq_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(c64_magic_voice_cartridge_device, tpi_pa_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(c64_magic_voice_cartridge_device, tpi_pa_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(c64_magic_voice_cartridge_device, tpi_pb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(c64_magic_voice_cartridge_device, tpi_pb_w))
+	MCFG_TPI6525_OUT_CA_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_ca_w))
+	MCFG_TPI6525_OUT_CA_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_cb_w))
 	MCFG_40105_ADD(CMOS40105_TAG, DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w), NULL)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

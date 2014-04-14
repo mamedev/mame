@@ -502,19 +502,6 @@ MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 	MACHINE_RESET_CALL_LEGACY( amigacd );
 }
 
-static const tpi6525_interface cdtv_tpi_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amigacd_tpi6525_irq),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(amiga_state, amigacd_tpi6525_portb_w),
-	DEVCB_DRIVER_MEMBER(amiga_state, amigacd_tpi6525_portc_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 READ8_MEMBER(a1200_state::a1200_cia_0_portA_r)
 {
 	UINT8 ret = ioport("CIA0PORTA")->read() & 0xc0; /* Gameport 1 and 0 buttons */
@@ -684,8 +671,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( cdtv, ntsc, cdtv_state)
 	MCFG_CDROM_ADD( "cdrom", cdtv_cdrom)
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
 
-	MCFG_TPI6525_ADD("tpi6525", cdtv_tpi_intf)
-
+	MCFG_DEVICE_ADD("tpi6525", TPI6525, 0)
+	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(amiga_state, amigacd_tpi6525_irq))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(amiga_state, amigacd_tpi6525_portb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(amiga_state, amigacd_tpi6525_portc_r))
+	
 	MCFG_DEVICE_MODIFY("cia_0")
 	MCFG_MOS6526_TOD(0) // connected to vsync
 MACHINE_CONFIG_END

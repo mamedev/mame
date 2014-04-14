@@ -336,9 +336,9 @@ static const gfx_layout hp9k_charlayout =
 	1,                  /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
 	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ STEP8(0,1) },
 	/* y offsets */
-	{ 1*8, 0*8, 3*8, 2*8, 5*8, 4*8, 7*8, 6*8, 9*8, 8*8, 11*8, 10*8, 13*8, 12*8, 15*8, 14*8 },
+	{ STEP16(0,8) },
 	8*16                    /* every char takes 16 bytes */
 };
 

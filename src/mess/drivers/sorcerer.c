@@ -386,16 +386,6 @@ UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 /**********************************************************************************************************/
 
-static const ay31015_config sorcerer_ay31015_config =
-{
-	4800.0,
-	4800.0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static const cassette_interface sorcerer_cassette_interface =
 {
 	sorcerer_cassette_formats,
@@ -445,8 +435,10 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
 
-	MCFG_AY31015_ADD( "uart", sorcerer_ay31015_config )
-
+	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(4800.0)
+	MCFG_AY31015_RX_CLOCK(4800.0)
+	
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "covox")
 	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )

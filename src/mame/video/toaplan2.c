@@ -1,7 +1,7 @@
 /***************************************************************************
 
  Functions to emulate additional video hardware on several Toaplan2 games.
- The main video is handled by the GP9001 (see video gp9001.c)
+ The main video is handled by the GP9001 (see video/gp9001.c)
 
  Extra-text RAM format
 
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 	attrib = m_tx_videoram[tile_index];
 	tile_number = attrib & 0x3ff;
 	color = attrib >> 10;
-	SET_TILE_INFO_MEMBER(2,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -66,8 +66,7 @@ void toaplan2_state::create_tx_tilemap(int dx, int dx_flipped)
 
 void toaplan2_state::truxton2_postload()
 {
-	for (int i = 0; i < 1024; i++)
-		m_gfxdecode->gfx(2)->mark_dirty(i);
+	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 VIDEO_START_MEMBER(toaplan2_state,toaplan2)
@@ -93,7 +92,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	m_gfxdecode->gfx(2)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	create_tx_tilemap(0x1d5, 0x16a);
@@ -146,7 +145,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 
 	/* Create the Text tilemap for this game */
 	m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
-	m_gfxdecode->gfx(2)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	create_tx_tilemap(0x1d4, 0x16b);
@@ -178,9 +177,8 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 
 	if (oldword != data)
 	{
-		int code = offset/32;
 		COMBINE_DATA(&m_tx_gfxram16[offset]);
-		m_gfxdecode->gfx(2)->mark_dirty(code);
+		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 	}
 }
 
@@ -201,8 +199,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	dest += (m_tx_linescroll.bytes()/2);
 	memcpy(dest, m_mainram16, m_mainram16.bytes());
 
-	for (int i = 0; i < 1024; i++)
-		m_gfxdecode->gfx(2)->mark_dirty(i);
+	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
@@ -349,12 +346,9 @@ UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind1
 
 UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_vdp0)
-	{
-		bitmap.fill(0, cliprect);
-		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp0->gp9001_render_vdp(machine(), bitmap, cliprect);
-	}
+	bitmap.fill(0, cliprect);
+	m_custom_priority_bitmap.fill(0, cliprect);
+	m_vdp0->gp9001_render_vdp(machine(), bitmap, cliprect);
 
 	return 0;
 }

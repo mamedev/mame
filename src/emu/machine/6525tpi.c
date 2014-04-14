@@ -106,6 +106,15 @@ const device_type TPI6525 = &device_creator<tpi6525_device>;
 
 tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock, "tpi6525", __FILE__),
+	m_out_irq_cb(*this),
+	m_in_pa_cb(*this),
+	m_out_pa_cb(*this),
+	m_in_pb_cb(*this),
+	m_out_pb_cb(*this),
+	m_in_pc_cb(*this),
+	m_out_pc_cb(*this),
+	m_out_ca_cb(*this),
+	m_out_cb_cb(*this),
 	m_port_a(0),
 	m_ddr_a(0),
 	m_in_a(0),
@@ -128,49 +137,21 @@ tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tpi6525_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tpi6525_interface *intf = reinterpret_cast<const tpi6525_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<tpi6525_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-		memset(&m_in_pc_cb, 0, sizeof(m_in_pc_cb));
-		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
-		memset(&m_out_ca_cb, 0, sizeof(m_out_ca_cb));
-		memset(&m_out_cb_cb, 0, sizeof(m_out_cb_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void tpi6525_device::device_start()
 {
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_in_pa_func.resolve(m_in_pa_cb, *this);
-	m_out_pa_func.resolve(m_out_pa_cb, *this);
-	m_in_pb_func.resolve(m_in_pb_cb, *this);
-	m_out_pb_func.resolve(m_out_pb_cb, *this);
-	m_in_pc_func.resolve(m_in_pc_cb, *this);
-	m_out_pc_func.resolve(m_out_pc_cb, *this);
-	m_out_ca_func.resolve(m_out_ca_cb, *this);
-	m_out_cb_func.resolve(m_out_cb_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_in_pa_cb.resolve();
+	m_out_pa_cb.resolve_safe();
+	m_in_pb_cb.resolve();
+	m_out_pb_cb.resolve_safe();
+	m_in_pc_cb.resolve();
+	m_out_pc_cb.resolve_safe();
+	m_out_ca_cb.resolve_safe();
+	m_out_cb_cb.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_port_a));
@@ -215,7 +196,7 @@ void tpi6525_device::set_interrupt()
 
 		DBG_LOG(machine(), 3, "tpi6525", ("%s set interrupt\n", tag()));
 
-		m_out_irq_func(m_interrupt_level);
+		m_out_irq_cb(m_interrupt_level);
 	}
 }
 
@@ -228,7 +209,7 @@ void tpi6525_device::clear_interrupt()
 
 		DBG_LOG(machine(), 3, "tpi6525", ("%s clear interrupt\n", tag()));
 
-		m_out_irq_func(m_interrupt_level);
+		m_out_irq_cb(m_interrupt_level);
 	}
 }
 
@@ -315,8 +296,8 @@ READ8_MEMBER( tpi6525_device::pa_r )
 {
 	UINT8 data = m_in_a;
 
-	if (!m_in_pa_func.isnull())
-		data = m_in_pa_func(offset);
+	if (!m_in_pa_cb.isnull())
+		data = m_in_pa_cb(offset);
 
 	data = (data & ~m_ddr_a) | (m_ddr_a & m_port_a);
 
@@ -334,8 +315,8 @@ READ8_MEMBER( tpi6525_device::pb_r )
 {
 	UINT8 data = m_in_b;
 
-	if (!m_in_pb_func.isnull())
-		data = m_in_pb_func(offset);
+	if (!m_in_pb_cb.isnull())
+		data = m_in_pb_cb(offset);
 
 	data = (data & ~m_ddr_b) | (m_ddr_b & m_port_b);
 
@@ -353,8 +334,8 @@ READ8_MEMBER( tpi6525_device::pc_r )
 {
 	UINT8 data = m_in_c;
 
-	if (!m_in_pc_func.isnull())
-		data &= m_in_pc_func(offset);
+	if (!m_in_pc_cb.isnull())
+		data &= m_in_pc_cb(offset);
 
 	data = (data & ~m_ddr_c) | (m_ddr_c & m_port_c);
 
@@ -377,8 +358,8 @@ READ8_MEMBER( tpi6525_device::read )
 	case 0:
 		data = m_in_a;
 
-		if (!m_in_pa_func.isnull())
-			data &= m_in_pa_func(0);
+		if (!m_in_pa_cb.isnull())
+			data &= m_in_pa_cb(0);
 
 		data = (data & ~m_ddr_a) | (m_ddr_a & m_port_a);
 
@@ -387,8 +368,8 @@ READ8_MEMBER( tpi6525_device::read )
 	case 1:
 		data = m_in_b;
 
-		if (!m_in_pb_func.isnull())
-			data &= m_in_pb_func(0);
+		if (!m_in_pb_cb.isnull())
+			data &= m_in_pb_cb(0);
 
 		data = (data & ~m_ddr_b) | (m_ddr_b & m_port_b);
 
@@ -412,8 +393,8 @@ READ8_MEMBER( tpi6525_device::read )
 		{
 			data = m_in_c;
 
-			if (!m_in_pc_func.isnull())
-				data &= m_in_pc_func(0);
+			if (!m_in_pc_cb.isnull())
+				data &= m_in_pc_cb(0);
 
 			data = (data & ~m_ddr_c) | (m_ddr_c & m_port_c);
 		}
@@ -491,36 +472,36 @@ WRITE8_MEMBER( tpi6525_device::write )
 	{
 	case 0:
 		m_port_a = data;
-		m_out_pa_func(0, (m_port_a & m_ddr_a) | (m_ddr_a ^ 0xff));
+		m_out_pa_cb((offs_t)0, (m_port_a & m_ddr_a) | (m_ddr_a ^ 0xff));
 		break;
 
 	case 1:
 		m_port_b = data;
-		m_out_pb_func(0, (m_port_b & m_ddr_b) | (m_ddr_b ^ 0xff));
+		m_out_pb_cb((offs_t)0, (m_port_b & m_ddr_b) | (m_ddr_b ^ 0xff));
 		break;
 
 	case 2:
 		m_port_c = data;
 
 		if (!INTERRUPT_MODE)
-			m_out_pc_func(0, (m_port_c & m_ddr_c) | (m_ddr_c ^ 0xff));
+			m_out_pc_cb((offs_t)0, (m_port_c & m_ddr_c) | (m_ddr_c ^ 0xff));
 		break;
 
 	case 3:
 		m_ddr_a = data;
-		m_out_pa_func(0, (m_port_a & m_ddr_a) | (m_ddr_a ^ 0xff));
+		m_out_pa_cb((offs_t)0, (m_port_a & m_ddr_a) | (m_ddr_a ^ 0xff));
 		break;
 
 	case 4:
 		m_ddr_b = data;
-		m_out_pb_func(0, (m_port_b & m_ddr_b) | (m_ddr_b ^ 0xff));
+		m_out_pb_cb((offs_t)0, (m_port_b & m_ddr_b) | (m_ddr_b ^ 0xff));
 		break;
 
 	case 5:
 		m_ddr_c = data;
 
 		if (!INTERRUPT_MODE)
-			m_out_pc_func(0, (m_port_c & m_ddr_c) | (m_ddr_c ^ 0xff));
+			m_out_pc_cb((offs_t)0, (m_port_c & m_ddr_c) | (m_ddr_c ^ 0xff));
 		break;
 
 	case 6:
@@ -533,7 +514,7 @@ WRITE8_MEMBER( tpi6525_device::write )
 				if (m_ca_level != CA_MANUAL_LEVEL)
 				{
 					m_ca_level = CA_MANUAL_LEVEL;
-					m_out_ca_func(m_ca_level);
+					m_out_ca_cb(m_ca_level);
 				}
 			}
 			if (CB_MANUAL_OUT)
@@ -541,7 +522,7 @@ WRITE8_MEMBER( tpi6525_device::write )
 				if (m_cb_level != CB_MANUAL_LEVEL)
 				{
 					m_cb_level = CB_MANUAL_LEVEL;
-					m_out_cb_func(m_cb_level);
+					m_out_cb_cb(m_cb_level);
 				}
 			}
 		}

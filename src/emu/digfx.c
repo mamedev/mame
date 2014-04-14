@@ -158,9 +158,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 				assert(region != NULL);
 				region_length = 8 * region->bytes();
 				region_base = region->base();
-				// FIXME
-				region_width = 1;
-				region_endianness = ENDIANNESS_NATIVE;
+				region_width = region->width();
+				region_endianness = region->endianness();
 			}
 		}
 		else

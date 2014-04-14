@@ -14,8 +14,6 @@ struct gp9001layer
 
 	gp9001layeroffsets extra_xoffset;
 	gp9001layeroffsets extra_yoffset;
-
-	UINT16* vram16; // vram for this layer
 };
 
 struct gp9001tilemaplayer : gp9001layer
@@ -31,24 +29,21 @@ struct gp9001spritelayer : gp9001layer
 
 
 class gp9001vdp_device : public device_t,
+							public device_gfx_interface,
 							public device_video_interface,
 							public device_memory_interface
 {
+	static const gfx_layout tilelayout, spritelayout;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_gfx_region(device_t &device, int gfxregion);
 
 	UINT16 gp9001_voffs;
 	UINT16 gp9001_scroll_reg;
 
 	gp9001tilemaplayer bg, top, fg;
 	gp9001spritelayer sp;
-
-	int    tile_region; // we also use this to figure out which vdp we're using in some debug logging features
 
 	// technically this is just rom banking, allowing the chip to see more graphic ROM, however it's easier to handle it
 	// in the chip implementation than externally for now (which would require dynamic decoding of the entire charsets every
@@ -62,10 +57,12 @@ public:
 	void gp9001_draw_custom_tilemap(running_machine& machine, bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
 	void gp9001_render_vdp(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gp9001_screen_eof(void);
-	void create_tilemaps(int region);
+	void create_tilemaps(void);
 	void init_scroll_regs(void);
 
 	bitmap_ind8 *custom_priority_bitmap;
+
+	DECLARE_ADDRESS_MAP(map, 16);
 
 	// access to VDP
 	DECLARE_READ16_MEMBER( gp9001_vdp_r );
@@ -84,35 +81,31 @@ public:
 	DECLARE_WRITE16_MEMBER( gp9001_bg_tmap_w );
 	DECLARE_WRITE16_MEMBER( gp9001_fg_tmap_w );
 	DECLARE_WRITE16_MEMBER( gp9001_top_tmap_w );
-	DECLARE_READ16_MEMBER( gp9001_bg_tmap_r );
-	DECLARE_READ16_MEMBER( gp9001_fg_tmap_r );
-	DECLARE_READ16_MEMBER( gp9001_top_tmap_r );
-	DECLARE_READ16_MEMBER( gp9001_spram_r );
-	DECLARE_WRITE16_MEMBER( gp9001_spram_w );
 
 protected:
-	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	address_space_config        m_space_config;
-	UINT8                       m_gfxregion;
 
 	TILE_GET_INFO_MEMBER(get_top0_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 
 private:
-	void gp9001_voffs_w(offs_t offset, UINT16 data, UINT16 mem_mask);
-	int gp9001_videoram16_r(offs_t offset);
-	void gp9001_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask);
-	UINT16 gp9001_vdpstatus_r();
-	void gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask );
-	void gp9001_scroll_reg_data_w(offs_t offset, UINT16 data, UINT16 mem_mask);
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_vram_bg;
+	required_shared_ptr<UINT16> m_vram_fg;
+	required_shared_ptr<UINT16> m_vram_top;
+	required_shared_ptr<UINT16> m_spriteram;
+
+	void gp9001_voffs_w(UINT16 data, UINT16 mem_mask);
+	int gp9001_videoram16_r(void);
+	void gp9001_videoram16_w(UINT16 data, UINT16 mem_mask);
+	UINT16 gp9001_vdpstatus_r(void);
+	void gp9001_scroll_reg_select_w(UINT16 data, UINT16 mem_mask);
+	void gp9001_scroll_reg_data_w(UINT16 data, UINT16 mem_mask);
 };
 
 extern const device_type GP9001_VDP;
@@ -123,21 +116,3 @@ extern const device_type GP9001_VDP;
 #define GP9001_SPRITERAM_SIZE 0x800 /* Sprite     RAM size */
 #define GP9001_SPRITE_FLIPX 0x1000  /* Sprite flip flags */
 #define GP9001_SPRITE_FLIPY 0x2000
-
-
-
-/* vdp map 0, gfx region 0 */
-#define MCFG_DEVICE_ADD_VDP0 \
-	MCFG_DEVICE_ADD("gp9001vdp0", GP9001_VDP, 0) \
-	gp9001vdp_device::static_set_gfx_region(*device, 0);
-
-/* vdp map 1, gfx region 2 */
-#define MCFG_DEVICE_ADD_VDP1 \
-	MCFG_DEVICE_ADD("gp9001vdp1", GP9001_VDP, 0) \
-	gp9001vdp_device::static_set_gfx_region(*device, 2);
-
-#define MCFG_GP9001_VDP_GFXDECODE(_gfxtag) \
-	gp9001vdp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_GP9001_VDP_PALETTE(_palette_tag) \
-	gp9001vdp_device::static_set_palette_tag(*device, "^" _palette_tag);
