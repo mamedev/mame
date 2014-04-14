@@ -5730,12 +5730,12 @@ ROM_START( nemo )
 ROM_END
 
 /* B-Board 89624B-3 */
-ROM_START( nemoa )
+ROM_START( nemor1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "nme_30.11f",    0x00000, 0x20000, CRC(71b333db) SHA1(8bd8b62d8fef2ad9d2788ccf46e89da953e5817c) )
-	ROM_LOAD16_BYTE( "nme_35.11h",    0x00001, 0x20000, CRC(d153bc18) SHA1(2b4a9a50081d403a6485b7311e179a31b659b74d) )
-	ROM_LOAD16_BYTE( "nme_31.12f",    0x40000, 0x20000, CRC(7e83dbd2) SHA1(d4c7e3786faab4dd9ded3c1a8f6fea114d423e64) )
-	ROM_LOAD16_BYTE( "nme_36.12h",    0x40001, 0x20000, CRC(6aeeec81) SHA1(d7dce52d0f2225d844d852d2c3e81a48cb53a43d) )
+	ROM_LOAD16_BYTE( "nme_30.11f",     0x00000, 0x20000, CRC(71b333db) SHA1(8bd8b62d8fef2ad9d2788ccf46e89da953e5817c) )
+	ROM_LOAD16_BYTE( "nme_35.11h",     0x00001, 0x20000, CRC(d153bc18) SHA1(2b4a9a50081d403a6485b7311e179a31b659b74d) )
+	ROM_LOAD16_BYTE( "nme_31.12f",     0x40000, 0x20000, CRC(7e83dbd2) SHA1(d4c7e3786faab4dd9ded3c1a8f6fea114d423e64) )
+	ROM_LOAD16_BYTE( "nme_36.12h",     0x40001, 0x20000, CRC(6aeeec81) SHA1(d7dce52d0f2225d844d852d2c3e81a48cb53a43d) )
 	ROM_LOAD16_WORD_SWAP( "nm-32m.8h", 0x80000, 0x80000, CRC(d6d1add3) SHA1(61c3013d322dbb7622cca032adcd020ba318e885) )
 
 	ROM_REGION( 0x200000, "gfx", 0 )
@@ -5760,10 +5760,9 @@ ROM_START( nemoa )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "nm24b.1a",     0x0000, 0x0117, CRC(7b25bac6) SHA1(fa0083c59c8d6da07798cb3a4fc25d388065b7cd) ) // no markings visible, assumed to be the same
+	ROM_LOAD( "nm24b.1a",     0x0000, 0x0117, CRC(7b25bac6) SHA1(fa0083c59c8d6da07798cb3a4fc25d388065b7cd) )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
-
 
 /* B-Board 89625B-? */
 ROM_START( nemoj )
@@ -11502,7 +11501,7 @@ GAME( 1990, cawingr1,    cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     
 GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", GAME_SUPPORTS_SAVE )
 GAME( 1990, cawingj,     cawing,   cps1_10MHz, cawing,   cps_state,   cps1,     ROT0,   "Capcom", "U.S. Navy (Japan 901012)", GAME_SUPPORTS_SAVE )
 GAME( 1990, nemo,        0,        cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901130)", GAME_SUPPORTS_SAVE )   // "ETC"
-GAME( 1990, nemoa,       nemo,     cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901109)", GAME_SUPPORTS_SAVE )   // "ETC"
+GAME( 1990, nemor1,      nemo,     cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (World 901109)", GAME_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemoj,       nemo,     cps1_10MHz, nemo,     cps_state,   cps1,     ROT0,   "Capcom", "Nemo (Japan 901120)", GAME_SUPPORTS_SAVE )
 GAME( 1991, sf2,         0,        cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910522)", GAME_SUPPORTS_SAVE )   // "ETC"
 GAME( 1991, sf2eb,       sf2,      cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910214)", GAME_SUPPORTS_SAVE )   // "ETC"

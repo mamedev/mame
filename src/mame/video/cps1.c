@@ -85,7 +85,8 @@ Carrier Air Wing (World 901012)                                    89624B-3   CA
 Carrier Air Wing (USA 901012)                                      89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 U.S. Navy (Japan 901012)                                           89625B-1   CA22B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 
-Nemo (World 901130)                                          1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
+Nemo (World 901109)                                          1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
+Nemo (World 901130)                                                89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                                89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
 
 Street Fighter II: The World Warrior (World 910214)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
@@ -1322,7 +1323,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"mtwins",      CPS_B_14,     mapper_CK24B },
 	{"chikij",      CPS_B_14,     mapper_CK24B },   // wrong, this set uses CK22B, dumped but equations still not added
 	{"nemo",        CPS_B_15,     mapper_NM24B },
-	{"nemoa",       CPS_B_15,     mapper_NM24B },
+	{"nemor1",      CPS_B_15,     mapper_NM24B },
 	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B, still not dumped
 	{"cawing",      CPS_B_16,     mapper_CA24B },
 	{"cawingr1",    CPS_B_16,     mapper_CA24B },
