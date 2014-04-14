@@ -341,7 +341,14 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_k037122_1(*this, "k037122_1"),
 		m_k037122_2(*this, "k037122_2" ),
-		m_adc12138(*this, "adc12138") { }
+		m_adc12138(*this, "adc12138"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_dsw(*this, "DSW"),
+		m_eepromout(*this, "EEPROMOUT"),
+		m_analog1(*this, "ANALOG1"),
+		m_analog2(*this, "ANALOG2"){ }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
@@ -359,6 +366,8 @@ public:
 	optional_device<k037122_device> m_k037122_1;
 	optional_device<k037122_device> m_k037122_2;
 	required_device<adc12138_device> m_adc12138;
+	required_ioport m_in0, m_in1, m_in2, m_dsw, m_eepromout;
+	optional_ioport m_analog1, m_analog2;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -393,6 +402,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
@@ -498,13 +508,17 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 READ8_MEMBER(hornet_state::sysreg_r)
 {
 	UINT8 r = 0;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
+
 	switch (offset)
 	{
 		case 0: /* I/O port 0 */
+			r = m_in0->read();
+			break;
 		case 1: /* I/O port 1 */
+			r = m_in1->read();
+			break;
 		case 2: /* I/O port 2 */
-			r = ioport(portnames[offset])->read();
+			r = m_in2->read();
 			break;
 
 		case 3: /* I/O port 3 */
@@ -522,7 +536,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			break;
 
 		case 4: /* I/O port 4 - DIP switches */
-			r = ioport("DSW")->read();
+			r = m_dsw->read();
 			break;
 	}
 	return r;
@@ -555,7 +569,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = LAMP1
 			    0x01 = LAMP0
 			*/
-			ioport("EEPROMOUT")->write(data, 0xff);
+			m_eepromout->write(data, 0xff);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -932,21 +946,17 @@ void hornet_state::machine_reset()
 		membank("bank5")->set_base(usr5);
 }
 
-static double adc12138_input_callback( device_t *device, UINT8 input )
+ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 {
 	int value = 0;
 	switch (input)
 	{
-		case 0: value = device->machine().root_device().ioport("ANALOG1")->read(); break;
-		case 1: value = device->machine().root_device().ioport("ANALOG2")->read(); break;
+		case 0: value = (m_analog1) ? m_analog1->read() : 0; break;
+		case 1: value = (m_analog2) ? m_analog2->read() : 0; break;
 	}
 
 	return (double)(value) / 2047.0;
 }
-
-static const adc12138_interface hornet_adc_interface = {
-	adc12138_input_callback
-};
 
 static const voodoo_config hornet_voodoo_intf =
 {
@@ -1009,7 +1019,8 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_M48T58_ADD( "m48t58" )
 
-	MCFG_ADC12138_ADD( "adc12138", hornet_adc_interface )
+	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
+	MCFG_ADC1213X_IPT_CONVERT_CB(hornet_state, adc12138_input_callback)
 MACHINE_CONFIG_END
 
 

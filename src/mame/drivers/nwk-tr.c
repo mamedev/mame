@@ -238,6 +238,15 @@ public:
 		m_k056800(*this, "k056800"),
 		m_k001604(*this, "k001604"),
 		m_adc12138(*this, "adc12138"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_dsw(*this, "DSW"),
+		m_analog1(*this, "ANALOG1"),
+		m_analog2(*this, "ANALOG2"),
+		m_analog3(*this, "ANALOG3"),
+		m_analog4(*this, "ANALOG4"),
+		m_analog5(*this, "ANALOG5"),
 		m_palette(*this, "palette") { }
 
 	// TODO: Needs verification on real hardware
@@ -252,6 +261,7 @@ public:
 	required_device<k056800_device> m_k056800;
 	required_device<k001604_device> m_k001604;
 	required_device<adc12138_device> m_adc12138;
+	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
 	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
@@ -271,6 +281,8 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
+	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+
 	TIMER_CALLBACK_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(nwktr);
 	virtual void machine_start();
@@ -279,8 +291,6 @@ public:
 
 	void lanc2_init();
 };
-
-
 
 
 
@@ -324,15 +334,15 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= ioport("IN0")->read() << 24;
+			r |= m_in0->read() << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= ioport("IN1")->read() << 16;
+			r |= m_in1->read() << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= ioport("IN2")->read() << 8;
+			r |= m_in2->read() << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -343,7 +353,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= ioport("DSW")->read() << 24;
+			r |= m_dsw->read() << 24;
 		}
 	}
 	return r;
@@ -689,25 +699,20 @@ static INPUT_PORTS_START( nwktr )
 INPUT_PORTS_END
 
 
-static double adc12138_input_callback( device_t *device, UINT8 input )
+ADC12138_IPT_CONVERT_CB(nwktr_state::adc12138_input_callback)
 {
 	int value = 0;
 	switch (input)
 	{
-		case 0:     value = device->machine().root_device().ioport("ANALOG1")->read(); break;
-		case 1:     value = device->machine().root_device().ioport("ANALOG2")->read(); break;
-		case 2:     value = device->machine().root_device().ioport("ANALOG3")->read(); break;
-		case 3:     value = device->machine().root_device().ioport("ANALOG4")->read(); break;
-		case 4:     value = device->machine().root_device().ioport("ANALOG5")->read(); break;
+		case 0: value = m_analog1->read(); break;
+		case 1: value = m_analog2->read(); break;
+		case 2: value = m_analog3->read(); break;
+		case 3: value = m_analog4->read(); break;
+		case 4: value = m_analog5->read(); break;
 	}
 
 	return (double)(value) / 4095.0;
 }
-
-static const adc12138_interface nwktr_adc_interface = {
-	adc12138_input_callback
-};
-
 
 void nwktr_state::machine_reset()
 {
@@ -741,7 +746,9 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
 	MCFG_M48T58_ADD( "m48t58" )
-	MCFG_ADC12138_ADD( "adc12138", nwktr_adc_interface )
+
+	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
+	MCFG_ADC1213X_IPT_CONVERT_CB(nwktr_state, adc12138_input_callback)
 
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo")
