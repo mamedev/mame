@@ -61,15 +61,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> tvcexp_interface
-
-struct tvcexp_interface
-{
-	devcb_write_line                m_out_irq_cb;
-	devcb_write_line                m_out_nmi_cb;
-};
-
-
 // ======================> device_tvcexp_interface
 
 class device_tvcexp_interface : public device_slot_card_interface
@@ -92,17 +83,18 @@ public:
 // ======================> tvcexp_slot_device
 
 class tvcexp_slot_device : public device_t,
-							public tvcexp_interface,
 							public device_slot_interface
 {
 public:
 	// construction/destruction
 	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~tvcexp_slot_device();
+	
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete();
 
 	// reading and writing
 	virtual UINT8 id_r();
@@ -113,8 +105,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(io_read);
 	virtual DECLARE_WRITE8_MEMBER(io_write);
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_nmi_func;
+	devcb2_write_line                m_out_irq_cb;
+	devcb2_write_line                m_out_nmi_cb;
 
 	device_tvcexp_interface*    m_cart;
 };
@@ -127,8 +119,12 @@ extern const device_type TVCEXP_SLOT;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_TVC64_EXPANSION_ADD(_tag,_config,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, TVCEXP_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+//	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	
+#define MCFG_TVCEXP_SLOT_OUT_IRQ_CB(_devcb) \
+	devcb = &tvcexp_slot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_TVCEXP_SLOT_OUT_NMI_CB(_devcb) \
+	devcb = &tvcexp_slot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+	
 #endif /* __TVCEXP_H__ */

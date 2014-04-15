@@ -657,12 +657,6 @@ static const cassette_interface tvc_cassette_interface =
 	NULL
 };
 
-static const tvcexp_interface tvc_exp_interface =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-};
-
 extern SLOT_INTERFACE_START(tvc_exp)
 	SLOT_INTERFACE("hbf", TVC_HBF)          // Videoton HBF floppy interface
 SLOT_INTERFACE_END
@@ -710,10 +704,22 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CARTSLOT_INTERFACE("tvc_cart")
 
 	/* expansion interface */
-	MCFG_TVC64_EXPANSION_ADD("exp1", tvc_exp_interface, tvc_exp , NULL)
-	MCFG_TVC64_EXPANSION_ADD("exp2", tvc_exp_interface, tvc_exp , NULL)
-	MCFG_TVC64_EXPANSION_ADD("exp3", tvc_exp_interface, tvc_exp , NULL)
-	MCFG_TVC64_EXPANSION_ADD("exp4", tvc_exp_interface, tvc_exp , NULL)
+	MCFG_DEVICE_ADD("exp1", TVCEXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_DEVICE_ADD("exp2", TVCEXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_DEVICE_ADD("exp3", TVCEXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_DEVICE_ADD("exp4", TVCEXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", tvc_cassette_interface )
