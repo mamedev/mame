@@ -74,28 +74,22 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define X68K_EXPANSION_INTERFACE(_name) \
-	const x68k_expansion_slot_interface (_name) =
+#define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(_devcb) \
+	devcb = &x68k_expansion_slot_device::set_out_irq2_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(_devcb) \
+	devcb = &x68k_expansion_slot_device::set_out_irq4_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_X68K_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, X68K_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+#define MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
+	devcb = &x68k_expansion_slot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_X68K_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
+	devcb = &x68k_expansion_slot_device::set_out_reset_callback(*device, DEVCB2_##_devcb);
+	
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// expansion slot interface
-
-struct x68k_expansion_slot_interface
-{
-	devcb_write_line    m_out_irq2_cb;
-	devcb_write_line    m_out_irq4_cb;
-	devcb_write_line    m_out_nmi_cb;
-	devcb_write_line    m_out_reset_cb;
-};
 
 // ======================> device_x68k_expansion_card_interface
 
@@ -115,13 +109,18 @@ public:
 // ======================> x68k_expansion_slot_device
 
 class x68k_expansion_slot_device : public device_t,
-									public x68k_expansion_slot_interface,
 									public device_slot_interface
 {
 public:
 	// construction/destruction
 	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~x68k_expansion_slot_device();
+	
+	template<class _Object> static devcb2_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq2_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irq4_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq4_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
+
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
@@ -132,12 +131,11 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
-	devcb_resolved_write_line   m_out_irq2_func;
-	devcb_resolved_write_line   m_out_irq4_func;
-	devcb_resolved_write_line   m_out_nmi_func;
-	devcb_resolved_write_line   m_out_reset_func;
+	devcb2_write_line    m_out_irq2_cb;
+	devcb2_write_line    m_out_irq4_cb;
+	devcb2_write_line    m_out_nmi_cb;
+	devcb2_write_line    m_out_reset_cb;
 
 	device_x68k_expansion_card_interface *m_card;
 };
