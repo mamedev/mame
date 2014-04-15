@@ -168,6 +168,8 @@ public:
 	DECLARE_READ32_MEMBER(copro_tgp_buffer_r);
 	DECLARE_WRITE32_MEMBER(copro_tgp_buffer_w);
 	DECLARE_READ8_MEMBER(tgpid_r);
+	DECLARE_READ32_MEMBER(copro_status_r);
+
 	DECLARE_READ8_MEMBER(driveio_port_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	DECLARE_READ8_MEMBER(driveio_port_str_r);

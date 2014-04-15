@@ -13,6 +13,8 @@
 	- desert: several 3d bugs, presumably down to FIFO;
 	- dynamcop: stalls at stage select screen;
 	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
+	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
+	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89);
 	- manxtt: missing 3d;
 	- motoraid: stalls after course select;
 	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
@@ -732,6 +734,9 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 	}
 	else
 	{
+//		if(m_coprocnt == 0)
+//			return;
+
 		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data);
@@ -742,7 +747,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 
 WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 {
-	/* FIXME: clean this up */
+	/* FIXME: clean this mess */
 	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
 		(strcmp(machine().system().name, "sfight" ) == 0) ||
 		(strcmp(machine().system().name, "fvipers" ) == 0) ||
@@ -751,7 +756,10 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0) ||
+		(strcmp(machine().system().name, "lastbrnx" ) == 0) ||
+		(strcmp(machine().system().name, "lastbrnxu" ) == 0) ||
+		(strcmp(machine().system().name, "lastbrnxj" ) == 0))
 	{
 		machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
 	}
@@ -1448,7 +1456,6 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_SHARE("bufferram")
 
-
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
 	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
 	AM_RANGE(0x00980030, 0x0098003f) AM_READ8(tgpid_r,0xffffffff)
@@ -1542,6 +1549,15 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
+/* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
+READ32_MEMBER(model2_state::copro_status_r)
+{
+	if(m_coprocnt == 0)
+		return -1;
+
+	return 0;
+}
+
 /* 2A-CRX overrides */
 static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
@@ -1552,6 +1568,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
+	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
@@ -1583,8 +1600,8 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE(copro_sharc_iop_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
+	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_sharc_ctl1_w )
 
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
@@ -1616,6 +1633,7 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
+	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
