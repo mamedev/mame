@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, NULL)
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
