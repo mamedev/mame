@@ -784,23 +784,6 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 
 
 //-------------------------------------------------
-//  logerror - printf-style error logging
-//-------------------------------------------------
-
-void CLIB_DECL running_machine::logerror(const char *format, ...)
-{
-	// process only if there is a target
-	if (m_logerror_list.first() != NULL)
-	{
-		va_list arg;
-		va_start(arg, format);
-		vlogerror(format, arg);
-		va_end(arg);
-	}
-}
-
-
-//-------------------------------------------------
 //  vlogerror - vprintf-style error logging
 //-------------------------------------------------
 
