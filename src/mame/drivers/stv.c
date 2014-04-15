@@ -921,10 +921,6 @@ DRIVER_INIT_MEMBER(stv_state,nameclv3)
 	DRIVER_INIT_CALL(stv);
 }
 
-
-static const sh2_cpu_core sh2_conf_master = { 0, NULL };
-static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
-
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
@@ -971,12 +967,12 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
-	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_SH2_IS_SLAVE(0)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", stv_state, saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
-	MCFG_CPU_CONFIG(sh2_conf_slave)
+	MCFG_SH2_IS_SLAVE(1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", stv_state, saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz

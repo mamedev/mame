@@ -60,12 +60,28 @@ enum
 	SH2_R8, SH2_R9, SH2_R10, SH2_R11, SH2_R12, SH2_R13, SH2_R14, SH2_R15, SH2_EA
 };
 
-struct sh2_cpu_core
-{
-	int is_slave;
-	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
-	int  (*dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
-};
+
+typedef device_delegate<int (UINT32 src, UINT32 dst, UINT32 data, int size)> sh2_dma_kludge_delegate;
+#define SH2_DMA_KLUDGE_CB(name)  int name(UINT32 src, UINT32 dst, UINT32 data, int size)
+
+typedef device_delegate<int (UINT32 src, UINT32 dst, UINT32 data, int size)> sh2_dma_fifo_data_available_delegate;
+#define SH2_DMA_FIFO_DATA_AVAILABLE_CB(name)  int name(UINT32 src, UINT32 dst, UINT32 data, int size)
+
+typedef device_delegate<void (UINT32 data)> sh2_ftcsr_read_delegate;
+#define SH2_FTCSR_READ_CB(name)  void name(UINT32 data)
+
+
+#define MCFG_SH2_IS_SLAVE(_slave) \
+	sh2_device::set_is_slave(*device, _slave);
+
+#define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
+	sh2_device::set_dma_kludge_callback(*device, sh2_dma_kludge_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
+	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
+	sh2_device::set_ftcsr_read_callback(*device, sh2_ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
 /***************************************************************************
@@ -96,7 +112,6 @@ enum
 class sh2_frontend;
 
 class sh2_device : public cpu_device
-				, public sh2_cpu_core
 {
 	friend class sh2_frontend;
 
@@ -105,11 +120,15 @@ public:
 	sh2_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type);
 
+	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
+	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
+	static void set_dma_fifo_data_available_callback(device_t &device, sh2_dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
+	static void set_ftcsr_read_callback(device_t &device, sh2_ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
+
 	DECLARE_WRITE32_MEMBER( sh2_internal_w );
 	DECLARE_READ32_MEMBER( sh2_internal_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
-	void sh2_set_ftcsr_read_callback(void (*callback)(UINT32));
 	void sh2_set_frt_input(int state);
 	void sh2drc_set_options(UINT32 options);
 	void sh2drc_add_pcflush(offs_t address);
@@ -119,7 +138,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_stop();
@@ -221,10 +239,9 @@ private:
 	UINT8 m_wtcsr;
 
 	int     m_is_slave, m_cpu_type;
-	int  (*m_dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
-	int  (*m_dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
-
-	void    (*m_ftcsr_read_callback)(UINT32 data);
+	sh2_dma_kludge_delegate              m_dma_kludge_cb;
+	sh2_dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
+	sh2_ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 	drcuml_state *      m_drcuml;                 /* DRC UML generator state */
