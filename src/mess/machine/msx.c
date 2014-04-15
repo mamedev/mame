@@ -788,9 +788,12 @@ void msx_state::msx_memory_init()
 	int size = 0;
 	const msx_slot_layout *layout= (msx_slot_layout*)NULL;
 	const msx_slot *slot;
-	const msx_driver_struct *driver;
 	slot_state *st;
 	UINT8 *mem = NULL;
+
+	if ( m_layout == NULL ) {
+		fatalerror("No msx slot layout defined for this system!\n");
+	}
 
 	m_empty = auto_alloc_array(machine(), UINT8, 0x4000);
 	memset (m_empty, 0xff, 0x4000);
@@ -803,21 +806,7 @@ void msx_state::msx_memory_init()
 		}
 	}
 
-	for (driver = msx_driver_list; driver->name[0]; driver++) {
-		if (!strcmp (driver->name, machine().system().name)) {
-			layout = driver->layout;
-		}
-	}
-
-	if (!layout) {
-		logerror ("msx_memory_init: error: missing layout definition in "
-					"msx_driver_list\n");
-		return;
-	}
-
-	m_layout = layout;
-
-	for (; layout->entry != MSX_LAYOUT_LAST; layout++) {
+	for (layout = m_layout; layout->entry != MSX_LAYOUT_LAST; layout++) {
 		switch (layout->entry) {
 		case MSX_LAYOUT_SLOT_ENTRY:
 			prim = layout->slot_primary;

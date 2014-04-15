@@ -17,15 +17,6 @@
 const device_type CPC_SSA1 = &device_creator<cpc_ssa1_device>;
 const device_type CPC_DKSPEECH = &device_creator<cpc_dkspeech_device>;
 
-CPC_EXPANSION_INTERFACE(sub_exp_intf)
-{
-	DEVCB_DEVICE_LINE_MEMBER("^^", cpc_expansion_slot_device, irq_w),
-	DEVCB_DEVICE_LINE_MEMBER("^^", cpc_expansion_slot_device, nmi_w),
-	DEVCB_NULL,  // RESET
-	DEVCB_DEVICE_LINE_MEMBER("^^", cpc_expansion_slot_device, romdis_w),  // ROMDIS
-	DEVCB_DEVICE_LINE_MEMBER("^^", cpc_expansion_slot_device, romen_w)  // /ROMEN
-};
-
 //-------------------------------------------------
 //  device I/O handlers
 //-------------------------------------------------
@@ -124,7 +115,12 @@ static MACHINE_CONFIG_FRAGMENT( cpc_ssa1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL)
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romen_w))  // /ROMEN
 
 MACHINE_CONFIG_END
 
@@ -136,7 +132,12 @@ static MACHINE_CONFIG_FRAGMENT( cpc_dkspeech )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL)
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romen_w))  // /ROMEN
 
 MACHINE_CONFIG_END
 

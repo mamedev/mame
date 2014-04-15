@@ -349,12 +349,6 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 }
 
-static AAKART_INTERFACE( kart_interface )
-{
-	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_tx_w),
-	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_rx_w)
-};
-
 static ARM_INTERFACE( a310_config )
 {
 	ARM_COPRO_TYPE_VL86C020
@@ -367,7 +361,9 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 	MCFG_CPU_CONFIG(a310_config)
 
-	MCFG_AAKART_ADD("kart", 8000000/256, kart_interface)
+	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
+	MCFG_AAKART_OUT_TX_CB(WRITELINE(archimedes_state, a310_kart_tx_w))
+	MCFG_AAKART_OUT_RX_CB(WRITELINE(archimedes_state, a310_kart_rx_w))
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x100)

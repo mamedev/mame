@@ -14,7 +14,6 @@
 #define __OSDEPEND_H__
 
 #include "emucore.h"
-#include "emutempl.h"
 #include "osdcore.h"
 #include "unicode.h"
 

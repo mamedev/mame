@@ -35,11 +35,15 @@
 
 #define TC8521_TAG  "rtc"
 
+#define MCFG_MSX_LAYOUT(_layout) \
+	msx_state::set_layout(*owner, msx_slot_layout_##_layout);
+
 class msx_state : public driver_device
 {
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_layout(NULL),
 		m_maincpu(*this, "maincpu"),
 		m_v9938(*this, "v9938"),
 		m_v9958(*this, "v9958"),
@@ -73,6 +77,9 @@ public:
 		m_io_key3(*this, "KEY3"),
 		m_io_key4(*this, "KEY4"),
 		m_io_key5(*this, "KEY5") { }
+
+	// static configuration helpers
+	static void set_layout(device_t &device, const msx_slot_layout *layout) { downcast<msx_state &>(device).m_layout = layout; }
 
 	DECLARE_WRITE8_MEMBER(msx_page0_w);
 	DECLARE_WRITE8_MEMBER(msx_page0_1_w);

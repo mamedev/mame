@@ -61,33 +61,6 @@ DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
 }
 
-static const isa16bus_interface indiana_isabus_intf =
-{
-	// interrupts 2-7
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// high IRQs 10-15
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// dma request 0-7
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 SLOT_INTERFACE_START( indiana_isa_cards )
 	// 8-bit
 	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
@@ -108,7 +81,8 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
 
-	MCFG_ISA16_BUS_ADD(ISABUS_TAG, ":"M68K_TAG, indiana_isabus_intf)
+	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
+	MCFG_ISA16_CPU(":"M68K_TAG)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa1", indiana_isa_cards, "vga", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa2", indiana_isa_cards, "fdc_at", false)

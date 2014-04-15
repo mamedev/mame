@@ -97,7 +97,6 @@ public:
 	optional_device<coco_vhd_image_device> m_vhd_1;
 
 	static const cococart_interface cartridge_config;
-	static const bitbanger_config coco_bitbanger_config;
 	static const cassette_interface coco_cassette_interface;
 
 	// driver update handlers
@@ -135,6 +134,9 @@ public:
 
 	// floating bus
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
+	
+	// bitbanger
+	DECLARE_WRITE_LINE_MEMBER( bitbanger_callback );
 
 protected:
 	// device-level overrides
@@ -214,7 +216,6 @@ private:
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);
 	void update_prinout(bool prinout);
-	DECLARE_WRITE_LINE_MEMBER( bitbanger_callback );
 	void diecom_lightgun_clock(void);
 
 	// thin wrappers for PIA output

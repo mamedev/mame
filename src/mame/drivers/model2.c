@@ -13,6 +13,8 @@
 	- desert: several 3d bugs, presumably down to FIFO;
 	- dynamcop: stalls at stage select screen;
 	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
+	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
+	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89);
 	- manxtt: missing 3d;
 	- motoraid: stalls after course select;
 	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
@@ -732,6 +734,9 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 	}
 	else
 	{
+//		if(m_coprocnt == 0)
+//			return;
+
 		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data);
@@ -742,7 +747,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 
 WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 {
-	/* FIXME: clean this up */
+	/* FIXME: clean this mess */
 	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
 		(strcmp(machine().system().name, "sfight" ) == 0) ||
 		(strcmp(machine().system().name, "fvipers" ) == 0) ||
@@ -751,7 +756,10 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0) ||
+		(strcmp(machine().system().name, "lastbrnx" ) == 0) ||
+		(strcmp(machine().system().name, "lastbrnxu" ) == 0) ||
+		(strcmp(machine().system().name, "lastbrnxj" ) == 0))
 	{
 		machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
 	}
@@ -1425,10 +1433,12 @@ WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
-READ32_MEMBER(model2_state::tgpid_r)
+/* Top Skater reads here */
+READ8_MEMBER(model2_state::tgpid_r)
 {
-	popmessage("Read from TGP ID, contact MAMEdev");
-	return 0;
+	unsigned char ID[]={0,'T','A','H',0,'A','K','O',0,'Z','A','K',0,'M','T','K'};
+
+	return ID[offset];
 }
 
 /* common map for all Model 2 versions */
@@ -1446,10 +1456,9 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_SHARE("bufferram")
 
-
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
 	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
-	AM_RANGE(0x00980030, 0x0098005f) AM_READ(tgpid_r)
+	AM_RANGE(0x00980030, 0x0098003f) AM_READ8(tgpid_r,0xffffffff)
 
 	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
 
@@ -1515,14 +1524,12 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00220000, 0x0023ffff) AM_ROM AM_REGION("maincpu", 0x20000)
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
 	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2o_serial_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2o_serial_w)
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
@@ -1542,11 +1549,18 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
+/* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
+READ32_MEMBER(model2_state::copro_status_r)
+{
+	if(m_coprocnt == 0)
+		return -1;
+
+	return 0;
+}
+
 /* 2A-CRX overrides */
 static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
-
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
 	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
@@ -1554,6 +1568,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
+	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
@@ -1585,14 +1600,16 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE(copro_sharc_iop_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
+	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_sharc_ctl1_w )
 
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
+	AM_RANGE(0x11000000, 0x110fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
+	AM_RANGE(0x11100000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
+	AM_RANGE(0x11200000, 0x112fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
+	AM_RANGE(0x11300000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
 	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
 
 
@@ -1616,6 +1633,7 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
+	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
@@ -1904,6 +1922,9 @@ static INPUT_PORTS_START( srallyc )
 	PORT_START("1c00004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+
+	PORT_START("1c0000c")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("1c00010")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN0")
@@ -3801,7 +3822,7 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C, Sega Game ID# 833-12861, RO
 	ROM_LOAD32_WORD( "mpr-19500.25", 0x000002, 0x400000, CRC(905f5798) SHA1(31f104e3022b5bc7ed7c667eb801a57949a06c93) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-19491.31", 0x000000, 0x080000, CRC(1c9b15fd) SHA1(045244a4eebc45f149aecf47f090cede1813477b) )
+	ROM_LOAD16_WORD_SWAP( "epr-19491.31", 0x080000, 0x080000, CRC(1c9b15fd) SHA1(045244a4eebc45f149aecf47f090cede1813477b) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-19504.32", 0x000000, 0x400000, CRC(9419ec08) SHA1(d05d9ceb7fd09fa8991c0df4d1c57eb621460e30) )
@@ -3845,7 +3866,7 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_LOAD32_WORD("mpr-19970.26", 0x0800002, 0x400000, CRC(c59d8d36) SHA1(24232390f0cac5ffbb17a0093a602363c686fbf8) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19967.31", 0x000000, 0x080000, CRC(c6b8ef3f) SHA1(9f86d6e365a5535d354ff6b0614f3a19c0790d0f) )
+	ROM_LOAD16_WORD_SWAP("epr-19967.31", 0x080000, 0x080000, CRC(c6b8ef3f) SHA1(9f86d6e365a5535d354ff6b0614f3a19c0790d0f) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD("mpr-19988.32", 0x000000, 0x400000, CRC(303732fb) SHA1(63efbd9f67b38fddeeed25de660514867e03486a) )
@@ -4472,7 +4493,7 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
+	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x080000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
@@ -4501,7 +4522,7 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, rom board stickered as 8
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
+	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x080000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
@@ -5761,7 +5782,7 @@ GAME( 1998, pltkids,         0, model2b, model2,  model2_state,  pltkids, ROT0, 
 GAME( 1995, rchase2,         0, model2b, rchase2, model2_state,  rchase2, ROT0, "Sega",   "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
-GAME( 1996, skisuprg,        0, model2c, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, skisuprg,        0, model2c, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, stcc,            0,    stcc, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, stccb,        stcc,    stcc, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, stcca,        stcc,    stcc, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

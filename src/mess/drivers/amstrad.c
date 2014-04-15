@@ -834,15 +834,6 @@ static SLOT_INTERFACE_START( aleste_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-CPC_EXPANSION_INTERFACE(cpc_exp_intf)
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-	DEVCB_NULL,  // RESET
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state, cpc_romdis),  // ROMDIS
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state, cpc_romen)  // /ROMEN
-};
-
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("cpr,bin")
@@ -913,7 +904,12 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL)
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(WRITELINE(amstrad_state, cpc_romen))  // /ROMEN
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -995,7 +991,12 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
 
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL)
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(WRITELINE(amstrad_state, cpc_romen))  // /ROMEN	
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

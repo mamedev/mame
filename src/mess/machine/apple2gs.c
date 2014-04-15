@@ -114,7 +114,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
 #include "emu.h"
 
 #include "includes/apple2gs.h"

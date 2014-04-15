@@ -732,22 +732,6 @@ SLOT_INTERFACE_START( filetto_isa8_cards )
 	SLOT_INTERFACE_INTERNAL("tetriskr", ISA8_CGA_TETRISKR)
 SLOT_INTERFACE_END
 
-static const isa8bus_interface filetto_isabus_intf =
-{
-	// interrupts
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir3_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir4_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir5_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir6_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir7_w),
-
-	// dma request
-	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq1_w),
-	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq2_w),
-	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq3_w)
-};
-
 
 static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
@@ -768,8 +752,18 @@ static MACHINE_CONFIG_FRAGMENT(pcxt)
 
 	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, NULL )
 
-	MCFG_ISA8_BUS_ADD("isa", ":maincpu", filetto_isabus_intf)
-
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

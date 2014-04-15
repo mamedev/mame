@@ -44,7 +44,7 @@ void serial_mouse_device::device_start()
 void serial_mouse_device::device_reset()
 {
 	m_head = m_tail = 0;
-	output_rxd(0);
+	output_rxd(1);
 	output_dcd(0);
 	output_dsr(0);
 	output_ri(0);
@@ -191,13 +191,11 @@ void serial_mouse_device::set_mouse_enable(bool state)
 	if(state && !m_enabled)
 	{
 		m_timer->adjust(attotime::zero, 0, attotime::from_hz(240));
-		output_rxd(1);
 	}
 	else if(!state && m_enabled)
 	{
 		m_timer->adjust(attotime::never);
 		m_head = m_tail = 0;
-		output_rxd(0);
 	}
 	m_enabled = state;
 

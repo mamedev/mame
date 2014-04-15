@@ -598,23 +598,6 @@ static SLOT_INTERFACE_START( mini_chief_isa8_cards )
 	SLOT_INTERFACE("wd1002a_wx1", ISA8_WD1002A_WX1)
 SLOT_INTERFACE_END
 
-static const isa8bus_interface isabus_intf =
-{
-	// interrupts
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// dma request
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  MACHINE_DRIVER( c1570 )
 //-------------------------------------------------
@@ -800,7 +783,8 @@ static MACHINE_CONFIG_FRAGMENT( mini_chief )
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
 	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 
-	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, M6502_TAG, isabus_intf)
+	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
+	MCFG_ISA8_CPU(M6502_TAG)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
 MACHINE_CONFIG_END
 

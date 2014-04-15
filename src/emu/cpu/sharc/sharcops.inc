@@ -586,6 +586,9 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			break;
 		}
 
+		case 0x11: /* TODO */
+			break;
+
 		case 0x12:      /* FEXT Rx BY <bit6>:<len6> (Sign Extended) */
 		{
 			UINT32 ext = (REG(rx) & MAKE_EXTRACT_MASK(bit, len)) >> bit;
@@ -758,6 +761,12 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 			case 0x1b:      /* Fm = Fxm * Fym,   Fa = FIX Fxa BY Fya */
 			{
 				compute_fmul_fix_scaled(fm, fxm, fym, fa, fxa, fya);
+				break;
+			}
+
+			case 0x1c: /* TODO! fmul_avg */
+			{
+				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
 				break;
 			}
 

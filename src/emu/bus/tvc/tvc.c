@@ -54,7 +54,9 @@ device_tvcexp_interface::~device_tvcexp_interface()
 //-------------------------------------------------
 tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, TVCEXP_SLOT, "TVC64 Expansion Slot", tag, owner, clock, "tvcexp_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_out_irq_cb(*this),
+		m_out_nmi_cb(*this)
 {
 }
 
@@ -75,33 +77,9 @@ void tvcexp_slot_device::device_start()
 	m_cart = dynamic_cast<device_tvcexp_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_out_nmi_cb.resolve_safe();
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tvcexp_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tvcexp_interface *intf = reinterpret_cast<const tvcexp_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<tvcexp_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-	}
-}
-
 
 /*-------------------------------------------------
     module id read

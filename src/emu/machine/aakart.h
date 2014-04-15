@@ -15,17 +15,12 @@ Acorn Archimedes KART interface
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_AAKART_ADD(_tag, _freq, _config) \
-	MCFG_DEVICE_ADD(_tag, AAKART, _freq) \
-	MCFG_DEVICE_CONFIG(_config)
-#define AAKART_INTERFACE(name) \
-	const aakart_interface (name) =
+#define MCFG_AAKART_OUT_TX_CB(_devcb) \
+	devcb = &aakart_device::set_out_tx_callback(*device, DEVCB2_##_devcb);
 
-struct aakart_interface
-{
-	devcb_write_line        m_out_tx_cb;
-	devcb_write_line        m_out_rx_cb;
-};
+#define MCFG_AAKART_OUT_RX_CB(_devcb) \
+	devcb = &aakart_device::set_out_rx_callback(*device, DEVCB2_##_devcb);
+	
 
 enum{
 	STATUS_NORMAL = 0,
@@ -42,12 +37,14 @@ enum{
 
 // ======================> aakart_device
 
-class aakart_device : public device_t,
-						public aakart_interface
+class aakart_device : public device_t
 {
 public:
 	// construction/destruction
 	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -60,7 +57,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 
 private:
 	static const device_timer_id RX_TIMER = 1;
@@ -72,8 +68,8 @@ private:
 	emu_timer *         m_mousetimer;
 	emu_timer *         m_keybtimer;
 
-	devcb_resolved_write_line   m_out_tx_func;
-	devcb_resolved_write_line   m_out_rx_func;
+	devcb2_write_line        m_out_tx_cb;
+	devcb2_write_line        m_out_rx_cb;
 	UINT8 m_tx_latch, m_rx_latch;
 	UINT8 m_rx;
 	UINT8 m_new_command;

@@ -1039,22 +1039,6 @@ WRITE_LINE_MEMBER( coco_state::bitbanger_callback )
 	bitbanger_changed(state ? true : false);
 }
 
-
-
-//-------------------------------------------------
-//  bitbanger_config
-//-------------------------------------------------
-
-const bitbanger_config coco_state::coco_bitbanger_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, bitbanger_callback),   /* callback */
-	BITBANGER_PRINTER,                                          /* default mode */
-	BITBANGER_600,                                              /* default output baud */
-	BITBANGER_0PERCENT                                          /* default fine tune adjustment */
-};
-
-
-
 //-------------------------------------------------
 //  poll_hires_joystick
 //-------------------------------------------------

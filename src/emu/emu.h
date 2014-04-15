@@ -22,7 +22,6 @@
 
 // core emulator headers -- must be first
 #include "emucore.h"
-#include "emutempl.h"
 #include "eminline.h"
 #include "profiler.h"
 

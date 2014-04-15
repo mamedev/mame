@@ -237,20 +237,5 @@ const msx_slot msx_slot_list[] = {
 #define MSX_SLOT_SAVESRAM(nm)       \
 	static int slot_##nm##_savesram (running_machine &machine, slot_state *state)
 
-struct msx_driver_struct {
-	char name[9];
-	const msx_slot_layout *layout;
-};
-
-extern const msx_driver_struct msx_driver_list[];
-
-#define MSX_DRIVER_LIST     \
-const msx_driver_struct msx_driver_list[] = {
-#define MSX_DRIVER(foo)     \
-		{ #foo, msx_slot_layout_##foo },
-#define MSX_DRIVER_END      \
-		{ "", NULL }        \
-};
-
 
 #endif /* MSX_SLOT_H_ */

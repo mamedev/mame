@@ -56,7 +56,13 @@ device_iq151cart_interface::~device_iq151cart_interface()
 iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock, "iq151cart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_out_irq0_cb(*this),
+		m_out_irq1_cb(*this),
+		m_out_irq2_cb(*this),
+		m_out_irq3_cb(*this),
+		m_out_irq4_cb(*this),
+		m_out_drq_cb(*this)
 {
 }
 
@@ -78,12 +84,12 @@ void iq151cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_iq151cart_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_irq0_func.resolve(m_out_irq0_cb, *this);
-	m_out_irq1_func.resolve(m_out_irq1_cb, *this);
-	m_out_irq2_func.resolve(m_out_irq2_cb, *this);
-	m_out_irq3_func.resolve(m_out_irq3_cb, *this);
-	m_out_irq4_func.resolve(m_out_irq4_cb, *this);
-	m_out_drq_func.resolve(m_out_drq_cb, *this);
+	m_out_irq0_cb.resolve_safe();
+	m_out_irq1_cb.resolve_safe();
+	m_out_irq2_cb.resolve_safe();
+	m_out_irq3_cb.resolve_safe();
+	m_out_irq4_cb.resolve_safe();
+	m_out_drq_cb.resolve_safe();
 
 }
 
@@ -95,24 +101,6 @@ void iq151cart_slot_device::device_start()
 
 void iq151cart_slot_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const iq151cart_interface *intf = reinterpret_cast<const iq151cart_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<iq151cart_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq0_cb, 0, sizeof(m_out_irq0_cb));
-		memset(&m_out_irq1_cb, 0, sizeof(m_out_irq1_cb));
-		memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
-		memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));
-		memset(&m_out_irq4_cb, 0, sizeof(m_out_irq4_cb));
-		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
-	}
-
 	// set brief and instance name
 	update_names();
 }

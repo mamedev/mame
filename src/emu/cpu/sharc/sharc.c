@@ -144,6 +144,24 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 	{
 		case 0x00: break;       // System configuration
 		case 0x02: break;       // External Memory Wait State Configuration
+		case 0x04: // External port DMA buffer 0
+		/* TODO: Last Bronx uses this to init program, shift and in */
+		{
+			UINT64 r = pm_read48(m_dma[6].int_index);
+
+			r &= ~((UINT64)(0xffff) << (m_extdma_shift*16));
+			r |= ((UINT64)data & 0xffff) << (m_extdma_shift*16);
+
+			pm_write48(m_dma[6].int_index, r);
+
+			m_extdma_shift++;
+			if (m_extdma_shift == 3)
+			{
+				m_extdma_shift = 0;
+				m_dma[6].int_index ++;
+			}
+		}
+		break;
 
 		case 0x08: break;       // Message Register 0
 		case 0x09: break;       // Message Register 1
@@ -153,6 +171,9 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 		case 0x0d: break;       // Message Register 5
 		case 0x0e: break;       // Message Register 6
 		case 0x0f: break;       // Message Register 7
+
+		case 0x14: // reserved??? written by Last Bronx
+		case 0x17: break;
 
 		// DMA 6
 		case 0x1c:
@@ -636,6 +657,7 @@ void adsp21062_device::device_reset()
 	}
 
 	m_pc = 0x20004;
+	m_extdma_shift = 0;
 	m_daddr = m_pc + 1;
 	m_faddr = m_daddr + 1;
 	m_nfaddr = m_faddr+1;

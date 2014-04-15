@@ -965,12 +965,6 @@ static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, stv_state )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-static SCUDSP_INTERFACE( scudsp_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(saturn_state, scudsp_end_w),
-	DEVCB_DRIVER_MEMBER16(saturn_state,scudsp_dma_r),
-	DEVCB_DRIVER_MEMBER16(saturn_state,scudsp_dma_w)
-};
 
 static MACHINE_CONFIG_START( stv, stv_state )
 
@@ -991,7 +985,9 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
 	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
 	MCFG_CPU_DATA_MAP(scudsp_data)
-	MCFG_CPU_CONFIG(scudsp_config)
+	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(saturn_state, scudsp_end_w))
+	MCFG_SCUDSP_IN_DMA_CB(READ16(saturn_state, scudsp_dma_r))
+	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)

@@ -120,26 +120,6 @@ void isa8_device::static_set_custom_spaces(device_t &device)
 
 void isa8_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const isa8bus_interface *intf = reinterpret_cast<const isa8bus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<isa8bus_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
-		memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));
-		memset(&m_out_irq4_cb, 0, sizeof(m_out_irq4_cb));
-		memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
-		memset(&m_out_irq6_cb, 0, sizeof(m_out_irq6_cb));
-		memset(&m_out_irq7_cb, 0, sizeof(m_out_irq7_cb));
-		memset(&m_out_drq1_cb, 0, sizeof(m_out_drq1_cb));
-		memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
-		memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
-	}
 	m_maincpu = subdevice<cpu_device>(m_cputag);
 }
 
@@ -158,6 +138,15 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 		m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, NULL),
 		m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, NULL),
 		m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, NULL),
+		m_out_irq2_cb(*this),
+		m_out_irq3_cb(*this),
+		m_out_irq4_cb(*this),
+		m_out_irq5_cb(*this),
+		m_out_irq6_cb(*this),
+		m_out_irq7_cb(*this),
+		m_out_drq1_cb(*this),
+		m_out_drq2_cb(*this),
+		m_out_drq3_cb(*this),
 		m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -177,6 +166,15 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 		m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, NULL),
 		m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, NULL),
 		m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, NULL),
+		m_out_irq2_cb(*this),
+		m_out_irq3_cb(*this),
+		m_out_irq4_cb(*this),
+		m_out_irq5_cb(*this),
+		m_out_irq6_cb(*this),
+		m_out_irq7_cb(*this),
+		m_out_drq1_cb(*this),
+		m_out_drq2_cb(*this),
+		m_out_drq3_cb(*this),
 		m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -224,15 +222,15 @@ void isa8_device::device_start()
 	// resolve callbacks
 	m_write_iochck.resolve_safe();
 
-	m_out_irq2_func.resolve(m_out_irq2_cb, *this);
-	m_out_irq3_func.resolve(m_out_irq3_cb, *this);
-	m_out_irq4_func.resolve(m_out_irq4_cb, *this);
-	m_out_irq5_func.resolve(m_out_irq5_cb, *this);
-	m_out_irq6_func.resolve(m_out_irq6_cb, *this);
-	m_out_irq7_func.resolve(m_out_irq7_cb, *this);
-	m_out_drq1_func.resolve(m_out_drq1_cb, *this);
-	m_out_drq2_func.resolve(m_out_drq2_cb, *this);
-	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
+	m_out_irq2_cb.resolve_safe();
+	m_out_irq3_cb.resolve_safe();
+	m_out_irq4_cb.resolve_safe();
+	m_out_irq5_cb.resolve_safe();
+	m_out_irq6_cb.resolve_safe();
+	m_out_irq7_cb.resolve_safe();
+	m_out_drq1_cb.resolve_safe();
+	m_out_drq2_cb.resolve_safe();
+	m_out_drq3_cb.resolve_safe();
 
 	m_maincpu = subdevice<cpu_device>(m_cputag);
 
@@ -358,17 +356,17 @@ bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 }
 
 // interrupt request from isa card
-WRITE_LINE_MEMBER( isa8_device::irq2_w ) { m_out_irq2_func(state); }
-WRITE_LINE_MEMBER( isa8_device::irq3_w ) { m_out_irq3_func(state); }
-WRITE_LINE_MEMBER( isa8_device::irq4_w ) { m_out_irq4_func(state); }
-WRITE_LINE_MEMBER( isa8_device::irq5_w ) { m_out_irq5_func(state); }
-WRITE_LINE_MEMBER( isa8_device::irq6_w ) { m_out_irq6_func(state); }
-WRITE_LINE_MEMBER( isa8_device::irq7_w ) { m_out_irq7_func(state); }
+WRITE_LINE_MEMBER( isa8_device::irq2_w ) { m_out_irq2_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::irq3_w ) { m_out_irq3_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::irq4_w ) { m_out_irq4_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::irq5_w ) { m_out_irq5_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::irq6_w ) { m_out_irq6_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::irq7_w ) { m_out_irq7_cb(state); }
 
 // dma request from isa card
-WRITE_LINE_MEMBER( isa8_device::drq1_w ) { m_out_drq1_func(state); }
-WRITE_LINE_MEMBER( isa8_device::drq2_w ) { m_out_drq2_func(state); }
-WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_func(state); }
+WRITE_LINE_MEMBER( isa8_device::drq1_w ) { m_out_drq1_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::drq2_w ) { m_out_drq2_cb(state); }
+WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_cb(state); }
 
 UINT8 isa8_device::dack_r(int line)
 {
@@ -463,7 +461,16 @@ const device_type ISA16 = &device_creator<isa16_device>;
 //-------------------------------------------------
 
 isa16_device::isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_device(mconfig, ISA16, "ISA16", tag, owner, clock, "isa16", __FILE__)
+		isa8_device(mconfig, ISA16, "ISA16", tag, owner, clock, "isa16", __FILE__),
+		m_out_irq10_cb(*this),
+		m_out_irq11_cb(*this),
+		m_out_irq12_cb(*this),
+		m_out_irq14_cb(*this),
+		m_out_irq15_cb(*this),
+		m_out_drq0_cb(*this),
+		m_out_drq5_cb(*this),
+		m_out_drq6_cb(*this),
+		m_out_drq7_cb(*this)
 {
 }
 
@@ -475,47 +482,6 @@ isa16_device::isa16_device(const machine_config &mconfig, const char *tag, devic
 
 void isa16_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const isa16bus_interface *intf = reinterpret_cast<const isa16bus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<isa16bus_interface *>(this) = *intf;
-		memcpy(&(isa8bus_interface::m_out_irq2_cb),&(isa16bus_interface::m_out_irq2_cb), sizeof(isa16bus_interface::m_out_irq2_cb));
-		memcpy(&(isa8bus_interface::m_out_irq3_cb),&(isa16bus_interface::m_out_irq3_cb), sizeof(isa16bus_interface::m_out_irq3_cb));
-		memcpy(&(isa8bus_interface::m_out_irq4_cb),&(isa16bus_interface::m_out_irq4_cb), sizeof(isa16bus_interface::m_out_irq4_cb));
-		memcpy(&(isa8bus_interface::m_out_irq5_cb),&(isa16bus_interface::m_out_irq5_cb), sizeof(isa16bus_interface::m_out_irq5_cb));
-		memcpy(&(isa8bus_interface::m_out_irq6_cb),&(isa16bus_interface::m_out_irq6_cb), sizeof(isa16bus_interface::m_out_irq6_cb));
-		memcpy(&(isa8bus_interface::m_out_irq7_cb),&(isa16bus_interface::m_out_irq7_cb), sizeof(isa16bus_interface::m_out_irq7_cb));
-		memcpy(&(isa8bus_interface::m_out_drq1_cb),&(isa16bus_interface::m_out_drq1_cb), sizeof(isa16bus_interface::m_out_drq1_cb));
-		memcpy(&(isa8bus_interface::m_out_drq2_cb),&(isa16bus_interface::m_out_drq2_cb), sizeof(isa16bus_interface::m_out_drq2_cb));
-		memcpy(&(isa8bus_interface::m_out_drq3_cb),&(isa16bus_interface::m_out_drq3_cb), sizeof(isa16bus_interface::m_out_drq3_cb));
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&(isa8bus_interface::m_out_irq2_cb), 0, sizeof(isa8bus_interface::m_out_irq2_cb));
-		memset(&(isa8bus_interface::m_out_irq3_cb), 0, sizeof(isa8bus_interface::m_out_irq3_cb));
-		memset(&(isa8bus_interface::m_out_irq4_cb), 0, sizeof(isa8bus_interface::m_out_irq4_cb));
-		memset(&(isa8bus_interface::m_out_irq5_cb), 0, sizeof(isa8bus_interface::m_out_irq5_cb));
-		memset(&(isa8bus_interface::m_out_irq6_cb), 0, sizeof(isa8bus_interface::m_out_irq6_cb));
-		memset(&(isa8bus_interface::m_out_irq7_cb), 0, sizeof(isa8bus_interface::m_out_irq7_cb));
-
-		memset(&m_out_irq10_cb, 0, sizeof(m_out_irq10_cb));
-		memset(&m_out_irq11_cb, 0, sizeof(m_out_irq11_cb));
-		memset(&m_out_irq12_cb, 0, sizeof(m_out_irq12_cb));
-		memset(&m_out_irq14_cb, 0, sizeof(m_out_irq14_cb));
-		memset(&m_out_irq15_cb, 0, sizeof(m_out_irq15_cb));
-
-		memset(&m_out_drq0_cb, 0, sizeof(m_out_drq0_cb));
-		memset(&(isa8bus_interface::m_out_drq1_cb), 0, sizeof(isa8bus_interface::m_out_drq1_cb));
-		memset(&(isa8bus_interface::m_out_drq2_cb), 0, sizeof(isa8bus_interface::m_out_drq2_cb));
-		memset(&(isa8bus_interface::m_out_drq3_cb), 0, sizeof(isa8bus_interface::m_out_drq3_cb));
-
-		memset(&m_out_drq5_cb, 0, sizeof(m_out_drq5_cb));
-		memset(&m_out_drq6_cb, 0, sizeof(m_out_drq6_cb));
-		memset(&m_out_drq7_cb, 0, sizeof(m_out_drq7_cb));
-	}
 	m_maincpu = mconfig().device<cpu_device>(m_cputag);
 }
 
@@ -528,16 +494,16 @@ void isa16_device::device_start()
 	isa8_device::device_start();
 
 	// resolve callbacks
-	m_out_irq10_func.resolve(m_out_irq10_cb, *this);
-	m_out_irq11_func.resolve(m_out_irq11_cb, *this);
-	m_out_irq12_func.resolve(m_out_irq12_cb, *this);
-	m_out_irq14_func.resolve(m_out_irq14_cb, *this);
-	m_out_irq15_func.resolve(m_out_irq15_cb, *this);
+	m_out_irq10_cb.resolve_safe();
+	m_out_irq11_cb.resolve_safe();
+	m_out_irq12_cb.resolve_safe();
+	m_out_irq14_cb.resolve_safe();
+	m_out_irq15_cb.resolve_safe();
 
-	m_out_drq0_func.resolve(m_out_drq0_cb, *this);
-	m_out_drq5_func.resolve(m_out_drq5_cb, *this);
-	m_out_drq6_func.resolve(m_out_drq6_cb, *this);
-	m_out_drq7_func.resolve(m_out_drq7_cb, *this);
+	m_out_drq0_cb.resolve_safe();
+	m_out_drq5_cb.resolve_safe();
+	m_out_drq6_cb.resolve_safe();
+	m_out_drq7_cb.resolve_safe();
 }
 
 void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
@@ -623,17 +589,17 @@ WRITE16_MEMBER(isa16_device::io16_swap_w)
 }
 
 // interrupt request from isa card
-WRITE_LINE_MEMBER( isa16_device::irq10_w ) { m_out_irq10_func(state); }
-WRITE_LINE_MEMBER( isa16_device::irq11_w ) { m_out_irq11_func(state); }
-WRITE_LINE_MEMBER( isa16_device::irq12_w ) { m_out_irq12_func(state); }
-WRITE_LINE_MEMBER( isa16_device::irq14_w ) { m_out_irq14_func(state); }
-WRITE_LINE_MEMBER( isa16_device::irq15_w ) { m_out_irq15_func(state); }
+WRITE_LINE_MEMBER( isa16_device::irq10_w ) { m_out_irq10_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::irq11_w ) { m_out_irq11_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::irq12_w ) { m_out_irq12_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::irq14_w ) { m_out_irq14_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::irq15_w ) { m_out_irq15_cb(state); }
 
 // dma request from isa card
-WRITE_LINE_MEMBER( isa16_device::drq0_w ) { m_out_drq0_func(state); }
-WRITE_LINE_MEMBER( isa16_device::drq5_w ) { m_out_drq5_func(state); }
-WRITE_LINE_MEMBER( isa16_device::drq6_w ) { m_out_drq6_func(state); }
-WRITE_LINE_MEMBER( isa16_device::drq7_w ) { m_out_drq7_func(state); }
+WRITE_LINE_MEMBER( isa16_device::drq0_w ) { m_out_drq0_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::drq5_w ) { m_out_drq5_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::drq6_w ) { m_out_drq6_cb(state); }
+WRITE_LINE_MEMBER( isa16_device::drq7_w ) { m_out_drq7_cb(state); }
 
 UINT16 isa16_device::dack16_r(int line)
 {

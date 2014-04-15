@@ -414,12 +414,6 @@ void aristmk5_state::machine_reset()
 #define NVRAM_PAGE_SIZE 0   /* max size of one write request */
 #endif
 
-/* TODO: this isn't supposed to access a keyboard ... */
-static AAKART_INTERFACE( kart_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_CPU_ADD("maincpu", ARM, 12000000)
@@ -429,7 +423,8 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 //  MCFG_I2CMEM_ADD("i2cmem")
 //  MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
 //  MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-	MCFG_AAKART_ADD("kart", 12000000/128, kart_interface) // TODO: frequency
+	/* TODO: this isn't supposed to access a keyboard ... */
+	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -474,7 +469,8 @@ static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
 //  MCFG_I2CMEM_ADD("i2cmem")
 //  MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
 //  MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-	MCFG_AAKART_ADD("kart", 12000000/128, kart_interface) // TODO: frequency
+	/* TODO: this isn't supposed to access a keyboard ... */
+	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

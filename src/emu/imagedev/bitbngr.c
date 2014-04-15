@@ -23,7 +23,8 @@ const device_type BITBANGER = &device_creator<bitbanger_device>;
 
 bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BITBANGER, "Bitbanger", tag, owner, clock, "bitbanger", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_input_cb(*this)
 {
 	m_output_timer = NULL;
 	m_input_timer = NULL;
@@ -314,13 +315,10 @@ void bitbanger_device::device_start(void)
 	m_input_buffer_cursor = 0;
 
 	/* defaults */
-	m_mode = m_default_mode;
-	m_baud = m_default_baud;
-	m_tune = m_default_tune;
 	m_current_baud = attotime::from_hz(baud_value());
 
 	/* callback */
-	m_input_func.resolve(m_input_callback, *this);
+	m_input_cb.resolve_safe();
 }
 
 
@@ -331,18 +329,6 @@ void bitbanger_device::device_start(void)
 
 void bitbanger_device::device_config_complete(void)
 {
-	const bitbanger_config *intf = reinterpret_cast<const bitbanger_config *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<bitbanger_config *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_input_callback, 0, sizeof(m_input_callback));
-		m_default_mode = 0;
-		m_default_baud = 0;
-		m_default_tune = 0;
-	}
 	update_names(BITBANGER, "bitbngr", "bitb");
 }
 
@@ -443,7 +429,7 @@ void bitbanger_device::set_input_line(UINT8 line)
 	if (m_current_input != line)
 	{
 		m_current_input = line;
-		m_input_func(line ? ASSERT_LINE : CLEAR_LINE);
+		m_input_cb(line ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
