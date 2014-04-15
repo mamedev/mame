@@ -692,7 +692,7 @@ void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
 		{
 			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
 			{
-				data = (m_in_dma_func(m_dma.src)<<16) | m_in_dma_func(m_dma.src+2);
+				data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
 				scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count );
 
 				m_dma.src += m_dma.add;
@@ -709,8 +709,8 @@ void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
 			{
 				data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count );
 
-				m_out_dma_func(m_dma.dst, data >> 16 );
-				m_out_dma_func(m_dma.dst+2, data & 0xffff );
+				m_out_dma_cb(m_dma.dst, data >> 16 );
+				m_out_dma_cb(m_dma.dst+2, data & 0xffff );
 
 				m_dma.dst += m_dma.add;
 
@@ -787,7 +787,7 @@ void scudsp_cpu_device::scudsp_end(UINT32 opcode)
 	{
 		/*ENDI*/
 		EF_1;
-		m_out_irq_func(1);
+		m_out_irq_cb(1);
 	}
 
 	EXF_0; /* END / ENDI */
@@ -806,7 +806,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	UINT32 data;
 	if ( m_dma.dir == 0 )
 	{
-		data = (m_in_dma_func(m_dma.src)<<16) | m_in_dma_func(m_dma.src+2);
+		data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
 		scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count );
 
 		m_dma.src += m_dma.add;
@@ -820,8 +820,8 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	{
 		data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count );
 
-		m_out_dma_func(m_dma.dst, data >> 16 );
-		m_out_dma_func(m_dma.dst+2, data & 0xffff );
+		m_out_dma_cb(m_dma.dst, data >> 16 );
+		m_out_dma_cb(m_dma.dst+2, data & 0xffff );
 
 		m_dma.dst += m_dma.add;
 
@@ -907,27 +907,6 @@ void scudsp_cpu_device::execute_run()
 	} while( m_icount > 0 );
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void scudsp_cpu_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const scudsp_interface *intf = reinterpret_cast<const scudsp_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<scudsp_interface *>(this) = *intf;
-
-	// or error out if none provided
-	else
-	{
-		fatalerror("SCUDSP_INTERFACE for cpu '%s' not defined!\n", tag());
-	}
-}
-
-
 void scudsp_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -988,9 +967,9 @@ void scudsp_cpu_device::device_start()
 	state_add( STATE_GENPC, "curpc", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).formatstr("%17s").noshow();
 
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_in_dma_func.resolve(m_in_dma_cb, *this);
-	m_out_dma_func.resolve(m_out_dma_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_in_dma_cb.resolve_safe(0);
+	m_out_dma_cb.resolve_safe();
 
 	m_icountptr = &m_icount;
 }
@@ -1011,6 +990,9 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 
 scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SCUDSP, "SCUDSP", tag, owner, clock, "scudsp", __FILE__)
+	, m_out_irq_cb(*this)
+	, m_in_dma_cb(*this)
+	, m_out_dma_cb(*this)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2)
 {
