@@ -42,22 +42,6 @@ static const cassette_interface mc1502_cassette_interface =
 
 // Timer
 
-static const isa8bus_interface mc1502_isabus_intf =
-{
-	// interrupts
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
-
-	// dma request
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 /* check if any keys are pressed, raise IRQ1 if so */
 
 TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
@@ -317,7 +301,14 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_dsr))
 
-	MCFG_ISA8_BUS_ADD("isa", ":maincpu", mc1502_isabus_intf)
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", mc1502_isa8_cards, "fdc", false)
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", mc1502_isa8_cards, "rom", false)
 	/* video hardware (only 1 chargen in ROM; CGA_FONT dip always 1 */

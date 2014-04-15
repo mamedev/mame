@@ -491,22 +491,6 @@ SLOT_INTERFACE_START( 4enlinea_isa8_cards )
 	SLOT_INTERFACE_INTERNAL("4enlinea",  ISA8_CGA_4ENLINEA)
 SLOT_INTERFACE_END
 
-static const isa8bus_interface _4enlinea_isabus_intf =
-{
-	// interrupts
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// dma request
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* TODO: irq sources are unknown */
 INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 {
@@ -540,7 +524,8 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	MCFG_CPU_IO_MAP(audio_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
 
-	MCFG_ISA8_BUS_ADD("isa", ":maincpu", _4enlinea_isabus_intf)
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", 4enlinea_isa8_cards, "4enlinea", true)
 
 

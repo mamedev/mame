@@ -108,28 +108,6 @@ static const pc_kbdc_interface pc_kbdc_intf =
 	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_data_w)
 };
 
-static const isa16bus_interface isabus_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq09_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq03_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq04_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq05_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq06_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq07_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq10_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq11_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq12_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq14_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, irq15_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq0_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq1_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq2_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq3_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq5_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq6_w),
-	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq7_w),
-};
-
 static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
@@ -162,8 +140,27 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_ISA16_BUS_ADD("isabus", ":maincpu", isabus_intf)
+	MCFG_DEVICE_ADD("isabus", ISA16, 0)
+	MCFG_ISA16_CPU(":maincpu")
 	MCFG_ISA_BUS_IOCHCK(DEVWRITELINE("cs4031", cs4031_device, iochck_w))
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("cs4031", cs4031_device, irq09_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("cs4031", cs4031_device, irq03_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("cs4031", cs4031_device, irq04_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("cs4031", cs4031_device, irq05_w))
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("cs4031", cs4031_device, irq06_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("cs4031", cs4031_device, irq07_w))
+	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE("cs4031", cs4031_device, irq10_w))
+	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE("cs4031", cs4031_device, irq11_w))
+	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE("cs4031", cs4031_device, irq12_w))
+	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE("cs4031", cs4031_device, irq14_w))
+	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE("cs4031", cs4031_device, irq15_w))
+	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("cs4031", cs4031_device, dreq0_w))
+	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("cs4031", cs4031_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("cs4031", cs4031_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("cs4031", cs4031_device, dreq3_w))
+	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("cs4031", cs4031_device, dreq5_w))
+	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("cs4031", cs4031_device, dreq6_w))
+	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("cs4031", cs4031_device, dreq7_w))
 	MCFG_ISA16_SLOT_ADD("isabus", "board1", pc_isa16_cards, "fdcsmc", true)
 	MCFG_ISA16_SLOT_ADD("isabus", "board2", pc_isa16_cards, "comat", true)
 	MCFG_ISA16_SLOT_ADD("isabus", "board3", pc_isa16_cards, "ide", true)
