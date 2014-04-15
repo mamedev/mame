@@ -169,9 +169,9 @@ void sh2_device::sh2_do_dma(int dma)
 				else
 					tempdst = m_active_dma_dst[dma];
 
-				if (m_dma_callback_fifo_data_available)
+				if (!m_dma_fifo_data_available_cb.isnull())
 				{
-					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
+					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
@@ -188,7 +188,7 @@ void sh2_device::sh2_do_dma(int dma)
 
 
 				dmadata = m_program->read_byte(tempsrc);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_byte(tempdst, dmadata);
 
 				if(m_active_dma_incs[dma] == 2)
@@ -217,9 +217,9 @@ void sh2_device::sh2_do_dma(int dma)
 				else
 					tempdst = m_active_dma_dst[dma];
 
-				if (m_dma_callback_fifo_data_available)
+				if (!m_dma_fifo_data_available_cb.isnull())
 				{
-					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
+					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
@@ -236,7 +236,7 @@ void sh2_device::sh2_do_dma(int dma)
 
 				// check: should this really be using read_word_32 / write_word_32?
 				dmadata = m_program->read_word(tempsrc);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_word(tempdst, dmadata);
 
 				if(m_active_dma_incs[dma] == 2)
@@ -264,9 +264,9 @@ void sh2_device::sh2_do_dma(int dma)
 				else
 					tempdst = m_active_dma_dst[dma];
 
-				if (m_dma_callback_fifo_data_available)
+				if (!m_dma_fifo_data_available_cb.isnull())
 				{
-					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
+					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
@@ -282,7 +282,7 @@ void sh2_device::sh2_do_dma(int dma)
 				#endif
 
 				dmadata = m_program->read_dword(tempsrc);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_dword(tempdst, dmadata);
 
 				if(m_active_dma_incs[dma] == 2)
@@ -309,9 +309,9 @@ void sh2_device::sh2_do_dma(int dma)
 				else
 					tempdst = m_active_dma_dst[dma];
 
-				if (m_dma_callback_fifo_data_available)
+				if (!m_dma_fifo_data_available_cb.isnull())
 				{
-					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
+					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
@@ -327,19 +327,19 @@ void sh2_device::sh2_do_dma(int dma)
 				#endif
 
 				dmadata = m_program->read_dword(tempsrc);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_dword(tempdst, dmadata);
 
 				dmadata = m_program->read_dword(tempsrc+4);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_dword(tempdst+4, dmadata);
 
 				dmadata = m_program->read_dword(tempsrc+8);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_dword(tempdst+8, dmadata);
 
 				dmadata = m_program->read_dword(tempsrc+12);
-				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
 				m_program->write_dword(tempdst+12, dmadata);
 
 				if(m_active_dma_incd[dma] == 2)
@@ -704,9 +704,9 @@ READ32_MEMBER( sh2_device::sh2_internal_r )
 	case 0x04: // TIER, FTCSR, FRC
 		if ( mem_mask == 0x00ff0000 )
 		{
-			if ( m_ftcsr_read_callback != NULL )
+			if (!m_ftcsr_read_cb.isnull())
 			{
-				m_ftcsr_read_callback( (m_m[4] & 0xffff0000) | m_frc );
+				m_ftcsr_read_cb((m_m[4] & 0xffff0000) | m_frc);
 			}
 		}
 		sh2_timer_resync();
@@ -739,11 +739,6 @@ READ32_MEMBER( sh2_device::sh2_internal_r )
 		return m_m[0x44];
 	}
 	return m_m[offset];
-}
-
-void sh2_device::sh2_set_ftcsr_read_callback(void (*callback)(UINT32))
-{
-	m_ftcsr_read_callback = callback;
 }
 
 void sh2_device::sh2_set_frt_input(int state)

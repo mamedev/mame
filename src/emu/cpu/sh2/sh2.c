@@ -166,6 +166,7 @@ ADDRESS_MAP_END
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SH2, "SH-2", tag, owner, clock, "sh2", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_is_slave(0)
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(NULL)
@@ -201,6 +202,7 @@ void sh2_device::device_stop()
 sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(NULL)
@@ -232,23 +234,6 @@ offs_t sh2_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 {
 	extern CPU_DISASSEMBLE( sh2 );
 	return CPU_DISASSEMBLE_NAME( sh2 )(this, buffer, pc, oprom, opram, options);
-}
-
-
-void sh2_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const sh2_cpu_core *intf = reinterpret_cast<const sh2_cpu_core *>(static_config());
-	if (intf != NULL)
-		*static_cast<sh2_cpu_core *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&dma_callback_kludge, 0, sizeof(dma_callback_kludge));
-		memset(&dma_callback_fifo_data_available, 0, sizeof(dma_callback_fifo_data_available));
-		is_slave = 0;
-	}
 }
 
 
@@ -2421,9 +2406,10 @@ void sh2_device::device_start()
 	m_dma_current_active_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
 	m_dma_current_active_timer[1]->adjust(attotime::never);
 
-	m_is_slave = is_slave;
-	m_dma_callback_kludge = dma_callback_kludge;
-	m_dma_callback_fifo_data_available = dma_callback_fifo_data_available;
+	/* resolve callbacks */
+	m_dma_kludge_cb.bind_relative_to(*owner());
+	m_dma_fifo_data_available_cb.bind_relative_to(*owner());
+	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();

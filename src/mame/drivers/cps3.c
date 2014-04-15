@@ -2325,9 +2325,6 @@ INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 }
 
 
-//static sh2_cpu_core sh2cp_conf_slave  = { 1, NULL };
-
-
 void cps3_state::machine_reset()
 {
 	m_current_table_address = -1;
@@ -2426,9 +2423,8 @@ void cps3_state::copy_from_nvram()
 }
 
 
-static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size)
+SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 {
-	cps3_state *state = device->machine().driver_data<cps3_state>();
 	/*
 	  on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
 
@@ -2450,22 +2446,22 @@ static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 da
 
 	if (src<0x80000)
 	{
-		int offs = (src&0x07ffff)>>2;
-		data = data ^ state->cps3_mask(offs*4, state->m_key1, state->m_key2);
+		int offs = (src & 0x07ffff) >> 2;
+		data = data ^ cps3_mask(offs * 4, m_key1, m_key2);
 	}
 	else if (src>=0x6000000 && src<0x6800000)
 	{
-		int offs = (src&0x07fffff)>>2;
-		if (!state->m_altEncryption) data = data ^ state->cps3_mask(0x6000000+offs*4, state->m_key1, state->m_key2);
+		int offs = (src & 0x07fffff) >> 2;
+		if (!m_altEncryption) data = data ^ cps3_mask(0x6000000 + offs * 4, m_key1, m_key2);
 	}
 	else if (src>=0x6800000 && src<0x7000000)
 	{
-		int offs = (src&0x07fffff)>>2;
-		if (!state->m_altEncryption) data = data ^ state->cps3_mask(0x6800000+offs*4, state->m_key1, state->m_key2);
+		int offs = (src & 0x07fffff) >> 2;
+		if (!m_altEncryption) data = data ^ cps3_mask(0x6800000 + offs * 4, m_key1, m_key2);
 	}
 	else
 	{
-		//printf("%s :src %08x, dst %08x, returning %08x\n", machine.describe_context(), src, dst, data);
+		//printf("%s :src %08x, dst %08x, returning %08x\n", machine().describe_context(), src, dst, data);
 	}
 
 	/* I doubt this is endian safe.. needs checking / fixing */
@@ -2482,12 +2478,6 @@ static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 da
 	return data;
 }
 
-
-
-static const sh2_cpu_core sh2_conf_cps3 = {
-	0, // master
-	cps3_dma_callback
-};
 
 static MACHINE_CONFIG_FRAGMENT( simm1_64mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm1.0")
@@ -2558,7 +2548,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_CPU_PROGRAM_MAP(cps3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
-	MCFG_CPU_CONFIG(sh2_conf_cps3)
+	MCFG_SH2_DMA_KLUDGE_CB(cps3_state, dma_callback)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
