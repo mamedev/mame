@@ -1425,7 +1425,7 @@ WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
-/* Top Skater reads here, and (I assume) isn't happy otherwise */
+/* Top Skater reads here */
 READ8_MEMBER(model2_state::tgpid_r)
 {
 	unsigned char ID[]={0,'T','A','H',0,'A','K','O',0,'Z','A','K',0,'M','T','K'};
@@ -3802,7 +3802,7 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C, Sega Game ID# 833-12861, RO
 	ROM_LOAD32_WORD( "mpr-19500.25", 0x000002, 0x400000, CRC(905f5798) SHA1(31f104e3022b5bc7ed7c667eb801a57949a06c93) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-19491.31", 0x000000, 0x080000, CRC(1c9b15fd) SHA1(045244a4eebc45f149aecf47f090cede1813477b) )
+	ROM_LOAD16_WORD_SWAP( "epr-19491.31", 0x080000, 0x080000, CRC(1c9b15fd) SHA1(045244a4eebc45f149aecf47f090cede1813477b) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-19504.32", 0x000000, 0x400000, CRC(9419ec08) SHA1(d05d9ceb7fd09fa8991c0df4d1c57eb621460e30) )
@@ -3846,7 +3846,7 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_LOAD32_WORD("mpr-19970.26", 0x0800002, 0x400000, CRC(c59d8d36) SHA1(24232390f0cac5ffbb17a0093a602363c686fbf8) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19967.31", 0x000000, 0x080000, CRC(c6b8ef3f) SHA1(9f86d6e365a5535d354ff6b0614f3a19c0790d0f) )
+	ROM_LOAD16_WORD_SWAP("epr-19967.31", 0x080000, 0x080000, CRC(c6b8ef3f) SHA1(9f86d6e365a5535d354ff6b0614f3a19c0790d0f) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD("mpr-19988.32", 0x000000, 0x400000, CRC(303732fb) SHA1(63efbd9f67b38fddeeed25de660514867e03486a) )
@@ -4473,7 +4473,7 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
+	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x080000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
@@ -4502,7 +4502,7 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, rom board stickered as 8
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
+	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x080000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
@@ -5762,7 +5762,7 @@ GAME( 1998, pltkids,         0, model2b, model2,  model2_state,  pltkids, ROT0, 
 GAME( 1995, rchase2,         0, model2b, rchase2, model2_state,  rchase2, ROT0, "Sega",   "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
-GAME( 1996, skisuprg,        0, model2c, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, skisuprg,        0, model2c, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, stcc,            0,    stcc, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, stccb,        stcc,    stcc, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, stcca,        stcc,    stcc, model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
