@@ -59,7 +59,8 @@ device_z88cart_interface::~device_z88cart_interface()
 z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock, "z88cart_slot", __FILE__),
 		device_image_interface(mconfig, *this),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_out_flp_cb(*this)
 {
 }
 
@@ -80,7 +81,7 @@ void z88cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_z88cart_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_flp_func.resolve(m_out_flp_cb, *this);
+	m_out_flp_cb.resolve_safe();
 
 	m_flp_timer = timer_alloc(TIMER_FLP_CLEAR);
 	m_flp_timer->reset();
@@ -94,19 +95,6 @@ void z88cart_slot_device::device_start()
 
 void z88cart_slot_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const z88cart_interface *intf = reinterpret_cast<const z88cart_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<z88cart_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_flp_cb, 0, sizeof(m_out_flp_cb));
-	}
-
 	// set brief and instance name
 	update_names();
 }
@@ -121,7 +109,7 @@ void z88cart_slot_device::device_timer(emu_timer &timer, device_timer_id id, int
 	if (id == TIMER_FLP_CLEAR)
 	{
 		// close the flap
-		m_out_flp_func(CLEAR_LINE);
+		m_out_flp_cb(CLEAR_LINE);
 	}
 }
 
@@ -154,7 +142,7 @@ bool z88cart_slot_device::call_load()
 	}
 
 	// open the flap
-	m_out_flp_func(ASSERT_LINE);
+	m_out_flp_cb(ASSERT_LINE);
 
 	// setup the timer for close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
@@ -173,7 +161,7 @@ void z88cart_slot_device::call_unload()
 		memset(m_cart->get_cart_base(), 0xff, m_cart->get_cart_size());
 
 	// open the flap
-	m_out_flp_func(ASSERT_LINE);
+	m_out_flp_cb(ASSERT_LINE);
 
 	// setup the timer for close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);

@@ -605,11 +605,6 @@ READ8_MEMBER(z88_state::kb_r)
 	return data;
 }
 
-static const z88cart_interface z88_cart_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("blink", upd65031_device, flp_w)
-};
-
 static SLOT_INTERFACE_START(z88_cart)
 	SLOT_INTERFACE("32krom",  Z88_32K_ROM)          // 32KB ROM cart
 	SLOT_INTERFACE("128krom", Z88_128K_ROM)         // 128KB ROM cart
@@ -660,9 +655,15 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
 
 	// cartridges
-	MCFG_Z88_CARTRIDGE_ADD("slot1", z88_cart_interface, z88_cart, NULL)
-	MCFG_Z88_CARTRIDGE_ADD("slot2", z88_cart_interface, z88_cart, NULL)
-	MCFG_Z88_CARTRIDGE_ADD("slot3", z88_cart_interface, z88_cart, NULL)
+	MCFG_DEVICE_ADD("slot1", Z88CART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, NULL, false)
+	MCFG_Z88CART_SLOT_OUT_FLP_CB(DEVWRITELINE("blink", upd65031_device, flp_w))
+	MCFG_DEVICE_ADD("slot2", Z88CART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, NULL, false)
+	MCFG_Z88CART_SLOT_OUT_FLP_CB(DEVWRITELINE("blink", upd65031_device, flp_w))
+	MCFG_DEVICE_ADD("slot3", Z88CART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, NULL, false)
+	MCFG_Z88CART_SLOT_OUT_FLP_CB(DEVWRITELINE("blink", upd65031_device, flp_w))
 MACHINE_CONFIG_END
 
 
