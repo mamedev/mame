@@ -476,6 +476,27 @@ void archimedes_state::latch_timer_cnt(int tmr)
 	m_ioc_timerout[tmr] = m_ioc_timercnt[tmr] - (UINT32)time;
 }
 
+bool archimedes_state::check_floppy_ready()
+{
+	floppy_image_device *floppy = NULL;
+
+	if(!m_fdc)
+		return false;
+
+	switch(m_floppy_select & 3)
+	{
+		case 0:
+			floppy = m_floppy0->get_device(); break;
+		case 1:
+			floppy = m_floppy1->get_device(); break;
+	}
+
+	if(floppy)
+		return floppy->ready_r();
+
+	return false;
+}
+
 /* TODO: should be a 8-bit handler */
 READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 {
@@ -487,8 +508,9 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		case CONTROL:
 		{
 			UINT8 i2c_data = 1;
-			static UINT8 flyback; //internal name for vblank here
+			UINT8 flyback; //internal name for vblank here
 			int vert_pos;
+			bool floppy_ready_state;
 
 			vert_pos = m_screen->vpos();
 			flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
@@ -498,7 +520,9 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 				i2c_data = (m_i2cmem->read_sda() & 1);
 			}
 
-			return (flyback) | (m_ioc_regs[CONTROL] & 0x7c) | (m_i2c_clk<<1) | i2c_data;
+			floppy_ready_state = check_floppy_ready();
+
+			return (flyback) | (m_ioc_regs[CONTROL] & 0x78) | (floppy_ready_state<<2) | (m_i2c_clk<<1) | i2c_data;
 		}
 
 		case KART:  // keyboard read
@@ -567,6 +591,17 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 				m_i2cmem->write_scl((data & 0x02) >> 1);
 			}
 			m_i2c_clk = (data & 2) >> 1;
+			//TODO: does writing bit 2 here causes a fdc force ready?
+			/*
+			-x-- ---- Printer ack
+			--x- ---- Sound mute
+			---x ---- Aux I/O connector
+			---- -x-- Floppy ready
+			---- --x- I2C clock
+			---- ---x I2C data
+			*/
+			//if(data & 0x40)
+			//	popmessage("Muting sound, contact MAME/MESSdev");
 			break;
 
 		case KART:
@@ -801,16 +836,26 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
+								/*
+								---- x--- floppy controller reset
+								*/
 								m_fdc->dden_w(BIT(data, 1));
+								if(data & 8)
+									m_fdc->soft_reset();
+								if(data & ~0xa)
+									printf("%02x Latch B\n",data);
 								return;
 
 							case 0x40: // latch A
+								/*
+								-x-- ---- In Use Control (floppy?)
+								*/
 								floppy_image_device *floppy = NULL;
 
-								if (!(data & 1)) { floppy = m_floppy0->get_device(); }
-								if (!(data & 2)) { floppy = m_floppy1->get_device(); }
-								if (!(data & 4)) { floppy = NULL; } // floppy 2
-								if (!(data & 8)) { floppy = NULL; } // floppy 3
+								if (!(data & 1)) { m_floppy_select = 0; floppy = m_floppy0->get_device(); }
+								if (!(data & 2)) { m_floppy_select = 1; floppy = m_floppy1->get_device(); }
+								if (!(data & 4)) { m_floppy_select = 2; floppy = NULL; } // floppy 2
+								if (!(data & 8)) { m_floppy_select = 3; floppy = NULL; } // floppy 3
 
 								m_fdc->set_floppy(floppy);
 
@@ -970,7 +1015,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 
 
 		//#ifdef MAME_DEBUG
-		if(1)
+		if(reg != VIDC_VCSR && reg != VIDC_VCER && reg != VIDC_HCSR)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
 		//#endif
 

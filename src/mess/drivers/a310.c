@@ -9,13 +9,14 @@
  *  Angelo Salese, August 2010
  *
  *  TODO:
+ *  - Make floppies to work;
+ *  - Attempting to load the GUI gives an exception;
+ *  - Graphics in GUI misses some vram data on the right edges (for example white vertical stripe on the far right), rmw bug related to the above?
+ *   - Apparently same deal happens to Arthur OS, on a bunch of icons;
+ *  - Hook up mouse in AAKART;
+ *  - Add shifted version of keyboard inputs, necessary especially for loading programs thru Supervisor Mode;
  *  - try to understand why bios 2 was working at some point and now isn't
- *  - fix RISC OS / Arthur booting, possible causes:
- *  \- missing reset page size hook-up
- *  \- some subtle memory paging fault
- *  \- missing RAM max size
- *  \- ARM bug?
- *  - 38776b8
+ *
  *
  *
 =======================================================================================

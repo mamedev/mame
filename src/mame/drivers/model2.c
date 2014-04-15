@@ -887,6 +887,7 @@ void model2_state::push_geo_data(UINT32 data)
 
 READ32_MEMBER(model2_state::geo_prg_r)
 {
+	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
 	return 0xffffffff;
 }
 
@@ -970,6 +971,8 @@ WRITE32_MEMBER(model2_state::geo_w)
 				UINT32 r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
+				if((address >> 4) & 0xc0)
+					popmessage("Eye mode? Contact MAMEdev");
 				push_geo_data(r);
 			}
 		}
