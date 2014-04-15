@@ -119,6 +119,13 @@ void ui_emu_menubar::menubar_draw_ui_elements()
 		machine().ui().draw_text_full(container(), text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
+	// if we're single-stepping, pause now
+	if (machine().ui().single_step())
+	{
+		machine().pause();
+		machine().ui().set_single_step(false);
+	}
+
 	// check for fast forward 
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
 	{
@@ -193,6 +200,9 @@ void ui_emu_menubar::build_file_menu()
 	// pause
 	menu_item &pause_menu = file_menu.append("Pause", &running_machine::toggle_pause, machine(), IPT_UI_PAUSE);
 	pause_menu.set_checked(machine().paused());
+
+	// single step
+	file_menu.append("Single Step", &ui_manager::do_single_step, machine().ui(), IPT_UI_PAUSE);
 
 	// reset
 	menu_item &reset_menu = file_menu.append("Reset");

@@ -1552,6 +1552,17 @@ void ui_manager::request_quit()
 
 
 //-------------------------------------------------
+//  do_single_step
+//-------------------------------------------------
+
+void ui_manager::do_single_step()
+{
+	set_single_step(true);
+	machine().resume();
+}
+
+
+//-------------------------------------------------
 //  handler_confirm_quit - leads the user through
 //  confirming quit emulation
 //-------------------------------------------------
