@@ -1589,8 +1589,10 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
+	AM_RANGE(0x11000000, 0x110fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
+	AM_RANGE(0x11100000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
+	AM_RANGE(0x11200000, 0x112fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
+	AM_RANGE(0x11300000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
 	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
 
 
