@@ -4,7 +4,6 @@
  PeT mess@utanet.at in december 2000
 ******************************************************************************/
 
-#include <assert.h>
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 

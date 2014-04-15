@@ -10,7 +10,6 @@
 #include "imagedev/floppy.h"
 #include "formats/ap2_dsk.h"
 #include "wozfdc.h"
-#include <assert.h>
 
 /***************************************************************************
     PARAMETERS

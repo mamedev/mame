@@ -56,8 +56,6 @@
 ***************************************************************************/
 
 #include <math.h>
-#include <assert.h>
-
 #include "emu.h"
 #include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"
