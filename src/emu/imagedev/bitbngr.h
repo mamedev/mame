@@ -55,40 +55,35 @@ enum
     CONSTANTS
 ***************************************************************************/
 
-#define MCFG_BITBANGER_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, BITBANGER, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_BITBANGER_INPUT_CB(_devcb) \
+	devcb = &bitbanger_device::set_input_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_BITBANGER_DEFAULT_MODE(_mode) \
+	bitbanger_device::set_default_mode(*device, _mode);
+	
+#define MCFG_BITBANGER_DEFAULT_BAUD(_baud) \
+	bitbanger_device::set_default_baud(*device, _baud);
+	
+#define MCFG_BITBANGER_DEFAULT_TUNE(_tune) \
+	bitbanger_device::set_default_tune(*device, _tune);
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct bitbanger_config
-{
-	/* callback to driver */
-	devcb_write_line        m_input_callback;
-
-	/* emulating a printer or modem */
-	int                     m_default_mode;
-
-	/* output bits per second */
-	int                     m_default_baud;
-
-	/* fine tune adjustment to the baud */
-	int                     m_default_tune;
-};
-
-
 
 class bitbanger_device :    public device_t,
-							public device_image_interface,
-							public bitbanger_config
+							public device_image_interface
 {
 public:
 	// construction/destruction
 	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_input_callback(device_t &device, _Object object) { return downcast<bitbanger_device &>(device).m_input_cb.set_callback(object); }
+	static void set_default_mode(device_t &device, int default_mode) { downcast<bitbanger_device &>(device).m_mode = default_mode; }
+	static void set_default_baud(device_t &device, int default_baud) { downcast<bitbanger_device &>(device).m_baud = default_baud; }
+	static void set_default_tune(device_t &device, int default_tune) { downcast<bitbanger_device &>(device).m_tune = default_tune; }
+	
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
@@ -145,7 +140,8 @@ private:
 	// variables
 	emu_timer *                 m_output_timer;
 	emu_timer *                 m_input_timer;
-	devcb_resolved_write_line   m_input_func;
+	
+	devcb2_write_line    	    m_input_cb; /* callback to driver */
 	int                         m_output_value;
 	int                         m_build_count;
 	int                         m_build_byte;
@@ -153,9 +149,9 @@ private:
 	attotime                    m_current_baud;
 	UINT32                      m_input_buffer_size;
 	UINT32                      m_input_buffer_cursor;
-	int                         m_mode;
-	int                         m_baud;
-	int                         m_tune;
+	int                         m_mode; /* emulating a printer or modem */
+	int                         m_baud; /* output bits per second */
+	int                         m_tune; /* fine tune adjustment to the baud */
 	UINT8                       m_current_input;
 	UINT8                       m_input_buffer[1000];
 };

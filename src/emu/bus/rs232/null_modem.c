@@ -9,16 +9,12 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 {
 }
 
-static bitbanger_config null_modem_image_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, null_modem_device, read),
-	BITBANGER_MODEM,
-	BITBANGER_9600,
-	BITBANGER_0PERCENT
-};
-
 static MACHINE_CONFIG_FRAGMENT(null_modem_config)
-	MCFG_BITBANGER_ADD("bitbanger", null_modem_image_config);
+	MCFG_DEVICE_ADD("bitbanger", BITBANGER, 0)
+	MCFG_BITBANGER_INPUT_CB(WRITELINE(null_modem_device, read))		/* callback */
+	MCFG_BITBANGER_DEFAULT_MODE(BITBANGER_MODEM)		/* default mode */
+	MCFG_BITBANGER_DEFAULT_BAUD(BITBANGER_9600)		/* default output baud */
+	MCFG_BITBANGER_DEFAULT_TUNE(BITBANGER_0PERCENT)		/* default fine tune adjustment */
 MACHINE_CONFIG_END
 
 machine_config_constructor null_modem_device::device_mconfig_additions() const

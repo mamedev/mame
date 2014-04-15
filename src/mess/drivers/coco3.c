@@ -262,7 +262,11 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
 	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
-	MCFG_BITBANGER_ADD(BITBANGER_TAG, coco_state::coco_bitbanger_config)
+	MCFG_DEVICE_ADD(BITBANGER_TAG, BITBANGER, 0)
+	MCFG_BITBANGER_INPUT_CB(WRITELINE(coco_state, bitbanger_callback))		/* callback */
+	MCFG_BITBANGER_DEFAULT_MODE(BITBANGER_PRINTER)		/* default mode */
+	MCFG_BITBANGER_DEFAULT_BAUD(BITBANGER_600)		/* default output baud */
+	MCFG_BITBANGER_DEFAULT_TUNE(BITBANGER_0PERCENT)		/* default fine tune adjustment */
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "fdcv11")
 	MCFG_COCO_VHD_ADD(VHD0_TAG)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
