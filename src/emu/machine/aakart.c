@@ -38,7 +38,9 @@ const device_type AAKART = &device_creator<aakart_device>;
 //-------------------------------------------------
 
 aakart_device::aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AAKART, "AAKART", tag, owner, clock, "aakart", __FILE__)
+	: device_t(mconfig, AAKART, "AAKART", tag, owner, clock, "aakart", __FILE__),
+		m_out_tx_cb(*this),
+		m_out_rx_cb(*this)
 {
 }
 
@@ -59,8 +61,8 @@ void aakart_device::device_validity_check(validity_checker &valid) const
 
 void aakart_device::device_start()
 {
-	m_out_tx_func.resolve(m_out_tx_cb, *this);
-	m_out_rx_func.resolve(m_out_rx_cb, *this);
+	m_out_tx_cb.resolve_safe();
+	m_out_rx_cb.resolve_safe();
 	m_rxtimer = timer_alloc(RX_TIMER);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	m_txtimer = timer_alloc(TX_TIMER);
@@ -69,27 +71,6 @@ void aakart_device::device_start()
 	m_mousetimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	m_keybtimer = timer_alloc(KEYB_TIMER);
 	m_keybtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void aakart_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const aakart_interface *intf = reinterpret_cast<const aakart_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<aakart_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
-		memset(&m_out_rx_cb, 0, sizeof(m_out_rx_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -124,7 +105,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                 break;
             case 0x20:
                 m_rx = 0x81;
-                m_out_tx_func(ASSERT_LINE);
+                m_out_tx_cb(ASSERT_LINE);
                 break;
             case 0x30:
             case 0x31:
@@ -136,7 +117,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                 {
                     //printf("Got row\n");
                     m_rx = m_keyb_row;
-                    m_out_tx_func(ASSERT_LINE);
+                    m_out_tx_cb(ASSERT_LINE);
                 }
 
                 break;
@@ -145,22 +126,22 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                 {
                     //printf("Got col\n");
                     m_rx = m_keyb_col;
-                    m_out_tx_func(ASSERT_LINE);
+                    m_out_tx_cb(ASSERT_LINE);
                     m_keyb_state = 0;
                 }
 
                 break;
             case 0xfd:
                 m_rx = 0xfd;
-                m_out_tx_func(ASSERT_LINE);
+                m_out_tx_cb(ASSERT_LINE);
                 break;
             case 0xfe:
                 m_rx = 0xfe;
-                m_out_tx_func(ASSERT_LINE);
+                m_out_tx_cb(ASSERT_LINE);
                 break;
             case 0xff:
                 m_rx = 0xff;
-                m_out_tx_func(ASSERT_LINE);
+                m_out_tx_cb(ASSERT_LINE);
                 break;
             default:
                 printf("%02x %02x %02x\n",m_tx_latch,m_rx_latch,m_keyb_enable);
@@ -168,7 +149,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
         }
 
         //m_new_command &= ~1;
-        m_out_rx_func(ASSERT_LINE);
+        m_out_rx_cb(ASSERT_LINE);
     }
 
 }
@@ -181,7 +162,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 READ8_MEMBER( aakart_device::read )
 {
-    m_out_tx_func(CLEAR_LINE);
+    m_out_tx_cb(CLEAR_LINE);
     //debugger_break(machine());
 	return m_rx;
 }
@@ -191,7 +172,7 @@ WRITE8_MEMBER( aakart_device::write )
 	// if(m_new_command) printf("skip cmd %02x\n",data);
 
 	m_tx_latch = data;
-    m_out_rx_func(CLEAR_LINE);
+    m_out_rx_cb(CLEAR_LINE);
     m_new_command |= 1;
 }
 
