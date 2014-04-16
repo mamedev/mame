@@ -2621,7 +2621,7 @@ static UINT32 * geo_code_jump( geo_state *geo, UINT32 opcode, UINT32 *input )
 
 static UINT32 * geo_process_command( geo_state *geo, UINT32 opcode, UINT32 *input )
 {
-	switch( opcode >> 23 )
+	switch( (opcode >> 23) & 0x1f )
 	{
 		case 0x00: input = geo_nop( geo, opcode, input );               break;
 		case 0x01: input = geo_object_data( geo, opcode, input );       break;

@@ -15,6 +15,7 @@
 	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
 	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
 	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
+	- lastbrnx: eventually crashes in attract mode, geo_parse_nn_s() is the culprit apparently;
 	- manxtt: missing 3d;
 	- motoraid: stalls after course select;
 	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
@@ -975,7 +976,14 @@ WRITE32_MEMBER(model2_state::geo_w)
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
 				if((address >> 4) & 0xc0)
-					popmessage("Eye mode? Contact MAMEdev");
+				{
+					UINT8 function = (address >> 4) & 0x3f;
+					if(function == 1)
+					{
+						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
+						//popmessage("Eye mode %02x? Contact MAMEdev",function);
+					}
+				}
 				push_geo_data(r);
 			}
 		}
