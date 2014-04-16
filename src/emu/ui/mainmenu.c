@@ -19,7 +19,6 @@
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/barcode.h"
-#include "ui/bbcontrl.h"
 #include "ui/tapectrl.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
@@ -87,11 +86,6 @@ void ui_menu_main::populate()
 		cassette_device_iterator cassiter(machine().root_device());
 		if (cassiter.first() != NULL)
 			item_append("Tape Control", NULL, 0, (void *)MESS_MENU_TAPE_CONTROL);
-
-		/* add bitbanger control menu */
-		bitbanger_device_iterator bititer(machine().root_device());
-		if (bititer.first() != NULL)
-			item_append("Bitbanger Control", NULL, 0, (void *)MESS_MENU_BITBANGER_CONTROL);
 	}
 
 	if (machine().ioport().has_bioses())
@@ -197,10 +191,6 @@ void ui_menu_main::handle()
 
 		case MESS_MENU_TAPE_CONTROL:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container, NULL)));
-			break;
-
-		case MESS_MENU_BITBANGER_CONTROL:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_bitbanger_control(machine(), container, NULL)));
 			break;
 
 		case SLOT_DEVICES:
