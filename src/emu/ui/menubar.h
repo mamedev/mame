@@ -89,6 +89,7 @@ public:
 		bool is_enabled() const { return m_is_enabled; }
 		bool is_separator() const { return m_is_separator; }
 		bool has_children() const { return m_first_child ? true : false; }
+		bool is_shortcut_always_enabled() const { return m_is_shortcut_always_enabled; }
 		int shortcut() const { return m_shortcut; }
 		const astring &text() const { return m_text; }
 		menu_item *parent() { return m_parent; }
@@ -106,6 +107,7 @@ public:
 		void set_enabled(bool enabled) { m_is_enabled = enabled; }
 		void set_text(const char *text) { m_text.cpy(text); }
 		void set_next_with_shortcut(menu_item *item) { m_next_with_shortcut = item; }
+		void set_shortcut_always_enabled(bool shortcut_always_enabled) { m_is_shortcut_always_enabled = shortcut_always_enabled; }
 
 	private:
 		// private variables
@@ -118,6 +120,7 @@ public:
 		bool			m_is_checked;
 		bool			m_is_enabled;
 		bool			m_is_separator;
+		bool			m_is_shortcut_always_enabled;
 		menu_item *		m_parent;
 		menu_item *		m_first_child;
 		menu_item *		m_last_child;
@@ -227,6 +230,7 @@ private:
 	osd_ticks_t				m_last_mouse_move;
 	menubar_visibility_t	m_menubar_visibility;
 	bool					m_first_time;
+	bool					m_shortcuts_enabled;
 
 	// selection walking
 	bool walk_selection_previous();

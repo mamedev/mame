@@ -309,7 +309,7 @@ bool ui_menubar::poll_navigation_keys()
 		result = walk_selection_previous_sub_menu();
 	else if (input_pressed_safe(code_next_sub_menu))
 		result = walk_selection_next_sub_menu();
-	else if (input_pressed_safe(IPT_UI_CONFIGURE))
+	else if (machine().ui().shortcuts_enabled() && input_pressed_safe(IPT_UI_CONFIGURE))
 		toggle_selection();
 	else if (input_pressed_safe(code_selected))
 		invoke(m_selected_item);
@@ -333,14 +333,19 @@ bool ui_menubar::poll_shortcut_keys(bool swallow)
 	// loop through all shortcut items
 	for (menu_item *item = m_shortcuted_menu_items; item != NULL; item = item->next_with_shortcut())
 	{
+		// sanity check
 		assert(item->is_invokable());
 		
-		// did we press this shortcut?
-		if (input_pressed_safe(item->shortcut()) && !swallow)
+		// should we check the shortcut?
+		if (machine().ui().shortcuts_enabled() || item->is_shortcut_always_enabled())
 		{
-			// this shortcut was pressed and we're not swallowing them; invoke it
-			invoke(item);
-			return true;
+			// did we press this shortcut?
+			if (input_pressed_safe(item->shortcut()) && !swallow)
+			{
+				// this shortcut was pressed and we're not swallowing them; invoke it
+				invoke(item);
+				return true;
+			}
 		}
 	}
 	return false;
@@ -831,6 +836,7 @@ ui_menubar::menu_item::menu_item(ui_menubar &menubar, const char *text, ui_menub
 	m_is_checked = false;
 	m_is_enabled = true;
 	m_is_separator = false;
+	m_is_shortcut_always_enabled = false;
 	m_shortcut = shortcut;
 	m_shortcut_text_width = -1;
 	clear_area();

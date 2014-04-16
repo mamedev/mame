@@ -123,6 +123,7 @@
 const int SPACE_COUNT = 3;
 const int KEY_BUFFER_SIZE = 4096;
 const unicode_char INVALID_CHAR = '?';
+const bool KEYBOARD_TRUMPS_UI_SHORTCUTS = false;
 
 
 
@@ -2478,7 +2479,7 @@ time_t ioport_manager::initialize()
 	}
 
 	// do we have a keyboard?  if so, we may need to change default UI keys in response
-	if (has_keyboard())
+	if (KEYBOARD_TRUMPS_UI_SHORTCUTS && has_keyboard())
 		adjust_ui_seqs_for_keyboard();
 
 	// renumber player numbers for controller ports

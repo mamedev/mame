@@ -418,6 +418,10 @@ void ui_emu_menubar::build_options_menu()
 	if (machine().config().m_memcard_handler != NULL)
 		options_menu.append<ui_emu_menubar>("Memory Card...", &ui_emu_menubar::start_menu<ui_menu_memory_card>, *this);
 
+	// shortcuts enabled
+	menu_item &shortcuts_enabled_item = options_menu.append<ui_manager>("Menu Shorcuts Enabled", &ui_manager::set_shortcuts_enabled, &ui_manager::shortcuts_enabled, machine().ui(), IPT_UI_SHORTCUTS_ENABLED);
+	shortcuts_enabled_item.set_shortcut_always_enabled(true);
+
 	// cheat
 	if (machine().options().cheat() && machine().cheat().first() != NULL)
 	{

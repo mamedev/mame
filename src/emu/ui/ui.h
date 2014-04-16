@@ -171,6 +171,8 @@ public:
 	void decrease_frameskip();
 	void request_quit();
 	void do_single_step();
+	bool shortcuts_enabled() const { return m_shortcuts_enabled; }
+	void set_shortcuts_enabled(bool shortcuts_enabled);
 
 	// UI handlers
 	static UINT32 ui_handler_load_save(running_machine &machine, render_container *container, UINT32 state);
@@ -201,6 +203,7 @@ private:
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
 	ui_menubar *			m_menubar;
+	bool					m_shortcuts_enabled;
 
 	// text generators
 	astring &disclaimer_string(astring &buffer);

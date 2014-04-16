@@ -711,7 +711,7 @@ void construct_core_types_keypad(simple_list<input_type_entry> &typelist)
 
 void construct_core_types_ui_general(simple_list<input_type_entry> &typelist)
 {
-	INPUT_PORT_DIGITAL_TYPE( 0, UI_GENERAL,      UI_CONFIGURE,        "Config Menu",            input_seq(KEYCODE_TAB, input_seq::or_code, KEYCODE_SCRLOCK) )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI_GENERAL,      UI_CONFIGURE,        "Config Menu",            input_seq(KEYCODE_TAB) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI_GENERAL,      UI_UP,               "UI Up",                  input_seq(KEYCODE_UP, input_seq::or_code, JOYCODE_Y_UP_SWITCH_INDEXED(0)) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI_GENERAL,      UI_DOWN,             "UI Down",                input_seq(KEYCODE_DOWN, input_seq::or_code, JOYCODE_Y_DOWN_SWITCH_INDEXED(0)) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI_GENERAL,      UI_LEFT,             "UI Left",                input_seq(KEYCODE_LEFT, input_seq::or_code, JOYCODE_X_LEFT_SWITCH_INDEXED(0)) )
@@ -754,6 +754,7 @@ void construct_core_types_ui_shortcuts(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 0, UI_SHORTCUT,      UI_TOGGLE_DEBUG,     "Toggle Debugger",        input_seq(KEYCODE_F5) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI_SHORTCUT,      UI_SAVE_STATE,       "Save State",             input_seq(KEYCODE_F7, KEYCODE_LSHIFT) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI_SHORTCUT,      UI_LOAD_STATE,       "Load State",             input_seq(KEYCODE_F7, input_seq::not_code, KEYCODE_LSHIFT) )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI_SHORTCUT,      UI_SHORTCUTS_ENABLED,"Enable Shortcuts",       input_seq(KEYCODE_SCRLOCK) )
  }
 
 void construct_core_types_OSD(simple_list<input_type_entry> &typelist)

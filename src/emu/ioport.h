@@ -369,13 +369,13 @@ enum ioport_type
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
 		IPT_UI_LOAD_STATE,
+		IPT_UI_SHORTCUTS_ENABLED,
 		
 		// dummy slots that will likely be filled soon (putting these in as a temporary convenience)
 		IPT_UI_DUMMY1,
 		IPT_UI_DUMMY2,
 		IPT_UI_DUMMY3,
 		IPT_UI_DUMMY4,
-		IPT_UI_DUMMY5,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,

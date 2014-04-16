@@ -224,6 +224,7 @@ ui_manager::ui_manager(running_machine &machine)
 	m_popup_text_end = 0;
 	m_use_natural_keyboard = false;
 	m_mouse_arrow_texture = NULL;
+	m_shortcuts_enabled = true;
 
 	// more initialization
 	set_handler(handler_messagebox, 0);
@@ -936,6 +937,17 @@ void ui_manager::show_menu()
 void ui_manager::show_mouse(bool status)
 {
 	m_mouse_show = status;
+}
+
+
+//-------------------------------------------------
+//  set_shortcuts_enabled
+//-------------------------------------------------
+
+void ui_manager::set_shortcuts_enabled(bool shortcuts_enabled)
+{
+	m_shortcuts_enabled = shortcuts_enabled;
+	popmessage("Menu shortcuts %s", shortcuts_enabled ? "enabled" : "disabled");
 }
 
 
