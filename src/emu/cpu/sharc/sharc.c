@@ -49,7 +49,7 @@ const device_type ADSP21062 = &device_creator<adsp21062_device>;
 
 // This is just used to stop the debugger from complaining about executing from I/O space
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
-	AM_RANGE(0x20000, 0x7ffff) AM_RAM
+	AM_RANGE(0x20000, 0x7ffff) AM_RAM AM_SHARE("x")
 ADDRESS_MAP_END
 
 
@@ -145,8 +145,14 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 		case 0x00: break;       // System configuration
 		case 0x02: break;       // External Memory Wait State Configuration
 		case 0x04: // External port DMA buffer 0
-		/* TODO: Last Bronx uses this to init program, shift and in */
+		/* TODO: Last Bronx uses this to init the program, int_index however is 0? */
 		{
+			external_dma_write(m_extdma_shift,data);
+			m_extdma_shift++;
+			if(m_extdma_shift == 3)
+				m_extdma_shift = 0;
+
+			#if 0
 			UINT64 r = pm_read48(m_dma[6].int_index);
 
 			r &= ~((UINT64)(0xffff) << (m_extdma_shift*16));
@@ -160,6 +166,7 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 				m_extdma_shift = 0;
 				m_dma[6].int_index ++;
 			}
+			#endif
 		}
 		break;
 

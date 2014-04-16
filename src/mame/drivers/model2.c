@@ -756,15 +756,18 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnx" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnxu" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnxj" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0))
 	{
 		machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
 	}
 	else
 	{
+		if(offset == 0x10/4)
+		{
+			machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
+			return;
+		}
+
 		if ((m_iop_write_num & 1) == 0)
 		{
 			m_iop_data = data & 0xffff;
