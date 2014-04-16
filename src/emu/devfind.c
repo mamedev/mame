@@ -51,7 +51,7 @@ void *finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
 	if (width != 0 && share->width() != width)
 	{
 		if (required)
-			mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
+			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
 		return NULL;
 	}
 
@@ -70,7 +70,7 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 {
 	if (required && strcmp(m_tag, FINDER_DUMMY_TAG)==0)
 	{
-		mame_printf_error("Tag not defined for required device\n");
+		osd_printf_error("Tag not defined for required device\n");
 		return false;
 	}
 
@@ -80,8 +80,8 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 
 	// otherwise, report
 	if (required)
-		mame_printf_error("Required %s '%s' not found\n", objname, m_tag);
+		osd_printf_error("Required %s '%s' not found\n", objname, m_tag);
 	else
-		mame_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
+		osd_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
 	return !required;
 }

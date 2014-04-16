@@ -69,7 +69,7 @@ READ32_MEMBER(saturn_dram_device::read_ext_dram0)
 		return m_ext_dram0[offset];
 	else
 	{
-		mame_printf_error("DRAM0 read beyond its boundary! offs: %X\n", offset);
+		osd_printf_error("DRAM0 read beyond its boundary! offs: %X\n", offset);
 		return 0xffffffff;
 	}
 }
@@ -80,7 +80,7 @@ READ32_MEMBER(saturn_dram_device::read_ext_dram1)
 		return m_ext_dram1[offset];
 	else
 	{
-		mame_printf_error("DRAM1 read beyond its boundary! offs: %X\n", offset);
+		osd_printf_error("DRAM1 read beyond its boundary! offs: %X\n", offset);
 		return 0xffffffff;
 	}
 }
@@ -90,7 +90,7 @@ WRITE32_MEMBER(saturn_dram_device::write_ext_dram0)
 	if (offset < m_size/2)
 		COMBINE_DATA(&m_ext_dram0[offset]);
 	else
-		mame_printf_error("DRAM0 write beyond its boundary! offs: %X data: %X\n", offset, data);
+		osd_printf_error("DRAM0 write beyond its boundary! offs: %X data: %X\n", offset, data);
 }
 
 WRITE32_MEMBER(saturn_dram_device::write_ext_dram1)
@@ -98,5 +98,5 @@ WRITE32_MEMBER(saturn_dram_device::write_ext_dram1)
 	if (offset < m_size/2)
 		COMBINE_DATA(&m_ext_dram1[offset]);
 	else
-		mame_printf_error("DRAM1 write beyond its boundary! offs: %X data: %X\n", offset, data);
+		osd_printf_error("DRAM1 write beyond its boundary! offs: %X data: %X\n", offset, data);
 }

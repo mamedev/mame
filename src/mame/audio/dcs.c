@@ -1831,12 +1831,12 @@ static void timer_enable_callback(adsp21xx_device &device, int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-		//mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
+		//osd_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
 		reset_timer(device.machine());
 	}
 	else
 	{
-		//mame_printf_debug("Timer disabled\n");
+		//osd_printf_debug("Timer disabled\n");
 		dcs.internal_timer->reset();
 	}
 }

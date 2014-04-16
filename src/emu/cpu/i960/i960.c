@@ -486,7 +486,7 @@ void i960_cpu_device::do_call(UINT32 adr, int type, UINT32 stack)
 
 	// set the new RIP
 	m_r[I960_RIP] = m_IP;
-//  mame_printf_debug("CALL (type %d): FP %x, %x => %x, stack %x, rcache_pos %d\n", type, m_r[I960_FP], m_r[I960_RIP], adr, stack, m_rcache_pos);
+//  osd_printf_debug("CALL (type %d): FP %x, %x => %x, stack %x, rcache_pos %d\n", type, m_r[I960_FP], m_r[I960_RIP], adr, stack, m_rcache_pos);
 
 	// are we out of cache entries?
 	if (m_rcache_pos >= I960_RCACHE_SIZE) {
@@ -544,7 +544,7 @@ void i960_cpu_device::do_ret_0()
 		memcpy(m_r, m_rcache[m_rcache_pos], 0x10*sizeof(UINT32));
 	}
 
-//  mame_printf_debug("RET (type %d): FP %x, %x => %x, rcache_pos %d\n", type, m_r[I960_FP], m_IP, m_r[I960_RIP], m_rcache_pos);
+//  osd_printf_debug("RET (type %d): FP %x, %x => %x, rcache_pos %d\n", type, m_r[I960_FP], m_IP, m_r[I960_RIP], m_rcache_pos);
 	m_IP = m_r[I960_RIP];
 }
 

@@ -48,9 +48,6 @@ enum
 //    TYPE DEFINITIONS
 //**************************************************************************
 
-// output channel callback
-typedef delegate<void (const char *, va_list)> output_delegate;
-
 class emulator_info
 {
 public:
@@ -95,31 +92,6 @@ extern const char build_version[];
 
 /* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 int mame_execute(emu_options &options, osd_interface &osd);
-
-
-
-/* ----- output management ----- */
-
-/* set the output handler for a channel, returns the current one */
-output_delegate mame_set_output_channel(output_channel channel, output_delegate callback);
-
-/* built-in default callbacks */
-void mame_file_output_callback(FILE *file, const char *format, va_list argptr);
-void mame_null_output_callback(FILE *param, const char *format, va_list argptr);
-
-/* calls to be used by the code */
-void mame_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
-void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
-void mame_printf_info(const char *format, ...) ATTR_PRINTF(1,2);
-void mame_printf_verbose(const char *format, ...) ATTR_PRINTF(1,2);
-void mame_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
-
-/* discourage the use of printf directly */
-/* sadly, can't do this because of the ATTR_PRINTF under GCC */
-/*
-#undef printf
-#define printf !MUST_USE_MAME_PRINTF_*_CALLS_WITHIN_THE_CORE!
-*/
 
 
 /* ----- miscellaneous bits & pieces ----- */

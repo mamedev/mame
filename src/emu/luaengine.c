@@ -106,7 +106,7 @@ void lua_engine::close()
 	if (m_lua_state) {
 		// close the Lua state
 		lua_close(m_lua_state);
-		mame_printf_verbose("[LUA] End executing script\n");
+		osd_printf_verbose("[LUA] End executing script\n");
 		m_lua_state = NULL;
 	}
 }
@@ -118,7 +118,7 @@ void lua_engine::close()
 void lua_engine::report_errors(int status)
 {
 	if ( status!=0 ) {
-	mame_printf_error("[LUA ERROR] %s\n",lua_tostring(m_lua_state, -1));
+	osd_printf_error("[LUA ERROR] %s\n",lua_tostring(m_lua_state, -1));
 	lua_pop(m_lua_state, 1); // remove error message
 
 	close(); // close in case of error
@@ -151,7 +151,7 @@ void lua_engine::execute(const char *filename)
 	int s = luaL_loadfile(m_lua_state, filename);
 	report_errors(s);
 
-	mame_printf_verbose("[LUA] Start executing script\n");
+	osd_printf_verbose("[LUA] Start executing script\n");
 }
 
 //-------------------------------------------------
@@ -165,7 +165,7 @@ void lua_engine::execute_string(const char *value)
 	int s = luaL_loadstring(m_lua_state, value);
 	report_errors(s);
 
-	mame_printf_verbose("[LUA] Start executing script\n");
+	osd_printf_verbose("[LUA] Start executing script\n");
 }
 //-------------------------------------------------
 //  lua_execute - execute slice of lua script

@@ -258,14 +258,14 @@ READ32_MEMBER( k001005_device::read )
 		case 0x000:         // FIFO read, high 16 bits
 		{
 			UINT16 value = m_fifo[m_fifo_read_ptr] >> 16;
-		//  mame_printf_debug("FIFO_r0: %08X\n", m_fifo_ptr);
+		//  osd_printf_debug("FIFO_r0: %08X\n", m_fifo_ptr);
 			return value;
 		}
 
 		case 0x001:         // FIFO read, low 16 bits
 		{
 			UINT16 value = m_fifo[m_fifo_read_ptr] & 0xffff;
-		//  mame_printf_debug("FIFO_r1: %08X\n", m_fifo_ptr);
+		//  osd_printf_debug("FIFO_r1: %08X\n", m_fifo_ptr);
 
 			if (m_status != 1 && m_status != 2)
 			{
@@ -308,7 +308,7 @@ READ32_MEMBER( k001005_device::read )
 			}
 
 		default:
-			//mame_printf_debug("m_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("m_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 	return 0;
@@ -339,7 +339,7 @@ WRITE32_MEMBER( k001005_device::write )
 				m_dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
-		//  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+		//  osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
 			m_fifo[m_fifo_write_ptr] = data;
 			m_fifo_write_ptr++;
 			m_fifo_write_ptr &= 0x7ff;
@@ -403,7 +403,7 @@ WRITE32_MEMBER( k001005_device::write )
 			break;
 
 		default:
-			//mame_printf_debug("m_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("m_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 
@@ -511,7 +511,7 @@ void k001005_device::render_polygons( )
 	const rectangle &visarea = visible_area();
 #endif
 
-//  mame_printf_debug("m_fifo_ptr = %08X\n", m_3d_fifo_ptr);
+//  osd_printf_debug("m_fifo_ptr = %08X\n", m_3d_fifo_ptr);
 
 	for (i = 0; i < m_3d_fifo_ptr; i++)
 	{
@@ -900,12 +900,12 @@ void k001005_device::render_polygons( )
 		else if ((m_3d_fifo[i] & 0xffffff00) == 0x80000000)
 		{
 			/*
-			mame_printf_debug("Unknown polygon type %08X:\n", m_3d_fifo[i]);
+			osd_printf_debug("Unknown polygon type %08X:\n", m_3d_fifo[i]);
 			for (j = 0; j < 0x20; j++)
 			{
-			    mame_printf_debug("  %02X: %08X\n", j, m_3d_fifo[i + 1 + j]);
+			    osd_printf_debug("  %02X: %08X\n", j, m_3d_fifo[i + 1 + j]);
 			}
-			mame_printf_debug("\n");
+			osd_printf_debug("\n");
 			*/
 		}
 	}

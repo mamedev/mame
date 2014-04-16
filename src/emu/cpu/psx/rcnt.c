@@ -99,7 +99,7 @@ WRITE32_MEMBER( psxrcnt_device::write )
 			( ( data & 0x0100 ) != 0 && n_counter != 0 && n_counter != 1 ) ||
 			( ( data & 0x0200 ) != 0 && n_counter != 2 ) )
 		{
-			mame_printf_debug( "mode %d 0x%04x\n", n_counter, data & 0xfca6 );
+			osd_printf_debug( "mode %d 0x%04x\n", n_counter, data & 0xfca6 );
 		}
 #endif
 		break;

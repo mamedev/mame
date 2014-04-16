@@ -292,7 +292,7 @@ WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 {
 	coin_counter_w(machine(), 0, data & 0x02);
-//  mame_printf_debug("Unknown = %02X\n", data);
+//  osd_printf_debug("Unknown = %02X\n", data);
 }
 
 

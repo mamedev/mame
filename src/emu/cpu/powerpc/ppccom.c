@@ -191,7 +191,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 	if (PRINTF_DECREMENTER)
 	{
 		UINT64 total = ppc->device->total_cycles();
-		mame_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
+		osd_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
 				curdec, newdec, ppc->tb_divisor,
 				(UINT32)(total >> 32), (UINT32)total, (UINT32)(cycles_until_done >> 32), (UINT32)cycles_until_done);
 	}
@@ -917,7 +917,7 @@ void ppccom_execute_mfspr(powerpc_state *ppc)
 	}
 
 	/* default handling */
-	mame_printf_debug("SPR %03X read\n", ppc->param0);
+	osd_printf_debug("SPR %03X read\n", ppc->param0);
 	ppc->param1 = ppc->spr[ppc->param0];
 }
 
@@ -1066,7 +1066,7 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 	}
 
 	/* default handling */
-	mame_printf_debug("SPR %03X write = %08X\n", ppc->param0, ppc->param1);
+	osd_printf_debug("SPR %03X write = %08X\n", ppc->param0, ppc->param1);
 	ppc->spr[ppc->param0] = ppc->param1;
 }
 
@@ -1121,7 +1121,7 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 
 	/* default handling */
 	if (ppc->dcr_read_func.isnull()) {
-		mame_printf_debug("DCR %03X read\n", ppc->param0);
+		osd_printf_debug("DCR %03X read\n", ppc->param0);
 		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
 			ppc->param1 = ppc->dcr[ppc->param0];
 		else
@@ -1213,7 +1213,7 @@ void ppccom_execute_mtdcr(powerpc_state *ppc)
 
 	/* default handling */
 	if (ppc->dcr_write_func.isnull()) {
-		mame_printf_debug("DCR %03X write = %08X\n", ppc->param0, ppc->param1);
+		osd_printf_debug("DCR %03X write = %08X\n", ppc->param0, ppc->param1);
 		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
 			ppc->dcr[ppc->param0] = ppc->param1;
 	} else {

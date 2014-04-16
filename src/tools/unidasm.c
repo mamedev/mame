@@ -349,9 +349,9 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 }
 
 
-void CLIB_DECL ATTR_PRINTF(1,2) mame_printf_debug(const char *format, ...)
+void CLIB_DECL ATTR_PRINTF(1,2) osd_printf_debug(const char *format, ...)
 {
-	/* silent mame_printf_debugs are allowed in disassemblers */
+	/* silent osd_printf_debugs are allowed in disassemblers */
 }
 
 

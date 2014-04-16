@@ -165,7 +165,7 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 	device_t *device = owner->subdevice(tag);
 	if (device == NULL)
 	{
-		mame_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
+		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
 		return device_add(owner, tag, type, clock);
 	}
 
@@ -186,7 +186,7 @@ device_t *machine_config::device_remove(device_t *owner, const char *tag)
 	device_t *device = owner->subdevice(tag);
 	if (device == NULL)
 	{
-		mame_printf_warning("Warning: attempting to remove non-existent device '%s'\n", tag);
+		osd_printf_warning("Warning: attempting to remove non-existent device '%s'\n", tag);
 		return NULL;
 	}
 

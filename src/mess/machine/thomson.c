@@ -21,7 +21,7 @@
 #define VERBOSE_IO    0  /* serial & parallel I/O */
 #define VERBOSE_MIDI  0
 
-#define PRINT(x) mame_printf_info x
+#define PRINT(x) osd_printf_info x
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 #define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)

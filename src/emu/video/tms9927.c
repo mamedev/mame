@@ -128,7 +128,7 @@ void tms9927_device::device_reset()
 
 void tms9927_device::device_stop()
 {
-	mame_printf_debug("TMS9937: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
+	osd_printf_debug("TMS9937: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
 						m_clock,
 						m_total_hpix,
 						0, m_visible_hpix,
@@ -199,7 +199,7 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 			break;
 
 		case 0x0b:  /* Up scroll */
-mame_printf_debug("Up scroll\n");
+osd_printf_debug("Up scroll\n");
 			m_screen->update_now();
 			m_start_datarow = (m_start_datarow + 1) % DATA_ROWS_PER_FRAME;
 			break;
@@ -233,7 +233,7 @@ WRITE8_MEMBER( tms9927_device::write )
 
 		case 0x0c:  /* LOAD CURSOR CHARACTER ADDRESS */
 		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
-mame_printf_debug("Cursor address changed\n");
+osd_printf_debug("Cursor address changed\n");
 			m_reg[offset - 0x0c + 7] = data;
 			recompute_parameters(FALSE);
 			break;
@@ -308,7 +308,7 @@ void tms9927_device::recompute_parameters(int postload)
 	offset_hpix = HSYNC_DELAY * m_hpixels_per_column;
 	offset_vpix = VERTICAL_DATA_START;
 
-	mame_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS);
+	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS);
 
 	/* see if it all makes sense */
 	m_valid_config = TRUE;

@@ -150,13 +150,13 @@ WRITE8_MEMBER( tx1_sound_device::pit8253_w )
 			m_pit8253.counts[cntsel].val = 0;
 		}
 		else
-			mame_printf_debug("PIT8253: Unsupported mode %d.\n", mode);
+			osd_printf_debug("PIT8253: Unsupported mode %d.\n", mode);
 	}
 }
 
 READ8_MEMBER( tx1_sound_device::pit8253_r )
 {
-	mame_printf_debug("PIT R: %x", offset);
+	osd_printf_debug("PIT R: %x", offset);
 	return 0;
 }
 

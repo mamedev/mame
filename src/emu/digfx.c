@@ -295,7 +295,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 {
 	// validate palette tag
 	if (m_palette_tag == NULL)
-		mame_printf_error("No palette specified for device '%s'\n", device().tag());
+		osd_printf_error("No palette specified for device '%s'\n", device().tag());
 	else
 	{
 		palette_device *palette;
@@ -305,7 +305,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 			palette = device().subdevice<palette_device>(m_palette_tag);
 
 		if (palette == NULL)
-			mame_printf_error("Device '%s' specifies nonexistent %sdevice '%s' as palette\n",
+			osd_printf_error("Device '%s' specifies nonexistent %sdevice '%s' as palette\n",
 								device().tag(),
 								(m_palette_is_sibling ? "sibling " : "sub"),
 								m_palette_tag);
@@ -333,7 +333,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 
 			UINT32 region_length = valid.region_length(gfxregion);
 			if (region_length == 0)
-				mame_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.cstr());
+				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.cstr());
 
 			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
 			else if (!IS_FRAC(layout.total))
@@ -353,7 +353,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 
 				// if not, this is an error
 				if ((start + len) / 8 > avail)
-					mame_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", gfxnum, region);
+					osd_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", gfxnum, region);
 			}
 		}
 
@@ -364,16 +364,16 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		if (layout.planeoffset[0] == GFX_RAW)
 		{
 			if (layout.total != RGN_FRAC(1,1))
-				mame_printf_error("gfx[%d] with unsupported layout total\n", gfxnum);
+				osd_printf_error("gfx[%d] with unsupported layout total\n", gfxnum);
 			if (xscale != 1 || yscale != 1)
-				mame_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
+				osd_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
 		}
 
 		// verify traditional decode doesn't have too many planes
 		else
 		{
 			if (layout.planes > MAX_GFX_PLANES)
-				mame_printf_error("gfx[%d] with invalid planes\n", gfxnum);
+				osd_printf_error("gfx[%d] with invalid planes\n", gfxnum);
 		}
 	}
 }

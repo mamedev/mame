@@ -1654,7 +1654,7 @@ void memory_manager::dump(FILE *file)
 
 memory_region *memory_manager::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
 {
-mame_printf_verbose("Region '%s' created\n", name);
+osd_printf_verbose("Region '%s' created\n", name);
 	// make sure we don't have a region of the same name; also find the end of the list
 	memory_region *info = m_regionlist.find(name);
 	if (info != NULL)

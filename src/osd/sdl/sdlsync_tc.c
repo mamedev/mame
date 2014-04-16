@@ -128,7 +128,7 @@ void osd_lock_acquire(osd_lock *lock)
 	r = pthread_mutex_lock(&mutex->id);
 	if (r==0)
 		return;
-	//mame_printf_error("Error on lock: %d: %s\n", r, strerror(r));
+	//osd_printf_error("Error on lock: %d: %s\n", r, strerror(r));
 }
 
 //============================================================
@@ -144,7 +144,7 @@ int osd_lock_try(osd_lock *lock)
 	if (r==0)
 		return 1;
 	//if (r!=EBUSY)
-	//  mame_printf_error("Error on trylock: %d: %s\n", r, strerror(r));
+	//  osd_printf_error("Error on trylock: %d: %s\n", r, strerror(r));
 	return 0;
 }
 

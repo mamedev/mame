@@ -402,29 +402,29 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		mame_printf_error("FATALERROR: %s\n", fatal.string());
+		osd_printf_error("FATALERROR: %s\n", fatal.string());
 		error = MAMERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
 	}
 	catch (emu_exception &)
 	{
-		mame_printf_error("Caught unhandled emulator exception\n");
+		osd_printf_error("Caught unhandled emulator exception\n");
 		error = MAMERR_FATALERROR;
 	}
 	catch (binding_type_exception &btex)
 	{
-		mame_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
+		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
 		error = MAMERR_FATALERROR;
 	}
 	catch (std::exception &ex)
 	{
-		mame_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
+		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
 		error = MAMERR_FATALERROR;
 	}
 	catch (...)
 	{
-		mame_printf_error("Caught unhandled exception\n");
+		osd_printf_error("Caught unhandled exception\n");
 		error = MAMERR_FATALERROR;
 	}
 
@@ -1078,7 +1078,7 @@ void running_machine::start_all_devices()
 						device->set_machine(*this);
 
 					// now start the device
-					mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
+					osd_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
 					device->start();
 				}
 
@@ -1086,7 +1086,7 @@ void running_machine::start_all_devices()
 				catch (device_missing_dependencies &)
 				{
 					// if we're the end, fail
-					mame_printf_verbose("  (missing dependencies; rescheduling)\n");
+					osd_printf_verbose("  (missing dependencies; rescheduling)\n");
 					failed_starts++;
 				}
 			}

@@ -272,7 +272,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
-//  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
+//  osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
 	membank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
 
 	m_msm_nmi_mask = data & 0x40;
@@ -282,7 +282,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 {
 	UINT8 *region_base = memregion("user2")->base();
-//  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
+//  osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
 
 	membank("bank1")->set_base(region_base + (data&0x0f) * 0x4000);
 
@@ -416,12 +416,12 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_writeA)
 {
-	mame_printf_debug("ymwA\n");
+	osd_printf_debug("ymwA\n");
 }
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_writeB)
 {
-	mame_printf_debug("ymwA\n");
+	osd_printf_debug("ymwA\n");
 }
 
 WRITE_LINE_MEMBER(suprgolf_state::irqhandler)

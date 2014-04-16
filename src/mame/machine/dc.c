@@ -241,7 +241,7 @@ int dc_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 //      debugger_break(machine);
 	}
 
@@ -265,7 +265,7 @@ int dc_state::decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	if ((mem_mask != U64(0x0000ffff00000000)) && (mem_mask != U64(0x000000000000ffff)) &&
 		(mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 //      debugger_break(machine);
 	}
 
@@ -369,7 +369,7 @@ READ64_MEMBER(dc_state::dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))  // filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space.device().safe_pc());
+		osd_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space.device().safe_pc());
 	}
 	#endif
 
@@ -413,18 +413,18 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 					if (dc_sysctrl_regs[SB_LMMODE0])
 						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
 					else
-						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
+						osd_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
 				else if ((address >= 0x13000000) && (address <= 0x13FFFFFF))
 					if (dc_sysctrl_regs[SB_LMMODE1])
 						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
 					else
-						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
+						osd_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
 				else if ((address >= 0x10800000) && (address <= 0x10ffffff))
 					printf("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 				else if ((address >= 0x10000000) && (address <= 0x107fffff))
-					mame_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+					osd_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 				else
-					mame_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+					osd_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 				#endif
 
 				if ((!(address & 0x01000000)))
@@ -467,7 +467,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))    // filter out IRQ acks and ch2 dma
 	{
-		mame_printf_verbose("SYSCTRL: write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask);
+		osd_printf_verbose("SYSCTRL: write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask);
 	}
 	#endif
 }
@@ -508,7 +508,7 @@ WRITE64_MEMBER(dc_state::dc_gdrom_w )
 		off=offset << 1;
 	}
 
-	mame_printf_verbose("GDROM: [%08x=%x]write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("GDROM: [%08x=%x]write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
 }
 
 READ64_MEMBER(dc_state::dc_g2_ctrl_r )
@@ -517,7 +517,7 @@ READ64_MEMBER(dc_state::dc_g2_ctrl_r )
 	UINT64 shift;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
-	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
+	osd_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
 	return (UINT64)g2bus_regs[reg] << shift;
 }
 
@@ -564,7 +564,7 @@ WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
 			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_wave_dma.sel,m_wave_dma.start,m_wave_dma.flag,m_wave_dma.dir);
 			#endif
 
-			//mame_printf_verbose("SB_ADST data %08x\n",dat);
+			//osd_printf_verbose("SB_ADST data %08x\n",dat);
 			if(((old & 1) == 0) && m_wave_dma.flag && m_wave_dma.start && ((m_wave_dma.sel & 2) == 0)) // 0 -> 1
 				wave_dma_execute(space);
 			break;
@@ -626,7 +626,7 @@ READ64_MEMBER(dc_state::dc_modem_r )
 		return U64(0xffffffffffffffff);
 	}
 
-	mame_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
+	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
 	return 0;
 }
 
@@ -638,7 +638,7 @@ WRITE64_MEMBER(dc_state::dc_modem_w )
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 
@@ -675,7 +675,7 @@ void dc_state::machine_reset()
 
 READ32_MEMBER(dc_state::dc_aica_reg_r)
 {
-//  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
+//  osd_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
 	if(offset == 0x2c00/4)
 		return m_armrst;
@@ -706,7 +706,7 @@ WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 
 	m_aica->write(space, offset*2, data, 0xffff);
 
-//  mame_printf_verbose("AICA REG: [%08x=%x] write %x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, data, offset, mem_mask);
+//  osd_printf_verbose("AICA REG: [%08x=%x] write %x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, data, offset, mem_mask);
 }
 
 READ32_MEMBER(dc_state::dc_arm_aica_r)

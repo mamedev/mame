@@ -2120,7 +2120,7 @@ int a400_state::a800_get_type(device_image_interface &image)
 			fatalerror("Cart type \"%d\" means this is an Atari 5200 cart.\n", hdr_type);
 			break;
 		default:
-			mame_printf_info("Cart type \"%d\" is currently unsupported.\n", hdr_type);
+			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", hdr_type);
 			break;
 	}
 	return cart_type;
@@ -2167,7 +2167,7 @@ int a400_state::a800_check_cart_type(device_image_interface &image)
 			case A800_RIGHT_8K:
 				break;
 			default:
-				mame_printf_info("Cart type \"%s\" currently unsupported.\n", pcb_name);
+				osd_printf_info("Cart type \"%s\" currently unsupported.\n", pcb_name);
 				break;
 		}
 	}

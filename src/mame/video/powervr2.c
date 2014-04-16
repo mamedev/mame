@@ -1778,7 +1778,7 @@ void powervr2_device::process_ta_fifo()
 	if (paratype == 0)
 	{ // end of list
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type 0 End of List\n");
+		osd_printf_verbose("Para Type 0 End of List\n");
 		#endif
 		/* Process transfer FIFO done irqs here */
 		/* FIXME: timing of these */
@@ -1797,32 +1797,32 @@ void powervr2_device::process_ta_fifo()
 	else if (paratype == 1)
 	{ // user tile clip
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type 1 User Tile Clip\n");
-		mame_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
+		osd_printf_verbose("Para Type 1 User Tile Clip\n");
+		osd_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 		#endif
 	}
 	else if (paratype == 2)
 	{ // object list set
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type 2 Object List Set at %08x\n", tafifo_buff[1]);
-		mame_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
+		osd_printf_verbose("Para Type 2 Object List Set at %08x\n", tafifo_buff[1]);
+		osd_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 		#endif
 	}
 	else if (paratype == 3)
 	{
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type %x Unknown!\n", tafifo_buff[0]);
+		osd_printf_verbose("Para Type %x Unknown!\n", tafifo_buff[0]);
 		#endif
 	}
 	else
 	{ // global parameter or vertex parameter
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type %d", paratype);
+		osd_printf_verbose("Para Type %d", paratype);
 		if (paratype == 7)
-			mame_printf_verbose(" End of Strip %d", endofstrip);
+			osd_printf_verbose(" End of Strip %d", endofstrip);
 		if (listtype_used & 3)
-			mame_printf_verbose(" List Type %d", listtype);
-		mame_printf_verbose("\n");
+			osd_printf_verbose(" List Type %d", listtype);
+		osd_printf_verbose("\n");
 		#endif
 
 		// set type of list currently being received
@@ -1870,7 +1870,7 @@ void powervr2_device::process_ta_fifo()
 				strideselect=(tafifo_buff[3] >> 25) & 1;
 				paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
+				osd_printf_verbose(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
 				#endif
 			}
 			if (paratype == 4)
@@ -1878,20 +1878,20 @@ void powervr2_device::process_ta_fifo()
 				if ((tafifo_listtype == 1) || (tafifo_listtype == 3))
 				{
 				#if DEBUG_PVRDLIST
-					mame_printf_verbose(" Modifier Volume\n");
+					osd_printf_verbose(" Modifier Volume\n");
 				#endif
 				}
 				else
 				{
 				#if DEBUG_PVRDLIST
-					mame_printf_verbose(" Polygon\n");
+					osd_printf_verbose(" Polygon\n");
 				#endif
 				}
 			}
 			if (paratype == 5)
 			{ // quad
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Sprite\n");
+				osd_printf_verbose(" Sprite\n");
 				#endif
 			}
 		}
@@ -1901,21 +1901,21 @@ void powervr2_device::process_ta_fifo()
 			if ((tafifo_listtype == 1) || (tafifo_listtype == 3))
 			{
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Vertex modifier volume");
-				mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
+				osd_printf_verbose(" Vertex modifier volume");
+				osd_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
 					u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
 					u2f(tafifo_buff[8]), u2f(tafifo_buff[9]));
-				mame_printf_verbose("\n");
+				osd_printf_verbose("\n");
 				#endif
 			}
 			else if (global_paratype == 5)
 			{
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Vertex sprite");
-				mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
+				osd_printf_verbose(" Vertex sprite");
+				osd_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
 					u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
 					u2f(tafifo_buff[8]), u2f(tafifo_buff[9]), u2f(tafifo_buff[10]), u2f(tafifo_buff[11]));
-				mame_printf_verbose("\n");
+				osd_printf_verbose("\n");
 				#endif
 				if (texture == 1)
 				{
@@ -1956,9 +1956,9 @@ void powervr2_device::process_ta_fifo()
 			else if (global_paratype == 4)
 			{
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Vertex polygon");
-				mame_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]));
-				mame_printf_verbose("\n");
+				osd_printf_verbose(" Vertex polygon");
+				osd_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]));
+				osd_printf_verbose("\n");
 				#endif
 				if (rd->verts_size <= 65530)
 				{
@@ -2009,7 +2009,7 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 		tafifo_buff[tafifo_pos]=(UINT32)data;
 		tafifo_buff[tafifo_pos+1]=(UINT32)(data >> 32);
 		#if DEBUG_FIFO_POLY
-		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %" I64FMT "x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
+		osd_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %" I64FMT "x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
 		#endif
 		tafifo_pos += 2;
 	}

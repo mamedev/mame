@@ -204,7 +204,7 @@ void saturn_state::cd_exec_command( void )
 					break;
 
 				default:
-					mame_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
+					osd_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
 					cr1 = cd_stat;
 					cr2 = 0;
 					cr3 = 0;
@@ -1991,7 +1991,7 @@ READ32_MEMBER( saturn_state::stvcd_r )
 			}
 			else
 			{
-				mame_printf_error("CD: Unknown data buffer read @ mask = %08x\n", mem_mask);
+				osd_printf_error("CD: Unknown data buffer read @ mask = %08x\n", mem_mask);
 			}
 
 			break;
@@ -2115,7 +2115,7 @@ void saturn_state::read_new_dir(UINT32 fileno)
 			// easy to fix, but make sure we *need* to first
 			if (curroot.length > MAX_DIR_SIZE)
 			{
-				mame_printf_error("ERROR: root directory too big (%d)\n", curroot.length);
+				osd_printf_error("ERROR: root directory too big (%d)\n", curroot.length);
 			}
 
 			// done with all that, read the root directory now
@@ -2126,7 +2126,7 @@ void saturn_state::read_new_dir(UINT32 fileno)
 	{
 		if (curdir[fileno].length > MAX_DIR_SIZE)
 		{
-			mame_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
+			osd_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
 		}
 		make_dir_current(curdir[fileno].firstfad);
 	}

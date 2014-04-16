@@ -770,17 +770,17 @@ DEVICE_IMAGE_LOAD_MEMBER( mtech_state, megatech_cart )
 	{
 		if (!core_stricmp("genesis", pcb_name))
 		{
-			mame_printf_debug("%s is genesis\n", mt_cart->tag);
+			osd_printf_debug("%s is genesis\n", mt_cart->tag);
 			m_cart_is_genesis[this_cart->slot] = 1;
 		}
 		else if (!core_stricmp("sms", pcb_name))
 		{
-			mame_printf_debug("%s is sms\n", mt_cart->tag);
+			osd_printf_debug("%s is sms\n", mt_cart->tag);
 			m_cart_is_genesis[this_cart->slot] = 0;
 		}
 		else
 		{
-			mame_printf_debug("%s is invalid\n", mt_cart->tag);
+			osd_printf_debug("%s is invalid\n", mt_cart->tag);
 		}
 
 	}

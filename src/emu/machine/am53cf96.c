@@ -32,7 +32,7 @@ READ8_MEMBER( am53cf96_device::read )
 
 	if (offset == REG_FIFO)
 	{
-//      mame_printf_debug("53cf96: read FIFO PC=%x\n", space.device().safe_pc());
+//      osd_printf_debug("53cf96: read FIFO PC=%x\n", space.device().safe_pc());
 		return 0;
 	}
 
@@ -71,7 +71,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 	// FIFO
 	if (offset == REG_FIFO)
 	{
-//      mame_printf_debug("%02x to FIFO @ %02d\n", data, fptr);
+//      osd_printf_debug("%02x to FIFO @ %02d\n", data, fptr);
 		fifo[fptr++] = data;
 		if (fptr > 15)
 		{

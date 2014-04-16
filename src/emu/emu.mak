@@ -56,7 +56,6 @@ EMUOBJS = \
 	$(EMUOBJ)/config.o \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \
-	$(EMUOBJ)/delegate.o \
 	$(EMUOBJ)/devdelegate.o \
 	$(EMUOBJ)/devcb.o \
 	$(EMUOBJ)/devcb2.o \
@@ -145,6 +144,7 @@ EMUOBJS = \
 	$(EMUOBJ)/debugint/debugint.o \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
+	$(OSDOBJ)/osdcore.o \
 	$(OSDOBJ)/osdepend.o \
 	$(OSDOBJ)/osdnet.o
 

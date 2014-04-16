@@ -680,7 +680,7 @@ void segaic16_tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info 
 	/* column AND row scroll */
 	if (info->colscroll && info->rowscroll)
 	{
-		if (PRINT_UNUSUAL_MODES) mame_printf_debug("Column AND row scroll\n");
+		if (PRINT_UNUSUAL_MODES) osd_printf_debug("Column AND row scroll\n");
 
 		/* loop over row chunks */
 		for (y = cliprect.min_y & ~7; y <= cliprect.max_y; y += 8)
@@ -718,7 +718,7 @@ void segaic16_tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info 
 	}
 	else if (info->colscroll)
 	{
-		if (PRINT_UNUSUAL_MODES) mame_printf_debug("Column scroll\n");
+		if (PRINT_UNUSUAL_MODES) osd_printf_debug("Column scroll\n");
 
 		/* loop over column chunks */
 		for (x = cliprect.min_x & ~15; x <= cliprect.max_x; x += 16)
@@ -746,7 +746,7 @@ void segaic16_tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info 
 	}
 	else if (info->rowscroll)
 	{
-		if (PRINT_UNUSUAL_MODES) mame_printf_debug("Row scroll\n");
+		if (PRINT_UNUSUAL_MODES) osd_printf_debug("Row scroll\n");
 
 		/* loop over row chunks */
 		for (y = cliprect.min_y & ~7; y <= cliprect.max_y; y += 8)
@@ -917,7 +917,7 @@ void segaic16_tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info 
 	/* column scroll? */
 	if (yscroll & 0x8000)
 	{
-		if (PRINT_UNUSUAL_MODES) mame_printf_debug("Column AND row scroll\n");
+		if (PRINT_UNUSUAL_MODES) osd_printf_debug("Column AND row scroll\n");
 
 		/* loop over row chunks */
 		for (y = cliprect.min_y & ~7; y <= cliprect.max_y; y += 8)
@@ -961,7 +961,7 @@ void segaic16_tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info 
 	}
 	else
 	{
-		if (PRINT_UNUSUAL_MODES) mame_printf_debug("Row scroll\n");
+		if (PRINT_UNUSUAL_MODES) osd_printf_debug("Row scroll\n");
 
 		/* loop over row chunks */
 		for (y = cliprect.min_y & ~7; y <= cliprect.max_y; y += 8)

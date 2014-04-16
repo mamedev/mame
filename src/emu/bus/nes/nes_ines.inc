@@ -745,7 +745,7 @@ void nes_cart_slot_device::call_load_ines()
 		if (prgout)
 		{
 			fwrite(m_cart->get_prg_base(), 1, 0x4000 * m_cart->get_prg_size(), prgout);
-			mame_printf_error("Created PRG chunk\n");
+			osd_printf_error("Created PRG chunk\n");
 		}
 
 		fclose(prgout);
@@ -767,7 +767,7 @@ void nes_cart_slot_device::call_load_ines()
 		if (chrout)
 		{
 			fwrite(m_cart->get_vrom_base(), 1, m_cart->get_vrom_size(), chrout);
-			mame_printf_error("Created CHR chunk\n");
+			osd_printf_error("Created CHR chunk\n");
 		}
 		fclose(chrout);
 	}

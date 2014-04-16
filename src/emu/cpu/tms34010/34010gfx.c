@@ -1406,7 +1406,7 @@ static void FUNCTION_NAME(pixblt_r)(tms34010_state *tms, int src_is_linear, int 
 
 		/* compute the starting addresses */
 		saddr = src_is_linear ? SADDR(tms) : SXYTOL(tms,SADDR_XY(tms));
-if ((saddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd saddr\n", BITS_PER_PIXEL);
+if ((saddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd saddr\n", BITS_PER_PIXEL);
 		saddr &= ~(BITS_PER_PIXEL - 1);
 
 		/* compute the bounds of the operation */
@@ -1423,7 +1423,7 @@ if ((saddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 		}
 		else
 			daddr = DADDR(tms);
-if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd daddr\n", BITS_PER_PIXEL);
+if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd daddr\n", BITS_PER_PIXEL);
 		daddr &= ~(BITS_PER_PIXEL - 1);
 		LOGGFX(("  saddr=%08X daddr=%08X sptch=%08X dptch=%08X\n", saddr, daddr, SPTCH(tms), DPTCH(tms)));
 

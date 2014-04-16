@@ -83,7 +83,7 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			}
 		}
 
-	//  mame_printf_debug("read io data port stage %d port %d %02x\n",mess_io_stage[portnum],portnum,retdata);
+	//  osd_printf_debug("read io data port stage %d port %d %02x\n",mess_io_stage[portnum],portnum,retdata);
 
 		retdata |= (retdata << 8);
 	}
@@ -151,7 +151,7 @@ WRITE16_MEMBER(md_cons_state::mess_md_io_write_data_port)
 		}
 	}
 	m_megadrive_io_data_regs[portnum] = data;
-	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
+	//osd_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 }
 
 

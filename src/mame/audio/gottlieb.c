@@ -131,7 +131,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 				else strcat(phonemes,PhonemeTable[phoneme]);
 			}
 
-			mame_printf_debug("Votrax played '%s'\n", phonemes);
+			osd_printf_debug("Votrax played '%s'\n", phonemes);
 
 			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)   /* Q-Bert & Tylz - Hello, I am turned on */
 								m_samples->start(0, 42);
@@ -415,7 +415,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
 		// nominal clock is 0xa0
 		if (data != m_last_speech_clock)
 		{
-			mame_printf_debug("clock = %02X\n", data);
+			osd_printf_debug("clock = %02X\n", data);
 
 			// totally random guesswork; would like to get real measurements on a board
 			if (m_votrax != NULL)

@@ -240,12 +240,12 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 		// find a device with the requested tag
 		const device_t *target = device().siblingdevice(route->m_target.cstr());
 		if (target == NULL)
-			mame_printf_error("Attempting to route sound to non-existant device '%s'\n", route->m_target.cstr());
+			osd_printf_error("Attempting to route sound to non-existant device '%s'\n", route->m_target.cstr());
 
 		// if it's not a speaker or a sound device, error
 		const device_sound_interface *sound;
 		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
-			mame_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.cstr(), target->name());
+			osd_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.cstr(), target->name());
 	}
 }
 

@@ -252,9 +252,9 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 
 			// validate the global map parameters
 			if (map->m_spacenum != spacenum)
-				mame_printf_error("Space %d has address space %d handlers!\n", spacenum, map->m_spacenum);
+				osd_printf_error("Space %d has address space %d handlers!\n", spacenum, map->m_spacenum);
 			if (map->m_databits != datawidth)
-				mame_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig->m_name, datawidth, map->m_databits);
+				osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig->m_name, datawidth, map->m_databits);
 
 			// loop over entries and look for errors
 			for (address_map_entry *entry = map->m_entrylist.first(); entry != NULL; entry = entry->next())
@@ -271,7 +271,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 							((entry->m_read.m_type != AMH_NONE && scan->m_read.m_type != AMH_NONE) ||
 								(entry->m_write.m_type != AMH_NONE && scan->m_write.m_type != AMH_NONE)))
 						{
-							mame_printf_warning("%s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.m_type, entry->m_write.m_type, scan->m_addrstart, scan->m_addrend, scan->m_read.m_type, scan->m_write.m_type);
+							osd_printf_warning("%s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.m_type, entry->m_write.m_type, scan->m_addrstart, scan->m_addrend, scan->m_read.m_type, scan->m_write.m_type);
 							detected_overlap = true;
 							break;
 						}
@@ -279,11 +279,11 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 
 				// look for inverted start/end pairs
 				if (byteend < bytestart)
-					mame_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend);
+					osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend);
 
 				// look for misaligned entries
 				if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
-					mame_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, alignunit);
+					osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, alignunit);
 
 				// if this is a program space, auto-assign implicit ROM entries
 				if (entry->m_read.m_type == AMH_ROM && entry->m_region == NULL)
@@ -312,14 +312,14 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 								// verify the address range is within the region's bounds
 								offs_t length = ROMREGION_GETLENGTH(romp);
 								if (entry->m_rgnoffs + (byteend - bytestart + 1) > length)
-									mame_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, length);
+									osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, length);
 								found = true;
 							}
 						}
 
 					// error if not found
 					if (!found)
-						mame_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
+						osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 				}
 
 				// make sure all devices exist
@@ -327,19 +327,19 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				{
 					astring temp(entry->m_read.m_tag);
 					if (device().siblingdevice(temp) == NULL)
-						mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
+						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 				}
 				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != NULL)
 				{
 					astring temp(entry->m_write.m_tag);
 					if (device().siblingdevice(temp) == NULL)
-						mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
+						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
 				}
 
 				// make sure ports exist
 //              if ((entry->m_read.m_type == AMH_PORT && entry->m_read.m_tag != NULL && portlist.find(entry->m_read.m_tag) == NULL) ||
 //                  (entry->m_write.m_type == AMH_PORT && entry->m_write.m_tag != NULL && portlist.find(entry->m_write.m_tag) == NULL))
-//                  mame_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
+//                  osd_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 
 				// validate bank and share tags
 				if (entry->m_read.m_type == AMH_BANK)

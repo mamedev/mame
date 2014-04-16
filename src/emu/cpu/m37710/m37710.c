@@ -775,7 +775,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 		// let's do it...
 		// push PB, then PC, then status
 		CLK(13);
-//      mame_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, m_ipl);
+//      osd_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, m_ipl);
 		m37710i_push_8(REG_PB>>16);
 		m37710i_push_16(REG_PC);
 		m37710i_push_8(m_ipl);

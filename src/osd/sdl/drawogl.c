@@ -390,11 +390,11 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks)
 
 	if (SDLMAME_SDL2)
 	{
-		mame_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
+		osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
 		load_gl_lib(machine);
 	}
 	else
-		mame_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
+		osd_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
 
 	return 0;
 }
@@ -434,7 +434,7 @@ static void loadgl_functions(void)
 
 	#define OSD_GL(ret,func,params) \
 	if (!( func = (ret (APIENTRY *)params) SDL_GL_GetProcAddress( #func ) )) \
-		{ err_count++; mame_printf_error("GL function %s not found!\n", #func ); }
+		{ err_count++; osd_printf_error("GL function %s not found!\n", #func ); }
 
 	#define OSD_GL_UNUSED(ret,func,params)
 
@@ -471,7 +471,7 @@ static void load_gl_lib(running_machine &machine)
 		{
 			fatalerror("Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 		}
-		mame_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
+		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 		/* FIXME: must be freed as well */
 		gl_dispatch = (osd_gl_dispatch *) osd_malloc(sizeof(osd_gl_dispatch));
 		dll_loaded=1;
@@ -511,7 +511,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	if  (!window->sdl_window )
 	{
-		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		return 1;
 	}
 
@@ -536,7 +536,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	sdl->gl_context_id = SDL_GL_CreateContext(window->sdl_window);
 	if  (!sdl->gl_context_id)
 	{
-		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		return 1;
 	}
 
@@ -565,7 +565,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(sdl->sdlsurf->flags & SDL_OPENGL) )
 	{
-		mame_printf_error("OpenGL not supported on this driver!\n");
+		osd_printf_error("OpenGL not supported on this driver!\n");
 		return 1;
 	}
 
@@ -595,7 +595,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	// print out the driver info for debugging
 	if (!shown_video_info)
 	{
-		mame_printf_verbose("OpenGL: %s\nOpenGL: %s\nOpenGL: %s\n", vendor, (char *)glGetString(GL_RENDERER), (char *)glGetString(GL_VERSION));
+		osd_printf_verbose("OpenGL: %s\nOpenGL: %s\nOpenGL: %s\n", vendor, (char *)glGetString(GL_RENDERER), (char *)glGetString(GL_VERSION));
 	}
 
 	sdl->usetexturerect = 0;
@@ -612,7 +612,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		has_and_allow_texturerect = 1;
 					if (!shown_video_info)
 					{
-							mame_printf_verbose("OpenGL: texture rectangle supported\n");
+							osd_printf_verbose("OpenGL: texture rectangle supported\n");
 					}
 	}
 
@@ -621,7 +621,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	{
 		if (!shown_video_info)
 		{
-			mame_printf_verbose("OpenGL: non-power-of-2 textures supported (new method)\n");
+			osd_printf_verbose("OpenGL: non-power-of-2 textures supported (new method)\n");
 		}
 					sdl->texpoweroftwo = 0;
 	}
@@ -632,7 +632,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		{
 			if (!shown_video_info)
 			{
-				mame_printf_verbose("OpenGL: non-power-of-2 textures supported (old method)\n");
+				osd_printf_verbose("OpenGL: non-power-of-2 textures supported (old method)\n");
 			}
 			sdl->usetexturerect = 1;
 		}
@@ -640,7 +640,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		{
 			if (!shown_video_info)
 			{
-				mame_printf_verbose("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
+				osd_printf_verbose("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
 			}
 		}
 	}
@@ -651,9 +651,9 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		if (!shown_video_info)
 		{
 			if(sdl->usevbo)
-				mame_printf_verbose("OpenGL: vertex buffer supported\n");
+				osd_printf_verbose("OpenGL: vertex buffer supported\n");
 			else
-				mame_printf_verbose("OpenGL: vertex buffer supported, but disabled\n");
+				osd_printf_verbose("OpenGL: vertex buffer supported, but disabled\n");
 		}
 	}
 
@@ -665,14 +665,14 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 			if (!shown_video_info)
 			{
 				if(sdl->usepbo)
-					mame_printf_verbose("OpenGL: pixel buffers supported\n");
+					osd_printf_verbose("OpenGL: pixel buffers supported\n");
 				else
-					mame_printf_verbose("OpenGL: pixel buffers supported, but disabled\n");
+					osd_printf_verbose("OpenGL: pixel buffers supported, but disabled\n");
 			}
 		} else {
 			if (!shown_video_info)
 			{
-				mame_printf_verbose("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
+				osd_printf_verbose("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
 			}
 		}
 	}
@@ -680,7 +680,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	{
 		if (!shown_video_info)
 		{
-			mame_printf_verbose("OpenGL: pixel buffers not supported\n");
+			osd_printf_verbose("OpenGL: pixel buffers not supported\n");
 		}
 	}
 
@@ -690,9 +690,9 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		if (!shown_video_info)
 		{
 			if(sdl->usefbo)
-				mame_printf_verbose("OpenGL: framebuffer object supported\n");
+				osd_printf_verbose("OpenGL: framebuffer object supported\n");
 			else
-				mame_printf_verbose("OpenGL: framebuffer object not supported\n");
+				osd_printf_verbose("OpenGL: framebuffer object not supported\n");
 		}
 	}
 
@@ -706,14 +706,14 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		if (!shown_video_info)
 		{
 			if(sdl->useglsl)
-				mame_printf_verbose("OpenGL: GLSL supported\n");
+				osd_printf_verbose("OpenGL: GLSL supported\n");
 			else
-				mame_printf_verbose("OpenGL: GLSL supported, but disabled\n");
+				osd_printf_verbose("OpenGL: GLSL supported, but disabled\n");
 		}
 	} else {
 		if (!shown_video_info)
 		{
-			mame_printf_verbose("OpenGL: GLSL not supported\n");
+			osd_printf_verbose("OpenGL: GLSL not supported\n");
 		}
 	}
 
@@ -726,7 +726,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&sdl->texture_max_height);
 	if (!shown_video_info)
 	{
-		mame_printf_verbose("OpenGL: max texture size %d x %d\n", sdl->texture_max_width, sdl->texture_max_height);
+		osd_printf_verbose("OpenGL: max texture size %d x %d\n", sdl->texture_max_width, sdl->texture_max_height);
 	}
 
 	shown_video_info = 1;
@@ -815,7 +815,7 @@ static void loadGLExtensions(sdl_window_info *window)
 		{
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
+				osd_printf_warning("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
 			}
 			sdl->usepbo=FALSE;
 		}
@@ -823,7 +823,7 @@ static void loadGLExtensions(sdl_window_info *window)
 		{
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
+				osd_printf_warning("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
 			}
 			sdl->useglsl=FALSE;
 		}
@@ -864,34 +864,34 @@ static void loadGLExtensions(sdl_window_info *window)
 		sdl->usepbo=FALSE;
 		if (_once)
 		{
-			mame_printf_warning("OpenGL: VBO not supported, missing: ");
+			osd_printf_warning("OpenGL: VBO not supported, missing: ");
 			if (!pfn_glGenBuffers)
 			{
-				mame_printf_warning("glGenBuffers, ");
+				osd_printf_warning("glGenBuffers, ");
 			}
 			if (!pfn_glDeleteBuffers)
 			{
-				mame_printf_warning("glDeleteBuffers");
+				osd_printf_warning("glDeleteBuffers");
 			}
 			if (!pfn_glBindBuffer)
 			{
-				mame_printf_warning("glBindBuffer, ");
+				osd_printf_warning("glBindBuffer, ");
 			}
 			if (!pfn_glBufferData)
 			{
-				mame_printf_warning("glBufferData, ");
+				osd_printf_warning("glBufferData, ");
 			}
 			if (!pfn_glBufferSubData)
 			{
-				mame_printf_warning("glBufferSubData, ");
+				osd_printf_warning("glBufferSubData, ");
 			}
-			mame_printf_warning("\n");
+			osd_printf_warning("\n");
 		}
 		if ( sdl->usevbo )
 		{
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: PBO not supported, no VBO support.\n");
+				osd_printf_warning("OpenGL: PBO not supported, no VBO support.\n");
 			}
 			sdl->usepbo=FALSE;
 		}
@@ -902,16 +902,16 @@ static void loadGLExtensions(sdl_window_info *window)
 		sdl->usepbo=FALSE;
 		if (_once)
 		{
-			mame_printf_warning("OpenGL: PBO not supported, missing: ");
+			osd_printf_warning("OpenGL: PBO not supported, missing: ");
 			if (!pfn_glMapBuffer)
 			{
-				mame_printf_warning("glMapBuffer, ");
+				osd_printf_warning("glMapBuffer, ");
 			}
 			if (!pfn_glUnmapBuffer)
 			{
-				mame_printf_warning("glUnmapBuffer, ");
+				osd_printf_warning("glUnmapBuffer, ");
 			}
-			mame_printf_warning("\n");
+			osd_printf_warning("\n");
 		}
 	}
 
@@ -923,32 +923,32 @@ static void loadGLExtensions(sdl_window_info *window)
 		sdl->usefbo=FALSE;
 		if (_once)
 		{
-			mame_printf_warning("OpenGL: FBO not supported, missing: ");
+			osd_printf_warning("OpenGL: FBO not supported, missing: ");
 			if (!pfn_glIsFramebuffer)
 			{
-				mame_printf_warning("pfn_glIsFramebuffer, ");
+				osd_printf_warning("pfn_glIsFramebuffer, ");
 			}
 			if (!pfn_glBindFramebuffer)
 			{
-				mame_printf_warning("pfn_glBindFramebuffer, ");
+				osd_printf_warning("pfn_glBindFramebuffer, ");
 			}
 			if (!pfn_glDeleteFramebuffers)
 			{
-				mame_printf_warning("pfn_glDeleteFramebuffers, ");
+				osd_printf_warning("pfn_glDeleteFramebuffers, ");
 			}
 			if (!pfn_glGenFramebuffers)
 			{
-				mame_printf_warning("pfn_glGenFramebuffers, ");
+				osd_printf_warning("pfn_glGenFramebuffers, ");
 			}
 			if (!pfn_glCheckFramebufferStatus)
 			{
-				mame_printf_warning("pfn_glCheckFramebufferStatus, ");
+				osd_printf_warning("pfn_glCheckFramebufferStatus, ");
 			}
 			if (!pfn_glFramebufferTexture2D)
 			{
-				mame_printf_warning("pfn_glFramebufferTexture2D, ");
+				osd_printf_warning("pfn_glFramebufferTexture2D, ");
 			}
-			mame_printf_warning("\n");
+			osd_printf_warning("\n");
 		}
 	}
 
@@ -956,29 +956,29 @@ static void loadGLExtensions(sdl_window_info *window)
 	{
 		if ( sdl->usevbo )
 		{
-			mame_printf_verbose("OpenGL: VBO supported\n");
+			osd_printf_verbose("OpenGL: VBO supported\n");
 		}
 		else
 		{
-			mame_printf_warning("OpenGL: VBO not supported\n");
+			osd_printf_warning("OpenGL: VBO not supported\n");
 		}
 
 		if ( sdl->usepbo )
 		{
-			mame_printf_verbose("OpenGL: PBO supported\n");
+			osd_printf_verbose("OpenGL: PBO supported\n");
 		}
 		else
 		{
-			mame_printf_warning("OpenGL: PBO not supported\n");
+			osd_printf_warning("OpenGL: PBO not supported\n");
 		}
 
 		if ( sdl->usefbo )
 		{
-			mame_printf_verbose("OpenGL: FBO supported\n");
+			osd_printf_verbose("OpenGL: FBO supported\n");
 		}
 		else
 		{
-			mame_printf_warning("OpenGL: FBO not supported\n");
+			osd_printf_warning("OpenGL: FBO not supported\n");
 		}
 	}
 
@@ -993,7 +993,7 @@ static void loadGLExtensions(sdl_window_info *window)
 		{
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: GLSL disabled, glActiveTexture(ARB) not supported\n");
+				osd_printf_warning("OpenGL: GLSL disabled, glActiveTexture(ARB) not supported\n");
 			}
 			sdl->useglsl = 0;
 		}
@@ -1008,7 +1008,7 @@ static void loadGLExtensions(sdl_window_info *window)
 		{
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
+				osd_printf_warning("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
 			}
 		}
 	}
@@ -1020,7 +1020,7 @@ static void loadGLExtensions(sdl_window_info *window)
 			sdl->useglsl = 0;
 			if (_once)
 			{
-				mame_printf_warning("OpenGL: GLSL supported, but disabled due to: prescale !=1 \n");
+				osd_printf_warning("OpenGL: GLSL supported, but disabled due to: prescale !=1 \n");
 			}
 		}
 	}
@@ -1039,20 +1039,20 @@ static void loadGLExtensions(sdl_window_info *window)
 			{
 				if (_once)
 				{
-					mame_printf_verbose("OpenGL: GLSL multipass not supported, due to unsupported FBO. Skipping followup shader\n");
+					osd_printf_verbose("OpenGL: GLSL multipass not supported, due to unsupported FBO. Skipping followup shader\n");
 				}
 				break;
 			}
 
 			if ( glsl_shader_add_mamebm(sdl->glsl, video_config.glsl_shader_mamebm[i], sdl->glsl_program_num) )
 			{
-				mame_printf_error("OpenGL: GLSL loading mame bitmap shader %d failed (%s)\n",
+				osd_printf_error("OpenGL: GLSL loading mame bitmap shader %d failed (%s)\n",
 					i, video_config.glsl_shader_mamebm[i]);
 			} else {
 				glsl_shader_feature = GLSL_SHADER_FEAT_CUSTOM;
 				if (_once)
 				{
-					mame_printf_verbose("OpenGL: GLSL using mame bitmap shader filter %d: '%s'\n",
+					osd_printf_verbose("OpenGL: GLSL using mame bitmap shader filter %d: '%s'\n",
 						sdl->glsl_program_num, video_config.glsl_shader_mamebm[i]);
 				}
 				sdl->glsl_program_mb2sc = sdl->glsl_program_num; // the last mame_bitmap (mb) shader does it.
@@ -1062,7 +1062,7 @@ static void loadGLExtensions(sdl_window_info *window)
 
 		if ( video_config.glsl_shader_scrn_num > 0 && sdl->glsl_program_num==0 )
 		{
-			mame_printf_verbose("OpenGL: GLSL cannot use screen bitmap shader without bitmap shader\n");
+			osd_printf_verbose("OpenGL: GLSL cannot use screen bitmap shader without bitmap shader\n");
 		}
 
 		for(i=0; sdl->usefbo && sdl->glsl_program_num>0 && i<video_config.glsl_shader_scrn_num; i++)
@@ -1070,12 +1070,12 @@ static void loadGLExtensions(sdl_window_info *window)
 			if ( glsl_shader_add_scrn(sdl->glsl, video_config.glsl_shader_scrn[i],
 											sdl->glsl_program_num-1-sdl->glsl_program_mb2sc) )
 			{
-				mame_printf_error("OpenGL: GLSL loading screen bitmap shader %d failed (%s)\n",
+				osd_printf_error("OpenGL: GLSL loading screen bitmap shader %d failed (%s)\n",
 					i, video_config.glsl_shader_scrn[i]);
 			} else {
 				if (_once)
 				{
-					mame_printf_verbose("OpenGL: GLSL using screen bitmap shader filter %d: '%s'\n",
+					osd_printf_verbose("OpenGL: GLSL using screen bitmap shader filter %d: '%s'\n",
 						sdl->glsl_program_num, video_config.glsl_shader_scrn[i]);
 				}
 				sdl->glsl_program_num++;
@@ -1091,7 +1091,7 @@ static void loadGLExtensions(sdl_window_info *window)
 
 			if (_once)
 			{
-				mame_printf_verbose("OpenGL: GLSL using shader filter '%s', idx: %d, num %d (vid filter: %d)\n",
+				osd_printf_verbose("OpenGL: GLSL using shader filter '%s', idx: %d, num %d (vid filter: %d)\n",
 					glsl_shader_get_filter_name_mamebm(glsl_shader_feature),
 					glsl_shader_feature, sdl->glsl_program_num, video_config.filter);
 			}
@@ -1100,7 +1100,7 @@ static void loadGLExtensions(sdl_window_info *window)
 	} else {
 		if (_once)
 		{
-			mame_printf_verbose("OpenGL: using vid filter: %d\n", video_config.filter);
+			osd_printf_verbose("OpenGL: using vid filter: %d\n", video_config.filter);
 		}
 	}
 
@@ -1666,7 +1666,7 @@ static void texture_compute_size_subroutine(sdl_window_info *window, texture_inf
 	while (texture->yprescale > 1 && height_create * texture->yprescale > sdl->texture_max_height)
 		texture->yprescale--;
 	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != window->prescale || texture->yprescale != window->prescale))
-		mame_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", window->prescale, window->prescale, texture->xprescale, texture->yprescale);
+		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", window->prescale, window->prescale, texture->xprescale, texture->yprescale);
 
 	width  *= texture->xprescale;
 	height *= texture->yprescale;
@@ -1724,7 +1724,7 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 	{
 		static int printed = FALSE;
 		if (!printed)
-			mame_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
+			osd_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
 		printed = TRUE;
 	}
 
@@ -1738,7 +1738,7 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 		texture->format==SDL_TEXFORMAT_PALETTE16A
 		)
 	{
-		mame_printf_verbose("GL texture: copy %d, shader %d, dynamic %d, %dx%d %dx%d [%s, Equal: %d, Palette: %d,\n"
+		osd_printf_verbose("GL texture: copy %d, shader %d, dynamic %d, %dx%d %dx%d [%s, Equal: %d, Palette: %d,\n"
 					"            scale %dx%d, border %d, pitch %d,%d/%d], bytes/pix %d\n",
 			!texture->nocopy, texture->type==TEXTURE_TYPE_SHADER, texture->type==TEXTURE_TYPE_DYNAMIC,
 			finalwidth, finalheight, finalwidth_create, finalheight_create,
@@ -1770,36 +1770,36 @@ static int gl_checkFramebufferStatus(void)
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return 0;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-			mame_printf_error("GL FBO: incomplete,incomplete attachment\n");
+			osd_printf_error("GL FBO: incomplete,incomplete attachment\n");
 			return -1;
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-			mame_printf_error("GL FBO: Unsupported framebuffer format\n");
+			osd_printf_error("GL FBO: Unsupported framebuffer format\n");
 			return -1;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			mame_printf_error("GL FBO: incomplete,missing attachment\n");
+			osd_printf_error("GL FBO: incomplete,missing attachment\n");
 			return -1;
 		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			mame_printf_error("GL FBO: incomplete,attached images must have same dimensions\n");
+			osd_printf_error("GL FBO: incomplete,attached images must have same dimensions\n");
 			return -1;
 		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-				mame_printf_error("GL FBO: incomplete,attached images must have same format\n");
+				osd_printf_error("GL FBO: incomplete,attached images must have same format\n");
 			return -1;
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			mame_printf_error("GL FBO: incomplete,missing draw buffer\n");
+			osd_printf_error("GL FBO: incomplete,missing draw buffer\n");
 			return -1;
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			mame_printf_error("GL FBO: incomplete,missing read buffer\n");
+			osd_printf_error("GL FBO: incomplete,missing read buffer\n");
 			return -1;
 #ifdef GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT
 		case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
-			mame_printf_error("GL FBO: incomplete, duplicate attachment\n");
+			osd_printf_error("GL FBO: incomplete, duplicate attachment\n");
 			return -1;
 #endif
 		case 0:
-			mame_printf_error("GL FBO: incomplete, implementation fault\n");
+			osd_printf_error("GL FBO: incomplete, implementation fault\n");
 			return -1;
 		default:
-			mame_printf_error("GL FBO: incomplete, implementation ERROR\n");
+			osd_printf_error("GL FBO: incomplete, implementation ERROR\n");
 			/* fall through */
 	}
 	return -1;
@@ -1815,7 +1815,7 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 		if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
 						0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
 		{
-			mame_printf_error("cannot create fbo texture, req: %dx%d, avail: %dx%d - bail out\n",
+			osd_printf_error("cannot create fbo texture, req: %dx%d, avail: %dx%d - bail out\n",
 						width, height, (int)_width, (int)_height);
 			return -1;
 		}
@@ -1835,7 +1835,7 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 
 	if ( gl_checkFramebufferStatus() )
 	{
-		mame_printf_error("FBO error fbo texture - bail out\n");
+		osd_printf_error("FBO error fbo texture - bail out\n");
 		return -1;
 	}
 
@@ -1892,7 +1892,7 @@ static int texture_shader_create(sdl_window_info *window,
 
 	if ( lut_table_width_pow2 > sdl->texture_max_width || lut_table_height_pow2 > sdl->texture_max_height )
 	{
-		mame_printf_error("Need lut size %dx%d, but max text size is %dx%d, bail out\n",
+		osd_printf_error("Need lut size %dx%d, but max text size is %dx%d, bail out\n",
 			lut_table_width_pow2, lut_table_height_pow2,
 			sdl->texture_max_width, sdl->texture_max_height);
 		return -1;
@@ -1982,7 +1982,7 @@ static int texture_shader_create(sdl_window_info *window,
 
 		pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 
-		mame_printf_verbose("GL texture: mpass mame-bmp   2x %dx%d (pow2 %dx%d)\n",
+		osd_printf_verbose("GL texture: mpass mame-bmp   2x %dx%d (pow2 %dx%d)\n",
 			texture->rawwidth, texture->rawheight, texture->rawwidth_create, texture->rawheight_create);
 	}
 
@@ -2004,7 +2004,7 @@ static int texture_shader_create(sdl_window_info *window,
 			}
 		}
 
-		mame_printf_verbose("GL texture: mpass screen-bmp 2x %dx%d (pow2 %dx%d)\n",
+		osd_printf_verbose("GL texture: mpass screen-bmp 2x %dx%d (pow2 %dx%d)\n",
 			window->width, window->height, surf_w_pow2, surf_h_pow2);
 	}
 
@@ -2024,7 +2024,7 @@ static int texture_shader_create(sdl_window_info *window,
 					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
 					&_width, &_height, 1) )
 	{
-		mame_printf_error("cannot create bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
+		osd_printf_error("cannot create bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
 			texture->rawwidth_create, texture->rawheight_create, (int)_width, (int)_height);
 		return -1;
 	}
@@ -2134,7 +2134,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			break;
 
 		default:
-			mame_printf_error("Unknown textureformat %d\n", PRIMFLAG_GET_TEXFORMAT(flags));
+			osd_printf_error("Unknown textureformat %d\n", PRIMFLAG_GET_TEXFORMAT(flags));
 	}
 
 	// compute the size
@@ -2558,7 +2558,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 					break;
 
 				default:
-					mame_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
+					osd_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
 					break;
 			}
 		}
@@ -2855,12 +2855,12 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 			uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[shaderIdx], "vid_attributes");
 			pfn_glUniform4fvARB(uniform_location, 1, &(vid_attributes[shaderIdx]));
 			if ( GL_CHECK_ERROR_QUIET() ) {
-				mame_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
+				osd_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
 			}
 		}
 		else
 		{
-			mame_printf_verbose("GLSL: could not get render container for screen %d\n", window->start_viewscreen);
+			osd_printf_verbose("GLSL: could not get render container for screen %d\n", window->start_viewscreen);
 		}
 	}
 }

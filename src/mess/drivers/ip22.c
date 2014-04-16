@@ -294,7 +294,7 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 	case 0xa4/4:
 	case 0xa8/4:
 	case 0xac/4:
-//      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
+//      osd_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return m_int3_regs[offset-0x80/4];
 	case 0xb0/4:
 		ret8 = m_pit->read(space, 0);
@@ -342,7 +342,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		cChar = data & 0x000000ff;
 		if( cChar >= 0x20 || cChar == 0x0d || cChar == 0x0a )
 		{
-//          mame_printf_info( "%c", cChar );
+//          osd_printf_info( "%c", cChar );
 		}
 		break;
 	case 0x034/4:
@@ -357,7 +357,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		cChar = data & 0x000000ff;
 		if( cChar >= 0x20 || cChar == 0x0d || cChar == 0x0a )
 		{
-//          mame_printf_info( "%c", cChar );
+//          osd_printf_info( "%c", cChar );
 		}
 		break;
 	case 0x40/4:
@@ -376,7 +376,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 	case 0x9c/4:
 	case 0xa0/4:
 	case 0xa4/4:
-//      mame_printf_info("INT3: w %x to %x (reg %d) mask %08x (PC=%x)\n", data, offset*4, offset-0x80/4, mem_mask, activecpu_get_pc());
+//      osd_printf_info("INT3: w %x to %x (reg %d) mask %08x (PC=%x)\n", data, offset*4, offset-0x80/4, mem_mask, activecpu_get_pc());
 		m_int3_regs[offset-0x80/4] = data;
 
 		// if no local0 interrupts now, clear the input to the CPU
@@ -729,7 +729,7 @@ WRITE32_MEMBER(ip22_state::rtc_w)
 {
 	RTC_WRITECNT++;
 
-//  mame_printf_info("RTC_W: offset %x => %x (PC=%x)\n", data, offset, activecpu_get_pc());
+//  osd_printf_info("RTC_W: offset %x => %x (PC=%x)\n", data, offset, activecpu_get_pc());
 
 	if( offset <= 0x0d )
 	{
@@ -1410,7 +1410,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 				wptr = space.read_dword(m_HPC3.nSCSI0Descriptor);
 				sptr = 0;
 
-//              mame_printf_info("DMA from device: %d words @ %x\n", words, wptr);
+//              osd_printf_info("DMA from device: %d words @ %x\n", words, wptr);
 
 				dump_chain(space, m_HPC3.nSCSI0Descriptor);
 

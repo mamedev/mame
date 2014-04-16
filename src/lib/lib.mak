@@ -46,6 +46,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/corestr.o \
 	$(LIBOBJ)/util/coreutil.o \
 	$(LIBOBJ)/util/cstrpool.o \
+	$(LIBOBJ)/util/delegate.o \
 	$(LIBOBJ)/util/flac.o \
 	$(LIBOBJ)/util/harddisk.o \
 	$(LIBOBJ)/util/hashing.o \

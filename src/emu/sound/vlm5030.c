@@ -543,7 +543,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					/* is this a zero energy frame? */
 					if (m_current_energy == 0)
 					{
-						/*mame_printf_debug("processing frame: zero energy\n");*/
+						/*osd_printf_debug("processing frame: zero energy\n");*/
 						m_target_energy = 0;
 						m_target_pitch = m_current_pitch;
 						for(i=0;i<=9;i++)
@@ -551,9 +551,9 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					}
 					else
 					{
-						/*mame_printf_debug("processing frame: Normal\n");*/
-						/*mame_printf_debug("*** Energy = %d\n",m_current_energy);*/
-						/*mame_printf_debug("proc: %d %d\n",last_fbuf_head,fbuf_head);*/
+						/*osd_printf_debug("processing frame: Normal\n");*/
+						/*osd_printf_debug("*** Energy = %d\n",m_current_energy);*/
+						/*osd_printf_debug("proc: %d %d\n",last_fbuf_head,fbuf_head);*/
 						m_target_energy = m_new_energy;
 						m_target_pitch = m_new_pitch;
 						for(i=0;i<=9;i++)

@@ -393,9 +393,9 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 
 	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{
-		mame_printf_debug("%03X:out1:", space.device().safe_pc());
-		if (!(data & 0x08)) mame_printf_debug(" SMS");
-		mame_printf_debug("\n");
+		osd_printf_debug("%03X:out1:", space.device().safe_pc());
+		if (!(data & 0x08)) osd_printf_debug(" SMS");
+		osd_printf_debug("\n");
 		m_i8049_out1 = data;
 	}
 

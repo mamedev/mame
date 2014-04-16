@@ -48,19 +48,6 @@ enum machine_notification
 };
 
 
-// output channels
-enum output_channel
-{
-	OUTPUT_CHANNEL_ERROR,
-	OUTPUT_CHANNEL_WARNING,
-	OUTPUT_CHANNEL_INFO,
-	OUTPUT_CHANNEL_DEBUG,
-	OUTPUT_CHANNEL_VERBOSE,
-	OUTPUT_CHANNEL_LOG,
-	OUTPUT_CHANNEL_COUNT
-};
-
-
 // debug flags
 const int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
 const int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook

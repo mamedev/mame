@@ -16,13 +16,13 @@ CPU_DISASSEMBLE( rsp );
 #define SAVE_DMEM                       0
 #define RSP_TEST_SYNC                   0
 
-#define PRINT_VECREG(x)     mame_printf_debug("V%d: %04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X\n", (x), \
+#define PRINT_VECREG(x)     osd_printf_debug("V%d: %04X|%04X|%04X|%04X|%04X|%04X|%04X|%04X\n", (x), \
 							(UINT16)VREG_S((x),0), (UINT16)VREG_S((x),1), \
 							(UINT16)VREG_S((x),2), (UINT16)VREG_S((x),3), \
 							(UINT16)VREG_S((x),4), (UINT16)VREG_S((x),5), \
 							(UINT16)VREG_S((x),6), (UINT16)VREG_S((x),7))
 
-#define PRINT_ACCUM(x)     mame_printf_debug("A%d: %08X|%08X\n", (x), \
+#define PRINT_ACCUM(x)     osd_printf_debug("A%d: %08X|%08X\n", (x), \
 							(UINT32)( ( ACCUM(x) >> 32 ) & 0x00000000ffffffff ),    \
 							(UINT32)(   ACCUM(x)         & 0x00000000ffffffff ))
 
@@ -222,7 +222,7 @@ static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 	{
 		char string[200];
 		rsp_dasm_one(string, rsp->ppc, op);
-		mame_printf_debug("%08X: %s\n", rsp->ppc, string);
+		osd_printf_debug("%08X: %s\n", rsp->ppc, string);
 	}
 
 #if SAVE_DISASM
@@ -869,7 +869,7 @@ static void handle_swc2(rsp_state *rsp, UINT32 op)
 
 			// FIXME: only works for index 0 and index 8
 
-			if (index & 0x7)    mame_printf_debug("RSP: SFV: index = %d at %08X\n", index, rsp->ppc);
+			if (index & 0x7)    osd_printf_debug("RSP: SFV: index = %d at %08X\n", index, rsp->ppc);
 
 			ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 

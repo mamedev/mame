@@ -450,7 +450,7 @@ INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
 
 DECO16IC_BANK_CB_MEMBER(backfire_state::bank_callback)
 {
-	//  mame_printf_debug("bank callback %04x\n",bank); // bit 1 gets set too?
+	//  osd_printf_debug("bank callback %04x\n",bank); // bit 1 gets set too?
 	bank = bank >> 4;
 	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
 
@@ -710,7 +710,7 @@ void backfire_state::descramble_sound()
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
-	//mame_printf_debug( "%08x\n",space.device().safe_pc());
+	//osd_printf_debug( "%08x\n",space.device().safe_pc());
 
 	if (space.device() .safe_pc()== 0xce44)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfire
 	if (space.device().safe_pc() == 0xcee4)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfirea

@@ -812,11 +812,11 @@ input_device::input_device(input_class &_class, int devindex, const char *name, 
 		astring tempstr;
 		if (!m_joymap.parse(mapstring))
 		{
-			mame_printf_error("Invalid joystick map: %s\n", mapstring);
+			osd_printf_error("Invalid joystick map: %s\n", mapstring);
 			m_joymap.parse(joystick_map_8way);
 		}
 		else if (mapstring != joystick_map_8way)
-			mame_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string(tempstr));
+			osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string(tempstr));
 	}
 }
 
@@ -990,7 +990,7 @@ input_device *input_class::add_device(int devindex, const char *name, void *inte
 	// update the maximum index found
 	m_maxindex = MAX(m_maxindex, devindex);
 
-	mame_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
+	osd_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
 	return m_device[devindex];
 }
 
@@ -2074,7 +2074,7 @@ bool input_manager::set_global_joystick_map(const char *mapstring)
 		return false;
 
 	astring tempstr;
-	mame_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string(tempstr));
+	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string(tempstr));
 
 	// iterate over joysticks and set the map
 	for (int joynum = 0; joynum <= m_joystick_class.maxindex(); joynum++)

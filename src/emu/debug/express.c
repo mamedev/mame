@@ -611,7 +611,7 @@ void parsed_expression::copy(const parsed_expression &src)
 void parsed_expression::print_tokens(FILE *out)
 {
 #if DEBUG_TOKENS
-	mame_printf_debug("----\n");
+	osd_printf_debug("----\n");
 	for (parse_token *token = m_tokens.first(); token != NULL; token = token->next())
 	{
 		switch (token->type)
@@ -689,7 +689,7 @@ void parsed_expression::print_tokens(FILE *out)
 				break;
 		}
 	}
-	mame_printf_debug("----\n");
+	osd_printf_debug("----\n");
 #endif
 }
 

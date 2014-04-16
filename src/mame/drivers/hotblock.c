@@ -93,14 +93,14 @@ READ8_MEMBER(hotblock_state::hotblock_video_read)
 /* port 4 is some kind of eeprom / storage .. used to store the scores */
 READ8_MEMBER(hotblock_state::hotblock_port4_r)
 {
-//  mame_printf_debug("port4_r\n");
+//  osd_printf_debug("port4_r\n");
 	return 0x00;
 }
 
 
 WRITE8_MEMBER(hotblock_state::hotblock_port4_w)
 {
-//  mame_printf_debug("port4_w: pc = %06x : data %04x\n", space.device().safe_pc(), data);
+//  osd_printf_debug("port4_w: pc = %06x : data %04x\n", space.device().safe_pc(), data);
 //  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
 
 	m_port4 = data;

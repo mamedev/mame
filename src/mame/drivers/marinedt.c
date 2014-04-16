@@ -295,14 +295,14 @@ WRITE8_MEMBER(marinedt_state::marinedt_pf_w)
 
 
 	//if ((m_pf & 0x07) != (data & 0x07))
-	//  mame_printf_debug("marinedt_pf_w: %02x\n", data & 0x07);
+	//  osd_printf_debug("marinedt_pf_w: %02x\n", data & 0x07);
 
 	if ((m_pf & 0x02) != (data & 0x02))
 	{
 		if (data & 0x02)
-			mame_printf_debug("tile flip\n");
+			osd_printf_debug("tile flip\n");
 		else
-			mame_printf_debug("tile non-flip\n");
+			osd_printf_debug("tile non-flip\n");
 
 		if (data & 0x02)
 			m_tx_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);

@@ -73,7 +73,7 @@ base *drawd3d9_init(void)
 	HINSTANCE dllhandle = LoadLibrary(TEXT("d3d9.dll"));
 	if (dllhandle == NULL)
 	{
-		mame_printf_verbose("Direct3D: Unable to access d3d9.dll\n");
+		osd_printf_verbose("Direct3D: Unable to access d3d9.dll\n");
 		return NULL;
 	}
 
@@ -81,7 +81,7 @@ base *drawd3d9_init(void)
 	direct3dcreate9_ptr direct3dcreate9 = (direct3dcreate9_ptr)GetProcAddress(dllhandle, "Direct3DCreate9");
 	if (direct3dcreate9 == NULL)
 	{
-		mame_printf_verbose("Direct3D: Unable to find Direct3DCreate9\n");
+		osd_printf_verbose("Direct3D: Unable to find Direct3DCreate9\n");
 		FreeLibrary(dllhandle);
 		dllhandle = NULL;
 		return NULL;
@@ -91,7 +91,7 @@ base *drawd3d9_init(void)
 	IDirect3D9 *d3d9 = (*direct3dcreate9)(D3D_SDK_VERSION);
 	if (d3d9 == NULL)
 	{
-		mame_printf_verbose("Direct3D: Error attempting to initialize Direct3D9\n");
+		osd_printf_verbose("Direct3D: Error attempting to initialize Direct3D9\n");
 		FreeLibrary(dllhandle);
 		dllhandle = NULL;
 		return NULL;
@@ -111,7 +111,7 @@ base *drawd3d9_init(void)
 	}
 	if (fxhandle == NULL)
 	{
-		mame_printf_verbose("Direct3D: Warning - Unable find any D3D9 DLLs; disabling post-effect rendering\n");
+		osd_printf_verbose("Direct3D: Warning - Unable find any D3D9 DLLs; disabling post-effect rendering\n");
 		post_available = false;
 	}
 
@@ -124,7 +124,7 @@ base *drawd3d9_init(void)
 	d3dptr->libhandle = fxhandle;
 	set_interfaces(d3dptr);
 
-	mame_printf_verbose("Direct3D: Using Direct3D 9\n");
+	osd_printf_verbose("Direct3D: Using Direct3D 9\n");
 	return d3dptr;
 }
 

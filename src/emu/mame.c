@@ -96,25 +96,7 @@
 /* started empty? */
 static bool started_empty;
 
-static bool print_verbose = false;
-
 static running_machine *global_machine;
-
-/* output channels */
-static output_delegate output_cb[OUTPUT_CHANNEL_COUNT] =
-{
-	output_delegate(FUNC(mame_file_output_callback), stderr),   // OUTPUT_CHANNEL_ERROR
-	output_delegate(FUNC(mame_file_output_callback), stderr),   // OUTPUT_CHANNEL_WARNING
-	output_delegate(FUNC(mame_file_output_callback), stdout),   // OUTPUT_CHANNEL_INFO
-#ifdef MAME_DEBUG
-	output_delegate(FUNC(mame_file_output_callback), stdout),   // OUTPUT_CHANNEL_DEBUG
-#else
-	output_delegate(FUNC(mame_null_output_callback), stdout),   // OUTPUT_CHANNEL_DEBUG
-#endif
-	output_delegate(FUNC(mame_file_output_callback), stdout),   // OUTPUT_CHANNEL_VERBOSE
-	output_delegate(FUNC(mame_file_output_callback), stdout)    // OUTPUT_CHANNEL_LOG
-};
-
 
 
 /***************************************************************************
@@ -129,10 +111,6 @@ int mame_execute(emu_options &options, osd_interface &osd)
 {
 	bool firstgame = true;
 	bool firstrun = true;
-
-	// extract the verbose printing option
-	if (options.verbose())
-		print_verbose = true;
 
 	// loop across multiple hard resets
 	bool exit_pending = false;
@@ -199,152 +177,6 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	// return an error
 	return error;
 }
-
-
-/***************************************************************************
-    OUTPUT MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    mame_set_output_channel - configure an output
-    channel
--------------------------------------------------*/
-
-output_delegate mame_set_output_channel(output_channel channel, output_delegate callback)
-{
-	assert(channel < OUTPUT_CHANNEL_COUNT);
-	assert(!callback.isnull());
-
-	/* return the originals if requested */
-	output_delegate prevcb = output_cb[channel];
-
-	/* set the new ones */
-	output_cb[channel] = callback;
-	return prevcb;
-}
-
-
-/*-------------------------------------------------
-    mame_file_output_callback - default callback
-    for file output
--------------------------------------------------*/
-
-void mame_file_output_callback(FILE *param, const char *format, va_list argptr)
-{
-	vfprintf(param, format, argptr);
-}
-
-
-/*-------------------------------------------------
-    mame_null_output_callback - default callback
-    for no output
--------------------------------------------------*/
-
-void mame_null_output_callback(FILE *param, const char *format, va_list argptr)
-{
-}
-
-
-/*-------------------------------------------------
-    mame_printf_error - output an error to the
-    appropriate callback
--------------------------------------------------*/
-
-void mame_printf_error(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OUTPUT_CHANNEL_ERROR](format, argptr);
-	va_end(argptr);
-}
-
-
-/*-------------------------------------------------
-    mame_printf_warning - output a warning to the
-    appropriate callback
--------------------------------------------------*/
-
-void mame_printf_warning(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OUTPUT_CHANNEL_WARNING](format, argptr);
-	va_end(argptr);
-}
-
-
-/*-------------------------------------------------
-    mame_printf_info - output info text to the
-    appropriate callback
--------------------------------------------------*/
-
-void mame_printf_info(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OUTPUT_CHANNEL_INFO](format, argptr);
-	va_end(argptr);
-}
-
-
-/*-------------------------------------------------
-    mame_printf_verbose - output verbose text to
-    the appropriate callback
--------------------------------------------------*/
-
-void mame_printf_verbose(const char *format, ...)
-{
-	va_list argptr;
-
-	/* if we're not verbose, skip it */
-	if (!print_verbose)
-		return;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OUTPUT_CHANNEL_VERBOSE](format, argptr);
-	va_end(argptr);
-}
-
-
-/*-------------------------------------------------
-    mame_printf_debug - output debug text to the
-    appropriate callback
--------------------------------------------------*/
-
-void mame_printf_debug(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OUTPUT_CHANNEL_DEBUG](format, argptr);
-	va_end(argptr);
-}
-
-
-/*-------------------------------------------------
-    mame_printf_log - output log text to the
-    appropriate callback
--------------------------------------------------*/
-
-#ifdef UNUSED_FUNCTION
-void mame_printf_log(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OUTPUT_CHANNEL_LOG])(format, argptr);
-	va_end(argptr);
-}
-#endif
 
 
 /***************************************************************************

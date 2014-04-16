@@ -623,22 +623,22 @@ int main(int argc, char *argv[])
 		sscanf(argv[2], "%x", &sens1);
 		sscanf(argv[3], "%x", &sens2);
 		sscanf(argv[4], "%x", &sens3);
-		mame_printf_debug("sensors: %04x %04x %04x %04x\n", sens0, sens1, sens2, sens3);
+		osd_printf_debug("sensors: %04x %04x %04x %04x\n", sens0, sens1, sens2, sens3);
 		if (sens0 && sens1)
 		{
-			mame_printf_debug("error: sensor 0 or 1 must be 0\n");
+			osd_printf_debug("error: sensor 0 or 1 must be 0\n");
 			return 1;
 		}
 
 		sensors_to_words(sens0, sens1, sens2, sens3, &word1, &word2, &word3, &beams);
-		mame_printf_debug("word1 = %04x  word2 = %04x  word3 = %04x  beams = %d\n",
+		osd_printf_debug("word1 = %04x  word2 = %04x  word3 = %04x  beams = %d\n",
 				(UINT32)word1, (UINT32)word2, (UINT32)word3, (UINT32)beams);
 
 		words_to_inters(word1, word2, word3, beams, &inter1, &inter2, &inter3);
-		mame_printf_debug("inter1 = %04x  inter2 = %04x  inter3 = %04x\n", (UINT32)inter1, (UINT32)inter2, (UINT32)inter3);
+		osd_printf_debug("inter1 = %04x  inter2 = %04x  inter3 = %04x\n", (UINT32)inter1, (UINT32)inter2, (UINT32)inter3);
 
 		inters_to_vels(inter1, inter2, inter3, beams, &x, &vx, &vy);
-		mame_printf_debug("x = %02x  vx = %02x  vy = %02x\n", (UINT32)x, (UINT32)vx, (UINT32)vy);
+		osd_printf_debug("x = %02x  vx = %02x  vy = %02x\n", (UINT32)x, (UINT32)vx, (UINT32)vy);
 	}
 	else if (argc == 4)
 	{
@@ -651,17 +651,17 @@ int main(int argc, char *argv[])
 		x = xin;
 		vx = vxin;
 		vy = vyin;
-		mame_printf_debug("x = %02x  vx = %02x  vy = %02x\n", (UINT32)x, (UINT32)vx, (UINT32)vy);
+		osd_printf_debug("x = %02x  vx = %02x  vy = %02x\n", (UINT32)x, (UINT32)vx, (UINT32)vy);
 
 		vels_to_inters(x, vx, vy, &inter1, &inter2, &inter3, &beams);
-		mame_printf_debug("inter1 = %04x  inter2 = %04x  inter3 = %04x  beams = %d\n", (UINT32)inter1, (UINT32)inter2, (UINT32)inter3, (UINT32)beams);
+		osd_printf_debug("inter1 = %04x  inter2 = %04x  inter3 = %04x  beams = %d\n", (UINT32)inter1, (UINT32)inter2, (UINT32)inter3, (UINT32)beams);
 
 		inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
-		mame_printf_debug("word1 = %04x  word2 = %04x  word3 = %04x  beams = %d\n",
+		osd_printf_debug("word1 = %04x  word2 = %04x  word3 = %04x  beams = %d\n",
 				(UINT32)word1, (UINT32)word2, (UINT32)word3, (UINT32)beams);
 
 		words_to_sensors(word1, word2, word3, beams, &sens0, &sens1, &sens2, &sens3);
-		mame_printf_debug("sensors: %04x %04x %04x %04x\n", sens0, sens1, sens2, sens3);
+		osd_printf_debug("sensors: %04x %04x %04x %04x\n", sens0, sens1, sens2, sens3);
 	}
 
 	return 0;

@@ -538,7 +538,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 		return false;
 
 	// parse the file
-	mame_printf_verbose("Parsing %s.ini\n", basename);
+	osd_printf_verbose("Parsing %s.ini\n", basename);
 	astring error;
 	bool result = parse_ini_file(file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 

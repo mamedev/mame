@@ -458,7 +458,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr (DSW actually reads in word units ...)
 
 		default:
-//          mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,space.device().safe_pc());
+//          osd_printf_debug("snes_r: offset = %x pc = %x\n",offset,space.device().safe_pc());
 // Added break; after commenting above line.  If uncommenting, drop the break;
 			break;
 	}
@@ -1388,7 +1388,7 @@ void snes_state::hdma( address_space &space )
 					break;
 				default:
 #ifdef MAME_DEBUG
-					mame_printf_debug( "  HDMA of unsupported type: %d\n", m_dma_channel[i].dmap & 0x07);
+					osd_printf_debug( "  HDMA of unsupported type: %d\n", m_dma_channel[i].dmap & 0x07);
 #endif
 					break;
 				}
@@ -1456,7 +1456,7 @@ void snes_state::dma( address_space &space, UINT8 channels )
 //          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", m_dma_channel[i].dmap & 0x07);
 
 #ifdef SNES_DBG_DMA
-			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", m_dma_channel[i].dmap & 0x07);
+			osd_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", m_dma_channel[i].dmap & 0x07);
 #endif
 
 			switch (m_dma_channel[i].dmap & 0x07)
@@ -1523,7 +1523,7 @@ void snes_state::dma( address_space &space, UINT8 channels )
 					break;
 				default:
 #ifdef MAME_DEBUG
-					mame_printf_debug("  DMA of unsupported type: %d\n", m_dma_channel[i].dmap & 0x07);
+					osd_printf_debug("  DMA of unsupported type: %d\n", m_dma_channel[i].dmap & 0x07);
 #endif
 					break;
 			}

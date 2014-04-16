@@ -456,12 +456,12 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 					{
 						if (objpix & 0x08)
 						{
-							mame_printf_debug("Collide car/object @ (%d,%d)\n", x, y);
+							osd_printf_debug("Collide car/object @ (%d,%d)\n", x, y);
 							m_collide = 0x1000 | 0x2000/* guess */ | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
 						}
 						else if ((mvid & 0x0f) != 0)
 						{
-							mame_printf_debug("Collide car/bg @ (%d,%d)\n", x, y);
+							osd_printf_debug("Collide car/bg @ (%d,%d)\n", x, y);
 							m_collide = 0x1000 | 0x4000/* guess */ | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
 						}
 					}
@@ -489,7 +489,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 			/* handle collision detection between MVID and OBJECT */
 			if (!(m_collide & 0x1000) && (objpix & 0x08) && (mvid & 0x0f) != 0)
 			{
-mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
+osd_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
 				m_collide = 0x1000 | 0x8000 | ((~y & 0x80) << 3) | ((~y & 0xf8) << 2) | ((~x & 0xf8) >> 3);
 			}
 

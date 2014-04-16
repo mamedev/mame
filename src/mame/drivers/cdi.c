@@ -310,8 +310,8 @@ static DEVICE_IMAGE_DISPLAY_INFO(cdi_cdinfo)
 	{
 		if (!core_stricmp(compatibility, "DVC"))
 		{
-			mame_printf_warning("This software requires the Digital Video Cartridge to work.\n");
-			mame_printf_warning("Therefore, it might not work in MESS at present.\n");
+			osd_printf_warning("This software requires the Digital Video Cartridge to work.\n");
+			osd_printf_warning("Therefore, it might not work in MESS at present.\n");
 		}
 	}
 }

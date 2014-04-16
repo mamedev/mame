@@ -461,7 +461,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 
 void software_list_device::release()
 {
-	mame_printf_verbose("Resetting %s\n", m_file.filename());
+	osd_printf_verbose("Resetting %s\n", m_file.filename());
 	m_parsed = false;
 	m_description = NULL;
 	m_errors.reset();
@@ -497,7 +497,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 	// check if there is at least one software list
 	software_list_device_iterator deviter(config.root_device());
 	if (deviter.first())
-		mame_printf_error("\n\"%s\" approximately matches the following\n"
+		osd_printf_error("\n\"%s\" approximately matches the following\n"
 							"supported software items (best match first):\n\n", name);
 
 	// iterate through lists
@@ -512,16 +512,16 @@ void software_list_device::display_matches(const machine_config &config, const c
 		{
 			// different output depending on original system or compatible
 			if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				mame_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
+				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
 			else
-				mame_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
+				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
 
 			// print them out
 			for (int softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
 				if (matches[softnum] != NULL)
-					mame_printf_error("%-18s%s\n", matches[softnum]->shortname(), matches[softnum]->longname());
+					osd_printf_error("%-18s%s\n", matches[softnum]->shortname(), matches[softnum]->longname());
 
-			mame_printf_error("\n");
+			osd_printf_error("\n");
 		}
 	}
 }
@@ -612,7 +612,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 	// first parse and output core errors if any
 	if (m_errors.len() > 0)
 	{
-		mame_printf_error("%s: Errors parsing software list:\n%s", filename(), errors_string());
+		osd_printf_error("%s: Errors parsing software list:\n%s", filename(), errors_string());
 		release();
 		return;
 	}
@@ -626,21 +626,21 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		// Did we lost any description?
 		if (swinfo->longname() == NULL)
 		{
-			mame_printf_error("%s: %s has no description\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no description\n", filename(), swinfo->shortname());
 			break;
 		}
 
 		// Did we lost any year?
 		if (swinfo->year() == NULL)
 		{
-			mame_printf_error("%s: %s has no year\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no year\n", filename(), swinfo->shortname());
 			break;
 		}
 
 		// Did we lost any publisher?
 		if (swinfo->publisher() == NULL)
 		{
-			mame_printf_error("%s: %s has no publisher\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no publisher\n", filename(), swinfo->shortname());
 			break;
 		}
 
@@ -650,12 +650,12 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		if (names.add(swinfo->shortname(), swinfo, false) == TMERR_DUPLICATE)
 		{
 			software_info *match = names.find(swinfo->shortname());
-			mame_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo->shortname(), match->shortname());
+			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo->shortname(), match->shortname());
 		}
 
 		// check for duplicate descriptions
 		if (descriptions.add(astring(swinfo->longname()).makelower().cstr(), swinfo, false) == TMERR_DUPLICATE)
-			mame_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
+			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
 
 		bool is_clone = false;
 		if (swinfo->parentname() != NULL)
@@ -663,7 +663,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			is_clone = true;
 			if (strcmp(swinfo->parentname(), swinfo->shortname()) == 0)
 			{
-				mame_printf_error("%s: %s is set as a clone of itself\n", filename(), swinfo->shortname());
+				osd_printf_error("%s: %s is set as a clone of itself\n", filename(), swinfo->shortname());
 				break;
 			}
 
@@ -671,21 +671,21 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			software_info *swinfo2 = find(swinfo->parentname());
 
 			if (swinfo2 == NULL)
-				mame_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo->parentname(), swinfo->shortname());
+				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo->parentname(), swinfo->shortname());
 			else if (swinfo2->parentname() != NULL)
-				mame_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo->shortname());
+				osd_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo->shortname());
 		}
 
 		// make sure the driver name is 8 chars or less
 		if ((is_clone && strlen(swinfo->shortname()) > NAME_LEN_CLONE) || (!is_clone && strlen(swinfo->shortname()) > NAME_LEN_PARENT))
-			mame_printf_error("%s: %s %s driver name must be %d characters or less\n", filename(), swinfo->shortname(),
+			osd_printf_error("%s: %s %s driver name must be %d characters or less\n", filename(), swinfo->shortname(),
 								is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 
 		// make sure the year is only digits, '?' or '+'
 		for (const char *s = swinfo->year(); *s != 0; s++)
 			if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
 			{
-				mame_printf_error("%s: %s has an invalid year '%s'\n", filename(), swinfo->shortname(), swinfo->year());
+				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), swinfo->shortname(), swinfo->year());
 				break;
 			}
 
@@ -693,13 +693,13 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		for (software_part *part = swinfo->first_part(); part != NULL; part = part->next())
 		{
 			if (part->interface() == NULL)
-				mame_printf_error("%s: %s has a part (%s) without interface\n", filename(), swinfo->shortname(), part->name());
+				osd_printf_error("%s: %s has a part (%s) without interface\n", filename(), swinfo->shortname(), part->name());
 
 			if (part->romdata() == NULL)
-				mame_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo->shortname(), part->name());
+				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo->shortname(), part->name());
 
 			if (part_names.add(part->name(), swinfo, false) == TMERR_DUPLICATE)
-				mame_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo->shortname(), part->name());
+				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo->shortname(), part->name());
 
 			for (const rom_entry *data = part->romdata(); data->_name != NULL; data++)
 				if (data->_hashdata != NULL)
@@ -708,14 +708,14 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 					for (const char *str = data->_name; *str; str++)
 						if (tolower((UINT8)*str) != *str)
 						{
-							mame_printf_error("%s: %s has upper case ROM name %s\n", filename(), swinfo->shortname(), data->_name);
+							osd_printf_error("%s: %s has upper case ROM name %s\n", filename(), swinfo->shortname(), data->_name);
 							break;
 						}
 
 					// make sure the hash is valid
 					hash_collection hashes;
 					if (!hashes.from_internal_string(data->_hashdata))
-						mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo->shortname(), data->_name, data->_hashdata);
+						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo->shortname(), data->_name, data->_hashdata);
 				}
 		}
 	}
@@ -743,7 +743,7 @@ softlist_parser::softlist_parser(software_list_device &list, astring &errors)
 		m_current_part(NULL),
 		m_pos(POS_ROOT)
 {
-	mame_printf_verbose("Parsing %s\n", m_list.m_file.filename());
+	osd_printf_verbose("Parsing %s\n", m_list.m_file.filename());
 
 	// set up memory callbacks
 	XML_Memory_Handling_Suite memcallbacks;
@@ -777,7 +777,7 @@ softlist_parser::softlist_parser(software_list_device &list, astring &errors)
 
 	// free the parser
 	XML_ParserFree(m_parser);
-	mame_printf_verbose("Parsing complete\n");
+	osd_printf_verbose("Parsing complete\n");
 }
 
 

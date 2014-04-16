@@ -163,7 +163,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 			buf[i++]=temp;
 			//m_terminal->write(space, 0, temp);
 		}
-		mame_printf_debug("%s", buf);
+		osd_printf_debug("%s", buf);
 		verboselog( machine(), 9, "(DEBUG) %s", buf);
 	}
 	return data;

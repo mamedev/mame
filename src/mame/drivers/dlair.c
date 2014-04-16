@@ -382,7 +382,7 @@ CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
 READ8_MEMBER(dlair_state::laserdisc_r)
 {
 	UINT8 result = laserdisc_data_r();
-	mame_printf_debug("laserdisc_r = %02X\n", result);
+	osd_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
 

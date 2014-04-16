@@ -590,7 +590,7 @@ void taitojc_state::debug_dsp_command()
 
 WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 {
-	//mame_printf_debug("dsp_shared: %08X, %04X at %08X\n", offset, data >> 16, space.device().safe_pc());
+	//osd_printf_debug("dsp_shared: %08X, %04X at %08X\n", offset, data >> 16, space.device().safe_pc());
 	if (ACCESSING_BITS_24_31)
 	{
 		m_dsp_shared_ram[offset] &= 0x00ff;
@@ -973,7 +973,7 @@ WRITE16_MEMBER(taitojc_state::dsp_texture_w)
 {
 	int index;
 	int x, y;
-	//mame_printf_debug("texture write %08X, %04X\n", dsp_addr1, data);
+	//osd_printf_debug("texture write %08X, %04X\n", dsp_addr1, data);
 
 	x = (m_dsp_tex_offset >> 0 & 0x1f) | (m_dsp_tex_offset >> 5 & 0x20);
 	y = (m_dsp_tex_offset >> 5 & 0x1f) | (m_dsp_tex_offset >> 6 & 0x20);
@@ -992,7 +992,7 @@ READ16_MEMBER(taitojc_state::dsp_texaddr_r)
 WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 {
 	m_dsp_tex_address = data;
-//  mame_printf_debug("texaddr = %08X at %08X\n", data, space.device().safe_pc());
+//  osd_printf_debug("texaddr = %08X at %08X\n", data, space.device().safe_pc());
 
 	m_texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
 	m_texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);

@@ -1148,7 +1148,7 @@ static void dinput_init(running_machine &machine)
 	}
 #endif
 
-	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
+	osd_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
 	// we need an exit callback
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(dinput_exit), &machine));
@@ -1445,7 +1445,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_REL);
 	if (result != DI_OK && result != DI_PROPNOEFFECT)
 	{
-		mame_printf_error("DirectInput: Unable to set relative mode for mouse %d (%s)\n", generic_device_index(mouse_list, devinfo), devinfo->name);
+		osd_printf_error("DirectInput: Unable to set relative mode for mouse %d (%s)\n", generic_device_index(mouse_list, devinfo), devinfo->name);
 		goto error;
 	}
 
@@ -1541,17 +1541,17 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	// set absolute mode
 	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);
 	if (result != DI_OK && result != DI_PROPNOEFFECT)
-		mame_printf_warning("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
+		osd_printf_warning("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
 
 	// turn off deadzone; we do our own calculations
 	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_DEADZONE, 0, DIPH_DEVICE, 0);
 	if (result != DI_OK && result != DI_PROPNOEFFECT)
-		mame_printf_warning("DirectInput: Unable to reset deadzone for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
+		osd_printf_warning("DirectInput: Unable to reset deadzone for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
 
 	// turn off saturation; we do our own calculations
 	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_SATURATION, 0, DIPH_DEVICE, 10000);
 	if (result != DI_OK && result != DI_PROPNOEFFECT)
-		mame_printf_warning("DirectInput: Unable to reset saturation for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
+		osd_printf_warning("DirectInput: Unable to reset saturation for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
 
 	// cap the number of axes, POVs, and buttons based on the format
 	devinfo->dinput.caps.dwAxes = MIN(devinfo->dinput.caps.dwAxes, 8);
@@ -1715,7 +1715,7 @@ static void rawinput_init(running_machine &machine)
 	get_rawinput_data = (get_rawinput_data_ptr)GetProcAddress(user32, "GetRawInputData");
 	if (register_rawinput_devices == NULL || get_rawinput_device_list == NULL || get_rawinput_device_info == NULL || get_rawinput_data == NULL)
 		goto error;
-	mame_printf_verbose("RawInput: APIs detected\n");
+	osd_printf_verbose("RawInput: APIs detected\n");
 
 	// get the number of devices, allocate a device list, and fetch it
 	if ((*get_rawinput_device_list)(NULL, &device_count, sizeof(*devlist)) != 0)

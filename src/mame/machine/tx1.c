@@ -118,7 +118,7 @@ static void sn_multiply(running_machine &machine)
 		}
 		default:
 		{
-			mame_printf_debug("sn74s516 ??? multiply: %x\n", SN74S516.code);
+			osd_printf_debug("sn74s516 ??? multiply: %x\n", SN74S516.code);
 		}
 	}
 
@@ -135,7 +135,7 @@ static void sn_divide(running_machine &machine)
 
 	if (SN74S516.X == 0)
 	{
-		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", machine.describe_context());
+		osd_printf_debug("%s:SN74S516 tried to divide by zero\n", machine.describe_context());
 		SN74S516.ZW.Z = (INT16)0xffff;
 		SN74S516.ZW.W = 0xffff;
 		SN74S516.ZWfl = 0;
@@ -164,7 +164,7 @@ static void sn_divide(running_machine &machine)
 		}
 		default:
 		{
-			mame_printf_debug("SN74S516 unhandled divide type: %x\n", SN74S516.code);
+			osd_printf_debug("SN74S516 unhandled divide type: %x\n", SN74S516.code);
 		}
 	}
 
@@ -282,7 +282,7 @@ static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 			if (SN74S516.code == 0x6666)
 			{
 				CLEAR_SEQUENCE;
-				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", machine.describe_context(), math.promaddr);
+				osd_printf_debug("%s:Code 6666: PROMADDR:%x\n", machine.describe_context(), math.promaddr);
 			}
 
 			UPDATE_SEQUENCE;
@@ -364,7 +364,7 @@ static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 		}
 		default:
 		{
-			mame_printf_debug("Unknown SN74S516 state. %x\n", SN74S516.code);
+			osd_printf_debug("Unknown SN74S516 state. %x\n", SN74S516.code);
 		}
 	}
 
@@ -677,7 +677,7 @@ READ16_MEMBER(tx1_state::tx1_math_r)
 			else if (math.mux == TX1_SEL_PSSEN)
 			{
 				// WRONG!!!!
-				mame_printf_debug("Math Read with PSSEN!\n");
+				osd_printf_debug("Math Read with PSSEN!\n");
 				math.ppshift = math.retval;
 			}
 
@@ -929,7 +929,7 @@ READ16_MEMBER(tx1_state::tx1_spcs_ram_r)
 /* Should never occur */
 WRITE16_MEMBER(tx1_state::tx1_spcs_ram_w)
 {
-	mame_printf_debug("Write to /SPCS RAM?");
+	osd_printf_debug("Write to /SPCS RAM?");
 	COMBINE_DATA(&m_math_ram[offset]);
 }
 
@@ -1004,7 +1004,7 @@ static void buggyboy_update_state(running_machine &machine)
 		else if (math.mux == BB_MUX_PPSEN)
 		{
 			// TODO: Needed?
-			//mame_printf_debug("/PPSEN with INS: %x\n", math.promaddr);
+			//osd_printf_debug("/PPSEN with INS: %x\n", math.promaddr);
 			//math.ppshift = lastval;//math.cpulatch;
 		}
 
@@ -1238,13 +1238,13 @@ WRITE16_MEMBER(tx1_state::buggyboy_math_w)
 		}
 		else
 		{
-			mame_printf_debug("BB_DSEL was not 3 for P->S load!\n");
+			osd_printf_debug("BB_DSEL was not 3 for P->S load!\n");
 			debugger_break(machine());
 		}
 	}
 	else
 	{
-		mame_printf_debug("Buggy Boy unknown math state!\n");
+		osd_printf_debug("Buggy Boy unknown math state!\n");
 		debugger_break(machine());
 	}
 

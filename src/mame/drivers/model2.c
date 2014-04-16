@@ -692,7 +692,7 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 	}
 	else
 	{
-		//mame_printf_debug("COPRO: push %08X\n", data);
+		//osd_printf_debug("COPRO: push %08X\n", data);
 	}
 }
 
@@ -766,7 +766,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 //		if(m_coprocnt == 0)
 //			return;
 
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data);
 		else
@@ -883,7 +883,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 	}
 }
 
@@ -912,7 +912,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 
 void model2_state::push_geo_data(UINT32 data)
 {
-	//mame_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
+	//osd_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
 	m_bufferram[m_geo_write_start_address/4] = data;
 	m_geo_write_start_address += 4;
 }
@@ -932,7 +932,7 @@ WRITE32_MEMBER(model2_state::geo_prg_w)
 	}
 	else
 	{
-		//mame_printf_debug("GEO: %08X: push %08X\n", m_geo_write_start_address, data);
+		//osd_printf_debug("GEO: %08X: push %08X\n", m_geo_write_start_address, data);
 		push_geo_data(data);
 	}
 }
@@ -950,7 +950,7 @@ READ32_MEMBER(model2_state::geo_r)
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", space.device().safe_pc(), address);
+	osd_printf_debug("geo_r: PC:%08x - %08X\n", space.device().safe_pc(), address);
 
 	return 0;
 }
@@ -965,11 +965,11 @@ WRITE32_MEMBER(model2_state::geo_w)
 		{
 		    int i;
 		    UINT32 a;
-		    mame_printf_debug("GEO: jump to %08X\n", (data & 0xfffff));
+		    osd_printf_debug("GEO: jump to %08X\n", (data & 0xfffff));
 		    a = (data & 0xfffff) / 4;
 		    for (i=0; i < 4; i++)
 		    {
-		        mame_printf_debug("   %08X: %08X %08X %08X %08X\n", 0x900000+(a*4)+(i*16),
+		        osd_printf_debug("   %08X: %08X %08X %08X %08X\n", 0x900000+(a*4)+(i*16),
 		            m_bufferram[a+(i*4)+0], m_bufferram[a+(i*4)+1], m_bufferram[a+(i*4)+2], m_bufferram[a+(i*4)+3]);
 		    }
 		}
@@ -980,12 +980,12 @@ WRITE32_MEMBER(model2_state::geo_w)
 		    {
 		        case 0x0:
 		        {
-		            mame_printf_debug("GEO: function %02X (%08X, %08X)\n", function, address, data);
+		            osd_printf_debug("GEO: function %02X (%08X, %08X)\n", function, address, data);
 		            break;
 		        }
 
-		        case 0x4:   mame_printf_debug("GEO: function %02X, command length %d\n", function, data & 0x3f); break;
-		        case 0x8:   mame_printf_debug("GEO: function %02X, data length %d\n", function, data & 0x7f); break;
+		        case 0x4:   osd_printf_debug("GEO: function %02X, command length %d\n", function, data & 0x3f); break;
+		        case 0x8:   osd_printf_debug("GEO: function %02X, data length %d\n", function, data & 0x7f); break;
 		    }
 		}*/
 
@@ -1018,12 +1018,12 @@ WRITE32_MEMBER(model2_state::geo_w)
 	}
 	else if (address == 0x1008)
 	{
-		//mame_printf_debug("GEO: Write Start Address: %08X\n", data);
+		//osd_printf_debug("GEO: Write Start Address: %08X\n", data);
 		m_geo_write_start_address = data & 0xfffff;
 	}
 	else if (address == 0x3008)
 	{
-		//mame_printf_debug("GEO: Read Start Address: %08X\n", data);
+		//osd_printf_debug("GEO: Read Start Address: %08X\n", data);
 		m_geo_read_start_address = data & 0xfffff;
 	}
 	else
@@ -1413,19 +1413,19 @@ WRITE32_MEMBER(model2_state::copro_w)
 		int function = (address & 0xfff) >> 4;
 		switch (address & 0xf)
 		{
-			case 0x0:   mame_printf_debug("COPRO: function %02X, command %d\n", function, (data >> 23) & 0x3f); break;
-			case 0x4:   mame_printf_debug("COPRO: function %02X, command length %d\n", function, data & 0x3f); break;
-			case 0x8:   mame_printf_debug("COPRO: function %02X, data length %d\n", function, data & 0x7f); break;
+			case 0x0:   osd_printf_debug("COPRO: function %02X, command %d\n", function, (data >> 23) & 0x3f); break;
+			case 0x4:   osd_printf_debug("COPRO: function %02X, command length %d\n", function, data & 0x3f); break;
+			case 0x8:   osd_printf_debug("COPRO: function %02X, data length %d\n", function, data & 0x7f); break;
 		}
 	}
 
-	//mame_printf_debug("COPRO: %08X = %08X\n", offset, data);
+	//osd_printf_debug("COPRO: %08X = %08X\n", offset, data);
 }
 #endif
 
 WRITE32_MEMBER(model2_state::mode_w)
 {
-	mame_printf_debug("Mode = %08X\n", data);
+	osd_printf_debug("Mode = %08X\n", data);
 }
 
 WRITE32_MEMBER(model2_state::model2o_tex_w0)
@@ -2187,7 +2187,7 @@ WRITE8_MEMBER(model2_state::scsp_irq)
 READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
 	UINT32 result = 0;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
+	//osd_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
 
 	copro_fifoin_pop(machine().device("dsp"), &result);
 	return result;
@@ -2195,7 +2195,7 @@ READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 
 WRITE32_MEMBER(model2_state::copro_sharc_output_fifo_w)
 {
-	//mame_printf_debug("SHARC FIFOOUT push %08X\n", data);
+	//osd_printf_debug("SHARC FIFOOUT push %08X\n", data);
 	copro_fifoout_push(machine().device("dsp"), data);
 }
 
@@ -2206,7 +2206,7 @@ READ32_MEMBER(model2_state::copro_sharc_buffer_r)
 
 WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 {
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
+	//osd_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
 	m_bufferram[offset & 0x7fff] = data;
 }
 

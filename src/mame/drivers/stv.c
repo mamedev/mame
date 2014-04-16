@@ -1044,7 +1044,7 @@ READ16_MEMBER( stv_state::adsp_control_r )
 			res = soundlatch_word_r(space,0);
 			break;
 		default:
-			mame_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
+			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
 	}
 	return res;
 }
@@ -1122,10 +1122,10 @@ WRITE16_MEMBER( stv_state::adsp_control_w )
 			break;
 		}
 		case 5:
-			mame_printf_debug("PFLAGS: %x\n", data);
+			osd_printf_debug("PFLAGS: %x\n", data);
 			break;
 		default:
-			mame_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
+			osd_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
 	}
 }
 

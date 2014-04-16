@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "emucore.h"
+#include "osdcomm.h"
 #include "delegate.h"
 
 

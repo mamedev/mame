@@ -487,7 +487,7 @@ int base_md_cart_slot_device::load_nonlist()
 
 	if (is_smd)
 	{
-		mame_printf_debug("SMD!\n");
+		osd_printf_debug("SMD!\n");
 
 		for (int ptr = 0; ptr < (tmplen - 0x200) / 0x2000; ptr += 2)
 		{
@@ -500,7 +500,7 @@ int base_md_cart_slot_device::load_nonlist()
 	}
 	else if (is_md)
 	{
-		mame_printf_debug("MD!\n");
+		osd_printf_debug("MD!\n");
 
 		for (int ptr = 0; ptr < tmplen; ptr += 2)
 		{
@@ -510,7 +510,7 @@ int base_md_cart_slot_device::load_nonlist()
 	}
 	else
 	{
-		mame_printf_debug("BIN!\n");
+		osd_printf_debug("BIN!\n");
 
 		fseek(0, SEEK_SET);
 		fread(ROM, len);

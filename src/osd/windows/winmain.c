@@ -460,7 +460,7 @@ int main(int argc, char *argv[])
 	if (win_is_gui_application() || is_double_click_start(argc))
 	{
 		// if we are a GUI app, output errors to message boxes
-		mame_set_output_channel(OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(winui_output_error), (delegate_late_bind *)0));
+		osd_set_output_channel(OSD_OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(winui_output_error), (delegate_late_bind *)0));
 
 		// make sure any console window that opened on our behalf is nuked
 		FreeConsole();
@@ -630,7 +630,7 @@ void windows_osd_interface::init(running_machine &machine)
 		osd_num_processors = atoi(stemp);
 		if (osd_num_processors < 1)
 		{
-			mame_printf_warning("Warning: numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
+			osd_printf_warning("Warning: numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
 			osd_num_processors = 0;
 		}
 	}

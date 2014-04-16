@@ -120,7 +120,7 @@ public:
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
-//  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
+//  osd_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
 	if((reg & 0xfe) == 0)
 		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
@@ -134,7 +134,7 @@ static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
-//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 
 	#if 1
 	switch(reg)
@@ -259,7 +259,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
-//  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
+//  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
 
 	if((reg & 0xfe) == 0)
 		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
@@ -279,7 +279,7 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
-//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 

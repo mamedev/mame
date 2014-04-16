@@ -526,7 +526,7 @@ INPUT_PORTS_END
 
 READ16_MEMBER(konamigv_state::btc_trackball_r)
 {
-//  mame_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
+//  osd_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
 
 	if( offset == 3 )
 	{
@@ -550,7 +550,7 @@ READ16_MEMBER(konamigv_state::btc_trackball_r)
 
 WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
-//  mame_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
+//  osd_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
 }
 
 static MACHINE_CONFIG_DERIVED( btchamp, konamigv )

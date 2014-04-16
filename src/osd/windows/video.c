@@ -213,7 +213,7 @@ static void init_monitors(void)
 			char *utf8_device = utf8_from_tstring(monitor->info.szDevice);
 			if (utf8_device != NULL)
 			{
-				mame_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle, utf8_device, (monitor == primary_monitor) ? "(primary)" : "");
+				osd_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle, utf8_device, (monitor == primary_monitor) ? "(primary)" : "");
 				osd_free(utf8_device);
 			}
 		}
@@ -359,11 +359,11 @@ static void extract_video_config(running_machine &machine)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
 		if (options.seconds_to_run() == 0)
-			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
+			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
 	{
-		mame_printf_warning("Invalid video value %s; reverting to gdi\n", stemp);
+		osd_printf_warning("Invalid video value %s; reverting to gdi\n", stemp);
 		video_config.mode = VIDEO_MODE_GDI;
 	}
 	video_config.waitvsync     = options.wait_vsync();
@@ -397,7 +397,7 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 		data = defdata;
 	}
 	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		mame_printf_error("Illegal aspect ratio value = %s\n", data);
+		osd_printf_error("Illegal aspect ratio value = %s\n", data);
 	return (float)num / (float)den;
 }
 
@@ -417,5 +417,5 @@ static void get_resolution(const char *defdata, const char *data, win_window_con
 		data = defdata;
 	}
 	if (sscanf(data, "%dx%d@%d", &config->width, &config->height, &config->refresh) < 2 && report_error)
-		mame_printf_error("Illegal resolution value = %s\n", data);
+		osd_printf_error("Illegal resolution value = %s\n", data);
 }

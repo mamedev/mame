@@ -1550,7 +1550,7 @@ void amiga_serial_in_w(running_machine &machine, UINT16 data)
 	/* set overrun if we weren't cleared */
 	if (CUSTOM_REG(REG_INTREQ) & INTENA_RBF)
 	{
-		mame_printf_debug("Serial data overflow\n");
+		osd_printf_debug("Serial data overflow\n");
 		CUSTOM_REG(REG_SERDATR) |= 0x8000;
 	}
 

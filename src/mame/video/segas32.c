@@ -2095,10 +2095,10 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
     static const char *const layname[] = { "TEXT", "NBG0", "NBG1", "NBG2", "NBG3", "BITM", "SPRI", "LINE" };
     for (groupnum = 0; groupnum <= sprgroup_mask; groupnum++)
     {
-        mame_printf_debug("%X: ", groupnum);
+        osd_printf_debug("%X: ", groupnum);
         for (i = 0; i <= numlayers; i++)
-            mame_printf_debug("%s(%02X) ", layname[layerorder[groupnum][i].index], layerorder[groupnum][i].effpri);
-        mame_printf_debug("\n");
+            osd_printf_debug("%s(%02X) ", layname[layerorder[groupnum][i].index], layerorder[groupnum][i].effpri);
+        osd_printf_debug("\n");
     }
 }*/
 
@@ -2298,9 +2298,9 @@ void segas32_state::print_mixer_data(int which)
 {
 	if (++m_print_count > 60 * 5)
 	{
-		mame_printf_debug("\n");
-		mame_printf_debug("OP: %04X\n", m_system32_videoram[0x1ff8e/2]);
-		mame_printf_debug("SC: %04X %04X %04X %04X - %04X %04X %04X %04X\n",
+		osd_printf_debug("\n");
+		osd_printf_debug("OP: %04X\n", m_system32_videoram[0x1ff8e/2]);
+		osd_printf_debug("SC: %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 			m_sprite_control_latched[0x00],
 			m_sprite_control_latched[0x01],
 			m_sprite_control_latched[0x02],
@@ -2309,7 +2309,7 @@ void segas32_state::print_mixer_data(int which)
 			m_sprite_control_latched[0x05],
 			m_sprite_control_latched[0x06],
 			m_sprite_control_latched[0x07]);
-		mame_printf_debug("00: %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
+		osd_printf_debug("00: %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 			m_mixer_control[which][0x00],
 			m_mixer_control[which][0x01],
 			m_mixer_control[which][0x02],
@@ -2326,7 +2326,7 @@ void segas32_state::print_mixer_data(int which)
 			m_mixer_control[which][0x0d],
 			m_mixer_control[which][0x0e],
 			m_mixer_control[which][0x0f]);
-		mame_printf_debug("20: %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
+		osd_printf_debug("20: %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 			m_mixer_control[which][0x10],
 			m_mixer_control[which][0x11],
 			m_mixer_control[which][0x12],
@@ -2343,7 +2343,7 @@ void segas32_state::print_mixer_data(int which)
 			m_mixer_control[which][0x1d],
 			m_mixer_control[which][0x1e],
 			m_mixer_control[which][0x1f]);
-		mame_printf_debug("40: %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
+		osd_printf_debug("40: %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 			m_mixer_control[which][0x20],
 			m_mixer_control[which][0x21],
 			m_mixer_control[which][0x22],

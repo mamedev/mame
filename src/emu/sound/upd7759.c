@@ -126,7 +126,7 @@
 
 
 #define DEBUG_STATES    (0)
-#define DEBUG_METHOD    mame_printf_debug
+#define DEBUG_METHOD    osd_printf_debug
 
 
 
