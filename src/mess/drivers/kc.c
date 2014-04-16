@@ -68,13 +68,6 @@ static const z80_daisy_config kc85_daisy_chain[] =
 	{ NULL }
 };
 
-static const kcexp_interface kc85_exp_interface =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT)
-};
-
 extern SLOT_INTERFACE_START(kc85_cart)
 	SLOT_INTERFACE("standard", KC_STANDARD) // standard 8KB ROM module
 	SLOT_INTERFACE("m006", KC_M006)         // BASIC
@@ -159,11 +152,26 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, "m011")
-	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL)
+	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, "m011", false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("mc")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_DEVICE_ADD("mc", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("exp")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* expansion interface */
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL)
+	MCFG_DEVICE_ADD("exp", KCEXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT(NULL)
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
@@ -213,11 +221,26 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL)
+	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, "m011", false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("mc")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_DEVICE_ADD("mc", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("exp")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* expansion interface */
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL)
+	MCFG_DEVICE_ADD("exp", KCEXP_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT(NULL)
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")

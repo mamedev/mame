@@ -155,13 +155,19 @@ device_kcexp_interface::~device_kcexp_interface()
 //-------------------------------------------------
 kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock, "kcexp_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_out_irq_cb(*this),
+		m_out_nmi_cb(*this),
+		m_out_halt_cb(*this)
 {
 }
 
 kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_out_irq_cb(*this),
+		m_out_nmi_cb(*this),
+		m_out_halt_cb(*this)
 {
 }
 
@@ -190,33 +196,9 @@ void kcexp_slot_device::device_start()
 	m_next_slot = m_next_slot_tag ? owner()->subdevice<kcexp_slot_device>(m_next_slot_tag) : NULL;
 
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_halt_func.resolve(m_out_halt_cb, *this);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kcexp_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const kcexp_interface *intf = reinterpret_cast<const kcexp_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<kcexp_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_halt_cb, 0, sizeof(m_out_halt_cb));
-	}
+	m_out_irq_cb.resolve_safe();
+	m_out_nmi_cb.resolve_safe();
+	m_out_halt_cb.resolve_safe();
 }
 
 
@@ -339,8 +321,6 @@ kccart_slot_device::~kccart_slot_device()
 
 void kccart_slot_device::device_config_complete()
 {
-	kcexp_slot_device::device_config_complete();
-
 	// set brief and instance name
 	update_names();
 }

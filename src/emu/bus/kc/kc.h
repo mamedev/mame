@@ -15,16 +15,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> kcext_interface
-
-struct kcexp_interface
-{
-	devcb_write_line                m_out_irq_cb;
-	devcb_write_line                m_out_nmi_cb;
-	devcb_write_line                m_out_halt_cb;
-};
-
-
 // ======================> device_kcexp_interface
 
 class device_kcexp_interface : public device_slot_card_interface
@@ -48,7 +38,6 @@ public:
 // ======================> kcexp_slot_device
 
 class kcexp_slot_device : public device_t,
-							public kcexp_interface,
 							public device_slot_interface
 {
 public:
@@ -57,9 +46,12 @@ public:
 	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~kcexp_slot_device();
 
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_halt_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_halt_cb.set_callback(object); }
+	
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete();
 
 	// inline configuration
 	static void static_set_next_slot(device_t &device, const char *next_module_tag);
@@ -74,9 +66,9 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
 	virtual DECLARE_WRITE_LINE_MEMBER( meo_w );
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_nmi_func;
-	devcb_resolved_write_line   m_out_halt_func;
+	devcb2_write_line                m_out_irq_cb;
+	devcb2_write_line                m_out_nmi_cb;
+	devcb2_write_line                m_out_halt_cb;
 
 	device_kcexp_interface*     m_cart;
 
@@ -124,16 +116,37 @@ extern const device_type KCCART_SLOT;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, KCEXP_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	kcexp_slot_device::static_set_next_slot(*device, _next_slot_tag);
+#define MCFG_KCEXP_SLOT_OUT_IRQ_CB(_devcb) \
+	devcb = &kcexp_slot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_KC85_CARTRIDGE_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, KCCART_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+#define MCFG_KCEXP_SLOT_OUT_NMI_CB(_devcb) \
+	devcb = &kcexp_slot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_KCEXP_SLOT_OUT_HALT_CB(_devcb) \
+	devcb = &kcexp_slot_device::set_out_halt_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_KCEXP_SLOT_NEXT_SLOT(_next_slot_tag) \
 	kcexp_slot_device::static_set_next_slot(*device, _next_slot_tag);
+	
+
+#define MCFG_KCCART_SLOT_OUT_IRQ_CB(_devcb) \
+	devcb = &kccart_slot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_KCCART_SLOT_OUT_NMI_CB(_devcb) \
+	devcb = &kccart_slot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_KCCART_SLOT_OUT_HALT_CB(_devcb) \
+	devcb = &kccart_slot_device::set_out_halt_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_KCCART_SLOT_NEXT_SLOT(_next_slot_tag) \
+	kccart_slot_device::static_set_next_slot(*device, _next_slot_tag);
+
+// #define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot) 
+//	MCFG_DEVICE_ADD(_tag, KCEXP_SLOT, 0) 
+//	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) 
+
+// #define MCFG_KC85_CARTRIDGE_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot)
+//	MCFG_DEVICE_ADD(_tag, KCCART_SLOT, 0) 
+//	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) 
 
 #endif /* __KCEXP_H__ */

@@ -46,34 +46,52 @@ SLOT_INTERFACE_EXTERN(kc85_exp);
 
 WRITE_LINE_MEMBER(kc_d002_device::out_irq_w)
 {
-	m_slot->m_out_irq_func(state);
+	m_slot->m_out_irq_cb(state);
 }
 
 WRITE_LINE_MEMBER(kc_d002_device::out_nmi_w)
 {
-	m_slot->m_out_nmi_func(state);
+	m_slot->m_out_nmi_cb(state);
 }
 
 WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
 {
-	m_slot->m_out_halt_func(state);
+	m_slot->m_out_halt_cb(state);
 }
 
-static const kcexp_interface kc_d002_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_halt_w)
-};
-
 static MACHINE_CONFIG_FRAGMENT( kc_d002 )
-	MCFG_KC85_CARTRIDGE_ADD("m0", "m4", kc_d002_interface, kc85_cart, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m4", "m8", kc_d002_interface, kc85_cart, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc_d002_interface, kc85_cart, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc_d002_interface, kc85_cart, NULL)
+	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("m4")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+	MCFG_DEVICE_ADD("m4", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("m8")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("mc")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+	MCFG_DEVICE_ADD("mc", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, NULL, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("exp")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
 
 	// expansion interface
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc_d002_interface, kc85_exp, NULL)
+	MCFG_DEVICE_ADD("exp", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, NULL, false)
+	MCFG_KCEXP_SLOT_NEXT_SLOT(NULL)
+	MCFG_KCEXP_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
 MACHINE_CONFIG_END
 
 //**************************************************************************
