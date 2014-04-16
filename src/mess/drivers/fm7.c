@@ -2052,7 +2052,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
@@ -2101,7 +2101,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
@@ -2151,7 +2151,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
@@ -2204,7 +2204,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
@@ -2251,7 +2251,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))

@@ -16,7 +16,6 @@
 #include "ui/filesel.h"
 #include "ui/imginfo.h"
 #include "ui/tapectrl.h"
-#include "ui/bbcontrl.h"
 #include "ui/swlist.h"
 #include "ui/viewgfx.h"
 #include "ui/barcode.h"
@@ -264,14 +263,6 @@ void ui_emu_menubar::build_images_menu()
 		if (cassette != NULL)
 		{
 			menu_item &control_menu = menu.append("Tape Control...", &ui_emu_menubar::tape_control, *this, cassette);
-			control_menu.set_enabled(is_loaded);
-		}
-
-		// bitbanger control
-		bitbanger_device *bitbanger = dynamic_cast<bitbanger_device *>(image);
-		if (bitbanger != NULL)
-		{
-			menu_item &control_menu = menu.append("Bitbanger Control...", &ui_emu_menubar::bitbanger_control, *this, bitbanger);
 			control_menu.set_enabled(is_loaded);
 		}
 	}
@@ -617,16 +608,6 @@ void ui_emu_menubar::select_from_software_list(device_image_interface *image, so
 void ui_emu_menubar::tape_control(cassette_image_device *image)
 {
 	start_menu(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container(), image)));
-}
-
-
-//-------------------------------------------------
-//  bitbanger_control
-//-------------------------------------------------
-
-void ui_emu_menubar::bitbanger_control(bitbanger_device *image)
-{
-	start_menu(auto_alloc_clear(machine(), ui_menu_mess_bitbanger_control(machine(), container(), image)));
 }
 
 

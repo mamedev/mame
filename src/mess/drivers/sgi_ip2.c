@@ -37,11 +37,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/mc68681.h" /* DUART0, DUART1 */
-#include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 
 #define TERMINAL_TAG "terminal"
@@ -409,12 +409,12 @@ WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
 };
 
 static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
-	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x08 ) // 19200
-	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x08 ) // 19200
-	DEVICE_INPUT_DEFAULTS( "TERM_STARTBITS", 0xff, 0x01 ) // 1
-	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x03 ) // 8
-	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x00 ) // N
-	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
@@ -431,9 +431,9 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", ip2_terminal)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

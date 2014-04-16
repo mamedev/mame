@@ -886,7 +886,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
 
 	MCFG_CASSETTE_ADD("cassette", crvision_cassette_interface)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
@@ -964,7 +964,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 
 	MCFG_CASSETTE_ADD("cassette", lasr2001_cassette_interface)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(laser2001_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

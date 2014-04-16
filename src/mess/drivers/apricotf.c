@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80dart_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

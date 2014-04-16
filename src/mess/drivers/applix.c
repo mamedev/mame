@@ -896,7 +896,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(applix_state, applix_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq2))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via6522", via6522_device, write_pa0))
 

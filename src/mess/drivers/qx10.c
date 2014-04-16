@@ -85,7 +85,7 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
-	required_device<qx10_keyboard_device> m_kbd;
+	required_device<rs232_port_device> m_kbd;
 	UINT8 m_vram_bank;
 	//required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_video_ram;
@@ -462,7 +462,7 @@ static UPD7201_INTERFACE(qx10_upd7201_interface)
 {
 	0, 0, 0, 0, // channel b clock set by pit2 channel 2
 
-	DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, input_txd),
+	DEVCB_DEVICE_LINE_MEMBER("kbd", rs232_port_device, write_txd),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -479,11 +479,6 @@ static UPD7201_INTERFACE(qx10_upd7201_interface)
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
-};
-
-static struct serial_keyboard_interface qx10_keyboard_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("upd7201", z80dart_device, rxa_w)
 };
 
 WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
@@ -797,6 +792,10 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 8, qx10_state )
 	AM_RANGE(0x00000, 0x5ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
+static SLOT_INTERFACE_START(keyboard)
+	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
@@ -867,7 +866,8 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
 
-	MCFG_QX10_KEYBOARD_ADD("kbd", qx10_keyboard_interface)
+	MCFG_RS232_PORT_ADD("kbd", keyboard, "qx10")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxa_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

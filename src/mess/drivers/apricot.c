@@ -423,7 +423,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsa_w))
 
 	// centronics printer
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsb_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcdb_w))

@@ -908,7 +908,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, rx_b_w))
 MACHINE_CONFIG_END
 

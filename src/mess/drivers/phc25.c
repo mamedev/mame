@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette", phc25_cassette_interface)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(phc25_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

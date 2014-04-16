@@ -63,7 +63,7 @@ class binbug_state : public driver_device
 public:
 	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_keyboard(*this, KEYBOARD_TAG),
+		m_rs232(*this, KEYBOARD_TAG),
 		m_cass(*this, "cassette"),
 		m_p_videoram(*this, "videoram"),
 		m_p_attribram(*this, "attribram"),
@@ -78,7 +78,7 @@ public:
 	UINT8 m_framecnt;
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	optional_device<serial_keyboard_device> m_keyboard;
+	optional_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_attribram;
@@ -92,7 +92,7 @@ WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
 
 READ8_MEMBER( binbug_state::binbug_serial_r )
 {
-	return m_keyboard->tx_r() & (m_cass->input() < 0.03);
+	return m_rs232->rxd_r() & (m_cass->input() < 0.03);
 }
 
 WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
@@ -117,11 +117,6 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( binbug )
 INPUT_PORTS_END
-
-static const serial_keyboard_interface keyboard_intf =
-{
-	DEVCB_NULL
-};
 
 void binbug_state::video_start()
 {
@@ -286,6 +281,14 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 	return result;
 }
 
+static DEVICE_INPUT_DEFAULTS_START( keyboard )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( binbug, binbug_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
@@ -306,7 +309,8 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */
-	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, 300)
+	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, default_rs232_devices, "keyboard")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

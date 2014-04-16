@@ -11,7 +11,6 @@
 
 #include "a2bus.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/centronics/image.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
