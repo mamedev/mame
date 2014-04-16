@@ -19,9 +19,12 @@ set the data line and then set the clock line.
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PC_KBDC_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, PC_KBDC, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_PC_KBDC_OUT_CLOCK_CB(_devcb) \
+	devcb = &pc_kbdc_device::set_out_clock_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_PC_KBDC_OUT_DATA_CB(_devcb) \
+	devcb = &pc_kbdc_device::set_out_data_callback(*device, DEVCB2_##_devcb);
+	
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
@@ -54,22 +57,17 @@ protected:
 extern const device_type PC_KBDC_SLOT;
 
 
-struct pc_kbdc_interface
-{
-	devcb_write_line    m_out_clock_cb;
-	devcb_write_line    m_out_data_cb;
-};
-
-
 class device_pc_kbd_interface;
 
-class pc_kbdc_device :  public device_t,
-						public pc_kbdc_interface
+class pc_kbdc_device :  public device_t
 {
 public:
 	// construction/destruction
 	pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_out_clock_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_clock_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_data_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_data_cb.set_callback(object); }
+	
 	void set_keyboard(device_pc_kbd_interface *keyboard);
 
 	int clock_signal() { return m_clock_state; }
@@ -84,13 +82,12 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	void update_clock_state();
 	void update_data_state();
 
-	devcb_resolved_write_line   m_out_clock_func;
-	devcb_resolved_write_line   m_out_data_func;
+	devcb2_write_line    m_out_clock_cb;
+	devcb2_write_line    m_out_data_cb;
 
 	int                         m_clock_state;
 	int                         m_data_state;

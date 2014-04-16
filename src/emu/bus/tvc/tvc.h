@@ -119,8 +119,6 @@ extern const device_type TVCEXP_SLOT;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-//	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-	
 #define MCFG_TVCEXP_SLOT_OUT_IRQ_CB(_devcb) \
 	devcb = &tvcexp_slot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
 

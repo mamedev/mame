@@ -72,19 +72,6 @@ static INPUT_PORTS_START( exp85 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_rst75, 0)
 INPUT_PORTS_END
 
-/* 8155 Interface */
-
-static I8155_INTERFACE( i8155_intf )
-{
-	DEVCB_NULL, /* port A read */
-	DEVCB_NULL, /* port A write */
-	DEVCB_NULL, /* port B read */
-	DEVCB_NULL, /* port B write */
-	DEVCB_NULL, /* port C read */
-	DEVCB_NULL, /* port C write */
-	DEVCB_NULL  /* timer output */
-};
-
 /* 8355 Interface */
 
 READ8_MEMBER( exp85_state::i8355_a_r )
@@ -211,7 +198,8 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
+	MCFG_DEVICE_ADD(I8155_TAG, I8155, XTAL_6_144MHz/2)
+
 	MCFG_DEVICE_ADD(I8355_TAG, I8355, XTAL_6_144MHz/2)
 	MCFG_I8355_IN_PA_CB(READ8(exp85_state, i8355_a_r))
 	MCFG_I8355_OUT_PA_CB(WRITE8(exp85_state, i8355_a_w))

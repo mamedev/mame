@@ -283,31 +283,6 @@ WRITE_LINE_MEMBER(meyc8088_state::meyc8088_sound_out)
 }
 
 
-static const i8155_interface i8155_intf[2] =
-{
-	{
-		// all ports set to input
-		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_input_r),
-		DEVCB_NULL,
-		DEVCB_INPUT_PORT("SW"), // filtered switch inputs
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_status_r),
-		DEVCB_NULL,
-		DEVCB_NULL // i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
-	},
-	{
-		// all ports set to output
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_lights2_w),
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_lights1_w),
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_common_w),
-		DEVCB_DRIVER_LINE_MEMBER(meyc8088_state,meyc8088_sound_out)
-	}
-};
-
-
 /***************************************************************************
 
   Inputs
@@ -378,8 +353,19 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
 
-	MCFG_I8155_ADD("i8155_1", XTAL_15MHz / (3*1), i8155_intf[0])
-	MCFG_I8155_ADD("i8155_2", XTAL_15MHz / (3*32), i8155_intf[1])
+	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL_15MHz / (3*1))
+	// all ports set to input
+	MCFG_I8155_IN_PORTA_CB(READ8(meyc8088_state, meyc8088_input_r))
+	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
+	MCFG_I8155_IN_PORTC_CB(READ8(meyc8088_state, meyc8088_status_r))
+	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
+
+	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL_15MHz / (3*32))
+	// all ports set to output
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(meyc8088_state, meyc8088_common_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(meyc8088_state, meyc8088_sound_out))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

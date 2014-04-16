@@ -265,23 +265,18 @@ WRITE8_MEMBER( g627_state::lamp_w )
 	}
 }
 
-static I8156_INTERFACE(i8156_intf)
-{
-	DEVCB_DRIVER_MEMBER(g627_state,porta_r), // Port A in
-	DEVCB_NULL, // Port A out
-	DEVCB_DRIVER_MEMBER(g627_state,portb_r), // Port B in
-	DEVCB_NULL, // Port B out
-	DEVCB_NULL, // Port C in
-	DEVCB_DRIVER_MEMBER(g627_state,portc_w), // Port C out
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI) // timer out
-};
-
 static MACHINE_CONFIG_START( g627, g627_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
 	MCFG_CPU_PROGRAM_MAP(g627_map)
 	MCFG_CPU_IO_MAP(g627_io)
-	MCFG_I8156_ADD("i8156", 14138000/8, i8156_intf)
+
+	MCFG_DEVICE_ADD("i8156", I8156, 14138000/8)
+	MCFG_I8155_IN_PORTA_CB(READ8(g627_state, porta_r))
+	MCFG_I8155_IN_PORTB_CB(READ8(g627_state, portb_r))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(g627_state, portc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */

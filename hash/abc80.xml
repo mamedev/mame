@@ -7,17 +7,18 @@
 		<year>19??</year>
 		<publisher>Myab</publisher>
 
+		<!-- Datadisc 80 format (8 sectors/track, 256 bytes/sector interleave, sector skew 5: 0 5 2 7 4 1 6 3) -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 0"/>
 			<dataarea name="flop" size="81920">
-				<rom name="cpmdisk_side0.img" size="81920" crc="a94198dc" sha1="fa67de361b8c2a6aa9d6762cee67be90ef1f3e00" offset="0" />
+				<rom name="cpmdisk_myab37_side0.img" size="81920" crc="7065fa91" sha1="f0ca7c2785bd92ed7ede46aaba8b8e2a2d826e47" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="81920">
-				<rom name="cpmdisk_side1.img" size="81920" crc="b542ad3e" sha1="3c8ecd69bf41b3eb25fb2a7c82504322bcaa051a" offset="0" />
+				<rom name="cpmdisk_myab37_side1.img" size="81920" crc="062e88c7" sha1="2d3baa1f225129474839972b9735444120965e08" offset="0" />
 			</dataarea>
 		</part>
 	</software>

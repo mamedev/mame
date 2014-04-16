@@ -235,12 +235,6 @@ SLOT_INTERFACE_START( pt68k4_isa8_cards )
 	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
 SLOT_INTERFACE_END
 
-static const pc_kbdc_interface pc_kbdc_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pt68k4_state, keyboard_clock_w),
-	DEVCB_DRIVER_LINE_MEMBER(pt68k4_state, keyboard_data_w)
-};
-
 static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz)
@@ -253,7 +247,9 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 
 	MCFG_MC68681_ADD("duart2", XTAL_16MHz / 4)
 
-	MCFG_PC_KBDC_ADD(KBDC_TAG, pc_kbdc_intf)
+	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(pt68k4_state, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(pt68k4_state, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)

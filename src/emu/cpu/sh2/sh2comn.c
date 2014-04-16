@@ -699,7 +699,7 @@ READ32_MEMBER( sh2_device::sh2_internal_r )
 	case 0x00:
 		break;
 	case 0x01:
-		return m_m[1] | 0x80000000; // TDRE: Trasmit Data Register Empty. Force it to be '1' for the time being.
+		return m_m[1] | 0; // bit31 is TDRE: Trasmit Data Register Empty. Forcing it to be '1' breaks Saturn.
 
 	case 0x04: // TIER, FTCSR, FRC
 		if ( mem_mask == 0x00ff0000 )

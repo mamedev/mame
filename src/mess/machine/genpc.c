@@ -412,24 +412,6 @@ I8255A_INTERFACE( pc_ppi8255_interface )
 	DEVCB_NULL
 };
 
-static const pc_kbdc_interface pc_kbdc_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_clock_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_data_w)
-};
-
-static const pc_kbdc_interface pc_kbdc_intf_5150 =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5150_mb_device, keyboard_clock_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_data_w)
-};
-
-static const pc_kbdc_interface pc_kbdc_intf_ec1841 =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ec1841_mb_device, keyboard_clock_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_data_w)
-};
-
 /**********************************************************
  *
  * NMI handling
@@ -478,7 +460,9 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
 
-	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ibm5160_mb_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(ibm5160_mb_device, keyboard_data_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -653,8 +637,8 @@ static const cassette_interface ibm5150_cassette_interface =
 static MACHINE_CONFIG_FRAGMENT( ibm5150_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
-	MCFG_DEVICE_REMOVE("pc_kbdc")
-	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf_5150)
+	MCFG_DEVICE_MODIFY("pc_kbdc")
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ibm5150_mb_device, keyboard_clock_w))
 
 	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_interface )
 MACHINE_CONFIG_END
@@ -836,8 +820,8 @@ const device_type EC1841_MOTHERBOARD = &device_creator<ec1841_mb_device>;
 static MACHINE_CONFIG_FRAGMENT( ec1841_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
-	MCFG_DEVICE_REMOVE("pc_kbdc")
-	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf_ec1841)
+	MCFG_DEVICE_MODIFY("pc_kbdc")
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ec1841_mb_device, keyboard_clock_w))
 MACHINE_CONFIG_END
 
 

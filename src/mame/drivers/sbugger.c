@@ -211,24 +211,17 @@ WRITE_LINE_MEMBER(sbugger_state::sbugger_interrupt)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 }
 
-static I8156_INTERFACE(i8156_intf)
-{
-	// all ports set to input
-	DEVCB_INPUT_PORT("INPUTS"),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(sbugger_state,sbugger_interrupt)
-};
-
 static MACHINE_CONFIG_START( sbugger, sbugger_state )
 
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sbugger_map)
 	MCFG_CPU_IO_MAP(sbugger_io_map)
-	MCFG_I8156_ADD("i8156", 200000, i8156_intf)     /* freq is an approximation */
+
+	MCFG_DEVICE_ADD("i8156", I8156, 200000)     /* freq is an approximation */
+	MCFG_I8155_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_I8155_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8155_IN_PORTC_CB(IOPORT("DSW2"))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(sbugger_state, sbugger_interrupt))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbugger)
 

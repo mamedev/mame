@@ -292,35 +292,18 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 	return IMAGE_INIT_PASS;
 }
 
-static I8155_INTERFACE( i8155_intf )
-{
-	DEVCB_NULL,                                       // port A read
-	DEVCB_DRIVER_MEMBER(cp1_state, i8155_porta_w),    // port A write
-	DEVCB_DRIVER_MEMBER(cp1_state, i8155_portb_r),    // port B read
-	DEVCB_DRIVER_MEMBER(cp1_state, i8155_portb_w),    // port B write
-	DEVCB_NULL,                                       // port C read
-	DEVCB_DRIVER_MEMBER(cp1_state, i8155_portc_w),    // port C write
-	DEVCB_NULL                                        // timer output
-};
-
-static I8155_INTERFACE( i8155_cp3_intf )
-{
-	DEVCB_NULL,    // port A read
-	DEVCB_NULL,    // port A write
-	DEVCB_NULL,    // port B read
-	DEVCB_NULL,    // port B write
-	DEVCB_NULL,    // port C read
-	DEVCB_NULL,    // port C write
-	DEVCB_NULL     // timer output
-};
-
 static MACHINE_CONFIG_START( cp1, cp1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(cp1_io)
 
-	MCFG_I8155_ADD("i8155", 0, i8155_intf)
-	MCFG_I8155_ADD("i8155_cp3", 0, i8155_cp3_intf)
+	MCFG_DEVICE_ADD("i8155", I8155, 0)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(cp1_state, i8155_porta_w))
+	MCFG_I8155_IN_PORTB_CB(READ8(cp1_state, i8155_portb_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(cp1_state, i8155_portb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(cp1_state, i8155_portc_w))
+
+	MCFG_DEVICE_ADD("i8155_cp3", I8155, 0)
 
 	MCFG_DEFAULT_LAYOUT(layout_cp1)
 
