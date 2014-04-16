@@ -504,7 +504,7 @@ inline void segag80r_state::sega005_update_sound_data()
 	UINT8 newval = memregion("005")->base()[m_sound_addr];
 	UINT8 diff = newval ^ m_sound_data;
 
-	//mame_printf_debug("  [%03X] = %02X\n", m_sound_addr, newval);
+	//osd_printf_debug("  [%03X] = %02X\n", m_sound_addr, newval);
 
 	/* latch the new value */
 	m_sound_data = newval;
@@ -512,14 +512,14 @@ inline void segag80r_state::sega005_update_sound_data()
 	/* if bit 5 goes high, we reset the timer */
 	if ((diff & 0x20) && !(newval & 0x20))
 	{
-		//mame_printf_debug("Stopping timer\n");
+		//osd_printf_debug("Stopping timer\n");
 		m_005snd->m_sega005_sound_timer->adjust(attotime::never);
 	}
 
 	/* if bit 5 goes low, we start the timer again */
 	if ((diff & 0x20) && (newval & 0x20))
 	{
-		//mame_printf_debug("Starting timer\n");
+		//osd_printf_debug("Starting timer\n");
 		m_005snd->m_sega005_sound_timer->adjust(attotime::from_hz(SEGA005_555_TIMER_FREQ), 0, attotime::from_hz(SEGA005_555_TIMER_FREQ));
 	}
 }
@@ -536,7 +536,7 @@ WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
 	UINT8 diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
-	//mame_printf_debug("sound[%d] = %02X\n", 1, data);
+	//osd_printf_debug("sound[%d] = %02X\n", 1, data);
 
 	/* force a stream update */
 	m_005snd->m_sega005_stream->update();

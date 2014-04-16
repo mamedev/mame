@@ -406,7 +406,7 @@ void tmmjprd_state::tmmjprd_do_blit()
 	int mask,shift;
 
 
-	if(BLITCMDLOG) mame_printf_debug("BLIT command %08x %08x %08x\n", tmmjprd_blitterregs[0], tmmjprd_blitterregs[1], tmmjprd_blitterregs[2]);
+	if(BLITCMDLOG) osd_printf_debug("BLIT command %08x %08x %08x\n", tmmjprd_blitterregs[0], tmmjprd_blitterregs[1], tmmjprd_blitterregs[2]);
 
 	if (blt_oddflg&1)
 	{
@@ -438,12 +438,12 @@ void tmmjprd_state::tmmjprd_do_blit()
 			case 0x00: /* copy nn bytes */
 				if (!blt_amount)
 				{
-					if(BLITLOG) mame_printf_debug("end of blit list\n");
+					if(BLITLOG) osd_printf_debug("end of blit list\n");
 					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(tmmjprd_state::tmmjprd_blit_done),this));
 					return;
 				}
 
-				if(BLITLOG) mame_printf_debug("blit copy %02x bytes\n", blt_amount);
+				if(BLITLOG) osd_printf_debug("blit copy %02x bytes\n", blt_amount);
 				for (loopcount=0;loopcount<blt_amount;loopcount++)
 				{
 					blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]));
@@ -459,7 +459,7 @@ void tmmjprd_state::tmmjprd_do_blit()
 				break;
 
 			case 0x02: /* fill nn bytes */
-				if(BLITLOG) mame_printf_debug("blit fill %02x bytes\n", blt_amount);
+				if(BLITLOG) osd_printf_debug("blit fill %02x bytes\n", blt_amount);
 				blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]));
 				blt_source+=2;
 
@@ -475,13 +475,13 @@ void tmmjprd_state::tmmjprd_do_blit()
 				break;
 
 			case 0x03: /* next line */
-				if(BLITLOG) mame_printf_debug("blit: move to next line\n");
+				if(BLITLOG) osd_printf_debug("blit: move to next line\n");
 				blt_column = (tmmjprd_blitterregs[1]&0x00ff0000)>>16; /* --CC---- */
 				blt_oddflg+=128;
 				break;
 
 			default: /* unknown / illegal */
-				if(BLITLOG) mame_printf_debug("uknown blit command %02x\n",blt_commnd);
+				if(BLITLOG) osd_printf_debug("uknown blit command %02x\n",blt_commnd);
 				break;
 		}
 	}

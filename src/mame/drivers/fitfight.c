@@ -220,35 +220,35 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(fitfight_state::snd_porta_r)
 {
-	//mame_printf_debug("PA R @%x\n",space.device().safe_pc());
+	//osd_printf_debug("PA R @%x\n",space.device().safe_pc());
 	return machine().rand();
 }
 
 READ8_MEMBER(fitfight_state::snd_portb_r)
 {
-	//mame_printf_debug("PB R @%x\n",space.device().safe_pc());
+	//osd_printf_debug("PB R @%x\n",space.device().safe_pc());
 	return machine().rand();
 }
 
 READ8_MEMBER(fitfight_state::snd_portc_r)
 {
-	//mame_printf_debug("PC R @%x\n",space.device().safe_pc());
+	//osd_printf_debug("PC R @%x\n",space.device().safe_pc());
 	return machine().rand();
 }
 
 WRITE8_MEMBER(fitfight_state::snd_porta_w)
 {
-	//mame_printf_debug("PA W %x @%x\n",data,space.device().safe_pc());
+	//osd_printf_debug("PA W %x @%x\n",data,space.device().safe_pc());
 }
 
 WRITE8_MEMBER(fitfight_state::snd_portb_w)
 {
-	//mame_printf_debug("PB W %x @%x\n",data,space.device().safe_pc());
+	//osd_printf_debug("PB W %x @%x\n",data,space.device().safe_pc());
 }
 
 WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
-	//mame_printf_debug("PC W %x @%x\n",data,space.device().safe_pc());
+	//osd_printf_debug("PC W %x @%x\n",data,space.device().safe_pc());
 }
 
 static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )

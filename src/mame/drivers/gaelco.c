@@ -72,7 +72,7 @@ WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 
 WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
 {
-	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
+	// osd_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&m_videoram[offset]);
 
@@ -82,7 +82,7 @@ WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 {
-	// mame_printf_debug("gaelco_encrypted_w!!\n");
+	// osd_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&m_screenram[offset]);
 }
@@ -91,7 +91,7 @@ WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 {
-	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
+	// osd_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&m_videoram[offset]);
 
@@ -100,7 +100,7 @@ WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 {
-	// mame_printf_debug("gaelco_encrypted_w!!\n");
+	// osd_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&m_screenram[offset]);
 }

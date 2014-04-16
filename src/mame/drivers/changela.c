@@ -19,7 +19,7 @@ Tomasz Slanina
 
 READ8_MEMBER(changela_state::mcu_r)
 {
-	//mame_printf_debug("Z80 MCU  R = %x\n", m_mcu_out);
+	//osd_printf_debug("Z80 MCU  R = %x\n", m_mcu_out);
 	return m_mcu_out;
 }
 

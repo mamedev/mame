@@ -515,7 +515,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
 			break;
 
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", space.device().safe_pc(), offset);
+			osd_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", space.device().safe_pc(), offset);
 			break;
 	}
 	return result;
@@ -587,7 +587,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 
 		// no other writes known
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", space.device().safe_pc(), offset, data);
+			osd_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", space.device().safe_pc(), offset, data);
 			break;
 	}
 }

@@ -404,7 +404,7 @@ bool samples_device::read_sample(emu_file &file, sample_t &sample)
 	UINT32 offset = file.read(buf, 4);
 	if (offset < 4)
 	{
-		mame_printf_warning("Unable to read %s, 0-byte file?\n", file.filename());
+		osd_printf_warning("Unable to read %s, 0-byte file?\n", file.filename());
 		return false;
 	}
 
@@ -415,7 +415,7 @@ bool samples_device::read_sample(emu_file &file, sample_t &sample)
 		return read_flac_sample(file, sample);
 
 	// if nothing appropriate, emit a warning
-	mame_printf_warning("Unable to read %s, corrupt file?\n", file.filename());
+	osd_printf_warning("Unable to read %s, corrupt file?\n", file.filename());
 	return false;
 }
 
@@ -434,7 +434,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	offset += file.read(&filesize, 4);
 	if (offset < 8)
 	{
-		mame_printf_warning("Unexpected size offset %u (%s)\n", offset, file.filename());
+		osd_printf_warning("Unexpected size offset %u (%s)\n", offset, file.filename());
 		return false;
 	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
@@ -444,12 +444,12 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	offset += file.read(buf, 4);
 	if (offset < 12)
 	{
-		mame_printf_warning("Unexpected WAVE offset %u (%s)\n", offset, file.filename());
+		osd_printf_warning("Unexpected WAVE offset %u (%s)\n", offset, file.filename());
 		return false;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
 	{
-		mame_printf_warning("Could not find WAVE header (%s)\n", file.filename());
+		osd_printf_warning("Could not find WAVE header (%s)\n", file.filename());
 		return false;
 	}
 
@@ -468,7 +468,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		offset += length;
 		if (offset >= filesize)
 		{
-			mame_printf_warning("Could not find fmt tag (%s)\n", file.filename());
+			osd_printf_warning("Could not find fmt tag (%s)\n", file.filename());
 			return false;
 		}
 	}
@@ -479,7 +479,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
 	{
-		mame_printf_warning("unsupported format %u - only PCM is supported (%s)\n", temp16, file.filename());
+		osd_printf_warning("unsupported format %u - only PCM is supported (%s)\n", temp16, file.filename());
 		return false;
 	}
 
@@ -488,7 +488,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
 	{
-		mame_printf_warning("unsupported number of channels %u - only mono is supported (%s)\n", temp16, file.filename());
+		osd_printf_warning("unsupported number of channels %u - only mono is supported (%s)\n", temp16, file.filename());
 		return false;
 	}
 
@@ -506,7 +506,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	bits = LITTLE_ENDIANIZE_INT16(bits);
 	if (bits != 8 && bits != 16)
 	{
-		mame_printf_warning("unsupported bits/sample %u - only 8 and 16 are supported (%s)\n", bits, file.filename());
+		osd_printf_warning("unsupported bits/sample %u - only 8 and 16 are supported (%s)\n", bits, file.filename());
 		return false;
 	}
 
@@ -528,7 +528,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		offset += length;
 		if (offset >= filesize)
 		{
-			mame_printf_warning("Could not find data tag (%s)\n", file.filename());
+			osd_printf_warning("Could not find data tag (%s)\n", file.filename());
 			return false;
 		}
 	}
@@ -536,7 +536,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	// if there was a 0 length data block, we're done
 	if (length == 0)
 	{
-		mame_printf_warning("empty data block (%s)\n", file.filename());
+		osd_printf_warning("empty data block (%s)\n", file.filename());
 		return false;
 	}
 
@@ -638,6 +638,6 @@ void samples_device::load_samples()
 		if (filerr == FILERR_NONE)
 			read_sample(file, m_sample[index]);
 		else if (filerr == FILERR_NOT_FOUND)
-			mame_printf_warning("Sample '%s' NOT FOUND\n", samplename);
+			osd_printf_warning("Sample '%s' NOT FOUND\n", samplename);
 	}
 }

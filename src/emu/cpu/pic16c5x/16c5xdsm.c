@@ -173,7 +173,7 @@ CPU_DISASSEMBLE( pic16c5x )
 		{
 			if (op != -1)
 			{
-				mame_printf_debug("Error: opcode %04Xh matches %d (%s) and %d (%s)\n",
+				osd_printf_debug("Error: opcode %04Xh matches %d (%s) and %d (%s)\n",
 					code,i,Op[i].fmt,op,Op[op].fmt);
 			}
 			op = i;
@@ -203,7 +203,7 @@ CPU_DISASSEMBLE( pic16c5x )
 
 	while (bit >= 0)
 	{
-		/* mame_printf_debug("{%c/%d}",*cp,bit); */
+		/* osd_printf_debug("{%c/%d}",*cp,bit); */
 		switch(*cp)
 		{
 			case 'a': a <<=1; a |= ((code & (1<<bit)) ? 1 : 0); bit--; break;

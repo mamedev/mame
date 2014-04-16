@@ -12,7 +12,7 @@
 
 #define VERBOSE 0 /* 0, 1 or 2 */
 
-#define PRINT(x) mame_printf_info x
+#define PRINT(x) osd_printf_info x
 
 #define LOG(x)  do { if (VERBOSE > 0) logerror x; } while (0)
 #define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)

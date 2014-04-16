@@ -53,10 +53,10 @@ static TIMER_CALLBACK( update_sound_a )
 	discrete->write(5, !(data & 0x20));
 	discrete->write(6, !(data & 0x40));
 
-if (!((data >> 1) & 1)) mame_printf_debug("/TRIG1\n");
-if (!((data >> 2) & 1)) mame_printf_debug("/TRIG2\n");
-if (!((data >> 3) & 1)) mame_printf_debug("/TRIG3\n");
-if (!((data >> 4) & 1)) mame_printf_debug("/TRIG4\n");
+if (!((data >> 1) & 1)) osd_printf_debug("/TRIG1\n");
+if (!((data >> 2) & 1)) osd_printf_debug("/TRIG2\n");
+if (!((data >> 3) & 1)) osd_printf_debug("/TRIG3\n");
+if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
 
 //  osel = (osel & 6) | ((data >> 5) & 1);
 //  turbo_update_samples(samples);

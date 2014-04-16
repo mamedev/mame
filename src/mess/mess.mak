@@ -2003,7 +2003,8 @@ $(MESSOBJ)/yamaha.a:            \
 
 $(MESS_DRIVERS)/ymmu100.o: $(MESS_DRIVERS)/ymmu100.inc
 $(MESS_DRIVERS)/ymmu100.inc: $(MESSSRC)/drivers/ymmu100.ppm $(FILE2STR_TARGET)
-	$(FILE2STR) $(MESSSRC)/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
+	@echo Converting $<...
+	@$(FILE2STR) $(MESSSRC)/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
 
 $(MESSOBJ)/zenith.a:            \
 	$(MESS_DRIVERS)/z100.o      \

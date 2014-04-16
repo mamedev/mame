@@ -343,7 +343,7 @@ cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const 
 		// anything else is ignored
 		else
 		{
-			mame_printf_warning("%s.xml(%d): unknown script item '%s' will be lost if saved\n", filename, entrynode->line, entrynode->name);
+			osd_printf_warning("%s.xml(%d): unknown script item '%s' will be lost if saved\n", filename, entrynode->line, entrynode->name);
 			continue;
 		}
 	}
@@ -479,7 +479,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 		}
 		catch (expression_error &err)
 		{
-			mame_printf_warning("Error executing conditional expression \"%s\": %s\n", m_condition.original_string(), err.code_string());
+			osd_printf_warning("Error executing conditional expression \"%s\": %s\n", m_condition.original_string(), err.code_string());
 			return;
 		}
 	}
@@ -493,7 +493,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 		}
 		catch (expression_error &err)
 		{
-			mame_printf_warning("Error executing expression \"%s\": %s\n", m_expression.original_string(), err.code_string());
+			osd_printf_warning("Error executing expression \"%s\": %s\n", m_expression.original_string(), err.code_string());
 		}
 	}
 
@@ -647,7 +647,7 @@ int cheat_script::script_entry::output_argument::values(UINT64 &argindex, UINT64
 		}
 		catch (expression_error &err)
 		{
-			mame_printf_warning("Error executing argument expression \"%s\": %s\n", m_expression.original_string(), err.code_string());
+			osd_printf_warning("Error executing argument expression \"%s\": %s\n", m_expression.original_string(), err.code_string());
 		}
 	}
 	return m_count;
@@ -724,7 +724,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 			// only one comment is kept
 			commentnode = xml_get_sibling(commentnode->next, "comment");
 			if (commentnode != NULL)
-				mame_printf_warning("%s.xml(%d): only one comment node is retained; ignoring additional nodes\n", filename, commentnode->line);
+				osd_printf_warning("%s.xml(%d): only one comment node is retained; ignoring additional nodes\n", filename, commentnode->line);
 		}
 
 		// read the first parameter node
@@ -737,7 +737,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 			// only one parameter allowed
 			paramnode = xml_get_sibling(paramnode->next, "parameter");
 			if (paramnode != NULL)
-				mame_printf_warning("%s.xml(%d): only one parameter node allowed; ignoring additional nodes\n", filename, paramnode->line);
+				osd_printf_warning("%s.xml(%d): only one parameter node allowed; ignoring additional nodes\n", filename, paramnode->line);
 		}
 
 		// read the script nodes
@@ -749,7 +749,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 			// if we have a script already for this slot, it is an error
 			auto_pointer<cheat_script> &slot = script_for_state(curscript->state());
 			if (slot != NULL)
-				mame_printf_warning("%s.xml(%d): only one on script allowed; ignoring additional scripts\n", filename, scriptnode->line);
+				osd_printf_warning("%s.xml(%d): only one on script allowed; ignoring additional scripts\n", filename, scriptnode->line);
 			else
 				slot.reset(curscript);
 		}
@@ -1202,7 +1202,7 @@ bool cheat_manager::save_all(const char *filename)
 	// catch errors and cleanup
 	catch (emu_fatalerror &err)
 	{
-		mame_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.string());
 		cheatfile.remove_on_close();
 	}
 	return false;
@@ -1375,7 +1375,7 @@ void cheat_manager::load_cheats(const char *filename)
 		// loop over all instrances of the files found in our search paths
 		while (filerr == FILERR_NONE)
 		{
-			mame_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
+			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 
 			// read the XML file into internal data structures
 			xml_parse_options options = { 0 };
@@ -1409,7 +1409,7 @@ void cheat_manager::load_cheats(const char *filename)
 					for (scannode = m_cheatlist.first(); scannode != NULL; scannode = scannode->next())
 						if (strcmp(scannode->description(), curcheat->description()) == 0)
 						{
-							mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description(), cheatfile.fullpath());
+							osd_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description(), cheatfile.fullpath());
 							break;
 						}
 
@@ -1431,7 +1431,7 @@ void cheat_manager::load_cheats(const char *filename)
 	// handle errors cleanly
 	catch (emu_fatalerror &err)
 	{
-		mame_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.string());
 		m_cheatlist.reset();
 		if (rootnode != NULL)
 			xml_file_free(rootnode);

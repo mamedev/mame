@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_16MHz / 4, ctc_intf )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, dart_intf )
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", ampro_state, ctc_tick, attotime::from_hz(XTAL_16MHz / 8))

@@ -37,7 +37,7 @@
  *************************************/
 
 #define LOG_FDC_COMMANDS    0
-#define FDC_LOG(x) do { if (LOG_FDC_COMMANDS) mame_printf_debug x; } while(0)
+#define FDC_LOG(x) do { if (LOG_FDC_COMMANDS) osd_printf_debug x; } while(0)
 
 
 enum int_levels
@@ -586,7 +586,7 @@ READ16_MEMBER(guab_state::io_r)
 		}
 		default:
 		{
-			mame_printf_debug("Unknown IO R:0x%x\n", 0xc0000 + (offset * 2));
+			osd_printf_debug("Unknown IO R:0x%x\n", 0xc0000 + (offset * 2));
 			return 0;
 		}
 	}
@@ -669,7 +669,7 @@ WRITE16_MEMBER(guab_state::io_w)
 		}
 		default:
 		{
-			mame_printf_debug("Unknown IO W:0x%x with %x\n", 0xc0000 + (offset * 2), data);
+			osd_printf_debug("Unknown IO W:0x%x with %x\n", 0xc0000 + (offset * 2), data);
 		}
 	}
 }

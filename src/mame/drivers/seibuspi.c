@@ -2107,7 +2107,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 	/* viprp1ot */
 	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
 
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_mainram[0x001e2e0/4];
 }
@@ -2116,7 +2116,7 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
 	/* viperp1o */
 	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",space.device().safe_pc());
 	return m_mainram[0x001d49c/4];
 }
 
@@ -2124,7 +2124,7 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 // causes input problems?
 READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
-// mame_printf_debug("%08x\n",space.device().safe_pc());
+// osd_printf_debug("%08x\n",space.device().safe_pc());
 	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
 	return m_mainram[0x002d224/4];
 }
@@ -2147,7 +2147,7 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 	/* rdftu */
 	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
 
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_mainram[0x00298d0/4];
 }
@@ -2166,7 +2166,7 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 	/* rdft2a */
 	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
 
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_mainram[0x0282ac/4];
 }
@@ -2189,7 +2189,7 @@ READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 	/* rfjetj */
 	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
 
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_mainram[0x002894c/4];
 }

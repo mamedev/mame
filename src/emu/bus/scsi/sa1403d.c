@@ -80,6 +80,8 @@ machine_config_constructor sa1403d_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 INPUT_PORTS_START( sa1403d )
+	PORT_INCLUDE(scsihle)
+
 	PORT_START("2H")
 	PORT_DIPNAME( 0xc0, 0x40, "LUN 0 Drive Type" ) PORT_DIPLOCATION("2H:7,8")
 	PORT_DIPSETTING(    0x00, "SA1002" ) // 2 heads, 256 cylinders

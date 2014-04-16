@@ -719,7 +719,7 @@ UINT16 regValue16(dsp56k_core* cpustate, const reg_id& reg)
 	if (reg == iM2) return M2;
 	if (reg == iM3) return M3;
 
-	mame_printf_debug("The dsp561xx core is requesting a 16 bit value from non-16 bit register!");
+	osd_printf_debug("The dsp561xx core is requesting a 16 bit value from non-16 bit register!");
 	return 0xdead;
 }
 

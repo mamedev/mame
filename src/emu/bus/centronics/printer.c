@@ -1,17 +1,17 @@
 #include "emu.h"
-#include "image.h"
+#include "printer.h"
 
 //**************************************************************************
 //  CENTRONICS PRINTER DEVICE
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_PRINTER_IMAGE = &device_creator<centronics_printer_image_device>;
+const device_type CENTRONICS_PRINTER = &device_creator<centronics_printer_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( centronics_printer )
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_image_device, printer_online))
+	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_device, printer_online))
 MACHINE_CONFIG_END
 
 
@@ -19,12 +19,13 @@ MACHINE_CONFIG_END
     IMPLEMENTATION
 ***************************************************************************/
 //-------------------------------------------------
-//  centronics_printer_image_device - constructor
+//  centronics_printer_device - constructor
 //-------------------------------------------------
 
-centronics_printer_image_device::centronics_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CENTRONICS_PRINTER_IMAGE, "Centronics Printer", tag, owner, clock, "centronics_printer", __FILE__),
-		device_centronics_peripheral_interface( mconfig, *this )
+centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock, "centronics_printer", __FILE__),
+	device_centronics_peripheral_interface( mconfig, *this ),
+	m_printer(*this, "printer")
 {
 }
 //-------------------------------------------------
@@ -32,7 +33,7 @@ centronics_printer_image_device::centronics_printer_image_device(const machine_c
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor centronics_printer_image_device::device_mconfig_additions() const
+machine_config_constructor centronics_printer_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( centronics_printer );
 }
@@ -42,12 +43,12 @@ machine_config_constructor centronics_printer_image_device::device_mconfig_addit
     sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(centronics_printer_image_device::printer_online)
+WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
 {
 	output_perror(!state);
 }
 
-void centronics_printer_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void centronics_printer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -81,20 +82,15 @@ void centronics_printer_image_device::device_timer(emu_timer &timer, device_time
 	}
 }
 
-void centronics_printer_image_device::device_start()
+void centronics_printer_device::device_start()
 {
-	m_owner = dynamic_cast<centronics_device *>(owner());
-
-	/* get printer device */
-	m_printer = subdevice<printer_image_device>("printer");
-
 	/* register for state saving */
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_data));
 	save_item(NAME(m_busy));
 }
 
-void centronics_printer_image_device::device_reset()
+void centronics_printer_device::device_reset()
 {
 	m_busy = FALSE;
 	output_busy(m_busy);
@@ -107,7 +103,7 @@ void centronics_printer_image_device::device_reset()
     ready
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( centronics_printer_image_device::input_strobe )
+WRITE_LINE_MEMBER( centronics_printer_device::input_strobe )
 {
 	/* look for a high -> low transition */
 	if (m_strobe == TRUE && state == FALSE && m_busy == FALSE)
@@ -125,7 +121,7 @@ WRITE_LINE_MEMBER( centronics_printer_image_device::input_strobe )
     printer (centronics mode)
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(centronics_printer_image_device::input_init)
+WRITE_LINE_MEMBER(centronics_printer_device::input_init)
 {
 	/* reset printer if line is low */
 	if (state == FALSE)

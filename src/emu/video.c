@@ -316,7 +316,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	int entries = (screen !=NULL && screen->palette() != NULL) ? screen->palette()->entries() : 0;
 	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
 	if (error != PNGERR_NONE)
-		mame_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
+		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
 
 	// free any data allocated
 	png_free(&pnginfo);
@@ -417,7 +417,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 			avi_error avierr = avi_create(fullpath, &info, &m_avi_file);
 			if (avierr != AVIERR_NONE)
 			{
-				mame_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
+				osd_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
 				return end_recording(format);
 			}
 		}
@@ -448,7 +448,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 			png_error pngerr = mng_capture_start(*m_mng_file, m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 			{
-				mame_printf_error("Error capturing MNG, png_error=%d\n", pngerr);
+				osd_printf_error("Error capturing MNG, png_error=%d\n", pngerr);
 				return end_recording(format);
 			}
 
@@ -457,7 +457,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		}
 		else
 		{
-			mame_printf_error("Error creating MNG, file_error=%d\n", filerr);
+			osd_printf_error("Error creating MNG, file_error=%d\n", filerr);
 			m_mng_file.reset();
 		}
 	}
@@ -542,7 +542,7 @@ void video_manager::exit()
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
 		double final_emu_time = m_overall_emutime.as_double();
-		mame_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime(0, ATTOSECONDS_PER_SECOND / 2)).seconds);
+		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime(0, ATTOSECONDS_PER_SECOND / 2)).seconds);
 	}
 }
 
@@ -970,7 +970,7 @@ void video_manager::update_refresh_speed()
 			// if we changed, log that verbosely
 			if (target_speed != m_speed)
 			{
-				mame_printf_verbose("Adjusting target speed to %.1f%% (hw=%.2fHz, game=%.2fHz, adjusted=%.2fHz)\n", target_speed / 10.0, minrefresh, ATTOSECONDS_TO_HZ(min_frame_period), ATTOSECONDS_TO_HZ(min_frame_period * 1000.0 / target_speed));
+				osd_printf_verbose("Adjusting target speed to %.1f%% (hw=%.2fHz, game=%.2fHz, adjusted=%.2fHz)\n", target_speed / 10.0, minrefresh, ATTOSECONDS_TO_HZ(min_frame_period), ATTOSECONDS_TO_HZ(min_frame_period * 1000.0 / target_speed));
 				m_speed = target_speed;
 			}
 		}

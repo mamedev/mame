@@ -469,18 +469,18 @@ void sdl_osd_interface::osd_exit(running_machine &machine)
 #define MACRO_VERBOSE(_mac) \
 	do { \
 		if (strcmp(MAC_EXPAND_STR(_mac), #_mac) != 0) \
-			mame_printf_verbose("%s=%s ", #_mac, MAC_EXPAND_STR(_mac)); \
+			osd_printf_verbose("%s=%s ", #_mac, MAC_EXPAND_STR(_mac)); \
 	} while (0)
 
 #define _SDL_VER #SDL_MAJOR_VERSION "." #SDL_MINOR_VERSION "." #SDL_PATCHLEVEL
 
 static void defines_verbose(void)
 {
-	mame_printf_verbose("Build version:      %s\n", build_version);
-	mame_printf_verbose("Build architecure:  ");
+	osd_printf_verbose("Build version:      %s\n", build_version);
+	osd_printf_verbose("Build architecure:  ");
 	MACRO_VERBOSE(SDLMAME_ARCH);
-	mame_printf_verbose("\n");
-	mame_printf_verbose("Build defines 1:    ");
+	osd_printf_verbose("\n");
+	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(SDLMAME_UNIX);
 	MACRO_VERBOSE(SDLMAME_X11);
 	MACRO_VERBOSE(SDLMAME_WIN32);
@@ -492,8 +492,8 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(SDLMAME_NOASM);
 	MACRO_VERBOSE(SDLMAME_IRIX);
 	MACRO_VERBOSE(SDLMAME_BSD);
-	mame_printf_verbose("\n");
-	mame_printf_verbose("Build defines 1:    ");
+	osd_printf_verbose("\n");
+	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(LSB_FIRST);
 	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_DEBUG);
@@ -502,30 +502,30 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(CPP_COMPILE);
 	MACRO_VERBOSE(DISTRO);
 	MACRO_VERBOSE(SYNC_IMPLEMENTATION);
-	mame_printf_verbose("\n");
-	mame_printf_verbose("SDL/OpenGL defines: ");
-	mame_printf_verbose("SDL_COMPILEDVERSION=%d ", SDL_COMPILEDVERSION);
+	osd_printf_verbose("\n");
+	osd_printf_verbose("SDL/OpenGL defines: ");
+	osd_printf_verbose("SDL_COMPILEDVERSION=%d ", SDL_COMPILEDVERSION);
 	MACRO_VERBOSE(USE_OPENGL);
 	MACRO_VERBOSE(USE_DISPATCH_GL);
-	mame_printf_verbose("\n");
-	mame_printf_verbose("Compiler defines A: ");
+	osd_printf_verbose("\n");
+	osd_printf_verbose("Compiler defines A: ");
 	MACRO_VERBOSE(__GNUC__);
 	MACRO_VERBOSE(__GNUC_MINOR__);
 	MACRO_VERBOSE(__GNUC_PATCHLEVEL__);
 	MACRO_VERBOSE(__VERSION__);
-	mame_printf_verbose("\n");
-	mame_printf_verbose("Compiler defines B: ");
+	osd_printf_verbose("\n");
+	osd_printf_verbose("Compiler defines B: ");
 	MACRO_VERBOSE(__amd64__);
 	MACRO_VERBOSE(__x86_64__);
 	MACRO_VERBOSE(__unix__);
 	MACRO_VERBOSE(__i386__);
 	MACRO_VERBOSE(__ppc__);
 	MACRO_VERBOSE(__ppc64__);
-	mame_printf_verbose("\n");
-	mame_printf_verbose("Compiler defines C: ");
+	osd_printf_verbose("\n");
+	osd_printf_verbose("Compiler defines C: ");
 	MACRO_VERBOSE(_FORTIFY_SOURCE);
 	MACRO_VERBOSE(__USE_FORTIFY_LEVEL);
-	mame_printf_verbose("\n");
+	osd_printf_verbose("\n");
 }
 
 //============================================================
@@ -537,39 +537,39 @@ static void osd_sdl_info(void)
 #if SDLMAME_SDL2
 	int i, num = SDL_GetNumVideoDrivers();
 
-	mame_printf_verbose("Available videodrivers: ");
+	osd_printf_verbose("Available videodrivers: ");
 	for (i=0;i<num;i++)
 	{
 		const char *name = SDL_GetVideoDriver(i);
-		mame_printf_verbose("%s ", name);
+		osd_printf_verbose("%s ", name);
 	}
-	mame_printf_verbose("\n");
-	mame_printf_verbose("Current Videodriver: %s\n", SDL_GetCurrentVideoDriver());
+	osd_printf_verbose("\n");
+	osd_printf_verbose("Current Videodriver: %s\n", SDL_GetCurrentVideoDriver());
 	num = SDL_GetNumVideoDisplays();
 	for (i=0;i<num;i++)
 	{
 		SDL_DisplayMode mode;
 		int j;
 
-		mame_printf_verbose("\tDisplay #%d\n", i);
+		osd_printf_verbose("\tDisplay #%d\n", i);
 		if (SDL_GetDesktopDisplayMode(i, &mode))
-			mame_printf_verbose("\t\tDesktop Mode:         %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
+			osd_printf_verbose("\t\tDesktop Mode:         %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
 		if (SDL_GetCurrentDisplayMode(i, &mode))
-			mame_printf_verbose("\t\tCurrent Display Mode: %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
-		mame_printf_verbose("\t\tRenderdrivers:\n");
+			osd_printf_verbose("\t\tCurrent Display Mode: %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
+		osd_printf_verbose("\t\tRenderdrivers:\n");
 		for (j=0; j<SDL_GetNumRenderDrivers(); j++)
 		{
 			SDL_RendererInfo info;
 			SDL_GetRenderDriverInfo(j, &info);
-			mame_printf_verbose("\t\t\t%10s (%dx%d)\n", info.name, info.max_texture_width, info.max_texture_height);
+			osd_printf_verbose("\t\t\t%10s (%dx%d)\n", info.name, info.max_texture_width, info.max_texture_height);
 		}
 	}
 
-	mame_printf_verbose("Available audio drivers: \n");
+	osd_printf_verbose("Available audio drivers: \n");
 	num = SDL_GetNumAudioDrivers();
 	for (i=0;i<num;i++)
 	{
-		mame_printf_verbose("\t%-20s\n", SDL_GetAudioDriver(i));
+		osd_printf_verbose("\t%-20s\n", SDL_GetAudioDriver(i));
 	}
 #endif
 }
@@ -603,14 +603,14 @@ void sdl_osd_interface::init(running_machine &machine)
 	stemp = options.audio_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
-		mame_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
+		osd_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
 	stemp = options.video_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
-		mame_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
+		osd_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
 	}
 
@@ -618,7 +618,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		stemp = options.render_driver();
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
-			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
+			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
 			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
 			SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
 		}
@@ -634,7 +634,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
-		mame_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);
+		osd_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);
 	}
 #endif
 
@@ -648,7 +648,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_num_processors = atoi(stemp);
 		if (osd_num_processors < 1)
 		{
-			mame_printf_warning("numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
+			osd_printf_warning("numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
 			osd_num_processors = 0;
 		}
 	}
@@ -662,7 +662,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #else
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #endif
-			mame_printf_error("Could not initialize SDL %s\n", SDL_GetError());
+			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 			exit(-1);
 		}
 		osd_sdl_info();
@@ -675,7 +675,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	if (!SDLMAME_HAS_DEBUGGER)
 		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		{
-			mame_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
+			osd_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
 			osd_exit(machine);
 			exit(-1);
 		}
@@ -683,7 +683,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	if (sdlvideo_init(machine))
 	{
 		osd_exit(machine);
-		mame_printf_error("sdlvideo_init: Initialization failed!\n\n\n");
+		osd_printf_error("sdlvideo_init: Initialization failed!\n\n\n");
 		fflush(stderr);
 		fflush(stdout);
 		exit(-1);
@@ -769,14 +769,14 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	if (!ct_font)
 	{
-		mame_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.cstr());
+		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.cstr());
 		return NULL;
 	}
 
 	CFStringRef real_name = CTFontCopyPostScriptName( ct_font );
 	char real_name_c_string[255];
 	CFStringGetCString ( real_name, real_name_c_string, 255, kCFStringEncodingUTF8 );
-	mame_printf_verbose("Matching font: %s\n", real_name_c_string);
+	osd_printf_verbose("Matching font: %s\n", real_name_c_string);
 	CFRelease( real_name );
 
 	CGFloat line_height = 0.0;
@@ -963,7 +963,7 @@ static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool u
 			continue;
 		}
 
-		mame_printf_verbose("Matching font: %s\n", val.u.s);
+		osd_printf_verbose("Matching font: %s\n", val.u.s);
 		{
 			astring match_name((const char*)val.u.s);
 			font = TTF_OpenFont_Magic(match_name, POINT_SIZE);
@@ -1000,7 +1000,7 @@ static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool u
 				continue;
 			}
 
-			mame_printf_verbose("Matching unstyled font: %s\n", val.u.s);
+			osd_printf_verbose("Matching unstyled font: %s\n", val.u.s);
 			{
 				astring match_name((const char*)val.u.s);
 				font = TTF_OpenFont_Magic(match_name, POINT_SIZE);
@@ -1053,14 +1053,14 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	if (!font)
 	{
-		mame_printf_verbose("Searching font %s in -%s\n", name.cstr(), OPTION_FONTPATH);
+		osd_printf_verbose("Searching font %s in -%s\n", name.cstr(), OPTION_FONTPATH);
 		emu_file file(machine().options().font_path(), OPEN_FLAG_READ);
 		if (file.open(name) == FILERR_NONE)
 		{
 			astring full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE);
 			if (font)
-				mame_printf_verbose("Found font %s\n", full_name.cstr());
+				osd_printf_verbose("Found font %s\n", full_name.cstr());
 		}
 	}
 
@@ -1076,7 +1076,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	{
 		if (!BDF_Check_Magic(name))
 		{
-			mame_printf_verbose("font %s is not TrueType or BDF, using MAME default\n", name.cstr());
+			osd_printf_verbose("font %s is not TrueType or BDF, using MAME default\n", name.cstr());
 		}
 		return NULL;
 	}
@@ -1093,7 +1093,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
 #else
 	if (strike)
-		mame_printf_warning("Ignoring strikethrough for SDL_TTF older than 2.0.10\n");
+		osd_printf_warning("Ignoring strikethrough for SDL_TTF older than 2.0.10\n");
 #endif // PATCHLEVEL
 	TTF_SetFontStyle(font, style);
 

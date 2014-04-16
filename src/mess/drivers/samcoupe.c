@@ -552,12 +552,12 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
 
 	/* devices */
-	MCFG_CENTRONICS_ADD("lpt1", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("lpt1", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(samcoupe_state, write_lpt1_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt1_data_out", "lpt1")
 
-	MCFG_CENTRONICS_ADD("lpt2", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("lpt2", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(samcoupe_state, write_lpt2_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")

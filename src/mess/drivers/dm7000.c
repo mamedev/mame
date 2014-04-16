@@ -272,7 +272,7 @@ UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &b
 
 READ32_MEMBER( dm7000_state::dcr_r )
 {
-	mame_printf_debug("DCR %03X read\n", offset);
+	osd_printf_debug("DCR %03X read\n", offset);
 	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
 	switch(offset) {
 		case DCRSTB045_CMD_STAT:
@@ -285,7 +285,7 @@ READ32_MEMBER( dm7000_state::dcr_r )
 
 WRITE32_MEMBER( dm7000_state::dcr_w )
 {
-	mame_printf_debug("DCR %03X write = %08X\n", offset, data);
+	osd_printf_debug("DCR %03X write = %08X\n", offset, data);
 	if(offset>=1024) {printf("get %04X\n", offset); } else
 	dcr[offset] = data;
 }

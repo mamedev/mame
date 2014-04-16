@@ -491,7 +491,7 @@ void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 			{
 				if( (int)n_0_size <= 0 )
 				{
-					mame_printf_debug( "ran out of data %08x\n", n_size );
+					osd_printf_debug( "ran out of data %08x\n", n_size );
 					n_0_size = 0;
 					break;
 				}
@@ -531,12 +531,12 @@ void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 
 		if( (int)n_0_size < 0 )
 		{
-			mame_printf_debug( "ran out of data %d\n", n_0_size );
+			osd_printf_debug( "ran out of data %d\n", n_0_size );
 		}
 	}
 	else
 	{
-		mame_printf_debug( "mdec1_read no conversion :%08x:%08x:\n", n_0_command, n_0_size );
+		osd_printf_debug( "mdec1_read no conversion :%08x:%08x:\n", n_0_command, n_0_size );
 	}
 	if((int)n_0_size <= 0)
 		n_1_status &= ~( 1L << 29 );

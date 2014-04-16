@@ -505,31 +505,31 @@ void bfcobra_state::RunBlit(address_space &space)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			mame_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
-			mame_printf_debug("Command Reg         %.2x",   blitter.command);
-			mame_printf_debug("     %s %s %s %s %s %s %s\n",
+			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
+			osd_printf_debug("Command Reg         %.2x",   blitter.command);
+			osd_printf_debug("     %s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
 				blitter.command & CMD_COLST ? "COLST" : "     ",
 				blitter.command & CMD_PARRD ? "PARRD" : "     ",
 				blitter.command & CMD_SRCUP ? "SRCUP" : "     ",
 				blitter.command & CMD_DSTUP ? "DSTUP" : "     ");
 
-			mame_printf_debug("Src Address Byte 0  %.2x\n", blitter.source.addr0);
-			mame_printf_debug("Src Address Byte 1  %.2x\n", blitter.source.addr1);
-			mame_printf_debug("Src Control         %.2x\n", blitter.source.addr2);
-			mame_printf_debug("  Src Address       %.5x\n", blitter.source.addr & 0xfffff);
-			mame_printf_debug("Dest Address Byte 0 %.2x\n", blitter.dest.addr0);
-			mame_printf_debug("Dest Address Byte 1 %.2x\n", blitter.dest.addr1);
-			mame_printf_debug("Dest Control        %.2x\n", blitter.dest.addr2);
-			mame_printf_debug("  Dst. Address      %.5x\n", blitter.dest.addr & 0xfffff);
-			mame_printf_debug("Mode Control        %.2x",   blitter.modectl);
-			mame_printf_debug("     %s\n", blitter.modectl & MODE_BITTOBYTE ? "BIT_TO_BYTE" : "");
+			osd_printf_debug("Src Address Byte 0  %.2x\n", blitter.source.addr0);
+			osd_printf_debug("Src Address Byte 1  %.2x\n", blitter.source.addr1);
+			osd_printf_debug("Src Control         %.2x\n", blitter.source.addr2);
+			osd_printf_debug("  Src Address       %.5x\n", blitter.source.addr & 0xfffff);
+			osd_printf_debug("Dest Address Byte 0 %.2x\n", blitter.dest.addr0);
+			osd_printf_debug("Dest Address Byte 1 %.2x\n", blitter.dest.addr1);
+			osd_printf_debug("Dest Control        %.2x\n", blitter.dest.addr2);
+			osd_printf_debug("  Dst. Address      %.5x\n", blitter.dest.addr & 0xfffff);
+			osd_printf_debug("Mode Control        %.2x",   blitter.modectl);
+			osd_printf_debug("     %s\n", blitter.modectl & MODE_BITTOBYTE ? "BIT_TO_BYTE" : "");
 
-			mame_printf_debug("Comp. and LFU       %.2x\n", blitter.compfunc);
-			mame_printf_debug("Outer Loop Count    %.2x (%d)\n", blitter.outercnt, blitter.outercnt);
-			mame_printf_debug("Inner Loop Count    %.2x (%d)\n", blitter.innercnt, blitter.innercnt);
-			mame_printf_debug("Step Value          %.2x\n", blitter.step);
-			mame_printf_debug("Pattern Byte        %.2x\n", blitter.pattern);
+			osd_printf_debug("Comp. and LFU       %.2x\n", blitter.compfunc);
+			osd_printf_debug("Outer Loop Count    %.2x (%d)\n", blitter.outercnt, blitter.outercnt);
+			osd_printf_debug("Inner Loop Count    %.2x (%d)\n", blitter.innercnt, blitter.innercnt);
+			osd_printf_debug("Step Value          %.2x\n", blitter.step);
+			osd_printf_debug("Pattern Byte        %.2x\n", blitter.pattern);
 		}
 #endif
 
@@ -795,7 +795,7 @@ READ8_MEMBER(bfcobra_state::ramdac_r)
 		}
 		default:
 		{
-			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", space.device().safe_pcbase());
+			osd_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", space.device().safe_pcbase());
 		}
 	}
 
@@ -945,7 +945,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, space.device().safe_pcbase());
+			osd_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, space.device().safe_pcbase());
 		}
 	}
 
@@ -1024,7 +1024,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 			if (data & CMD_RUN)
 				RunBlit(space);
 			else
-				mame_printf_debug("Blitter stopped by IO.\n");
+				osd_printf_debug("Blitter stopped by IO.\n");
 
 			break;
 		}
@@ -1035,7 +1035,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, space.device().safe_pcbase());
+			osd_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, space.device().safe_pcbase());
 		}
 	}
 }
@@ -1218,7 +1218,7 @@ WRITE8_MEMBER(bfcobra_state::fdctrl_w)
 		}
 		default:
 		{
-			mame_printf_debug("Unknown FDC phase?!");
+			osd_printf_debug("Unknown FDC phase?!");
 		}
 	}
 }
@@ -1236,7 +1236,7 @@ void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 			/* Specify */
 			case READ_DATA:
 			{
-//              mame_printf_debug("Read data\n");
+//              osd_printf_debug("Read data\n");
 				fdc.cmd_len = 9;
 				fdc.res_len = 7;
 				fdc.next_phase = EXECUTION_R;
@@ -1245,7 +1245,7 @@ void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 			}
 			case SPECIFY:
 			{
-//              mame_printf_debug("Specify\n");
+//              osd_printf_debug("Specify\n");
 				fdc.cmd_len = 3;
 				fdc.res_len = 0;
 				fdc.next_phase = COMMAND;
@@ -1253,7 +1253,7 @@ void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 			}
 			case RECALIBRATE:
 			{
-//              mame_printf_debug("Recalibrate\n");
+//              osd_printf_debug("Recalibrate\n");
 				fdc.cmd_len = 2;
 				fdc.res_len = 0;
 				fdc.next_phase = COMMAND;
@@ -1262,7 +1262,7 @@ void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 			}
 			case SENSE_INTERRUPT_STATUS:
 			{
-//              mame_printf_debug("Sense interrupt status\n");
+//              osd_printf_debug("Sense interrupt status\n");
 				fdc.cmd_len = 1;
 				fdc.res_len = 2;
 				fdc.phase = RESULTS;
@@ -1276,7 +1276,7 @@ void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 			}
 			case SEEK:
 			{
-//              mame_printf_debug("Seek\n");
+//              osd_printf_debug("Seek\n");
 				fdc.cmd_len = 3;
 				fdc.res_len = 0;
 				fdc.next_phase = COMMAND;
@@ -1284,14 +1284,14 @@ void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 			}
 			default:
 			{
-//              mame_printf_debug("%x\n",data & 0x1f);
+//              osd_printf_debug("%x\n",data & 0x1f);
 			}
 		}
 	}
 	else
 	{
 		fdc.cmd[fdc.cmd_cnt++] = data;
-		//mame_printf_debug(" %x\n",data);
+		//osd_printf_debug(" %x\n",data);
 	}
 
 	if (fdc.cmd_cnt == fdc.cmd_len)

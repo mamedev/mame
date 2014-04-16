@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 #if 0
-void ATTR_PRINTF(1,2) mame_printf_warning(const char *format, ...)
+void ATTR_PRINTF(1,2) osd_printf_warning(const char *format, ...)
 {
 	va_list argptr;
 

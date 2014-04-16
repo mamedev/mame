@@ -216,11 +216,11 @@ void eeprom_base_device::device_validity_check(validity_checker &valid) const
 {
 	// ensure the number of cells is an even power of 2
 	if (m_cells != (1 << m_address_bits))
-		mame_printf_error("Invalid EEPROM size %d specified\n", m_cells);
+		osd_printf_error("Invalid EEPROM size %d specified\n", m_cells);
 
 	// ensure only the sizes we support are requested
 	if (m_data_bits != 8 && m_data_bits != 16)
-		mame_printf_error("Invalid EEPROM data width %d specified\n", m_data_bits);
+		osd_printf_error("Invalid EEPROM data width %d specified\n", m_data_bits);
 }
 
 
@@ -278,7 +278,7 @@ void eeprom_base_device::nvram_default()
 	// handle hard-coded data from the driver
 	if (m_default_data.u8 != NULL)
 	{
-		mame_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
+		osd_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
 		for (offs_t offs = 0; offs < m_default_data_size; offs++)
 		{
 			if (m_data_bits == 8)
@@ -297,7 +297,7 @@ void eeprom_base_device::nvram_default()
 			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag());
 		if (m_data_bits == 16 && (m_region->width() != 2 || m_region->endianness() != ENDIANNESS_BIG))
 			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
-		mame_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
+		osd_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
 
 		for (offs_t offs = 0; offs < eeprom_length; offs++)
 			if (m_data_bits == 8)

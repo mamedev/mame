@@ -4,7 +4,7 @@
 #ifndef RS232_LOOPBACK_H_
 #define RS232_LOOPBACK_H_
 
-#include "bus/rs232/rs232.h"
+#include "rs232.h"
 
 class rs232_loopback_device : public device_t,
 	public device_rs232_port_interface

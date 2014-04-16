@@ -283,7 +283,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_1_w)
 		}
 		case 0x3:
 		{
-			//mame_printf_debug("%c", data);
+			//osd_printf_debug("%c", data);
 			break;
 		}
 		case 0x4:
@@ -314,7 +314,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_1_w)
 		}
 		case 0xb:
 		{
-			//mame_printf_debug("%c",data);
+			//osd_printf_debug("%c",data);
 			break;
 		}
 		case 0xc:

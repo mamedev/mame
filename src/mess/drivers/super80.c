@@ -664,7 +664,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

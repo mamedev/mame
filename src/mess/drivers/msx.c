@@ -1110,7 +1110,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
@@ -1208,7 +1208,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
@@ -1278,7 +1278,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 

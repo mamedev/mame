@@ -17,25 +17,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
+	virtual ioport_constructor device_input_ports() const;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual ioport_constructor device_input_ports() const;
 
 	virtual void tra_callback();
 	virtual void tra_complete();
 	virtual void rcv_complete();
 	virtual void send_key(UINT8 code);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { if (started()) { output_dsr(state); } }
-
 private:
-	required_ioport m_io_term_txbaud;
-	required_ioport m_io_term_rxbaud;
-	required_ioport m_io_term_startbits;
-	required_ioport m_io_term_databits;
-	required_ioport m_io_term_parity;
-	required_ioport m_io_term_stopbits;
+	required_ioport m_rs232_txbaud;
+	required_ioport m_rs232_rxbaud;
+	required_ioport m_rs232_startbits;
+	required_ioport m_rs232_databits;
+	required_ioport m_rs232_parity;
+	required_ioport m_rs232_stopbits;
 
 	UINT8 m_curr_key;
 	bool m_key_valid;

@@ -10,7 +10,7 @@
 #define PRINTF_IDE_COMMANDS         0
 #define PRINTF_IDE_PASSWORD         0
 
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) mame_printf_debug x; } while (0)
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) osd_printf_debug x; } while (0)
 
 #define TIME_PER_SECTOR                     (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
@@ -480,12 +480,12 @@ void ata_mass_storage_device::process_buffer()
 			for (i = 0; i < 34; i += 2)
 			{
 				if (i % 8 == 2)
-					mame_printf_debug("\n");
+					osd_printf_debug("\n");
 
-				mame_printf_debug("0x%02x, 0x%02x, ", m_buffer[i], m_buffer[i + 1]);
-				//mame_printf_debug("0x%02x%02x, ", m_buffer[i], m_buffer[i + 1]);
+				osd_printf_debug("0x%02x, 0x%02x, ", m_buffer[i], m_buffer[i + 1]);
+				//osd_printf_debug("0x%02x%02x, ", m_buffer[i], m_buffer[i + 1]);
 			}
-			mame_printf_debug("\n");
+			osd_printf_debug("\n");
 		}
 
 		if (m_master_password_enable || m_user_password_enable)
@@ -766,8 +766,8 @@ void ide_hdd_device::device_reset()
 			m_num_cylinders = hdinfo->cylinders;
 			m_num_sectors = hdinfo->sectors;
 			m_num_heads = hdinfo->heads;
-			if (PRINTF_IDE_COMMANDS) mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
-			mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
+			if (PRINTF_IDE_COMMANDS) osd_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
+			osd_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}
 
 		// build the features page

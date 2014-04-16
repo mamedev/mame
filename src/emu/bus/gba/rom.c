@@ -395,7 +395,7 @@ void gba_eeprom_device::write(UINT32 data)
 
 			if (m_bits == 0)
 			{
-				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_addr);
+				osd_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_addr);
 				if (m_addr >= m_data_size)
 					fatalerror("eeprom: invalid address (%x)\n", m_addr);
 

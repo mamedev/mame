@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(rmnimbus_state,nimbus_via_irq_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(rmnimbus_state, nimbus_ack_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

@@ -18,7 +18,7 @@ scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-static INPUT_PORTS_START(scsihle)
+INPUT_PORTS_START(scsihle)
 	PORT_START("SCSI_ID")
 	PORT_CONFNAME(0x07, 0x07, "SCSI ID")
 	PORT_CONFSETTING( 0x00, "0")

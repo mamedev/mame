@@ -1586,9 +1586,9 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	if (rootnode == NULL)
 	{
 		if (filename[0] != '<')
-			mame_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
+			osd_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
 		else
-			mame_printf_warning("Improperly formatted XML string, ignoring\n");
+			osd_printf_warning("Improperly formatted XML string, ignoring\n");
 		return false;
 	}
 
@@ -1601,9 +1601,9 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	catch (emu_fatalerror &err)
 	{
 		if (filename[0] != '<')
-			mame_printf_warning("Error in XML file '%s': %s\n", filename, err.string());
+			osd_printf_warning("Error in XML file '%s': %s\n", filename, err.string());
 		else
-			mame_printf_warning("Error in XML string: %s\n", err.string());
+			osd_printf_warning("Error in XML string: %s\n", err.string());
 		result = false;
 	}
 

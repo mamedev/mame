@@ -64,12 +64,12 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 	m_p = pcap_open_live(name, 65535, 1, 1, errbuf);
 	if(!m_p)
 	{
-		mame_printf_verbose("Unable to open %s: %s\n", name, errbuf);
+		osd_printf_verbose("Unable to open %s: %s\n", name, errbuf);
 		return;
 	}
 	if(pcap_set_datalink(m_p, DLT_EN10MB) == -1)
 	{
-		mame_printf_verbose("Unable to set %s to ethernet\n", name);
+		osd_printf_verbose("Unable to set %s to ethernet\n", name);
 		pcap_close(m_p);
 		m_p = NULL;
 		return;
@@ -89,10 +89,10 @@ void netdev_pcap::set_mac(const char *mac)
 	if(!m_p) return;
 	sprintf(filter, "not ether src %.2X:%.2X:%.2X:%.2X:%.2X:%.2X and (ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast or ether dst 09:00:07:ff:ff:ff)", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5], (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 	if(pcap_compile(m_p, &fp, filter, 1, 0) == -1) {
-		mame_printf_verbose("Error with pcap_compile\n");
+		osd_printf_verbose("Error with pcap_compile\n");
 	}
 	if(pcap_setfilter(m_p, &fp) == -1) {
-		mame_printf_verbose("Error with pcap_setfilter\n");
+		osd_printf_verbose("Error with pcap_setfilter\n");
 	}
 }
 
@@ -136,7 +136,7 @@ void init_pcap()
 	char errbuf[PCAP_ERRBUF_SIZE];
 	if(pcap_findalldevs(&devs, errbuf) == -1)
 	{
-		mame_printf_verbose("Unable to get network devices: %s\n", errbuf);
+		osd_printf_verbose("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
 

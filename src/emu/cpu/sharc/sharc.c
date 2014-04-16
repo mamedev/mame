@@ -274,7 +274,7 @@ void adsp21062_device::external_iop_write(UINT32 address, UINT32 data)
 	}
 	else
 	{
-		mame_printf_debug("SHARC IOP write %08X, %08X\n", address, data);
+		osd_printf_debug("SHARC IOP write %08X, %08X\n", address, data);
 		sharc_iop_w(address, data);
 	}
 }

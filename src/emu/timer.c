@@ -153,31 +153,31 @@ void timer_device::device_validity_check(validity_checker &valid) const
 	{
 		case TIMER_TYPE_GENERIC:
 			if (m_screen_tag != NULL || m_first_vpos != 0 || m_start_delay != attotime::zero)
-				mame_printf_warning("Generic timer specified parameters for a scanline timer\n");
+				osd_printf_warning("Generic timer specified parameters for a scanline timer\n");
 			if (m_period != attotime::zero || m_start_delay != attotime::zero)
-				mame_printf_warning("Generic timer specified parameters for a periodic timer\n");
+				osd_printf_warning("Generic timer specified parameters for a periodic timer\n");
 			break;
 
 		case TIMER_TYPE_PERIODIC:
 			if (m_screen_tag != NULL || m_first_vpos != 0)
-				mame_printf_warning("Periodic timer specified parameters for a scanline timer\n");
+				osd_printf_warning("Periodic timer specified parameters for a scanline timer\n");
 			if (m_period <= attotime::zero)
-				mame_printf_error("Periodic timer specified invalid period\n");
+				osd_printf_error("Periodic timer specified invalid period\n");
 			break;
 
 		case TIMER_TYPE_SCANLINE:
 			if (m_period != attotime::zero || m_start_delay != attotime::zero)
-				mame_printf_warning("Scanline timer specified parameters for a periodic timer\n");
+				osd_printf_warning("Scanline timer specified parameters for a periodic timer\n");
 			if (m_param != 0)
-				mame_printf_warning("Scanline timer specified parameter which is ignored\n");
+				osd_printf_warning("Scanline timer specified parameter which is ignored\n");
 //          if (m_first_vpos < 0)
-//              mame_printf_error("Scanline timer specified invalid initial position\n");
+//              osd_printf_error("Scanline timer specified invalid initial position\n");
 //          if (m_increment < 0)
-//              mame_printf_error("Scanline timer specified invalid increment\n");
+//              osd_printf_error("Scanline timer specified invalid increment\n");
 			break;
 
 		default:
-			mame_printf_error("Invalid type specified\n");
+			osd_printf_error("Invalid type specified\n");
 			break;
 	}
 }

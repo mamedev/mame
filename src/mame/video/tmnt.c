@@ -81,7 +81,7 @@ void ssbl_tile_callback( running_machine &machine, int layer, int bank, int *cod
 	else
 	{
 		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-//      mame_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
+//      osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
 	}
 
 	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);

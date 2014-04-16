@@ -1337,11 +1337,6 @@ WRITE_LINE_MEMBER( x68k_state::mfp_tbo_w )
 	m_mfpdev->clock_w(state);
 }
 
-static struct serial_keyboard_interface x68k_keyboard_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, write_rx)
-};
-
 static I8255A_INTERFACE( ppi_interface )
 {
 	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_a_r),
@@ -1795,6 +1790,10 @@ static SLOT_INTERFACE_START( x68k_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START(keyboard)
+	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
@@ -1811,9 +1810,10 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(x68k_state, mfp_irq_callback))
 	MCFG_MC68901_OUT_TBO_CB(WRITELINE(x68k_state, mfp_tbo_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 
-	MCFG_X68K_KEYBOARD_ADD("keyboard", x68k_keyboard_interface)
+	MCFG_RS232_PORT_ADD("keyboard", keyboard, "x68k")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 

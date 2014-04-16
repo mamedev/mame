@@ -1689,7 +1689,7 @@ inline int naomi_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 //      debugger_break(machine);
 	}
 
@@ -1725,7 +1725,7 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 		return U64(0xffffffffffffffff);
 	}
 
-	mame_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
+	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
 	return 0;
 }
 
@@ -1737,7 +1737,7 @@ WRITE64_MEMBER(naomi_state::aw_modem_w )
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )

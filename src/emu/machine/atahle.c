@@ -6,7 +6,7 @@
 #define PRINTF_IDE_COMMANDS         0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) mame_printf_debug x; } while (0)
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) osd_printf_debug x; } while (0)
 
 enum
 {

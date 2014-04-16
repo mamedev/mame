@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bw2_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

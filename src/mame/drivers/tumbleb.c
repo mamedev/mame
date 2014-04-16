@@ -611,7 +611,7 @@ WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 	if (sound == 0x00)
 	{
 		/* pangpang has more commands than tumbleb2, extra sounds */
-		//mame_printf_debug("Command %04x\n", data);
+		//osd_printf_debug("Command %04x\n", data);
 	}
 	else if (sound == -2)
 	{
@@ -3506,7 +3506,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 
 READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 {
-	//mame_printf_debug("bcstory_io %06x\n",space.device().safe_pc());
+	//osd_printf_debug("bcstory_io %06x\n",space.device().safe_pc());
 
 	if (space.device().safe_pc()==0x0560) return 0x1a0;
 	else return ioport("SYSTEM")->read();

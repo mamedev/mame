@@ -137,7 +137,7 @@ UINT8 BSX_base::read(UINT32 offset)
 	offset &= 0xffff;
 	if (offset < 0x2188 || offset >= 0x21a0)
 	{
-		mame_printf_debug("BS-X Base Unit reg read outside correct range!\n");
+		osd_printf_debug("BS-X Base Unit reg read outside correct range!\n");
 		return 0x00;
 	}
 
@@ -199,7 +199,7 @@ void BSX_base::write(UINT32 offset, UINT8 data)
 	offset &= 0xffff;
 	if (offset < 0x2188 || offset >= 0x21a0)
 	{
-		mame_printf_debug("BS-X Base Unit reg write outside correct range!\n");
+		osd_printf_debug("BS-X Base Unit reg write outside correct range!\n");
 		return;
 	}
 

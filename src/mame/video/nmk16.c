@@ -244,7 +244,7 @@ WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
 
 WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
 {
-//  mame_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
+//  osd_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
 
 	switch (data & 0xff00)
 	{

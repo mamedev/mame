@@ -247,10 +247,10 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 					}
 					if ((cw==0) || (ch==0))
 					{
-						mame_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", monitor->monitor_device);
-						mame_printf_warning("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
-						mame_printf_warning("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
-						mame_printf_warning("         Assuming 1024x768 now!\n");
+						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", monitor->monitor_device);
+						osd_printf_warning("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
+						osd_printf_warning("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
+						osd_printf_warning("         Assuming 1024x768 now!\n");
 						cw=1024;
 						ch=768;
 					}
@@ -274,8 +274,8 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 		static int info_shown=0;
 		if (!info_shown)
 		{
-			mame_printf_verbose("SDL Device Driver     : %s\n", monitor->monitor_device);
-			mame_printf_verbose("SDL Monitor Dimensions: %d x %d\n", monitor->monitor_width, monitor->monitor_height);
+			osd_printf_verbose("SDL Device Driver     : %s\n", monitor->monitor_device);
+			osd_printf_verbose("SDL Monitor Dimensions: %d x %d\n", monitor->monitor_width, monitor->monitor_height);
 			info_shown = 1;
 		}
 	}
@@ -448,7 +448,7 @@ static void init_monitors(void)
 	{
 		int i;
 
-		mame_printf_verbose("Enter init_monitors\n");
+		osd_printf_verbose("Enter init_monitors\n");
 
 		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
 		{
@@ -468,7 +468,7 @@ static void init_monitors(void)
 			monitor->handle = i;
 			// guess the aspect ratio assuming square pixels
 			monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
-			mame_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
+			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
 
 			// save the primary monitor handle
 			if (i == 0)
@@ -479,7 +479,7 @@ static void init_monitors(void)
 			tailptr = &monitor->next;
 		}
 	}
-	mame_printf_verbose("Leave init_monitors\n");
+	osd_printf_verbose("Leave init_monitors\n");
 	#elif defined(SDLMAME_WIN32)
 	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
 	#else
@@ -642,7 +642,7 @@ static void extract_video_config(running_machine &machine)
 		video_config.novideo = 1;
 
 		if (options.seconds_to_run() == 0)
-			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
+			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL) == 0))
 		video_config.mode = VIDEO_MODE_OPENGL;
@@ -658,7 +658,7 @@ static void extract_video_config(running_machine &machine)
 	}
 	else
 	{
-		mame_printf_warning("Invalid video value %s; reverting to software\n", stemp);
+		osd_printf_warning("Invalid video value %s; reverting to software\n", stemp);
 		video_config.mode = VIDEO_MODE_SOFT;
 	}
 
@@ -669,7 +669,7 @@ static void extract_video_config(running_machine &machine)
 	video_config.syncrefresh   = options.sync_refresh();
 	if (!video_config.waitvsync && video_config.syncrefresh)
 	{
-		mame_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
+		osd_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
 		video_config.syncrefresh = 0;
 	}
 
@@ -681,7 +681,7 @@ static void extract_video_config(running_machine &machine)
 		video_config.prescale      = options.prescale();
 		if (video_config.prescale < 1 || video_config.prescale > 3)
 		{
-			mame_printf_warning("Invalid prescale option, reverting to '1'\n");
+			osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 			video_config.prescale = 1;
 		}
 		// default to working video please
@@ -748,13 +748,13 @@ static void extract_video_config(running_machine &machine)
 #if (!SDLMAME_SDL2)
 	if (video_config.numscreens < 1 || video_config.numscreens > 1) //MAX_VIDEO_WINDOWS)
 	{
-		mame_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
+		osd_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
 		video_config.numscreens = 1;
 	}
 #else
 	if (video_config.numscreens < 1 || video_config.numscreens > MAX_VIDEO_WINDOWS)
 	{
-		mame_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
+		osd_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
 		video_config.numscreens = 1;
 	}
 #endif
@@ -763,12 +763,12 @@ static void extract_video_config(running_machine &machine)
 	video_config.scale_mode = drawsdl_scale_mode(stemp);
 	if (video_config.scale_mode < 0)
 	{
-		mame_printf_warning("Invalid yuvmode value %s; reverting to none\n", stemp);
+		osd_printf_warning("Invalid yuvmode value %s; reverting to none\n", stemp);
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
 	if ( (video_config.mode != VIDEO_MODE_SOFT) && (video_config.scale_mode != VIDEO_SCALE_MODE_NONE) )
 	{
-		mame_printf_warning("scalemode is only for -video soft, overriding\n");
+		osd_printf_warning("scalemode is only for -video soft, overriding\n");
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
 }
@@ -789,7 +789,7 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 		data = defdata;
 	}
 	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		mame_printf_error("Illegal aspect ratio value = %s\n", data);
+		osd_printf_error("Illegal aspect ratio value = %s\n", data);
 	return (float)num / (float)den;
 }
 
@@ -812,5 +812,5 @@ static void get_resolution(const char *defdata, const char *data, sdl_window_con
 	}
 
 	if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
-		mame_printf_error("Illegal resolution value = %s\n", data);
+		osd_printf_error("Illegal resolution value = %s\n", data);
 }

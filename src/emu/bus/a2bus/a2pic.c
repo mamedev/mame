@@ -22,7 +22,7 @@ const device_type A2BUS_PIC = &device_creator<a2bus_pic_device>;
 #define PIC_CENTRONICS_TAG "pic_ctx"
 
 MACHINE_CONFIG_FRAGMENT( pic )
-	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
 

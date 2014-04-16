@@ -315,7 +315,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 			m_votrax->set_output_gain(0, data ? 1.0 : 0.0);
 #endif
 			break;
-		case 7: mame_printf_debug("io_1:%d\n", data); break;
+		case 7: osd_printf_debug("io_1:%d\n", data); break;
 	}
 	return 0xff;
 }
@@ -334,7 +334,7 @@ READ8_MEMBER(astrocde_state::gorf_io_2_r)
 		case 4: output_set_lamp_value(4, data); break;
 		case 5: output_set_lamp_value(5, data); break;
 		case 6: /* n/c */                       break;
-		case 7: mame_printf_debug("io_2:%d\n", data); break;
+		case 7: osd_printf_debug("io_2:%d\n", data); break;
 	}
 	return 0xff;
 }
@@ -526,7 +526,7 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lamp_w)
 WRITE8_MEMBER(astrocde_state::tenpindx_counter_w)
 {
 	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	if (data & 0xfc) mame_printf_debug("tenpindx_counter_w = %02X\n", data);
+	if (data & 0xfc) osd_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
 

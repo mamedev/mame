@@ -698,8 +698,8 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
 	astring tempstr;
-	mame_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
-	mame_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
+	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
+	osd_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
 }
 
 /*-------------------------------------------------
@@ -716,7 +716,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	UINT32 actlength = file->size();
 	if (explength != actlength)
 	{
-		mame_printf_error("%s WRONG LENGTH (expected: %d found: %d)\n", name, explength, actlength);
+		osd_printf_error("%s WRONG LENGTH (expected: %d found: %d)\n", name, explength, actlength);
 		retVal++;
 	}
 
@@ -725,20 +725,20 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	hash_collection &acthashes = file->hashes(hashes.hash_types(tempstr));
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
-		mame_printf_error("%s NO GOOD DUMP KNOWN\n", name);
+		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
 	}
 	/* verify checksums */
 	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
-		mame_printf_error("%s WRONG CHECKSUMS:\n", name);
+		osd_printf_error("%s WRONG CHECKSUMS:\n", name);
 		dump_wrong_and_correct_checksums(hashes, acthashes);
 		retVal++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 	{
-		mame_printf_error("%s NEEDS REDUMP\n",name);
+		osd_printf_error("%s NEEDS REDUMP\n",name);
 	}
 	return retVal;
 }
@@ -774,9 +774,9 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 				UINT32 supported = swinfo->supported();
 				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
-					mame_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
 				if (supported == SOFTWARE_SUPPORTED_NO)
-					mame_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 
 				// attempt reading up the chain through the parents and create a locationtag astring in the format
 				// " swlist % clonename % parentname "
@@ -845,7 +845,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 	}
 	if (warningcount > 0)
 	{
-		mame_printf_error("WARNING: the software item might not run correctly.\n");
+		osd_printf_error("WARNING: the software item might not run correctly.\n");
 	}
 	return retVal;
 }
@@ -966,7 +966,7 @@ done:
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
 				popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
-				mame_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
+				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
 		clear();
 	}
@@ -981,7 +981,7 @@ done:
 				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
 					popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
 				else
-					mame_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
+					osd_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
 			}
 		}
 	}
@@ -1265,7 +1265,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 
 	// check compatibility
 	if (!swpart->is_compatible(swpart->info().list()))
-		mame_printf_warning("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), swpart->info().list().filter());
+		osd_printf_warning("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), swpart->info().list().filter());
 
 	// check requirements and load those images
 	const char *requirement = swpart->feature("requirement");

@@ -166,7 +166,7 @@ void igs022_device::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 	}
 	else
 	{
-		mame_printf_debug("unhandled copy mode %04x!\n", mode);
+		osd_printf_debug("unhandled copy mode %04x!\n", mode);
 		printf ("DMA MODE: %d, src: %4.4x, dst: %4.4x, size: %4.4x, param: %2.2x\n", mode, src, dst, size, param);
 		// not used by killing blade
 		/* invalid? */

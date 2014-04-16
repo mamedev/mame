@@ -477,7 +477,7 @@ void nes_cart_slot_device::call_load_unif()
 	}
 
 	if (small_prg)  // This is not supported yet, so warn users about this
-		mame_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MESS yet.");
+		osd_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MESS yet.");
 
 	if (vrom_size)
 	{
@@ -495,7 +495,7 @@ void nes_cart_slot_device::call_load_unif()
 		if (prgout)
 		{
 			fwrite(m_cart->get_prg_base(), 1, 0x4000 * m_cart->get_prg_size(), prgout);
-			mame_printf_error("Created PRG chunk\n");
+			osd_printf_error("Created PRG chunk\n");
 		}
 
 		fclose(prgout);
@@ -513,7 +513,7 @@ void nes_cart_slot_device::call_load_unif()
 		if (chrout)
 		{
 			fwrite(m_cart->get_vrom_base(), 1, m_cart->get_vrom_size(), chrout);
-			mame_printf_error("Created CHR chunk\n");
+			osd_printf_error("Created CHR chunk\n");
 		}
 		fclose(chrout);
 	}

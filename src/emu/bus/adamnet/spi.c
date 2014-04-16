@@ -85,7 +85,7 @@ static MACHINE_CONFIG_FRAGMENT( adam_spi )
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

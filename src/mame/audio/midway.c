@@ -748,7 +748,7 @@ WRITE8_MEMBER(midway_sounds_good_device::write)
 
 WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
 {
-//if (state) mame_printf_debug("SG Reset\n");
+//if (state) osd_printf_debug("SG Reset\n");
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 

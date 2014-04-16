@@ -2126,7 +2126,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2213,7 +2213,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2307,7 +2307,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2416,7 +2416,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

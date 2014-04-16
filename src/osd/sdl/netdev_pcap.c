@@ -27,12 +27,12 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 	m_p = pcap_open_live(name, 65535, 1, 1, errbuf);
 	if(!m_p)
 	{
-		mame_printf_verbose("Unable to open %s: %s\n", name, errbuf);
+		osd_printf_verbose("Unable to open %s: %s\n", name, errbuf);
 		return;
 	}
 	if(pcap_set_datalink(m_p, DLT_EN10MB) == -1)
 	{
-		mame_printf_verbose("Unable to set %s to ethernet", name);
+		osd_printf_verbose("Unable to set %s to ethernet", name);
 		pcap_close(m_p);
 		m_p = NULL;
 		return;
@@ -80,7 +80,7 @@ void init_pcap()
 	char errbuf[PCAP_ERRBUF_SIZE];
 	if(pcap_findalldevs(&devs, errbuf) == -1)
 	{
-		mame_printf_verbose("Unable to get network devices: %s\n", errbuf);
+		osd_printf_verbose("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
 

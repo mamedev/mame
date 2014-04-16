@@ -119,7 +119,7 @@ WRITE8_MEMBER( votrax_sc01_device::write )
 	// only 6 bits matter
 	m_phoneme = data & 0x3f;
 const UINT8 *rom = m_rom + (m_phoneme << 3);
-mame_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%X CLD=%X VD=%X PAC=%X PH=%02X)\n",
+osd_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%X CLD=%X VD=%X PAC=%X PH=%02X)\n",
 		machine().time().as_string(3), s_phoneme_table[m_phoneme],
 		rom[0] >> 4, rom[1] >> 4, rom[2] >> 4, rom[3] >> 4, rom[4] >> 4, rom[5] >> 4, rom[6] >> 4,
 		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
@@ -508,24 +508,24 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 	if (m_counter_34 % 32 == 0 && m_master_clock == 0)
 	{
 	if (LOG_TIMING)
-		mame_printf_debug("MCLK C034 L070 L072 BET1  P1   P2  PHI1 PHI2 PH1' PH2' SUBC C088 C084 L092 IIRQ ");
+		osd_printf_debug("MCLK C034 L070 L072 BET1  P1   P2  PHI1 PHI2 PH1' PH2' SUBC C088 C084 L092 IIRQ ");
 	if (LOG_LOWPARAM)
-		mame_printf_debug("F132 F114 F112 F142 L080 ");
+		osd_printf_debug("F132 F114 F112 F142 L080 ");
 	if (LOG_GLOTTAL)
-		mame_printf_debug("C220 C222 C224 C234 C236 FGAT GLSY ");
+		osd_printf_debug("C220 C222 C224 C234 C236 FGAT GLSY ");
 	if (LOG_TRANSITION)
-		mame_printf_debug("0625 C046 L046 A0-2 L168 L170  FC   VA   FA   F1   F2   F3   F2Q ");
-	mame_printf_debug("\n");
+		osd_printf_debug("0625 C046 L046 A0-2 L168 L170  FC   VA   FA   F1   F2   F3   F2Q ");
+	osd_printf_debug("\n");
 	}
 	if (LOG_TIMING)
-		mame_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_master_clock, m_counter_34, m_latch_70, m_latch_72, m_beta1, m_p1, m_p2, m_phi1, m_phi2, m_phi1_20, m_phi2_20, m_subphoneme_count, m_clock_88, m_counter_84, m_latch_92, m_internal_request);
+		osd_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_master_clock, m_counter_34, m_latch_70, m_latch_72, m_beta1, m_p1, m_p2, m_phi1, m_phi2, m_phi1_20, m_phi2_20, m_subphoneme_count, m_clock_88, m_counter_84, m_latch_92, m_internal_request);
 	if (LOG_LOWPARAM)
-		mame_printf_debug("%4X %4X %4X %4X %4X ", m_srff_132, m_srff_114, m_srff_112, m_srff_142, m_latch_80);
+		osd_printf_debug("%4X %4X %4X %4X %4X ", m_srff_132, m_srff_114, m_srff_112, m_srff_142, m_latch_80);
 	if (LOG_GLOTTAL)
-		mame_printf_debug("%4X %4X %4X %4X %4X %4X %4X ", m_counter_220, m_counter_222, m_counter_224, m_counter_234, m_counter_236, m_fgate, m_glottal_sync);
+		osd_printf_debug("%4X %4X %4X %4X %4X %4X %4X ", m_counter_220, m_counter_222, m_counter_224, m_counter_234, m_counter_236, m_fgate, m_glottal_sync);
 	if (LOG_TRANSITION)
-		mame_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_0625_clock, m_counter_46, m_latch_46, m_latch_72 & 7, m_latch_168, m_latch_170, m_fc, m_va, m_fa, m_f1, m_f2, m_f3, m_f2q);
-	mame_printf_debug("\n");
+		osd_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_0625_clock, m_counter_46, m_latch_46, m_latch_72 & 7, m_latch_168, m_latch_170, m_fc, m_va, m_fa, m_f1, m_f2, m_f3, m_f2q);
+	osd_printf_debug("\n");
 }
 
 			//==============================================
@@ -639,7 +639,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			else if (clock_88_rising)
 			{
 				m_counter_84 = (m_counter_84 - 1) & 0x0f;
-mame_printf_debug("counter=%d\n", m_counter_84);
+osd_printf_debug("counter=%d\n", m_counter_84);
 			}
 
 			// clock the zero count latch
@@ -711,7 +711,7 @@ mame_printf_debug("counter=%d\n", m_counter_84);
 						if (m_latch_80 != (romdata & 0x7f))
 						{
 							m_latch_80 = romdata & 0x7f;
-mame_printf_debug("[PH=%02X]\n", m_latch_80);
+osd_printf_debug("[PH=%02X]\n", m_latch_80);
 							UINT32 old_period = m_subphoneme_period;
 							update_subphoneme_clock_period();
 							m_subphoneme_count = (m_subphoneme_count * m_subphoneme_period) / old_period;
@@ -1342,7 +1342,7 @@ void votrax_sc01_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	// if we're supposed to have fired, do it now
 	if (m_internal_request == ASSERT_LINE)
 	{
-mame_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
+osd_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 		m_request_cb(m_request_state = ASSERT_LINE);
 		return;
 	}

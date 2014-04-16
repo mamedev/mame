@@ -359,7 +359,7 @@ WRITE8_MEMBER(segag80v_state::unknown_w)
 	/* writing an 0x04 here enables interrupts */
 	/* some games write 0x00/0x01 here as well */
 	if (data != 0x00 && data != 0x01 && data != 0x04)
-		mame_printf_debug("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
+		osd_printf_debug("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
 }
 
 

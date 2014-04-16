@@ -514,7 +514,7 @@ void nick_device::write_pixels(UINT8 data_byte, UINT8 char_idx)
 
 		case NICK_4_COLOUR_MODE:
 		{
-			//mame_printf_info("4 colour\r\n");
+			//osd_printf_info("4 colour\r\n");
 
 			/* left margin attributes */
 			if (m_LPT.LM & NICK_LM_MSBALT)
@@ -543,7 +543,7 @@ void nick_device::write_pixels(UINT8 data_byte, UINT8 char_idx)
 
 		case NICK_16_COLOUR_MODE:
 		{
-			//mame_printf_info("16 colour\r\n");
+			//osd_printf_info("16 colour\r\n");
 
 			/* left margin attributes */
 			if (m_LPT.LM & NICK_LM_MSBALT)
@@ -667,7 +667,7 @@ void nick_device::write_pixels_lpixel(UINT8 data_byte, UINT8 char_idx)
 
 		case NICK_4_COLOUR_MODE:
 		{
-			//mame_printf_info("4 colour\r\n");
+			//osd_printf_info("4 colour\r\n");
 
 			/* left margin attributes */
 			if (m_LPT.LM & NICK_LM_MSBALT)
@@ -698,7 +698,7 @@ void nick_device::write_pixels_lpixel(UINT8 data_byte, UINT8 char_idx)
 
 		case NICK_16_COLOUR_MODE:
 		{
-			//mame_printf_info("16 colour\r\n");
+			//osd_printf_info("16 colour\r\n");
 
 			/* left margin attributes */
 			if (m_LPT.LM & NICK_LM_MSBALT)
@@ -931,14 +931,14 @@ void nick_device::do_display()
 
 			case NICK_ATTR_MODE:
 			{
-				//mame_printf_info("attr mode\r\n");
+				//osd_printf_info("attr mode\r\n");
 				do_attr(clocks_visible);
 			}
 			break;
 
 			case NICK_CH256_MODE:
 			{
-				//mame_printf_info("ch256 mode\r\n");
+				//osd_printf_info("ch256 mode\r\n");
 				do_ch256(clocks_visible);
 			}
 			break;
@@ -951,7 +951,7 @@ void nick_device::do_display()
 
 			case NICK_CH64_MODE:
 			{
-				//mame_printf_info("ch64 mode\r\n");
+				//osd_printf_info("ch64 mode\r\n");
 				do_ch64(clocks_visible);
 			}
 			break;

@@ -216,7 +216,7 @@ INLINE void generate_exception(int exception, int backup)
 	/* most exceptions go to offset 0x180, except for TLB stuff */
 	if (exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE)
 	{
-		mame_printf_debug("TLB miss @ %08X\n", (UINT32)mips3.core.cpr[0][COP0_BadVAddr]);
+		osd_printf_debug("TLB miss @ %08X\n", (UINT32)mips3.core.cpr[0][COP0_BadVAddr]);
 	}
 	mips3.core.pc += offset;
 

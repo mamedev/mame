@@ -656,7 +656,7 @@ WRITE16_MEMBER( ksys573_state::atapi_reset_w )
 void ksys573_state::cdrom_dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size )
 {
 	verboselog( 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
-//  mame_printf_debug( "DMA read: address %08x size %08x\n", n_address, n_size );
+//  osd_printf_debug( "DMA read: address %08x size %08x\n", n_address, n_size );
 }
 
 void ksys573_state::cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size )
@@ -664,7 +664,7 @@ void ksys573_state::cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size
 	m_p_n_psxram = ram;
 
 	verboselog( 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
-//  mame_printf_debug( "DMA write: address %08x size %08x\n", n_address, n_size );
+//  osd_printf_debug( "DMA write: address %08x size %08x\n", n_address, n_size );
 
 	m_atapi_xferbase = n_address;
 	m_atapi_xfersize = n_size;

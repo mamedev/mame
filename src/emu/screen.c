@@ -244,28 +244,28 @@ void screen_device::device_validity_check(validity_checker &valid) const
 {
 	// sanity check dimensions
 	if (m_width <= 0 || m_height <= 0)
-		mame_printf_error("Invalid display dimensions\n");
+		osd_printf_error("Invalid display dimensions\n");
 
 	// sanity check display area
 	if (m_type != SCREEN_TYPE_VECTOR)
 	{
 		if (m_visarea.empty() || m_visarea.max_x >= m_width || m_visarea.max_y >= m_height)
-			mame_printf_error("Invalid display area\n");
+			osd_printf_error("Invalid display area\n");
 
 		// sanity check screen formats
 		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
-			mame_printf_error("Missing SCREEN_UPDATE function\n");
+			osd_printf_error("Missing SCREEN_UPDATE function\n");
 	}
 
 	// check for zero frame rate
 	if (m_refresh == 0)
-		mame_printf_error("Invalid (zero) refresh rate\n");
+		osd_printf_error("Invalid (zero) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
-		mame_printf_error("Screen does not have palette defined\n");
+		osd_printf_error("Screen does not have palette defined\n");
 	if (m_palette != NULL && texformat == TEXFORMAT_RGB32)
-		mame_printf_warning("Screen does not need palette defined\n");
+		osd_printf_warning("Screen does not need palette defined\n");
 }
 
 
@@ -1048,5 +1048,5 @@ void screen_device::load_effect_overlay(const char *filename)
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else
-		mame_printf_warning("Unable to load effect PNG file '%s'\n", fullname.cstr());
+		osd_printf_warning("Unable to load effect PNG file '%s'\n", fullname.cstr());
 }

@@ -1,7 +1,7 @@
 /***************************************************************************
 Generic ASCII Keyboard
 
-Use MCFG_ASCII_KEYBOARD_ADD to attach as a generic ascii input device in
+Use GENERIC_KEYBOARD to attach as a generic ascii input device in
 cases where either the driver isn't developed enough yet; or for testing;
 or for the case of a computer with an inbuilt (not serial) ascii keyboard.
 

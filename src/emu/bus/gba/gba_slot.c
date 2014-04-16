@@ -188,7 +188,7 @@ bool gba_cart_slot_device::call_load()
 
 			//printf("Type: %s\n", gba_get_slot(m_type));
 
-			mame_printf_info("GBA: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
+			osd_printf_info("GBA: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
 
 		if (m_type == GBA_SRAM)
@@ -301,7 +301,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
 			chip |= GBA_CHIP_RTC;
 	}
-	mame_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).cstr());
+	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).cstr());
 
 	// fix for games which return more than one kind of chip: either it is one of the known titles, or we default to no battery
 	if (gba_chip_has_conflict(chip))
@@ -312,7 +312,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
 
-		mame_printf_info("GBA: Game Code \"%s\"\n", game_code);
+		osd_printf_info("GBA: Game Code \"%s\"\n", game_code);
 
 		chip &= ~(GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_4K | GBA_CHIP_EEPROM_64K | GBA_CHIP_FLASH | GBA_CHIP_FLASH_1M | GBA_CHIP_FLASH_512 | GBA_CHIP_SRAM);
 
@@ -328,7 +328,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			}
 		}
 		if (!resolved)
-			mame_printf_warning("GBA: NVRAM is disabled because multiple NVRAM chips were detected!\n");
+			osd_printf_warning("GBA: NVRAM is disabled because multiple NVRAM chips were detected!\n");
 	}
 
 	// fix for games which are known to require an eeprom with 14-bit addressing (64 kbit)
@@ -339,7 +339,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
 
-		mame_printf_info("GBA: Game Code \"%s\"\n", game_code);
+		osd_printf_info("GBA: Game Code \"%s\"\n", game_code);
 
 		for (int i = 0; i < sizeof(gba_chip_fix_eeprom_list) / sizeof(gba_chip_fix_eeprom_item); i++)
 		{
@@ -354,11 +354,11 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 	if (type & GBA_CHIP_RTC)
 	{
-		mame_printf_verbose("game has RTC - not emulated at the moment\n");
+		osd_printf_verbose("game has RTC - not emulated at the moment\n");
 		chip &= ~GBA_CHIP_RTC;
 	}
 
-	mame_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).cstr());
+	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).cstr());
 
 	switch (chip)
 	{

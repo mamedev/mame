@@ -370,7 +370,6 @@ ToDo:
 #include "machine/nvram.h"
 #include "sound/speaker.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/centronics/image.h"
 
 class cat_state : public driver_device
 {
@@ -1245,7 +1244,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
-	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(cat_state, prn_ack_ff))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")

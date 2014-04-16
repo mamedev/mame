@@ -8,8 +8,12 @@
 
 *******************************************************************c********/
 
+
+#include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
 
+extern bool g_print_verbose;
 
 //-------------------------------------------------
 //  osd_interface - constructor
@@ -67,6 +71,12 @@ void osd_interface::init(running_machine &machine)
 	//
 
 	m_machine = &machine;
+	
+	emu_options &options = downcast<emu_options &>(machine.options());
+	// extract the verbose printing option
+	if (options.verbose())
+		g_print_verbose = true;
+	
 }
 
 

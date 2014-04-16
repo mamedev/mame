@@ -805,7 +805,7 @@ void cdicdic_device::process_delayed_command()
 
 			if(!cdrom_read_data(m_cd, lba, buffer, CD_TRACK_RAW_DONTCARE))
 			{
-				mame_printf_verbose("Unable to read CD-ROM data.\n");
+				osd_printf_verbose("Unable to read CD-ROM data.\n");
 			}
 
 			if(!(msf & 0x0000ff))

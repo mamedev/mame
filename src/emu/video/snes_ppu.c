@@ -2674,7 +2674,7 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			m_direct_color = BIT(data, 0);
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x2) != (PPU_REG(CGWSEL) & 0x2))
-				mame_printf_debug("Add/Sub Layer: %s\n", ((data & 0x2) >> 1) ? "Subscreen" : "Fixed colour");
+				osd_printf_debug("Add/Sub Layer: %s\n", ((data & 0x2) >> 1) ? "Subscreen" : "Fixed colour");
 #endif
 			break;
 		case CGADSUB:   /* Addition/Subtraction designation for each screen */
@@ -2713,7 +2713,7 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			dynamic_res_change(space.machine());
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x8) != (PPU_REG(SETINI) & 0x8))
-				mame_printf_debug("Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off");
+				osd_printf_debug("Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off");
 #endif
 			break;
 		}

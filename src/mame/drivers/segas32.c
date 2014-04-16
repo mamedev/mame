@@ -1128,7 +1128,7 @@ WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 
 WRITE16_MEMBER(segas32_state::random_number_16_w)
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
+//  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 READ16_MEMBER(segas32_state::random_number_16_r)
@@ -1138,7 +1138,7 @@ READ16_MEMBER(segas32_state::random_number_16_r)
 
 WRITE32_MEMBER(segas32_state::random_number_32_w)
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
+//  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 READ32_MEMBER(segas32_state::random_number_32_r)

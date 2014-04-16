@@ -586,7 +586,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(elwro800_state, write_centronics_ack))
 

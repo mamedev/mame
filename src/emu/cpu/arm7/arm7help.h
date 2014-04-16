@@ -6,7 +6,7 @@
 
 
 #if 0
-#define LOG(x) mame_printf_debug x
+#define LOG(x) osd_printf_debug x
 #else
 #define LOG(x) logerror x
 #endif

@@ -216,7 +216,7 @@
 #include "e132xs.h"
 
 #ifdef MAME_DEBUG
-#define DEBUG_PRINTF(x) do { mame_printf_debug x; } while (0)
+#define DEBUG_PRINTF(x) do { osd_printf_debug x; } while (0)
 #else
 #define DEBUG_PRINTF(x) do { } while (0)
 #endif

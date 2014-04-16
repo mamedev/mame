@@ -20,11 +20,7 @@
 #define __OSDCORE_H__
 
 #include "osdcomm.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+#include "delegate.h"
 
 /***************************************************************************
     FILE I/O INTERFACES
@@ -908,8 +904,38 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data);
 -----------------------------------------------------------------------------*/
 const char *osd_get_volume_name(int idx);
 
-#ifdef __cplusplus
-}
-#endif
+/* ----- output management ----- */
+
+// output channels
+enum output_channel
+{
+	OSD_OUTPUT_CHANNEL_ERROR,
+	OSD_OUTPUT_CHANNEL_WARNING,
+	OSD_OUTPUT_CHANNEL_INFO,
+	OSD_OUTPUT_CHANNEL_DEBUG,
+	OSD_OUTPUT_CHANNEL_VERBOSE,
+	OSD_OUTPUT_CHANNEL_LOG,
+	OSD_OUTPUT_CHANNEL_COUNT
+};
+
+// output channel callback
+typedef delegate<void (const char *, va_list)> output_delegate;
+
+/* set the output handler for a channel, returns the current one */
+output_delegate osd_set_output_channel(output_channel channel, output_delegate callback);
+
+/* calls to be used by the code */
+void CLIB_DECL osd_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
+void CLIB_DECL osd_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
+void CLIB_DECL osd_printf_info(const char *format, ...) ATTR_PRINTF(1,2);
+void CLIB_DECL osd_printf_verbose(const char *format, ...) ATTR_PRINTF(1,2);
+void CLIB_DECL osd_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
+
+/* discourage the use of printf directly */
+/* sadly, can't do this because of the ATTR_PRINTF under GCC */
+/*
+#undef printf
+#define printf !MUST_USE_osd_printf_*_CALLS_WITHIN_THE_CORE!
+*/
 
 #endif  /* __OSDEPEND_H__ */

@@ -59,7 +59,7 @@ CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_protection_r)
 	case 0x72b5: ret = 0xcb; break;
 
 	default:
-		mame_printf_debug("unhandled $2400 read @ %x\n", m_maincpu->pcbase());
+		osd_printf_debug("unhandled $2400 read @ %x\n", m_maincpu->pcbase());
 		break;
 	}
 

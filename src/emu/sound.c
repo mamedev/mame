@@ -22,7 +22,7 @@
 
 #define VERBOSE         (0)
 
-#define VPRINTF(x)      do { if (VERBOSE) mame_printf_debug x; } while (0)
+#define VPRINTF(x)      do { if (VERBOSE) osd_printf_debug x; } while (0)
 
 
 

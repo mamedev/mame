@@ -257,7 +257,7 @@ void alpha8201_cpu_device::M_UNDEFINED()
 {
 	logerror("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
 #if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
+	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
 	debugger_break(machine());
@@ -270,7 +270,7 @@ void alpha8201_cpu_device::M_UNDEFINED2()
 	UINT8 imm = M_RDMEM_OPCODE();
 	logerror("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
+	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
 	debugger_break(machine());
@@ -581,7 +581,7 @@ void alpha8201_cpu_device::execute_run()
 			{
 				/* EVEN , get PC low */
 				m_pc.b.l = M_RDMEM(pcptr);
-//mame_printf_debug("alpha8201 load PCL ENTRY=%02X PCL=%02X\n",pcptr, m_pc.b.l);
+//osd_printf_debug("alpha8201 load PCL ENTRY=%02X PCL=%02X\n",pcptr, m_pc.b.l);
 				m_icount -= C1;
 				M_WRMEM(0x001,pcptr+1);
 				continue;
@@ -608,7 +608,7 @@ void alpha8201_cpu_device::execute_run()
 
 #if SHOW_ENTRY_POINT
 logerror("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
-mame_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
+osd_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 #endif
 		}
 
@@ -617,7 +617,7 @@ mame_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 		debugger_instruction_hook(this, m_pc.w.l);
 		opcode =M_RDOP(m_pc.w.l);
 #if TRACE_PC
-mame_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);
+osd_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);
 #endif
 		m_pc.b.l++;
 		m_inst_cycles = m_opmap[opcode].cycles;
@@ -635,7 +635,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 	if(inputnum == INPUT_LINE_HALT)
 	{
 		m_halt = (state==ASSERT_LINE) ? 1 : 0;
-/* mame_printf_debug("alpha8201 HALT %d\n",m_halt); */
+/* osd_printf_debug("alpha8201 HALT %d\n",m_halt); */
 	}
 }
 

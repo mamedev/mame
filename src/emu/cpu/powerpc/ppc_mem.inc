@@ -222,18 +222,18 @@ static int ppc_translate_address(offs_t *addr_ptr, int flags)
 
 		if (DUMP_PAGEFAULTS)
 		{
-			mame_printf_debug("PAGE FAULT: address=%08X PC=%08X SDR1=%08X MSR=%08X\n", address, ppc.pc, ppc.sdr1, ppc.msr);
-			mame_printf_debug("\n");
+			osd_printf_debug("PAGE FAULT: address=%08X PC=%08X SDR1=%08X MSR=%08X\n", address, ppc.pc, ppc.sdr1, ppc.msr);
+			osd_printf_debug("\n");
 
 			for (i = 0; i < 4; i++)
 			{
 				bl = bat[i].u & 0x00001FFC;
 				mask = (~bl << 15) & 0xFFFE0000;
-				mame_printf_debug("    BAT[%d]=%08X%08X    (A & %08X = %08X)\n", i, bat[i].u, bat[i].l,
+				osd_printf_debug("    BAT[%d]=%08X%08X    (A & %08X = %08X)\n", i, bat[i].u, bat[i].l,
 					mask, bat[i].u & 0xFFFE0000);
 			}
-			mame_printf_debug("\n");
-			mame_printf_debug("    VSID=%06X HASH=%05X HASH\'=%05X\n", vsid, hash, hash ^ 0x7FFFF);
+			osd_printf_debug("\n");
+			osd_printf_debug("    VSID=%06X HASH=%05X HASH\'=%05X\n", vsid, hash, hash ^ 0x7FFFF);
 
 			for (hash_type = 0; hash_type <= 1; hash_type++)
 			{
@@ -242,7 +242,7 @@ static int ppc_translate_address(offs_t *addr_ptr, int flags)
 					for (i = 0; i < 8; i++)
 					{
 						pte = pteg_ptr[hash_type][i];
-						mame_printf_debug("    PTE[%i%c]=%08X%08X\n",
+						osd_printf_debug("    PTE[%i%c]=%08X%08X\n",
 							i,
 							hash_type ? '\'' : ' ',
 							(unsigned) (pte >> 32),

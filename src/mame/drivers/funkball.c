@@ -195,7 +195,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 {
 	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
 
-	//mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
+	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
 		case 0:     return 0x00001078;
@@ -208,7 +208,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 {
 	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
 
-	//mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
+	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
 }
 
@@ -234,13 +234,13 @@ WRITE8_MEMBER( funkball_state::serial_w )
 
 UINT8 funkball_state::funkball_config_reg_r()
 {
-	//mame_printf_debug("funkball_config_reg_r %02X\n", funkball_config_reg_sel);
+	//osd_printf_debug("funkball_config_reg_r %02X\n", funkball_config_reg_sel);
 	return m_funkball_config_regs[m_funkball_config_reg_sel];
 }
 
 void funkball_state::funkball_config_reg_w(UINT8 data)
 {
-	//mame_printf_debug("funkball_config_reg_w %02X, %02X\n", funkball_config_reg_sel, data);
+	//osd_printf_debug("funkball_config_reg_w %02X, %02X\n", funkball_config_reg_sel, data);
 	m_funkball_config_regs[m_funkball_config_reg_sel] = data;
 }
 
@@ -341,7 +341,7 @@ READ32_MEMBER(funkball_state::biu_ctrl_r)
 
 WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 {
-	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
+	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
 	if (offset == 0x0c/4)       // BC_XMAP_3 register

@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

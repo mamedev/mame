@@ -159,7 +159,7 @@ TILEMAP_MAPPER_MEMBER(tryout_state::get_bg_memory_offset)
 //  else
 		a= (7 - (row & 7)) + ((0x8 - (row & 0x8)) << 4) + ((col & 0xf) << 3) + (( (  (col & 0x10) ) ) << 4) + ((( (col & 0x20))) << 4);
 
-//  mame_printf_debug("%d %d -> %d\n",col,row, a);
+//  osd_printf_debug("%d %d -> %d\n",col,row, a);
 	return a;
 }
 

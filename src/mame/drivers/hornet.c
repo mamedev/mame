@@ -555,7 +555,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			break;
 
 		case 2: /* Parallel data register */
-			mame_printf_debug("Parallel data = %02X\n", data);
+			osd_printf_debug("Parallel data = %02X\n", data);
 			break;
 
 		case 3: /* System Register 0 */
@@ -570,7 +570,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x01 = LAMP0
 			*/
 			m_eepromout->write(data, 0xff);
-			mame_printf_debug("System register 0 = %02X\n", data);
+			osd_printf_debug("System register 0 = %02X\n", data);
 			break;
 
 		case 4: /* System Register 1 */
@@ -590,7 +590,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			m_adc12138->sclk_w(space, 0, data & 0x1);
 
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			mame_printf_debug("System register 1 = %02X\n", data);
+			osd_printf_debug("System register 1 = %02X\n", data);
 			break;
 
 		case 5: /* Sound Control Register */
@@ -604,7 +604,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = DEEN0
 			    0x01 = ATCK0
 			*/
-			mame_printf_debug("Sound control register = %02X\n", data);
+			osd_printf_debug("Sound control register = %02X\n", data);
 			break;
 
 		case 6: /* WDT Register */
