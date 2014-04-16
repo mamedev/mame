@@ -182,7 +182,7 @@ public: // HACK FOR MC6845
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<i8271_device> m_i8271;
-	required_ioport m_joy0, m_joy1, m_joy2, m_joy3;
+	optional_ioport m_joy0, m_joy1, m_joy2, m_joy3;
 
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_user1;
