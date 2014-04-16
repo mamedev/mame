@@ -24,7 +24,7 @@
 	- vcop: lightgun input is offsetted;
 	- vcop: sound dies at enter initial screen (i.e. after played the game once);
 	- vcop: priority bug at stage select screen;
-	- vcop2: no 3d;
+	- vcop2: no textures;
 	- vf2: stalls after disclaimer screen;
 	- zeroguna: stalls after some seconds of gameplay;
 
@@ -5752,8 +5752,6 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 DRIVER_INIT_MEMBER(model2_state,overrev)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
-
-	//TODO: cache patch?
 }
 
 
