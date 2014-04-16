@@ -10,11 +10,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-// Windows 95/NT4 multimonitor stubs
-#ifdef WIN95_MULTIMON
-#include "multidef.h"
-#endif
-
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"

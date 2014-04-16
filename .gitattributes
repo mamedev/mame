@@ -9055,7 +9055,6 @@ src/osd/windows/main.c svneol=native#text/plain
 src/osd/windows/mame.ico -text svneol=unset#image/x-icon
 src/osd/windows/mame.man svneol=CRLF#text/plain eol=crlf
 src/osd/windows/mame.rc svneol=CRLF#text/plain eol=crlf
-src/osd/windows/multidef.h svneol=native#text/plain
 src/osd/windows/netdev.c svneol=native#text/plain
 src/osd/windows/netdev.h svneol=native#text/plain
 src/osd/windows/netdev_pcap.c svneol=native#text/plain
