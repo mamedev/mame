@@ -68,7 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER( mb89352_w );
 
 	void set_phase(int phase);
-	int get_phase(void);
 
 protected:
 	// device-level overrides (none are required, but these are common)

@@ -638,7 +638,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						m_fdc.floppy[drive]->mon_w(false);
+						m_fdc.floppy[drive]->mon_w(true);
 						m_fdc.floppy[drive]->unload();
 					}
 				}
@@ -1048,8 +1048,6 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	m_current_vector[2] = 0x02;  // bus error
-	m_current_irq_line = 2;
 	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
@@ -1059,8 +1057,6 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	m_current_vector[2] = 0x02;  // bus error
-	m_current_irq_line = 2;
 	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
@@ -1069,8 +1065,6 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	m_current_vector[2] = 0x02;  // bus error
-	m_current_irq_line = 2;
 	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
@@ -1080,8 +1074,6 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	m_current_vector[2] = 0x02;  // bus error
-	m_current_irq_line = 2;
 	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1), 1, mem_mask);
 }
@@ -1089,8 +1081,6 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 READ16_MEMBER(x68k_state::x68k_exp_r)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	m_current_vector[2] = 0x02;  // bus error
-	m_current_irq_line = 2;
 	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
 	return 0xff;
@@ -1099,8 +1089,6 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 WRITE16_MEMBER(x68k_state::x68k_exp_w)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	m_current_vector[2] = 0x02;  // bus error
-	m_current_irq_line = 2;
 	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }

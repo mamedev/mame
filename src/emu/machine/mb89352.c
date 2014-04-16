@@ -242,11 +242,6 @@ void mb89352_device::set_phase(int phase)
 	logerror("MB89352: phase set to %i\n",m_phase);
 }
 
-int mb89352_device::get_phase(void)
-{
-	return m_phase;
-}
-
 READ8_MEMBER( mb89352_device::mb89352_r )
 {
 	UINT8 ret;
