@@ -201,7 +201,7 @@ void ui_emu_menubar::build_file_menu()
 	pause_menu.set_checked(machine().paused());
 
 	// single step
-	file_menu.append("Single Step", &ui_manager::do_single_step, machine().ui(), IPT_UI_PAUSE);
+	file_menu.append("Single Step", &ui_manager::do_single_step, machine().ui(), IPT_UI_SINGLE_STEP);
 
 	// reset
 	menu_item &reset_menu = file_menu.append("Reset");
