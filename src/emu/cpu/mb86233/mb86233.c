@@ -1001,6 +1001,11 @@ void mb86233_cpu_device::execute_run()
 
 				switch( op )
 				{
+					case 0x04: // ?
+						GETA().u = GETARAM()[r1];
+						GETB().u = GETEXTERNAL( GETEB(),r2);
+					break;
+
 					case 0x0C:
 						GETA().u = GETARAM()[r1];
 						GETB().u = GETBRAM()[r2];
