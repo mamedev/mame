@@ -355,7 +355,15 @@ void mb86233_cpu_device::ALU( UINT32 alu)
 		break;
 
 		case 0x0F:  /* D = int(D) */
-			GETD().i = (INT32)GETD().f;
+	    	switch((m_fpucontrol>>1)&3)
+			{
+				//case 0: GETD().i = floor(GETD().f+0.5f); break;
+				//case 1: GETD().i = ceil(GETD().f); break;
+				case 2: GETD().i = floor(GETD().f); break; // Manx TT
+				case 3: GETD().i = (INT32)GETD().f; break;
+				default: popmessage("TGP uses D = int(D) with FPU control = %02x, contact MAMEdev",m_fpucontrol>>1); break;
+			}
+
 			FLAGSI( GETD().u);
 		break;
 
@@ -1181,12 +1189,50 @@ void mb86233_cpu_device::execute_run()
 					}
 					break;
 
+					case 0x17: /* External r2-> RAMInd r3 */
+					{
+						UINT32  offset;
+
+						offset = INDIRECT(r1,1);
+
+						val = GETEXTERNAL( GETEB(), offset);
+						ALU(alu);
+						GETARAM()[INDIRECT(r2|(6<<6),0)] = val;
+					}
+					break;
+
+					case 0x0d: /* Move RAM->BRAM indirect? */
+					{
+						val = GETARAM()[r1];
+						ALU( alu);
+						GETBRAM()[INDIRECT(r2|(2<<6),0)] = val;
+					}
+					break;
+
 					default:
-						logerror( "TGP: Unknown TGP move (op=%d) at PC:%x\n", op, GETPC());
+						logerror( "TGP: Unknown TGP move (op=%02x) at PC:%x\n", op, GETPC());
 					break;
 				}
 			}
 			break;
+
+			case 0x0d: /* CONTROL? */
+			{
+				UINT32  sub = (opcode>>16) & 0xff;
+
+				switch(sub)
+				{
+					case 0x0a: // FPU Round Control opcode
+						m_fpucontrol = opcode & 0xff;
+						logerror( "TGP: FPU Round CONTROL sets %02x at PC:%x\n", m_fpucontrol, GETPC());
+						break;
+					default:
+						logerror( "TGP: Unknown CONTROL sub-type %02x at PC:%x\n", sub, GETPC());
+						break;
+				}
+
+				break;
+			}
 
 			case 0x0e:  /* LDIMM24 */
 			{
@@ -1563,7 +1609,7 @@ void mb86233_cpu_device::execute_run()
 			break;
 
 			default:
-				logerror( "TGP: unknown opcode %08x at PC:%04x\n", opcode, GETPC() );
+				logerror( "TGP: unknown opcode %08x at PC:%04x (%02x)\n", opcode, GETPC(),(opcode >> 26) & 0x3f );
 			break;
 		}
 

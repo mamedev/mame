@@ -572,6 +572,29 @@ void adsp21062_device::compute_fadd(int rn, int rx, int ry)
 	m_astat |= AF;
 }
 
+void adsp21062_device::compute_favg(int rn, int rx, int ry)
+{
+	SHARC_REG r;
+	r.f = (FREG(rx) + FREG(ry)) / (float) 2.0f;
+
+	CLEAR_ALU_FLAGS();
+	// AN
+	m_astat |= (r.f < 0.0f) ? AN : 0;
+	// AZ
+	m_astat |= (IS_FLOAT_DENORMAL(r.r) || IS_FLOAT_ZERO(r.r)) ? AZ : 0;
+	// AUS
+	m_stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
+	// AI
+	m_astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
+	/* TODO: AV flag */
+
+	// AIS
+	if (m_astat & AI)   m_stky |= AIS;
+
+	FREG(rn) = r.f;
+	m_astat |= AF;
+}
+
 /* Fn = Fx - Fy */
 void adsp21062_device::compute_fsub(int rn, int rx, int ry)
 {

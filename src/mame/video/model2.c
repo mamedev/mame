@@ -2621,7 +2621,7 @@ static UINT32 * geo_code_jump( geo_state *geo, UINT32 opcode, UINT32 *input )
 
 static UINT32 * geo_process_command( geo_state *geo, UINT32 opcode, UINT32 *input )
 {
-	switch( opcode >> 23 )
+	switch( (opcode >> 23) & 0x1f )
 	{
 		case 0x00: input = geo_nop( geo, opcode, input );               break;
 		case 0x01: input = geo_object_data( geo, opcode, input );       break;
@@ -2717,7 +2717,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 
 UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	logerror("--- frame ---\n");
+	//logerror("--- frame ---\n");
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);

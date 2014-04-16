@@ -14,7 +14,8 @@
 	- dynamcop: stalls at stage select screen;
 	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
 	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
-	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89);
+	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
+	- lastbrnx: eventually crashes in attract mode, geo_parse_nn_s() is the culprit apparently;
 	- manxtt: missing 3d;
 	- motoraid: stalls after course select;
 	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
@@ -23,7 +24,7 @@
 	- vcop: lightgun input is offsetted;
 	- vcop: sound dies at enter initial screen (i.e. after played the game once);
 	- vcop: priority bug at stage select screen;
-	- vcop2: no 3d;
+	- vcop2: no textures;
 	- vf2: stalls after disclaimer screen;
 	- zeroguna: stalls after some seconds of gameplay;
 
@@ -543,6 +544,34 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 	return iptval;
 }
 
+/*	PORT_DIPSETTING(    0x00, "0" ) // 0: neutral
+	PORT_DIPSETTING(    0x10, "1" ) // 2nd gear
+	PORT_DIPSETTING(    0x20, "2" ) // 1st gear
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x50, "5" ) // 4th gear
+	PORT_DIPSETTING(    0x60, "6" ) // 3rd gear
+	PORT_DIPSETTING(    0x70, "7" )*/
+
+/* Used specifically by Sega Rally, others might be different */
+CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
+{
+	UINT8 res = ioport("GEARS")->read_safe(0);
+	int i;
+	const UINT8 gearvalue[5] = { 0, 2, 1, 6, 5 };
+
+	for(i=0;i<5;i++)
+	{
+		if(res & 1<<i)
+		{
+			m_gearsel = i;
+			return gearvalue[i];
+		}
+	}
+
+	return gearvalue[m_gearsel];
+}
+
 /*
     Rail Chase 2 "Drive I/O BD" documentation
 
@@ -756,15 +785,18 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnx" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnxu" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnxj" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0))
 	{
 		machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
 	}
 	else
 	{
+		if(offset == 0x10/4)
+		{
+			machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
+			return;
+		}
+
 		if ((m_iop_write_num & 1) == 0)
 		{
 			m_iop_data = data & 0xffff;
@@ -887,6 +919,7 @@ void model2_state::push_geo_data(UINT32 data)
 
 READ32_MEMBER(model2_state::geo_prg_r)
 {
+	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
 	return 0xffffffff;
 }
 
@@ -970,6 +1003,15 @@ WRITE32_MEMBER(model2_state::geo_w)
 				UINT32 r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
+				if((address >> 4) & 0xc0)
+				{
+					UINT8 function = (address >> 4) & 0x3f;
+					if(function == 1)
+					{
+						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
+						//popmessage("Eye mode %02x? Contact MAMEdev",function);
+					}
+				}
 				push_geo_data(r);
 			}
 		}
@@ -1920,8 +1962,8 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c00000_r, NULL)
 
 	PORT_START("1c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN3")
 
 	PORT_START("1c0000c")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1931,7 +1973,7 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
 
 	PORT_START("1c00014")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN4")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("1c0001c")
@@ -1944,18 +1986,33 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // VR
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(1) PORT_NAME("VR") // VR
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x0090, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x0070, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,srallyc_gearbox_r, NULL)
+	PORT_BIT(0x008f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("GEARS") // fake to handle gear bits
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("GEAR N")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("GEAR 1")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("GEAR 2")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("GEAR 3")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("GEAR 4")
+
+	PORT_START("IN3")
+	//PORT_BIT(0x00ff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Handle (Drive)")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 
 	PORT_START("ANA0")  // steer
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -5695,8 +5752,6 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 DRIVER_INIT_MEMBER(model2_state,overrev)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
-
-	//TODO: cache patch?
 }
 
 
