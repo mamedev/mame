@@ -657,7 +657,13 @@ void adsp21062_device::device_reset()
 		}
 
 		case BOOT_MODE_HOST:
+		{
+			m_dma[6].int_index      = 0x20000;
+			m_dma[6].int_modifier   = 1;
+			m_dma[6].int_count      = 0x100;
+			m_dma[6].control        = 0xa1;
 			break;
+		}
 
 		default:
 			fatalerror("SHARC: Unimplemented boot mode %d\n", m_boot_mode);
