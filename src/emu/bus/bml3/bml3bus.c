@@ -100,30 +100,6 @@ void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
 	bml3bus.m_cputag = tag;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void bml3bus_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const bml3bus_interface *intf = reinterpret_cast<const bml3bus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<bml3bus_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_firq_cb, 0, sizeof(m_out_firq_cb));
-	}
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -133,12 +109,18 @@ void bml3bus_device::device_config_complete()
 //-------------------------------------------------
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, BML3BUS, "Hitachi MB-6890 Bus", tag, owner, clock, "bml3bus", __FILE__)
+		device_t(mconfig, BML3BUS, "Hitachi MB-6890 Bus", tag, owner, clock, "bml3bus", __FILE__),
+		m_out_nmi_cb(*this),
+		m_out_irq_cb(*this),
+		m_out_firq_cb(*this)
 {
 }
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_out_nmi_cb(*this),
+		m_out_irq_cb(*this),
+		m_out_firq_cb(*this)
 {
 }
 //-------------------------------------------------
@@ -150,9 +132,9 @@ void bml3bus_device::device_start()
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 
 	// resolve callbacks
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_firq_func.resolve(m_out_firq_cb, *this);
+	m_out_nmi_cb.resolve_safe();
+	m_out_irq_cb.resolve_safe();
+	m_out_firq_cb.resolve_safe();
 
 	// clear slots
 	for (int i = 0; i < BML3BUS_MAX_SLOTS; i++)
@@ -186,23 +168,23 @@ void bml3bus_device::add_bml3bus_card(int slot, device_bml3bus_card_interface *c
 
 void bml3bus_device::set_nmi_line(int state)
 {
-	m_out_nmi_func(state);
+	m_out_nmi_cb(state);
 }
 
 void bml3bus_device::set_irq_line(int state)
 {
-	m_out_irq_func(state);
+	m_out_irq_cb(state);
 }
 
 void bml3bus_device::set_firq_line(int state)
 {
-	m_out_firq_func(state);
+	m_out_firq_cb(state);
 }
 
 // interrupt request from bml3bus card
-WRITE_LINE_MEMBER( bml3bus_device::nmi_w ) { m_out_nmi_func(state); }
-WRITE_LINE_MEMBER( bml3bus_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( bml3bus_device::firq_w ) { m_out_firq_func(state); }
+WRITE_LINE_MEMBER( bml3bus_device::nmi_w ) { m_out_nmi_cb(state); }
+WRITE_LINE_MEMBER( bml3bus_device::irq_w ) { m_out_irq_cb(state); }
+WRITE_LINE_MEMBER( bml3bus_device::firq_w ) { m_out_firq_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG BML3BUS CARD INTERFACE

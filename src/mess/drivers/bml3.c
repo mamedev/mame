@@ -98,9 +98,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
 	DECLARE_WRITE8_MEMBER(relay_w);
-	DECLARE_WRITE8_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE8_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE8_MEMBER(bml3bus_firq_w);
+	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
@@ -370,19 +370,19 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	return res;
 }
 
-WRITE8_MEMBER(bml3_state::bml3bus_nmi_w)
+WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, data);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE8_MEMBER(bml3_state::bml3bus_irq_w)
+WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
 {
-	m_maincpu->set_input_line(M6809_IRQ_LINE, data);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE8_MEMBER(bml3_state::bml3bus_firq_w)
+WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
 {
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, data);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
 
 
@@ -973,14 +973,6 @@ static const ay8910_interface ay8910_config =
 };
 #endif
 
-static const struct bml3bus_interface bml3bus_intf =
-{
-	// interrupt lines
-	DEVCB_DRIVER_MEMBER(bml3_state,bml3bus_nmi_w),
-	DEVCB_DRIVER_MEMBER(bml3_state,bml3bus_irq_w),
-	DEVCB_DRIVER_MEMBER(bml3_state,bml3bus_firq_w),
-};
-
 static SLOT_INTERFACE_START(bml3_cards)
 	SLOT_INTERFACE("bml3mp1802", BML3BUS_MP1802)  /* MP-1802 Floppy Controller Card */
 	SLOT_INTERFACE("bml3mp1805", BML3BUS_MP1805)  /* MP-1805 Floppy Controller Card */
@@ -1036,7 +1028,11 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* slot devices */
-	MCFG_BML3BUS_BUS_ADD("bml3bus", "maincpu", bml3bus_intf)
+	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0) 
+	MCFG_BML3BUS_CPU("maincpu")
+	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(bml3_state, bml3bus_nmi_w))
+	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(bml3_state, bml3bus_irq_w))
+	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(bml3_state, bml3bus_firq_w))
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
