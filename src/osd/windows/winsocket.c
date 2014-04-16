@@ -203,6 +203,5 @@ file_error win_write_socket(osd_file *file, const void *buffer, UINT64 offset, U
 file_error win_close_socket(osd_file *file)
 {
 	closesocket(file->socket);
-	free(file);
 	return FILERR_NONE;
 }

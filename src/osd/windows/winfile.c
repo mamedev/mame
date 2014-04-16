@@ -281,20 +281,23 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 
 file_error osd_close(osd_file *file)
 {
+	file_error result = FILERR_NONE;
+
 	switch (file->type)
 	{
 		case WINFILE_FILE:
-			// close the file handle and free the file structure
 			CloseHandle(file->handle);
-			osd_free(file);
 			break;
 		case WINFILE_SOCKET:
-			return win_close_socket(file);
+			result = win_close_socket(file);
 			break;
 		case WINFILE_PTTY:
-			return win_close_ptty(file);
+			result = win_close_ptty(file);
+			break;
 	}
-	return FILERR_NONE;
+
+	osd_free(file);
+	return result;
 }
 
 
