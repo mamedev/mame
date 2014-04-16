@@ -77,30 +77,6 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 #define LOG     0
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct kb_keytr_state
-{
-	device_t *cpu;
-
-	devcb_resolved_write_line out_clock_func;
-	devcb_resolved_write_line out_data_func;
-
-	/* state of i/o signals */
-	int clock_signal;
-	int data_signal;
-
-	/* internal state */
-	UINT8 p1;
-	UINT8 p1_data;
-	UINT8 p2;
-	UINT8 p3;
-	UINT16 last_write_addr;
-};
-
-
 /*****************************************************************************
     INPUT PORTS
 *****************************************************************************/
