@@ -14,6 +14,8 @@ Base class for HLE'd SCSI devices.
 #include "scsi.h"
 #include "machine/t10spc.h"
 
+INPUT_PORTS_EXTERN( scsihle );
+
 class scsihle_device : public device_t,
 	public scsi_port_interface,
 	public virtual t10spc

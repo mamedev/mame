@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "pc_lpt.h"
 #include "bus/centronics/covox.h"
-#include "bus/centronics/image.h"
+#include "bus/centronics/printer.h"
 
 
 const device_type PC_LPT = &device_creator<pc_lpt_device>;
@@ -47,13 +47,13 @@ void pc_lpt_device::device_reset()
 }
 
 static SLOT_INTERFACE_START(pc_centronics)
-	SLOT_INTERFACE("image", CENTRONICS_PRINTER_IMAGE)
+	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
 	SLOT_INTERFACE("covox", CENTRONICS_COVOX)
 	SLOT_INTERFACE("covox_stereo", CENTRONICS_COVOX_STEREO)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( pc_lpt )
-	MCFG_CENTRONICS_ADD("centronics", pc_centronics, "image")
+	MCFG_CENTRONICS_ADD("centronics", pc_centronics, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
 	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))

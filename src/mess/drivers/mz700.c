@@ -404,7 +404,7 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 
 	MCFG_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

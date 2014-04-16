@@ -44,7 +44,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 	printf("atapi_xfer_end atapi_xferlen = %d\n", atapi_xferlen );
 
-	//mame_printf_debug("ATAPI: xfer_end.  xferlen = %d\n", atapi_xferlen);
+	//osd_printf_debug("ATAPI: xfer_end.  xferlen = %d\n", atapi_xferlen);
 
 	m_ata->write_dmack(1);
 
@@ -134,7 +134,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 {
 	g1bus_regs[offset] = data; // 5f7400+reg*4=dat
-//  mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
+//  osd_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (offset)
 	{
 	case SB_GDST:

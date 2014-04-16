@@ -249,7 +249,7 @@ static int config_load_xml(running_machine &machine, emu_file &file, int which_t
 
 		/* log that we are processing this entry */
 		if (DEBUG_CONFIG)
-			mame_printf_debug("Entry: %s -- processing\n", name);
+			osd_printf_debug("Entry: %s -- processing\n", name);
 
 		/* loop over all registrants and call their load function */
 		for (type = typelist; type; type = type->next)

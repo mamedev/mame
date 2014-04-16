@@ -689,7 +689,7 @@ void segas24_state::reset_reset()
 		if(resetcontrol & 2) {
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-//          mame_printf_debug("enable 2nd cpu!\n");
+//          osd_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
 
 		} else

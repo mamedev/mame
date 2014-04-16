@@ -166,11 +166,11 @@ void gstriker_state::MB60553_reg_written(int numchip, int num_reg)
 		break;
 
 	case 2:
-		mame_printf_debug("MB60553_reg chip %d, reg 2 %04x\n",numchip, cur->regs[2]);
+		osd_printf_debug("MB60553_reg chip %d, reg 2 %04x\n",numchip, cur->regs[2]);
 		break;
 
 	case 3:
-		mame_printf_debug("MB60553_reg chip %d, reg 3 %04x\n",numchip, cur->regs[3]);
+		osd_printf_debug("MB60553_reg chip %d, reg 3 %04x\n",numchip, cur->regs[3]);
 		break;
 
 	case 4:

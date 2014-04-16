@@ -18,7 +18,7 @@ void bishi_tile_callback( running_machine &machine, int layer, int *code, int *c
 //  *code -= '0';
 //  *color = state->m_layer_colorbase[layer] | (*color>>2 & 0x0f);
 //  K055555GX_decode_vmixcolor(layer, color);
-//  if (*color) mame_printf_debug("plane %x col %x [55 %x %x]\n", layer, *color, layer_colorbase[layer], K055555_get_palette_index(layer));
+//  if (*color) osd_printf_debug("plane %x col %x [55 %x %x]\n", layer, *color, layer_colorbase[layer], K055555_get_palette_index(layer));
 
 	*color = state->m_layer_colorbase[layer] + ((*color & 0xf0));
 }

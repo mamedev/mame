@@ -170,6 +170,7 @@ public:
 	void increase_frameskip();
 	void decrease_frameskip();
 	void request_quit();
+	void do_single_step();
 
 	// UI handlers
 	static UINT32 ui_handler_load_save(running_machine &machine, render_container *container, UINT32 state);

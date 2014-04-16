@@ -105,9 +105,11 @@ public:
 	UINT32 m_soundack;
 	void model2_check_irq_state();
 	void model2_check_irqack_state(UINT32 data);
+	UINT8 m_gearsel;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);

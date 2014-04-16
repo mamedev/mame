@@ -190,7 +190,7 @@ void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
 			m_io->write_byte(MC68HC11_IO_PORTA, value);
 			return;
 		case 0x01:      /* DDRA */
-			//mame_printf_debug("HC11: ddra = %02X\n", value);
+			//osd_printf_debug("HC11: ddra = %02X\n", value);
 			return;
 		case 0x03:      /* PORTC */
 			m_io->write_byte(MC68HC11_IO_PORTC, value);
@@ -202,7 +202,7 @@ void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
 			m_io->write_byte(MC68HC11_IO_PORTD, value); //mask & 0x3f?
 			return;
 		case 0x09:      /* DDRD */
-			//mame_printf_debug("HC11: ddrd = %02X\n", value);
+			//osd_printf_debug("HC11: ddrd = %02X\n", value);
 			return;
 		case 0x0a:      /* PORTE */
 			m_io->write_byte(MC68HC11_IO_PORTE, value);
@@ -271,13 +271,13 @@ void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
 			m_io->write_byte(MC68HC11_IO_PORTH, value);
 			return;
 		case 0x7d:      /* DDRH */
-			//mame_printf_debug("HC11: ddrh = %02X at %04X\n", value, m_pc);
+			//osd_printf_debug("HC11: ddrh = %02X at %04X\n", value, m_pc);
 			return;
 		case 0x7e:      /* PORTG */
 			m_io->write_byte(MC68HC11_IO_PORTG, value);
 			return;
 		case 0x7f:      /* DDRG */
-			//mame_printf_debug("HC11: ddrg = %02X at %04X\n", value, m_pc);
+			//osd_printf_debug("HC11: ddrg = %02X at %04X\n", value, m_pc);
 			return;
 
 		case 0x88:      /* SPCR2 */

@@ -2862,14 +2862,14 @@ READ16_MEMBER(seta_state::pairlove_prot_r)
 	int retdata;
 
 	retdata = m_pairslove_protram[offset];
-	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",space.device().safe_pc(), offset,retdata);
+	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",space.device().safe_pc(), offset,retdata);
 	m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
 	return retdata;
 }
 
 WRITE16_MEMBER(seta_state::pairlove_prot_w)
 {
-	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",space.device().safe_pc(), offset,data);
+	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",space.device().safe_pc(), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
 	m_pairslove_protram[offset] = data;
 }

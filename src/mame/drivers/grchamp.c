@@ -176,7 +176,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			/* bit 5: n/c */
 			/* bit 6: G-Z */
 			if (diff)
-				mame_printf_debug("OUT10=%02X\n", data);
+				osd_printf_debug("OUT10=%02X\n", data);
 			break;
 
 		case 0x0d:  /* OUT13 */

@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
 
@@ -913,7 +913,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
 

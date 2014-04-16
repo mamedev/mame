@@ -315,6 +315,7 @@ private:
 	inline void compute_scalb(int rn, int rx, int ry);
 	inline void compute_fadd(int rn, int rx, int ry);
 	inline void compute_fsub(int rn, int rx, int ry);
+	inline void compute_favg(int rn, int rx, int ry);
 	inline void compute_fneg(int rn, int rx);
 	inline void compute_fcomp(int rx, int ry);
 	inline void compute_fabs_plus(int rn, int rx, int ry);

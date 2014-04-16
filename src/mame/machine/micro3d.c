@@ -192,7 +192,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_scc_w)
 {
 #if DRMATH_MONITOR_DISPLAY
 	if (offset == 1)
-		mame_printf_debug("%c", data);
+		osd_printf_debug("%c", data);
 #endif
 }
 

@@ -107,7 +107,7 @@ static MACHINE_CONFIG_START( altair, altair_state )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_cts))

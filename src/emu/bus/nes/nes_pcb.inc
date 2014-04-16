@@ -506,7 +506,7 @@ void nes_cart_slot_device::call_load_pcb()
 		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc2-pin3")),
 						nes_cart_get_line(get_feature("vrc2-pin4")),
 						(nes_cart_get_line(get_feature("vrc2-pin21")) != 10) ? 1 : 0);
-//      mame_printf_error("VRC-2, pin3: A%d, pin4: A%d, pin21: %d\n", nes_cart_get_line(get_feature("vrc2-pin3")), nes_cart_get_line(get_feature("vrc2-pin4")),
+//      osd_printf_error("VRC-2, pin3: A%d, pin4: A%d, pin21: %d\n", nes_cart_get_line(get_feature("vrc2-pin3")), nes_cart_get_line(get_feature("vrc2-pin4")),
 //                              nes_cart_get_line(get_feature("vrc2-pin21")));
 	}
 
@@ -515,7 +515,7 @@ void nes_cart_slot_device::call_load_pcb()
 		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc4-pin3")),
 						nes_cart_get_line(get_feature("vrc4-pin4")),
 						0);
-//      mame_printf_error("VRC-4, pin3: A%d, pin4: A%d\n", nes_cart_get_line(get_feature("vrc4-pin3"), nes_cart_get_line(get_feature("vrc4-pin4"));
+//      osd_printf_error("VRC-4, pin3: A%d, pin4: A%d\n", nes_cart_get_line(get_feature("vrc4-pin3"), nes_cart_get_line(get_feature("vrc4-pin4"));
 	}
 
 	if (m_pcb_id == KONAMI_VRC6)
@@ -523,7 +523,7 @@ void nes_cart_slot_device::call_load_pcb()
 		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc6-pin9")),
 						nes_cart_get_line(get_feature("vrc6-pin10")),
 						0);
-//      mame_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
+//      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
 	}
 
 	if (m_pcb_id == STD_HKROM || m_pcb_id == TAITO_X1_017)

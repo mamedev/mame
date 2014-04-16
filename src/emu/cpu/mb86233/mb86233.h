@@ -103,6 +103,7 @@ private:
 	UINT32          m_shift;
 	UINT32          m_repcnt;
 	UINT16          m_sr;
+	UINT8 			m_fpucontrol;
 
 	UINT32          m_gpr[16];
 	UINT32          m_extport[0x30];

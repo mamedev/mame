@@ -1214,7 +1214,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			break;
 
 		case NREG_UARTTHR:      /* serial port output */
-			if (PRINTF_SERIAL) mame_printf_debug("%c", data & 0xff);
+			if (PRINTF_SERIAL) osd_printf_debug("%c", data & 0xff);
 			logit = 0;
 			break;
 		case NREG_UARTIER:      /* serial interrupt enable */

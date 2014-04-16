@@ -644,7 +644,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, ca1_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bw12_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(bw12_state, write_centronics_fault))

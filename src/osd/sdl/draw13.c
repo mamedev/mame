@@ -321,7 +321,7 @@ INLINE SDL_BlendMode map_blendmode(int blendmode)
 		case BLENDMODE_ADD:
 			return SDL_BLENDMODE_ADD;
 		default:
-			mame_printf_warning("Unknown Blendmode %d", blendmode);
+			osd_printf_warning("Unknown Blendmode %d", blendmode);
 	}
 	return SDL_BLENDMODE_NONE;
 }
@@ -422,7 +422,7 @@ static int RendererSupportsFormat(Uint32 format, Uint32 access, const char *sfor
 		if (format == render_info.texture_formats[i])
 			return 1;
 	}
-	mame_printf_verbose("Pixelformat <%s> not supported\n", sformat);
+	osd_printf_verbose("Pixelformat <%s> not supported\n", sformat);
 	return 0;
 }
 #else
@@ -447,8 +447,8 @@ static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 
 		SDL_DestroyTexture(texid);
 		return 1;
 	}
-	mame_printf_verbose("Pixelformat <%s> error %s \n", sformat, SDL_GetError());
-	mame_printf_verbose("Pixelformat <%s> not supported\n", sformat);
+	osd_printf_verbose("Pixelformat <%s> error %s \n", sformat, SDL_GetError());
+	osd_printf_verbose("Pixelformat <%s> not supported\n", sformat);
 	fmt_support[i].status = 0;
 	return 0;
 }
@@ -494,7 +494,7 @@ int draw13_init(running_machine &machine, sdl_draw_info *callbacks)
 	callbacks->exit = draw13_exit;
 	callbacks->attach = draw13_attach;
 
-	mame_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
+	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
 	expand_copy_info(blit_info_default);
 	//FIXME: -opengl16 should be -opengl -prefer16bpp
@@ -509,9 +509,9 @@ int draw13_init(running_machine &machine, sdl_draw_info *callbacks)
 
 	// No fatalerror here since not all video drivers support GL !
 	if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==NULL
-		mame_printf_verbose("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
+		osd_printf_verbose("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 	else
-		mame_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
+		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 
 	return 0;
 }
@@ -529,7 +529,7 @@ static void draw13_exit(void)
 		for (bi = blit_info[i]; bi != NULL; )
 		{
 			if (bi->pixel_count)
-				mame_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
+				osd_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
 						bi->rotate ? "rot" : "norot", bi->bm_mask, bi->samples,
 						(int) bi->perf);
 			freeme = bi;
@@ -564,7 +564,7 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 	// allocate memory for our structures
 	sdl_info *sdl = (sdl_info *) osd_malloc(sizeof(*sdl));
 
-	mame_printf_verbose("Enter draw13_window_create\n");
+	osd_printf_verbose("Enter draw13_window_create\n");
 
 	memset(sdl, 0, sizeof(*sdl));
 
@@ -602,7 +602,7 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 				mode.format = SDL_PIXELFORMAT_RGB888;
 				break;
 			default:
-				mame_printf_warning("Ignoring depth %d\n", window->depth);
+				osd_printf_warning("Ignoring depth %d\n", window->depth);
 			}
 		}
 		SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
@@ -638,7 +638,7 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 	sdl->texture_max_height = 64;
 
 	SDL_RenderPresent(sdl->sdl_renderer);
-	mame_printf_verbose("Leave draw13_window_create\n");
+	osd_printf_verbose("Leave draw13_window_create\n");
 	return 0;
 }
 
@@ -929,7 +929,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			break;
 
 		default:
-			mame_printf_error("Unknown textureformat %d\n", PRIMFLAG_GET_TEXFORMAT(flags));
+			osd_printf_error("Unknown textureformat %d\n", PRIMFLAG_GET_TEXFORMAT(flags));
 	}
 
 	texture->rawwidth = texsource->width;
@@ -945,7 +945,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 
 	// Watch out for 0x0 textures ...
 	if (!texture->setup.rotwidth || !texture->setup.rotheight)
-		mame_printf_warning("Trying to create texture with zero dim\n");
+		osd_printf_warning("Trying to create texture with zero dim\n");
 
 	// compute the size
 	texture->copyinfo = texture_compute_size_type(sdl->sdl_renderer, texsource, texture, flags);
@@ -954,7 +954,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			texture->setup.rotwidth, texture->setup.rotheight);
 
 	if (!texture->texture_id)
-		mame_printf_error("Error creating texture: %d x %d, pixelformat %s error: %s\n", texture->setup.rotwidth, texture->setup.rotheight,
+		osd_printf_error("Error creating texture: %d x %d, pixelformat %s error: %s\n", texture->setup.rotwidth, texture->setup.rotheight,
 				texture->copyinfo->dstname, SDL_GetError());
 
 	if ( (texture->copyinfo->func != NULL) && (texture->sdl_access == SDL_TEXTUREACCESS_STATIC))

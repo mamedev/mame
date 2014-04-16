@@ -921,10 +921,6 @@ DRIVER_INIT_MEMBER(stv_state,nameclv3)
 	DRIVER_INIT_CALL(stv);
 }
 
-
-static const sh2_cpu_core sh2_conf_master = { 0, NULL };
-static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
-
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
@@ -965,24 +961,18 @@ static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, stv_state )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-static SCUDSP_INTERFACE( scudsp_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(saturn_state, scudsp_end_w),
-	DEVCB_DRIVER_MEMBER16(saturn_state,scudsp_dma_r),
-	DEVCB_DRIVER_MEMBER16(saturn_state,scudsp_dma_w)
-};
 
 static MACHINE_CONFIG_START( stv, stv_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
-	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_SH2_IS_SLAVE(0)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", stv_state, saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
-	MCFG_CPU_CONFIG(sh2_conf_slave)
+	MCFG_SH2_IS_SLAVE(1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", stv_state, saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
@@ -991,7 +981,9 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
 	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
 	MCFG_CPU_DATA_MAP(scudsp_data)
-	MCFG_CPU_CONFIG(scudsp_config)
+	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(saturn_state, scudsp_end_w))
+	MCFG_SCUDSP_IN_DMA_CB(READ16(saturn_state, scudsp_dma_r))
+	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(saturn_state, scudsp_dma_w))
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
@@ -1052,7 +1044,7 @@ READ16_MEMBER( stv_state::adsp_control_r )
 			res = soundlatch_word_r(space,0);
 			break;
 		default:
-			mame_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
+			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
 	}
 	return res;
 }
@@ -1130,10 +1122,10 @@ WRITE16_MEMBER( stv_state::adsp_control_w )
 			break;
 		}
 		case 5:
-			mame_printf_debug("PFLAGS: %x\n", data);
+			osd_printf_debug("PFLAGS: %x\n", data);
 			break;
 		default:
-			mame_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
+			osd_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
 	}
 }
 

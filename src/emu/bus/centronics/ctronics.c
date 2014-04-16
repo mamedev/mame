@@ -116,8 +116,8 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 }
 
 
-#include "image.h"
+#include "printer.h"
 
 SLOT_INTERFACE_START(centronics_printers)
-	SLOT_INTERFACE("image", CENTRONICS_PRINTER_IMAGE)
+	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
 SLOT_INTERFACE_END

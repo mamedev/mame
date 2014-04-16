@@ -522,7 +522,7 @@ ReadWriteC148( address_space &space, offs_t offset, UINT16 data, int bWrite )
 	case 0x1d0000: /* ? NAMCOS2_C148_0 */
 		if( bWrite )
 		{
-			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+			// osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 			/* Dubious to assert IRQ for other CPU here, but Starblade seems to rely on it.
 			   It fails to show large polygons otherwise. */
 			altcpu->execute().set_input_line(pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
@@ -534,7 +534,7 @@ ReadWriteC148( address_space &space, offs_t offset, UINT16 data, int bWrite )
 	case 0x1d4000: /* ? NAMCOS2_C148_2 */
 		if( bWrite )
 		{
-			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+			// osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 			/* Dubious to assert IRQ for other CPU here: Rolling Thunder 2 and Fine Hour break. */
 			// altcpu->execute().set_input_line(pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
 		}
@@ -543,22 +543,22 @@ ReadWriteC148( address_space &space, offs_t offset, UINT16 data, int bWrite )
 
 	/* IRQ ack */
 	case 0x1d6000: /* NAMCOS2_C148_CPUIRQ */
-		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_CPUIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1d8000: /* NAMCOS2_C148_EXIRQ */
-		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_EXIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1da000: /* NAMCOS2_C148_POSIRQ */
-		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_POSIRQ], CLEAR_LINE);
 		break;
 
 	case 0x1dc000: /* NAMCOS2_C148_SERIRQ */
-		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_SERIRQ], CLEAR_LINE);
 		break;
 

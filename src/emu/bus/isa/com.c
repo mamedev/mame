@@ -50,7 +50,7 @@ static const ins8250_interface genpc_com_interface[2]=
 static SLOT_INTERFACE_START(isa_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
 	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
-	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
+	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 SLOT_INTERFACE_END
 

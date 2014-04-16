@@ -743,7 +743,7 @@ void uml::instruction::simplify()
 	        astring disasm1, disasm2;
 	        orig.disasm(disasm1, block->drcuml);
 	        inst->disasm(disasm2, block->drcuml);
-	        mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
+	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
 	    }
 	*/
 

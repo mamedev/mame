@@ -230,7 +230,7 @@ WRITE8_MEMBER( sega_315_5195_mapper_device::write )
 	// wraps every 32 bytes
 	offset &= 0x1f;
 
-if (LOG_MEMORY_MAP) mame_printf_debug("(Write %02X = %02X)\n", offset, data);
+if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 
 	// remember the previous value and swap in the new one
 	UINT8 oldval = m_regs[offset];
@@ -361,9 +361,9 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 	compute_region(info, m_curregion, length, mirror, offset);
 	if (LOG_MEMORY_MAP)
 	{
-		mame_printf_debug("Map %06X-%06X (%06X) as ROM+%06X(%s)", info.start, info.end, info.mirror, rgnoffset, bank_name);
-		if (!whandler.isnull()) mame_printf_debug(" with handler=%s", whandler.name());
-		mame_printf_debug("\n");
+		osd_printf_debug("Map %06X-%06X (%06X) as ROM+%06X(%s)", info.start, info.end, info.mirror, rgnoffset, bank_name);
+		if (!whandler.isnull()) osd_printf_debug(" with handler=%s", whandler.name());
+		osd_printf_debug("\n");
 	}
 
 	// don't map if the start is past the end of the ROM region
@@ -411,9 +411,9 @@ void sega_315_5195_mapper_device::map_as_ram(UINT32 offset, UINT32 length, offs_
 	compute_region(info, m_curregion, length, mirror, offset);
 	if (LOG_MEMORY_MAP)
 	{
-		mame_printf_debug("Map %06X-%06X (%06X) as RAM(%s)", info.start, info.end, info.mirror, bank_share_name);
-		if (!whandler.isnull()) mame_printf_debug(" with handler=%s", whandler.name());
-		mame_printf_debug("\n");
+		osd_printf_debug("Map %06X-%06X (%06X) as RAM(%s)", info.start, info.end, info.mirror, bank_share_name);
+		if (!whandler.isnull()) osd_printf_debug(" with handler=%s", whandler.name());
+		osd_printf_debug("\n");
 	}
 
 	// map now
@@ -446,10 +446,10 @@ void sega_315_5195_mapper_device::map_as_handler(UINT32 offset, UINT32 length, o
 	compute_region(info, m_curregion, length, mirror, offset);
 	if (LOG_MEMORY_MAP)
 	{
-		mame_printf_debug("Map %06X-%06X (%06X) as handler", info.start, info.end, info.mirror);
-		if (!rhandler.isnull()) mame_printf_debug(" read=%s", rhandler.name());
-		if (!whandler.isnull()) mame_printf_debug(" write=%s", whandler.name());
-		mame_printf_debug("\n");
+		osd_printf_debug("Map %06X-%06X (%06X) as handler", info.start, info.end, info.mirror);
+		if (!rhandler.isnull()) osd_printf_debug(" read=%s", rhandler.name());
+		if (!whandler.isnull()) osd_printf_debug(" write=%s", whandler.name());
+		osd_printf_debug("\n");
 	}
 
 	// install read/write handlers
@@ -571,7 +571,7 @@ void sega_315_5195_mapper_device::compute_region(region_info &info, UINT8 index,
 
 void sega_315_5195_mapper_device::update_mapping()
 {
-	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
+	if (LOG_MEMORY_MAP) osd_printf_debug("----\nRemapping:\n");
 
 	// first reset everything back to the beginning
 	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(FUNC(sega_315_5195_mapper_device::read), this), write8_delegate(FUNC(sega_315_5195_mapper_device::write), this), 0x00ff);

@@ -218,7 +218,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 				break;
 
 			default:
-				mame_printf_debug("unhandled val mode %i\n", t->channel[chn].valMode);
+				osd_printf_debug("unhandled val mode %i\n", t->channel[chn].valMode);
 			}
 
 			switch (t->channel[chn].cntMode)
@@ -238,7 +238,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 				break;
 
 			default:
-				mame_printf_debug("unhandled cnt mode %i\n", t->channel[chn].cntMode);
+				osd_printf_debug("unhandled cnt mode %i\n", t->channel[chn].cntMode);
 			}
 		}
 		break;
@@ -258,7 +258,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 			t->channel[chn].cnval = (t->channel[chn].cnval >> 8) | (val << 8);
 			break;
 		default:
-			mame_printf_debug("unhandled val mode %i\n", t->channel[chn].valMode);
+			osd_printf_debug("unhandled val mode %i\n", t->channel[chn].valMode);
 		}
 
 		if (t->channel[chn].cntMode==0)
@@ -282,7 +282,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 				break;
 
 			default:
-				mame_printf_debug("unhandled val mode %i\n", t->channel[chn].valMode);
+				osd_printf_debug("unhandled val mode %i\n", t->channel[chn].valMode);
 			}
 
 			switch (t->channel[chn].cntMode)
@@ -299,7 +299,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 				break;
 
 			default:
-				mame_printf_debug("unhandled cnt mode %i\n", t->channel[chn].cntMode);
+				osd_printf_debug("unhandled cnt mode %i\n", t->channel[chn].cntMode);
 			}
 		}
 	}

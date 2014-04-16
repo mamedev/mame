@@ -775,7 +775,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(IC_I063, z80pio_device, strobe_a))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(einstein_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(einstein_state, write_centronics_perror))

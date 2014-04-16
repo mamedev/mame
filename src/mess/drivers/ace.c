@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 	MCFG_I8255A_ADD(I8255_TAG, ppi_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_6_5MHz/2, pio_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

@@ -60,7 +60,7 @@ const char * emulator_info::get_usage() { return USAGE;}
 const char * emulator_info::get_xml_root() { return XML_ROOT;}
 const char * emulator_info::get_xml_top() { return XML_TOP;}
 const char * emulator_info::get_state_magic_num() { return STATE_MAGIC_NUM;}
-void emulator_info::printf_usage(const char *par1, const char *par2) { mame_printf_info(USAGE, par1, par2); }
+void emulator_info::printf_usage(const char *par1, const char *par2) { osd_printf_info(USAGE, par1, par2); }
 
 /*************************************
  *

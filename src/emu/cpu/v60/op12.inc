@@ -1800,7 +1800,7 @@ UINT32 v60_device::opSHAB()
 		SetSZPF_Byte(appb);
 	}
 
-//  mame_printf_debug("SHAB: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appb, _CY, _Z, _OV, _S);
+//  osd_printf_debug("SHAB: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appb, _CY, _Z, _OV, _S);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -1854,7 +1854,7 @@ UINT32 v60_device::opSHAH()
 		SetSZPF_Word(apph);
 	}
 
-//  mame_printf_debug("SHAH: %x >> %d = %x _CY: %d _Z: %d _OV: %d _S: %d\n", oldval, count, apph, _CY, _Z, _OV, _S);
+//  osd_printf_debug("SHAH: %x >> %d = %x _CY: %d _Z: %d _OV: %d _S: %d\n", oldval, count, apph, _CY, _Z, _OV, _S);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -1908,7 +1908,7 @@ UINT32 v60_device::opSHAW()
 		SetSZPF_Long(appw);
 	}
 
-//  mame_printf_debug("SHAW: %x >> %d = %x _CY: %d _Z: %d _OV: %d _S: %d\n", oldval, count, appw, _CY, _Z, _OV, _S);
+//  osd_printf_debug("SHAW: %x >> %d = %x _CY: %d _Z: %d _OV: %d _S: %d\n", oldval, count, appw, _CY, _Z, _OV, _S);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -1968,7 +1968,7 @@ UINT32 v60_device::opSHLB() /* TRUSTED */
 		}
 	}
 
-//  mame_printf_debug("SHLB: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appb, _CY, _Z, _OV, _S);
+//  osd_printf_debug("SHLB: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appb, _CY, _Z, _OV, _S);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -1985,7 +1985,7 @@ UINT32 v60_device::opSHLH() /* TRUSTED */
 	F12LOADOP2HALF();
 
 	count = (INT8)(m_op1 & 0xFF);
-//  mame_printf_debug("apph: %x count: %d  ", apph, count);
+//  osd_printf_debug("apph: %x count: %d  ", apph, count);
 	if (count > 0)
 	{
 		// left shift flags:
@@ -2028,7 +2028,7 @@ UINT32 v60_device::opSHLH() /* TRUSTED */
 		}
 	}
 
-//  mame_printf_debug("SHLH: %x _CY: %d _Z: %d _OV: %d _S: %d\n", apph, _CY, _Z, _OV, _S);
+//  osd_printf_debug("SHLH: %x _CY: %d _Z: %d _OV: %d _S: %d\n", apph, _CY, _Z, _OV, _S);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -2087,7 +2087,7 @@ UINT32 v60_device::opSHLW() /* TRUSTED */
 		}
 	}
 
-//  mame_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
+//  osd_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
 
 	F12STOREOP2WORD();
 	F12END();

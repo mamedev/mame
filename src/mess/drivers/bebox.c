@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "cdrom", SCSICD, SCSI_ID_3)
 
-	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
+	MCFG_DEVICE_ADD("lsi53c810", LSI53C810, 0)
 	MCFG_LSI53C810_IRQ_CB(bebox_state, scsi_irq_callback)
 	MCFG_LSI53C810_DMA_CB(bebox_state, scsi_dma_callback)
 	MCFG_LSI53C810_FETCH_CB(bebox_state, scsi_fetch)

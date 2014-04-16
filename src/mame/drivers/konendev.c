@@ -84,7 +84,7 @@ WRITE32_MEMBER(konendev_state::gcu_w)
 	switch (reg)
 	{
 		default:
-			mame_printf_debug("[%x] %.4x\n", reg, data);
+			osd_printf_debug("[%x] %.4x\n", reg, data);
 	}
 }
 

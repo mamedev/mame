@@ -44,14 +44,14 @@ WRITE8_MEMBER(blockade_state::blockade_sound_freq_w)
 
 WRITE8_MEMBER(blockade_state::blockade_env_on_w)
 {
-	if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
+	if (BLOCKADE_LOG) osd_printf_debug("Boom Start\n");
 	m_samples->start(0,0);
 	return;
 }
 
 WRITE8_MEMBER(blockade_state::blockade_env_off_w)
 {
-	if (BLOCKADE_LOG) mame_printf_debug("Boom End\n");
+	if (BLOCKADE_LOG) osd_printf_debug("Boom End\n");
 	return;
 }
 

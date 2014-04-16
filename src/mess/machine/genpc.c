@@ -412,22 +412,6 @@ I8255A_INTERFACE( pc_ppi8255_interface )
 	DEVCB_NULL
 };
 
-static const isa8bus_interface isabus_intf =
-{
-	// interrupts
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
-
-	// dma request
-	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq1_w),
-	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq2_w),
-	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq3_w)
-};
-
 static const pc_kbdc_interface pc_kbdc_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_clock_w),
@@ -482,7 +466,17 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 
 	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_ISA8_BUS_ADD("isa", ":maincpu", isabus_intf)
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
 
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 

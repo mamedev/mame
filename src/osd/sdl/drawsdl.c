@@ -197,9 +197,9 @@ int drawsdl_init(sdl_draw_info *callbacks)
 	callbacks->attach = drawsdl_attach;
 
 	if (SDLMAME_SDL2)
-		mame_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
+		osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
 	else
-		mame_printf_verbose("Using SDL single-window soft driver (SDL 1.2)\n");
+		osd_printf_verbose("Using SDL single-window soft driver (SDL 1.2)\n");
 
 	return 0;
 }
@@ -323,7 +323,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 		global_free_array(sdl->yuv_bitmap);
 	}
 
-	mame_printf_verbose("SDL: Creating %d x %d YUV-Overlay ...\n", minimum_width, minimum_height);
+	osd_printf_verbose("SDL: Creating %d x %d YUV-Overlay ...\n", minimum_width, minimum_height);
 
 	sdl->yuv_bitmap = global_alloc_array(UINT16, minimum_width*minimum_height);
 
@@ -331,7 +331,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 			sdl_sm->pixel_format, sdl->sdlsurf);
 
 	if ( sdl->yuvsurf == NULL ) {
-		mame_printf_error("SDL: Couldn't create SDL_yuv_overlay: %s\n", SDL_GetError());
+		osd_printf_error("SDL: Couldn't create SDL_yuv_overlay: %s\n", SDL_GetError());
 		//return 1;
 	}
 
@@ -340,9 +340,9 @@ static void yuv_overlay_init(sdl_window_info *window)
 
 	if (!shown_video_info)
 	{
-		mame_printf_verbose("YUV Mode         : %s\n", sdl_sm->name);
-		mame_printf_verbose("YUV Overlay Size : %d x %d\n", minimum_width, minimum_height);
-		mame_printf_verbose("YUV Acceleration : %s\n", sdl->yuvsurf->hw_overlay ? "Hardware" : "Software");
+		osd_printf_verbose("YUV Mode         : %s\n", sdl_sm->name);
+		osd_printf_verbose("YUV Overlay Size : %d x %d\n", minimum_width, minimum_height);
+		osd_printf_verbose("YUV Acceleration : %s\n", sdl->yuvsurf->hw_overlay ? "Hardware" : "Software");
 		shown_video_info = 1;
 	}
 }
@@ -374,10 +374,10 @@ static void drawsdl_show_info(sdl_window_info *window, struct SDL_RendererInfo *
 		};
 	int i;
 
-	mame_printf_verbose("window: using renderer %s\n", render_info->name ? render_info->name : "<unknown>");
+	osd_printf_verbose("window: using renderer %s\n", render_info->name ? render_info->name : "<unknown>");
 	for (i = 0; rflist[i].name != NULL; i++)
 		if (render_info->flags & rflist[i].flag)
-			mame_printf_verbose("renderer: flag %s\n", rflist[i].name);
+			osd_printf_verbose("renderer: flag %s\n", rflist[i].name);
 }
 #endif
 
@@ -460,7 +460,7 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 
 			if (!found)
 			{
-				mame_printf_verbose("window: Scale mode %s not supported!\n", sm->name);
+				osd_printf_verbose("window: Scale mode %s not supported!\n", sm->name);
 				window->machine().ui().popup_time(3, "Scale mode %s not supported!", sm->name);
 			}
 		}
@@ -823,7 +823,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				break;
 
 			default:
-				mame_printf_error("SDL: ERROR! Unknown video mode: R=%08X G=%08X B=%08X\n", rmask, gmask, bmask);
+				osd_printf_error("SDL: ERROR! Unknown video mode: R=%08X G=%08X B=%08X\n", rmask, gmask, bmask);
 				break;
 		}
 	}

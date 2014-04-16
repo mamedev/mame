@@ -25,7 +25,7 @@ const device_type T6A04 = &device_creator<t6a04_device>;
 void t6a04_device::device_validity_check(validity_checker &valid) const
 {
 	if (m_height == 0 || m_width == 0)
-		mame_printf_error("Configured with invalid parameter\n");
+		osd_printf_error("Configured with invalid parameter\n");
 }
 
 //**************************************************************************

@@ -1428,7 +1428,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(nc_state, write_nc100_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(nc_state, write_centronics_busy))
 

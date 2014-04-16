@@ -49,7 +49,6 @@ private:
 	void select_new_game();
 	void select_from_software_list(device_image_interface *image, software_list_device *swlist);
 	void tape_control(cassette_image_device *image);
-	void bitbanger_control(bitbanger_device *image);
 	void load(device_image_interface *image);
 	bool has_images();
 	void set_throttle_rate(float throttle_rate);

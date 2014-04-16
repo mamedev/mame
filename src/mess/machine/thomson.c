@@ -21,7 +21,7 @@
 #define VERBOSE_IO    0  /* serial & parallel I/O */
 #define VERBOSE_MIDI  0
 
-#define PRINT(x) mame_printf_info x
+#define PRINT(x) osd_printf_info x
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 #define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_FRAGMENT( to7_io_line )
 	MCFG_RS232_CTS_HANDLER(WRITELINE(to7_io_line_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(to7_io_line_device, write_dsr))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(to7_io_line_device, write_centronics_busy))
 

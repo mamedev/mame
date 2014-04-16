@@ -106,7 +106,7 @@ static void sound_exit(running_machine &machine)
 
 	// print out over/underflow stats
 	if (buffer_overflows || buffer_underflows)
-		mame_printf_verbose("Sound: buffer overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
+		osd_printf_verbose("Sound: buffer overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
 	LOG(("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows));
 }
@@ -242,7 +242,7 @@ static HRESULT dsound_init(running_machine &machine)
 	result = DirectSoundCreate(NULL, &dsound, NULL);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error creating DirectSound: %08x\n", (UINT32)result);
+		osd_printf_error("Error creating DirectSound: %08x\n", (UINT32)result);
 		goto error;
 	}
 
@@ -251,7 +251,7 @@ static HRESULT dsound_init(running_machine &machine)
 	result = IDirectSound_GetCaps(dsound, &dsound_caps);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error getting DirectSound capabilities: %08x\n", (UINT32)result);
+		osd_printf_error("Error getting DirectSound capabilities: %08x\n", (UINT32)result);
 		goto error;
 	}
 
@@ -259,7 +259,7 @@ static HRESULT dsound_init(running_machine &machine)
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->hwnd, DSSCL_PRIORITY);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);
+		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);
 		goto error;
 	}
 
@@ -288,7 +288,7 @@ static HRESULT dsound_init(running_machine &machine)
 	result = IDirectSoundBuffer_Play(stream_buffer, 0, 0, DSBPLAY_LOOPING);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error playing: %08x\n", (UINT32)result);
+		osd_printf_error("Error playing: %08x\n", (UINT32)result);
 		goto error;
 	}
 	return DS_OK;
@@ -334,7 +334,7 @@ static HRESULT dsound_create_buffers(void)
 	result = IDirectSound_CreateSoundBuffer(dsound, &primary_desc, &primary_buffer, NULL);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error creating primary DirectSound buffer: %08x\n", (UINT32)result);
+		osd_printf_error("Error creating primary DirectSound buffer: %08x\n", (UINT32)result);
 		goto error;
 	}
 
@@ -342,7 +342,7 @@ static HRESULT dsound_create_buffers(void)
 	result = IDirectSoundBuffer_SetFormat(primary_buffer, &stream_format);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error setting primary DirectSound buffer format: %08x\n", (UINT32)result);
+		osd_printf_error("Error setting primary DirectSound buffer format: %08x\n", (UINT32)result);
 		goto error;
 	}
 
@@ -350,10 +350,10 @@ static HRESULT dsound_create_buffers(void)
 	result = IDirectSoundBuffer_GetFormat(primary_buffer, &primary_format, sizeof(primary_format), NULL);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error getting primary DirectSound buffer format: %08x\n", (UINT32)result);
+		osd_printf_error("Error getting primary DirectSound buffer format: %08x\n", (UINT32)result);
 		goto error;
 	}
-	mame_printf_verbose("DirectSound: Primary buffer: %d Hz, %d bits, %d channels\n",
+	osd_printf_verbose("DirectSound: Primary buffer: %d Hz, %d bits, %d channels\n",
 				(int)primary_format.nSamplesPerSec, (int)primary_format.wBitsPerSample, (int)primary_format.nChannels);
 
 	// create a buffer desc for the stream buffer
@@ -367,7 +367,7 @@ static HRESULT dsound_create_buffers(void)
 	result = IDirectSound_CreateSoundBuffer(dsound, &stream_desc, &stream_buffer, NULL);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error creating DirectSound stream buffer: %08x\n", (UINT32)result);
+		osd_printf_error("Error creating DirectSound stream buffer: %08x\n", (UINT32)result);
 		goto error;
 	}
 
@@ -375,7 +375,7 @@ static HRESULT dsound_create_buffers(void)
 	result = IDirectSoundBuffer_Lock(stream_buffer, 0, stream_buffer_size, &buffer, &locked, NULL, NULL, 0);
 	if (result != DS_OK)
 	{
-		mame_printf_error("Error locking DirectSound stream buffer: %08x\n", (UINT32)result);
+		osd_printf_error("Error locking DirectSound stream buffer: %08x\n", (UINT32)result);
 		goto error;
 	}
 

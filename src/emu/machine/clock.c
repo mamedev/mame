@@ -24,7 +24,10 @@ void clock_device::device_clock_changed()
 
 attotime clock_device::period()
 {
-	return attotime::from_hz(m_clock * 2);
+	if (m_clock > 0)
+		return attotime::from_hz(m_clock * 2);
+
+	return attotime::never;
 }
 
 void clock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

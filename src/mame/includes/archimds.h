@@ -133,6 +133,8 @@ private:
 	bool m_cursor_enabled;
 	emu_timer *m_timer[4], *m_snd_timer, *m_vid_timer;
 	emu_timer *m_vbl_timer;
+	UINT8 m_floppy_select;
+	bool check_floppy_ready();
 };
 
 /* IOC registers */

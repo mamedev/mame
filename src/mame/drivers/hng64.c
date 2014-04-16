@@ -877,7 +877,7 @@ WRITE32_MEMBER(hng64_state::dl_w)
 #if 0
 READ32_MEMBER(hng64_state::dl_r)
 {
-	//mame_printf_debug("dl R (%08x) : %x %x\n", space.device().safe_pc(), offset, hng64_dl[offset]);
+	//osd_printf_debug("dl R (%08x) : %x %x\n", space.device().safe_pc(), offset, hng64_dl[offset]);
 	//usrintf_showmessage("dl R (%08x) : %x %x", space.device().safe_pc(), offset, hng64_dl[offset]);
 	return hng64_dl[offset];
 }
@@ -933,7 +933,7 @@ WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 WRITE32_MEMBER(hng64_state::activate_3d_buffer)
 {
 	COMBINE_DATA (&active_3d_buffer[offset]);
-	mame_printf_debug("COMBINED %d\n", active_3d_buffer[offset]);
+	osd_printf_debug("COMBINED %d\n", active_3d_buffer[offset]);
 }
 #endif
 

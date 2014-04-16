@@ -446,7 +446,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 static void midvplus_xf1_w(tms3203x_device &device, UINT8 val)
 {
 	midvunit_state *state = device.machine().driver_data<midvunit_state>();
-//  mame_printf_debug("xf1_w = %d\n", val);
+//  osd_printf_debug("xf1_w = %d\n", val);
 
 	if (state->m_lastval && !val)
 		memcpy(state->m_ram_base, state->m_fastram_base, 0x20000*4);

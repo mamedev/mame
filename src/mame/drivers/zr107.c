@@ -365,7 +365,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			break;
 
 		case 2: /* Parallel data register */
-			mame_printf_debug("Parallel data = %02X\n", data);
+			osd_printf_debug("Parallel data = %02X\n", data);
 			break;
 
 		case 3: /* System Register 0 */
@@ -381,7 +381,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			*/
 			m_eepromout->write(data & 0x07, 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			mame_printf_debug("System register 0 = %02X\n", data);
+			osd_printf_debug("System register 0 = %02X\n", data);
 			break;
 
 		case 4: /* System Register 1 */
@@ -401,7 +401,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			m_out4->write(data, 0xff);
-			mame_printf_debug("System register 1 = %02X\n", data);
+			osd_printf_debug("System register 1 = %02X\n", data);
 			break;
 
 		case 5: /* System Register 2 */

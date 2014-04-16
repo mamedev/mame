@@ -1496,7 +1496,7 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9_timer_port_out))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	/* internal ram */
@@ -1715,7 +1715,7 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_PIA_CB2_HANDLER(NULL)
 	MCFG_PIA_IRQA_HANDLER(NULL)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_MODIFY("mc6846")
@@ -1871,7 +1871,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_PIA_IRQA_HANDLER(NULL)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_MODIFY("mc6846")
@@ -2220,7 +2220,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_game_cb2_out))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2459,7 +2459,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 

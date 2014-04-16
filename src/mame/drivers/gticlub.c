@@ -397,7 +397,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 		}
 
 		default:
-			mame_printf_debug("sysreg_r %d\n", offset);
+			osd_printf_debug("sysreg_r %d\n", offset);
 			break;
 	}
 	return 0;

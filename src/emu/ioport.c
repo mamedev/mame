@@ -2474,7 +2474,7 @@ time_t ioport_manager::initialize()
 		astring errors;
 		m_portlist.append(*device, errors);
 		if (errors)
-			mame_printf_error("Input port errors:\n%s", errors.cstr());
+			osd_printf_error("Input port errors:\n%s", errors.cstr());
 	}
 
 	// do we have a keyboard?  if so, we may need to change default UI keys in response
@@ -2624,7 +2624,7 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 		return;
 	}
 	else if (strcmp(stemp, "keyboard") != 0)
-		mame_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 
 	// only scan the list if we haven't already enabled this class of control
 	if (first_port() != NULL && !machine().input().device_class(autoenable).enabled())
@@ -2634,7 +2634,7 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 				// if this port type is in use, apply the autoselect criteria
 				if ((type1 != 0 && field->type() == type1) || (type2 != 0 && field->type() == type2) || (type3 != 0 && field->type() == type3))
 				{
-					mame_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
+					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
 					machine().input().device_class(autoenable).enable();
 					break;
 				}
@@ -3469,16 +3469,16 @@ time_t ioport_manager::playback_init()
 		fatalerror("Input file format version mismatch\n");
 
 	// output info to console
-	mame_printf_info("Input file: %s\n", filename);
-	mame_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
+	osd_printf_info("Input file: %s\n", filename);
+	osd_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
 	time_t basetime = header[0x08] | (header[0x09] << 8) | (header[0x0a] << 16) | (header[0x0b] << 24) |
 						((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
-	mame_printf_info("Created %s\n", ctime(&basetime));
-	mame_printf_info("Recorded using %s\n", header + 0x20);
+	osd_printf_info("Created %s\n", ctime(&basetime));
+	osd_printf_info("Recorded using %s\n", header + 0x20);
 
 	// verify the header against the current game
 	if (memcmp(machine().system().name, header + 0x14, strlen(machine().system().name) + 1) != 0)
-		mame_printf_info("Input file is for %s '%s', not for current %s '%s'\n", emulator_info::get_gamenoun(), header + 0x14, emulator_info::get_gamenoun(), machine().system().name);
+		osd_printf_info("Input file is for %s '%s', not for current %s '%s'\n", emulator_info::get_gamenoun(), header + 0x14, emulator_info::get_gamenoun(), machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -3504,8 +3504,8 @@ void ioport_manager::playback_end(const char *message)
 
 		// display speed stats
 		m_playback_accumulated_speed /= m_playback_accumulated_frames;
-		mame_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
-		mame_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
+		osd_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
+		osd_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
 	}
 }
 
@@ -4521,7 +4521,7 @@ int validate_natural_keyboard_statics(void)
     {
         if (last_char >= charinfo[i].ch)
         {
-            mame_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
+            osd_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
             error = TRUE;
         }
         last_char = charinfo[i].ch;
@@ -4533,7 +4533,7 @@ int validate_natural_keyboard_statics(void)
         ci = char_info::find(charinfo[i].ch);
         if (ci != &charinfo[i])
         {
-            mame_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
+            osd_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
             error = TRUE;
         }
     }

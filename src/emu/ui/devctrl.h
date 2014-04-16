@@ -2,7 +2,7 @@
 
     ui/devctrl.h
 
-    Device specific control (base class for tapectrl and bbcontrl)
+    Device specific control (base class for tapectrl)
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.

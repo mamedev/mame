@@ -9,13 +9,14 @@
  *  Angelo Salese, August 2010
  *
  *  TODO:
+ *  - Make floppies to work;
+ *  - Attempting to load the GUI gives an exception;
+ *  - Graphics in GUI misses some vram data on the right edges (for example white vertical stripe on the far right), rmw bug related to the above?
+ *   - Apparently same deal happens to Arthur OS, on a bunch of icons;
+ *  - Hook up mouse in AAKART;
+ *  - Add shifted version of keyboard inputs, necessary especially for loading programs thru Supervisor Mode;
  *  - try to understand why bios 2 was working at some point and now isn't
- *  - fix RISC OS / Arthur booting, possible causes:
- *  \- missing reset page size hook-up
- *  \- some subtle memory paging fault
- *  \- missing RAM max size
- *  \- ARM bug?
- *  - 38776b8
+ *
  *
  *
 =======================================================================================
@@ -349,12 +350,6 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 }
 
-static AAKART_INTERFACE( kart_interface )
-{
-	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_tx_w),
-	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_rx_w)
-};
-
 static ARM_INTERFACE( a310_config )
 {
 	ARM_COPRO_TYPE_VL86C020
@@ -367,7 +362,9 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 	MCFG_CPU_CONFIG(a310_config)
 
-	MCFG_AAKART_ADD("kart", 8000000/256, kart_interface)
+	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
+	MCFG_AAKART_OUT_TX_CB(WRITELINE(archimedes_state, a310_kart_tx_w))
+	MCFG_AAKART_OUT_RX_CB(WRITELINE(archimedes_state, a310_kart_rx_w))
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x100)

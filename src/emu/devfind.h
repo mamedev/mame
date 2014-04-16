@@ -102,8 +102,8 @@ public:
 		this->m_target = dynamic_cast<_DeviceClass *>(device);
 		if (device != NULL && this->m_target == NULL)
 		{
-			void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
-			mame_printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
+			void osd_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
+			osd_printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
 		}
 		return this->report_missing(this->m_target != NULL, "device", _Required);
 	}

@@ -193,7 +193,7 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
 #endif
 		{
-			mame_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
+			osd_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
 			exit(-1);
 		}
 	}
@@ -208,7 +208,7 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 
 int sdlwindow_init(running_machine &machine)
 {
-	mame_printf_verbose("Enter sdlwindow_init\n");
+	osd_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
 	multithreading_enabled = downcast<sdl_options &>(machine.options()).multithreading();
 
@@ -257,7 +257,7 @@ int sdlwindow_init(running_machine &machine)
 
 	// set up the window list
 	last_window_ptr = &sdl_window_list;
-	mame_printf_verbose("Leave sdlwindow_init\n");
+	osd_printf_verbose("Leave sdlwindow_init\n");
 	return 0;
 }
 
@@ -273,7 +273,7 @@ static void sdlwindow_sync(void)
 		// Fallback
 		while (!osd_work_queue_wait(work_queue, osd_ticks_per_second()*10))
 		{
-			mame_printf_warning("sdlwindow_sync: Sleeping...\n");
+			osd_printf_warning("sdlwindow_sync: Sleeping...\n");
 			osd_sleep(100000);
 		}
 	}
@@ -300,7 +300,7 @@ static void sdlwindow_exit(running_machine &machine)
 {
 	ASSERT_MAIN_THREAD();
 
-	mame_printf_verbose("Enter sdlwindow_exit\n");
+	osd_printf_verbose("Enter sdlwindow_exit\n");
 
 	// free all the windows
 	while (sdl_window_list != NULL)
@@ -326,7 +326,7 @@ static void sdlwindow_exit(running_machine &machine)
 		osd_work_queue_wait(work_queue, 1000000);
 		osd_work_queue_free(work_queue);
 	}
-	mame_printf_verbose("Leave sdlwindow_exit\n");
+	osd_printf_verbose("Leave sdlwindow_exit\n");
 
 }
 
@@ -836,7 +836,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 
 	if (num == 0)
 	{
-		mame_printf_error("SDL: No modes available?!\n");
+		osd_printf_error("SDL: No modes available?!\n");
 		exit(-1);
 	}
 	else
@@ -865,7 +865,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 			if (window->refresh)
 				size_score *= 1.0f / (1.0f + fabsf(window->refresh - mode.refresh_rate) / 10.0f);
 
-			mame_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, size_score);
+			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, size_score);
 
 			// best so far?
 			if (size_score > best_score)
@@ -912,7 +912,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 
 	if (modes == (SDL_Rect **)0)
 	{
-		mame_printf_error("SDL: No modes available?!\n");
+		osd_printf_error("SDL: No modes available?!\n");
 		exit(-1);
 	}
 	else if (modes == (SDL_Rect **)-1)  // all modes are possible
@@ -939,7 +939,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 			if (modes[i]->w == window->maxwidth && modes[i]->h == window->maxheight)
 				size_score = 2.0f;
 
-			mame_printf_verbose("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
+			osd_printf_verbose("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
 
 			// best so far?
 			if (size_score > best_score)
@@ -1136,7 +1136,7 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 	if( (currentTime-lastTime)>1L*osd_ticks_per_second() && frames>frames_skip4fps )
 	{
 		dt = (double) (currentTime-startTime) / tps; // in decimale sec.
-		mame_printf_info("%6.2lfs, %4lu F, "
+		osd_printf_info("%6.2lfs, %4lu F, "
 				"avrg game: %5.2lf FPS %.2lf ms/f, "
 				"avrg video: %5.2lf FPS %.2lf ms/f, "
 				"last video: %5.2lf FPS %.2lf ms/f\n",

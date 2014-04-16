@@ -132,7 +132,7 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", mc68681_device, rx_a_w))
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )

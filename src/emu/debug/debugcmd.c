@@ -871,7 +871,7 @@ static void execute_tracelog(running_machine &machine, int ref, int params, cons
 
 static void execute_quit(running_machine &machine, int ref, int params, const char *param[])
 {
-	mame_printf_error("Exited via the debugger\n");
+	osd_printf_error("Exited via the debugger\n");
 	machine.schedule_exit();
 }
 

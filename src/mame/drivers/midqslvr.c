@@ -68,7 +68,7 @@ public:
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
-//  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
+//  osd_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
 	if((reg & 0xfc) == 0 && function == 0) // return vendor ID
 		return (0x71008086 >> (reg & 3)*8) & 0xff;

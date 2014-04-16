@@ -189,22 +189,6 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-static const isa8bus_interface p1_isabus_intf =
-{
-	// interrupts
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
-
-	// dma request
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 static const cassette_interface p1_cassette_interface =
 {
 	cassette_default_formats,
@@ -292,7 +276,13 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_I8255A_ADD( "ppi8255n1", p1_ppi8255_interface_1 )
 	MCFG_I8255A_ADD( "ppi8255n2", p1_ppi8255_interface_2 )
 
-	MCFG_ISA8_BUS_ADD("isa", ":maincpu", p1_isabus_intf)
+	MCFG_DEVICE_ADD("isa", ISA8, 0)
+	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", p1_isa8_cards, "fdc", false)
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", p1_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("isa", "isa3", p1_isa8_cards, NULL, false)

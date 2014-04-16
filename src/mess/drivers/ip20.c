@@ -270,14 +270,14 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		{
 			UINT32 next;
 
-			mame_printf_info("DMA activated for SCSI0\n");
-			mame_printf_info("Descriptor block:\n");
-			mame_printf_info("CTL: %08x BUFPTR: %08x DESCPTR %08x\n",
+			osd_printf_info("DMA activated for SCSI0\n");
+			osd_printf_info("Descriptor block:\n");
+			osd_printf_info("CTL: %08x BUFPTR: %08x DESCPTR %08x\n",
 				program_read_dword(m_HPC.nSCSI0Descriptor), program_read_dword(m_HPC.nSCSI0Descriptor+4),
 				program_read_dword(m_HPC.nSCSI0Descriptor+8));
 
 			next = program_read_dword(m_HPC.nSCSI0Descriptor+8);
-			mame_printf_info("CTL: %08x BUFPTR: %08x DESCPTR %08x\n",
+			osd_printf_info("CTL: %08x BUFPTR: %08x DESCPTR %08x\n",
 				program_read_dword(next), program_read_dword(next+4),
 				program_read_dword(next+8));
 		}
@@ -384,7 +384,7 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		if( ( data & 0x000000ff ) >= 0x00000020 )
 		{
 //          verboselog(2, "HPC DUART1 Channel B Control Write: %08x (%08x) %c\n", data, mem_mask, data & 0x000000ff );
-			//mame_printf_info( "%c", data & 0x000000ff );
+			//osd_printf_info( "%c", data & 0x000000ff );
 		}
 		else
 		{
@@ -395,7 +395,7 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		if( ( data & 0x000000ff ) >= 0x00000020 || ( data & 0x000000ff ) == 0x0d || ( data & 0x000000ff ) == 0x0a )
 		{
 			verboselog(2, "HPC DUART1 Channel B Data Write: %08x (%08x) %c\n", data, mem_mask, data & 0x000000ff );
-			mame_printf_info( "%c", data & 0x000000ff );
+			osd_printf_info( "%c", data & 0x000000ff );
 		}
 		else
 		{
@@ -403,37 +403,37 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		}
 		break;
 	case 0x0d18:
-		mame_printf_info("HPC DUART1 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
+		osd_printf_info("HPC DUART1 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d1c:
 		verboselog(2, "HPC DUART1 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d20:
-		mame_printf_info("HPC DUART2 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
+		osd_printf_info("HPC DUART2 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d24:
 		verboselog(2, "HPC DUART2 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d28:
-		mame_printf_info("HPC DUART2 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
+		osd_printf_info("HPC DUART2 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d2c:
 		verboselog(2, "HPC DUART2 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d30:
-		mame_printf_info("HPC DUART3 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
+		osd_printf_info("HPC DUART3 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d34:
 		verboselog(2, "HPC DUART3 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d38:
-		mame_printf_info("HPC DUART3 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
+		osd_printf_info("HPC DUART3 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	case 0x0d3c:
 		verboselog(2, "HPC DUART3 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
 		break;
 	default:
-		mame_printf_info("Unmapped HPC write: 0x%08x (%08x): %08x\n", 0x1fb80000 + offset, mem_mask, data);
+		osd_printf_info("Unmapped HPC write: 0x%08x (%08x): %08x\n", 0x1fb80000 + offset, mem_mask, data);
 		break;
 	}
 }
@@ -441,13 +441,13 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 // INT/INT2/INT3 interrupt controllers
 READ32_MEMBER(ip20_state::int_r)
 {
-	mame_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+	osd_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 	return 0;
 }
 
 WRITE32_MEMBER(ip20_state::int_w)
 {
-	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 }
 
 static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32, ip20_state )

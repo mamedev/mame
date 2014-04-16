@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, dcdb_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rib_w))

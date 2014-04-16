@@ -199,18 +199,6 @@ GFX check (these don't explicitly fails):
 #include "machine/mega32x.h"
 
 
-/* need to make fifo callback part of device */
-static UINT16 fifo_block_a[4];
-static UINT16 fifo_block_b[4];
-static UINT16* current_fifo_block;
-static UINT16* current_fifo_readblock;
-int current_fifo_write_pos;
-int current_fifo_read_pos;
-int fifo_block_a_full;
-int fifo_block_b_full;
-
-
-
 const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
 const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
 
@@ -362,7 +350,7 @@ READ16_MEMBER( sega_32x_device::_32x_68k_a15106_r )
 
 	retval = m_a15106_reg;
 
-	if (fifo_block_a_full && fifo_block_b_full) retval |= 0x8080;
+	if (m_fifo_block_a_full && m_fifo_block_b_full) retval |= 0x8080;
 
 	return retval;
 }
@@ -390,12 +378,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 		if((m_a15106_reg & 4) == 0) // clears the FIFO state
 		{
-			current_fifo_block = fifo_block_a;
-			current_fifo_readblock = fifo_block_b;
-			current_fifo_write_pos = 0;
-			current_fifo_read_pos = 0;
-			fifo_block_a_full = 0;
-			fifo_block_b_full = 0;
+			m_current_fifo_block = m_fifo_block_a;
+			m_current_fifo_readblock = m_fifo_block_b;
+			m_current_fifo_write_pos = 0;
+			m_current_fifo_read_pos = 0;
+			m_fifo_block_a_full = 0;
+			m_fifo_block_b_full = 0;
 		}
 
 		//printf("_32x_68k_a15106_w %04x\n", data);
@@ -440,44 +428,44 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 				return 0xffff;
 			}
 
-			UINT16 retdat = current_fifo_readblock[current_fifo_read_pos];
+			UINT16 retdat = m_current_fifo_readblock[m_current_fifo_read_pos];
 
-			current_fifo_read_pos++;
+			m_current_fifo_read_pos++;
 
 		//  printf("reading FIFO!\n");
 
-			if (current_fifo_readblock == fifo_block_a && !fifo_block_a_full)
+			if (m_current_fifo_readblock == m_fifo_block_a && !m_fifo_block_a_full)
 				printf("Fifo block a isn't filled!\n");
 
-			if (current_fifo_readblock == fifo_block_b && !fifo_block_b_full)
+			if (m_current_fifo_readblock == m_fifo_block_b && !m_fifo_block_b_full)
 				printf("%08x Fifo block b isn't filled!\n",space.device().safe_pc());
 
 
-			if (current_fifo_read_pos==4)
+			if (m_current_fifo_read_pos==4)
 			{
-				if (current_fifo_readblock == fifo_block_a)
+				if (m_current_fifo_readblock == m_fifo_block_a)
 				{
-					fifo_block_a_full = 0;
+					m_fifo_block_a_full = 0;
 
-					if (fifo_block_b_full)
+					if (m_fifo_block_b_full)
 					{
-						current_fifo_readblock = fifo_block_b;
-						current_fifo_block = fifo_block_a;
+						m_current_fifo_readblock = m_fifo_block_b;
+						m_current_fifo_block = m_fifo_block_a;
 					}
 
-					current_fifo_read_pos = 0;
+					m_current_fifo_read_pos = 0;
 				}
-				else if (current_fifo_readblock == fifo_block_b)
+				else if (m_current_fifo_readblock == m_fifo_block_b)
 				{
-					fifo_block_b_full = 0;
+					m_fifo_block_b_full = 0;
 
-					if (fifo_block_a_full)
+					if (m_fifo_block_a_full)
 					{
-						current_fifo_readblock = fifo_block_a;
-						current_fifo_block = fifo_block_b;
+						m_current_fifo_readblock = m_fifo_block_a;
+						m_current_fifo_block = m_fifo_block_b;
 					}
 
-					current_fifo_read_pos = 0;
+					m_current_fifo_read_pos = 0;
 				}
 			}
 
@@ -544,13 +532,13 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 				return;
 			}
 
-			if (current_fifo_block==fifo_block_a && fifo_block_a_full)
+			if (m_current_fifo_block==m_fifo_block_a && m_fifo_block_a_full)
 			{
 				printf("attempt to write to Full Fifo block a!\n");
 				return;
 			}
 
-			if (current_fifo_block==fifo_block_b && fifo_block_b_full)
+			if (m_current_fifo_block==m_fifo_block_b && m_fifo_block_b_full)
 			{
 				printf("attempt to write to Full Fifo block b!\n");
 				return;
@@ -562,40 +550,40 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 				return;
 			}
 
-			current_fifo_block[current_fifo_write_pos] = data;
-			current_fifo_write_pos++;
+			m_current_fifo_block[m_current_fifo_write_pos] = data;
+			m_current_fifo_write_pos++;
 
-			if (current_fifo_write_pos==4)
+			if (m_current_fifo_write_pos==4)
 			{
-				if (current_fifo_block==fifo_block_a)
+				if (m_current_fifo_block==m_fifo_block_a)
 				{
-					fifo_block_a_full = 1;
-					if (!fifo_block_b_full)
+					m_fifo_block_a_full = 1;
+					if (!m_fifo_block_b_full)
 					{
-						current_fifo_block = fifo_block_b;
-						current_fifo_readblock = fifo_block_a;
+						m_current_fifo_block = m_fifo_block_b;
+						m_current_fifo_readblock = m_fifo_block_a;
 						// incase we have a stalled DMA in progress, let the SH2 know there is data available
 						m_master_cpu->sh2_notify_dma_data_available();
 						m_slave_cpu->sh2_notify_dma_data_available();
 
 					}
-					current_fifo_write_pos = 0;
+					m_current_fifo_write_pos = 0;
 				}
 				else
 				{
-					fifo_block_b_full = 1;
+					m_fifo_block_b_full = 1;
 
-					if (!fifo_block_a_full)
+					if (!m_fifo_block_a_full)
 					{
-						current_fifo_block = fifo_block_a;
-						current_fifo_readblock = fifo_block_b;
+						m_current_fifo_block = m_fifo_block_a;
+						m_current_fifo_readblock = m_fifo_block_b;
 						// incase we have a stalled DMA in progress, let the SH2 know there is data available
 						m_master_cpu->sh2_notify_dma_data_available();
 						m_slave_cpu->sh2_notify_dma_data_available();
 
 					}
 
-					current_fifo_write_pos = 0;
+					m_current_fifo_write_pos = 0;
 				}
 			}
 
@@ -1598,15 +1586,14 @@ void sega_32x_device::_32x_interrupt_cb(int scanline, int irq6)
 }
 
 
-
-int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size)
+SH2_DMA_FIFO_DATA_AVAILABLE_CB(sega_32x_device::_32x_fifo_available_callback)
 {
 	if (src==0x4012)
 	{
-		if (current_fifo_readblock==fifo_block_a && fifo_block_a_full)
+		if (m_current_fifo_readblock==m_fifo_block_a && m_fifo_block_a_full)
 			return 1;
 
-		if (current_fifo_readblock==fifo_block_b && fifo_block_b_full)
+		if (m_current_fifo_readblock==m_fifo_block_b && m_fifo_block_b_full)
 			return 1;
 
 		return 0;
@@ -1745,9 +1732,6 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, UINT32 prio
 	}
 }
 
-static const sh2_cpu_core sh2_conf_master = { 0, NULL, _32x_fifo_available_callback };
-static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callback };
-
 #if 0
 // for now we just use the regular loading because we have 2 different BIOS roms, and you can't use -bios within a device for obvious reasons
 ROM_START( 32x )
@@ -1775,17 +1759,20 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_SH2_IS_SLAVE(0)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
 	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
-	MCFG_CPU_CONFIG(sh2_conf_slave)
+	MCFG_SH2_IS_SLAVE(1)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_SH2_IS_SLAVE(0)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
 	MCFG_DAC_ADD("lch_pwm")
@@ -1802,17 +1789,20 @@ static MACHINE_CONFIG_FRAGMENT( _32x_pal )
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_SH2_IS_SLAVE(0)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
 	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
-	MCFG_CPU_CONFIG(sh2_conf_slave)
+	MCFG_SH2_IS_SLAVE(1)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_SH2_IS_SLAVE(0)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
 	MCFG_DAC_ADD("lch_pwm")
@@ -1882,12 +1872,12 @@ void sega_32x_device::device_reset()
 	m_32x_displaymode = 0;
 	m_32x_240mode = 0;
 
-	current_fifo_block = fifo_block_a;
-	current_fifo_readblock = fifo_block_b;
-	current_fifo_write_pos = 0;
-	current_fifo_read_pos = 0;
-	fifo_block_a_full = 0;
-	fifo_block_b_full = 0;
+	m_current_fifo_block = m_fifo_block_a;
+	m_current_fifo_readblock = m_fifo_block_b;
+	m_current_fifo_write_pos = 0;
+	m_current_fifo_read_pos = 0;
+	m_fifo_block_a_full = 0;
+	m_fifo_block_b_full = 0;
 
 	m_32x_hcount_compare_val = -1;
 	m_32x_hcount_reg = 0;

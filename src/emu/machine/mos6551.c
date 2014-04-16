@@ -34,7 +34,9 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 	m_dsr(1),
 	m_dcd(1),
 	m_rxd(1),
-	m_tx_output(OUTPUT_MARK)
+	m_tx_state(STATE_START),
+	m_tx_output(OUTPUT_MARK),
+	m_tx_counter(0)
 {
 }
 
@@ -369,6 +371,9 @@ void mos6551_device::write_command(UINT8 data)
 
 READ8_MEMBER( mos6551_device::read )
 {
+	if (space.debugger_access())
+		return 0xff;
+
 	switch (offset & 0x03)
 	{
 	case 0:

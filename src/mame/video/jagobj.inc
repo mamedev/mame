@@ -804,7 +804,7 @@ UINT32 *jaguar_state::process_scaled_bitmap(UINT16 *scanline, UINT32 *objdata, i
 			logerror("Unhandled pitch = %d\n", pitch);
 		if (flags & 2)
 		{
-			mame_printf_debug("Unhandled blend mode in scaled bitmap case\n");
+			osd_printf_debug("Unhandled blend mode in scaled bitmap case\n");
 			logerror("Unhandled blend mode in scaled bitmap case\n");
 		}
 

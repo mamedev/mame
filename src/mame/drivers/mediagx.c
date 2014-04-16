@@ -468,12 +468,12 @@ READ32_MEMBER(mediagx_state::biu_ctrl_r)
 
 WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 {
-	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
+	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
 	if (offset == 3)        // BC_XMAP_3 register
 	{
-		//mame_printf_debug("BC_XMAP_3: %08X, %08X, %08X\n", data, offset, mem_mask);
+		//osd_printf_debug("BC_XMAP_3: %08X, %08X, %08X\n", data, offset, mem_mask);
 	}
 }
 
@@ -633,7 +633,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 {
 	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
 
-	//mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
+	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
 		case 0:     return 0x00001078;
@@ -646,7 +646,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 {
 	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
 
-	//mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
+	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
 }
 

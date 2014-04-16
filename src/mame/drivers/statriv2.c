@@ -1129,13 +1129,13 @@ READ8_MEMBER(statriv2_state::laserdisc_io_r)
 	UINT8 result = 0x00;
 	if (offset == 1)
 		result = 0x18;
-	mame_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
+	osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
 {
-	mame_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
+	osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 }
 
 DRIVER_INIT_MEMBER(statriv2_state,laserdisc)

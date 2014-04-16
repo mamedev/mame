@@ -56,7 +56,7 @@ void segas18_state::set_grayscale(bool enable)
 	{
 		m_screen->update_partial(m_screen->vpos());
 		m_grayscale_enable = enable;
-//      mame_printf_debug("Grayscale = %02X\n", enable);
+//      osd_printf_debug("Grayscale = %02X\n", enable);
 	}
 }
 
@@ -68,7 +68,7 @@ void segas18_state::set_vdp_enable(bool enable)
 		m_screen->update_partial(m_screen->vpos());
 		m_vdp_enable = enable;
 #if DEBUG_VDP
-		mame_printf_debug("VDP enable = %02X\n", enable);
+		osd_printf_debug("VDP enable = %02X\n", enable);
 #endif
 	}
 }
@@ -81,7 +81,7 @@ void segas18_state::set_vdp_mixing(UINT8 mixing)
 		m_screen->update_partial(m_screen->vpos());
 		m_vdp_mixing = mixing;
 #if DEBUG_VDP
-		mame_printf_debug("VDP mixing = %02X\n", mixing);
+		osd_printf_debug("VDP mixing = %02X\n", mixing);
 #endif
 	}
 }

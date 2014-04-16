@@ -1337,11 +1337,6 @@ WRITE_LINE_MEMBER( x68k_state::mfp_tbo_w )
 	m_mfpdev->clock_w(state);
 }
 
-static struct serial_keyboard_interface x68k_keyboard_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, write_rx)
-};
-
 static I8255A_INTERFACE( ppi_interface )
 {
 	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_a_r),
@@ -1581,14 +1576,6 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
 
 }
 
-static X68K_EXPANSION_INTERFACE(x68k_exp_intf)
-{
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,x68k_irq2_line),
-	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-	DEVCB_NULL  // RESET
-};
-
 static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX) // Neptune-X ethernet adapter (ISA NE2000 bridge)
 	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
@@ -1803,6 +1790,10 @@ static SLOT_INTERFACE_START( x68k_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START(keyboard)
+	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
@@ -1819,9 +1810,10 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(x68k_state, mfp_irq_callback))
 	MCFG_MC68901_OUT_TBO_CB(WRITELINE(x68k_state, mfp_tbo_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 
-	MCFG_X68K_KEYBOARD_ADD("keyboard", x68k_keyboard_interface)
+	MCFG_RS232_PORT_ADD("keyboard", keyboard, "x68k")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 
@@ -1881,7 +1873,11 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
 
-	MCFG_X68K_EXPANSION_SLOT_ADD("exp",x68k_exp_intf,x68000_exp_cards,NULL)
+	MCFG_DEVICE_ADD("exp", X68K_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, NULL, false)
+	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(x68k_state, x68k_irq2_line))
+	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(INPUTLINE("maincpu", M68K_IRQ_4))
+	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

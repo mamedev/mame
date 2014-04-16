@@ -57,7 +57,7 @@ inline int validity_checker::get_defstr_index(const char *string, bool suppress_
 	// check for strings that should be DEF_STR
 	int strindex = m_defstr_map.find(string);
 	if (!suppress_error && strindex != 0 && string != ioport_string_from_index(strindex))
-		mame_printf_error("Must use DEF_STR( %s )\n", string);
+		osd_printf_error("Must use DEF_STR( %s )\n", string);
 	return strindex;
 }
 
@@ -71,7 +71,7 @@ void validity_checker::validate_tag(const char *tag)
 {
 	// some common names that are now deprecated
 	if (strcmp(tag, "main") == 0 || strcmp(tag, "audio") == 0 || strcmp(tag, "sound") == 0 || strcmp(tag, "left") == 0 || strcmp(tag, "right") == 0)
-		mame_printf_error("Invalid generic tag '%s' used\n", tag);
+		osd_printf_error("Invalid generic tag '%s' used\n", tag);
 
 	// scan for invalid characters
 	static const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
@@ -80,17 +80,17 @@ void validity_checker::validate_tag(const char *tag)
 		// only lower-case permitted
 		if (*p != tolower((UINT8)*p))
 		{
-			mame_printf_error("Tag '%s' contains upper-case characters\n", tag);
+			osd_printf_error("Tag '%s' contains upper-case characters\n", tag);
 			break;
 		}
 		if (*p == ' ')
 		{
-			mame_printf_error("Tag '%s' contains spaces\n", tag);
+			osd_printf_error("Tag '%s' contains spaces\n", tag);
 			break;
 		}
 		if (strchr(validchars, *p) == NULL)
 		{
-			mame_printf_error("Tag '%s' contains invalid character '%c'\n",  tag, *p);
+			osd_printf_error("Tag '%s' contains invalid character '%c'\n",  tag, *p);
 			break;
 		}
 	}
@@ -104,13 +104,13 @@ void validity_checker::validate_tag(const char *tag)
 
 	// 0-length = bad
 	if (*begin == 0)
-		mame_printf_error("Found 0-length tag\n");
+		osd_printf_error("Found 0-length tag\n");
 
 	// too short/too long = bad
 	if (strlen(begin) < MIN_TAG_LENGTH)
-		mame_printf_error("Tag '%s' is too short (must be at least %d characters)\n", tag, MIN_TAG_LENGTH);
+		osd_printf_error("Tag '%s' is too short (must be at least %d characters)\n", tag, MIN_TAG_LENGTH);
 	if (strlen(begin) > MAX_TAG_LENGTH)
-		mame_printf_error("Tag '%s' is too long (must be less than %d characters)\n", tag, MAX_TAG_LENGTH);
+		osd_printf_error("Tag '%s' is too long (must be less than %d characters)\n", tag, MAX_TAG_LENGTH);
 }
 
 
@@ -224,8 +224,8 @@ void validity_checker::check_all()
 void validity_checker::validate_begin()
 {
 	// take over error and warning outputs
-	m_saved_error_output = mame_set_output_channel(OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(validity_checker::error_output), this));
-	m_saved_warning_output = mame_set_output_channel(OUTPUT_CHANNEL_WARNING, output_delegate(FUNC(validity_checker::warning_output), this));
+	m_saved_error_output = osd_set_output_channel(OSD_OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(validity_checker::error_output), this));
+	m_saved_warning_output = osd_set_output_channel(OSD_OUTPUT_CHANNEL_WARNING, output_delegate(FUNC(validity_checker::warning_output), this));
 
 	// reset all our maps
 	m_names_map.reset();
@@ -249,8 +249,8 @@ void validity_checker::validate_begin()
 void validity_checker::validate_end()
 {
 	// restore the original output callbacks
-	mame_set_output_channel(OUTPUT_CHANNEL_ERROR, m_saved_error_output);
-	mame_set_output_channel(OUTPUT_CHANNEL_WARNING, m_saved_warning_output);
+	osd_set_output_channel(OSD_OUTPUT_CHANNEL_ERROR, m_saved_error_output);
+	osd_set_output_channel(OSD_OUTPUT_CHANNEL_WARNING, m_saved_warning_output);
 }
 
 
@@ -285,7 +285,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	}
 	catch (emu_fatalerror &err)
 	{
-		mame_printf_error("Fatal error %s", err.string());
+		osd_printf_error("Fatal error %s", err.string());
 	}
 	m_current_config = NULL;
 
@@ -324,32 +324,32 @@ void validity_checker::validate_core()
 	// basic system checks
 	UINT8 a = 0xff;
 	UINT8 b = a + 1;
-	if (b > a) mame_printf_error("UINT8 must be 8 bits\n");
+	if (b > a) osd_printf_error("UINT8 must be 8 bits\n");
 
 	// check size of core integer types
-	if (sizeof(INT8)   != 1) mame_printf_error("INT8 must be 8 bits\n");
-	if (sizeof(UINT8)  != 1) mame_printf_error("UINT8 must be 8 bits\n");
-	if (sizeof(INT16)  != 2) mame_printf_error("INT16 must be 16 bits\n");
-	if (sizeof(UINT16) != 2) mame_printf_error("UINT16 must be 16 bits\n");
-	if (sizeof(INT32)  != 4) mame_printf_error("INT32 must be 32 bits\n");
-	if (sizeof(UINT32) != 4) mame_printf_error("UINT32 must be 32 bits\n");
-	if (sizeof(INT64)  != 8) mame_printf_error("INT64 must be 64 bits\n");
-	if (sizeof(UINT64) != 8) mame_printf_error("UINT64 must be 64 bits\n");
+	if (sizeof(INT8)   != 1) osd_printf_error("INT8 must be 8 bits\n");
+	if (sizeof(UINT8)  != 1) osd_printf_error("UINT8 must be 8 bits\n");
+	if (sizeof(INT16)  != 2) osd_printf_error("INT16 must be 16 bits\n");
+	if (sizeof(UINT16) != 2) osd_printf_error("UINT16 must be 16 bits\n");
+	if (sizeof(INT32)  != 4) osd_printf_error("INT32 must be 32 bits\n");
+	if (sizeof(UINT32) != 4) osd_printf_error("UINT32 must be 32 bits\n");
+	if (sizeof(INT64)  != 8) osd_printf_error("INT64 must be 64 bits\n");
+	if (sizeof(UINT64) != 8) osd_printf_error("UINT64 must be 64 bits\n");
 
 	// check pointer size
 #ifdef PTR64
-	if (sizeof(void *) != 8) mame_printf_error("PTR64 flag enabled, but was compiled for 32-bit target\n");
+	if (sizeof(void *) != 8) osd_printf_error("PTR64 flag enabled, but was compiled for 32-bit target\n");
 #else
-	if (sizeof(void *) != 4) mame_printf_error("PTR64 flag not enabled, but was compiled for 64-bit target\n");
+	if (sizeof(void *) != 4) osd_printf_error("PTR64 flag not enabled, but was compiled for 64-bit target\n");
 #endif
 
 	// check endianness definition
 	UINT16 lsbtest = 0;
 	*(UINT8 *)&lsbtest = 0xff;
 #ifdef LSB_FIRST
-	if (lsbtest == 0xff00) mame_printf_error("LSB_FIRST specified, but running on a big-endian machine\n");
+	if (lsbtest == 0xff00) osd_printf_error("LSB_FIRST specified, but running on a big-endian machine\n");
 #else
-	if (lsbtest == 0x00ff) mame_printf_error("LSB_FIRST not specified, but running on a little-endian machine\n");
+	if (lsbtest == 0x00ff) osd_printf_error("LSB_FIRST not specified, but running on a little-endian machine\n");
 #endif
 }
 
@@ -396,32 +396,32 @@ void validity_checker::validate_inlines()
 	resulti64 = mul_32x32(testi32a, testi32b);
 	expectedi64 = (INT64)testi32a * (INT64)testi32b;
 	if (resulti64 != expectedi64)
-		mame_printf_error("Error testing mul_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testi32a, testi32b, (UINT32)(resulti64 >> 32), (UINT32)resulti64, (UINT32)(expectedi64 >> 32), (UINT32)expectedi64);
+		osd_printf_error("Error testing mul_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testi32a, testi32b, (UINT32)(resulti64 >> 32), (UINT32)resulti64, (UINT32)(expectedi64 >> 32), (UINT32)expectedi64);
 
 	resultu64 = mulu_32x32(testu32a, testu32b);
 	expectedu64 = (UINT64)testu32a * (UINT64)testu32b;
 	if (resultu64 != expectedu64)
-		mame_printf_error("Error testing mulu_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testu32a, testu32b, (UINT32)(resultu64 >> 32), (UINT32)resultu64, (UINT32)(expectedu64 >> 32), (UINT32)expectedu64);
+		osd_printf_error("Error testing mulu_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testu32a, testu32b, (UINT32)(resultu64 >> 32), (UINT32)resultu64, (UINT32)(expectedu64 >> 32), (UINT32)expectedu64);
 
 	resulti32 = mul_32x32_hi(testi32a, testi32b);
 	expectedi32 = ((INT64)testi32a * (INT64)testi32b) >> 32;
 	if (resulti32 != expectedi32)
-		mame_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
+		osd_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
 
 	resultu32 = mulu_32x32_hi(testu32a, testu32b);
 	expectedu32 = ((INT64)testu32a * (INT64)testu32b) >> 32;
 	if (resultu32 != expectedu32)
-		mame_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
+		osd_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
 
 	resulti32 = mul_32x32_shift(testi32a, testi32b, 7);
 	expectedi32 = ((INT64)testi32a * (INT64)testi32b) >> 7;
 	if (resulti32 != expectedi32)
-		mame_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
+		osd_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
 
 	resultu32 = mulu_32x32_shift(testu32a, testu32b, 7);
 	expectedu32 = ((INT64)testu32a * (INT64)testu32b) >> 7;
 	if (resultu32 != expectedu32)
-		mame_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
+		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
 
 	while ((INT64)testi32a * (INT64)0x7fffffff < testi64a)
 		testi64a /= 2;
@@ -431,34 +431,34 @@ void validity_checker::validate_inlines()
 	resulti32 = div_64x32(testi64a, testi32a);
 	expectedi32 = testi64a / (INT64)testi32a;
 	if (resulti32 != expectedi32)
-		mame_printf_error("Error testing div_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing div_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, expectedi32);
 
 	resultu32 = divu_64x32(testu64a, testu32a);
 	expectedu32 = testu64a / (UINT64)testu32a;
 	if (resultu32 != expectedu32)
-		mame_printf_error("Error testing divu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing divu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32);
 
 	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
 	expectedi32 = testi64a / (INT64)testi32a;
 	expremainder = testi64a % (INT64)testi32a;
 	if (resulti32 != expectedi32 || remainder != expremainder)
-		mame_printf_error("Error testing div_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, remainder, expectedi32, expremainder);
+		osd_printf_error("Error testing div_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, remainder, expectedi32, expremainder);
 
 	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
 	expectedu32 = testu64a / (UINT64)testu32a;
 	expuremainder = testu64a % (UINT64)testu32a;
 	if (resultu32 != expectedu32 || uremainder != expuremainder)
-		mame_printf_error("Error testing divu_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, uremainder, expectedu32, expuremainder);
+		osd_printf_error("Error testing divu_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, uremainder, expectedu32, expuremainder);
 
 	resulti32 = mod_64x32(testi64a, testi32a);
 	expectedi32 = testi64a % (INT64)testi32a;
 	if (resulti32 != expectedi32)
-		mame_printf_error("Error testing mod_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing mod_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testi64a >> 32), (UINT32)testi64a, testi32a, resulti32, expectedi32);
 
 	resultu32 = modu_64x32(testu64a, testu32a);
 	expectedu32 = testu64a % (UINT64)testu32a;
 	if (resultu32 != expectedu32)
-		mame_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", (UINT32)(testu64a >> 32), (UINT32)testu64a, testu32a, resultu32, expectedu32);
 
 	while ((INT64)testi32a * (INT64)0x7fffffff < ((INT32)testi64a << 3))
 		testi64a /= 2;
@@ -468,39 +468,39 @@ void validity_checker::validate_inlines()
 	resulti32 = div_32x32_shift((INT32)testi64a, testi32a, 3);
 	expectedi32 = ((INT64)(INT32)testi64a << 3) / (INT64)testi32a;
 	if (resulti32 != expectedi32)
-		mame_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (INT32)testi64a, testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (INT32)testi64a, testi32a, resulti32, expectedi32);
 
 	resultu32 = divu_32x32_shift((UINT32)testu64a, testu32a, 3);
 	expectedu32 = ((UINT64)(UINT32)testu64a << 3) / (UINT64)testu32a;
 	if (resultu32 != expectedu32)
-		mame_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (UINT32)testu64a, testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (UINT32)testu64a, testu32a, resultu32, expectedu32);
 
 	if (fabs(recip_approx(100.0) - 0.01) > 0.0001)
-		mame_printf_error("Error testing recip_approx\n");
+		osd_printf_error("Error testing recip_approx\n");
 
 	testi32a = (testi32a & 0x0000ffff) | 0x400000;
 	if (count_leading_zeros(testi32a) != 9)
-		mame_printf_error("Error testing count_leading_zeros\n");
+		osd_printf_error("Error testing count_leading_zeros\n");
 	testi32a = (testi32a | 0xffff0000) & ~0x400000;
 	if (count_leading_ones(testi32a) != 9)
-		mame_printf_error("Error testing count_leading_ones\n");
+		osd_printf_error("Error testing count_leading_ones\n");
 
 	testi32b = testi32a;
 	if (compare_exchange32(&testi32a, testi32b, 1000) != testi32b || testi32a != 1000)
-		mame_printf_error("Error testing compare_exchange32\n");
+		osd_printf_error("Error testing compare_exchange32\n");
 #ifdef PTR64
 	testi64b = testi64a;
 	if (compare_exchange64(&testi64a, testi64b, 1000) != testi64b || testi64a != 1000)
-		mame_printf_error("Error testing compare_exchange64\n");
+		osd_printf_error("Error testing compare_exchange64\n");
 #endif
 	if (atomic_exchange32(&testi32a, testi32b) != 1000)
-		mame_printf_error("Error testing atomic_exchange32\n");
+		osd_printf_error("Error testing atomic_exchange32\n");
 	if (atomic_add32(&testi32a, 45) != testi32b + 45)
-		mame_printf_error("Error testing atomic_add32\n");
+		osd_printf_error("Error testing atomic_add32\n");
 	if (atomic_increment32(&testi32a) != testi32b + 46)
-		mame_printf_error("Error testing atomic_increment32\n");
+		osd_printf_error("Error testing atomic_increment32\n");
 	if (atomic_decrement32(&testi32a) != testi32b + 45)
-		mame_printf_error("Error testing atomic_decrement32\n");
+		osd_printf_error("Error testing atomic_decrement32\n");
 }
 
 
@@ -516,14 +516,14 @@ void validity_checker::validate_driver()
 	if (m_names_map.add(m_current_driver->name, m_current_driver, false) == TMERR_DUPLICATE)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name);
-		mame_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).cstr(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).cstr(), match->name);
 	}
 
 	// check for duplicate descriptions
 	if (m_descriptions_map.add(m_current_driver->description, m_current_driver, false) == TMERR_DUPLICATE)
 	{
 		const game_driver *match = m_descriptions_map.find(m_current_driver->description);
-		mame_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).cstr(), match->name);
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).cstr(), match->name);
 	}
 
 	// determine if we are a clone
@@ -535,27 +535,27 @@ void validity_checker::validate_driver()
 	// if we have at least 100 drivers, validate the clone
 	// (100 is arbitrary, but tries to avoid tiny.mak dependencies)
 	if (driver_list::total() > 100 && clone_of == -1 && is_clone)
-		mame_printf_error("Driver is a clone of nonexistant driver %s\n", m_current_driver->parent);
+		osd_printf_error("Driver is a clone of nonexistant driver %s\n", m_current_driver->parent);
 
 	// look for recursive cloning
 	if (clone_of != -1 && &m_drivlist.driver(clone_of) == m_current_driver)
-		mame_printf_error("Driver is a clone of itself\n");
+		osd_printf_error("Driver is a clone of itself\n");
 
 	// look for clones that are too deep
 	if (clone_of != -1 && (clone_of = m_drivlist.non_bios_clone(clone_of)) != -1)
-		mame_printf_error("Driver is a clone of a clone\n");
+		osd_printf_error("Driver is a clone of a clone\n");
 
 	// make sure the driver name is not too long
 	if (!is_clone && strlen(m_current_driver->name) > 8)
-		mame_printf_error("Parent driver name must be 8 characters or less\n");
+		osd_printf_error("Parent driver name must be 8 characters or less\n");
 	if (is_clone && strlen(m_current_driver->name) > 16)
-		mame_printf_error("Clone driver name must be 16 characters or less\n");
+		osd_printf_error("Clone driver name must be 16 characters or less\n");
 
 	// make sure the year is only digits, '?' or '+'
 	for (const char *s = m_current_driver->year; *s != 0; s++)
 		if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
 		{
-			mame_printf_error("Driver has an invalid year '%s'\n", m_current_driver->year);
+			osd_printf_error("Driver has an invalid year '%s'\n", m_current_driver->year);
 			break;
 		}
 
@@ -566,24 +566,24 @@ void validity_checker::validate_driver()
 
 	// check for this driver being compatible with a non-existant driver
 	if (compatible_with != NULL && m_drivlist.find(m_current_driver->compatible_with) == -1)
-		mame_printf_error("Driver is listed as compatible with nonexistant driver %s\n", m_current_driver->compatible_with);
+		osd_printf_error("Driver is listed as compatible with nonexistant driver %s\n", m_current_driver->compatible_with);
 
 	// check for clone_of and compatible_with being specified at the same time
 	if (m_drivlist.clone(*m_current_driver) != -1 && compatible_with != NULL)
-		mame_printf_error("Driver cannot be both a clone and listed as compatible with another system\n");
+		osd_printf_error("Driver cannot be both a clone and listed as compatible with another system\n");
 
 	// find any recursive dependencies on the current driver
 	for (int other_drv = m_drivlist.compatible_with(*m_current_driver); other_drv != -1; other_drv = m_drivlist.compatible_with(other_drv))
 		if (m_current_driver == &m_drivlist.driver(other_drv))
 		{
-			mame_printf_error("Driver is recursively compatible with itself\n");
+			osd_printf_error("Driver is recursively compatible with itself\n");
 			break;
 		}
 
 	// make sure sound-less drivers are flagged
 	sound_interface_iterator iter(m_current_config->root_device());
 	if ((m_current_driver->flags & GAME_IS_BIOS_ROOT) == 0 && iter.first() == NULL && (m_current_driver->flags & GAME_NO_SOUND) == 0 && (m_current_driver->flags & GAME_NO_SOUND_HW) == 0)
-		mame_printf_error("Driver is missing GAME_NO_SOUND flag\n");
+		osd_printf_error("Driver is missing GAME_NO_SOUND flag\n");
 }
 
 
@@ -614,7 +614,7 @@ void validity_checker::validate_roms()
 			{
 				// if we haven't seen any items since the last region, print a warning
 				if (items_since_region == 0)
-					mame_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
+					osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
 
 				// reset our region tracking states
 				const char *basetag = ROMREGION_GETTAG(romp);
@@ -624,7 +624,7 @@ void validity_checker::validate_roms()
 				// check for a valid tag
 				if (basetag == NULL)
 				{
-					mame_printf_error("ROM_REGION tag with NULL name\n");
+					osd_printf_error("ROM_REGION tag with NULL name\n");
 					continue;
 				}
 
@@ -638,7 +638,7 @@ void validity_checker::validate_roms()
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
 				if (m_region_map.add(fulltag, current_length, false) == TMERR_DUPLICATE)
-					mame_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.cstr());
+					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.cstr());
 			}
 
 			// If this is a system bios, make sure it is using the next available bios number
@@ -646,7 +646,7 @@ void validity_checker::validate_roms()
 			{
 				int bios_flags = ROM_GETBIOSFLAGS(romp);
 				if (bios_flags != last_bios + 1)
-					mame_printf_error("Non-sequential bios %s (specified as %d, expected to be %d)\n", ROM_GETNAME(romp), bios_flags, last_bios + 1);
+					osd_printf_error("Non-sequential bios %s (specified as %d, expected to be %d)\n", ROM_GETNAME(romp), bios_flags, last_bios + 1);
 				last_bios = bios_flags;
 			}
 
@@ -661,14 +661,14 @@ void validity_checker::validate_roms()
 				for (const char *s = last_name; *s != 0; s++)
 					if (tolower((UINT8)*s) != *s)
 					{
-						mame_printf_error("ROM name '%s' contains upper case characters\n", last_name);
+						osd_printf_error("ROM name '%s' contains upper case characters\n", last_name);
 						break;
 					}
 
 				// make sure the hash is valid
 				hash_collection hashes;
 				if (!hashes.from_internal_string(ROM_GETHASHDATA(romp)))
-					mame_printf_error("ROM '%s' has an invalid hash string '%s'\n", last_name, ROM_GETHASHDATA(romp));
+					osd_printf_error("ROM '%s' has an invalid hash string '%s'\n", last_name, ROM_GETHASHDATA(romp));
 			}
 
 			// for any non-region ending entries, make sure they don't extend past the end
@@ -676,13 +676,13 @@ void validity_checker::validate_roms()
 			{
 				items_since_region++;
 				if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > current_length)
-					mame_printf_error("ROM '%s' extends past the defined memory region\n", last_name);
+					osd_printf_error("ROM '%s' extends past the defined memory region\n", last_name);
 			}
 		}
 
 		// final check for empty regions
 		if (items_since_region == 0)
-			mame_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
+			osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
 
 
 		// reset the current device
@@ -700,11 +700,11 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 {
 	// analog ports must have a valid sensitivity
 	if (field.sensitivity() == 0)
-		mame_printf_error("Analog port with zero sensitivity\n");
+		osd_printf_error("Analog port with zero sensitivity\n");
 
 	// check that the default falls in the bitmask range
 	if (field.defvalue() & ~field.mask())
-		mame_printf_error("Analog port with a default value (%X) out of the bitmask range (%X)\n", field.defvalue(), field.mask());
+		osd_printf_error("Analog port with a default value (%X) out of the bitmask range (%X)\n", field.defvalue(), field.mask());
 
 	// tests for positional devices
 	if (field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
@@ -718,7 +718,7 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 
 		// positional port size must fit in bits used
 		if ((field.mask() >> shift) + 1 < field.maxval())
-			mame_printf_error("Analog port with a positional port size bigger then the mask size\n");
+			osd_printf_error("Analog port with a positional port size bigger then the mask size\n");
 	}
 
 	// tests for absolute devices
@@ -737,20 +737,20 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 
 		// check that the default falls in the MINMAX range
 		if (default_value < analog_min || default_value > analog_max)
-			mame_printf_error("Analog port with a default value (%X) out of PORT_MINMAX range (%X-%X)\n", field.defvalue(), field.minval(), field.maxval());
+			osd_printf_error("Analog port with a default value (%X) out of PORT_MINMAX range (%X-%X)\n", field.defvalue(), field.minval(), field.maxval());
 
 		// check that the MINMAX falls in the bitmask range
 		// we use the unadjusted min for testing
 		if (field.minval() & ~field.mask() || analog_max & ~field.mask())
-			mame_printf_error("Analog port with a PORT_MINMAX (%X-%X) value out of the bitmask range (%X)\n", field.minval(), field.maxval(), field.mask());
+			osd_printf_error("Analog port with a PORT_MINMAX (%X-%X) value out of the bitmask range (%X)\n", field.minval(), field.maxval(), field.mask());
 
 		// absolute analog ports do not use PORT_RESET
 		if (field.analog_reset())
-			mame_printf_error("Absolute analog port using PORT_RESET\n");
+			osd_printf_error("Absolute analog port using PORT_RESET\n");
 
 		// absolute analog ports do not use PORT_WRAPS
 		if (field.analog_wraps())
-			mame_printf_error("Absolute analog port using PORT_WRAPS\n");
+			osd_printf_error("Absolute analog port using PORT_WRAPS\n");
 	}
 
 	// tests for non IPT_POSITIONAL relative devices
@@ -758,16 +758,16 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 	{
 		// relative devices do not use PORT_MINMAX
 		if (field.minval() != 0 || field.maxval() != field.mask())
-			mame_printf_error("Relative port using PORT_MINMAX\n");
+			osd_printf_error("Relative port using PORT_MINMAX\n");
 
 		// relative devices do not use a default value
 		// the counter is at 0 on power up
 		if (field.defvalue() != 0)
-			mame_printf_error("Relative port using non-0 default value\n");
+			osd_printf_error("Relative port using non-0 default value\n");
 
 		// relative analog ports do not use PORT_WRAPS
 		if (field.analog_wraps())
-			mame_printf_error("Absolute analog port using PORT_WRAPS\n");
+			osd_printf_error("Absolute analog port using PORT_WRAPS\n");
 	}
 }
 
@@ -794,15 +794,15 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 
 		// make sure demo sounds default to on
 		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
-			mame_printf_error("Demo Sounds must default to On\n");
+			osd_printf_error("Demo Sounds must default to On\n");
 
 		// check for bad demo sounds options
 		if (field.name() == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			mame_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
+			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
 
 		// check for bad flip screen options
 		if (field.name() == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			mame_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
+			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
 
 		// if we have a neighbor, compare ourselves to him
 		if (setting->next() != NULL)
@@ -810,21 +810,21 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 			// check for inverted off/on dispswitch order
 			int next_strindex = get_defstr_index(setting->next()->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
-				mame_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
+				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
 
 			// check for inverted yes/no dispswitch order
 			else if (strindex == INPUT_STRING_Yes && next_strindex == INPUT_STRING_No)
-				mame_printf_error("%s option must have Yes/No options in the order: No, Yes\n", field.name());
+				osd_printf_error("%s option must have Yes/No options in the order: No, Yes\n", field.name());
 
 			// check for inverted upright/cocktail dispswitch order
 			else if (strindex == INPUT_STRING_Cocktail && next_strindex == INPUT_STRING_Upright)
-				mame_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", field.name());
+				osd_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", field.name());
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
 						strindex >= next_strindex && setting->condition() == setting->next()->condition())
 			{
-				mame_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), setting->next()->name());
+				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), setting->next()->name());
 				coin_error = true;
 			}
 		}
@@ -854,7 +854,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 
 	// then find a matching port
 	if (port_map.find(porttag) == 0)
-		mame_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
+		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 
 
@@ -884,12 +884,12 @@ void validity_checker::validate_inputs()
 
 		// report any errors during construction
 		if (errorbuf)
-			mame_printf_error("I/O port error during construction:\n%s\n", errorbuf.cstr());
+			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.cstr());
 
 		// do a first pass over ports to add their names and find duplicates
 		for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
 			if (port_map.add(port->tag(), 1, false) == TMERR_DUPLICATE)
-				mame_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
 
 		// iterate over ports
 		for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
@@ -905,14 +905,14 @@ void validity_checker::validate_inputs()
 
 				// look for invalid (0) types which should be mapped to IPT_OTHER
 				if (field->type() == IPT_INVALID)
-					mame_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
+					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
 
 				// verify dip switches
 				if (field->type() == IPT_DIPSWITCH)
 				{
 					// dip switch fields must have a name
 					if (field->name() == NULL)
-						mame_printf_error("DIP switch has a NULL name\n");
+						osd_printf_error("DIP switch has a NULL name\n");
 
 					// verify the settings list
 					validate_dip_settings(*field);
@@ -924,15 +924,15 @@ void validity_checker::validate_inputs()
 				{
 					// check for empty string
 					if (name[0] == 0)
-						mame_printf_error("Field name is an empty string\n");
+						osd_printf_error("Field name is an empty string\n");
 
 					// check for trailing spaces
 					if (name[0] != 0 && name[strlen(name) - 1] == ' ')
-						mame_printf_error("Field '%s' has trailing spaces\n", name);
+						osd_printf_error("Field '%s' has trailing spaces\n", name);
 
 					// check for invalid UTF-8
 					if (!utf8_is_valid_string(name))
-						mame_printf_error("Field '%s' has invalid characters\n", name);
+						osd_printf_error("Field '%s' has invalid characters\n", name);
 
 					// look up the string and print an error if default strings are not used
 					/*strindex =get_defstr_index(defstr_map, name, driver, &error);*/
@@ -985,15 +985,15 @@ void validity_checker::validate_devices()
 
 		// look for duplicates
 		if (device_map.add(device->tag(), 0, false) == TMERR_DUPLICATE)
-			mame_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
+			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
 
 		// all devices must have a shortname
 		if (strcmp(device->shortname(), "") == 0)
-			mame_printf_error("Device does not have short name defined\n");
+			osd_printf_error("Device does not have short name defined\n");
 
 		// all devices must have a source file defined
 		if (strcmp(device->source(), "") == 0)
-			mame_printf_error("Device does not have source file location defined\n");
+			osd_printf_error("Device does not have source file location defined\n");
 
 		// check for device-specific validity check
 		device->validity_check(*this);
@@ -1021,7 +1021,7 @@ void validity_checker::validate_devices()
 
 			if (strcmp(dev->shortname(), "") == 0) {
 				if (slot_device_map.add(dev->name(), 0, false) != TMERR_DUPLICATE)
-					mame_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
+					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
 			}
 
 			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.cstr());

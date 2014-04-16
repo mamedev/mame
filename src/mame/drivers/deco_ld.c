@@ -246,7 +246,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 READ8_MEMBER(deco_ld_state::laserdisc_r)
 {
 	UINT8 result = m_laserdisc->status_r();
-//  mame_printf_debug("laserdisc_r = %02X\n", result);
+//  osd_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
 

@@ -172,7 +172,7 @@ READ8_MEMBER(gsword_state::gsword_hack_r)
 {
 	UINT8 data = m_cpu2_ram[offset + 4];
 
-	/*if(offset==1)mame_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
+	/*if(offset==1)osd_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
 
 	/* speedup timeout cound down */
 	if(m_protect_hack)
@@ -240,7 +240,7 @@ INTERRUPT_GEN_MEMBER(gsword_state::gsword_snd_interrupt)
 
 WRITE8_MEMBER(gsword_state::gsword_nmi_set_w)
 {
-/*  mame_printf_debug("AY write %02X\n",data);*/
+/*  osd_printf_debug("AY write %02X\n",data);*/
 
 	m_protect_hack = (data&0x80) ? 0 : 1;
 #if 0

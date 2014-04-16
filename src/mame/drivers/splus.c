@@ -176,7 +176,7 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 		}
 #if DEBUG_OUTPUT
 		if ((data & 0x1f) == 0x01)
-			mame_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", m_stop_pos[0],m_stop_pos[1],m_stop_pos[2],m_stop_pos[3],m_stop_pos[4],((m_bank40 >> 0) & 1),((m_bank10 >> 5) & 1),(data & 0x1f), m_p1_unknown);
+			osd_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", m_stop_pos[0],m_stop_pos[1],m_stop_pos[2],m_stop_pos[3],m_stop_pos[4],((m_bank40 >> 0) & 1),((m_bank10 >> 5) & 1),(data & 0x1f), m_p1_unknown);
 #endif
 	}
 
@@ -199,40 +199,40 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 		case 0x00: // Bank 10
 			if (((m_bank10 >> 0) & 1) != ((data >> 0) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Coin Drop Meter =%02X\n",(data >> 0) & 1);
+				osd_printf_info("Coin Drop Meter =%02X\n",(data >> 0) & 1);
 #endif
 			}
 			if (((m_bank10 >> 1) & 1) != ((data >> 1) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Coin Out Meter =%02X\n",(data >> 1) & 1);
+				osd_printf_info("Coin Out Meter =%02X\n",(data >> 1) & 1);
 #endif
 			}
 			if (((m_bank10 >> 2) & 1) != ((data >> 2) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Coin In Meter =%02X\n",(data >> 2) & 1);
+				osd_printf_info("Coin In Meter =%02X\n",(data >> 2) & 1);
 #endif
 			}
 			if (((m_bank10 >> 3) & 1) != ((data >> 3) & 1)) {
-				//mame_printf_info("B Switch for SDS =%02X\n",(data >> 3) & 1);
+				//osd_printf_info("B Switch for SDS =%02X\n",(data >> 3) & 1);
 			}
 			if (((m_bank10 >> 4) & 1) != ((data >> 4) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Hopper Drive 2 =%02X\n",(data >> 4) & 1);
+				osd_printf_info("Hopper Drive 2 =%02X\n",(data >> 4) & 1);
 #endif
 			}
 			if (((m_bank10 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Stepper Motor Direction =%02X\n",(data >> 5) & 1);
+				osd_printf_info("Stepper Motor Direction =%02X\n",(data >> 5) & 1);
 #endif
 			}
 			if (((m_bank10 >> 6) & 1) != ((data >> 6) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Mechanical Bell =%02X\n",(data >> 6) & 1);
+				osd_printf_info("Mechanical Bell =%02X\n",(data >> 6) & 1);
 #endif
 			}
 			if (((m_bank10 >> 7) & 1) != ((data >> 7) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Cancelled Credits Meter =%02X\n",(data >> 7) & 1);
+				osd_printf_info("Cancelled Credits Meter =%02X\n",(data >> 7) & 1);
 #endif
 			}
 			m_bank10 = data;
@@ -249,17 +249,17 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 		case 0x01: // Bank 20
 			if (((m_bank20 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Games Played Meter =%02X\n",(data >> 5) & 1);
+				osd_printf_info("Games Played Meter =%02X\n",(data >> 5) & 1);
 #endif
 			}
 			if (((m_bank20 >> 6) & 1) != ((data >> 6) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Bill Acceptor Enable =%02X\n",(data >> 6) & 1);
+				osd_printf_info("Bill Acceptor Enable =%02X\n",(data >> 6) & 1);
 #endif
 			}
 			if (((m_bank20 >> 7) & 1) != ((data >> 7) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Jackpots Meter =%02X\n",(data >> 7) & 1);
+				osd_printf_info("Jackpots Meter =%02X\n",(data >> 7) & 1);
 #endif
 			}
 			m_bank20 = data;
@@ -276,22 +276,22 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 		case 0x02: // Bank 30
 			if (((m_bank30 >> 2) & 1) != ((data >> 2) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Handle Release =%02X\n",(data >> 2) & 1);
+				osd_printf_info("Handle Release =%02X\n",(data >> 2) & 1);
 #endif
 			}
 			if (((m_bank30 >> 3) & 1) != ((data >> 3) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Diverter =%02X\n",(data >> 3) & 1);
+				osd_printf_info("Diverter =%02X\n",(data >> 3) & 1);
 #endif
 			}
 			if (((m_bank30 >> 4) & 1) != ((data >> 4) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Coin Lockout =%02X\n",(data >> 4) & 1);
+				osd_printf_info("Coin Lockout =%02X\n",(data >> 4) & 1);
 #endif
 			}
 			if (((m_bank30 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Hopper Drive 1 =%02X\n",(data >> 5) & 1);
+				osd_printf_info("Hopper Drive 1 =%02X\n",(data >> 5) & 1);
 #endif
 			}
 			m_bank30 = data;
@@ -308,12 +308,12 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 		case 0x04: // Bank 40
 			if (((m_bank40 >> 0) & 1) != ((data >> 0) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Stepper Motor Power Supply =%02X\n",(data >> 0) & 1);
+				osd_printf_info("Stepper Motor Power Supply =%02X\n",(data >> 0) & 1);
 #endif
 			}
 			if (((m_bank40 >> 3) & 1) != ((data >> 3) & 1)) {
 #if DEBUG_OUTPUT
-				mame_printf_info("Jackpot/Hand Pay Lamp =%02X\n",(data >> 3) & 1);
+				osd_printf_info("Jackpot/Hand Pay Lamp =%02X\n",(data >> 3) & 1);
 #endif
 			}
 			m_bank40 = data;
@@ -391,7 +391,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 				m_coin_state = 1; // Start Coin Cycle
 				m_last_cycles = m_maincpu->total_cycles();
 #if DEBUG_OUTPUT
-				mame_printf_info("coin=%02X\n", m_coin_state);
+				osd_printf_info("coin=%02X\n", m_coin_state);
 #endif
 			} else {
 				/* Process Next Coin Optic State */
@@ -401,7 +401,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 						m_coin_state = 0;
 					m_last_cycles = m_maincpu->total_cycles();
 #if DEBUG_OUTPUT
-					mame_printf_info("coin=%02X\n", m_coin_state);
+					osd_printf_info("coin=%02X\n", m_coin_state);
 #endif
 				}
 			}

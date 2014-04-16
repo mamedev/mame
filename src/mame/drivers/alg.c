@@ -145,7 +145,7 @@ TIMER_CALLBACK_MEMBER(alg_state::response_timer)
 	{
 		UINT8 data = m_laserdisc->data_r();
 		if (data != 0x0a)
-			mame_printf_debug("Sending serial data = %02X\n", data);
+			osd_printf_debug("Sending serial data = %02X\n", data);
 		amiga_serial_in_w(machine(), data);
 	}
 

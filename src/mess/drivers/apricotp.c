@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   floppy_image_device::default_floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(fp_state, write_centronics_select))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fp_state, write_centronics_fault))

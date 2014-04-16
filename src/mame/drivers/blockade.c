@@ -87,7 +87,7 @@ WRITE8_MEMBER(blockade_state::blockade_coin_latch_w)
 {
 	if (data & 0x80)
 	{
-		if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
+		if (BLOCKADE_LOG) osd_printf_debug("Reset Coin Latch\n");
 		if (m_just_been_reset)
 		{
 			m_just_been_reset = 0;
@@ -99,11 +99,11 @@ WRITE8_MEMBER(blockade_state::blockade_coin_latch_w)
 
 	if (data & 0x20)
 	{
-		if (BLOCKADE_LOG) mame_printf_debug("Pin 19 High\n");
+		if (BLOCKADE_LOG) osd_printf_debug("Pin 19 High\n");
 	}
 	else
 	{
-		if (BLOCKADE_LOG) mame_printf_debug("Pin 19 Low\n");
+		if (BLOCKADE_LOG) osd_printf_debug("Pin 19 Low\n");
 	}
 
 	return;

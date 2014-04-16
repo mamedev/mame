@@ -8,7 +8,7 @@
 #include "lpt.h"
 #include "machine/pc_lpt.h"
 #include "bus/centronics/covox.h"
-#include "bus/centronics/image.h"
+#include "bus/centronics/printer.h"
 
 const device_type ISA8_LPT = &device_creator<isa8_lpt_device>;
 

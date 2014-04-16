@@ -14,7 +14,8 @@
 	- dynamcop: stalls at stage select screen;
 	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
 	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
-	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89);
+	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
+	- lastbrnx: eventually crashes in attract mode, geo_parse_nn_s() is the culprit apparently;
 	- manxtt: missing 3d;
 	- motoraid: stalls after course select;
 	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
@@ -23,7 +24,7 @@
 	- vcop: lightgun input is offsetted;
 	- vcop: sound dies at enter initial screen (i.e. after played the game once);
 	- vcop: priority bug at stage select screen;
-	- vcop2: no 3d;
+	- vcop2: no textures;
 	- vf2: stalls after disclaimer screen;
 	- zeroguna: stalls after some seconds of gameplay;
 
@@ -543,6 +544,34 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 	return iptval;
 }
 
+/*	PORT_DIPSETTING(    0x00, "0" ) // 0: neutral
+	PORT_DIPSETTING(    0x10, "1" ) // 2nd gear
+	PORT_DIPSETTING(    0x20, "2" ) // 1st gear
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x50, "5" ) // 4th gear
+	PORT_DIPSETTING(    0x60, "6" ) // 3rd gear
+	PORT_DIPSETTING(    0x70, "7" )*/
+
+/* Used specifically by Sega Rally, others might be different */
+CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
+{
+	UINT8 res = ioport("GEARS")->read_safe(0);
+	int i;
+	const UINT8 gearvalue[5] = { 0, 2, 1, 6, 5 };
+
+	for(i=0;i<5;i++)
+	{
+		if(res & 1<<i)
+		{
+			m_gearsel = i;
+			return gearvalue[i];
+		}
+	}
+
+	return gearvalue[m_gearsel];
+}
+
 /*
     Rail Chase 2 "Drive I/O BD" documentation
 
@@ -663,7 +692,7 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 	}
 	else
 	{
-		//mame_printf_debug("COPRO: push %08X\n", data);
+		//osd_printf_debug("COPRO: push %08X\n", data);
 	}
 }
 
@@ -737,7 +766,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 //		if(m_coprocnt == 0)
 //			return;
 
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data);
 		else
@@ -756,15 +785,18 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "gunblade" ) == 0) ||
 		(strcmp(machine().system().name, "von" ) == 0) ||
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnx" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnxu" ) == 0) ||
-		(strcmp(machine().system().name, "lastbrnxj" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0))
 	{
 		machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
 	}
 	else
 	{
+		if(offset == 0x10/4)
+		{
+			machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
+			return;
+		}
+
 		if ((m_iop_write_num & 1) == 0)
 		{
 			m_iop_data = data & 0xffff;
@@ -851,7 +883,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 	}
 }
 
@@ -880,13 +912,14 @@ WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 
 void model2_state::push_geo_data(UINT32 data)
 {
-	//mame_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
+	//osd_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
 	m_bufferram[m_geo_write_start_address/4] = data;
 	m_geo_write_start_address += 4;
 }
 
 READ32_MEMBER(model2_state::geo_prg_r)
 {
+	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
 	return 0xffffffff;
 }
 
@@ -899,7 +932,7 @@ WRITE32_MEMBER(model2_state::geo_prg_w)
 	}
 	else
 	{
-		//mame_printf_debug("GEO: %08X: push %08X\n", m_geo_write_start_address, data);
+		//osd_printf_debug("GEO: %08X: push %08X\n", m_geo_write_start_address, data);
 		push_geo_data(data);
 	}
 }
@@ -917,7 +950,7 @@ READ32_MEMBER(model2_state::geo_r)
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", space.device().safe_pc(), address);
+	osd_printf_debug("geo_r: PC:%08x - %08X\n", space.device().safe_pc(), address);
 
 	return 0;
 }
@@ -932,11 +965,11 @@ WRITE32_MEMBER(model2_state::geo_w)
 		{
 		    int i;
 		    UINT32 a;
-		    mame_printf_debug("GEO: jump to %08X\n", (data & 0xfffff));
+		    osd_printf_debug("GEO: jump to %08X\n", (data & 0xfffff));
 		    a = (data & 0xfffff) / 4;
 		    for (i=0; i < 4; i++)
 		    {
-		        mame_printf_debug("   %08X: %08X %08X %08X %08X\n", 0x900000+(a*4)+(i*16),
+		        osd_printf_debug("   %08X: %08X %08X %08X %08X\n", 0x900000+(a*4)+(i*16),
 		            m_bufferram[a+(i*4)+0], m_bufferram[a+(i*4)+1], m_bufferram[a+(i*4)+2], m_bufferram[a+(i*4)+3]);
 		    }
 		}
@@ -947,12 +980,12 @@ WRITE32_MEMBER(model2_state::geo_w)
 		    {
 		        case 0x0:
 		        {
-		            mame_printf_debug("GEO: function %02X (%08X, %08X)\n", function, address, data);
+		            osd_printf_debug("GEO: function %02X (%08X, %08X)\n", function, address, data);
 		            break;
 		        }
 
-		        case 0x4:   mame_printf_debug("GEO: function %02X, command length %d\n", function, data & 0x3f); break;
-		        case 0x8:   mame_printf_debug("GEO: function %02X, data length %d\n", function, data & 0x7f); break;
+		        case 0x4:   osd_printf_debug("GEO: function %02X, command length %d\n", function, data & 0x3f); break;
+		        case 0x8:   osd_printf_debug("GEO: function %02X, data length %d\n", function, data & 0x7f); break;
 		    }
 		}*/
 
@@ -970,18 +1003,27 @@ WRITE32_MEMBER(model2_state::geo_w)
 				UINT32 r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
+				if((address >> 4) & 0xc0)
+				{
+					UINT8 function = (address >> 4) & 0x3f;
+					if(function == 1)
+					{
+						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
+						//popmessage("Eye mode %02x? Contact MAMEdev",function);
+					}
+				}
 				push_geo_data(r);
 			}
 		}
 	}
 	else if (address == 0x1008)
 	{
-		//mame_printf_debug("GEO: Write Start Address: %08X\n", data);
+		//osd_printf_debug("GEO: Write Start Address: %08X\n", data);
 		m_geo_write_start_address = data & 0xfffff;
 	}
 	else if (address == 0x3008)
 	{
-		//mame_printf_debug("GEO: Read Start Address: %08X\n", data);
+		//osd_printf_debug("GEO: Read Start Address: %08X\n", data);
 		m_geo_read_start_address = data & 0xfffff;
 	}
 	else
@@ -1371,19 +1413,19 @@ WRITE32_MEMBER(model2_state::copro_w)
 		int function = (address & 0xfff) >> 4;
 		switch (address & 0xf)
 		{
-			case 0x0:   mame_printf_debug("COPRO: function %02X, command %d\n", function, (data >> 23) & 0x3f); break;
-			case 0x4:   mame_printf_debug("COPRO: function %02X, command length %d\n", function, data & 0x3f); break;
-			case 0x8:   mame_printf_debug("COPRO: function %02X, data length %d\n", function, data & 0x7f); break;
+			case 0x0:   osd_printf_debug("COPRO: function %02X, command %d\n", function, (data >> 23) & 0x3f); break;
+			case 0x4:   osd_printf_debug("COPRO: function %02X, command length %d\n", function, data & 0x3f); break;
+			case 0x8:   osd_printf_debug("COPRO: function %02X, data length %d\n", function, data & 0x7f); break;
 		}
 	}
 
-	//mame_printf_debug("COPRO: %08X = %08X\n", offset, data);
+	//osd_printf_debug("COPRO: %08X = %08X\n", offset, data);
 }
 #endif
 
 WRITE32_MEMBER(model2_state::mode_w)
 {
-	mame_printf_debug("Mode = %08X\n", data);
+	osd_printf_debug("Mode = %08X\n", data);
 }
 
 WRITE32_MEMBER(model2_state::model2o_tex_w0)
@@ -1920,8 +1962,8 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c00000_r, NULL)
 
 	PORT_START("1c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN3")
 
 	PORT_START("1c0000c")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1931,7 +1973,7 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
 
 	PORT_START("1c00014")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN4")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("1c0001c")
@@ -1944,18 +1986,33 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // VR
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(1) PORT_NAME("VR") // VR
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x0090, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x0070, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,srallyc_gearbox_r, NULL)
+	PORT_BIT(0x008f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("GEARS") // fake to handle gear bits
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("GEAR N")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("GEAR 1")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("GEAR 2")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("GEAR 3")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("GEAR 4")
+
+	PORT_START("IN3")
+	//PORT_BIT(0x00ff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Handle (Drive)")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 
 	PORT_START("ANA0")  // steer
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -2130,7 +2187,7 @@ WRITE8_MEMBER(model2_state::scsp_irq)
 READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
 	UINT32 result = 0;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
+	//osd_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
 
 	copro_fifoin_pop(machine().device("dsp"), &result);
 	return result;
@@ -2138,7 +2195,7 @@ READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 
 WRITE32_MEMBER(model2_state::copro_sharc_output_fifo_w)
 {
-	//mame_printf_debug("SHARC FIFOOUT push %08X\n", data);
+	//osd_printf_debug("SHARC FIFOOUT push %08X\n", data);
 	copro_fifoout_push(machine().device("dsp"), data);
 }
 
@@ -2149,7 +2206,7 @@ READ32_MEMBER(model2_state::copro_sharc_buffer_r)
 
 WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 {
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
+	//osd_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
 	m_bufferram[offset & 0x7fff] = data;
 }
 
@@ -5695,8 +5752,6 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 DRIVER_INIT_MEMBER(model2_state,overrev)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
-
-	//TODO: cache patch?
 }
 
 

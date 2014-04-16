@@ -506,7 +506,7 @@ static void display_rom_load_results(romload_private *romdata, bool from_list)
 	if (romdata->errors != 0)
 	{
 		/* create the error message and exit fatally */
-		mame_printf_error("%s", romdata->errorstring.cstr());
+		osd_printf_error("%s", romdata->errorstring.cstr());
 		fatalerror_exitcode(romdata->machine(), MAMERR_MISSING_FILES, "Required files are missing, the %s cannot be run.",emulator_info::get_gamenoun());
 	}
 
@@ -516,7 +516,7 @@ static void display_rom_load_results(romload_private *romdata, bool from_list)
 		romdata->errorstring.cat("WARNING: the ");
 		romdata->errorstring.cat(emulator_info::get_gamenoun());
 		romdata->errorstring.cat(" might not run correctly.");
-		mame_printf_warning("%s\n", romdata->errorstring.cstr());
+		osd_printf_warning("%s\n", romdata->errorstring.cstr());
 	}
 }
 
@@ -721,7 +721,7 @@ static int read_rom_data(romload_private *romdata, const rom_entry *parent_regio
 
 	/* make sure the length was an even multiple of the group size */
 	if (numbytes % groupsize != 0)
-		mame_printf_warning("Warning in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
+		osd_printf_warning("Warning in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
 
 	/* make sure we only fill within the region space */
 	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > romdata->region->bytes())

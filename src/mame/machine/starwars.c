@@ -224,8 +224,8 @@ void starwars_state::run_mproc()
 		IP6_0  = m_PROM_MAS[m_MPA];
 
 #if (MATHDEBUG)
-		mame_printf_debug("\n(MPA:%x), Strobe: %x, IP7: %d, IP6_0:%x\n",m_MPA, IP15_8, IP7, IP6_0);
-		mame_printf_debug("(BIC: %x), A: %x, B: %x, C: %x, ACC: %x\n",m_BIC,m_A,m_B,m_C,m_ACC);
+		osd_printf_debug("\n(MPA:%x), Strobe: %x, IP7: %d, IP6_0:%x\n",m_MPA, IP15_8, IP7, IP6_0);
+		osd_printf_debug("(BIC: %x), A: %x, B: %x, C: %x, ACC: %x\n",m_BIC,m_A,m_B,m_C,m_ACC);
 #endif
 
 		/* construct the current RAM address */

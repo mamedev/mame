@@ -235,22 +235,6 @@ SLOT_INTERFACE_START( pt68k4_isa8_cards )
 	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
 SLOT_INTERFACE_END
 
-static const isa8bus_interface pt68k4_isabus_intf =
-{
-	// interrupts
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// dma request
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 static const pc_kbdc_interface pc_kbdc_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(pt68k4_state, keyboard_clock_w),
@@ -274,7 +258,8 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_ISA8_BUS_ADD(ISABUS_TAG, ":"M68K_TAG, pt68k4_isabus_intf)
+	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
+	MCFG_ISA8_CPU(":"M68K_TAG)
 	MCFG_ISA8_BUS_CUSTOM_SPACES()
 	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa1", pt68k4_isa8_cards, "fdc_at", false)
 	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa2", pt68k4_isa8_cards, "mda", false)

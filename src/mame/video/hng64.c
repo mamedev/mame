@@ -118,8 +118,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 #if 0
 	for (int iii = 0; iii < 0x0f; iii++)
-		mame_printf_debug("%.8x ", state->m_videoregs[iii]);
-	mame_printf_debug("\n");
+		osd_printf_debug("%.8x ", state->m_videoregs[iii]);
+	osd_printf_debug("\n");
 #endif
 
 	while( source<finish )
@@ -173,7 +173,7 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 #if 0
 		if (!(source[4] == 0x00000000 || source[4] == 0x000000aa))
-			mame_printf_debug("unknown : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x \n", source[0], source[1], source[2], source[3],
+			osd_printf_debug("unknown : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x \n", source[0], source[1], source[2], source[3],
 				source[4], source[5], source[6], source[7]);
 #endif
 
@@ -570,7 +570,7 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 		hng64_mark_tile_dirty(state, 3, offset&0x3fff);
 	}
 
-//  if ((realoff>=0x40000)) mame_printf_debug("offsw %08x %08x\n",realoff,data);
+//  if ((realoff>=0x40000)) osd_printf_debug("offsw %08x %08x\n",realoff,data);
 
 	/* 400000 - 7fffff is scroll regs etc. */
 }
@@ -2852,8 +2852,8 @@ static void DrawWireframe(running_machine &machine, struct polygon *p)
 	int j;
 	for (j = 0; j < p->n; j++)
 	{
-		// mame_printf_debug("now drawing : %f %f %f, %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[j].clipCoords[2], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[2]);
-		// mame_printf_debug("%f %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1]);
+		// osd_printf_debug("now drawing : %f %f %f, %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[j].clipCoords[2], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[2]);
+		// osd_printf_debug("%f %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1]);
 		UINT32 color = rgb_t((UINT8)255, (UINT8)255, (UINT8)0, (UINT8)0);
 		drawline2d(machine, p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], color);
 	}

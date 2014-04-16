@@ -139,13 +139,13 @@ WRITE32_MEMBER( k001006_device::write )
 			}
 			case 0xf:   // Unknown RAM write
 			{
-			//  mame_printf_debug("Unknown RAM %08X = %04X\n", m_addr, data & 0xffff);
+			//  osd_printf_debug("Unknown RAM %08X = %04X\n", m_addr, data & 0xffff);
 				m_unknown_ram[m_addr++] = data & 0xffff;
 				break;
 			}
 			default:
 			{
-				mame_printf_debug("k001006_w: device %02X, write %04X to %08X\n", m_device_sel, data & 0xffff, m_addr++);
+				osd_printf_debug("k001006_w: device %02X, write %04X to %08X\n", m_device_sel, data & 0xffff, m_addr++);
 			}
 		}
 	}

@@ -428,11 +428,11 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 
 			default:
 			{
-				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
+				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
 				break;
 			}
 		}
-		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", machine().describe_context(), data, offset, mem_mask);
+		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", machine().describe_context(), data, offset, mem_mask);
 	}
 	else
 	{

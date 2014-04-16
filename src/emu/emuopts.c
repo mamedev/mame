@@ -105,8 +105,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_GAMMA "(0.1-3.0)",                          "1.0",       OPTION_FLOAT,      "default game screen gamma correction" },
 	{ OPTION_PAUSE_BRIGHTNESS "(0.0-1.0)",               "0.65",      OPTION_FLOAT,      "amount to scale the screen brightness when paused" },
 	{ OPTION_EFFECT,                                     "none",      OPTION_STRING,     "name of a PNG file to use for visual effects, or 'none'" },
-	{ OPTION_MINIMUM_WIDTH,                              "320",       OPTION_INTEGER,    "minimum screen width" },
-	{ OPTION_MINIMUM_HEIGHT,                             "240",       OPTION_INTEGER,    "minimum screen height" },
 
 	// vector options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE VECTOR OPTIONS" },
@@ -540,7 +538,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 		return false;
 
 	// parse the file
-	mame_printf_verbose("Parsing %s.ini\n", basename);
+	osd_printf_verbose("Parsing %s.ini\n", basename);
 	astring error;
 	bool result = parse_ini_file(file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 

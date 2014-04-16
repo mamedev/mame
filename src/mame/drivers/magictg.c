@@ -273,7 +273,7 @@ UINT32 magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 
 
 static UINT32 pci_dev0_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
-	mame_printf_debug("PCI[0] READ: %x\n", reg);
+	osd_printf_debug("PCI[0] READ: %x\n", reg);
 	return 0x00000000; // TODO
 }
 
@@ -299,7 +299,7 @@ static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function
 			val = state->m_voodoo_pci_regs[0].init_enable;
 			break;
 		default:
-			mame_printf_debug("Voodoo[0] PCI R: %x\n", reg);
+			osd_printf_debug("Voodoo[0] PCI R: %x\n", reg);
 	}
 	return val;
 }
@@ -325,7 +325,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 			break;
 
 		default:
-			mame_printf_debug("Voodoo [%x]: %x\n", reg, data);
+			osd_printf_debug("Voodoo [%x]: %x\n", reg, data);
 	}
 }
 
@@ -347,7 +347,7 @@ static UINT32 voodoo_1_pci_r(device_t *busdevice, device_t *device, int function
 			val = state->m_voodoo_pci_regs[1].init_enable;
 			break;
 		default:
-			mame_printf_debug("Voodoo[1] PCI R: %x\n", reg);
+			osd_printf_debug("Voodoo[1] PCI R: %x\n", reg);
 	}
 	return val;
 }
@@ -373,7 +373,7 @@ static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, 
 			break;
 
 		default:
-			mame_printf_debug("Voodoo [%x]: %x\n", reg, data);
+			osd_printf_debug("Voodoo [%x]: %x\n", reg, data);
 	}
 }
 #endif
@@ -432,7 +432,7 @@ static UINT32 zr36120_pci_r(device_t* busdevice, device_t* device, int function,
 			val = state->m_zr36120.base_addr;
 			break;
 		default:
-			mame_printf_debug("ZR36120 R[%x]\n", reg);
+			osd_printf_debug("ZR36120 R[%x]\n", reg);
 	}
 	return val;
 }
@@ -450,7 +450,7 @@ static void zr36120_pci_w(device_t* busdevice, device_t* device, int function, i
 			state->m_zr36120.base_addr = data & 0xfffff000;
 			break;
 		default:
-			mame_printf_debug("ZR36120 [%x]: %x\n", reg, data);
+			osd_printf_debug("ZR36120 [%x]: %x\n", reg, data);
 	}
 }
 
@@ -473,7 +473,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 		/* Post office */
 		res = 0;//mame_rand(space.machine);//m_zr36120.as_regs[0x48/4];
 	}
-	mame_printf_debug("PINKEYE_R[%x]\n", offset);
+	osd_printf_debug("PINKEYE_R[%x]\n", offset);
 	return res;
 }
 
@@ -483,7 +483,7 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 
 	if (offset < 0x200)
 	{
-		mame_printf_debug("PINKEYE_W[%x] %x\n", offset, data);
+		osd_printf_debug("PINKEYE_W[%x] %x\n", offset, data);
 		switch (offset)
 		{
 			case 0x00/4:
@@ -506,7 +506,7 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 		//  zr36120_guest_write(guest, g_data, g_reg);
 		// 2 - ZR36050 JPEG decoder
 		// 3 - ZR36016 color-space converter
-		mame_printf_debug("GUEST (%.8x): %d  REG: %d  DATA: %x\n", data, guest, g_reg, g_data);
+		osd_printf_debug("GUEST (%.8x): %d  REG: %d  DATA: %x\n", data, guest, g_reg, g_data);
 	}
 }
 
@@ -554,21 +554,21 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		case 0x808:
 		case 0x80c:
 			m_dma_ch[ch].count = data;
-//          mame_printf_debug("DMA%d COUNT: %.8x\n", ch, data);
+//          osd_printf_debug("DMA%d COUNT: %.8x\n", ch, data);
 			break;
 
 		case 0x814:
 		case 0x818:
 		case 0x81c:
 			m_dma_ch[ch].src_addr = data;
-//          mame_printf_debug("DMA%d SRC: %.8x\n", ch, data);
+//          osd_printf_debug("DMA%d SRC: %.8x\n", ch, data);
 			break;
 
 		case 0x824:
 		case 0x828:
 		case 0x82c:
 			m_dma_ch[ch].dst_addr = data;
-//          mame_printf_debug("DMA%d DST: %.8x\n", ch, data);
+//          osd_printf_debug("DMA%d DST: %.8x\n", ch, data);
 			break;
 
 		case 0x844:
@@ -576,7 +576,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		case 0x84c:
 		{
 			m_dma_ch[ch].ctrl = data;
-//          mame_printf_debug("DMA%d CTRL: %.8x\n", ch, data);
+//          osd_printf_debug("DMA%d CTRL: %.8x\n", ch, data);
 
 			if (data & 0x1000)
 			{
@@ -622,7 +622,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 			break;
 		}
 //      default:
-//          mame_printf_debug("W: %.8x: %.8x\n", 0x0f000000 + offset, data);
+//          osd_printf_debug("W: %.8x: %.8x\n", 0x0f000000 + offset, data);
 	}
 }
 
@@ -659,7 +659,7 @@ READ32_MEMBER( magictg_state::f0_r )
 			break;
 		}
 //      default:
-//          mame_printf_debug("R: %.8x\n", 0x0f000000 + offset);
+//          osd_printf_debug("R: %.8x\n", 0x0f000000 + offset);
 	}
 
 	return FLIPENDIAN_INT32(val);
@@ -685,7 +685,7 @@ READ32_MEMBER( magictg_state::adsp_idma_data_r )
 	// TODO: Set /IACK appropriately
 	if (ACCESSING_BITS_0_15)
 	{
-		//mame_printf_debug("RD %.8x %.8x\n", offset, mem_mask);
+		//osd_printf_debug("RD %.8x %.8x\n", offset, mem_mask);
 		return m_adsp->idma_addr_r();
 	}
 	else
@@ -701,7 +701,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		m_adsp->idma_addr_w(data >> 16);
-		//mame_printf_debug("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
+		//osd_printf_debug("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
 	}
 	else
 		fatalerror("????\n");
@@ -726,7 +726,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 			res = space.machine().rand() & 0xff;
 			break;
 		default:
-			mame_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
+			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
 	}
 	return res;
 }
@@ -804,10 +804,10 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 			break;
 		}
 		case 5:
-			mame_printf_debug("PFLAGS: %x\n", data);
+			osd_printf_debug("PFLAGS: %x\n", data);
 			break;
 		default:
-			mame_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
+			osd_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
 	}
 }
 

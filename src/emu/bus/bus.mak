@@ -693,7 +693,7 @@ BUSOBJS += $(BUSOBJ)/centronics/ctronics.o
 BUSOBJS += $(BUSOBJ)/centronics/comxpl80.o
 BUSOBJS += $(BUSOBJ)/centronics/covox.o
 BUSOBJS += $(BUSOBJ)/centronics/dsjoy.o
-BUSOBJS += $(BUSOBJ)/centronics/image.o
+BUSOBJS += $(BUSOBJ)/centronics/printer.o
 endif
 
 #-------------------------------------------------
@@ -706,6 +706,7 @@ OBJDIRS += $(BUSOBJ)/rs232
 BUSOBJS += $(BUSOBJ)/rs232/keyboard.o
 BUSOBJS += $(BUSOBJ)/rs232/loopback.o
 BUSOBJS += $(BUSOBJ)/rs232/null_modem.o
+BUSOBJS += $(BUSOBJ)/rs232/printer.o
 BUSOBJS += $(BUSOBJ)/rs232/rs232.o
 BUSOBJS += $(BUSOBJ)/rs232/ser_mouse.o
 BUSOBJS += $(BUSOBJ)/rs232/terminal.o

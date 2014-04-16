@@ -1144,7 +1144,7 @@ static void recompute_video_memory(voodoo_state *v)
 	if (v->fbi.auxoffs != ~0 && v->fbi.auxoffs > v->fbi.mask)
 		v->fbi.auxoffs = v->fbi.mask;
 
-/*  mame_printf_debug("rgb[0] = %08X   rgb[1] = %08X   rgb[2] = %08X   aux = %08X\n",
+/*  osd_printf_debug("rgb[0] = %08X   rgb[1] = %08X   rgb[2] = %08X   aux = %08X\n",
             v->fbi.rgboffs[0], v->fbi.rgboffs[1], v->fbi.rgboffs[2], v->fbi.auxoffs);*/
 
 	/* compute the memory FIFO location and size */
@@ -1362,7 +1362,7 @@ static void recompute_texture_params(tmu_state *t)
 
 	/* start with the base of LOD 0 */
 	if (t->texaddr_shift == 0 && (t->reg[texBaseAddr].u & 1))
-		mame_printf_debug("Tiled texture\n");
+		osd_printf_debug("Tiled texture\n");
 	base = (t->reg[texBaseAddr].u & t->texaddr_mask) << t->texaddr_shift;
 	t->lodoffset[0] = base & t->mask;
 
@@ -1597,7 +1597,7 @@ static int cmdfifo_compute_expected_depth(voodoo_state *v, cmdfifo_info *f)
 			return 2 + ((command >> 3) & 0x7ffff);
 
 		default:
-			mame_printf_debug("UNKNOWN PACKET TYPE %d\n", command & 7);
+			osd_printf_debug("UNKNOWN PACKET TYPE %d\n", command & 7);
 			return 1;
 	}
 }
@@ -1648,7 +1648,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 				case 1:     /* JSR */
 					if (LOG_CMDFIFO) logerror("  JSR $%06X\n", target);
-					mame_printf_debug("JSR in CMDFIFO!\n");
+					osd_printf_debug("JSR in CMDFIFO!\n");
 					src = &fifobase[target / 4];
 					break;
 
@@ -1669,7 +1669,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 					break;
 
 				default:
-					mame_printf_debug("INVALID JUMP COMMAND!\n");
+					osd_printf_debug("INVALID JUMP COMMAND!\n");
 					fatalerror("  INVALID JUMP COMMAND\n");
 					break;
 			}
@@ -2618,25 +2618,25 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					vgadiff = vgaperiod - refresh;
 					if (vgadiff < 0) vgadiff = -vgadiff;
 
-					mame_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",
+					osd_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",
 						v->reg[hSync].u, v->reg[vSync].u, v->reg[backPorch].u, v->reg[videoDimensions].u);
-					mame_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
+					osd_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
 
 					/* configure the screen based on which one matches the closest */
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
 						v->screen->configure(htotal, vtotal, visarea, stdperiod);
-						mame_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
+						osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 					}
 					else if (meddiff < vgadiff)
 					{
 						v->screen->configure(htotal, vtotal, visarea, medperiod);
-						mame_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
+						osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 					}
 					else
 					{
 						v->screen->configure(htotal, vtotal, visarea, vgaperiod);
-						mame_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
+						osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 					}
 
 					/* configure the new framebuffer info */

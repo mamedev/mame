@@ -1401,7 +1401,7 @@ void arm_cpu_device::HandleCoProVL86C020( UINT32 insn )
 			0x00<<0 <- Revision number, 0
 			*/
 			SetRegister(rn, 0x41560300);
-			debugger_break(machine());
+			//debugger_break(machine());
 		}
 		else
 			SetRegister(rn, m_coproRegister[crn]);
@@ -1413,7 +1413,7 @@ void arm_cpu_device::HandleCoProVL86C020( UINT32 insn )
 		if(crn != 0)
 			m_coproRegister[crn]=GetRegister(rn);
 
-		printf("%08x:  VL86C020 copro instruction write %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
+		//printf("%08x:  VL86C020 copro instruction write %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
 	}
 	else
 	{

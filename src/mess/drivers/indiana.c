@@ -61,33 +61,6 @@ DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
 }
 
-static const isa16bus_interface indiana_isabus_intf =
-{
-	// interrupts 2-7
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// high IRQs 10-15
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// dma request 0-7
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 SLOT_INTERFACE_START( indiana_isa_cards )
 	// 8-bit
 	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
@@ -98,17 +71,21 @@ SLOT_INTERFACE_START( indiana_isa_cards )
 	SLOT_INTERFACE("ide", ISA16_IDE)
 SLOT_INTERFACE_END
 
-static struct serial_keyboard_interface keyboard_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(MFP_TAG, mc68901_device, write_rx)
-};
+static DEVICE_INPUT_DEFAULTS_START( keyboard )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( indiana, indiana_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
 
-	MCFG_ISA16_BUS_ADD(ISABUS_TAG, ":"M68K_TAG, indiana_isabus_intf)
+	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
+	MCFG_ISA16_CPU(":"M68K_TAG)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa1", indiana_isa_cards, "vga", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa2", indiana_isa_cards, "fdc_at", false)
@@ -119,9 +96,11 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_MC68901_TIMER_CLOCK(XTAL_16MHz/4)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 
-	MCFG_SERIAL_KEYBOARD_ADD("keyboard", keyboard_interface, 1200)
+	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MFP_TAG, mc68901_device, write_rx))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 MACHINE_CONFIG_END
 
 /* ROM definition */

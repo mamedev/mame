@@ -1,86 +1,32 @@
 #include "terminal.h"
 
+serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__),
+	device_serial_interface(mconfig, *this),
+	device_rs232_port_interface(mconfig, *this),
+	m_rs232_txbaud(*this, "RS232_TXBAUD"),
+	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
+	m_rs232_startbits(*this, "RS232_STARTBITS"),
+	m_rs232_databits(*this, "RS232_DATABITS"),
+	m_rs232_parity(*this, "RS232_PARITY"),
+	m_rs232_stopbits(*this, "RS232_STOPBITS")
+{
+}
+
 static INPUT_PORTS_START(serial_terminal)
 	PORT_INCLUDE(generic_terminal)
-	PORT_START("TERM_TXBAUD")
-	PORT_CONFNAME(0xff, 0x06, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
-	PORT_CONFSETTING( 0x0d, "110")
-	PORT_CONFSETTING( 0x00, "150")
-	PORT_CONFSETTING( 0x01, "300")
-	PORT_CONFSETTING( 0x02, "600")
-	PORT_CONFSETTING( 0x03, "1200")
-	PORT_CONFSETTING( 0x04, "2400")
-	PORT_CONFSETTING( 0x05, "4800")
-	PORT_CONFSETTING( 0x06, "9600")
-	PORT_CONFSETTING( 0x07, "14400")
-	PORT_CONFSETTING( 0x08, "19200")
-	PORT_CONFSETTING( 0x09, "28800")
-	PORT_CONFSETTING( 0x0a, "38400")
-	PORT_CONFSETTING( 0x0b, "57600")
-	PORT_CONFSETTING( 0x0c, "115200")
 
-	PORT_START("TERM_RXBAUD")
-	PORT_CONFNAME(0xff, 0x06, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
-	PORT_CONFSETTING( 0x0d, "110")
-	PORT_CONFSETTING( 0x00, "150")
-	PORT_CONFSETTING( 0x01, "300")
-	PORT_CONFSETTING( 0x02, "600")
-	PORT_CONFSETTING( 0x03, "1200")
-	PORT_CONFSETTING( 0x04, "2400")
-	PORT_CONFSETTING( 0x05, "4800")
-	PORT_CONFSETTING( 0x06, "9600")
-	PORT_CONFSETTING( 0x07, "14400")
-	PORT_CONFSETTING( 0x08, "19200")
-	PORT_CONFSETTING( 0x09, "28800")
-	PORT_CONFSETTING( 0x0a, "38400")
-	PORT_CONFSETTING( 0x0b, "57600")
-	PORT_CONFSETTING( 0x0c, "115200")
-
-	PORT_START("TERM_STARTBITS")
-	PORT_CONFNAME(0xff, 0x01, "Start Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
-	PORT_CONFSETTING( 0x00, "0")
-	PORT_CONFSETTING( 0x01, "1")
-
-	PORT_START("TERM_DATABITS")
-	PORT_CONFNAME(0xff, 0x03, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
-	PORT_CONFSETTING( 0x00, "5")
-	PORT_CONFSETTING( 0x01, "6")
-	PORT_CONFSETTING( 0x02, "7")
-	PORT_CONFSETTING( 0x03, "8")
-	PORT_CONFSETTING( 0x04, "9")
-
-	PORT_START("TERM_PARITY")
-	PORT_CONFNAME(0xff, 0x00, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
-	PORT_CONFSETTING( 0x00, "None")
-	PORT_CONFSETTING( 0x01, "Odd")
-	PORT_CONFSETTING( 0x02, "Even")
-	PORT_CONFSETTING( 0x03, "Mark")
-	PORT_CONFSETTING( 0x04, "Space")
-
-	PORT_START("TERM_STOPBITS")
-	PORT_CONFNAME(0xff, 0x01, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
-	PORT_CONFSETTING( 0x00, "0")
-	PORT_CONFSETTING( 0x01, "1")
-	PORT_CONFSETTING( 0x02, "1.5")
-	PORT_CONFSETTING( 0x03, "2")
+	MCFG_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", serial_terminal_device, update_serial)
+	MCFG_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_terminal_device, update_serial)
+	MCFG_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_terminal_device, update_serial)
+	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_terminal_device, update_serial)
+	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_terminal_device, update_serial)
+	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_terminal_device, update_serial)
 INPUT_PORTS_END
 
 ioport_constructor serial_terminal_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(serial_terminal);
-}
-
-serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__),
-	device_serial_interface(mconfig, *this),
-	device_rs232_port_interface(mconfig, *this),
-	m_io_term_txbaud(*this, "TERM_TXBAUD"),
-	m_io_term_rxbaud(*this, "TERM_RXBAUD"),
-	m_io_term_startbits(*this, "TERM_STARTBITS"),
-	m_io_term_databits(*this, "TERM_DATABITS"),
-	m_io_term_parity(*this, "TERM_PARITY"),
-	m_io_term_stopbits(*this, "TERM_STOPBITS")
-{
 }
 
 void serial_terminal_device::device_start()
@@ -89,31 +35,30 @@ void serial_terminal_device::device_start()
 
 WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 {
-	static const int m_baud[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200, 110};
-	static const int m_startbits[] = {0, 1};
-	static const int m_databits[] = {5, 6, 7, 8, 9};
-	static const parity_t m_parity[] = {PARITY_NONE, PARITY_ODD, PARITY_EVEN, PARITY_MARK, PARITY_SPACE};
-	static const stop_bits_t m_stopbits[] = {STOP_BITS_0, STOP_BITS_1, STOP_BITS_1_5, STOP_BITS_2};
+	int startbits = convert_startbits(m_rs232_startbits->read());
+	int databits = convert_databits(m_rs232_databits->read());
+	parity_t parity = convert_parity(m_rs232_parity->read());
+	stop_bits_t stopbits = convert_stopbits(m_rs232_stopbits->read());
 
-	UINT8 startbits = m_io_term_startbits->read();
-	UINT8 databits = m_io_term_databits->read();
-	UINT8 parity = m_io_term_parity->read();
-	UINT8 stopbits = m_io_term_stopbits->read();
+	set_data_frame(startbits, databits, parity, stopbits);
 
-	set_data_frame(m_startbits[startbits], m_databits[databits], m_parity[parity], m_stopbits[stopbits]);
+	int txbaud = convert_baud(m_rs232_txbaud->read());
+	set_tra_rate(txbaud);
 
-	UINT8 txbaud = m_io_term_txbaud->read();
-	set_tra_rate(m_baud[txbaud]);
+	int rxbaud = convert_baud(m_rs232_rxbaud->read());
+	set_rcv_rate(rxbaud);
 
-	UINT8 rxbaud = m_io_term_rxbaud->read();
-	set_rcv_rate(m_baud[rxbaud]);
+	output_rxd(1);
+
+	// TODO: make this configurable
+	output_dcd(0);
+	output_dsr(0);
+	output_cts(0);
 }
 
 void serial_terminal_device::device_reset()
 {
 	generic_terminal_device::device_reset();
-
-	output_rxd(1);
 
 	update_serial(0);
 }
@@ -125,11 +70,12 @@ void serial_terminal_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 void serial_terminal_device::send_key(UINT8 code)
 {
-	if(is_transmit_register_empty())
+	if (is_transmit_register_empty())
 	{
 		transmit_register_setup(code);
 		return;
 	}
+
 	m_key_valid = true;
 	m_curr_key = code;
 }
@@ -141,7 +87,7 @@ void serial_terminal_device::tra_callback()
 
 void serial_terminal_device::tra_complete()
 {
-	if(m_key_valid)
+	if (m_key_valid)
 	{
 		transmit_register_setup(m_curr_key);
 		m_key_valid = false;

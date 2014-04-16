@@ -743,7 +743,7 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_CASSETTE_ADD("cassette", jtc_cassette_interface)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 

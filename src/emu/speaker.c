@@ -22,7 +22,7 @@
 
 #define VERBOSE         (0)
 
-#define VPRINTF(x)      do { if (VERBOSE) mame_printf_debug x; } while (0)
+#define VPRINTF(x)      do { if (VERBOSE) osd_printf_debug x; } while (0)
 
 
 
@@ -68,7 +68,7 @@ speaker_device::~speaker_device()
 #ifdef MAME_DEBUG
 	// log the maximum sample values for all speakers
 	if (m_max_sample > 0)
-		mame_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
+		osd_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
 #endif
 }
 

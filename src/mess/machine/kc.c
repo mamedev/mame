@@ -50,7 +50,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 
 	if (datasize > size - 128)
 	{
-		mame_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (UINT32)size - 128);
+		osd_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (UINT32)size - 128);
 		datasize = size - 128;
 	}
 

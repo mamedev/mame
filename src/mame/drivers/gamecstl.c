@@ -310,7 +310,7 @@ WRITE32_MEMBER(gamecstl_state::pnp_config_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-//      mame_printf_debug("PNP Config: %02X\n", (data >> 8) & 0xff);
+//      osd_printf_debug("PNP Config: %02X\n", (data >> 8) & 0xff);
 	}
 }
 
@@ -318,7 +318,7 @@ WRITE32_MEMBER(gamecstl_state::pnp_data_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-//      mame_printf_debug("PNP Data: %02X\n", (data >> 8) & 0xff);
+//      osd_printf_debug("PNP Data: %02X\n", (data >> 8) & 0xff);
 	}
 }
 

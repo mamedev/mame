@@ -33,7 +33,7 @@ READ8_MEMBER(solomon_state::solomon_0xe603_r)
 	}
 	else
 	{
-		mame_printf_debug("unhandled solomon_0xe603_r %04x\n", space.device().safe_pc());
+		osd_printf_debug("unhandled solomon_0xe603_r %04x\n", space.device().safe_pc());
 		return 0;
 	}
 }

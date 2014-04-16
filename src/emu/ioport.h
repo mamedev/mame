@@ -334,6 +334,7 @@ enum ioport_type
 		IPT_UI_ON_SCREEN_DISPLAY,
 		IPT_UI_DEBUG_BREAK,
 		IPT_UI_PAUSE,
+		IPT_UI_SINGLE_STEP,
 		IPT_UI_RESET_MACHINE,
 		IPT_UI_SOFT_RESET,
 		IPT_UI_SHOW_GFX,
@@ -368,6 +369,13 @@ enum ioport_type
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
 		IPT_UI_LOAD_STATE,
+		
+		// dummy slots that will likely be filled soon (putting these in as a temporary convenience)
+		IPT_UI_DUMMY1,
+		IPT_UI_DUMMY2,
+		IPT_UI_DUMMY3,
+		IPT_UI_DUMMY4,
+		IPT_UI_DUMMY5,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,

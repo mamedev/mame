@@ -63,7 +63,7 @@ static const ptm6840_interface ptm_intf =
 WRITE8_MEMBER(esripsys_state::uart_w)
 {
 	if ((offset & 1) == 0)
-		mame_printf_debug("%c",data);
+		osd_printf_debug("%c",data);
 }
 
 READ8_MEMBER(esripsys_state::uart_r)

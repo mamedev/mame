@@ -1,82 +1,14 @@
-/***************************************************************************
-Generic ASCII Serial Keyboard
-
-Use MCFG_SERIAL_KEYBOARD_ADD to attach this as a serial device to a terminal
-or computer.
-
-
-Example of usage in a driver.
-
-In MACHINE_CONFIG
-	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, 0)
-or
-	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, initial_baud_rate)
-
-
-In the code:
-
-WRITE8_MEMBER( xxx_state::kbd_put )
-{
-    (code to capture the key as it is pressed)
-}
-
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-    DEVCB_DRIVER_MEMBER(xxx_state, kbd_put)
-};
-
-If a baud_rate is specified, it will be the initial baud rate, with
-8 bits, no parity, 1 stop bit. However you can override this with the
-config switches. (Note that the config switch will specify 9600 initially,
-even though it isn't).
-
-If a baud_rate is not specified, the rate will be solely determined
-by the config switches. (Default 9600 baud)
-
-
-***************************************************************************/
-
 #include "keyboard.h"
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-static INPUT_PORTS_START(serial_keyboard)
-	PORT_INCLUDE(generic_keyboard)
-	PORT_START("TERM_FRAME")
-	PORT_CONFNAME(0x0f, 0x06, "Baud") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_keyboard_device, update_frame, 0)
-	PORT_CONFSETTING( 0x0d, "110")
-	PORT_CONFSETTING( 0x00, "150")
-	PORT_CONFSETTING( 0x01, "300")
-	PORT_CONFSETTING( 0x02, "600")
-	PORT_CONFSETTING( 0x03, "1200")
-	PORT_CONFSETTING( 0x04, "2400")
-	PORT_CONFSETTING( 0x05, "4800")
-	PORT_CONFSETTING( 0x06, "9600")
-	PORT_CONFSETTING( 0x07, "14400")
-	PORT_CONFSETTING( 0x08, "19200")
-	PORT_CONFSETTING( 0x09, "28800")
-	PORT_CONFSETTING( 0x0a, "38400")
-	PORT_CONFSETTING( 0x0b, "57600")
-	PORT_CONFSETTING( 0x0c, "115200")
-	PORT_CONFNAME(0x30, 0x00, "Format") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_keyboard_device, update_frame, 0)
-	PORT_CONFSETTING( 0x00, "8N1")
-	PORT_CONFSETTING( 0x10, "7E1")
-	PORT_CONFSETTING( 0x20, "8N2")
-	PORT_CONFSETTING( 0x30, "8E1")
-INPUT_PORTS_END
-
-ioport_constructor serial_keyboard_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(serial_keyboard);
-}
 
 serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock, "serial_keyboard", __FILE__),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
-	m_io_term_frame(*this, "TERM_FRAME")
+	m_rs232_txbaud(*this, "RS232_TXBAUD"),
+	m_rs232_startbits(*this, "RS232_STARTBITS"),
+	m_rs232_databits(*this, "RS232_DATABITS"),
+	m_rs232_parity(*this, "RS232_PARITY"),
+	m_rs232_stopbits(*this, "RS232_STOPBITS")
 {
 }
 
@@ -84,75 +16,60 @@ serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, de
 	: generic_keyboard_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
-	m_io_term_frame(*this, "TERM_FRAME")
+	m_rs232_txbaud(*this, "RS232_TXBAUD"),
+	m_rs232_startbits(*this, "RS232_STARTBITS"),
+	m_rs232_databits(*this, "RS232_DATABITS"),
+	m_rs232_parity(*this, "RS232_PARITY"),
+	m_rs232_stopbits(*this, "RS232_STOPBITS")
 {
 }
 
-void serial_keyboard_device::device_config_complete()
-{
-	const serial_keyboard_interface *intf = reinterpret_cast<const serial_keyboard_interface *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<serial_keyboard_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
-	}
-}
+static INPUT_PORTS_START(serial_keyboard)
+	PORT_INCLUDE(generic_keyboard)
 
-static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200, 110};
+	MCFG_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", serial_keyboard_device, update_serial)
+	MCFG_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_keyboard_device, update_serial)
+	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_keyboard_device, update_serial)
+	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_keyboard_device, update_serial)
+	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_keyboard_device, update_serial)
+INPUT_PORTS_END
+
+ioport_constructor serial_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(serial_keyboard);
+}
 
 void serial_keyboard_device::device_start()
 {
-	m_baud = clock();
-	m_out_tx_func.resolve(m_out_tx_cb, *this);
+	/// HACK: the base class resolves a handler in device_start()
 	m_timer = timer_alloc();
-
-	if (m_baud)
-	{
-		set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-		set_tra_rate(m_baud);
-	}
 }
 
-INPUT_CHANGED_MEMBER(serial_keyboard_device::update_frame)
+WRITE_LINE_MEMBER(serial_keyboard_device::update_serial)
 {
-	m_baud = 0;
 	reset();
 }
 
 void serial_keyboard_device::device_reset()
 {
 	generic_keyboard_device::device_reset();
-	m_rbit = 1;
-	if (m_port)
-		output_rxd(m_rbit);
-	else
-		m_out_tx_func(m_rbit);
 
-	if (m_baud == 0)
-	{
-		UINT8 val = m_io_term_frame->read();
-		set_tra_rate(rates[val & 0x0f]);
+	int startbits = convert_startbits(m_rs232_startbits->read());
+	int databits = convert_databits(m_rs232_databits->read());
+	parity_t parity = convert_parity(m_rs232_parity->read());
+	stop_bits_t stopbits = convert_stopbits(m_rs232_stopbits->read());
 
-		switch(val & 0x30)
-		{
-		case 0x10:
-			set_data_frame(1, 7, PARITY_EVEN, STOP_BITS_1);
-			break;
-		case 0x00:
-		default:
-			set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-			break;
-		case 0x20:
-			set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-			break;
-		case 0x30:
-			set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
-			break;
-		}
-	}
+	set_data_frame(startbits, databits, parity, stopbits);
+
+	int txbaud = convert_baud(m_rs232_txbaud->read());
+	set_tra_rate(txbaud);
+
+	output_rxd(1);
+
+	// TODO: make this configurable
+	output_dcd(0);
+	output_dsr(0);
+	output_cts(0);
 }
 
 void serial_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -176,11 +93,7 @@ void serial_keyboard_device::send_key(UINT8 code)
 
 void serial_keyboard_device::tra_callback()
 {
-	m_rbit = transmit_register_get_data_bit();
-	if(m_port)
-		output_rxd(m_rbit);
-	else
-		m_out_tx_func(m_rbit);
+	output_rxd(transmit_register_get_data_bit());
 }
 
 void serial_keyboard_device::tra_complete()
@@ -190,11 +103,6 @@ void serial_keyboard_device::tra_complete()
 		transmit_register_setup(m_curr_key);
 		m_key_valid = false;
 	}
-}
-
-READ_LINE_MEMBER(serial_keyboard_device::tx_r)
-{
-	return m_rbit;
 }
 
 const device_type SERIAL_KEYBOARD = &device_creator<serial_keyboard_device>;

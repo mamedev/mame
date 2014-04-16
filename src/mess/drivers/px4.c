@@ -1400,7 +1400,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	// centronics printer
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(px4_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(px4_state, write_centronics_perror))
 

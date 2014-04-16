@@ -1247,7 +1247,7 @@ void n64_periphs::ai_fifo_push(UINT32 address, UINT32 length)
 {
 	if (ai_fifo_num == AUDIO_DMA_DEPTH)
 	{
-		mame_printf_debug("ai_fifo_push: tried to push to full DMA FIFO!!!\n");
+		osd_printf_debug("ai_fifo_push: tried to push to full DMA FIFO!!!\n");
 	}
 
 	ai_fifo[ai_fifo_wpos].address = address;
@@ -1324,7 +1324,7 @@ void n64_periphs::ai_dma()
 
 	ram = &ram[current->address/2];
 
-	//mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
+	//osd_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
 	dmadac_transfer(&ai_dac[0], 2, 1, 2, current->length/4, ram);
 
@@ -1779,7 +1779,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				}
 				case 5:
 				{
-					mame_printf_debug("EEPROM2? read status\n");
+					osd_printf_debug("EEPROM2? read status\n");
 					return 1;
 				}
 			}
@@ -1972,7 +1972,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 		default:
 		{
-			mame_printf_debug("handle_pif: unknown/unimplemented command %02X\n", command);
+			osd_printf_debug("handle_pif: unknown/unimplemented command %02X\n", command);
 			return 1;
 		}
 	}

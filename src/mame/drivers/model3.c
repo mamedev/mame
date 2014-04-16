@@ -1079,7 +1079,7 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 			}
 			break;
 	}
-	mame_printf_debug("real3d_dma_r: %08X, %08X%08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	osd_printf_debug("real3d_dma_r: %08X, %08X%08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 	return 0;
 }
 
@@ -1424,7 +1424,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 						}
 						break;
 					default:
-						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), space.device().safe_pc());
+						//osd_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), space.device().safe_pc());
 						break;
 				}
 			}
@@ -1631,14 +1631,14 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 READ64_MEMBER(model3_state::network_r)
 {
-	mame_printf_debug("network_r: %02X at %08X\n", offset, space.device().safe_pc());
+	osd_printf_debug("network_r: %02X at %08X\n", offset, space.device().safe_pc());
 	return m_network_ram[offset];
 }
 
 WRITE64_MEMBER(model3_state::network_w)
 {
 	COMBINE_DATA(m_network_ram + offset);
-	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), space.device().safe_pc());
+	osd_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), space.device().safe_pc());
 }
 
 
