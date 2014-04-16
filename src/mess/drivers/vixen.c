@@ -488,7 +488,7 @@ DISCRETE_SOUND_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8155_INTERFACE( i8155_intf )
+//  I8155 interface
 //-------------------------------------------------
 
 READ8_MEMBER( vixen_state::i8155_pa_r )
@@ -550,20 +550,8 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	m_discrete->write(space, NODE_01, BIT(data, 5));
 }
 
-static I8155_INTERFACE( i8155_intf )
-{
-	DEVCB_DRIVER_MEMBER(vixen_state, i8155_pa_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vixen_state, i8155_pb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vixen_state, i8155_pc_w),
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
-//  I8155_INTERFACE( io_i8155_intf )
+//  I8155 IO interface
 //-------------------------------------------------
 
 WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
@@ -641,18 +629,6 @@ WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 		m_usart->write_rxc(state);
 	}
 }
-
-static I8155_INTERFACE( io_i8155_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pc_w),
-	DEVCB_DRIVER_LINE_MEMBER(vixen_state, io_i8155_to_w)
-};
-
 
 //-------------------------------------------------
 //  i8251_interface usart_intf
@@ -800,8 +776,16 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices
-	MCFG_I8155_ADD(P8155H_TAG, XTAL_23_9616MHz/6, i8155_intf)
-	MCFG_I8155_ADD(P8155H_IO_TAG, XTAL_23_9616MHz/6, io_i8155_intf)
+	MCFG_DEVICE_ADD(P8155H_TAG, I8155, XTAL_23_9616MHz/6)
+	MCFG_I8155_IN_PORTA_CB(READ8(vixen_state, i8155_pa_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(vixen_state, i8155_pb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(vixen_state, i8155_pc_w))
+
+	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, XTAL_23_9616MHz/6)
+	MCFG_I8155_OUT_PORTA_CB(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(vixen_state, io_i8155_pb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(vixen_state, io_i8155_pc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(vixen_state, io_i8155_to_w))
 
 	MCFG_DEVICE_ADD(P8251A_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

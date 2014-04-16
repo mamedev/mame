@@ -125,19 +125,6 @@ WRITE_LINE_MEMBER(horse_state::horse_timer_out)
 	m_dac->write_signed8(state ? 0x7f : 0);
 }
 
-static I8155_INTERFACE(i8155_intf)
-{
-	// port A input, port B output, port C output (but unused)
-	DEVCB_DRIVER_MEMBER(horse_state,horse_input_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(horse_state,horse_output_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(horse_state,horse_timer_out)
-};
-
-
 /***************************************************************************
 
   Inputs
@@ -209,7 +196,11 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_CPU_IO_MAP(horse_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  horse_interrupt)
 
-	MCFG_I8155_ADD("i8155", XTAL_12MHz / 2, i8155_intf)
+	MCFG_DEVICE_ADD("i8155", I8155, XTAL_12MHz / 2)
+	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, horse_input_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, horse_output_w))
+	//port C output (but unused)
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(horse_state, horse_timer_out))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
