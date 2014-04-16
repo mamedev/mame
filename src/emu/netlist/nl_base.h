@@ -623,7 +623,7 @@ public:
 	netlist_matrix_solver_t *m_solver;
 	netlist_core_terminal_t * RESTRICT m_railterminal;
 
-	ATTR_HOT void solve();
+	ATTR_HOT void schedule_solve();
 
 	netlist_list_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
 	plinked_list<netlist_core_terminal_t> m_list_active;

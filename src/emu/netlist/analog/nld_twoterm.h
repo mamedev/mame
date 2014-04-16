@@ -115,7 +115,11 @@ class NETLIB_NAME(R_base) : public NETLIB_NAME(twoterm)
 public:
 	ATTR_COLD NETLIB_NAME(R_base)() : NETLIB_NAME(twoterm)(RESISTOR) { }
 
-	inline void set_R(const double R) { set(1.0 / R, 0.0, 0.0); }
+	inline void set_R(const double R)
+	{
+	    set(1.0 / R, 0.0, 0.0);
+	    //update_dev();
+	}
 
 protected:
 	ATTR_COLD virtual void start();

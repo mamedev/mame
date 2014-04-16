@@ -63,13 +63,13 @@ NETLIB_UPDATE(VCCS)
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	/* Big FIXME ... */
 	if (!m_IP.net().isRailNet())
-		m_IP.net().solve();
+		m_IP.net().schedule_solve();
 	else if (!m_IN.net().isRailNet())
-		m_IN.net().solve();
+		m_IN.net().schedule_solve();
 	else if (!m_OP.net().isRailNet())
-		m_OP.net().solve();
+		m_OP.net().schedule_solve();
 	else if (!m_ON.net().isRailNet())
-		m_ON.net().solve();
+		m_ON.net().schedule_solve();
 }
 
 // ----------------------------------------------------------------------------------------

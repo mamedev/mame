@@ -114,24 +114,24 @@ ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 
 ATTR_HOT void netlist_matrix_solver_t::schedule()
 {
-	if (!solve())
-	{
-		// NL_VERBOSE_OUT(("update_inputs\n");
-		update_inputs();
-	}
-	else
-	{
-		m_owner->netlist().warning("Matrix solver reschedule .. Consider increasing RESCHED_LOOPS");
-		if (m_owner != NULL)
-			this->m_owner->schedule();
-	}
-	//solve();
-	//    update_inputs();
+#if 0
+    if (/*!m_scheduled &&*/ m_owner != NULL)
+    {
+        m_scheduled = true;
+        this->m_owner->schedule();
+    }
+#else
+    solve();
+    update_inputs();
+
+    m_scheduled = false;
+#endif
 }
 
 ATTR_COLD void netlist_matrix_solver_t::reset()
 {
 	m_last_step = netlist_time::zero;
+	m_scheduled = true;
 }
 
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
@@ -141,9 +141,8 @@ ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 		m_steps[k]->step_time(dd);
 }
 
-ATTR_HOT bool netlist_matrix_solver_t::solve()
+ATTR_HOT void netlist_matrix_solver_t::solve()
 {
-	int  resched_cnt = 0;
 
 	netlist_time now = owner().netlist().time();
 	netlist_time delta = now - m_last_step;
@@ -162,17 +161,16 @@ ATTR_HOT bool netlist_matrix_solver_t::solve()
 		int this_resched;
 		do
 		{
-			update_dynamic();
-			this_resched = solve_non_dynamic();
-			resched_cnt += this_resched;
-		} while (this_resched > 1 && resched_cnt < m_params.m_resched_loops);
+            update_dynamic();
+            while ((this_resched = solve_non_dynamic()) > m_params.m_resched_loops)
+                owner().netlist().warning("Dynamic Solve iterations exceeded .. Consider increasing RESCHED_LOOPS");
+		} while (this_resched > 1);
 	}
 	else
 	{
-		resched_cnt = solve_non_dynamic();
-		//printf("resched_cnt %d %d\n", resched_cnt, m_resched_loops);
+		while (solve_non_dynamic() > m_params.m_resched_loops)
+            owner().netlist().warning("Non-Dynamic Solve iterations exceeded .. Consider increasing RESCHED_LOOPS");
 	}
-	return (resched_cnt >= m_params.m_resched_loops);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -425,7 +423,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 
 ATTR_HOT int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 {
-#if 1
+#if 0
 
 	double gtot_t = 0.0;
 	double RHS_t = 0.0;
@@ -654,7 +652,8 @@ NETLIB_START(solver)
 	register_output("Q_step", m_Q_step);
 	//register_input("FB", m_feedback);
 
-	register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(5).as_double());
+    register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(5).as_double());
+	//register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_US(10).as_double());
 	m_nt_sync_delay = m_sync_delay.Value();
 
 	register_param("FREQ", m_freq, 48000.0);
@@ -674,13 +673,13 @@ NETLIB_START(solver)
 	connect(m_fb_sync, m_Q_sync);
 	connect(m_fb_step, m_Q_step);
 
-	save(NAME(m_last_step));
+	//save(NAME(m_last_step));
 
 }
 
 NETLIB_RESET(solver)
 {
-	m_last_step = netlist_time::zero;
+	//m_last_step = netlist_time::zero;
 	for (int i = 0; i < m_mat_solvers.count(); i++)
 		m_mat_solvers[i]->reset();
 }
@@ -705,17 +704,7 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 NETLIB_UPDATE(solver)
 {
-	netlist_time now = netlist().time();
-	netlist_time delta = now - m_last_step;
-	bool do_full = false;
-	bool global_resched = false;
-	bool this_resched[100];
 	int t_cnt = m_mat_solvers.count();
-
-	if (delta < m_inc)
-		do_full = true; // we have been called between updates
-
-	m_last_step = now;
 
 #if HAS_OPENMP && USE_OPENMP
 	if (m_parallel.Value())
@@ -738,35 +727,17 @@ NETLIB_UPDATE(solver)
 				this_resched[i] = m_mat_solvers[i]->solve();
 		}
 #else
-	for (int i = 0; i < t_cnt; i++)
-	{
-		if (do_full || (m_mat_solvers[i]->is_timestep()))
-			this_resched[i] = m_mat_solvers[i]->solve();
-	}
+    for (int i = 0; i < t_cnt; i++)
+    {
+        if (m_mat_solvers[i]->is_timestep())
+            m_mat_solvers[i]->solve();
+        m_mat_solvers[i]->update_inputs();
+    }
 #endif
 
-	for (int i = 0; i < t_cnt; i++)
-	{
-		if (do_full || m_mat_solvers[i]->is_timestep())
-		{
-			global_resched = global_resched || this_resched[i];
-			if (!this_resched[i])
-				m_mat_solvers[i]->update_inputs();
-		}
-	}
-
-	if (global_resched)
-	{
-		netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
-		schedule();
-	}
-	else
-	{
-		/* step circuit */
-		if (!m_Q_step.net().is_queued())
-			m_Q_step.net().push_to_queue(m_inc);
-	}
-
+    /* step circuit */
+    if (!m_Q_step.net().is_queued())
+        m_Q_step.net().push_to_queue(m_inc);
 }
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()

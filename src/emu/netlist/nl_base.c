@@ -712,7 +712,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 	m_last_Analog = m_cur_Analog;
 }
 
-ATTR_HOT void netlist_net_t::solve()
+ATTR_HOT void netlist_net_t::schedule_solve()
 {
 	if (m_solver != NULL)
 		m_solver->schedule();

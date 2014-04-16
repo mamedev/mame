@@ -115,6 +115,8 @@ public:
 			}
 			m_RB.set(gb, v,   0.0);
 			m_RC.set(gc, 0.0, 0.0);
+			//m_RB.update_dev();
+            //m_RC.update_dev();
 			m_state_on = new_state;
 		}
 	}
@@ -122,11 +124,11 @@ public:
 	ATTR_HOT ATTR_ALIGN void virtual update()
 	{
 		if (!m_RB.m_P.net().isRailNet())
-			m_RB.m_P.net().solve();   // Basis
+			m_RB.m_P.net().schedule_solve();   // Basis
 		else if (!m_RB.m_N.net().isRailNet())
-			m_RB.m_N.net().solve();   // Emitter
+			m_RB.m_N.net().schedule_solve();   // Emitter
 		else if (!m_RC.m_P.net().isRailNet())
-			m_RB.m_P.net().solve();   // Collector
+			m_RC.m_P.net().schedule_solve();   // Collector
 	}
 
 	nld_twoterm m_RB;

@@ -165,11 +165,11 @@ NETLIB_START(QBJT_EB)
 NETLIB_UPDATE(QBJT_EB)
 {
 	if (!m_D_EB.m_P.net().isRailNet())
-		m_D_EB.m_P.net().solve();   // Basis
+		m_D_EB.m_P.net().schedule_solve();   // Basis
 	else if (!m_D_EB.m_N.net().isRailNet())
-		m_D_EB.m_N.net().solve();   // Emitter
+		m_D_EB.m_N.net().schedule_solve();   // Emitter
 	else
-		m_D_CB.m_N.net().solve();   // Collector
+		m_D_CB.m_N.net().schedule_solve();   // Collector
 }
 
 NETLIB_RESET(QBJT_EB)
