@@ -102,12 +102,6 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static const pc_kbdc_interface pc_kbdc_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_clock_w),
-	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_data_w)
-};
-
 static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
@@ -137,7 +131,9 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("cs4031", cs4031_device, irq01_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
 	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
-	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
+	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)

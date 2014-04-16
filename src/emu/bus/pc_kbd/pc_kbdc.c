@@ -69,6 +69,8 @@ const device_type PC_KBDC = &device_creator<pc_kbdc_device>;
 //-------------------------------------------------
 pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PC_KBDC, "PC_KBDC", tag, owner, clock, "pc_kbdc", __FILE__),
+		m_out_clock_cb(*this),
+		m_out_data_cb(*this),
 		m_clock_state(-1),
 		m_data_state(-1),
 		m_kb_clock_state(1),
@@ -76,30 +78,6 @@ pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, d
 		m_keyboard( NULL )
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-void pc_kbdc_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pc_kbdc_interface *intf = reinterpret_cast<const pc_kbdc_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<pc_kbdc_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
-	}
-}
-
 
 void pc_kbdc_device::set_keyboard( device_pc_kbd_interface *keyboard )
 {
@@ -113,8 +91,8 @@ void pc_kbdc_device::set_keyboard( device_pc_kbd_interface *keyboard )
 void pc_kbdc_device::device_start()
 {
 	// resolve callbacks
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
-	m_out_data_func.resolve(m_out_data_cb, *this);
+	m_out_clock_cb.resolve_safe();
+	m_out_data_cb.resolve_safe();
 }
 
 
@@ -144,7 +122,7 @@ void pc_kbdc_device::update_clock_state()
 		m_clock_state = new_clock_state;
 
 		// Send state to keyboard interface logic on mainboard
-		m_out_clock_func( m_clock_state );
+		m_out_clock_cb( m_clock_state );
 
 		// Send state to keyboard
 		if ( m_keyboard )
@@ -165,7 +143,7 @@ void pc_kbdc_device::update_data_state()
 		m_data_state = new_data_state;
 
 		// Send state to keyboard interface logic on mainboard
-		m_out_data_func( m_data_state );
+		m_out_data_cb( m_data_state );
 
 		// Send state to keyboard
 		if ( m_keyboard )
