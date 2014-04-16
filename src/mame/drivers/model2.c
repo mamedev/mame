@@ -14,7 +14,7 @@
 	- dynamcop: stalls at stage select screen;
 	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
 	- lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
-	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89);
+	- lastbrnx: uses a shitload of unsupported SHARC opcodes (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
 	- manxtt: missing 3d;
 	- motoraid: stalls after course select;
 	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;

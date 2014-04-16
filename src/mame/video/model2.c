@@ -2717,7 +2717,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 
 UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	logerror("--- frame ---\n");
+	//logerror("--- frame ---\n");
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
