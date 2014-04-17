@@ -16,7 +16,7 @@
 const device_type K001604 = &device_creator<k001604_device>;
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K001604, "Konami 001604", tag, owner, clock, "k001604", __FILE__),
+	: device_t(mconfig, K001604, "Konami 001604 2D tilemaps + 2x ROZ", tag, owner, clock, "k001604", __FILE__),
 	m_gfx_index_1(0),
 	m_gfx_index_2(0),
 	m_layer_size(0),

@@ -80,7 +80,7 @@ void netlist_mame_sub_interface::static_set_mult_offset(device_t &device, const 
 
 
 netlist_mame_analog_input_t::netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
+		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Analog Input", tag, owner, clock, "netlist_analog_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_param(0),
 			m_auto_port(true),
@@ -116,7 +116,7 @@ void netlist_mame_analog_input_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_analog_output_t::netlist_mame_analog_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog output", tag, owner, clock, "netlist_analog_output", __FILE__),
+		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Analog Output", tag, owner, clock, "netlist_analog_output", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_in("")
 {

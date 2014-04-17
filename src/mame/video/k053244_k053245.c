@@ -42,7 +42,7 @@ main ram and the buffer.
 const device_type K053244 = &device_creator<k05324x_device>;
 
 k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053244, "Konami 053244 & 053245", tag, owner, clock, "k05324x", __FILE__),
+	: device_t(mconfig, K053244, "Konami 053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
 	m_ram(NULL),
 	m_buffer(NULL),
 	m_gfx(NULL),

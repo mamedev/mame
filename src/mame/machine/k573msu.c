@@ -72,7 +72,7 @@
 */
 
 k573msu_device::k573msu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, KONAMI_573_MULTI_SESSION_UNIT, "Konami Multi Session Unit", tag, owner, clock, "k573msu", __FILE__)
+	device_t(mconfig, KONAMI_573_MULTI_SESSION_UNIT, "Konami 573 Multi Session Unit", tag, owner, clock, "k573msu", __FILE__)
 {
 }
 

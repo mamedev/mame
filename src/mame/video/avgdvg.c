@@ -1450,12 +1450,12 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, co
 }
 
 dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avgdvg_device(mconfig, DVG, "DVG", tag, owner, clock, "dvg", __FILE__)
+		avgdvg_device(mconfig, DVG, "Atari DVG", tag, owner, clock, "dvg", __FILE__)
 {
 }
 
 avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avgdvg_device(mconfig, AVG, "AVG", tag, owner, clock, "avg", __FILE__)
+		avgdvg_device(mconfig, AVG, "Atari AVG", tag, owner, clock, "avg", __FILE__)
 {
 }
 
@@ -1466,31 +1466,31 @@ avg_device::avg_device(const machine_config &mconfig, device_type type, const ch
 
 
 avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avg_device(mconfig, AVG_TEMPEST, "AVG_TEMPEST", tag, owner, clock, "avg_tempest", __FILE__)
+		avg_device(mconfig, AVG_TEMPEST, "Atari AVG (Tempest)", tag, owner, clock, "avg_tempest", __FILE__)
 {
 }
 avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avg_device(mconfig, AVG_MHAVOC, "AVG_MHAVOC", tag, owner, clock, "avg_mhavoc", __FILE__)
+		avg_device(mconfig, AVG_MHAVOC, "Atari AVG (Major Havoc)", tag, owner, clock, "avg_mhavoc", __FILE__)
 {
 }
 
 avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avg_device(mconfig, AVG_STARWARS, "AVG_STARWARS", tag, owner, clock, "avg_starwars", __FILE__)
+		avg_device(mconfig, AVG_STARWARS, "Atari AVG (Star Wars)", tag, owner, clock, "avg_starwars", __FILE__)
 {
 }
 
 avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avg_device(mconfig, AVG_QUANTUM, "AVG_QUANTUM", tag, owner, clock, "avg_quantum", __FILE__)
+		avg_device(mconfig, AVG_QUANTUM, "Atari AVG (Quantum)", tag, owner, clock, "avg_quantum", __FILE__)
 {
 }
 
 avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avg_device(mconfig, AVG_BZONE, "AVG_BZONE", tag, owner, clock, "avg_bzone", __FILE__)
+		avg_device(mconfig, AVG_BZONE, "Atari AVG (Battle Zone)", tag, owner, clock, "avg_bzone", __FILE__)
 {
 }
 
 avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		avg_device(mconfig, AVG_TOMCAT, "AVG_TOMCAT", tag, owner, clock, "avg_tomcat", __FILE__)
+		avg_device(mconfig, AVG_TOMCAT, "Atari AVG (TomCat)", tag, owner, clock, "avg_tomcat", __FILE__)
 {
 }
 

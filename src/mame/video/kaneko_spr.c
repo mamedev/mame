@@ -30,7 +30,7 @@ const device_type KANEKO_VU002_SPRITE = &device_creator<kaneko_vu002_sprite_devi
 const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_device>;
 
 kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
-	: device_t(mconfig, type, "kaneko16_sprite_device", tag, owner, clock, "kaneko16_sprite", __FILE__),
+	: device_t(mconfig, type, "Kaneko 16-bit Sprites", tag, owner, clock, "kaneko16_sprite", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxdecode(*this)
 {

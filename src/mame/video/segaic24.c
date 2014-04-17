@@ -22,7 +22,7 @@ const device_type S24MIXER = &device_creator<segas24_mixer>;
 
 
 segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, S24TILE, "S24TILE", tag, owner, clock, "segas24_tile", __FILE__),
+	: device_t(mconfig, S24TILE, "Sega System 24 Tilemap", tag, owner, clock, "segas24_tile", __FILE__),
 		m_gfxdecode(*this),
 		m_palette(*this)
 {
@@ -601,7 +601,7 @@ WRITE32_MEMBER(segas24_tile::char32_w)
 
 
 segas24_sprite::segas24_sprite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, S24SPRITE, "S24SPRITE", tag, owner, clock, "segas24_sprite", __FILE__)
+	: device_t(mconfig, S24SPRITE, "Sega System 24 Sprites", tag, owner, clock, "segas24_sprite", __FILE__)
 {
 }
 
@@ -846,7 +846,7 @@ READ16_MEMBER(segas24_sprite::read)
 
 
 segas24_mixer::segas24_mixer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, S24MIXER, "S24MIXER", tag, owner, clock, "segas24_mixer", __FILE__)
+	: device_t(mconfig, S24MIXER, "Sega System 24 Mixer", tag, owner, clock, "segas24_mixer", __FILE__)
 {
 }
 

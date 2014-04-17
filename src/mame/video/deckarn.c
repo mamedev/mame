@@ -13,7 +13,7 @@ void deco_karnovsprites_device::set_gfx_region(device_t &device, int region)
 const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device>;
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_KARNOVSPRITES, "karnovsprites_device", tag, owner, clock, "deco_karnovsprites", __FILE__),
+	: device_t(mconfig, DECO_KARNOVSPRITES, "DECO Karnov Sprites", tag, owner, clock, "deco_karnovsprites", __FILE__),
 		m_gfxregion(0),
 		m_gfxdecode(*this),
 		m_palette(*this)

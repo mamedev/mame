@@ -27,7 +27,7 @@ const device_type K053260 = &device_creator<k053260_device>;
 //-------------------------------------------------
 
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053260, "Konami 053260", tag, owner, clock, "k053260", __FILE__),
+	: device_t(mconfig, K053260, "Konami 053260 PCM", tag, owner, clock, "k053260", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(NULL),
 		m_mode(0),

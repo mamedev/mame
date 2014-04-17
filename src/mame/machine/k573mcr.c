@@ -12,7 +12,7 @@
 */
 
 k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, KONAMI_573_MEMORY_CARD_READER, "Konami Memory Card Reader", tag, owner, clock, "k573mcr", __FILE__)
+	device_t(mconfig, KONAMI_573_MEMORY_CARD_READER, "Konami 573 Memory Card Reader", tag, owner, clock, "k573mcr", __FILE__)
 {
 }
 

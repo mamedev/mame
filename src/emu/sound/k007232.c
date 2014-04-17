@@ -146,7 +146,7 @@ static const float kdaca_fn[][2] = {
 const device_type K007232 = &device_creator<k007232_device>;
 
 k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007232, "Konami 007232", tag, owner, clock, "k007232", __FILE__),
+	: device_t(mconfig, K007232, "Konami 007232 PCM Controller", tag, owner, clock, "k007232", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_port_write_handler(*this)
 {

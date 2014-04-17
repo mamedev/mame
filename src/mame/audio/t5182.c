@@ -152,7 +152,7 @@ rom.
 const device_type T5182 = &device_creator<t5182_device>;
 
 t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, T5182, "T5182", tag, owner, clock, "toshiba_t5182", __FILE__),
+	: device_t(mconfig, T5182, "T5182 MCU", tag, owner, clock, "toshiba_t5182", __FILE__),
 	m_t5182_sharedram(NULL),
 	m_irqstate(0),
 	m_semaphore_main(0),

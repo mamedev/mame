@@ -62,7 +62,7 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 }
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FIXFREQ, "FIXFREQ", tag, owner, clock, "fixfreq", __FILE__),
+	: device_t(mconfig, FIXFREQ, "Fixed Frequency Monochrome Monitor", tag, owner, clock, "fixfreq", __FILE__),
 		device_video_interface(mconfig, *this, false)
 {
 }

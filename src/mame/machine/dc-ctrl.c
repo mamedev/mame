@@ -28,7 +28,7 @@ void dc_controller_device::static_set_versions(device_t &device, const char *ver
 }
 
 dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	maple_device(mconfig, DC_CONTROLLER, "DC_CONTROLLER", tag, owner, clock, "dcctrl", __FILE__)
+	maple_device(mconfig, DC_CONTROLLER, "Dreamcast Controller", tag, owner, clock, "dcctrl", __FILE__)
 {
 	memset(port_tag, 0, sizeof(port_tag));
 

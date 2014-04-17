@@ -11,7 +11,7 @@
 const device_type S11C_BG = &device_creator<s11c_bg_device>;
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig,S11C_BG,"Williams System 11C background music",tag,owner,clock, "s11c_bg", __FILE__),
+	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),
 		m_cpu(*this,"bgcpu"),
 		m_ym2151(*this,"ym2151"),
 		m_hc55516(*this,"hc55516_bg"),
