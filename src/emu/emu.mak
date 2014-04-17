@@ -116,10 +116,10 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/ui.o \
 	$(EMUOBJ)/ui/swlist.o \
 	$(EMUOBJ)/ui/menu.o \
-	$(EMUOBJ)/ui/menubar.o \
-	$(EMUOBJ)/ui/emenubar.o \
+	$(EMUOBJ)/ui/mainmenu.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/selgame.o \
+	$(EMUOBJ)/ui/filemngr.o \
 	$(EMUOBJ)/ui/filesel.o \
 	$(EMUOBJ)/ui/imgcntrl.o \
 	$(EMUOBJ)/ui/imginfo.o \

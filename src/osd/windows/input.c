@@ -173,7 +173,6 @@ static bool                 input_enabled;
 static osd_lock *           input_lock;
 static bool                 input_paused;
 static DWORD                last_poll;
-static bool					menubar_visible;
 
 // DirectInput variables
 static LPDIRECTINPUT        dinput;
@@ -533,9 +532,6 @@ void wininput_poll(running_machine &machine)
 {
 	bool hasfocus = winwindow_has_focus() && input_enabled;
 
-	// check menubar
-	menubar_visible = (machine.phase() > MACHINE_PHASE_INIT) && machine.ui().menubar_visible();
-
 	// ignore if not enabled
 	if (input_enabled)
 	{
@@ -576,7 +572,7 @@ void wininput_poll(running_machine &machine)
 bool wininput_should_hide_mouse(void)
 {
 	// if we are paused or disabled, no
-	if (input_paused || !input_enabled || menubar_visible)
+	if (input_paused || !input_enabled)
 		return false;
 
 	// if neither mice nor lightguns enabled in the core, then no
@@ -752,7 +748,6 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 				entry->configure_osd("RENDER_SNAP", "Take Rendered Snapshot");
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LALT, input_seq::not_code, KEYCODE_LSHIFT);
 				break;
-
 			// add a NOT-lalt to our default F12
 			case IPT_UI_SNAPSHOT: // emu/input.c: input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT)
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
@@ -763,7 +758,6 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 				entry->configure_osd("RENDER_AVI", "Record Rendered Video");
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
 				break;
-
 			// add a NOT-lalt to our default shift-F12
 			case IPT_UI_RECORD_MOVIE: // emu/input.c: input_seq(KEYCODE_F12, KEYCODE_LSHIFT)
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
@@ -783,36 +777,6 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			default:
 				break;
 		}
-}
-
-
-//============================================================
-//  customize_menubar
-//============================================================
-
-void windows_osd_interface::customize_menubar(ui_menubar &menu_bar)
-{
-	// find existing menus
-	ui_menubar::menu_item &root_menu = menu_bar.root_menu();
-	ui_menubar::menu_item &options_menu = root_menu.find_child("Options");
-
-	// Fullscreen
-	ui_menubar::menu_item &fullscreen_menu = options_menu.append("Fullscreen", &windows_osd_interface::toggle_full_screen, *this, IPT_OSD_1);
-	fullscreen_menu.set_checked(video_config.windowed ? false : true);
-
-	// HLSL
-	ui_menubar::menu_item &hlsl_menu = options_menu.append("HLSL");
-
-	// enable HLSL
-	ui_menubar::menu_item &enable_hlsl_menu = hlsl_menu.append("Enable HLSL", &windows_osd_interface::toggle_fsfx, *this, IPT_OSD_4);
-	enable_hlsl_menu.set_enabled(winwindow_can_toggle_fsfx());
-	enable_hlsl_menu.set_checked(winwindow_is_fsfx_enabled());
-
-	// take rendered snapshot
-	hlsl_menu.append("Take Rendered Snapshot", &windows_osd_interface::take_snap, *this, IPT_OSD_2).set_enabled(winwindow_can_take_snap());
-
-	// record rendered video
-	hlsl_menu.append("Record Rendered Video", &windows_osd_interface::take_video, *this, IPT_OSD_3).set_enabled(winwindow_can_take_video());
 }
 
 
