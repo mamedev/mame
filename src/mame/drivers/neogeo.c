@@ -443,7 +443,6 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "imagedev/cartslot.h"
-#include "mcfglgcy.h"
 #include "neogeo.lh"
 
 
@@ -1805,7 +1804,7 @@ static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
 	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
-	MCFG_MEMCARD_ADD("memcard", 0x800)
+	MCFG_NEOGEO_MEMCARD_ADD("memcard")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mvs, neogeo )

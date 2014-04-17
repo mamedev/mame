@@ -57,7 +57,6 @@
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/megacdcd.h"
-#include "mcfglgcy.h"
 
 
 extern const char layout_neogeo[];
@@ -1373,7 +1372,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aes_main_map)
 
-	MCFG_MEMCARD_ADD("memcard", 0x800)
+	MCFG_NEOGEO_MEMCARD_ADD("memcard")
 
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)

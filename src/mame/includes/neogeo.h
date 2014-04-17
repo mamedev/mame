@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "machine/upd1990a.h"
-#include "machine/memcard.h"
+#include "machine/ng_memcard.h"
 
 #define NEOGEO_MASTER_CLOCK                     (24000000)
 #define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
@@ -331,7 +331,7 @@ protected:
 
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	optional_device<memcard_device> m_memcard;
+	optional_device<ng_memcard_device> m_memcard;
 	
 	// configuration
 	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;

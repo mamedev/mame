@@ -823,6 +823,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/neogeo.o      \
 	$(MAME_MACHINE)/neoprot.o   \
 	$(MAME_MACHINE)/neocrypt.o  \
+	$(MAME_MACHINE)/ng_memcard.o   \
 	$(MAME_DRIVERS)/cdi.o       \
 	$(MAME_MACHINE)/cdi070.o    \
 	$(MAME_MACHINE)/cdicdic.o   \

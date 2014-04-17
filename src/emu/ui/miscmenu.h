@@ -213,24 +213,6 @@ public:
 	virtual void handle();
 };
 
-class ui_menu_memory_card : public ui_menu {
-public:
-	ui_menu_memory_card(running_machine &machine, render_container *container);
-	virtual ~ui_menu_memory_card();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	enum {
-		MEMCARD_ITEM_SELECT = 1,
-		MEMCARD_ITEM_LOAD,
-		MEMCARD_ITEM_EJECT,
-		MEMCARD_ITEM_CREATE
-	};
-
-	int cardnum;
-};
-
 class ui_menu_sliders : public ui_menu {
 public:
 	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);

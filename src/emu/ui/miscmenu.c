@@ -23,7 +23,6 @@
 #include <ctype.h>
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
-#include "machine/memcard.h"
 
 
 
@@ -1481,112 +1480,6 @@ void ui_menu_cheat::populate()
 }
 
 ui_menu_cheat::~ui_menu_cheat()
-{
-}
-
-/*-------------------------------------------------
-    menu_memory_card - handle the memory card
-    menu
--------------------------------------------------*/
-
-void ui_menu_memory_card::handle()
-{
-	/* process the menu */
-	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
-	memcard_device_iterator memiter(machine().root_device());
-	memcard_device *memcard = memiter.first();
-
-	/* if something was selected, act on it */
-	if (menu_event != NULL && menu_event->itemref != NULL)
-	{
-		FPTR item = (FPTR)menu_event->itemref;
-
-		/* select executes actions on some of the items */
-		if (menu_event->iptkey == IPT_UI_SELECT)
-		{
-			switch (item)
-			{
-				/* handle card loading; if we succeed, clear the menus */
-				case MEMCARD_ITEM_LOAD:
-					if (memcard->insert(cardnum) == 0)
-					{
-						popmessage("Memory card loaded");
-						ui_menu::stack_reset(machine());
-					}
-					else
-						popmessage("Error loading memory card");
-					break;
-
-				/* handle card ejecting */
-				case MEMCARD_ITEM_EJECT:
-					memcard->eject();
-					popmessage("Memory card ejected");
-					break;
-
-				/* handle card creating */
-				case MEMCARD_ITEM_CREATE:
-					if (memcard->create(cardnum, false) == 0)
-						popmessage("Memory card created");
-					else
-						popmessage("Error creating memory card\n(Card may already exist)");
-					break;
-			}
-		}
-
-		/* the select item has extra keys */
-		else if (item == MEMCARD_ITEM_SELECT)
-		{
-			switch (menu_event->iptkey)
-			{
-				/* left decrements the card number */
-				case IPT_UI_LEFT:
-					cardnum -= 1;
-					reset(UI_MENU_RESET_REMEMBER_REF);
-					break;
-
-				/* right decrements the card number */
-				case IPT_UI_RIGHT:
-					cardnum += 1;
-					reset(UI_MENU_RESET_REMEMBER_REF);
-					break;
-			}
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    menu_memory_card_populate - populate the
-    memory card menu
--------------------------------------------------*/
-
-ui_menu_memory_card::ui_menu_memory_card(running_machine &machine, render_container *container) : ui_menu(machine, container)
-{
-}
-
-void ui_menu_memory_card::populate()
-{
-	memcard_device_iterator memiter(machine().root_device());
-	memcard_device *memcard = memiter.first();
-	char tempstring[20];
-	UINT32 flags = 0;
-
-	/* add the card select menu */
-	sprintf(tempstring, "%d", cardnum);
-	if (cardnum > 0)
-		flags |= MENU_FLAG_LEFT_ARROW;
-	if (cardnum < 1000)
-		flags |= MENU_FLAG_RIGHT_ARROW;
-	item_append("Card Number:", tempstring, flags, (void *)MEMCARD_ITEM_SELECT);
-
-	/* add the remaining items */
-	item_append("Load Selected Card", NULL, 0, (void *)MEMCARD_ITEM_LOAD);
-	if (memcard->present() != -1)
-		item_append("Eject Current Card", NULL, 0, (void *)MEMCARD_ITEM_EJECT);
-	item_append("Create New Card", NULL, 0, (void *)MEMCARD_ITEM_CREATE);
-}
-
-ui_menu_memory_card::~ui_menu_memory_card()
 {
 }
 
