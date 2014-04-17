@@ -775,8 +775,9 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* fdc */
-	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
+	MCFG_DEVICE_ADD("i8271", I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
+	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
@@ -834,8 +835,9 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* fdc */
-	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
+	MCFG_DEVICE_ADD("i8271", I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
+	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 

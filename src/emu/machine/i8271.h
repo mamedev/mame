@@ -15,21 +15,14 @@
 #define MCFG_I8271_DRQ_CALLBACK(_write) \
 	devcb = &i8271_device::set_drq_wr_callback(*device, DEVCB2_##_write);
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct i8271_interface
-{
-	const char *m_floppy_drive_tags[2];
-};
+#define MCFG_I8271_FLOPPIES(_tag1, _tag2) \
+	i8271_device::set_floppy_tags(*device, _tag1, _tag2);
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-class i8271_device : public device_t,
-							public i8271_interface
+class i8271_device : public device_t
 {
 public:
 	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -37,6 +30,13 @@ public:
 
 	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_drq.set_callback(object); }
+
+	static void set_floppy_tags(device_t &device, const char *tag1, const char *tag2) 
+	{ 
+		i8271_device &dev = downcast<i8271_device &>(device);
+		dev.m_floppy_tag1 = tag1;
+		dev.m_floppy_tag2 = tag2;
+	}
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -49,7 +49,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -64,6 +63,9 @@ private:
 
 	devcb2_write_line m_write_irq;
 	devcb2_write_line m_write_drq;
+
+	const char *m_floppy_tag1, *m_floppy_tag2;
+	legacy_floppy_image_device *m_floppy[2];
 
 	int m_flags;
 	int m_state;
@@ -128,7 +130,6 @@ private:
 	emu_timer *m_data_timer;
 	emu_timer *m_command_complete_timer;
 
-	legacy_floppy_image_device *current_image();
 	void seek_to_track(int track);
 	void load_bad_tracks(int surface);
 	void write_bad_track(int surface, int track, int data);
@@ -158,14 +159,5 @@ private:
 };
 
 extern const device_type I8271;
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_I8271_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, I8271, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* I8271_H_ */

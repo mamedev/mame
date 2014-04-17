@@ -554,7 +554,7 @@ WRITE8_MEMBER( atom_state::ppi_pc_w )
 }
 
 /*-------------------------------------------------
-    i8271_interface fdc_intf
+    i8271 interface
 -------------------------------------------------*/
 
 WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
@@ -577,11 +577,6 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 
 	m_previous_i8271_int_state = state;
 }
-
-static const i8271_interface fdc_intf =
-{
-	{ FLOPPY_0, FLOPPY_1 }
-};
 
 /*-------------------------------------------------
     LEGACY_FLOPPY_OPTIONS( atom )
@@ -824,8 +819,9 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
 
-	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
+	MCFG_DEVICE_ADD(I8271_TAG, I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
+	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")

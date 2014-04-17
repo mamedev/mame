@@ -99,6 +99,8 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__),
 	m_write_irq(*this),
 	m_write_drq(*this),
+	m_floppy_tag1(NULL),
+	m_floppy_tag2(NULL),
 	m_flags(0),
 	m_state(0),
 	m_Command(0),
@@ -146,27 +148,6 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8271_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8271_interface *intf = reinterpret_cast<const i8271_interface *>(static_config());
-	if (intf != NULL)
-			*static_cast<i8271_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_floppy_drive_tags[0] = "";
-		m_floppy_drive_tags[1] = "";
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -179,6 +160,9 @@ void i8271_device::device_start()
 	m_command_complete_timer = timer_alloc(TIMER_TIMED_COMMAND_COMPLETE);
 	m_drive = 0;
 	m_pExecutionPhaseData = auto_alloc_array(machine(), char, 0x4000);
+
+	m_floppy[0] = machine().device<legacy_floppy_image_device>(m_floppy_tag1);
+	m_floppy[1] = machine().device<legacy_floppy_image_device>(m_floppy_tag2);
 
 	// register for state saving
 	/*save_item(NAME(m_flags));
@@ -237,19 +221,8 @@ void i8271_device::device_reset()
 	set_dma_drq();
 }
 
-legacy_floppy_image_device *i8271_device::current_image()
-{
-	if (m_floppy_drive_tags[m_drive]!=NULL) {
-		return machine().device<legacy_floppy_image_device>(m_floppy_drive_tags[m_drive]);
-	} else {
-		return NULL;
-	}
-}
-
-
 void i8271_device::seek_to_track(int track)
 {
-	legacy_floppy_image_device *img = current_image();
 	if (track==0)
 	{
 		/* seek to track 0 */
@@ -258,11 +231,11 @@ void i8271_device::seek_to_track(int track)
 		/*logerror("step\n"); */
 
 		/* track 0 not set, not seeked more than 255 tracks */
-		while (img->floppy_tk00_r() && (StepCount != 0))
+		while (m_floppy[m_drive]->floppy_tk00_r() && (StepCount != 0))
 		{
 /*            logerror("step\n"); */
 			StepCount--;
-			img->floppy_drive_seek(-1);
+			m_floppy[m_drive]->floppy_drive_seek(-1);
 		}
 
 		m_CurrentTrack[m_drive] = 0;
@@ -296,7 +269,7 @@ void i8271_device::seek_to_track(int track)
 
 
 		/* seek to track 0 */
-		img->floppy_drive_seek(SignedTracks);
+		m_floppy[m_drive]->floppy_drive_seek(SignedTracks);
 
 		m_CurrentTrack[m_drive] = track;
 	}
@@ -609,7 +582,7 @@ void i8271_device::command_continue()
 		case I8271_COMMAND_WRITE_DATA_SINGLE_RECORD:
 		{
 			/* put the buffer to the sector */
-			current_image()->floppy_drive_write_sector_data(m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7),0);
+			m_floppy[m_drive]->floppy_drive_write_sector_data(m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7),0);
 
 			/* completed all sectors? */
 			m_Counter--;
@@ -652,7 +625,7 @@ void i8271_device::do_read()
 	if (find_sector())
 	{
 		/* get the sector into the buffer */
-		current_image()->floppy_drive_read_sector_data(m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7));
+		m_floppy[m_drive]->floppy_drive_read_sector_data(m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7));
 
 		/* initialise for reading */
 		initialise_execution_phase_read(1<<(m_ID_N+7));
@@ -671,7 +644,7 @@ void i8271_device::do_read_id()
 	chrn_id id;
 
 	/* get next id from disc */
-	current_image()->floppy_drive_get_next_id(m_side,&id);
+	m_floppy[m_drive]->floppy_drive_get_next_id(m_side,&id);
 
 	m_pExecutionPhaseData[0] = id.C;
 	m_pExecutionPhaseData[1] = id.H;
@@ -703,7 +676,6 @@ void i8271_device::do_write()
 
 int i8271_device::find_sector()
 {
-	legacy_floppy_image_device *img = current_image();
 //  int track_count_attempt;
 
 //  track_count_attempt
@@ -718,7 +690,7 @@ int i8271_device::find_sector()
 		chrn_id id;
 
 		/* get next id from disc */
-		if (img->floppy_drive_get_next_id(m_side,&id))
+		if (m_floppy[m_drive]->floppy_drive_get_next_id(m_side,&id))
 		{
 			/* tested on Amstrad CPC - All bytes must match, otherwise
 			a NO DATA error is reported */
@@ -741,7 +713,7 @@ int i8271_device::find_sector()
 		}
 
 			/* index set? */
-		if (img->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX))
+		if (m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX))
 		{
 			index_count++;
 		}
@@ -758,8 +730,6 @@ int i8271_device::find_sector()
 
 void i8271_device::command_execute()
 {
-	legacy_floppy_image_device *img = current_image();
-
 	/* clear it = good completion status */
 	/* this will be changed if anything bad happens! */
 	m_ResultRegister = 0;
@@ -860,10 +830,7 @@ void i8271_device::command_execute()
 
 					/* assumption: select bits reflect the select bits from the previous
 					command. i.e. read drive status */
-					data = (m_drive_control_output & ~0x0c0)
-						| (m_CommandRegister & 0x0c0);
-
-
+					data = (m_drive_control_output & ~0x0c0) | (m_CommandRegister & 0x0c0);
 				}
 				break;
 
@@ -884,10 +851,10 @@ void i8271_device::command_execute()
 					m_drive_control_input = (1<<6) | (1<<2);
 
 					/* bit 3 = 0 if write protected */
-					m_drive_control_input |= img->floppy_wpt_r() << 3;
+					m_drive_control_input |= m_floppy[m_drive]->floppy_wpt_r() << 3;
 
 					/* bit 1 = 0 if head at track 0 */
-					m_drive_control_input |= img->floppy_tk00_r() << 1;
+					m_drive_control_input |= m_floppy[m_drive]->floppy_tk00_r() << 1;
 
 					/* need to setup this register based on drive selected */
 					data = m_drive_control_input;
@@ -1020,19 +987,19 @@ void i8271_device::command_execute()
 
 					/* load head - on mini-sized drives this turns on the disc motor,
 					on standard-sized drives this loads the head and turns the motor on */
-					img->floppy_mon_w(!BIT(m_CommandParameters[1], 3));
-					img->floppy_drive_set_ready_state(1, 1);
+					m_floppy[m_drive]->floppy_mon_w(!BIT(m_CommandParameters[1], 3));
+					m_floppy[m_drive]->floppy_drive_set_ready_state(1, 1);
 
 					/* step pin changed? if so perform a step in the direction indicated */
 					if (((m_drive_control_output^m_CommandParameters[1]) & (1<<1))!=0)
 					{
 						/* step pin changed state? */
 
-						if ((m_CommandParameters[1] & (1<<1))!=0)
+						if (BIT(m_CommandParameters[1], 1))
 						{
 							signed int signed_tracks;
 
-							if ((m_CommandParameters[1] & (1<<2))!=0)
+							if (BIT(m_CommandParameters[1], 2))
 							{
 								signed_tracks = 1;
 							}
@@ -1041,7 +1008,7 @@ void i8271_device::command_execute()
 								signed_tracks = -1;
 							}
 
-							img->floppy_drive_seek(signed_tracks);
+							m_floppy[m_drive]->floppy_drive_seek(signed_tracks);
 						}
 					}
 
@@ -1079,25 +1046,27 @@ void i8271_device::command_execute()
 
 			/* these two do not appear to be set at all! ?? */
 
-			if (m_floppy_drive_tags[0]!=NULL) {
-				if (machine().device<legacy_floppy_image_device>(m_floppy_drive_tags[0])->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (m_floppy[0]) 
+			{
+				if (m_floppy[0]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 				{
-					status |= (1<<2);
+					status |= (1 << 2);
 				}
 			}
 
-			if (m_floppy_drive_tags[1]!=NULL) {
-				if (machine().device<legacy_floppy_image_device>(m_floppy_drive_tags[1])->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (m_floppy[1]) 
+			{
+				if (m_floppy[1]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 				{
-					status |= (1<<6);
+					status |= (1 << 6);
 				}
 			}
 
 			/* bit 3 = 1 if write protected */
-			status |= !img->floppy_wpt_r() << 3;
+			status |= !m_floppy[m_drive]->floppy_wpt_r() << 3;
 
 			/* bit 1 = 1 if head at track 0 */
-			status |= !img->floppy_tk00_r() << 1;
+			status |= !m_floppy[m_drive]->floppy_tk00_r() << 1;
 
 			m_ResultRegister = status;
 			command_complete(1,0);
@@ -1108,7 +1077,6 @@ void i8271_device::command_execute()
 		case I8271_COMMAND_SEEK:
 		{
 			get_drive();
-
 
 			seek_to_track(m_CommandParameters[0]);
 
@@ -1139,7 +1107,7 @@ void i8271_device::command_execute()
 
 			get_drive();
 
-			if (!img->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
@@ -1172,7 +1140,7 @@ void i8271_device::command_execute()
 
 			get_drive();
 
-			if (!img->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
@@ -1211,7 +1179,7 @@ void i8271_device::command_execute()
 
 			m_drive_control_output &=~1;
 
-			if (!img->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
@@ -1220,7 +1188,7 @@ void i8271_device::command_execute()
 			}
 			else
 			{
-				if (img->floppy_wpt_r() == CLEAR_LINE)
+				if (m_floppy[m_drive]->floppy_wpt_r() == CLEAR_LINE)
 				{
 					/* Completion type: operation intervention probably required for recovery */
 					/* Completion code: Drive write protected */
@@ -1256,7 +1224,7 @@ void i8271_device::command_execute()
 
 			m_drive_control_output &=~1;
 
-			if (!img->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
@@ -1265,7 +1233,7 @@ void i8271_device::command_execute()
 			}
 			else
 			{
-				if (img->floppy_wpt_r() == CLEAR_LINE)
+				if (m_floppy[m_drive]->floppy_wpt_r() == CLEAR_LINE)
 				{
 					/* Completion type: operation intervention probably required for recovery */
 					/* Completion code: Drive write protected */
@@ -1295,7 +1263,7 @@ void i8271_device::command_execute()
 
 			get_drive();
 
-			if (!img->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
+			if (!m_floppy[m_drive]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */

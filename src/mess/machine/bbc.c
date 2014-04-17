@@ -1469,12 +1469,6 @@ WRITE_LINE_MEMBER(bbc_state::bbc_i8271_interrupt)
 }
 
 
-const i8271_interface bbc_i8271_interface=
-{
-	{FLOPPY_0, FLOPPY_1}
-};
-
-
 READ8_MEMBER(bbc_state::bbc_i8271_read)
 {
 	int ret;

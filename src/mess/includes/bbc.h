@@ -420,8 +420,6 @@ public: // HACK FOR MC6845
 /*----------- defined in machine/bbc.c -----------*/
 
 extern const mc6845_interface bbc_mc6845_intf;
-
-extern const i8271_interface bbc_i8271_interface;
 extern const wd17xx_interface bbc_wd17xx_interface;
 
 #endif /* BBC_H_ */
