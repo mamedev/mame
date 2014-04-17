@@ -5355,6 +5355,7 @@ src/mame/drivers/wpc_flip2.c svneol=native#text/plain
 src/mame/drivers/wpc_s.c svneol=native#text/plain
 src/mame/drivers/wrally.c svneol=native#text/plain
 src/mame/drivers/wwfsstar.c svneol=native#text/plain
+src/mame/drivers/wyvernf0.c svneol=native#text/plain
 src/mame/drivers/xain.c svneol=native#text/plain
 src/mame/drivers/xexex.c svneol=native#text/plain
 src/mame/drivers/xmen.c svneol=native#text/plain
