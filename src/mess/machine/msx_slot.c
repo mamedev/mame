@@ -731,7 +731,7 @@ MSX_SLOT_LOADSRAM(ascii8_sram)
 		logerror ("ascii8_sram: error: no sram filename provided\n");
 		return 1;
 	}
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_READ);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_READ);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -757,7 +757,7 @@ MSX_SLOT_SAVESRAM(ascii8_sram)
 		return 0;
 	}
 
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_WRITE);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_WRITE);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -901,7 +901,7 @@ MSX_SLOT_LOADSRAM(ascii16_sram)
 		return 1;
 	}
 
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_READ);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_READ);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -936,7 +936,7 @@ MSX_SLOT_SAVESRAM(ascii16_sram)
 	{
 		return 0;
 	}
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_WRITE);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_WRITE);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -1174,7 +1174,7 @@ MSX_SLOT_LOADSRAM(gmaster2)
 
 	p = state->m_cart.sram.mem;
 
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_READ);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_READ);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -1197,7 +1197,7 @@ MSX_SLOT_LOADSRAM(gmaster2)
 
 MSX_SLOT_SAVESRAM(gmaster2)
 {
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_WRITE);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_WRITE);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -1748,7 +1748,7 @@ MSX_SLOT_LOADSRAM(fmpac)
 		logerror ("No sram filename provided\n");
 		return 1;
 	}
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_READ);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_READ);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
@@ -1777,7 +1777,7 @@ MSX_SLOT_SAVESRAM(fmpac)
 		return 0;
 	}
 
-	emu_file f(machine.options().memcard_directory(), OPEN_FLAG_WRITE);
+	emu_file f(machine.options().nvram_directory(), OPEN_FLAG_WRITE);
 	file_error filerr = f.open(state->m_sramfile);
 	if (filerr == FILERR_NONE)
 	{
