@@ -239,20 +239,6 @@ WRITE8_MEMBER(nyny_state::ic48_1_74123_output_changed)
 	m_pia2->ca1_w(data);
 }
 
-
-static const ttl74123_interface ic48_1_config =
-{
-	TTL74123_GROUNDED,  /* the hook up type */
-	RES_K(22),          /* resistor connected to RCext */
-	CAP_U(0.01),        /* capacitor connected to Cext and RCext */
-	1,                  /* A pin - driven by the CRTC */
-	1,                  /* B pin - pulled high */
-	1,                  /* Clear pin - pulled high */
-	DEVCB_DRIVER_MEMBER(nyny_state,ic48_1_74123_output_changed)
-};
-
-
-
 /*************************************
  *
  *  Video system
@@ -688,8 +674,15 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
-	MCFG_TTL74123_ADD("ic48_1", ic48_1_config)
-
+	MCFG_DEVICE_ADD("ic48_1", TTL74123, 0)
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(nyny_state, ic48_1_74123_output_changed))
+	
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))

@@ -141,30 +141,6 @@ WRITE8_MEMBER(m10_state::ic8j2_output_changed)
 	m_ic8j1->a_w(space, 0, data);
 }
 
-static const ttl74123_interface ic8j1_intf =
-{
-	/* completely illegible */
-	TTL74123_NOT_GROUNDED_DIODE,    /* the hook up type */
-	RES_K(1),               /* resistor connected to RCext */
-	CAP_U(1),               /* capacitor connected to Cext and RCext */
-	1,                  /* A pin - driven by the CRTC */
-	1,                  /* B pin - pulled high */
-	1,                  /* Clear pin - pulled high */
-	DEVCB_DRIVER_MEMBER(m10_state,ic8j1_output_changed)
-};
-
-static const ttl74123_interface ic8j2_intf =
-{
-	TTL74123_NOT_GROUNDED_DIODE,    /* the hook up type */
-	/* 10k + 20k variable resistor */
-	RES_K(22),              /* resistor connected to RCext */
-	CAP_U(2.2),             /* capacitor connected to Cext and RCext */
-	1,                  /* A pin - driven by the CRTC */
-	1,                  /* B pin - pulled high */
-	1,                  /* Clear pin - pulled high */
-	DEVCB_DRIVER_MEMBER(m10_state,ic8j2_output_changed)
-};
-
 /*************************************
  *
  *  Initialization
@@ -859,8 +835,23 @@ static MACHINE_CONFIG_START( m10, m10_state )
 
 	/* 74LS123 */
 
-	MCFG_TTL74123_ADD("ic8j1", ic8j1_intf)
-	MCFG_TTL74123_ADD("ic8j2", ic8j2_intf)
+	MCFG_DEVICE_ADD("ic8j1", TTL74123, 0) /* completely illegible */
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(1))               /* resistor connected to RCext */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(1))               /* capacitor connected to Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(m10_state, ic8j1_output_changed))
+	MCFG_DEVICE_ADD("ic8j2", TTL74123, 0)
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
+	/* 10k + 20k variable resistor */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(2.2))               /* capacitor connected to Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(m10_state, ic8j2_output_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

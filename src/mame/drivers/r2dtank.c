@@ -247,20 +247,6 @@ CUSTOM_INPUT_MEMBER(r2dtank_state::get_ttl74123_output)
 	return m_ttl74123_output;
 }
 
-
-static const ttl74123_interface ttl74123_intf =
-{
-	TTL74123_GROUNDED,  /* the hook up type */
-	RES_K(22),          /* resistor connected to RCext */
-	CAP_U(0.01),        /* capacitor connected to Cext and RCext */
-	1,                  /* A pin - driven by the CRTC */
-	1,                  /* B pin - pulled high */
-	1,                  /* Clear pin - pulled high */
-	DEVCB_DRIVER_MEMBER(r2dtank_state,ttl74123_output_changed)
-};
-
-
-
 /*************************************
  *
  *  Machine start
@@ -521,7 +507,14 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 
 	/* 74LS123 */
 
-	MCFG_TTL74123_ADD("74123", ttl74123_intf)
+	MCFG_DEVICE_ADD("74123", TTL74123, 0)
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(r2dtank_state, ttl74123_output_changed))
 
 	MCFG_DEVICE_ADD("pia_main", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))

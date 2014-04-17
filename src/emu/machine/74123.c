@@ -27,36 +27,16 @@ const device_type TTL74123 = &device_creator<ttl74123_device>;
 //-------------------------------------------------
 
 ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__)
+	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__),
+		m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
+		m_res(1.0),
+		m_cap(1.0),
+		m_a(0),
+		m_b(0),
+		m_clear(0),
+		m_output_changed_cb(*this)
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ttl74123_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ttl74123_interface *intf = reinterpret_cast<const ttl74123_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<ttl74123_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_connection_type = TTL74123_NOT_GROUNDED_NO_DIODE;
-		m_res = 1.0;
-		m_cap = 1.0;
-		m_a = 0;
-		m_b = 0;
-		m_clear = 0;
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -64,7 +44,7 @@ void ttl74123_device::device_config_complete()
 
 void ttl74123_device::device_start()
 {
-	m_output_changed.resolve(m_output_changed_cb, *this);
+	m_output_changed_cb.resolve_safe();
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ttl74123_device::clear_callback),this));
 
@@ -139,7 +119,7 @@ int ttl74123_device::timer_running()
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
 {
-	m_output_changed(0, param);
+	m_output_changed_cb((offs_t)0, param);
 }
 
 
@@ -165,7 +145,7 @@ TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )
 {
 	int output = timer_running();
 
-	m_output_changed(0, output);
+	m_output_changed_cb((offs_t)0, output);
 }
 
 //-------------------------------------------------
