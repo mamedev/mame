@@ -18,10 +18,27 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_NUBUS_BUS_ADD(_tag, _cputag, _config) \
-	MCFG_DEVICE_ADD(_tag, NUBUS, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
+#define MCFG_NUBUS_CPU(_cputag) \
 	nubus_device::static_set_cputag(*device, _cputag);
+
+#define MCFG_NUBUS_OUT_IRQ9_CB(_devcb) \
+	devcb = &nubus_device::set_out_irq9_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_NUBUS_OUT_IRQA_CB(_devcb) \
+	devcb = &nubus_device::set_out_irqa_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_NUBUS_OUT_IRQB_CB(_devcb) \
+	devcb = &nubus_device::set_out_irqb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_NUBUS_OUT_IRQC_CB(_devcb) \
+	devcb = &nubus_device::set_out_irqc_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_NUBUS_OUT_IRQD_CB(_devcb) \
+	devcb = &nubus_device::set_out_irqd_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_NUBUS_OUT_IRQE_CB(_devcb) \
+	devcb = &nubus_device::set_out_irqe_callback(*device, DEVCB2_##_devcb);
+	
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
@@ -33,9 +50,6 @@
 	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
 	device_nubus_card_interface::static_set_nubus_tag(*device, _nbtag, _tag);
-
-#define MCFG_NUBUS_BUS_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -64,30 +78,25 @@ protected:
 // device type definition
 extern const device_type NUBUS_SLOT;
 
-// ======================> nbbus_interface
-
-struct nbbus_interface
-{
-	devcb_write_line    m_out_irq9_cb;
-	devcb_write_line    m_out_irqa_cb;
-	devcb_write_line    m_out_irqb_cb;
-	devcb_write_line    m_out_irqc_cb;
-	devcb_write_line    m_out_irqd_cb;
-	devcb_write_line    m_out_irqe_cb;
-};
 
 class device_nubus_card_interface;
 // ======================> nubus_device
-class nubus_device : public device_t,
-					public nbbus_interface
+class nubus_device : public device_t
 {
 public:
 	// construction/destruction
 	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~nubus_device() { m_device_list.detach_all(); }
+	
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
+	template<class _Object> static devcb2_base &set_out_irq9_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irq9_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irqa_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irqb_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irqc_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqc_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irqd_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqd_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irqe_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqe_cb.set_callback(object); }
 
 	void add_nubus_card(device_nubus_card_interface *card);
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask=0xffffffff);
@@ -109,17 +118,16 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb_resolved_write_line   m_out_irq9_func;
-	devcb_resolved_write_line   m_out_irqa_func;
-	devcb_resolved_write_line   m_out_irqb_func;
-	devcb_resolved_write_line   m_out_irqc_func;
-	devcb_resolved_write_line   m_out_irqd_func;
-	devcb_resolved_write_line   m_out_irqe_func;
+	devcb2_write_line    m_out_irq9_cb;
+	devcb2_write_line    m_out_irqa_cb;
+	devcb2_write_line    m_out_irqb_cb;
+	devcb2_write_line    m_out_irqc_cb;
+	devcb2_write_line    m_out_irqd_cb;
+	devcb2_write_line    m_out_irqe_cb;
 
 	simple_list<device_nubus_card_interface> m_device_list;
 	const char *m_cputag;

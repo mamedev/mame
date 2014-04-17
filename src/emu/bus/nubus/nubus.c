@@ -66,33 +66,6 @@ void nubus_device::static_set_cputag(device_t &device, const char *tag)
 	nubus.m_cputag = tag;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void nubus_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const nbbus_interface *intf = reinterpret_cast<const nbbus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<nbbus_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq9_cb, 0, sizeof(m_out_irq9_cb));
-		memset(&m_out_irqa_cb, 0, sizeof(m_out_irqa_cb));
-		memset(&m_out_irqb_cb, 0, sizeof(m_out_irqb_cb));
-		memset(&m_out_irqc_cb, 0, sizeof(m_out_irqc_cb));
-		memset(&m_out_irqd_cb, 0, sizeof(m_out_irqd_cb));
-		memset(&m_out_irqe_cb, 0, sizeof(m_out_irqe_cb));
-	}
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -102,12 +75,24 @@ void nubus_device::device_config_complete()
 //-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__)
+		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__),
+		m_out_irq9_cb(*this),
+		m_out_irqa_cb(*this),
+		m_out_irqb_cb(*this),
+		m_out_irqc_cb(*this),
+		m_out_irqd_cb(*this),
+		m_out_irqe_cb(*this)
 {
 }
 
 nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_out_irq9_cb(*this),
+		m_out_irqa_cb(*this),
+		m_out_irqb_cb(*this),
+		m_out_irqc_cb(*this),
+		m_out_irqd_cb(*this),
+		m_out_irqe_cb(*this)
 {
 }
 //-------------------------------------------------
@@ -118,12 +103,12 @@ void nubus_device::device_start()
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	// resolve callbacks
-	m_out_irq9_func.resolve(m_out_irq9_cb, *this);
-	m_out_irqa_func.resolve(m_out_irqa_cb, *this);
-	m_out_irqb_func.resolve(m_out_irqb_cb, *this);
-	m_out_irqc_func.resolve(m_out_irqc_cb, *this);
-	m_out_irqd_func.resolve(m_out_irqd_cb, *this);
-	m_out_irqe_func.resolve(m_out_irqe_cb, *this);
+	m_out_irq9_cb.resolve_safe();
+	m_out_irqa_cb.resolve_safe();
+	m_out_irqb_cb.resolve_safe();
+	m_out_irqc_cb.resolve_safe();
+	m_out_irqd_cb.resolve_safe();
+	m_out_irqe_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -252,12 +237,12 @@ void nubus_device::set_irq_line(int slot, int state)
 }
 
 // interrupt request from nubus card
-WRITE_LINE_MEMBER( nubus_device::irq9_w ) { m_out_irq9_func(state); }
-WRITE_LINE_MEMBER( nubus_device::irqa_w ) { m_out_irqa_func(state); }
-WRITE_LINE_MEMBER( nubus_device::irqb_w ) { m_out_irqb_func(state); }
-WRITE_LINE_MEMBER( nubus_device::irqc_w ) { m_out_irqc_func(state); }
-WRITE_LINE_MEMBER( nubus_device::irqd_w ) { m_out_irqd_func(state); }
-WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_func(state); }
+WRITE_LINE_MEMBER( nubus_device::irq9_w ) { m_out_irq9_cb(state); }
+WRITE_LINE_MEMBER( nubus_device::irqa_w ) { m_out_irqa_cb(state); }
+WRITE_LINE_MEMBER( nubus_device::irqb_w ) { m_out_irqb_cb(state); }
+WRITE_LINE_MEMBER( nubus_device::irqc_w ) { m_out_irqc_cb(state); }
+WRITE_LINE_MEMBER( nubus_device::irqd_w ) { m_out_irqd_cb(state); }
+WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG NUBUS CARD INTERFACE

@@ -841,17 +841,6 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const struct nbbus_interface nubus_intf =
-{
-	// interrupt lines
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_9_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_a_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_b_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_c_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_d_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_e_w)
-};
-
 static const struct macpds_interface macpds_intf =
 {
 	0
@@ -1113,7 +1102,14 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
-	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc")
 	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, NULL)
@@ -1180,7 +1176,14 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
-	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc")
 	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, NULL)
@@ -1252,9 +1255,16 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_NUBUS_SLOT_REMOVE("nbc")
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
-	MCFG_NUBUS_BUS_REMOVE("nubus")
+	MCFG_DEVICE_REMOVE("nubus")
 
-	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("pds", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("pds","lcpds", mac_lcpds_cards, NULL)
 
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, WRITELINE(mac_state, mac_asc_irq))
@@ -1345,7 +1355,14 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbvvram)
 
-	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL)
@@ -1373,7 +1390,14 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbvvram)
 
-	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL)
@@ -1442,7 +1466,14 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
-	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("pdss", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("pds","pds030", mac_pds030_cards, NULL)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
@@ -1731,7 +1762,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_NUBUS_SLOT_REMOVE("nbc")
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
-	MCFG_NUBUS_BUS_REMOVE("nubus")
+	MCFG_DEVICE_REMOVE("nubus")
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1852,7 +1883,14 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
-	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
+	MCFG_NUBUS_CPU("maincpu")
+	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
+	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
+	MCFG_NUBUS_OUT_IRQB_CB(WRITELINE(mac_state, nubus_irq_b_w))
+	MCFG_NUBUS_OUT_IRQC_CB(WRITELINE(mac_state, nubus_irq_c_w))
+	MCFG_NUBUS_OUT_IRQD_CB(WRITELINE(mac_state, nubus_irq_d_w))
+	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL)
 
