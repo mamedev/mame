@@ -26,6 +26,7 @@
 	- vcop: priority bug at stage select screen;
 	- vcop2: no textures;
 	- vf2: stalls after disclaimer screen;
+	- vstriker: countdown in team select goes way too fast;
 	- zeroguna: stalls after some seconds of gameplay;
 
     OK (controls may be wrong/missing/incomplete)
@@ -2246,6 +2247,8 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+#define VIDEO_CLOCK         XTAL_32MHz
+
 /* original Model 2 */
 static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -2283,7 +2286,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(25000000/2, 496+16, 0, 496, 384+16, 0, 384) // not accurate
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -2331,7 +2334,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(25000000/2, 496+16, 0, 496, 384+16, 0, 384) // not accurate
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -2432,7 +2435,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(25000000/2, 496+16, 0, 496, 384+16, 0, 384) // not accurate
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -2478,7 +2481,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_RAW_PARAMS(25000000/2, 496+16, 0, 496, 384+16, 0, 384) // not accurate
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/) // TODO: from System 24, might not be accurate for Model 2
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
 	MCFG_PALETTE_ADD("palette", 8192)
