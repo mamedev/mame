@@ -111,5 +111,6 @@ MODULE(cybiko)
 MODULE(cybikoxt)
 MODULE(psion)
 MODULE(bml3)
+MODULE(hp48)
 
 #endif /* MODULES_RECURSIVE */

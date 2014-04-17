@@ -663,9 +663,12 @@ END_UPDATE
 
 UPDATE_HI( overlay3 )
 {
+	/* Note: "Manuel Technique" doc implies that the palette entries are 0,1,2,4,8;
+	   we now use palette entries 0,1,2,3,4 instead, as this is what the TEO emulator uses and it has been confirmed correct
+	*/
 	static const int p[2][2][2][2] = {
-			{ { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
-			{ { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
+			{ { { 0, 1 }, { 2, 1 } }, { { 3, 1 }, { 2, 1 } } },
+			{ { { 4, 1 }, { 2, 1 } }, { { 3, 1 }, { 2, 1 } } }
 	};
 	int i;
 	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
@@ -678,8 +681,8 @@ END_UPDATE
 UPDATE_LOW( overlay3 )
 {
 	static const int p[2][2][2][2] = {
-			{ { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
-			{ { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
+			{ { { 0, 1 }, { 2, 1 } }, { { 3, 1 }, { 2, 1 } } },
+			{ { { 4, 1 }, { 2, 1 } }, { { 3, 1 }, { 2, 1 } } }
 	};
 	int i;
 	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )

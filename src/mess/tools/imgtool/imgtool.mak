@@ -61,6 +61,7 @@ IMGTOOL_LIB_OBJS =                  \
 	$(IMGTOOL_MODULES)/cybikoxt.o       \
 	$(IMGTOOL_MODULES)/psion.o      \
 	$(IMGTOOL_MODULES)/bml3.o      \
+	$(IMGTOOL_MODULES)/hp48.o      \
 
 $(LIBIMGTOOL): $(IMGTOOL_LIB_OBJS)
 

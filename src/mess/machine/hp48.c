@@ -587,7 +587,6 @@ READ8_MEMBER(hp48_state::hp48_bank_r)
 	   bits 1-2: select bank 0x00000-0x3ffff
 	   bits 3-6: select bank 0x40000-0x7ffff
 	 */
-	/* bit 0: ignored, bits 2-5: bank number, bit 6: enable */
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
@@ -692,8 +691,8 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer2_cb)
         NCE1         256KB ROM      512KB ROM         2MB flash ROM
 
 
-   - NCE1 (ROM) cannot be configured, it is always visible at addresses
-   not covered by higher priority modules.
+   - NCE1 (ROM) cannot be configured, it is always visible at addresses 
+   00000-7ffff not covered by higher priority modules.
 
    - only the address of HDW (I/O) can be configured, its size is constant
    (64 nibbles)
@@ -722,8 +721,11 @@ void hp48_state::hp48_apply_modules()
 		LOG(( "hp48_apply_modules: high ROM bank is %i\n", bank_hi ));
 		space.install_read_bank( 0x00000, 0x3ffff, 0, 0x80000, "bank5" );
 		space.install_read_bank( 0x40000, 0x7ffff, 0, 0x80000, "bank6" );
-		membank("bank5")->set_base( m_rom + bank_lo * 0x40000 );
-		membank("bank6")->set_base( m_rom + bank_hi * 0x40000 );
+		if ( m_rom ) 
+		{
+			membank("bank5")->set_base( m_rom + bank_lo * 0x40000 );
+			membank("bank6")->set_base( m_rom + bank_hi * 0x40000 );
+		}
 	}
 	else if ( HP48_G_SERIES )
 	{
@@ -732,7 +734,7 @@ void hp48_state::hp48_apply_modules()
 		{
 			int off = (m_bank_switch << 16) % m_port_size[1];
 			LOG(( "hp48_apply_modules: port 2 offset is %i\n", off ));
-			m_modules[4].data = m_port_data[1] + off;
+			m_modules[HP48_NCE3].data = m_port_data[1] + off;
 		}
 
 		/* ROM A19 (hi 256 KB) / NCE3 (port 2) control switch */
@@ -750,12 +752,14 @@ void hp48_state::hp48_apply_modules()
 			LOG(( "hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled" ));
 			space.install_read_bank( 0, 0x7ffff, 0, 0x80000, "bank5" );
 		}
-		membank("bank5")->set_base( m_rom );
+		if ( m_rom ) 
+			membank("bank5")->set_base( m_rom );
 	}
 	else
 	{
 		space.install_read_bank( 0, 0x7ffff, 0, 0x80000, "bank5" );
-		membank("bank5")->set_base( m_rom );
+		if ( m_rom )
+			membank("bank5")->set_base( m_rom );
 	}
 
 
@@ -796,7 +800,9 @@ void hp48_state::hp48_apply_modules()
 		else
 		{
 			if (m_modules[i].data)
+			{
 				space.install_write_bank( base, end, 0, mirror, bank );
+			}
 			else
 			{
 				if (!m_modules[i].write.isnull())
@@ -997,10 +1003,7 @@ void hp48_port_image_device::hp48_fill_port()
 	state->m_modules[conf->module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
 	state->m_modules[conf->module].read     = read8_delegate();
 	state->m_modules[conf->module].write    = write8_delegate();
-	state->m_modules[conf->module].isnop    = 0;
-	if (state->m_port_write[conf->port]) {
-		state->m_modules[conf->module].isnop    = 1;
-	}
+	state->m_modules[conf->module].isnop    = state->m_port_write[conf->port] ? 0 : 1;
 	state->m_modules[conf->module].data     = state->m_port_data[conf->port];
 	state->hp48_apply_modules();
 }
@@ -1010,10 +1013,13 @@ void hp48_port_image_device::hp48_unfill_port()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
 	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
+	LOG(( "hp48_unfill_port\n" ));
 	state->m_modules[conf->module].off_mask = 0x00fff;  /* 2 KB */
 	state->m_modules[conf->module].read     = read8_delegate();
 	state->m_modules[conf->module].write    = write8_delegate();
 	state->m_modules[conf->module].data     = NULL;
+	state->m_modules[conf->module].isnop    = 1;
+	state->m_port_size[conf->port]          = 0;
 }
 
 
@@ -1023,6 +1029,7 @@ bool hp48_port_image_device::call_load()
 	struct hp48_port_interface* conf = (struct hp48_port_interface*)static_config();
 	int size = length();
 	if ( size == 0 ) size = conf->max_size; /* default size */
+	LOG(( "hp48_port_image load: size=%i\n", size ));
 
 	/* check size */
 	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
@@ -1044,6 +1051,7 @@ bool hp48_port_image_device::call_create(int format_type, option_resolution *for
 	hp48_state *state = machine().driver_data<hp48_state>();
 	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	int size = conf->max_size;
+	LOG(( "hp48_port_image create: size=%i\n", size ));
 	/* XXX defaults to max_size; get user-specified size instead */
 
 	/* check size */
@@ -1065,7 +1073,7 @@ void hp48_port_image_device::call_unload()
 	hp48_state *state = machine().driver_data<hp48_state>();
 	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	LOG(( "hp48_port image unload: %s size=%i rw=%i\n",
-			tag(), state->m_port_size[conf->port] ,state->m_port_write[conf->port] ));
+			tag(), state->m_port_size[conf->port], state->m_port_write[conf->port] ));
 	if ( state->m_port_write[conf->port] )
 	{
 		state->hp48_encode_nibble( state->m_port_data[conf->port], state->m_port_data[conf->port], state->m_port_size[conf->port] );
@@ -1079,6 +1087,7 @@ void hp48_port_image_device::call_unload()
 
 void hp48_port_image_device::device_start()
 {
+	LOG(("hp48_port_image start\n"));
 	hp48_unfill_port();
 }
 
@@ -1107,9 +1116,11 @@ DRIVER_INIT_MEMBER(hp48_state,hp48)
 		m_modules[i].read     = read8_delegate();
 		m_modules[i].write    = write8_delegate();
 		m_modules[i].data     = NULL;
+		m_modules[i].isnop    = 0;
 	}
 	m_port_size[0] = 0;
 	m_port_size[1] = 0;
+	m_rom = NULL;
 }
 
 void hp48_state::machine_reset()
@@ -1155,8 +1166,6 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	m_timer2 = 0;
 	m_bank_switch = 0;
 
-	/* static module configuration */
-	memset(m_modules,0,sizeof(m_modules)); // to put all on 0
 	/* I/O RAM */
 	m_modules[HP48_HDW].off_mask = 0x0003f;  /* 32 B */
 	m_modules[HP48_HDW].read     = read8_delegate(FUNC(hp48_state::hp48_io_r),this);
@@ -1167,8 +1176,8 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	{
 		m_modules[HP48_NCE2].off_mask = 2 * 256 * 1024 - 1;
 		m_modules[HP48_NCE2].data     = ram;
-		m_modules[HP48_CE2].off_mask = 2 * 128 * 1024 - 1;
-		m_modules[HP48_CE2].data     = ram + 2 * 256 * 1024;
+		m_modules[HP48_CE2].off_mask  = 2 * 128 * 1024 - 1;
+		m_modules[HP48_CE2].data      = ram + 2 * 256 * 1024;
 		m_modules[HP48_NCE3].off_mask = 2 * 128 * 1024 - 1;
 		m_modules[HP48_NCE3].data     = ram + 2 * (128+256) * 1024;
 	}

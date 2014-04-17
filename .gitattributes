@@ -8738,6 +8738,7 @@ src/mess/tools/imgtool/modules/cybiko.c svneol=native#text/plain
 src/mess/tools/imgtool/modules/cybikoxt.c svneol=native#text/plain
 src/mess/tools/imgtool/modules/fat.c svneol=native#text/plain
 src/mess/tools/imgtool/modules/fat.h svneol=native#text/plain
+src/mess/tools/imgtool/modules/hp48.c svneol=native#text/plain
 src/mess/tools/imgtool/modules/mac.c svneol=native#text/plain
 src/mess/tools/imgtool/modules/macbin.c svneol=native#text/plain
 src/mess/tools/imgtool/modules/macutil.c svneol=native#text/plain
