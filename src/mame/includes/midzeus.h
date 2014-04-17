@@ -67,16 +67,42 @@ public:
 	DECLARE_MACHINE_START(midzeus);
 	DECLARE_MACHINE_RESET(midzeus);
 	DECLARE_VIDEO_START(midzeus);
-	DECLARE_VIDEO_START(midzeus2);
 	UINT32 screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
+private:
 	void exit_handler();
-	void exit_handler2();
+	void zeus_pointer_w(UINT32 which, UINT32 data, int logit);
+	void zeus_register16_w(offs_t offset, UINT16 data, int logit);
+	void zeus_register32_w(offs_t offset, UINT32 data, int logit);
+	void zeus_register_update(offs_t offset);
+	int zeus_fifo_process(const UINT32 *data, int numwords);
+	void zeus_draw_model(UINT32 texdata, int logit);
+	void zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit);
+
+	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
+	void log_waveram(UINT32 length_and_base);	
 };
 
-/*----------- defined in video/midzeus2.c -----------*/
-DECLARE_READ32_HANDLER( zeus2_r );
-DECLARE_WRITE32_HANDLER( zeus2_w );
+
+class midzeus2_state : public midzeus_state
+{
+public:
+	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
+				: midzeus_state(mconfig, type, tag) { }
+
+	DECLARE_VIDEO_START(midzeus2);
+	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ32_MEMBER( zeus2_r );
+	DECLARE_WRITE32_MEMBER( zeus2_w );
+private:	
+	void exit_handler2();
+	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
+	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
+	int zeus2_fifo_process(const UINT32 *data, int numwords);
+	void zeus2_pointer_write(UINT8 which, UINT32 value);
+	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
+	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);	
+	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
+};

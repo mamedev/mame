@@ -571,12 +571,12 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus_state )
+static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
-	AM_RANGE(0x880000, 0x88007f) AM_READWRITE_LEGACY(zeus2_r, zeus2_w) AM_SHARE("zeusbase")
+	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_SHARE("zeusbase")
 	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_SHARE("linkram")
 	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
@@ -1122,24 +1122,24 @@ static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 	MCFG_CPU_IO_MAP(pic_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( midzeus2, midzeus_state )
+static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state,  display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state,  display_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
-	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
+	MCFG_MACHINE_START_OVERRIDE(midzeus2_state,midzeus)
+	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(midzeus_state, screen_update_midzeus2)
+	MCFG_SCREEN_UPDATE_DRIVER(midzeus2_state, screen_update_midzeus2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus2)
+	MCFG_VIDEO_START_OVERRIDE(midzeus2_state,midzeus2)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
