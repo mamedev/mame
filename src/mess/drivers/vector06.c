@@ -185,9 +185,19 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_I8255_ADD("ppi8255", vector06_ppi8255_interface)
-	MCFG_I8255_ADD("ppi8255_2", vector06_ppi8255_2_interface)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(vector06_state, vector06_8255_portc_r))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_romdisk_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_romdisk_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(vector06_state, vector06_romdisk_portc_w))
+
 	MCFG_CASSETTE_ADD("cassette", vector_cassette_interface)
+
 	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 

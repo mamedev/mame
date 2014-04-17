@@ -81,27 +81,6 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 	m_romdisk_msb = data << 8;
 }
 
-I8255A_INTERFACE( vector06_ppi8255_2_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_romdisk_porta_w),
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_romdisk_portb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_romdisk_portc_w)
-};
-
-
-I8255A_INTERFACE( vector06_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_portc_r),
-	DEVCB_NULL
-};
-
 READ8_MEMBER( vector06_state::vector06_8255_1_r )
 {
 	return m_ppi->read(space, offset^3);

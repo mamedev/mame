@@ -508,7 +508,7 @@ WRITE_LINE_MEMBER( compis_state::tmr5_w )
 }
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255A interface
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(compis_state::write_centronics_busy)
@@ -584,17 +584,6 @@ WRITE8_MEMBER( compis_state::ppi_pc_w )
 
 	m_isbx0->opt0_w(BIT(data, 7));
 }
-
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_DRIVER_MEMBER(compis_state, ppi_pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(compis_state, ppi_pc_w)
-};
-
 
 //-------------------------------------------------
 //  I8274_INTERFACE( mpsc_intf )
@@ -723,7 +712,10 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_PIT8253_CLK2(XTAL_16MHz/8)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(compis_state, tmr5_w))
 
-	MCFG_I8255_ADD(I8255_TAG, ppi_intf )
+	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8(compis_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(compis_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(COMPIS_KEYBOARD_TAG, compis_keyboard_device, si_w))

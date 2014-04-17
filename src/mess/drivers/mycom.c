@@ -439,36 +439,6 @@ WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 	m_rtc->cs_w(BIT(data, 7));
 }
 
-static I8255_INTERFACE( ppi8255_intf_0 )
-{
-	DEVCB_NULL,         /* Port A read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_04_w),   /* Port A write */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_05_r),   /* Port B read */
-	DEVCB_NULL,         /* Port B write */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_r),   /* Port C read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_w)    /* Port C write */
-};
-
-static I8255_INTERFACE( ppi8255_intf_1 )
-{
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_08_r),   /* Port A read */
-	DEVCB_NULL,         /* Port A write */
-	DEVCB_NULL,         /* Port B read */
-	DEVCB_NULL,         /* Port B write */
-	DEVCB_NULL,         /* Port C read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_0a_w)    /* Port C write */
-};
-
-static I8255_INTERFACE( ppi8255_intf_2 )
-{
-	DEVCB_NULL,         /* Port A read */
-	DEVCB_NULL,         /* Port A write */
-	DEVCB_DEVICE_MEMBER("rtc", msm5832_device, data_r),         /* Port B read */
-	DEVCB_DEVICE_MEMBER("rtc", msm5832_device, data_w),         /* Port B write */
-	DEVCB_NULL,         /* Port C read */
-	DEVCB_DRIVER_MEMBER(mycom_state,mycom_rtc_w)            /* Port C write */
-};
-
 static const UINT8 mycom_keyval[] = { 0,
 0x1b,0x1b,0x7c,0x7c,0x18,0x18,0x0f,0x0f,0x09,0x09,0x1c,0x1c,0x30,0x00,0x50,0x70,0x3b,0x2b,
 0x00,0x00,0x31,0x21,0x51,0x71,0x41,0x61,0x5a,0x7a,0x17,0x17,0x2d,0x3d,0x40,0x60,0x3a,0x2a,
@@ -552,9 +522,20 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_CPU_PROGRAM_MAP(mycom_map)
 	MCFG_CPU_IO_MAP(mycom_io)
 
-	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
-	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mycom_state, mycom_04_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(mycom_state, mycom_05_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(mycom_state, mycom_06_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mycom_state, mycom_06_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mycom_state, mycom_08_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mycom_state, mycom_0a_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("rtc", msm5832_device, data_r))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("rtc", msm5832_device, data_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mycom_state, mycom_rtc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -421,27 +421,6 @@ WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 	coin_lockout_w(machine(), 1, BIT(data,4));
 }
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_a_w),         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_b_w),         /* Port B write */
-	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_c_r),         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 /*************************************
  *
  *  Video
@@ -570,9 +549,15 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(smsmfg_state, ppi0_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(smsmfg_state, ppi0_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(smsmfg_state, ppi0_c_r))
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -112,16 +112,6 @@ WRITE8_MEMBER( basic52_state::kbd_put )
 	m_term_data = data;
 }
 
-static I8255_INTERFACE( ppi8255_intf )
-{
-	DEVCB_NULL,                 /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_NULL,                 /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_NULL,                 /* Port C read */
-	DEVCB_NULL                  /* Port C write */
-};
-
 static MACHINE_CONFIG_START( basic31, basic52_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
@@ -133,7 +123,7 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(basic52_state, kbd_put))
 
-	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( basic52, basic31 )

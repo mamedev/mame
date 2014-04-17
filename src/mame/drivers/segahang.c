@@ -35,34 +35,6 @@ const UINT32 MASTER_CLOCK_25MHz = 25174800;
 const UINT32 MASTER_CLOCK_10MHz = 10000000;
 const UINT32 MASTER_CLOCK_8MHz = 8000000;
 
-
-
-//**************************************************************************
-//  PPI INTERFACES
-//**************************************************************************
-
-static I8255_INTERFACE(hangon_ppi_intf_0)
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segahang_state, video_lamps_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segahang_state, tilemap_sound_w)
-};
-
-static I8255_INTERFACE(hangon_ppi_intf_1)
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segahang_state, sub_control_adc_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segahang_state, adc_status_r),
-	DEVCB_NULL
-};
-
-
-
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
 //**************************************************************************
@@ -804,8 +776,14 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_I8255_ADD( "i8255_1", hangon_ppi_intf_0 )
-	MCFG_I8255_ADD( "i8255_2", hangon_ppi_intf_1 )
+	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(segahang_state, video_lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segahang_state, tilemap_sound_w))
+
+	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(segahang_state, sub_control_adc_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(segahang_state, adc_status_r))
 
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")

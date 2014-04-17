@@ -183,7 +183,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi0_intf )
+//  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
 /*
@@ -201,7 +201,7 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi0_intf )
+//  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
 WRITE8_MEMBER( sage2_state::ppi0_pc_w )
@@ -246,19 +246,9 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 	if(BIT(data, 7)) m_fdc->reset();
 }
 
-static I8255A_INTERFACE( ppi0_intf )
-{
-	DEVCB_INPUT_PORT("J7"),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("J6"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(sage2_state, ppi0_pc_w)
-};
-
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi1_intf )
+//  I8255A INTERFACE( ppi1_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(sage2_state::write_centronics_ack)
@@ -373,17 +363,6 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	}
 }
 
-static I8255A_INTERFACE( ppi1_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_DRIVER_MEMBER(sage2_state, ppi1_pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(sage2_state, ppi1_pc_w)
-};
-
-
 WRITE_LINE_MEMBER( sage2_state::br1_w )
 {
 	m_usart0->write_txc(state);
@@ -464,8 +443,16 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 
 	// devices
 	MCFG_PIC8259_ADD(I8259_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_1), VCC, NULL)
-	MCFG_I8255A_ADD(I8255A_0_TAG, ppi0_intf)
-	MCFG_I8255A_ADD(I8255A_1_TAG, ppi1_intf)
+
+	MCFG_DEVICE_ADD(I8255A_0_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("J7"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("J6"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sage2_state, ppi0_pc_w))
+
+	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8(sage2_state, ppi1_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sage2_state, ppi1_pc_w))
 
 	MCFG_DEVICE_ADD(I8253_0_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(0) // from U75 OUT0

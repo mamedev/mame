@@ -120,7 +120,6 @@ public:
 
 /*----------- defined in machine/mz700.c -----------*/
 
-extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 
 #endif /* MZ700_H_ */

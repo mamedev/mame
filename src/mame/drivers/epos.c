@@ -105,17 +105,6 @@ WRITE8_MEMBER(epos_state::write_prtc)
 	membank("bank2")->set_entry(data & 0x01);
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("INPUTS"),     /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(epos_state,write_prtc)      /* Port C write */
-};
-
-
 /*************************************
  *
  *  Port definitions
@@ -421,7 +410,9 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 

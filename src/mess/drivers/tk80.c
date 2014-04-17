@@ -116,19 +116,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tk80_io, AS_IO, 8, tk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mikrolab_io, AS_IO, 8, tk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nd80z_io, AS_IO, 8, tk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -247,37 +247,6 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 	m_ppi_portc = data;
 }
 
-static I8255_INTERFACE( ppi_intf_0 )
-{
-	DEVCB_DRIVER_MEMBER(tk80_state, key_matrix_r),        /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(tk80_state, serial_r),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(tk80_state, serial_w)         /* Port C write */
-};
-
-static I8255_INTERFACE( ppi_intf_1 )
-{
-	DEVCB_DRIVER_MEMBER(tk80_state, key_matrix_r),        /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(tk80_state, serial_r),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(tk80_state, mikrolab_serial_w)        /* Port C write */
-};
-
-static I8255_INTERFACE( ppi_intf_2 )
-{
-	DEVCB_DRIVER_MEMBER(tk80_state, nd80z_key_r),        /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(tk80_state, serial_r),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(tk80_state, mikrolab_serial_w)        /* Port C write */
-};
-
-
 static MACHINE_CONFIG_START( tk80, tk80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) // 18.432 / 9
@@ -288,25 +257,36 @@ static MACHINE_CONFIG_START( tk80, tk80_state )
 	MCFG_DEFAULT_LAYOUT(layout_tk80)
 
 	/* Devices */
-	MCFG_I8255_ADD( "ppi8255_0", ppi_intf_0 )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, key_matrix_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, serial_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(mikrolab_io)
+
 	/* Devices */
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_I8255_ADD( "ppi8255_1", ppi_intf_1 )
+	MCFG_DEVICE_REMOVE("ppi8255")
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, key_matrix_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nd80z, tk80 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
+
 	/* Devices */
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_I8255_ADD( "ppi8255_2", ppi_intf_2 )
+	MCFG_DEVICE_REMOVE("ppi8255")
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, nd80z_key_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tk85, tk80 )

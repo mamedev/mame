@@ -156,22 +156,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 
 //**************************************************************************
-//  PPI INTERFACES
-//**************************************************************************
-
-static I8255_INTERFACE(single_ppi_intf)
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segas16a_state, misc_control_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segas16a_state, tilemap_sound_w)
-};
-
-
-
-//**************************************************************************
 //  PPI READ/WRITE CALLBACKS
 //**************************************************************************
 
@@ -1911,7 +1895,10 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255_ADD( "i8255", single_ppi_intf )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(segas16a_state, misc_control_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segas16a_state, tilemap_sound_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -105,27 +105,6 @@ static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,     0, 16 ) /* wrong */
 GFXDECODE_END
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL,                         /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL,                         /* Port C write */
-};
-
-
 static MACHINE_CONFIG_START( tcl, tcl_state )
 
 	/* basic machine hardware */
@@ -144,9 +123,8 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tcl)
 	MCFG_PALETTE_ADD("palette", 16*16)
 
-
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

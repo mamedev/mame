@@ -61,8 +61,4 @@ public:
 	void pp01_set_memory(UINT8 block, UINT8 data);
 };
 
-
-/*----------- defined in machine/pp01.c -----------*/
-extern const i8255_interface pp01_ppi8255_interface;
-
 #endif

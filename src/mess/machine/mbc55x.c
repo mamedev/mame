@@ -86,16 +86,6 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 	m_fdc->set_side(BIT(data, 2));
 }
 
-I8255_INTERFACE( mbc55x_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(mbc55x_state, mbc55x_ppi_porta_r),
-	DEVCB_DRIVER_MEMBER(mbc55x_state, mbc55x_ppi_porta_w),
-	DEVCB_DRIVER_MEMBER(mbc55x_state, mbc55x_ppi_portb_r),
-	DEVCB_DRIVER_MEMBER(mbc55x_state, mbc55x_ppi_portb_w),
-	DEVCB_DRIVER_MEMBER(mbc55x_state, mbc55x_ppi_portc_r),
-	DEVCB_DRIVER_MEMBER(mbc55x_state, mbc55x_ppi_portc_w)
-};
-
 /* Serial port USART, unimplemented as yet */
 
 READ8_MEMBER( mbc55x_state::mbc55x_usart_r )

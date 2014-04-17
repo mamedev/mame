@@ -122,26 +122,6 @@ WRITE8_MEMBER( special_state::specialist_8255_portc_w )
 	m_dac->write_unsigned8(BIT(data, 5)); //beeper
 }
 
-I8255_INTERFACE( specialist_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_r),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_w)
-};
-
-I8255_INTERFACE( specimx_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_r),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(special_state, specimx_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_w)
-};
-
 void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)

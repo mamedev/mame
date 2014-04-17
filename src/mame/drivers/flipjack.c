@@ -403,17 +403,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("P1"),             /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("P2"),             /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("P3"),             /* Port C read */
-	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_portc_w)        /* Port C write */
-};
-
-
 static const ay8910_interface ay8910_config_1 =
 {
 	AY8910_LEGACY_OUTPUT,                   /* Flags */
@@ -493,8 +482,11 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_CPU_IO_MAP(flipjack_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
-
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("P3"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(flipjack_state, flipjack_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

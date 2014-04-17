@@ -413,22 +413,6 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
 	output_set_lamp_value(8, (data >> 1) & 1);  /* hold1 lamp */
 }
 
-
-/*************************
-*      Machine Init      *
-*************************/
-
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(gatron_state,output_port_1_w)   /* Port C write */
-};
-
-
 /*************************
 * Memory Map Information *
 *************************/
@@ -559,7 +543,10 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(gatron_state, output_port_1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

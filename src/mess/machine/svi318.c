@@ -208,16 +208,6 @@ WRITE8_MEMBER(svi318_state::svi318_ppi_port_c_w)
 	m_svi.keyboard_row = data & 0x0F;
 }
 
-I8255_INTERFACE( svi318_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(svi318_state,svi318_ppi_port_a_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(svi318_state,svi318_ppi_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(svi318_state,svi318_ppi_port_c_w)
-};
-
 WRITE8_MEMBER(svi318_state::svi318_ppi_w)
 {
 	m_ppi->write(space, offset + 2, data);

@@ -519,27 +519,6 @@ READ8_MEMBER(freekick_state::snd_rom_r)
 	return memregion("user1")->base()[m_romaddr & 0x7fff];
 }
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(freekick_state,snd_rom_addr_l_w),   /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(freekick_state,snd_rom_addr_h_w),   /* Port B write */
-	DEVCB_DRIVER_MEMBER(freekick_state,snd_rom_r),          /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),       /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("DSW3"),       /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-
 /*************************************
  *
  *  Graphics definitions
@@ -674,8 +653,15 @@ static MACHINE_CONFIG_DERIVED( freekickb, base )
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(freekick_state, snd_rom_addr_l_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(freekick_state, snd_rom_addr_h_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(freekick_state, snd_rom_r))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

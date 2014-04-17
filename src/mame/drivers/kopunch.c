@@ -123,54 +123,6 @@ WRITE8_MEMBER(kopunch_state::coin_w)
 //      printf("port 34 = %02x   ",data);
 }
 
-/*******************************************************/
-
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kopunch_state, sensors1_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kopunch_state, sensors2_r),
-	DEVCB_NULL
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kopunch_state, coin_w),
-	DEVCB_NULL,
-	DEVCB_UNMAPPED,
-	DEVCB_NULL,
-	DEVCB_UNMAPPED
-};
-
-static I8255A_INTERFACE( ppi8255_2_intf )
-{
-	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kopunch_state, lamp_w),
-	DEVCB_NULL,
-	DEVCB_UNMAPPED,
-	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_NULL
-};
-
-static I8255A_INTERFACE( ppi8255_3_intf )
-{
-	// $3c - always $88 (PPI mode 0, ports A & B & lower C as output, upper C as input)
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kopunch_state, scroll_x_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kopunch_state, scroll_y_w),
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_DRIVER_MEMBER(kopunch_state, gfxbank_w)
-};
-
-
-
 /********************************************************
 
   Inputs
@@ -281,10 +233,30 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 	MCFG_CPU_IO_MAP(kopunch_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
 
-	MCFG_I8255A_ADD("ppi8255_0", ppi8255_0_intf)
-	MCFG_I8255A_ADD("ppi8255_1", ppi8255_1_intf)
-	MCFG_I8255A_ADD("ppi8255_2", ppi8255_2_intf)
-	MCFG_I8255A_ADD("ppi8255_3", ppi8255_3_intf)
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(READ8(kopunch_state, sensors1_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(kopunch_state, sensors2_r))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, coin_w))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_OUT_PORTC_CB(LOGGER("PPI8255 - unmapped write port C", 0))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, lamp_w))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW"))
+
+	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
+	// $3c - always $88 (PPI mode 0, ports A & B & lower C as output, upper C as input)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, scroll_x_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(kopunch_state, scroll_y_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("P2"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kopunch_state, gfxbank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

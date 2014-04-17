@@ -560,7 +560,7 @@ static const ay8910_interface psg_intf =
 
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255A interface
 //-------------------------------------------------
 
 READ8_MEMBER(ace_state::sby_r)
@@ -605,17 +605,6 @@ WRITE8_MEMBER(ace_state::ald_w)
 		m_sp0256->ald_w(space, 0, data & 0x3f);
 	}
 }
-
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ace_state,sby_r),
-	DEVCB_DRIVER_MEMBER(ace_state,ald_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  Z80PIO_INTERFACE( pio_intf )
@@ -751,7 +740,11 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	// devices
 	MCFG_CASSETTE_ADD("cassette", ace_cassette_interface)
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
-	MCFG_I8255A_ADD(I8255_TAG, ppi_intf)
+
+	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTB_CB(READ8(ace_state, sby_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ace_state, ald_w))
+
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_6_5MHz/2, pio_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 

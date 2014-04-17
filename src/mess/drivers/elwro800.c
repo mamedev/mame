@@ -199,16 +199,6 @@ WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
 	m_centronics->write_strobe((data >> 7) & 0x01);
 }
 
-static I8255_INTERFACE(elwro800jr_ppi8255_interface)
-{
-	DEVCB_INPUT_PORT("JOY"),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_DRIVER_MEMBER(elwro800_state,i8255_port_c_r),
-	DEVCB_DRIVER_MEMBER(elwro800_state,i8255_port_c_w)
-};
-
 /*************************************
  *
  *  I/O reads and writes
@@ -583,7 +573,13 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
+
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("JOY"))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTC_CB(READ8(elwro800_state, i8255_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(elwro800_state, i8255_port_c_w))
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")

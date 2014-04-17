@@ -386,7 +386,14 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specialist_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+
 	MCFG_CASSETTE_ADD( "cassette", special_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
@@ -405,7 +412,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specialm, special )
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_I8255_ADD( "ppi8255", specimx_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specimx_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specimx, special )
@@ -438,7 +451,14 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch2))
 
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_I8255_ADD( "ppi8255", specimx_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specimx_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
@@ -480,7 +500,15 @@ static MACHINE_CONFIG_START( erik, special_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", special_cassette_interface )
-	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
+
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specialist_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)

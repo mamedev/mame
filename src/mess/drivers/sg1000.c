@@ -470,7 +470,7 @@ static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 };
 
 /*-------------------------------------------------
-    I8255_INTERFACE( sc3000_ppi_intf )
+    I8255 INTERFACE
 -------------------------------------------------*/
 
 READ8_MEMBER( sc3000_state::ppi_pa_r )
@@ -545,16 +545,6 @@ WRITE8_MEMBER( sc3000_state::ppi_pc_w )
 	/* TODO printer */
 }
 
-I8255_INTERFACE( sc3000_ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pa_r),    // Port A read
-	DEVCB_NULL,                                     // Port A write
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pb_r),    // Port B read
-	DEVCB_NULL,                                     // Port B write
-	DEVCB_NULL,                                     // Port C read
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pc_w),    // Port C write
-};
-
 /*-------------------------------------------------
     cassette_interface sc3000_cassette_interface
 -------------------------------------------------*/
@@ -569,7 +559,7 @@ const cassette_interface sc3000_cassette_interface =
 };
 
 /*-------------------------------------------------
-    I8255_INTERFACE( sf7000_ppi_intf )
+    I8255 INTERFACE
 -------------------------------------------------*/
 
 WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
@@ -639,16 +629,6 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	/* printer strobe */
 	m_centronics->write_strobe(BIT(data, 7));
 }
-
-static I8255_INTERFACE( sf7000_ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pa_r),                // Port A read
-	DEVCB_NULL,                                                 // Port A write
-	DEVCB_NULL,                                                 // Port B read
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // Port B write
-	DEVCB_NULL,                                                 // Port C read
-	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)                 // Port C write
-};
 
 /*-------------------------------------------------
     upd765_interface sf7000_upd765_interface
@@ -827,8 +807,13 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_I8255_ADD(UPD9255_TAG, sc3000_ppi_intf)
+	MCFG_DEVICE_ADD(UPD9255_TAG, I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(sc3000_state, ppi_pa_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(sc3000_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sc3000_state, ppi_pc_w))
+
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
+
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	/* cartridge */
@@ -864,8 +849,15 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
-	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
+	MCFG_DEVICE_ADD(UPD9255_0_TAG, I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(sc3000_state, ppi_pa_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(sc3000_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sc3000_state, ppi_pc_w))
+
+	MCFG_DEVICE_ADD(UPD9255_1_TAG, I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(sf7000_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sf7000_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

@@ -192,26 +192,6 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 }
 
 
-I8255A_INTERFACE( lviv_ppi8255_interface_0 )
-{
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_0_porta_r),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_0_porta_w),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_0_portb_r),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_0_portb_w),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_0_portc_r),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_0_portc_w)
-};
-
-I8255A_INTERFACE( lviv_ppi8255_interface_1 )
-{
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_1_porta_r),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_1_porta_w),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_1_portb_r),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_1_portb_w),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_1_portc_r),
-	DEVCB_DRIVER_MEMBER(lviv_state,lviv_ppi_1_portc_w)
-};
-
 void lviv_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);

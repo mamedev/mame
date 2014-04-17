@@ -323,17 +323,6 @@ GFXDECODE_END
 
 /**************************************************************************/
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	// all ports are outputs
-	DEVCB_NULL,             /* Port A read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollhi_w), /* Port A write */
-	DEVCB_NULL,             /* Port B read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrolly_w),  /* Port B write */
-	DEVCB_NULL,             /* Port C read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollx_w)   /* Port C write */
-};
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -379,8 +368,10 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_CPU_IO_MAP(homerun_iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
 
-
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(homerun_state, homerun_scrollhi_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(homerun_state, homerun_scrolly_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(homerun_state, homerun_scrollx_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

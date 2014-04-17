@@ -77,28 +77,6 @@ static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8, pioneer_ldv1000_device )
 ADDRESS_MAP_END
 
 
-static I8255_INTERFACE(ppi0intf)
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_porta_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portb_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_w)
-};
-
-
-static I8255_INTERFACE(ppi1intf)
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portb_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portc_w)
-};
-
-
 static Z80CTC_INTERFACE( ctcintf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ctc_interrupt),
@@ -122,8 +100,17 @@ static MACHINE_CONFIG_FRAGMENT( ldv1000 )
 	MCFG_CPU_IO_MAP(ldv1000_portmap)
 
 	MCFG_Z80CTC_ADD("ldvctc", XTAL_5MHz/2, ctcintf)
-	MCFG_I8255_ADD("ldvppi0", ppi0intf)
-	MCFG_I8255_ADD("ldvppi1", ppi1intf)
+
+	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pioneer_ldv1000_device, ppi0_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pioneer_ldv1000_device, ppi0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi0_portc_w))
+
+	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pioneer_ldv1000_device, ppi1_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pioneer_ldv1000_device, ppi1_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi1_portc_w))
 MACHINE_CONFIG_END
 
 

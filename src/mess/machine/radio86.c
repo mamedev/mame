@@ -74,28 +74,6 @@ WRITE8_MEMBER(radio86_state::radio86_8255_portc_w2)
 }
 
 
-I8255A_INTERFACE( radio86_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_porta_w2),
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portb_r2),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portc_r2),
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portc_w2),
-};
-
-I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
-{
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portb_r2),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_porta_w2),
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portc_r2),
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portc_w2),
-};
-
-
-
 READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
 {
 	double level = m_cassette->input();
@@ -114,16 +92,6 @@ READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
 	}
 	return key;
 }
-
-I8255A_INTERFACE( rk7007_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_porta_w2),
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portb_r2),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,rk7007_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_8255_portc_w2),
-};
 
 WRITE_LINE_MEMBER(radio86_state::hrq_w)
 {
@@ -213,30 +181,10 @@ WRITE8_MEMBER(radio86_state::radio86_romdisk_portc_w)
 	m_romdisk_msb = data;
 }
 
-I8255A_INTERFACE( radio86_ppi8255_interface_2 )
-{
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_romdisk_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_romdisk_portb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,radio86_romdisk_portc_w)
-};
-
 WRITE8_MEMBER(radio86_state::mikrosha_8255_font_page_w)
 {
 	m_mikrosha_font_page = (data  > 7) & 1;
 }
-
-I8255A_INTERFACE( mikrosha_ppi8255_interface_2 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state,mikrosha_8255_font_page_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 const i8275_interface radio86_i8275_interface = {
 	6,

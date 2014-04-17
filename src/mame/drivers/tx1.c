@@ -468,34 +468,6 @@ READ8_MEMBER(tx1_state::bbjr_analog_r)
 
 /*************************************
  *
- *  8255 PPI Interfaces
- *
- *************************************/
-
-/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-static I8255A_INTERFACE( buggyboy_ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("PPI_PORTA"),                      /* Port A read */
-	DEVCB_NULL,                                         /* Port A write */
-	DEVCB_NULL,                                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(tx1_state,bb_coin_cnt_w),       /* Port B write */
-	DEVCB_INPUT_PORT("PPI_PORTC"),                      /* Port C read */
-	DEVCB_NULL                                          /* Port C write */
-};
-
-static I8255A_INTERFACE( tx1_ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_porta_r),     /* Port A read */
-	DEVCB_NULL,                                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_portb_r),     /* Port B read */
-	DEVCB_NULL,                                         /* Port B write */
-	DEVCB_INPUT_PORT("PPI_PORTC"),                      /* Port C read */
-	DEVCB_DRIVER_MEMBER(tx1_state,tx1_coin_cnt_w)       /* Port C write */
-};
-
-
-/*************************************
- *
  *  TX-1 Memory Maps
  *
  *************************************/
@@ -706,7 +678,11 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255A_ADD("ppi8255", tx1_ppi8255_intf)
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(tx1_state, tx1_ppi_porta_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(tx1_state, tx1_ppi_portb_r))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(tx1_state, tx1_coin_cnt_w))
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
@@ -762,7 +738,11 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255A_ADD("ppi8255", buggyboy_ppi8255_intf)
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
+	MCFG_I8255_IN_PORTA_CB(IOPORT("PPI_PORTA"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(tx1_state, bb_coin_cnt_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
 
 	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
 

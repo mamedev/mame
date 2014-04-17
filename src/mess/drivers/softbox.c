@@ -173,7 +173,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi0_intf )
+//  I8255A 0 Interface
 //-------------------------------------------------
 
 READ8_MEMBER( softbox_state::ppi0_pa_r )
@@ -186,19 +186,8 @@ WRITE8_MEMBER( softbox_state::ppi0_pb_w )
 	m_ieee->dio_w(data ^ 0xff);
 }
 
-static I8255A_INTERFACE( ppi0_intf )
-{
-	DEVCB_DRIVER_MEMBER(softbox_state, ppi0_pa_r),
-	DEVCB_NULL, // Port A write
-	DEVCB_NULL, // Port B read
-	DEVCB_DRIVER_MEMBER(softbox_state, ppi0_pb_w),
-	DEVCB_INPUT_PORT("SW1"), // Port C read
-	DEVCB_NULL  // Port C write
-};
-
-
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi1_intf )
+//  I8255A 1 Interface
 //-------------------------------------------------
 
 READ8_MEMBER( softbox_state::ppi1_pa_r )
@@ -307,17 +296,6 @@ WRITE8_MEMBER( softbox_state::ppi1_pc_w )
 	output_set_led_value(LED_READY, !BIT(data, 2));
 }
 
-static I8255A_INTERFACE( ppi1_intf )
-{
-	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pa_r),
-	DEVCB_NULL, // Port A write
-	DEVCB_NULL, // Port B read
-	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pb_w),
-	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pc_r),
-	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pc_w)
-};
-
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -405,8 +383,16 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_I8255A_ADD(I8255_0_TAG, ppi0_intf)
-	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
+	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(softbox_state, ppi0_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(softbox_state, ppi0_pb_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW1"))
+
+	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(softbox_state, ppi1_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(softbox_state, ppi1_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(softbox_state, ppi1_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(softbox_state, ppi1_pc_w))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))

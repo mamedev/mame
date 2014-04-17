@@ -474,65 +474,10 @@ static ADDRESS_MAP_START( cowrace_sound_io, AS_IO, 8, kingdrby_state )
 ADDRESS_MAP_END
 
 
-/*************************************
-*
-* PPI configuration
-*
-* 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
-* 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
-*
-*************************************/
-
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	/* A & B as input, C (all) as output */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_r),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_w)         /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	/* B & C (lower) as input, A & C (upper) as output */
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),            /* Port A write */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,key_matrix_r),       /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,input_mux_r),            /* Port C read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,outport2_w)          /* Port C write */
-};
-
 WRITE8_MEMBER(kingdrby_state::outportb_w)
 {
-//  printf("%02x B\n",data);
+	//  printf("%02x B\n",data);
 }
-
-
-static I8255A_INTERFACE( ppi8255_1986_0_intf )
-{
-	/* C as input, (all) as output */
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),            /* Port A write */
-	DEVCB_INPUT_PORT("IN0"),            /* Port B read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,outportb_w),         /* Port B write */
-	DEVCB_INPUT_PORT("IN1"),            /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1986_1_intf )
-{
-	/* actually unused */
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL,                         /* Port C write */
-};
-
 
 /*************************************
  *
@@ -1037,8 +982,18 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(kingdrby_state, hopper_io_r))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, hopper_io_w))
+
+	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(kingdrby_state, key_matrix_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(kingdrby_state, input_mux_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, outport2_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
@@ -1050,7 +1005,6 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)    /* controlled by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 	MCFG_SCREEN_PALETTE("palette")
-
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32, mc6845_intf)  /* 53.333 Hz. guess */
 
@@ -1071,8 +1025,16 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_1986_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1986_1_intf )
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	/* C as input, (all) as output */
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(kingdrby_state, outportb_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	/* actually unused */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )

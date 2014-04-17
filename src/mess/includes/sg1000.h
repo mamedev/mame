@@ -35,7 +35,6 @@
 
 
 INPUT_PORTS_EXTERN( sk1100 );
-extern const i8255_interface ( sc3000_ppi_intf );
 extern const cassette_interface sc3000_cassette_interface;
 
 class sg1000_state : public driver_device

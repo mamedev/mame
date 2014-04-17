@@ -161,26 +161,6 @@ WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
 	m_cassette->output((BIT(data, 6)) ? +1.0 : 0.0);
 }
 
-static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_80_porta_w),
-	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_80_portb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_80_portc_w)
-};
-
-static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
-{
-	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_r),
-	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_portc_w)
-};
-
 READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
 {
 	UINT8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
@@ -381,7 +361,6 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_CPU_IO_MAP(pk8000_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8000_state,  pk8000_interrupt)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -394,8 +373,15 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
-	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
-	MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_state, pk8000_80_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pk8000_state, pk8000_80_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_state, pk8000_80_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, pk8000_84_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, pk8000_84_porta_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state,pk8000_84_portc_w))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

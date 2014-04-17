@@ -1142,37 +1142,6 @@ static INPUT_PORTS_START( couplep )
 INPUT_PORTS_END
 
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),    /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),    /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),    /* Port C read */
-	DEVCB_NULL                  /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW"),    /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_NULL,                 /* Port B read */
-	DEVCB_DRIVER_MEMBER(merit_state,led1_w),        /* Port B write */
-	DEVCB_NULL,                 /* Port C read */
-	DEVCB_DRIVER_MEMBER(merit_state,misc_w)     /* Port C write */
-};
-
-static I8255A_INTERFACE( couple_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW"),    /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_NULL,                 /* Port B read */
-	DEVCB_DRIVER_MEMBER(merit_state,led1_w),        /* Port B write */
-	DEVCB_NULL,                 /* Port C read */
-	DEVCB_DRIVER_MEMBER(merit_state,misc_couple_w)/* Port C write */
-};
-
-
 static const ay8910_interface merit_ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1201,8 +1170,15 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_CPU_PROGRAM_MAP(pitboss_map)
 	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(merit_state, led1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_w))
 
 	/* video hardware */
 
@@ -1291,7 +1267,10 @@ static MACHINE_CONFIG_DERIVED( couple, pitboss )
 	MCFG_CPU_IO_MAP(tictac_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_I8255A_ADD( "ppi8255_1", couple_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(merit_state, led1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_couple_w))
 MACHINE_CONFIG_END
 
 

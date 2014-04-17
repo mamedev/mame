@@ -157,26 +157,6 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 //  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
-I8255_INTERFACE( mc1502_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_ppi_portb_w),
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_ppi_portc_r),
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_ppi_portc_w)
-};
-
-I8255_INTERFACE( mc1502_ppi8255_interface_2 )
-{
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_portb_w),
-	DEVCB_DEVICE_MEMBER("cent_status_in", input_buffer_device, read),
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_portc_w)
-};
-
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
 {
 	if (!BIT(m_ppi_portc,3))
@@ -285,8 +265,17 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
-	MCFG_I8255_ADD( "ppi8255n1", mc1502_ppi8255_interface_1 )
-	MCFG_I8255_ADD( "ppi8255n2", mc1502_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mc1502_state, mc1502_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(mc1502_state, mc1502_ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mc1502_state, mc1502_ppi_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255n2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mc1502_state, mc1502_kppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mc1502_state, mc1502_kppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mc1502_state, mc1502_kppi_portc_w))
 
 	MCFG_DEVICE_ADD( "upd8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_txd))

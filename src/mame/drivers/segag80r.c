@@ -307,24 +307,6 @@ WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 }
 
 
-
-/*************************************
- *
- *  PPI 8255 configurations
- *
- *************************************/
-
-static I8255A_INTERFACE( sindbadm_ppi_intf )
-{
-	DEVCB_NULL,                             /* Port A read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_soundport_w),   /* Port A write */
-	DEVCB_INPUT_PORT("FC"),                 /* Port B read */
-	DEVCB_NULL,                             /* Port B write */
-	DEVCB_NULL,                             /* Port C read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_misc_w)         /* Port C write */
-};
-
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -917,7 +899,10 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 
-	MCFG_I8255A_ADD( "ppi8255", sindbadm_ppi_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, sindbadm_soundport_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("FC"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, sindbadm_misc_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)

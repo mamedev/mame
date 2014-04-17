@@ -152,13 +152,6 @@ protected:
 	int m_cas_tx;
 };
 
-
-/*----------- defined in machine/pmd85.c -----------*/
-
-extern const i8255_interface pmd85_ppi8255_interface[4];
-extern const i8255_interface alfa_ppi8255_interface[3];
-extern const i8255_interface mato_ppi8255_interface;
-
 /*----------- defined in video/pmd85.c -----------*/
 
 extern const unsigned char pmd85_palette[3*3];

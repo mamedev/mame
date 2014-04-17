@@ -121,27 +121,6 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_NULL,                 /* Port A read = watchdog? */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_INPUT_PORT("DSW1"),   /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_NULL,                 /* Port C read = unused? */
-	DEVCB_NULL                  /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),    /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),    /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_NULL,                 /* Port C read */
-	DEVCB_NULL                  /* Port C write = unknown */
-};
-
 WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -170,8 +149,15 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 	MCFG_CPU_PROGRAM_MAP(kingpin_program_map)
 	MCFG_CPU_IO_MAP(kingpin_io_map)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	// PORT A read = watchdog?
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	// PORT C read = unused?
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	// PORT C read = unknown
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

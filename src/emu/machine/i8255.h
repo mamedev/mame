@@ -39,56 +39,47 @@
 
 #include "emu.h"
 
-
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I8255_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, I8255, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_I8255_IN_PORTA_CB(_devcb) \
+	devcb = &i8255_device::set_in_pa_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_I8255_IN_PORTB_CB(_devcb) \
+	devcb = &i8255_device::set_in_pb_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8255A_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, I8255A, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_I8255_IN_PORTC_CB(_devcb) \
+	devcb = &i8255_device::set_in_pc_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_I8255_OUT_PORTA_CB(_devcb) \
+	devcb = &i8255_device::set_out_pa_callback(*device, DEVCB2_##_devcb);
 
-#define I8255_INTERFACE(name) \
-	const i8255_interface (name) =
+#define MCFG_I8255_OUT_PORTB_CB(_devcb) \
+	devcb = &i8255_device::set_out_pb_callback(*device, DEVCB2_##_devcb);
 
-
-#define I8255A_INTERFACE(name) \
-	const i8255_interface (name) =
-
+#define MCFG_I8255_OUT_PORTC_CB(_devcb) \
+	devcb = &i8255_device::set_out_pc_callback(*device, DEVCB2_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> i8255_interface
-
-struct i8255_interface
-{
-	devcb_read8         m_in_pa_cb;
-	devcb_write8        m_out_pa_cb;
-	devcb_read8         m_in_pb_cb;
-	devcb_write8        m_out_pb_cb;
-	devcb_read8         m_in_pc_cb;
-	devcb_write8        m_out_pc_cb;
-};
-
-
 // ======================> i8255_device
 
-class i8255_device :  public device_t,
-						public i8255_interface
+class i8255_device :  public device_t
 {
 public:
 	// construction/destruction
 	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_in_pa_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_pb_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_pc_callback(device_t &device, _Object object)  { return downcast<i8255_device &>(device).m_in_pc_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8255_device &>(device).m_out_pa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8255_device &>(device).m_out_pb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<i8255_device &>(device).m_out_pc_cb.set_callback(object); }
+	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -104,7 +95,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -132,6 +122,14 @@ private:
 	void set_mode(UINT8 data);
 	void set_pc_bit(int bit, int state);
 
+	devcb2_read8        m_in_pa_cb;
+	devcb2_read8        m_in_pb_cb;
+	devcb2_read8        m_in_pc_cb;
+	
+	devcb2_write8       m_out_pa_cb;
+	devcb2_write8       m_out_pb_cb;
+	devcb2_write8       m_out_pc_cb;
+	
 	devcb_resolved_read8        m_in_port_func[3];
 	devcb_resolved_write8       m_out_port_func[3];
 
@@ -151,7 +149,6 @@ private:
 // device type definition
 extern const device_type I8255;
 extern const device_type I8255A;
-
 
 
 #endif

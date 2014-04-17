@@ -847,16 +847,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-static I8255A_INTERFACE( ppi_interface )
-{
-	DEVCB_NULL,     // port A read
-	DEVCB_NULL,     // port A write
-	DEVCB_NULL,     // port B read
-	DEVCB_NULL,     // port B write
-	DEVCB_NULL,     // port C read
-	DEVCB_NULL      // port C write
-};
-
 WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
 {
 	m_i8259->ir4_w(state);
@@ -934,7 +924,8 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */
-	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
+
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(m20_state, kbd_tx))

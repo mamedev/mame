@@ -195,16 +195,6 @@ WRITE8_MEMBER( amico2k_state::ppi_pb_w )
 	m_ls145_p = (data >> 1) & 0x0f;
 }
 
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pa_r),   // Port A read
-	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pa_w),   // Port A write
-	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pb_r),   // Port B read
-	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pb_w),   // Port B write
-	DEVCB_NULL,                 // Port C read
-	DEVCB_NULL                  // Port C write
-};
-
 void amico2k_state::machine_start()
 {
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amico2k_state::led_refresh),this));
@@ -222,7 +212,11 @@ static MACHINE_CONFIG_START( amico2k, amico2k_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_amico2k )
 
-	MCFG_I8255_ADD("i8255", ppi_intf)
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(amico2k_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(amico2k_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(amico2k_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(amico2k_state, ppi_pb_w))
 MACHINE_CONFIG_END
 
 

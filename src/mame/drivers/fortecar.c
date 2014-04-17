@@ -459,19 +459,6 @@ READ8_MEMBER(fortecar_state::ppi0_portc_r)
 	return ((m_eeprom->do_read()<<4) & 0x10);
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	/*  Init with 0x9a... A, B and high C as input
-	 Serial Eprom connected to Port C */
-	DEVCB_INPUT_PORT("SYSTEM"),                     /* Port A read */
-	DEVCB_NULL,                                     /* Port A write */
-	DEVCB_INPUT_PORT("INPUT"),                      /* Port B read */
-	DEVCB_NULL,                                     /* Port B write */
-	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_r),   /* Port C read */
-	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_w)    /* Port C write */
-};
-
-
 WRITE8_MEMBER(fortecar_state::ayporta_w)
 {
 /*  System Lamps...
@@ -698,7 +685,14 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
-	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
+	MCFG_DEVICE_ADD("fcppi0", I8255A, 0)
+	/*  Init with 0x9a... A, B and high C as input
+     Serial Eprom connected to Port C */
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INPUT"))
+	MCFG_I8255_IN_PORTC_CB(READ8(fortecar_state, ppi0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(fortecar_state, ppi0_portc_w))
+
 	MCFG_V3021_ADD("rtc")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fortecar)

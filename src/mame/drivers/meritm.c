@@ -838,26 +838,6 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 	output_set_value("P1 CANCEL LAMP", !BIT(data,6));
 }
 
-static I8255A_INTERFACE( crt260_ppi8255_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_8255_port_c_r),/* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( crt250_ppi8255_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_crt250_port_b_w),/* Port B write (used LMP x DRIVE) */
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_8255_port_c_r),/* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 /*************************************
  *
  *  AY8930
@@ -1113,8 +1093,9 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_CPU_CONFIG(meritm_daisy_chain)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meritm_state, meritm_interrupt, "screen", 0, 1)
 
-
-	MCFG_I8255A_ADD( "ppi8255", crt250_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))	// used LMP x DRIVE
+	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
 
 	MCFG_Z80PIO_ADD( "z80pio_0", SYSTEM_CLK/6, meritm_audio_pio_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", SYSTEM_CLK/6, meritm_io_pio_intf )
@@ -1171,7 +1152,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_CPU_IO_MAP(meritm_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_I8255A_ADD( "ppi8255", crt260_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)

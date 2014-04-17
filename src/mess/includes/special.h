@@ -149,13 +149,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-
-/*----------- defined in machine/special.c -----------*/
-
-extern const i8255_interface specialist_ppi8255_interface;
-extern const i8255_interface specimx_ppi8255_interface;
-
-
 /*----------- defined in video/special.c -----------*/
 
 extern const rgb_t specimx_palette[16];

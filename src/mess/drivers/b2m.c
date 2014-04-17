@@ -208,11 +208,19 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk0))
 
-	MCFG_I8255_ADD( "ppi8255_1", b2m_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(b2m_state, b2m_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(b2m_state, b2m_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(b2m_state, b2m_8255_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(b2m_state, b2m_8255_portc_w))
 
-	MCFG_I8255_ADD( "ppi8255_2", b2m_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(b2m_state, b2m_ext_8255_portc_w))
 
-	MCFG_I8255_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
+	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(b2m_state, b2m_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(b2m_state, b2m_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(b2m_state, b2m_romdisk_portc_w))
 
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(b2m_state,b2m_pic_set_int_line), VCC, NULL )
 

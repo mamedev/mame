@@ -173,7 +173,10 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
 	MCFG_CPU_IO_MAP(mikro80_io)
 
-	MCFG_I8255_ADD( "ppi8255", mikro80_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mikro80_state, mikro80_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(mikro80_state, mikro80_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(mikro80_state, mikro80_8255_portc_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

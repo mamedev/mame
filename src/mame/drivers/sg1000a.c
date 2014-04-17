@@ -256,17 +256,6 @@ WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 	coin_counter_w(machine(), 0, data & 0x01);
 }
 
-static I8255_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_DRIVER_MEMBER(sg1000a_state,sg1000a_coin_counter_w)
-};
-
-
 /*************************************
  *
  *  Machine drivers
@@ -279,7 +268,11 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_I8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sg1000a_state, sg1000a_coin_counter_w))
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, sg1000a_tms9928a_interface )

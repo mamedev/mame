@@ -320,7 +320,7 @@ static MC6845_INTERFACE( grip5_crtc_intf )
 
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255A interface
 //-------------------------------------------------
 
 READ8_MEMBER( grip_device::ppi_pa_r )
@@ -414,17 +414,6 @@ WRITE8_MEMBER( grip_device::ppi_pc_w )
 	// PROF-80 handshaking
 	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
 }
-
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pa_r),  // Port A read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pa_w),  // Port A write
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pb_r),  // Port B read
-	DEVCB_NULL,                                                     // Port B write
-	DEVCB_NULL,                                                     // Port C read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pc_w)   // Port C write
-};
-
 
 //-------------------------------------------------
 //  Z80STI_INTERFACE( sti_intf )
@@ -555,7 +544,13 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	// devices
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/4, crtc_intf)
 //  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL_16MHz/4, grip5_crtc_intf)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(grip_device, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(grip_device, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(grip_device, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(grip_device, ppi_pc_w))
+
 	MCFG_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, sti_intf)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
@@ -578,7 +573,6 @@ machine_config_constructor grip_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( grip );
 }
-
 
 
 //**************************************************************************

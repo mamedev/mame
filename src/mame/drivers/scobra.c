@@ -739,8 +739,14 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	MCFG_I8255A_ADD( "ppi8255_0", scramble_ppi_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(WRITELINE(scobra_state,galaxold_7474_9m_1_callback))
@@ -831,7 +837,10 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 	/* basic machine hardware */
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -878,9 +887,14 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
-	/* device config overrides */
-	MCFG_I8255A_ADD( "ppi8255_0", scramble_ppi_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

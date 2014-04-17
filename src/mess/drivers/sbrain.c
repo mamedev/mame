@@ -266,16 +266,6 @@ static SLOT_INTERFACE_START( sbrain_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pa_r),   // Port A read
-	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pa_w),   // Port A write
-	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pb_r),   // Port B read
-	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pb_w),   // Port B write
-	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pc_r),   // Port C read
-	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pc_w),   // Port C write
-};
-
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
 	m_beep->set_frequency(800);
@@ -349,7 +339,13 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_I8255_ADD("ppi", ppi_intf)
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(sbrain_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(sbrain_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(sbrain_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(sbrain_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(sbrain_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sbrain_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD("uart0", I8251, 0)
 

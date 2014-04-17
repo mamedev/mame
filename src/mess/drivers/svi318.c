@@ -315,7 +315,10 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_MACHINE_START_OVERRIDE(svi318_state, svi318_pal )
 	MCFG_MACHINE_RESET_OVERRIDE(svi318_state, svi318 )
 
-	MCFG_I8255_ADD( "ppi8255", svi318_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, svi318_ppi_port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, svi318_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(svi318_state, svi318_ppi_port_c_w))
 
 	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0], 1000000 )
 	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1], 3072000 )
@@ -431,7 +434,10 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_MACHINE_START_OVERRIDE(svi318_state, svi318_pal )
 	MCFG_MACHINE_RESET_OVERRIDE(svi318_state, svi328_806 )
 
-	MCFG_I8255A_ADD( "ppi8255", svi318_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(svi318_state, svi318_ppi_port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(svi318_state, svi318_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(svi318_state, svi318_ppi_port_c_w))
 
 	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0], 1000000 )
 	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1], 3072000 )

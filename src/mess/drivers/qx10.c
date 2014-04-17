@@ -426,19 +426,6 @@ static I8237_INTERFACE( qx10_dma8237_2_interface )
 };
 
 /*
-    8255
-*/
-static I8255_INTERFACE(qx10_i8255_interface)
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/*
     MC146818
 */
 
@@ -845,9 +832,10 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PIC8259_ADD("pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(qx10_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
 	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
-	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
+
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, MAIN_CLK/6) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)

@@ -274,36 +274,6 @@ void midcoin24cdjuke_state::machine_reset()
 {
 }
 
-static I8255A_INTERFACE( ppi8255_intf_1 )
-{
-	DEVCB_INPUT_PORT("MD1"),        // Port A read
-	DEVCB_NULL,                     // Port A write
-	DEVCB_INPUT_PORT("MD2"),        // Port B read
-	DEVCB_NULL,                     // Port B write
-	DEVCB_INPUT_PORT("MD3"),        // Port C write
-	DEVCB_NULL                      // Port C read
-};
-
-static I8255A_INTERFACE( ppi8255_intf_2 )
-{
-	DEVCB_NULL,                     // Port A read
-	DEVCB_NULL,                     // Port A write
-	DEVCB_INPUT_PORT("PB"),         // Port B read
-	DEVCB_NULL,                     // Port B write
-	DEVCB_DRIVER_MEMBER(midcoin24cdjuke_state, kb_row_r), // Port C read
-	DEVCB_DRIVER_MEMBER(midcoin24cdjuke_state, kb_col_w)  // Port C write
-};
-
-static I8255A_INTERFACE( ppi8255_intf_3 )
-{
-	DEVCB_NULL,                     // Port A read
-	DEVCB_NULL,                     // Port A write
-	DEVCB_NULL,                     // Port B read
-	DEVCB_UNMAPPED,                 // Port B write
-	DEVCB_INPUT_PORT("MD4"),        // Port C read
-	DEVCB_NULL                      // Port C write
-};
-
 
 static MACHINE_CONFIG_START( midcoin24cdjuke, midcoin24cdjuke_state )
 	/* basic machine hardware */
@@ -314,11 +284,20 @@ static MACHINE_CONFIG_START( midcoin24cdjuke, midcoin24cdjuke_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_24cdjuke)
 
-	MCFG_I8255A_ADD( "ic11", ppi8255_intf_1 )
-	MCFG_I8255A_ADD( "ic25", ppi8255_intf_2 )
-	MCFG_I8255A_ADD( "ic31", ppi8255_intf_3 )
-MACHINE_CONFIG_END
+	MCFG_DEVICE_ADD("ic11", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("MD1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("MD2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("MD3"))
 
+	MCFG_DEVICE_ADD("ic25", I8255A, 0)
+	MCFG_I8255_IN_PORTB_CB(IOPORT("PB"))
+	MCFG_I8255_IN_PORTC_CB(READ8(midcoin24cdjuke_state, kb_row_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(midcoin24cdjuke_state, kb_col_w))
+
+	MCFG_DEVICE_ADD("ic31", I8255A, 0)
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("MD4"))
+MACHINE_CONFIG_END
 
 
 ROM_START( 24cdjuke )

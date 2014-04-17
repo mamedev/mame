@@ -53,18 +53,8 @@ void isa8_pds_device::device_stop()
 {
 }
 
-I8255_INTERFACE(pds_ppi_intf)
-{
-	DEVCB_NULL, //m_in_pa_cb;
-	DEVCB_NULL, //m_out_pa_cb;
-	DEVCB_NULL, //m_in_pb_cb;
-	DEVCB_NULL, //m_out_pb_cb;
-	DEVCB_NULL, //m_in_pc_cb;
-	DEVCB_NULL, //m_out_pc_cb;
-};
-
 static MACHINE_CONFIG_FRAGMENT( pds_config )
-	MCFG_I8255_ADD("pds_ppi", pds_ppi_intf)
+	MCFG_DEVICE_ADD("pds_ppi", I8255, 0)
 MACHINE_CONFIG_END
 
 machine_config_constructor isa8_pds_device::device_mconfig_additions() const

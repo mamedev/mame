@@ -117,7 +117,4 @@ protected:
 	void orionpro_bank_switch();
 };
 
-/*----------- defined in machine/orion.c -----------*/
-extern const i8255_interface orion128_ppi8255_interface_1;
-
 #endif /* ORION_H_ */

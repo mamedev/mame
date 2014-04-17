@@ -109,27 +109,6 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
 }
 
 
-static I8255_INTERFACE (ppi8255_intf_ic26)
-{
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write (0 is coin lockout) */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(jpmmps_state,jpmmps_meters_w)                      /* Port C write meters */
-};
-
-static I8255_INTERFACE (ppi8255_intf_ic21)
-{
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-
 WRITE8_MEMBER(jpmmps_state::jpmmps_psg_buf_w)
 {
 	m_sound_buffer = data;
@@ -151,26 +130,6 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 	MechMtr_update(8, (data & 0x08));
 
 }
-
-static I8255_INTERFACE (ppi8255_intf_ic22)
-{
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(jpmmps_state,jpmmps_psg_buf_w),                /* Port B write (SN chip data)*/
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(jpmmps_state,jpmmps_ic22_portc_w)              /* Port C write (C3 is last meter, C2 latches in data) */
-};
-
-static I8255_INTERFACE (ppi8255_intf_ic25)
-{
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
 
 // Communication with Reel MCU
 static const tms9902_interface tms9902_uart4_ic10_params =
@@ -214,10 +173,17 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
 
-	MCFG_I8255_ADD( "ppi8255_ic26", ppi8255_intf_ic26 )
-	MCFG_I8255_ADD( "ppi8255_ic21", ppi8255_intf_ic21 )
-	MCFG_I8255_ADD( "ppi8255_ic22", ppi8255_intf_ic22 )
-	MCFG_I8255_ADD( "ppi8255_ic25", ppi8255_intf_ic25 )
+	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
+	// Port B 0 is coin lockout
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmmps_state, jpmmps_meters_w))
+
+	MCFG_DEVICE_ADD("ppi8255_ic21", I8255, 0)
+
+	MCFG_DEVICE_ADD("ppi8255_ic22", I8255, 0)
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(jpmmps_state, jpmmps_psg_buf_w))	// SN chip data
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmmps_state, jpmmps_ic22_portc_w))	// C3 is last meter, C2 latches in data
+
+	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
 
 	MCFG_TMS9902_ADD("tms9902_ic10", tms9902_uart4_ic10_params, DUART_CLOCK)
 	MCFG_TMS9902_ADD("tms9902_ic5",  tms9902_uart2_ic5_params,  DUART_CLOCK)

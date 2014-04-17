@@ -111,17 +111,6 @@ WRITE8_MEMBER(iqblock_state::port_C_w)
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("P1"),             /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("P2"),             /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("EXTRA"),          /* Port C read */
-	DEVCB_DRIVER_MEMBER(iqblock_state,port_C_w)             /* Port C write */
-};
-
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, iqblock_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("rambase")
@@ -278,7 +267,11 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, iqblock_irq, "screen", 0, 1)
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(iqblock_state, port_C_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

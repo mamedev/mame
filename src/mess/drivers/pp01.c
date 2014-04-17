@@ -232,7 +232,13 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk0))
 
-	MCFG_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pp01_state, pp01_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pp01_state, pp01_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pp01_state, pp01_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pp01_state, pp01_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pp01_state, pp01_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pp01_state, pp01_8255_portc_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

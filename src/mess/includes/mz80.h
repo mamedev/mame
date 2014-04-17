@@ -60,11 +60,6 @@ public:
 };
 
 
-/*----------- defined in machine/mz80.c -----------*/
-
-extern const i8255_interface mz80k_8255_int;
-
-
 /*----------- defined in video/mz80.c -----------*/
 
 extern const gfx_layout mz80k_charlayout;

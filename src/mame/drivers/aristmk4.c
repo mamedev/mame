@@ -1603,17 +1603,6 @@ READ8_MEMBER(aristmk4_state::pc1_r)
 	return 0;
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(aristmk4_state,pa1_r),              /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(aristmk4_state,pb1_r),              /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_DRIVER_MEMBER(aristmk4_state,pc1_r),              /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 /* same as Casino Winner HW */
 PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
 {
@@ -1713,8 +1702,11 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(aristmk4_state, pa1_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(aristmk4_state, pb1_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(aristmk4_state, pc1_r))
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0) /* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))

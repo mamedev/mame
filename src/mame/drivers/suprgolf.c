@@ -474,27 +474,6 @@ void suprgolf_state::machine_reset()
 	m_msm_nmi_mask = 0;
 }
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
-{
-	DEVCB_DRIVER_MEMBER(suprgolf_state,p1_r),                       /* Port A read */
-	DEVCB_NULL,                                 /* Port A write */
-	DEVCB_DRIVER_MEMBER(suprgolf_state,p2_r),                       /* Port B read */
-	DEVCB_NULL,                                 /* Port B write */
-	DEVCB_DRIVER_MEMBER(suprgolf_state,pedal_extra_bits_r),         /* Port C read */
-	DEVCB_NULL                                  /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_intf_1 )
-{
-	DEVCB_INPUT_PORT("SYSTEM"),                 /* Port A read */
-	DEVCB_NULL,                                 /* Port A write */
-	DEVCB_DRIVER_MEMBER(suprgolf_state,rom_bank_select_r),          /* Port B read */
-	DEVCB_DRIVER_MEMBER(suprgolf_state,rom_bank_select_w),          /* Port B write */
-	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_vregs_r),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_vregs_w)                /* Port C write */
-};
-
-
 #define MASTER_CLOCK XTAL_12MHz
 
 static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
@@ -505,10 +484,17 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprgolf_state,  irq0_line_hold)
 
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(suprgolf_state, p1_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(suprgolf_state, p2_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(suprgolf_state, pedal_extra_bits_r))
 
-
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
+	MCFG_I8255_IN_PORTB_CB(READ8(suprgolf_state, rom_bank_select_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(suprgolf_state, rom_bank_select_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(suprgolf_state, suprgolf_vregs_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(suprgolf_state, suprgolf_vregs_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

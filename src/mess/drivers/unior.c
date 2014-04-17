@@ -320,17 +320,6 @@ WRITE8_MEMBER( unior_state::ppi0_b_w )
 {
 }
 
-// ports a & c connect to an external slot
-static I8255A_INTERFACE( ppi0_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(unior_state, ppi0_b_r),
-	DEVCB_DRIVER_MEMBER(unior_state, ppi0_b_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 READ8_MEMBER( unior_state::ppi1_a_r )
 {
 	return m_4c;
@@ -365,19 +354,6 @@ WRITE8_MEMBER( unior_state::ppi1_c_w )
 	m_4e = data;
 	m_pit->write_gate2(BIT(data, 4));
 }
-
-// ports a & b are for the keyboard
-// port c operates various control lines for mostly unknown purposes
-static I8255A_INTERFACE( ppi1_intf )
-{
-	DEVCB_DRIVER_MEMBER(unior_state, ppi1_a_r),
-	DEVCB_DRIVER_MEMBER(unior_state, ppi1_a_w),
-	DEVCB_DRIVER_MEMBER(unior_state, ppi1_b_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(unior_state, ppi1_c_r),
-	DEVCB_DRIVER_MEMBER(unior_state, ppi1_c_w),
-};
-
 
 /*************************************************
 
@@ -449,8 +425,19 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_PIT8253_CLK2(XTAL_16MHz / 9 / 64) // unknown frequency
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
-	MCFG_I8255_ADD( "ppi0", ppi0_intf )
-	MCFG_I8255_ADD( "ppi1", ppi1_intf )
+	MCFG_DEVICE_ADD("ppi0", I8255, 0)
+	// ports a & c connect to an external slot
+	MCFG_I8255_IN_PORTB_CB(READ8(unior_state, ppi0_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(unior_state, ppi0_b_w))
+
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	// ports a & b are for the keyboard
+	// port c operates various control lines for mostly unknown purposes
+	MCFG_I8255_IN_PORTA_CB(READ8(unior_state, ppi1_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(unior_state, ppi1_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(unior_state, ppi1_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
 
 	MCFG_DEVICE_ADD("dma", I8257, XTAL_20MHz / 9) // unknown clock
 	MCFG_I8257_OUT_HRQ_CB(INPUTLINE("maincpu", I8085_HALT))

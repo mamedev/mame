@@ -119,26 +119,6 @@ WRITE8_MEMBER(p1_state::p1_ppi2_portb_w)
 	p1_speaker_set_spkrdata( data & 0x02 );
 }
 
-I8255_INTERFACE( p1_ppi8255_interface_1 )
-{
-/*60H*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_porta_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_porta_w),
-/*69H*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portb_r),
-	DEVCB_NULL,
-/*6AH*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portc_w)
-};
-
-I8255_INTERFACE( p1_ppi8255_interface_2 )
-{
-/*68H*/ DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_porta_w),
-/*61H*/ DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_portb_w),
-/*62H*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_portc_r),
-	DEVCB_NULL
-};
-
 READ8_MEMBER(p1_state::p1_ppi_r)
 {
 //  DBG_LOG(1,"p1ppi",("R %.2x\n", 0x60+offset));
@@ -273,8 +253,17 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NULL )
 
-	MCFG_I8255A_ADD( "ppi8255n1", p1_ppi8255_interface_1 )
-	MCFG_I8255A_ADD( "ppi8255n2", p1_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(p1_state, p1_ppi_porta_r))	/*60H*/
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(p1_state, p1_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(p1_state, p1_ppi_portb_r))	/*69H*/
+	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(p1_state, p1_ppi_portc_w))	/*6AH*/
+
+	MCFG_DEVICE_ADD("ppi8255n2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(p1_state, p1_ppi2_porta_w))	/*68H*/
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(p1_state, p1_ppi2_portb_w))	/*61H*/
+	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi2_portc_r))	/*62H*/
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU(":maincpu")

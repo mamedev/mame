@@ -365,7 +365,11 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_PIT8253_CLK2(0)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz_state, pit_irq_2))
 
-	MCFG_I8255_ADD("ppi8255", mz700_ppi8255_interface)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz_state, pio_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(mz_state, pio_port_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(mz_state, pio_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz_state, pio_port_c_w))
 
 	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
 

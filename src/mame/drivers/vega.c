@@ -796,17 +796,6 @@ READ8_MEMBER(vega_state::randomizer )
 }
 
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(vega_state, txtram_r), /* Port A read */
-	DEVCB_DRIVER_MEMBER(vega_state, txtram_w),      /* Port A write */
-	DEVCB_INPUT_PORT("IN0"),        /* Port B read */
-	DEVCB_DRIVER_MEMBER(vega_state, ppi_pb_w),      /* Port B write */
-	DEVCB_DRIVER_MEMBER(vega_state, randomizer),
-	DEVCB_DRIVER_MEMBER(vega_state, ppi_pc_w)       /* Port C write */
-};
-
-
 static const ay8910_interface ay8910_inf =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -830,9 +819,14 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_CPU_IO_MAP(vega_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTC_CB(READ8(vega_state, txtram_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, txtram_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(vega_state, randomizer))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, ppi_pc_w))
 
-
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
 	MCFG_INS8154_IN_A_CB(READ8(vega_state, ins8154_pa_r))
 	MCFG_INS8154_OUT_A_CB(WRITE8(vega_state, ins8154_pa_w))

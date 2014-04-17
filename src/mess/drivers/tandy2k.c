@@ -636,15 +636,6 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 	m_centronics->write_strobe(BIT(data, 7));
 }
 
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,                                                 // Port A read
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // Port A write
-	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),               // Port B write
-	DEVCB_NULL,                                                 // Port B write
-	DEVCB_NULL,                                                 // Port C read
-	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pc_w)                // Port C write
-};
 
 // Intel 8259 Interfaces
 
@@ -805,7 +796,10 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8(tandy2k_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(tandy2k_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

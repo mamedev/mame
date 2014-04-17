@@ -94,57 +94,6 @@ WRITE8_MEMBER(taxidriv_state::p8910_0b_w)
 	m_s4 = data & 1;
 }
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0a_r),              /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0b_w),              /* Port B write */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_r),              /* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_w)               /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1a_w),              /* Port A write */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1b_r),              /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_r),              /* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_w)               /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_2_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p2a_w),              /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p2b_w),              /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p2c_w)               /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_3_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p3a_w),              /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p3b_w),              /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p3c_w)               /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_4_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p4a_w),              /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p4b_w),              /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p4c_w)               /* Port C write */
-};
-
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM /* ??? */
@@ -406,11 +355,32 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_2_intf )
-	MCFG_I8255A_ADD( "ppi8255_3", ppi8255_3_intf )
-	MCFG_I8255A_ADD( "ppi8255_4", ppi8255_4_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(taxidriv_state, p0a_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p0b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(taxidriv_state, p0c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p0c_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p1a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(taxidriv_state, p1b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(taxidriv_state, p1c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p1c_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p2a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p2b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p2c_w))
+
+	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p3a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p3b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p3c_w))
+
+	MCFG_DEVICE_ADD("ppi8255_4", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p4a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p4b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p4c_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

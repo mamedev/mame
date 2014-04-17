@@ -264,16 +264,6 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	m_cassette->output( BIT(data, 7));
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(mpf1_state, ppi_pa_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mpf1_state, ppi_pb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mpf1_state, ppi_pc_w),
-};
-
 /* Z80CTC Interface */
 
 static Z80CTC_INTERFACE( mpf1_ctc_intf )
@@ -355,7 +345,12 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_3_579545MHz/2, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_3_579545MHz/2, mpf1_ctc_intf)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
+
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+
 	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
 
 	/* video hardware */
@@ -379,7 +374,12 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_3_579545MHz/2, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_3_579545MHz/2, mpf1_ctc_intf)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
+
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+
 	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
 
 	/* video hardware */
@@ -409,7 +409,12 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, 2500000, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, mpf1_ctc_intf)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
+
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+
 	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
 
 	/* sound hardware */

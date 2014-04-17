@@ -197,16 +197,6 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 	m_kb_matrix_row = data & 0x0f;
 }
 
-static I8255A_INTERFACE(pengadvb_ppi8255_interface)
-{
-	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_a_r),
-	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_a_w),
-	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_c_w)
-};
-
 /**************************************************************************/
 
 // TMS9928
@@ -264,7 +254,11 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	MCFG_I8255_ADD("ppi8255", pengadvb_ppi8255_interface)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pengadvb_state, pengadvb_ppi_port_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pengadvb_state, pengadvb_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_c_w))
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD("tms9128", TMS9128, pengadvb_tms9128_interface)

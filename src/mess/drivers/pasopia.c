@@ -176,16 +176,6 @@ READ8_MEMBER( pasopia_state::vram_latch_r )
 	return m_p_vram[m_vram_addr];
 }
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
-{
-	DEVCB_NULL,     /* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_addr_lo_w),     /* Port A write */
-	DEVCB_NULL,     /* Port B read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_latch_w),       /* Port B write */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_latch_r),       /* Port C read */
-	DEVCB_NULL      /* Port C write */
-};
-
 READ8_MEMBER( pasopia_state::portb_1_r )
 {
 	/*
@@ -224,30 +214,10 @@ WRITE8_MEMBER( pasopia_state::screen_mode_w )
 	printf("Screen Mode=%02x\n",data);
 }
 
-static I8255A_INTERFACE( ppi8255_intf_1 )
-{
-	DEVCB_NULL,     /* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, screen_mode_w),      /* Port A write */
-	DEVCB_DRIVER_MEMBER(pasopia_state, portb_1_r),      /* Port B read */
-	DEVCB_NULL,     /* Port B write */
-	DEVCB_NULL,     /* Port C read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_addr_hi_w)      /* Port C write */
-};
-
 READ8_MEMBER( pasopia_state::rombank_r )
 {
 	return (m_ram_bank) ? 4 : 0;
 }
-
-static I8255A_INTERFACE( ppi8255_intf_2 )
-{
-	DEVCB_NULL,     /* Port A read */
-	DEVCB_NULL,     /* Port A write */
-	DEVCB_NULL,     /* Port B read */
-	DEVCB_NULL,     /* Port B write */
-	DEVCB_DRIVER_MEMBER(pasopia_state, rombank_r),      /* Port C read */
-	DEVCB_NULL      /* Port C write */
-};
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
@@ -375,9 +345,20 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_4MHz/4, mc6845_intf)   /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia_state, vram_addr_lo_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pasopia_state, vram_latch_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pasopia_state, vram_latch_r))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia_state, screen_mode_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pasopia_state, portb_1_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pasopia_state, vram_addr_hi_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTC_CB(READ8(pasopia_state, rombank_r))
+
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_4MHz, ctc_intf )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
 MACHINE_CONFIG_END

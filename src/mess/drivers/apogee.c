@@ -213,11 +213,15 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_PIT8253_CLK2(XTAL_16MHz/9)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(apogee_state,pit8253_out2_changed))
 
-	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
-	//MCFG_I8255_ADD( "ppi8255_2", apogee_ppi8255_interface_2 )
+	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 
-	MCFG_I8275_ADD  ( "i8275", apogee_i8275_interface)
+	MCFG_I8275_ADD("i8275", apogee_i8275_interface)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)

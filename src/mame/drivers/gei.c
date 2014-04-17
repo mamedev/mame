@@ -1095,56 +1095,6 @@ static INPUT_PORTS_START(sprtauth)
 
 INPUT_PORTS_END
 
-static I8255A_INTERFACE( getrivia_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("DSWA"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN0"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(gei_state,sound_w)          /* Port C write */
-};
-
-static I8255A_INTERFACE( getrivia_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN1"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(gei_state,lamps_w),         /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(gei_state,lamps2_w)         /* Port C write */
-};
-
-static I8255A_INTERFACE( gselect_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("DSWA"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN0"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(gei_state,sound2_w)         /* Port C write */
-};
-
-static I8255A_INTERFACE( gselect_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN1"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(gei_state,lamps_w),         /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
-	DEVCB_DRIVER_MEMBER(gei_state,nmi_w)            /* Port C write */
-};
-
-static I8255A_INTERFACE( findout_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN1"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(gei_state,lamps_w),         /* Port B write */
-	DEVCB_DRIVER_MEMBER(gei_state,portC_r),         /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
 
 INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 {
@@ -1172,8 +1122,16 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255A_ADD( "ppi8255_0", getrivia_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", getrivia_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, sound_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, lamps2_w))
+
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
@@ -1189,7 +1147,10 @@ static MACHINE_CONFIG_DERIVED( findout, getrivia )
 	MCFG_CPU_PROGRAM_MAP(findout_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_I8255A_ADD( "ppi8255_1", findout_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(gei_state, portC_r))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizvid, findout )
@@ -1212,8 +1173,17 @@ static MACHINE_CONFIG_DERIVED( gselect, getrivia )
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_I8255A_ADD( "ppi8255_0", gselect_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", gselect_ppi8255_1_intf )
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, sound2_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, nmi_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )

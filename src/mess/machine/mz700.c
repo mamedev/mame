@@ -34,19 +34,8 @@
 	} while (0)
 
 
-I8255_INTERFACE( mz700_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mz_state,pio_port_a_w),
-	DEVCB_DRIVER_MEMBER(mz_state,pio_port_b_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mz_state,pio_port_c_r),
-	DEVCB_DRIVER_MEMBER(mz_state,pio_port_c_w)
-};
-
-
 /***************************************************************************
-    INITIALIZATIoN
+    INITIALIZATION
 ***************************************************************************/
 
 DRIVER_INIT_MEMBER(mz_state,mz700)

@@ -480,17 +480,6 @@ void imolagp_state::machine_reset()
 }
 
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
-	DEVCB_INPUT_PORT("IN0"),
-	DEVCB_NULL,
-	DEVCB_UNMAPPED,
-	DEVCB_UNMAPPED,
-	DEVCB_INPUT_PORT("IN1"),
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( imolagp, imolagp_state )
 
 	/* basic machine hardware */
@@ -507,7 +496,12 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B", 0))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

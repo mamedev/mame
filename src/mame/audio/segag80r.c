@@ -438,20 +438,11 @@ static const samples_interface sega005_samples_interface =
 };
 
 
-static I8255A_INTERFACE( ppi8255_005_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sega005_sound_a_w),  /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sega005_sound_b_w),  /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_005_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, sega005_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(segag80r_state, sega005_sound_b_w))
 
 	/* sound hardware */
 
@@ -734,20 +725,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static I8255A_INTERFACE( monsterb_ppi_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,monsterb_sound_a_w), /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,monsterb_sound_b_w), /* Port B write */
-	DEVCB_DRIVER_MEMBER(segag80r_state,n7751_status_r),     /* Port C read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,n7751_command_w)     /* Port C write */
-};
-
-
 MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
-
-	MCFG_I8255A_ADD( "ppi8255", monsterb_ppi_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, monsterb_sound_a_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, monsterb_sound_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(segag80r_state, n7751_status_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, n7751_command_w))
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", N7751, 6000000)

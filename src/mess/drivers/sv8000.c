@@ -272,17 +272,6 @@ WRITE8_MEMBER( sv8000_state::i8255_portc_w )
 }
 
 
-static I8255_INTERFACE( sv8000_i8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_porta_r),   /* port A read */
-	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_porta_w),   /* port A write */
-	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portb_r),   /* port B read */
-	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portb_w),   /* port B write */
-	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portc_r),   /* port C read */
-	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portc_w)    /* port C write */
-};
-
-
 READ8_MEMBER( sv8000_state::ay_port_a_r )
 {
 	UINT8 data = 0xFF;
@@ -422,7 +411,13 @@ static MACHINE_CONFIG_START( sv8000, sv8000_state )
 	MCFG_CPU_IO_MAP(sv8000_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sv8000_state,  irq0_line_hold)
 
-	MCFG_I8255_ADD( "i8255", sv8000_i8255_interface )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(sv8000_state, i8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(sv8000_state, i8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(sv8000_state, i8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(sv8000_state, i8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(sv8000_state, i8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sv8000_state, i8255_portc_w))
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used

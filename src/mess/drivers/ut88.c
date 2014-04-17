@@ -213,7 +213,11 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_I8255A_ADD( "ppi8255", ut88_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ut88_state, ut88_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(ut88_state, ut88_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(ut88_state, ut88_8255_portc_r))
+
 	MCFG_CASSETTE_ADD( "cassette", ut88_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END

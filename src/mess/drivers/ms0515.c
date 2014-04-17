@@ -237,15 +237,6 @@ WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
 {
 	m_sysreg = data;
 }
-I8255A_INTERFACE( ms0515_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ms0515_state,ms0515_portc_w)
-};
 
 static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	/* basic machine hardware */
@@ -269,8 +260,10 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
 
-	MCFG_I8255_ADD( "ppi8255_1", ms0515_ppi8255_interface_1 )
-	//MCFG_I8255_ADD( "ppi8255_2", ms0515_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ms0515_state, ms0515_portc_w))
+
+	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

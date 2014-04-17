@@ -1910,16 +1910,6 @@ READ8_MEMBER(pc6001_state::pc6001_8255_portc_r)
 
 
 
-static I8255_INTERFACE( pc6001_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_porta_r),
-	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portc_w)
-};
-
 static const ay8910_interface pc6001_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -2332,7 +2322,14 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_PALETTE_ADD("palette", 16+4)
 	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
 
-	MCFG_I8255_ADD( "ppi8255", pc6001_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pc6001_state, pc6001_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc6001_state, pc6001_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pc6001_state, pc6001_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc6001_state, pc6001_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc6001_state, pc6001_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc6001_state, pc6001_8255_portc_w))
+
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 

@@ -375,16 +375,6 @@ UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static I8255_INTERFACE( iq151_ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(iq151_state, keyboard_row_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(iq151_state, keyboard_column_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(iq151_state, ppi_portc_r),
-	DEVCB_DRIVER_MEMBER(iq151_state, ppi_portc_w)
-};
-
 static const cassette_interface iq151_cassette_interface =
 {
 	cassette_default_formats,
@@ -434,7 +424,11 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	MCFG_PIC8259_ADD("pic8259", WRITELINE(iq151_state, pic_set_int_line), VCC, NULL)
 
-	MCFG_I8255_ADD("ppi8255", iq151_ppi8255_intf)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(iq151_state, keyboard_row_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(iq151_state, keyboard_column_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(iq151_state, ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_state, ppi_portc_w))
 
 	MCFG_CASSETTE_ADD( "cassette", iq151_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))

@@ -236,16 +236,6 @@ WRITE8_MEMBER( votrpss_state::ppi_pc_w )
 	m_portc = data;
 }
 
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(votrpss_state, ppi_pa_r),   // Port A read
-	DEVCB_DRIVER_MEMBER(votrpss_state, ppi_pa_w),   // Port A write
-	DEVCB_DRIVER_MEMBER(votrpss_state, ppi_pb_r),   // Port B read
-	DEVCB_DRIVER_MEMBER(votrpss_state, ppi_pb_w),   // Port B write
-	DEVCB_DRIVER_MEMBER(votrpss_state, ppi_pc_r),   // Port C read
-	DEVCB_DRIVER_MEMBER(votrpss_state, ppi_pc_w),   // Port C write
-};
-
 static const ay8910_interface ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,   // flags
@@ -307,7 +297,14 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_PIT8253_CLK1(XTAL_8MHz / 256) /* Timer 1: Pitch */
 	MCFG_PIT8253_CLK2(XTAL_8MHz / 4096) /* Timer 2: Volume */
 
-	MCFG_I8255_ADD("ppi", ppi_intf)
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(votrpss_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(votrpss_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(votrpss_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(votrpss_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(votrpss_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(votrpss_state, ppi_pc_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
 MACHINE_CONFIG_END
 

@@ -119,20 +119,6 @@ Some bugs left :
 #define SYSTEM_GX4000 2
 
 
-/* -----------------------------
-   - amstrad_ppi8255_interface -
-   -----------------------------*/
-static I8255_INTERFACE( amstrad_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_r), /* port A read */
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_w), /* port A write */
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portb_r), /* port B read */
-	DEVCB_NULL,                         /* port B write */
-	DEVCB_NULL,                         /* port C read */
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)  /* port C write */
-};
-
-
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
 be paged into bank 0 and bank 3. */
@@ -869,7 +855,11 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
 
-	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(amstrad_state, amstrad_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(amstrad_state, amstrad_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(amstrad_state, amstrad_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(amstrad_state, amstrad_ppi_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -950,7 +940,11 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
 
-	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(amstrad_state, amstrad_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(amstrad_state, amstrad_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(amstrad_state, amstrad_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(amstrad_state, amstrad_ppi_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1015,7 +1009,11 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
 
-	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(amstrad_state, amstrad_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(amstrad_state, amstrad_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(amstrad_state, amstrad_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(amstrad_state, amstrad_ppi_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

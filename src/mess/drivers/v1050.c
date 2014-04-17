@@ -650,31 +650,11 @@ WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
 	m_ppi_6502->pc4_w(BIT(data, 7));
 }
 
-static I8255A_INTERFACE( disp_ppi_intf )
-{
-	DEVCB_DEVICE_MEMBER(I8255A_M6502_TAG, i8255_device, pb_r),  // Port A read
-	DEVCB_NULL,                         // Port A write
-	DEVCB_NULL,                         // Port B read
-	DEVCB_NULL,                         // Port B write
-	DEVCB_NULL,                         // Port C read
-	DEVCB_DRIVER_MEMBER(v1050_state,disp_ppi_pc_w)      // Port C write
-};
-
 WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
 {
 	m_ppi_disp->pc2_w(BIT(data, 7));
 	m_ppi_disp->pc4_w(BIT(data, 6));
 }
-
-static I8255A_INTERFACE( m6502_ppi_intf )
-{
-	DEVCB_DEVICE_MEMBER(I8255A_DISP_TAG, i8255_device, pb_r),   // Port A read
-	DEVCB_NULL,                         // Port A write
-	DEVCB_NULL,                         // Port B read
-	DEVCB_NULL,                         // Port B write
-	DEVCB_NULL,                         // Port C read
-	DEVCB_DRIVER_MEMBER(v1050_state,m6502_ppi_pc_w) // Port C write
-};
 
 // Miscellanous 8255A Interface
 
@@ -809,16 +789,6 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 	set_baud_sel((data >> 2) & 0x03);
 }
 
-static I8255A_INTERFACE( misc_ppi_intf )
-{
-	DEVCB_NULL,                         // Port A read
-	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pa_w),        // Port A write
-	DEVCB_NULL,                         // Port B read
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),     // Port B write
-	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pc_r),     // Port C read
-	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pc_w)     // Port C write
-};
-
 // Real Time Clock 8255A Interface
 
 WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
@@ -896,16 +866,6 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
 	m_rtc->read_w(BIT(data, 6));
 	m_rtc->cs2_w(BIT(data, 7));
 }
-
-static I8255A_INTERFACE( rtc_ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pa_r),
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pa_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pb_w),
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_r),
-	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_w)
-};
 
 // Keyboard 8251A Interface
 
@@ -1094,10 +1054,26 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_MSM58321_D3_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_3_w))
 	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(v1050_state, rtc_ppi_pc_3_w))
 
-	MCFG_I8255A_ADD(I8255A_DISP_TAG, disp_ppi_intf)
-	MCFG_I8255A_ADD(I8255A_MISC_TAG, misc_ppi_intf)
-	MCFG_I8255A_ADD(I8255A_RTC_TAG, rtc_ppi_intf)
-	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
+	MCFG_DEVICE_ADD(I8255A_DISP_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8(I8255A_M6502_TAG, i8255_device, pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state, disp_ppi_pc_w))
+
+	MCFG_DEVICE_ADD(I8255A_MISC_TAG, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(v1050_state, misc_ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTC_CB(READ8(v1050_state,misc_ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state,misc_ppi_pc_w))
+
+	MCFG_DEVICE_ADD(I8255A_RTC_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(v1050_state, rtc_ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(v1050_state, rtc_ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(v1050_state, rtc_ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(v1050_state, rtc_ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state, rtc_ppi_pc_w))
+
+	MCFG_DEVICE_ADD(I8255A_M6502_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8(I8255A_DISP_TAG, i8255_device, pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state, m6502_ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0/*XTAL_16MHz/8,*/)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w))

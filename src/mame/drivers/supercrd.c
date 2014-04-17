@@ -424,32 +424,6 @@ GFXDECODE_END
 //};
 
 
-/************************
-*    PPI's Interface    *
-************************/
-
-//static I8255_INTERFACE (ppi8255_intf_0)
-//{
-//  /* (port) Mode X - description */
-//  DEVCB_UNMAPPED,     /* Port A read */
-//  DEVCB_UNMAPPED,     /* Port A write */
-//  DEVCB_UNMAPPED,     /* Port B read */
-//  DEVCB_UNMAPPED,     /* Port B write */
-//  DEVCB_UNMAPPED,     /* Port C read */
-//  DEVCB_UNMAPPED      /* Port C write */
-//};
-
-//static I8255_INTERFACE (ppi8255_intf_1)
-//{
-//  /* (port) Mode X - description */
-//  DEVCB_UNMAPPED,     /* Port A read */
-//  DEVCB_UNMAPPED,     /* Port A write */
-//  DEVCB_UNMAPPED,     /* Port B read */
-//  DEVCB_UNMAPPED,     /* Port B write */
-//  DEVCB_UNMAPPED,     /* Port C read */
-//  DEVCB_UNMAPPED      /* Port C write */
-//};
-
 /**************************
 *     Machine Drivers     *
 **************************/
@@ -461,8 +435,8 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
-//  MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
-//  MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+//  MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+//  MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 
 	/* video hardware */
 

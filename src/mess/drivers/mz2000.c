@@ -740,16 +740,6 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	m_old_portc = data;
 }
 
-static I8255_INTERFACE( ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_porta_r),                       /* Port A read */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_porta_w),                       /* Port A write */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portb_r),                       /* Port B read */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portb_w),                       /* Port B write */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portc_r),                       /* Port C read */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portc_w)                        /* Port C write */
-};
-
 WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
 {
 	m_tvram_enable = ((data & 0xc0) == 0xc0);
@@ -844,8 +834,14 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_CPU_PROGRAM_MAP(mz2000_map)
 	MCFG_CPU_IO_MAP(mz2000_io)
 
+	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mz2000_state, mz2000_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz2000_state, mz2000_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(mz2000_state, mz2000_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz2000_state, mz2000_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(mz2000_state, mz2000_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2000_state, mz2000_portc_w))
 
-	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", MASTER_CLOCK, mz2000_pio1_intf )
 
 	/* TODO: clocks aren't known */

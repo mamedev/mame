@@ -553,41 +553,6 @@ void slotcarn_state::machine_start()
 }
 
 
-/***************************************
-*       PPI 8255 (x3) Interfaces       *
-***************************************/
-
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_2_intf )
-{
-	DEVCB_INPUT_PORT("IN3"),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN4"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 /*************************************
 *          AY8910 Interface          *
 *************************************/
@@ -614,11 +579,17 @@ static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
 	MCFG_CPU_PROGRAM_MAP(slotcarn_map)
 	MCFG_CPU_IO_MAP(spielbud_io_map)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -451,7 +451,7 @@ static TMS9928A_INTERFACE(m5_tms9928a_interface)
 
 
 //-------------------------------------------------
-//  I8255_INTERFACE( ppi_intf )
+//  I8255 Interface
 //-------------------------------------------------
 
 READ8_MEMBER( m5_state::ppi_pa_r )
@@ -536,17 +536,6 @@ WRITE8_MEMBER( m5_state::ppi_pc_w )
 	m_ibfa = BIT(data, 5);
 	m_obfa = BIT(data, 7);
 }
-
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(m5_state, ppi_pa_r),
-	DEVCB_DRIVER_MEMBER(m5_state, ppi_pa_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(m5_state, ppi_pb_w),
-	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_r),
-	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_w)
-};
-
 
 //-------------------------------------------------
 //  upd765_interface fdc_intf
@@ -646,7 +635,14 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
-	MCFG_I8255_ADD(I8255A_TAG, ppi_intf)
+
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(m5_state, ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(m5_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(m5_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(m5_state, ppi_pc_w))
+
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)

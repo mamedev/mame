@@ -962,16 +962,6 @@ WRITE8_MEMBER(jpmimpct_state::display_c_w)
 	m_vfd->sclk(data & 0x01);
 }
 
-static I8255_INTERFACE (ppi8255_intf)
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(jpmimpct_state,payen_a_w),
-	DEVCB_DRIVER_MEMBER(jpmimpct_state,hopper_b_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(jpmimpct_state,hopper_c_r),
-	DEVCB_DRIVER_MEMBER(jpmimpct_state,display_c_w)
-};
-
 MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 {
 	save_item(NAME(m_duart_1_irq));
@@ -1343,7 +1333,12 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_I8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(jpmimpct_state, payen_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(jpmimpct_state, hopper_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(jpmimpct_state, hopper_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmimpct_state, display_c_w))
+
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

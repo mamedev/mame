@@ -90,11 +90,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-
-/*----------- defined in machine/ut88.c -----------*/
-
-extern const i8255_interface ut88_ppi8255_interface;
-
 /*----------- defined in video/ut88.c -----------*/
 
 extern const gfx_layout ut88_charlayout;

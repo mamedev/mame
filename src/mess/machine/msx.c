@@ -386,16 +386,6 @@ MACHINE_RESET_MEMBER(msx_state,msx2)
 	msx_ch_reset_core ();
 }
 
-I8255_INTERFACE( msx_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(msx_state, msx_ppi_port_a_w),
-	DEVCB_DRIVER_MEMBER(msx_state, msx_ppi_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(msx_state, msx_ppi_port_c_w)
-};
-
 
 static const UINT8 cc_op[0x100] = {
 	4+1,10+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1, 4+1,11+1, 7+1, 6+1, 4+1, 4+1, 7+1, 4+1,

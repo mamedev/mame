@@ -213,10 +213,6 @@ protected:
 
 /*----------- defined in machine/msx.c -----------*/
 
-extern const i8255_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
-/* start/stop functions */
-
-/* I/O functions */
 
 #endif /* __MSX_H__ */

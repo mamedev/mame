@@ -329,36 +329,6 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ NULL }
 };
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("P1"),             /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */  // related to sound/music : check code at 0x1c0a
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(pipeline_state,vidctrl_w)           /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),           /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_DRIVER_MEMBER(pipeline_state,protection_r),       /* Port C read */
-	DEVCB_DRIVER_MEMBER(pipeline_state,protection_w)            /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_2_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -402,9 +372,18 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 
 	MCFG_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audiocpu" */, ctc_intf )
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	// PORT B Write - related to sound/music : check code at 0x1c0a
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pipeline_state, vidctrl_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(READ8(pipeline_state, protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pipeline_state, protection_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,6 +406,7 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 MACHINE_CONFIG_END
+
 
 ROM_START( pipeline )
 	ROM_REGION( 0x10000, "maincpu", 0 )

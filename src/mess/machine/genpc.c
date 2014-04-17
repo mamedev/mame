@@ -402,16 +402,6 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 }
 
 
-I8255A_INTERFACE( pc_ppi8255_interface )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portc_r),
-	DEVCB_NULL
-};
-
 /**********************************************************
  *
  * NMI handling
@@ -446,7 +436,10 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NULL )
 
-	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ibm5160_mb_device, pc_ppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ibm5160_mb_device, pc_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(ibm5160_mb_device, pc_ppi_portc_r))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU(":maincpu")

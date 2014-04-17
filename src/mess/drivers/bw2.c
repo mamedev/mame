@@ -393,7 +393,7 @@ WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
 }
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255A interface
 //-------------------------------------------------
 
 WRITE8_MEMBER( bw2_state::ppi_pa_w )
@@ -498,17 +498,6 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 
 	return data;
 }
-
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pa_w),
-	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pc_r),
-	DEVCB_DRIVER_MEMBER(bw2_state, ppi_pc_w),
-};
-
 
 //-------------------------------------------------
 //  pit8253_config pit_intf
@@ -619,7 +608,12 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(bw2_state, mtron_w))
 
-	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(bw2_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(bw2_state, ppi_pb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(bw2_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(bw2_state, ppi_pc_w))
+
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")

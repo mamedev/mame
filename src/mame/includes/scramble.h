@@ -102,13 +102,6 @@ public:
 	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 };
 
-
-/*----------- defined in machine/scramble.c -----------*/
-
-extern const i8255_interface(scramble_ppi_0_intf);
-extern const i8255_interface(scramble_ppi_1_intf);
-extern const i8255_interface(stratgyx_ppi_1_intf);
-
 /*----------- defined in audio/scramble.c -----------*/
 
 MACHINE_CONFIG_EXTERN( ad2083_audio );

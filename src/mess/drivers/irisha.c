@@ -287,17 +287,6 @@ WRITE8_MEMBER(irisha_state::irisha_8255_portc_w)
 	update_speaker();
 }
 
-static I8255A_INTERFACE( irisha_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(irisha_state, irisha_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(irisha_state, irisha_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(irisha_state, irisha_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(irisha_state, irisha_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(irisha_state, irisha_8255_portc_w),
-};
-
-
 /*************************************************
 
     i8259
@@ -427,7 +416,13 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_PIT8253_CLK2(XTAL_16MHz / 9)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(irisha_state, speaker_w))
 
-	MCFG_I8255_ADD( "ppi8255", irisha_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(irisha_state, irisha_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(irisha_state, irisha_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(irisha_state, irisha_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(irisha_state, irisha_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(irisha_state, irisha_8255_portc_w))
+
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(irisha_state,irisha_pic_set_int_line), VCC, NULL )
 MACHINE_CONFIG_END
 

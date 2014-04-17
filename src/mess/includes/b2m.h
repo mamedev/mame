@@ -78,10 +78,4 @@ public:
 	void b2m_set_bank(int bank);
 };
 
-/*----------- defined in machine/b2m.c -----------*/
-
-extern const i8255_interface b2m_ppi8255_interface_1;
-extern const i8255_interface b2m_ppi8255_interface_2;
-extern const i8255_interface b2m_ppi8255_interface_3;
-
 #endif

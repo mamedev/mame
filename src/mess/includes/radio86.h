@@ -121,13 +121,6 @@ INPUT_PORTS_EXTERN( ms7007 );
 
 /*----------- defined in machine/radio86.c -----------*/
 
-extern const i8255_interface radio86_ppi8255_interface_1;
-extern const i8255_interface radio86_ppi8255_interface_2;
-extern const i8255_interface rk7007_ppi8255_interface;
-
-extern const i8255_interface mikrosha_ppi8255_interface_1;
-extern const i8255_interface mikrosha_ppi8255_interface_2;
-
 extern const i8275_interface radio86_i8275_interface;
 extern const i8275_interface partner_i8275_interface;
 extern const i8275_interface mikrosha_i8275_interface;

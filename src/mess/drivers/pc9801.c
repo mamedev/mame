@@ -3183,27 +3183,6 @@ READ8_MEMBER(pc9801_state::ppi_sys_portc_r)
 	return 0xa0; // 0x80 cpu triple fault reset flag?
 }
 
-static I8255A_INTERFACE( ppi_system_intf )
-{
-	DEVCB_INPUT_PORT("DSW2"),                  /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_INPUT_PORT("DSW1"),                  /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portc_r),                 /* Port C read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portc_w)                   /* Port C write */
-};
-
-/* TODO: check this one */
-static I8255A_INTERFACE( ppi_printer_intf )
-{
-	DEVCB_NULL,                 /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_INPUT_PORT("DSW5"),                  /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_NULL,                 /* Port C read */
-	DEVCB_NULL                  /* Port C write */
-};
-
 READ8_MEMBER(pc9801_state::ppi_fdd_porta_r)
 {
 	return 0xff;
@@ -3223,16 +3202,6 @@ WRITE8_MEMBER(pc9801_state::ppi_fdd_portc_w)
 {
 	//upd765_data_w(machine().device("upd765_2dd"),space, 0,data);
 }
-
-static I8255A_INTERFACE( ppi_fdd_intf )
-{
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_porta_r),                  /* Port A read */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portb_r),                  /* Port B read */
-	DEVCB_NULL,                 /* Port B write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_r),                  /* Port C read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_w)                   /* Port C write */
-};
 
 READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 {
@@ -3277,16 +3246,6 @@ WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
 
 	m_mouse.control = data;
 }
-
-static I8255A_INTERFACE( ppi_mouse_intf )
-{
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_r),                    /* Port A read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_w),                    /* Port A write */
-	DEVCB_INPUT_PORT("DSW3"),                    /* Port B read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_w),                    /* Port B write */
-	DEVCB_INPUT_PORT("DSW4"),                    /* Port C read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_w)                 /* Port C write */
-};
 
 /****************************************
 *
@@ -3579,7 +3538,13 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
-	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
+	MCFG_DEVICE_ADD("ppi8255_mouse", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pc9801_state, ppi_mouse_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc9801_state, ppi_mouse_porta_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW3"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc9801_state, ppi_mouse_portb_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW4"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_mouse_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pc9801_state, mouse_irq_cb, attotime::from_hz(120))
 MACHINE_CONFIG_END
@@ -3633,9 +3598,23 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8237_ADD("i8237", 5000000, dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
-	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
-	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
-	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+
+	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc9801_state, ppi_sys_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_sys_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_prn", I8255, 0)
+	/* TODO: check this one */
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW5"))
+
+	MCFG_DEVICE_ADD("ppi8255_fdd", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pc9801_state, ppi_fdd_porta_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(pc9801_state, ppi_fdd_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc9801_state, ppi_fdd_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_fdd_portc_w))
+
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
@@ -3719,9 +3698,23 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK_X1*8, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
-	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
-	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
-	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+
+	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc9801_state, ppi_sys_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_sys_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_prn", I8255, 0)
+	/* TODO: check this one */
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW5"))
+
+	MCFG_DEVICE_ADD("ppi8255_fdd", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pc9801_state, ppi_fdd_porta_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(pc9801_state, ppi_fdd_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc9801_state, ppi_fdd_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_fdd_portc_w))
+
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_ide)
@@ -3811,9 +3804,23 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
-	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
-	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
-	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+
+	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc9801_state, ppi_sys_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_sys_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_prn", I8255, 0)
+	/* TODO: check this one */
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW5"))
+
+	MCFG_DEVICE_ADD("ppi8255_fdd", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pc9801_state, ppi_fdd_porta_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(pc9801_state, ppi_fdd_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc9801_state, ppi_fdd_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_fdd_portc_w))
+
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_ide)

@@ -2104,16 +2104,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_NULL,                                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(system1_state, soundport_w),    /* Port A write */
-	DEVCB_NULL,                                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(system1_state, videomode_w),    /* Port B write */
-	DEVCB_NULL,                                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(system1_state,sound_control_w)                      /* Port C write */
-};
-
 static Z80PIO_INTERFACE( pio_interface )
 {
 	DEVCB_NULL,
@@ -2148,8 +2138,10 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(system1_state, soundport_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(system1_state, videomode_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(system1_state, sound_control_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

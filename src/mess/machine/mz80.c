@@ -71,16 +71,6 @@ WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-I8255_INTERFACE( mz80k_8255_int )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mz80_state, mz80k_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(mz80_state, mz80k_8255_portb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mz80_state, mz80k_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(mz80_state, mz80k_8255_portc_w),
-};
-
 READ8_MEMBER( mz80_state::mz80k_strobe_r )
 {
 	return 0x7e | (UINT8)m_mz80k_tempo_strobe;

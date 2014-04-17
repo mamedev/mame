@@ -225,16 +225,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_DRIVER_MEMBER(albazg_state,mux_w),            /* Port A write */
-	DEVCB_INPUT_PORT("SYSTEM"),     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_DRIVER_MEMBER(albazg_state,mux_r),            /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
 /***************************************************************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
@@ -390,7 +380,10 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(albazg_state, mux_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_I8255_IN_PORTC_CB(READ8(albazg_state, mux_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

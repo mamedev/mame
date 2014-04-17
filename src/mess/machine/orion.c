@@ -36,17 +36,6 @@ WRITE8_MEMBER(orion_state::orion_romdisk_portc_w)
 	m_romdisk_msb = data;
 }
 
-I8255A_INTERFACE( orion128_ppi8255_interface_1)
-{
-	DEVCB_DRIVER_MEMBER(orion_state,orion_romdisk_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(orion_state,orion_romdisk_portb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(orion_state,orion_romdisk_portc_w)
-};
-
-
 MACHINE_START_MEMBER(orion_state,orion128)
 {
 	m_video_mode_mask = 7;

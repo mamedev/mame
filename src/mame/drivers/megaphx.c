@@ -348,17 +348,6 @@ WRITE8_MEMBER(megaphx_state::port_c_w)
 }
 
 
-static I8255A_INTERFACE( ppi8255_intf_0 )
-{
-	DEVCB_INPUT_PORT("P0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("P1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,        /* Port C read */ // should be connected to above functions but values are incorrect
-	DEVCB_NULL,        /* Port C write */  // should be connected to above functions but values are incorrect
-};
-
-
 static ADDRESS_MAP_START( megaphx_pic_io_map, AS_IO, 8, megaphx_state )
 //	AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
 //	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
@@ -376,14 +365,14 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(megaphx_pic_io_map)
 
-
 	MCFG_INDER_AUDIO_ADD("inder_sb")
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P1"))
+	// PORT C should be connected to above functions but values are incorrect
 
 	MCFG_INDER_VIDEO_ADD("inder_vid")
-
-
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(megaphx_state,megaphx)

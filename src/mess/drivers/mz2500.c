@@ -1939,16 +1939,6 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 		logerror("PPI PORTC W %02x\n",data & ~0x0f);
 }
 
-static I8255_INTERFACE( ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_porta_r),                       /* Port A read */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_porta_w),                       /* Port A write */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portb_r),                       /* Port B read */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portb_w),                       /* Port B write */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portc_r),                       /* Port C read */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portc_w)                        /* Port C write */
-};
-
 WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
 {
 //  printf("%02x\n",data);
@@ -2121,10 +2111,17 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_CPU_IO_MAP(mz2500_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
 
+	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mz2500_state, mz2500_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz2500_state, mz2500_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(mz2500_state, mz2500_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz2500_state, mz2500_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(mz2500_state, mz2500_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2500_state, mz2500_portc_w))
 
-	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
+
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
 

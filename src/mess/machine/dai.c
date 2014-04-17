@@ -70,16 +70,6 @@ WRITE8_MEMBER(dai_state::dai_keyboard_w)
 	m_keyboard_scan_mask = data;
 }
 
-I8255A_INTERFACE( dai_ppi82555_intf )
-{
-	DEVCB_NULL, /* Port A read */
-	DEVCB_NULL, /* Port A write */
-	DEVCB_NULL, /* Port B read */
-	DEVCB_NULL, /* Port B write */
-	DEVCB_NULL, /* Port C read */
-	DEVCB_NULL  /* Port C write */
-};
-
 IRQ_CALLBACK_MEMBER(dai_state::int_ack)
 {
 	return m_tms5501->get_vector();

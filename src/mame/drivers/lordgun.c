@@ -619,47 +619,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static I8255A_INTERFACE( lordgun_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("DIP"),            /* Port A read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),              /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,lordgun_eeprom_w),    /* Port B write */
-	DEVCB_INPUT_PORT("SERVICE"),        /* Port C read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake2_w)              /* Port C write */
-};
-
-static I8255A_INTERFACE( lordgun_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("START1"),         /* Port A read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),              /* Port A write */
-	DEVCB_INPUT_PORT("START2"),         /* Port B read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),              /* Port B write */
-	DEVCB_INPUT_PORT("COIN"),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w)               /* Port C write */
-};
-
-static I8255A_INTERFACE( aliencha_ppi8255_0_intf )
-{
-	DEVCB_DRIVER_MEMBER(lordgun_state,aliencha_dip_r),      /* Port A read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake2_w),             /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,aliencha_eeprom_w),   /* Port B write */
-	DEVCB_INPUT_PORT("SERVICE"),        /* Port C read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,aliencha_dip_w)       /* Port C write */
-};
-
-static I8255A_INTERFACE( aliencha_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("P1"),             /* Port A read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),              /* Port A write */
-	DEVCB_INPUT_PORT("P2"),             /* Port B read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),              /* Port B write */
-	DEVCB_INPUT_PORT("COIN"),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w)               /* Port C write */
-};
-
-
 WRITE_LINE_MEMBER(lordgun_state::soundirq)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -674,8 +633,20 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_CPU_IO_MAP(lordgun_soundio_map)
 
-	MCFG_I8255A_ADD( "ppi8255_0", lordgun_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", lordgun_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DIP"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, lordgun_eeprom_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake2_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("START1"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("START2"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -711,8 +682,20 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_CPU_IO_MAP(aliencha_soundio_map)
 
-	MCFG_I8255A_ADD( "ppi8255_0", aliencha_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", aliencha_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(lordgun_state, aliencha_dip_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake2_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, aliencha_eeprom_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, aliencha_dip_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

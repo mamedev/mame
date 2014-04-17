@@ -168,17 +168,6 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 		return 0xff;
 }
 
-
-I8255A_INTERFACE( savia84_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_porta_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(savia84_state, savia84_8255_portc_w)
-};
-
 static MACHINE_CONFIG_START( savia84, savia84_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
@@ -189,7 +178,12 @@ static MACHINE_CONFIG_START( savia84, savia84_state )
 	MCFG_DEFAULT_LAYOUT(layout_savia84)
 
 	/* Devices */
-	MCFG_I8255_ADD( "ppi8255", savia84_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(savia84_state, savia84_8255_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(savia84_state, savia84_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(savia84_state, savia84_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(savia84_state, savia84_8255_portc_w))
+
 MACHINE_CONFIG_END
 
 /* ROM definition */

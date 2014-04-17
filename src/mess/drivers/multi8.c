@@ -619,16 +619,6 @@ WRITE8_MEMBER( multi8_state::portc_w )
 }
 
 
-static I8255_INTERFACE( ppi8255_intf_0 )
-{
-	DEVCB_DRIVER_MEMBER(multi8_state, porta_r), /* Port A read */
-	DEVCB_NULL,                 /* Port B read */
-	DEVCB_NULL,                 /* Port C read */
-	DEVCB_DRIVER_MEMBER(multi8_state, portb_w), /* Port B write */
-	DEVCB_NULL,                 /* Port A write */
-	DEVCB_DRIVER_MEMBER(multi8_state, portc_w)  /* Port C write */
-};
-
 WRITE8_MEMBER( multi8_state::ym2203_porta_w )
 {
 	m_beeper->set_state((data & 0x08));
@@ -665,7 +655,6 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_CPU_PROGRAM_MAP(multi8_mem)
 	MCFG_CPU_IO_MAP(multi8_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -690,7 +679,11 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(multi8_state, porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(multi8_state, portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(multi8_state, portc_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

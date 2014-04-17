@@ -71,9 +71,4 @@ public:
 	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
 };
 
-
-/*----------- defined in machine/vector06.c -----------*/
-extern const i8255_interface vector06_ppi8255_interface;
-extern const i8255_interface vector06_ppi8255_2_interface;
-
 #endif /* VECTOR06_H_ */

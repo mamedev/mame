@@ -508,16 +508,6 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("P1"),             /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("P2"),             /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("SYSTEM"),         /* Port C read */
-	DEVCB_DRIVER_MEMBER(zaccaria_state,zaccaria_dsw_sel_w)  /* Port C write */
-};
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -552,7 +542,11 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map_2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SYSTEM"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaccaria_state, zaccaria_dsw_sel_w))
 
 	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(zaccaria_state, zaccaria_port0a_r))

@@ -357,16 +357,6 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 	return data;
 }
 
-I8255_INTERFACE( pcjr_ppi8255_interface )
-{
-	DEVCB_CONSTANT(0xff),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pcjr_state,pcjr_ppi_portb_w),
-	DEVCB_DRIVER_MEMBER(pcjr_state,pcjr_ppi_portc_r),
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 {
 	logerror("fdc: dor = %02x\n", data);
@@ -637,7 +627,10 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NULL )
 
-	MCFG_I8255_ADD( "ppi8255", pcjr_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pcjr_state, pcjr_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pcjr_state, pcjr_ppi_portc_r))
 
 	MCFG_INS8250_ADD( "ins8250", pcjr_com_interface, XTAL_1_8432MHz )
 

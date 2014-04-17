@@ -175,16 +175,6 @@ WRITE8_MEMBER( apricot_state::i8255_portc_w )
 //  schematic page 294 says pc6 outputs to centronics pin 15, which is unused
 }
 
-static const i8255_interface apricot_i8255a_intf =
-{
-	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(apricot_state, i8255_portb_w),
-	DEVCB_DRIVER_MEMBER(apricot_state, i8255_portc_r),
-	DEVCB_DRIVER_MEMBER(apricot_state, i8255_portc_w)
-};
-
 WRITE_LINE_MEMBER( apricot_state::timer_out1 )
 {
 	// receive clock via timer 1
@@ -400,7 +390,13 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RAM_EXTRA_OPTIONS("384k,512k") // with 1 or 2 128k expansion boards
 
 	// devices
-	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
+	MCFG_DEVICE_ADD("ic17", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(apricot_state, i8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(apricot_state, i8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(apricot_state, i8255_portc_w))
+
 	MCFG_PIC8259_ADD("ic31", INPUTLINE("ic91", 0), VCC, NULL)
 
 	MCFG_DEVICE_ADD("ic16", PIT8253, 0)

@@ -354,9 +354,14 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_CPU_IO_MAP(radio86_io)
 	MCFG_MACHINE_RESET_OVERRIDE(radio86_state, radio86 )
 
-	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
-	MCFG_I8275_ADD  ( "i8275", radio86_i8275_interface)
+	MCFG_I8275_ADD("i8275", radio86_i8275_interface)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
@@ -394,7 +399,10 @@ static MACHINE_CONFIG_DERIVED( radiorom, radio86 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86rom_mem)
 
-	MCFG_I8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
@@ -406,7 +414,10 @@ static MACHINE_CONFIG_DERIVED( radioram, radio86 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86ram_mem)
 
-	MCFG_I8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
@@ -414,7 +425,11 @@ static MACHINE_CONFIG_DERIVED( rk7007, radio86 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
 
-	MCFG_I8255_ADD( "ms7007", rk7007_ppi8255_interface )
+	MCFG_DEVICE_ADD("ms7007", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
@@ -422,7 +437,11 @@ static MACHINE_CONFIG_DERIVED( rk700716, radio16 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
 
-	MCFG_I8255_ADD( "ms7007", rk7007_ppi8255_interface )
+	MCFG_DEVICE_ADD("ms7007", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mikron2, radio86 )

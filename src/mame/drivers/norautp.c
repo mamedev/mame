@@ -1201,50 +1201,6 @@ static GFXDECODE_START( norautp )
 GFXDECODE_END
 
 
-/************************************
-*      PPI 8255 (x3) Interface      *
-************************************/
-
-static I8255_INTERFACE (ppi8255_intf_0)
-{
-	/* (60-63) Mode 0 - Port A set as input */
-	DEVCB_INPUT_PORT("DSW1"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(norautp_state,mainlamps_w),     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(norautp_state,counterlamps_w)   /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_intf_1)
-{
-	/* (a0-a3) Mode 0 - Ports A & B set as input */
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(norautp_state,soundlamps_w)     /* Port C write */
-};
-
-//static I8255A_INTERFACE (ppi8255_intf_2)
-//{
-	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
-	           Group B Mode 0, output;  (see below for lines PC0-PC2) */
-//  DEVCB_DRIVER_MEMBER(norautp_state,vram_data_r),     /* Port A read (VRAM data read)*/
-//  DEVCB_DRIVER_MEMBER(norautp_state,vram_data_w),     /* Port A write (VRAM data write) */
-//  DEVCB_NULL,                     /* Port B read */
-//  DEVCB_DRIVER_MEMBER(norautp_state,vram_addr_w),     /* Port B write (VRAM address write) */
-//  DEVCB_DRIVER_MEMBER(norautp_state,ppi2_portc_r),    /* Port C read */
-//  DEVCB_DRIVER_MEMBER(norautp_state,ppi2_portc_w)     /* Port C write */
-
-	/*  PPI-2 is configured as mixed mode2 and mode0 output.
-	    It means that port A should be bidirectional and port B just as output.
-	    Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets).
-	*/
-//};
-
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -1258,10 +1214,29 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   /* doesn't work if placed at derivative drivers */
 
-	/* 3x 8255 */
-	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
-//  MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	/* (60-63) Mode 0 - Port A set as input */
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(norautp_state, mainlamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, counterlamps_w))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	/* (a0-a3) Mode 0 - Ports A & B set as input */
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, soundlamps_w))
+
+	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
+     Group B Mode 0, output;  (see below for lines PC0-PC2) */
+	//MCFG_I8255_IN_PORTA_CB(READ8(norautp_state, vram_data_r))	// VRAM data read
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(norautp_state, vram_data_w))	// VRAM data write
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(norautp_state, vram_addr_w))	// VRAM address write
+	//MCFG_I8255_IN_PORTC_CB(READ8(norautp_state, ppi2_portc_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, ppi2_portc_w))
+	/*  PPI-2 is configured as mixed mode2 and mode0 output.
+     It means that port A should be bidirectional and port B just as output.
+     Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

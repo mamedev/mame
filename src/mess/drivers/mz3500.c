@@ -648,17 +648,6 @@ WRITE8_MEMBER(mz3500_state::mz3500_pc_w)
 
 }
 
-static I8255A_INTERFACE( i8255_intf )
-{
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_DRIVER_MEMBER(mz3500_state,mz3500_pa_w),            /* Port A write */
-	DEVCB_NULL,     /* Port B read */
-	DEVCB_DRIVER_MEMBER(mz3500_state,mz3500_pb_w),            /* Port B write */
-	DEVCB_NULL,     /* Port C read */
-	DEVCB_DRIVER_MEMBER(mz3500_state,mz3500_pc_w),            /* Port C write */
-};
-
-
 static INPUT_PORTS_START( mz3500 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
@@ -825,7 +814,10 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	MCFG_I8255A_ADD( "i8255", i8255_intf )
+	MCFG_DEVICE_ADD("i8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz3500_state, mz3500_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz3500_state, mz3500_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz3500_state, mz3500_pc_w))
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))

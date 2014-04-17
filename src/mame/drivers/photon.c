@@ -116,26 +116,6 @@ WRITE8_MEMBER(photon_state::pk8000_80_portc_w)
 	m_speaker->level_w(BIT(data,7));
 }
 
-static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_porta_w),
-	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_portb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_portc_w)
-};
-
-static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
-{
-	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_r),
-	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_portc_w)
-};
-
 static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, photon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
@@ -220,8 +200,15 @@ static MACHINE_CONFIG_START( photon, photon_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
-	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
-	MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(photon_state, pk8000_80_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(photon_state, pk8000_80_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(photon_state, pk8000_80_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, pk8000_84_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, pk8000_84_porta_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state, pk8000_84_portc_w))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

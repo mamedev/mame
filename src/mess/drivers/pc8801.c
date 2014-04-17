@@ -1849,16 +1849,6 @@ WRITE8_MEMBER(pc8801_state::cpu_8255_c_w)
 }
 
 
-static I8255A_INTERFACE( master_fdd_intf )
-{
-	DEVCB_DEVICE_MEMBER("d8255_slave", i8255_device, pb_r), // Port A read
-	DEVCB_NULL,                         // Port A write
-	DEVCB_DEVICE_MEMBER("d8255_slave", i8255_device, pa_r), // Port B read
-	DEVCB_NULL,                         // Port B write
-	DEVCB_DRIVER_MEMBER(pc8801_state,cpu_8255_c_r),     // Port C read
-	DEVCB_DRIVER_MEMBER(pc8801_state,cpu_8255_c_w)          // Port C write
-};
-
 READ8_MEMBER(pc8801_state::fdc_8255_c_r)
 {
 //  machine().scheduler().synchronize(); // force resync
@@ -1872,17 +1862,6 @@ WRITE8_MEMBER(pc8801_state::fdc_8255_c_w)
 
 	m_i8255_1_pc = data;
 }
-
-static I8255A_INTERFACE( slave_fdd_intf )
-{
-	DEVCB_DEVICE_MEMBER("d8255_master", i8255_device, pb_r),    // Port A read
-	DEVCB_NULL,                         // Port A write
-	DEVCB_DEVICE_MEMBER("d8255_master", i8255_device, pa_r),    // Port B read
-	DEVCB_NULL,                         // Port B write
-	DEVCB_DRIVER_MEMBER(pc8801_state,fdc_8255_c_r),     // Port C read
-	DEVCB_DRIVER_MEMBER(pc8801_state,fdc_8255_c_w)          // Port C write
-};
-
 
 static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -2639,9 +2618,17 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
+	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_slave", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_slave", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc8801_state, cpu_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc8801_state, cpu_8255_c_w))
 
-	MCFG_I8255_ADD( "d8255_master", master_fdd_intf )
-	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
+	MCFG_DEVICE_ADD("d8255_slave", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_master", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_master", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc8801_state, fdc_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc8801_state, fdc_8255_c_w))
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))

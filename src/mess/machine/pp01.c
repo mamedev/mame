@@ -195,15 +195,3 @@ READ8_MEMBER(pp01_state::pp01_8255_portc_r)
 {
 	return 0xff;
 }
-
-
-
-I8255A_INTERFACE( pp01_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_porta_r),
-	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portc_w)
-};

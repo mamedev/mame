@@ -290,34 +290,6 @@ const UINT32 MASTER_CLOCK = XTAL_40MHz;
 const UINT32 SOUND_CLOCK = XTAL_16MHz;
 const UINT32 MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
 
-
-
-//**************************************************************************
-//  PPI INTERFACES
-//**************************************************************************
-
-static I8255_INTERFACE(outrun_ppi_intf)
-{
-	DEVCB_DRIVER_MEMBER(segaorun_state, bankmotor_limit_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_w),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, bankmotor_control_w),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, video_control_w)
-};
-
-static I8255_INTERFACE(shangon_ppi_intf)
-{
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_w),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_w),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, video_control_w)
-};
-
-
-
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
 //**************************************************************************
@@ -1188,7 +1160,14 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_I8255_ADD( "i8255", outrun_ppi_intf )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, bankmotor_limit_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(segaorun_state, unknown_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(segaorun_state, unknown_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(segaorun_state, bankmotor_control_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
+
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware
@@ -1257,7 +1236,13 @@ static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
-	MCFG_I8255_ADD( "i8255", shangon_ppi_intf )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, unknown_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(segaorun_state, unknown_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(segaorun_state, unknown_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(segaorun_state, unknown_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

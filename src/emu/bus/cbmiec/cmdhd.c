@@ -74,21 +74,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
-//-------------------------------------------------
-
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( cmd_hd )
 //-------------------------------------------------
 
@@ -98,7 +83,7 @@ static MACHINE_CONFIG_FRAGMENT( cmd_hd )
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 2000000)
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 2000000)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	//MCFG_RTC72421A_ADD(RTC72421A_TAG)
 
 	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)

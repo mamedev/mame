@@ -93,10 +93,4 @@ protected:
 	void pk8020_set_bank(UINT8 data);
 };
 
-
-/*----------- defined in machine/pk8020.c -----------*/
-extern const i8255_interface pk8020_ppi8255_interface_1;
-extern const i8255_interface pk8020_ppi8255_interface_2;
-extern const i8255_interface pk8020_ppi8255_interface_3;
-
 #endif /* pk8020_H_ */

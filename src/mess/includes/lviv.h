@@ -60,13 +60,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(lviv_reset);
 };
 
-
-/*----------- defined in machine/lviv.c -----------*/
-
-extern const i8255_interface lviv_ppi8255_interface_0;
-extern const i8255_interface lviv_ppi8255_interface_1;
-
-
 /*----------- defined in video/lviv.c -----------*/
 
 extern const unsigned char lviv_palette[8*3];

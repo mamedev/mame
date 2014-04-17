@@ -99,9 +99,16 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_MACHINE_START_OVERRIDE(orion_state, orion128 )
 	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orion128 )
 
-	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(orion_state, orion_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(orion_state, orion_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(orion_state, orion_romdisk_portc_w))
 
-	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -144,7 +151,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( orion128ms, orion128 )
 	MCFG_DEVICE_REMOVE("ppi8255_2")
-	MCFG_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 static const ay8910_interface orionz80_ay_interface =
@@ -163,9 +174,16 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_MACHINE_START_OVERRIDE(orion_state, orionz80 )
 	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionz80 )
 
-	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(orion_state, orion_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(orion_state, orion_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(orion_state, orion_romdisk_portc_w))
 
-	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -216,7 +234,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( orionz80ms, orionz80 )
 
 	MCFG_DEVICE_REMOVE("ppi8255_2")
-	MCFG_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( orionpro, orion_state )
@@ -226,9 +248,16 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionpro )
 
-	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(orion_state, orion_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(orion_state, orion_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(orion_state, orion_romdisk_portc_w))
 
-	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

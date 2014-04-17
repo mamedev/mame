@@ -270,46 +270,6 @@ public:
 };
 
 
-static I8255_INTERFACE (ppi8255_intf_a)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_a_strobedat0),           /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_b_strobedat1),           /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_c_strobe)            /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_intf_b)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_a),          /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_b),          /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_c)           /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_intf_c)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_a),          /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_b),          /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_c)           /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_intf_d)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a_reel01),           /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_b_reel23),           /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_c)           /* Port C write */
-};
-
 // this is a copy of roc10937charset for now, I don't know what chip we're meant be using here
 // it is some kind of 14 digit, 16 seg display tho
 static const UINT16 ecoin_charset[]=
@@ -460,48 +420,6 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 	update_display();
 
 }
-
-
-static I8255_INTERFACE (ppi8255_intf_e)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_a),                       /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_a_alpha_display),        /* Port A write */ /* alpha display characters*/
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_b),                       /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_b),                      /* Port B write */  // not written at an appropriate time for it to be a 'send' address for the text
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_c),                       /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_c)                       /* Port C write */  // not written at an appropriate time for it to be a 'send' address for the text
-};
-
-static I8255_INTERFACE (ppi8255_intf_f)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_a),          /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_b),          /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_c)           /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_intf_g)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_a),          /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_b),          /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_c)           /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_intf_h)
-{
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_a),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_a),          /* Port A write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_b),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_b),          /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_c),           /* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_c)           /* Port C write */
-};
-
 
 static ADDRESS_MAP_START( pyramid_memmap, AS_PROGRAM, 8, ecoinf3_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
@@ -759,24 +677,75 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	MCFG_SOUND_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_I8255_ADD( "ppi8255_a", ppi8255_intf_a )
-	MCFG_I8255_ADD( "ppi8255_b", ppi8255_intf_b )
-	MCFG_I8255_ADD( "ppi8255_c", ppi8255_intf_c )
-	MCFG_I8255_ADD( "ppi8255_d", ppi8255_intf_d )
-	MCFG_I8255_ADD( "ppi8255_e", ppi8255_intf_e )
-	MCFG_I8255_ADD( "ppi8255_f", ppi8255_intf_f )
-	MCFG_I8255_ADD( "ppi8255_g", ppi8255_intf_g )
-	MCFG_I8255_ADD( "ppi8255_h", ppi8255_intf_h )
+	MCFG_DEVICE_ADD("ppi8255_a", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_a_strobedat0))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_b_strobedat1))	
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_c_strobe))
+
+	MCFG_DEVICE_ADD("ppi8255_b", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_b_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_b_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_b_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_b_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_b_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_b_write_c))
+
+	MCFG_DEVICE_ADD("ppi8255_c", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_c_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_c_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_c_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_c_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_c_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_c_write_c))
+
+	MCFG_DEVICE_ADD("ppi8255_d", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_d_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_d_write_a_reel01))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_d_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_d_write_b_reel23))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_d_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_d_write_c))
+
+	MCFG_DEVICE_ADD("ppi8255_e", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_a_alpha_display))	// alpha display characters
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_b))	// not written at an appropriate time for it to be a 'send' address for the text
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_c))	// not written at an appropriate time for it to be a 'send' address for the text
+
+	MCFG_DEVICE_ADD("ppi8255_f", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_f_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_f_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_f_write_c))
+
+	MCFG_DEVICE_ADD("ppi8255_g", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_g_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_g_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_g_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_g_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_g_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_g_write_c))
+
+	MCFG_DEVICE_ADD("ppi8255_h", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_c))
 MACHINE_CONFIG_END
-
-
 
 
 /********************************************************************************************************************
  ROMs for PYRAMID Hw Type
 ********************************************************************************************************************/
-
-
 
 ROM_START( ec_pyram )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* the last 0x2000 bytes (unmapped?) are the same as on the ec_sphin set */

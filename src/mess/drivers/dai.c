@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch2))
 
-	MCFG_I8255_ADD( "ppi8255", dai_ppi82555_intf )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -6149,65 +6149,6 @@ static GFXDECODE_START( cm97 )
 GFXDECODE_END
 
 
-
-/*************************************
-*      PPI 8255 (x3) Interfaces      *
-*************************************/
-
-static I8255A_INTERFACE( ncb3_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN3"),        /* Port B read */ //Player2 controls, confirmed.
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( ncb3_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN1"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN2"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("DSW1"),       /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( ncb3_ppi8255_2_intf )
-{
-	DEVCB_INPUT_PORT("DSW2"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-
-static I8255A_INTERFACE( cm_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( cm_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),       /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("DSW3"),       /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-
-
-
 WRITE8_MEMBER(goldstar_state::system_outputa_w)
 {
 	//popmessage("system_outputa_w %02x",data);
@@ -6226,88 +6167,6 @@ WRITE8_MEMBER(goldstar_state::system_outputc_w)
 	m_unkch_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
 }
-
-
-static I8255A_INTERFACE( lucky8_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( lucky8_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN3"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN4"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("DSW1"),       /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( lucky8_ppi8255_2_intf )
-{
-	DEVCB_INPUT_PORT("DSW2"),           /* Port A read */
-	DEVCB_DRIVER_MEMBER(goldstar_state,system_outputa_w),   /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(goldstar_state,system_outputb_w),   /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(goldstar_state,system_outputc_w)        /* Port C write */
-};
-
-static I8255A_INTERFACE( kkotnoli_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( kkotnoli_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("IN3"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN4"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( kkotnoli_ppi8255_2_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( ladylinr_ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
-static I8255A_INTERFACE( ladylinr_ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),       /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
-};
-
 
 static const ay8910_interface ay8910_config =
 {
@@ -6607,10 +6466,17 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))	//Player2 controls, confirmed
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6649,10 +6515,17 @@ static MACHINE_CONFIG_START( cb3e, goldstar_state )
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))	//Player2 controls, confirmed
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6691,10 +6564,17 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))	//Player2 controls, confirmed
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6732,10 +6612,17 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))	//Player2 controls, confirmed
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6774,10 +6661,17 @@ static MACHINE_CONFIG_START( wcherry, goldstar_state )
 	MCFG_CPU_IO_MAP(wcherry_readwriteport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))	//Player2 controls, confirmed
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6816,9 +6710,15 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_CPU_IO_MAP(cm_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6857,9 +6757,15 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_CPU_IO_MAP(cm_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6893,9 +6799,15 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_CPU_IO_MAP(cmast91_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6934,10 +6846,21 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6975,10 +6898,21 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7015,10 +6949,21 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7072,10 +7017,21 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7113,11 +7069,17 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", kkotnoli_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", kkotnoli_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", kkotnoli_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7151,9 +7113,13 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ladylinr_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ladylinr_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7191,10 +7157,21 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
-	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7234,9 +7211,15 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_CPU_IO_MAP(amcoe1_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7274,9 +7257,15 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_CPU_IO_MAP(amcoe1_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7314,9 +7303,15 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_CPU_IO_MAP(amcoe2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7349,9 +7344,15 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_CPU_IO_MAP(amcoe2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7431,9 +7432,15 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_CPU_IO_MAP(cm_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
-	/* 2x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7467,10 +7474,9 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 	MCFG_CPU_IO_MAP(megaline_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
-	/* 3x 8255 */
-//  MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-//  MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-//  MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+	//MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	//MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	//MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

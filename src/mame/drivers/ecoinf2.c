@@ -225,57 +225,6 @@ public:
 };
 
 
-static I8255_INTERFACE (ppi8255_ic10_intf)//lamps
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic10_write_a_strobedat0),           /* Port A write */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic10_write_b_strobedat1),           /* Port B write */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic10_write_c_strobe)            /* Port C write */
-};
-
-static I8255_INTERFACE (ppi8255_ic13_intf)//leds
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic13_write_a_strobedat0),           /* Port A write */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic13_write_b_strobedat1),           /* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic13_read_c_panel),            /* Port C read */
-	DEVCB_NULL
-};
-
-static I8255_INTERFACE (ppi8255_ic22_intf)//inputs
-{
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_a_levels),          /* Port A read - manual says level switches*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_b_coins),           /* Port B read*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_c_misc),            /* Port C read (0x20 appears to be meter power)*/
-	DEVCB_NULL
-};
-
-// IC24 is the workhorse of the Phoenix, it seems to handle meters, payslides, coin lamps, inhibits and the watchdog! */
-static I8255_INTERFACE (ppi8255_ic24_intf)//coins and related
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic24_write_a_meters),          /* Port A write*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic24_write_b_payouts),         /* Port B write*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic24_write_c_inhibits),         /* Port C write*/
-};
-
-static I8255_INTERFACE (ppi8255_ic23_intf)//reels
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic23_write_a_reel01),          /* Port A write*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic23_write_b_reel23),         /* Port B write*/
-	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic23_read_c_key),            /* Port C read (optos and keys)*/
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER(ecoinf2_state::ox_port5c_out_w)
 {
 	// Watchdog?
@@ -566,13 +515,33 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(ecoinf2_state, ecoinf2 )
 
-	MCFG_I8255_ADD( "ic10_lamp", ppi8255_ic10_intf )
-	MCFG_I8255_ADD( "ic24_coin", ppi8255_ic24_intf )
-	MCFG_I8255_ADD( "ic22_inpt", ppi8255_ic22_intf )
-	MCFG_I8255_ADD( "ic23_reel", ppi8255_ic23_intf )
-	MCFG_I8255_ADD( "ic13_leds", ppi8255_ic13_intf )
-//  MCFG_I8255_ADD( "ic25_dips", ppi8255_ic25_intf )
+	MCFG_DEVICE_ADD("ic10_lamp", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_a_strobedat0))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_b_strobedat1))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_c_strobe))
 
+	// IC24 is the workhorse of the Phoenix, it seems to handle meters, payslides, coin lamps, inhibits and the watchdog! */
+	MCFG_DEVICE_ADD("ic24_coin", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_a_meters))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_b_payouts))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_c_inhibits))
+
+	MCFG_DEVICE_ADD("ic22_inpt", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf2_state, ppi8255_ic22_read_a_levels))	// manual says level switches
+	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf2_state, ppi8255_ic22_read_b_coins))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic22_read_c_misc))	// 0x20 appears to be meter power
+
+	MCFG_DEVICE_ADD("ic23_reel", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic23_write_a_reel01))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic23_write_b_reel23))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic23_read_c_key))	// optos and keys
+
+	MCFG_DEVICE_ADD("ic13_leds", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_a_strobedat0))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
+	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic13_read_c_panel))
+
+//  MCFG_DEVICE_ADD("ic25_dips", I8255, 0)
 MACHINE_CONFIG_END
 
 

@@ -423,7 +423,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    I8255_INTERFACE( ppi_intf )
+    I8255 interface
 -------------------------------------------------*/
 
 WRITE8_MEMBER( atom_state::ppi_pa_w )
@@ -552,16 +552,6 @@ WRITE8_MEMBER( atom_state::ppi_pc_w )
 	/* MC6847 CSS */
 	m_vdg->css_w(BIT(data, 3));
 }
-
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(atom_state, ppi_pa_w),
-	DEVCB_DRIVER_MEMBER(atom_state, ppi_pb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(atom_state, ppi_pc_r),
-	DEVCB_DRIVER_MEMBER(atom_state, ppi_pc_w)
-};
 
 /*-------------------------------------------------
     i8271_interface fdc_intf
@@ -828,7 +818,12 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
 
-	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
+	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(atom_state, ppi_pb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
+
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
@@ -911,7 +906,11 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
 
-	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
+	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(atom_state, ppi_pb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))

@@ -153,7 +153,6 @@ protected:
 
 /*----------- defined in machine/svi318.c -----------*/
 
-extern const i8255_interface svi318_ppi8255_interface;
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
 

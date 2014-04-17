@@ -870,42 +870,12 @@ READ8_MEMBER(pk8020_state::pk8020_portc_r)
 }
 
 
-I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
-{
-	DEVCB_DRIVER_MEMBER(pk8020_state,pk8020_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8020_state,pk8020_portb_w),
-	DEVCB_DRIVER_MEMBER(pk8020_state,pk8020_portc_r),
-	DEVCB_DRIVER_MEMBER(pk8020_state,pk8020_portc_w)
-};
-
 WRITE8_MEMBER(pk8020_state::pk8020_2_portc_w)
 {
 	m_sound_gate = BIT(data,3);
 
 	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
 }
-
-I8255A_INTERFACE( pk8020_ppi8255_interface_2 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8020_state,pk8020_2_portc_w)
-};
-
-I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out0)
 {

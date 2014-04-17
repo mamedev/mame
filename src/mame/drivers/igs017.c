@@ -3458,18 +3458,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 }
 
 
-// Dips are read through the 8255
-static I8255A_INTERFACE( iqblocka_ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),           /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("DSW3"),           /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 {
 	m_nmi_enable = 0;
@@ -3483,7 +3471,10 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_CPU_IO_MAP(iqblocka_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
-	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3534,16 +3525,6 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
 
-static I8255A_INTERFACE( mgcs_ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("COINS"),          /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(igs017_state,mgcs_keys_r),          /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
@@ -3551,7 +3532,9 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
-	MCFG_I8255A_ADD( "ppi8255", mgcs_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
+	MCFG_I8255_IN_PORTB_CB(READ8(igs017_state, mgcs_keys_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3577,16 +3560,6 @@ MACHINE_CONFIG_END
 
 // lhzb2
 
-static I8255A_INTERFACE( lhzb2_ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("COINS"),          /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("DSW1"),           /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("DSW2"),           /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
@@ -3594,7 +3567,10 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
-	MCFG_I8255A_ADD( "ppi8255", lhzb2_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3672,7 +3648,10 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
-	MCFG_I8255A_ADD( "ppi8255", lhzb2_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3703,16 +3682,6 @@ MACHINE_CONFIG_END
 
 // sdmg2
 
-static I8255A_INTERFACE( sdmg2_ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),           /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
@@ -3720,7 +3689,9 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
-	MCFG_I8255A_ADD( "ppi8255", sdmg2_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3756,16 +3727,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
-static I8255A_INTERFACE( mgdh_ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
@@ -3773,7 +3734,8 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
-	MCFG_I8255A_ADD( "ppi8255", mgdh_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3804,7 +3766,10 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_CPU_IO_MAP(tjsb_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
-	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
@@ -3840,7 +3805,10 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_CPU_IO_MAP(spkrform_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
-	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 

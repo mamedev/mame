@@ -135,16 +135,6 @@ READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
 	return 0;
 }
 
-I8255A_INTERFACE( sm1800_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(sm1800_state, sm1800_8255_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(sm1800_state, sm1800_8255_portb_w),
-	DEVCB_DRIVER_MEMBER(sm1800_state, sm1800_8255_portc_r),
-	DEVCB_DRIVER_MEMBER(sm1800_state, sm1800_8255_portc_w)
-};
-
 PALETTE_INIT_MEMBER(sm1800_state, sm1800)
 {
 	palette.set_pen_color(0, rgb_t::black); // black
@@ -192,8 +182,14 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)
 
 	/* Devices */
-	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )
+	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(sm1800_state, sm1800_8255_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(sm1800_state, sm1800_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(sm1800_state, sm1800_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sm1800_state, sm1800_8255_portc_w))
+
 	MCFG_I8275_ADD  ("i8275", sm1800_i8275_interface)
+
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 MACHINE_CONFIG_END
 

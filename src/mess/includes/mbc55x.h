@@ -174,9 +174,6 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 
 /*----------- defined in machine/mbc55x.c -----------*/
 
-extern const i8255_interface mbc55x_ppi8255_interface;
-
-
 /* Memory controller */
 #define RAM_BANK00_TAG  "bank0"
 #define RAM_BANK01_TAG  "bank1"

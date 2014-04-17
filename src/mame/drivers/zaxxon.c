@@ -869,34 +869,6 @@ static INPUT_PORTS_START( congo )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- * PPI8255 configurations
- *
- *************************************/
-
-static I8255A_INTERFACE( zaxxon_ppi_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_a_w),    /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_b_w),    /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_c_w)     /* Port C write */
-};
-
-static I8255A_INTERFACE( congo_ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),  /* Port A read */
-	DEVCB_NULL,                     /* Port A write */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_b_w), /* Port B write */
-	DEVCB_NULL,                     /* Port C read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_c_w)  /* Port C write */
-};
-
-
 /*************************************
  *
  *  Graphics definitions
@@ -941,8 +913,10 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 
-
-	MCFG_I8255A_ADD( "ppi8255", zaxxon_ppi_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(zaxxon_state, zaxxon_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, zaxxon_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, zaxxon_sound_c_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaxxon)
@@ -1001,7 +975,10 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	MCFG_CPU_PROGRAM_MAP(congo_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_I8255A_ADD( "ppi8255", congo_ppi_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, congo_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, congo_sound_c_w))
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(congo_sound_map)

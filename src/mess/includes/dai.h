@@ -102,11 +102,6 @@ protected:
 };
 
 
-/*----------- defined in machine/dai.c -----------*/
-
-extern const i8255_interface dai_ppi82555_intf;
-
-
 /*----------- defined in video/dai.c -----------*/
 
 extern const unsigned char dai_palette[16*3];

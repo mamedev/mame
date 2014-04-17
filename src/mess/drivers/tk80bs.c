@@ -143,16 +143,6 @@ READ8_MEMBER( tk80bs_state::port_b_r )
 		return 0;
 }
 
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(tk80bs_state, port_a_r),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(tk80bs_state, port_b_r),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
 WRITE8_MEMBER( tk80bs_state::kbd_put )
 {
 	data &= 0x7f;
@@ -195,7 +185,10 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk80bs)
 
 	/* Devices */
-	MCFG_I8255_ADD( "ppi", ppi_intf)
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(tk80bs_state, port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(tk80bs_state, port_b_r))
+
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tk80bs_state, kbd_put))
 MACHINE_CONFIG_END

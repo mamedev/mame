@@ -192,17 +192,6 @@ READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_c )
 	return BIT(m_z80_ppi_c, 5) << 7;
 }
 
-static I8255_INTERFACE( d71055c_0_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi0_i_a),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi0_o_b),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi0_i_c),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi0_o_c),
-};
-
-
 //-------------------------------------------------
 //  D71055C PPI (Z80)
 //-------------------------------------------------
@@ -236,17 +225,6 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
 
 	m_z80_ppi_c = data;
 }
-
-static I8255_INTERFACE( d71055c_1_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi1_o_a),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi1_i_b),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ppi1_o_c),
-};
-
 
 //-------------------------------------------------
 //  D8253 PIT
@@ -295,8 +273,16 @@ static MACHINE_CONFIG_FRAGMENT( ibm_mfc )
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_I8255_ADD("d71055c_0", d71055c_0_intf)
-	MCFG_I8255_ADD("d71055c_1", d71055c_1_intf)
+	MCFG_DEVICE_ADD("d71055c_0", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(isa8_ibm_mfc_device, ppi0_i_a))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(isa8_ibm_mfc_device, ppi0_o_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(isa8_ibm_mfc_device, ppi0_i_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(isa8_ibm_mfc_device, ppi0_o_c))
+
+	MCFG_DEVICE_ADD("d71055c_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(isa8_ibm_mfc_device, ppi1_o_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(isa8_ibm_mfc_device, ppi1_i_b))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(isa8_ibm_mfc_device, ppi1_o_c))
 
 	MCFG_DEVICE_ADD("d71051", I8251, 0)
 

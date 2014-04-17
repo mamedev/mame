@@ -1580,16 +1580,6 @@ WRITE8_MEMBER(pc88va_state::cpu_8255_c_w)
 	m_i8255_0_pc = data;
 }
 
-static I8255A_INTERFACE( master_fdd_intf )
-{
-	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pb_r),    // Port A read
-	DEVCB_NULL,                         // Port A write
-	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pa_r), // Port B read
-	DEVCB_NULL,                         // Port B write
-	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_r),     // Port C read
-	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_w)          // Port C write
-};
-
 READ8_MEMBER(pc88va_state::fdc_8255_c_r)
 {
 	return m_i8255_0_pc >> 4;
@@ -1599,16 +1589,6 @@ WRITE8_MEMBER(pc88va_state::fdc_8255_c_w)
 {
 	m_i8255_1_pc = data;
 }
-
-static I8255A_INTERFACE( slave_fdd_intf )
-{
-	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pb_r), // Port A read
-	DEVCB_NULL,                         // Port A write
-	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pa_r), // Port B read
-	DEVCB_NULL,                         // Port B write
-	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_r),     // Port C read
-	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_w)          // Port C write
-};
 
 READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
 {
@@ -1651,16 +1631,6 @@ WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
 {
 	// ...
 }
-
-static I8255_INTERFACE( r232c_ctrl_intf )
-{
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_r),                        /* Port A read */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_w),                        /* Port A write */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_r),                        /* Port B read */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_w),                        /* Port B write */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_r),                        /* Port C read */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_w)                     /* Port C write */
-};
 
 IRQ_CALLBACK_MEMBER(pc88va_state::pc88va_irq_callback)
 {
@@ -1854,10 +1824,25 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc88va )
 
-	MCFG_I8255_ADD( "d8255_2", master_fdd_intf )
-	MCFG_I8255_ADD( "d8255_3", r232c_ctrl_intf )
+	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_2s", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_2s", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, cpu_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, cpu_8255_c_w))
 
-	MCFG_I8255_ADD( "d8255_2s", slave_fdd_intf )
+	MCFG_DEVICE_ADD("d8255_3", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pc88va_state, r232_ctrl_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc88va_state, r232_ctrl_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pc88va_state, r232_ctrl_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc88va_state, r232_ctrl_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, r232_ctrl_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, r232_ctrl_portc_w))
+
+	MCFG_DEVICE_ADD("d8255_2s", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_2", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_2", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, fdc_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, fdc_8255_c_w))
 
 	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pc88va_state, pc88va_pic_irq), VCC, READ8(pc88va_state,get_slave_ack) )
 

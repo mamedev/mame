@@ -175,16 +175,6 @@ READ8_MEMBER( pulsar_state::ppi_pc_r )
 	return m_rtc->data_r(space, 0);
 }
 
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,   // Port A read
-	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pa_w),   // Port A write
-	DEVCB_NULL,   // Port B read
-	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pb_w),   // Port B write
-	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pc_r),   // Port C read
-	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pc_w),   // Port C write
-};
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -257,7 +247,12 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */
-	MCFG_I8255_ADD( "ppi", ppi_intf )
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pulsar_state, ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pulsar_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pulsar_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pulsar_state, ppi_pc_w))
+
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 
 	MCFG_Z80DART_ADD("z80dart",  XTAL_4MHz, dart_intf )

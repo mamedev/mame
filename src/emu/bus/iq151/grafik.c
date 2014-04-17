@@ -15,18 +15,11 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static I8255_INTERFACE( grafik_ppi8255_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_grafik_device, x_write),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_grafik_device, y_write),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_grafik_device, control_w),
-};
-
 static MACHINE_CONFIG_FRAGMENT( iq151_grafik )
-	MCFG_I8255_ADD("ppi8255", grafik_ppi8255_intf)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_grafik_device, control_w))
 MACHINE_CONFIG_END
 
 

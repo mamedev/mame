@@ -394,17 +394,6 @@ READ8_MEMBER( pc100_state::rtc_portc_r )
 	return m_rtc_portc;
 }
 
-static I8255A_INTERFACE( pc100_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc100_state, rtc_porta_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc100_state, rtc_portc_r),
-	DEVCB_DRIVER_MEMBER(pc100_state, rtc_portc_w)
-};
-
-
 WRITE8_MEMBER( pc100_state::lower_mask_w )
 {
 	m_crtc.mask = (m_crtc.mask & 0xff00) | data;
@@ -420,16 +409,6 @@ WRITE8_MEMBER( pc100_state::crtc_bank_w )
 	m_bank_w = data & 0xf;
 	m_bank_r = (data & 0x30) >> 4;
 }
-
-static I8255A_INTERFACE( pc100_ppi8255_interface_2 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc100_state, lower_mask_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc100_state, upper_mask_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc100_state, crtc_bank_w)
-};
 
 IRQ_CALLBACK_MEMBER(pc100_state::pc100_irq_callback)
 {
@@ -514,9 +493,19 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
-	MCFG_I8255_ADD( "ppi8255_1", pc100_ppi8255_interface_1 )
-	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc100_state, rtc_porta_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pc100_state, rtc_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, rtc_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc100_state, lower_mask_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc100_state, upper_mask_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, crtc_bank_w))
+
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pc100_state, pc100_set_int_line), GND, NULL )
+
 	MCFG_UPD765A_ADD("upd765", true, true)
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL_32_768kHz)

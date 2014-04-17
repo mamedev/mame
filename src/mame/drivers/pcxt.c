@@ -429,26 +429,6 @@ WRITE8_MEMBER(pcxt_state::sys_reset_w)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_a_r),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_r),           /* Port B read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_w),           /* Port B write */
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_c_r),           /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,wss_1_w),                /* Port A write */
-	DEVCB_NULL,                         /* Port B read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,wss_2_w),                /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,sys_reset_w)         /* Port C write */
-};
-
 
 /*Floppy Disk Controller 765 device*/
 /*Currently we only emulate it at a point that the BIOS will pass the checks*/
@@ -745,8 +725,16 @@ static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcxt_state, ibm5150_pit8253_out2_changed))
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pcxt_state, port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(pcxt_state, port_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pcxt_state, port_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pcxt_state, port_c_r))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_1_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_2_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, sys_reset_w))
 
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 

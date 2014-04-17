@@ -249,17 +249,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -287,11 +276,13 @@ static MACHINE_CONFIG_START( rgum, rgum_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16, mc6845_intf)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rgum)
 	MCFG_PALETTE_ADD("palette", 0x100)
-
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

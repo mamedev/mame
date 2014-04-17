@@ -935,17 +935,6 @@ WRITE8_MEMBER( pasogo_state::ppi_portb_w )
 }
 
 
-static I8255A_INTERFACE( ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(pasogo_state, ppi_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pasogo_state, ppi_portb_w),
-	DEVCB_DRIVER_MEMBER(pasogo_state, ppi_portc_r),
-	DEVCB_NULL
-};
-
-
 WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
@@ -971,7 +960,10 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, dma8237_config )
 
-	MCFG_I8255_ADD( "ppi8255", ppi8255_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pasogo_state, ppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pasogo_state, ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pasogo_state, ppi_portc_r))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

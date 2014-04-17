@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "machine/i8255.h"
 #include "machine/wd_fdc.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
@@ -168,16 +167,6 @@ READ8_MEMBER(b2m_state::b2m_8255_portb_r)
 	return m_b2m_video_scroll;
 }
 
-I8255A_INTERFACE( b2m_ppi8255_interface_1 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portb_r),
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portc_w)
-};
-
 WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
 {
 	/* Clears HALT state of CPU when data is ready to read */
@@ -217,16 +206,6 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	}
 }
 
-I8255A_INTERFACE( b2m_ppi8255_interface_2 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_ext_8255_portc_w)
-};
-
 READ8_MEMBER(b2m_state::b2m_romdisk_porta_r)
 {
 	UINT8 *romdisk = memregion("maincpu")->base() + 0x12000;
@@ -242,16 +221,6 @@ WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
 {
 	m_b2m_romdisk_msb = data & 0x7f;
 }
-
-I8255A_INTERFACE( b2m_ppi8255_interface_3 )
-{
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_romdisk_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_romdisk_portb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b2m_state,b2m_romdisk_portc_w)
-};
 
 WRITE_LINE_MEMBER(b2m_state::b2m_pic_set_int_line)
 {

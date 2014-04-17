@@ -411,16 +411,6 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 	return data;
 }
 
-static I8255A_INTERFACE( printer_8255_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, write_strobe),
-	DEVCB_DRIVER_MEMBER(xor100_state, i8255_pc_r),
-	DEVCB_NULL
-};
-
 /* Z80-CTC Interface */
 
 WRITE_LINE_MEMBER( xor100_state::ctc_z0_w )
@@ -548,7 +538,11 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(xor100_state, com5016_fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(xor100_state, com5016_ft_w))
 
-	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_I8255_IN_PORTC_CB(READ8(xor100_state, i8255_pc_r))
+
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_FD1795x_ADD(WD1795_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)

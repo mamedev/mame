@@ -896,31 +896,6 @@ static INPUT_PORTS_START( sstar97 )
 INPUT_PORTS_END
 
 
-/**************************************
-*       PPI 8255 (x2) Interface       *
-**************************************/
-
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN1"),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN2"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("DSW1"),           /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_INPUT_PORT("DSW2"),           /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN3"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("IN4"),            /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
 /**********************************
 *       AY-3-8910 Interface       *
 **********************************/
@@ -958,8 +933,15 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x M5M82C255, or 2x PPI8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

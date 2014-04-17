@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi0_intf )
+//  I8255A 0 interface
 //-------------------------------------------------
 
 READ8_MEMBER( hardbox_device::ppi0_pa_r )
@@ -151,19 +151,8 @@ READ8_MEMBER( hardbox_device::ppi0_pc_r )
 	return data;
 }
 
-static I8255A_INTERFACE( ppi0_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi0_pa_r),
-	DEVCB_NULL, // Port A write
-	DEVCB_NULL, // Port B read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi0_pb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi0_pc_r),
-	DEVCB_NULL  // Port C write
-};
-
-
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi1_intf )
+//  I8255A 1 interface
 //-------------------------------------------------
 
 READ8_MEMBER( hardbox_device::ppi1_pa_r )
@@ -274,17 +263,6 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 	output_set_led_value(LED_READY, !BIT(data, 2));
 }
 
-static I8255A_INTERFACE( ppi1_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi1_pa_r),
-	DEVCB_NULL, // Port A write
-	DEVCB_NULL, // Port B read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi1_pb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi1_pc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi1_pc_w)
-};
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( hardbox )
 //-------------------------------------------------
@@ -296,8 +274,16 @@ static MACHINE_CONFIG_FRAGMENT( hardbox )
 	MCFG_CPU_IO_MAP(hardbox_io)
 
 	// devices
-	MCFG_I8255A_ADD(I8255_0_TAG, ppi0_intf)
-	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
+	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(hardbox_device, ppi0_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(hardbox_device, ppi0_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(hardbox_device, ppi0_pc_r))
+
+	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(hardbox_device, ppi1_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(hardbox_device, ppi1_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(hardbox_device, ppi1_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(hardbox_device, ppi1_pc_w))
 
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_CONFIG_ADD("harddisk1", corvus_hdc_t::hd_intf)

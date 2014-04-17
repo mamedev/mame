@@ -1870,16 +1870,6 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_DRIVER_MEMBER(x1_state, x1_porta_r),                      /* Port A read */
-	DEVCB_DRIVER_MEMBER(x1_state, x1_porta_w),                      /* Port A write */
-	DEVCB_DRIVER_MEMBER(x1_state, x1_portb_r),                      /* Port B read */
-	DEVCB_DRIVER_MEMBER(x1_state, x1_portb_w),                      /* Port B write */
-	DEVCB_DRIVER_MEMBER(x1_state, x1_portc_r),                      /* Port C read */
-	DEVCB_DRIVER_MEMBER(x1_state, x1_portc_w)                       /* Port C write */
-};
-
 static MC6845_INTERFACE( mc6845_intf )
 {
 	true,       /* show border area */
@@ -2570,7 +2560,13 @@ static MACHINE_CONFIG_START( x1, x1_state )
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
 
 	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)

@@ -241,16 +241,6 @@ WRITE8_MEMBER( amust_state::port06_w )
 	m_port06 = data;
 }
 
-static I8255_INTERFACE( ppi1_intf )
-{
-	DEVCB_DRIVER_MEMBER(amust_state, port04_r),   // Port A read
-	DEVCB_DRIVER_MEMBER(amust_state, port04_w),   // Port A write
-	DEVCB_DRIVER_MEMBER(amust_state, port05_r),   // Port B read
-	DEVCB_NULL,                                   // Port B write
-	DEVCB_DRIVER_MEMBER(amust_state, port06_r),   // Port C read
-	DEVCB_DRIVER_MEMBER(amust_state, port06_w),   // Port C write
-};
-
 READ8_MEMBER( amust_state::port08_r )
 {
 	return m_port08;
@@ -300,16 +290,6 @@ WRITE8_MEMBER( amust_state::port0a_w )
 		timer_set(attotime::from_msec(150), TIMER_BEEP_OFF);
 	}
 }
-
-static I8255_INTERFACE( ppi2_intf )
-{
-	DEVCB_DRIVER_MEMBER(amust_state, port08_r),   // Port A read
-	DEVCB_DRIVER_MEMBER(amust_state, port08_w),   // Port A write
-	DEVCB_DRIVER_MEMBER(amust_state, port09_r),   // Port B read
-	DEVCB_NULL,                                   // Port B write
-	DEVCB_DRIVER_MEMBER(amust_state, port0a_r),   // Port C read
-	DEVCB_DRIVER_MEMBER(amust_state, port0a_w),   // Port C write
-};
 
 WRITE8_MEMBER( amust_state::port0d_w )
 {
@@ -458,8 +438,20 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_I8255A_ADD("ppi1", ppi1_intf)
-	MCFG_I8255A_ADD("ppi2", ppi2_intf)
+
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(amust_state, port04_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(amust_state, port04_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(amust_state, port05_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(amust_state, port06_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(amust_state, port06_w))
+
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(amust_state, port08_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(amust_state, port08_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(amust_state, port09_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(amust_state, port0a_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(amust_state, port0a_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

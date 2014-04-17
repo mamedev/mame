@@ -159,16 +159,6 @@ WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
 	m_uart8251->write_txc(state);
 }
 
-static const i8255_interface isbc86_ppi_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 READ8_MEMBER( isbc_state::get_slave_ack )
 {
 	if (offset == 7)
@@ -190,16 +180,6 @@ WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
 	if(state)
 		m_pic_1->ir7_w(1);
 }
-
-static const i8255_interface isbc286_ppi_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_DEVICE_MEMBER("cent_status_in", input_buffer_device, read),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(isbc_state, ppi_c_w),
-};
 
 WRITE8_MEMBER( isbc_state::ppi_c_w )
 {
@@ -252,7 +232,7 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
 
-	MCFG_I8255A_ADD("ppi", isbc86_ppi_interface)
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -282,7 +262,7 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
 
-	MCFG_I8255A_ADD("ppi", isbc86_ppi_interface)
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -317,7 +297,10 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
 
-	MCFG_I8255A_ADD("ppi", isbc286_ppi_interface)
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(isbc_state, ppi_c_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(isbc_state, write_centronics_ack))

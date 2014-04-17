@@ -187,17 +187,6 @@ UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-static I8255_INTERFACE( mbc200_ppi8255_interface_1 )
-{
-	DEVCB_NULL, /* port A read */
-	DEVCB_NULL, /* port A write */
-	DEVCB_NULL, /* port B read */
-	DEVCB_NULL, /* port B write */
-	DEVCB_NULL, /* port C read */
-	DEVCB_NULL  /* port C write */
-};
-
-
 WRITE8_MEMBER( mbc200_state::porta_w )
 {
 	machine().scheduler().synchronize(); // force resync
@@ -205,17 +194,6 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 	m_comm_latch = data; // to slave CPU
 	m_hs_bit &= ~0x80;
 }
-
-static I8255_INTERFACE( mbc200_ppi8255_interface_2 )
-{
-	DEVCB_NULL, /* port A read */
-	DEVCB_DRIVER_MEMBER(mbc200_state,porta_w),  /* port A write */
-	DEVCB_NULL, /* port B read */
-	DEVCB_NULL, /* port B write */
-	DEVCB_NULL, /* port C read */
-	DEVCB_NULL  /* port C write */
-};
-
 
 static const wd17xx_interface mbc200_mb8876_interface =
 {
@@ -277,8 +255,12 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4, mbc200_crtc) // HD46505SP
-	MCFG_I8255_ADD("ppi8255_1", mbc200_ppi8255_interface_1) // i8255AC-5
-	MCFG_I8255_ADD("ppi8255_2", mbc200_ppi8255_interface_2) // i8255AC-5
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc200_state, porta_w))
+
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
 	MCFG_MB8876_ADD("fdc",mbc200_mb8876_interface) // MB8876A

@@ -364,17 +364,6 @@ WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
 	m_input_mux=data;
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_a_w),     /* Port A write */
-	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_b_r),     /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_c_w)          /* Port C write */
-};
-
-
 static INPUT_PORTS_START( sfkick )
 	PORT_START("IN0")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
@@ -497,7 +486,10 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 	MCFG_SCREEN_PALETTE("v9938:palette")
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(sfkick_state, ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(sfkick_state, ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(sfkick_state, ppi_port_c_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/6)

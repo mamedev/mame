@@ -181,11 +181,16 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, radio86 )
 
-	MCFG_I8255_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
-	MCFG_I8255_ADD( "ppi8255_2", mikrosha_ppi8255_interface_2 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, mikrosha_8255_font_page_w))
 
-	MCFG_I8275_ADD  ( "i8275", mikrosha_i8275_interface)
+	MCFG_I8275_ADD("i8275", mikrosha_i8275_interface)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)

@@ -206,7 +206,6 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_CPU_IO_MAP(pk8020_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -220,10 +219,16 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pk8020_state, pk8020_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pk8020_state, pk8020_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(pk8020_state, pk8020_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8020_state, pk8020_portc_w))
 
-	MCFG_I8255_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )
-	MCFG_I8255_ADD( "ppi8255_2", pk8020_ppi8255_interface_2 )
-	MCFG_I8255_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8020_state, pk8020_2_portc_w))
+
+	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_20MHz / 10)
@@ -233,11 +238,11 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_PIT8253_CLK2((XTAL_20MHz / 8) / 164)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pk8020_state,pk8020_pic_set_int_line), VCC, NULL )
-	MCFG_DEVICE_ADD( "rs232", I8251, 0)
-	MCFG_DEVICE_ADD( "lan", I8251, 0)
+	MCFG_PIC8259_ADD("pic8259", WRITELINE(pk8020_state,pk8020_pic_set_int_line), VCC, NULL)
+	MCFG_DEVICE_ADD("rs232", I8251, 0)
+	MCFG_DEVICE_ADD("lan", I8251, 0)
 
-	MCFG_FD1793_ADD( "wd1793", pk8020_wd17xx_interface )
+	MCFG_FD1793_ADD("wd1793", pk8020_wd17xx_interface)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

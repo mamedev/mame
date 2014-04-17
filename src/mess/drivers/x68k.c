@@ -1325,16 +1325,6 @@ WRITE_LINE_MEMBER( x68k_state::mfp_tbo_w )
 	m_mfpdev->clock_w(state);
 }
 
-static I8255A_INTERFACE( ppi_interface )
-{
-	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_a_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_b_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_c_r),
-	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_c_w)
-};
-
 static const hd63450_interface dmac_interface =
 {
 	"maincpu",  // CPU - 68000
@@ -1803,7 +1793,11 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "x68k")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
-	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(x68k_state, ppi_port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(x68k_state, ppi_port_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(x68k_state, ppi_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(x68k_state, ppi_port_c_w))
 
 	MCFG_DEVICE_ADD( "hd63450", HD63450, 0 )
 	MCFG_DEVICE_CONFIG(dmac_interface)

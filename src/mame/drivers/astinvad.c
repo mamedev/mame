@@ -104,37 +104,6 @@ protected:
 
 /*************************************
  *
- *  Prototypes and interfaces
- *
- *************************************/
-
-
-
-
-
-static I8255A_INTERFACE( ppi8255_0_intf )
-{
-	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
-	DEVCB_NULL,                         /* Port A write */
-	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
-	DEVCB_NULL,                         /* Port B write */
-	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-static I8255A_INTERFACE( ppi8255_1_intf )
-{
-	DEVCB_NULL,                         /* Port A read */
-	DEVCB_DRIVER_MEMBER(astinvad_state,astinvad_sound1_w),  /* Port A write */
-	DEVCB_INPUT_PORT("CABINET"),        /* Port B read */
-	DEVCB_DRIVER_MEMBER(astinvad_state,astinvad_sound2_w),  /* Port B write */
-	DEVCB_NULL,                         /* Port C read */
-	DEVCB_NULL                          /* Port C write */
-};
-
-
-/*************************************
- *
  *  Spaceint color RAM handling
  *
  *************************************/
@@ -624,8 +593,15 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(astinvad_state, astinvad_sound1_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("CABINET"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(astinvad_state, astinvad_sound2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

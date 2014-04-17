@@ -114,16 +114,6 @@ READ8_MEMBER( fk1_state::fk1_ppi_1_c_r )
 	return 0;
 }
 
-static I8255_INTERFACE( fk1_ppi8255_interface_1 )
-{
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_a_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_a_w),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_b_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_b_w),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_c_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_c_w)
-};
-
 /*
 Port A:
     Writing data to disk
@@ -166,16 +156,6 @@ READ8_MEMBER( fk1_state::fk1_ppi_2_c_r )
 //  logerror("fk1_ppi_2_c_r\n");
 	return 0;
 }
-
-static I8255_INTERFACE( fk1_ppi8255_interface_2 )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_a_w),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_b_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_c_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_c_w)
-};
 
 
 /*
@@ -234,16 +214,6 @@ READ8_MEMBER( fk1_state::fk1_ppi_3_c_r )
 //  logerror("fk1_ppi_3_c_r\n");
 	return 0;
 }
-
-static I8255_INTERFACE( fk1_ppi8255_interface_3 )
-{
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_a_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_a_w),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_b_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_b_w),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_c_r),
-	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_c_w)
-};
 
 WRITE_LINE_MEMBER( fk1_state::fk1_pit_out0 )
 {
@@ -458,9 +428,27 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_PIT8253_CLK2(0)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(fk1_state, fk1_pit_out2))
 
-	MCFG_I8255_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
-	MCFG_I8255_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )
-	MCFG_I8255_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(fk1_state, fk1_ppi_1_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_1_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_1_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(fk1_state, fk1_ppi_1_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_1_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_1_c_w))
+
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_2_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_2_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_2_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_2_c_w))
+
+	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(fk1_state, fk1_ppi_3_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_3_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_3_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(fk1_state, fk1_ppi_3_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_3_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_3_c_w))
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)

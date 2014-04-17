@@ -86,16 +86,6 @@ WRITE8_MEMBER( ut88_state::ut88_8255_porta_w )
 	m_keyboard_mask = data ^ 0xff;
 }
 
-I8255A_INTERFACE( ut88_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ut88_state, ut88_8255_porta_w),
-	DEVCB_DRIVER_MEMBER(ut88_state, ut88_8255_portb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ut88_state, ut88_8255_portc_r),
-	DEVCB_NULL,
-};
-
 MACHINE_RESET_MEMBER(ut88_state,ut88)
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);

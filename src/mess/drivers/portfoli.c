@@ -702,21 +702,6 @@ GFXDECODE_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8255_INTERFACE( ppi_intf )
-//-------------------------------------------------
-
-static I8255_INTERFACE( ppi_intf )
-{
-	DEVCB_NULL,                                                 // Port A read
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),         // Port A write
-	DEVCB_NULL,                                                 // Port B read
-	DEVCB_DEVICE_MEMBER("cent_ctrl_out", output_latch_device, write),                  // Port B write
-	DEVCB_DEVICE_MEMBER("cent_status_in", input_buffer_device, read),                  // Port C read
-	DEVCB_NULL                                                  // Port C write
-};
-
-
-//-------------------------------------------------
 //  ins8250_interface i8250_intf
 //-------------------------------------------------
 
@@ -862,7 +847,10 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_I8255A_ADD(M82C55A_TAG, ppi_intf)
+	MCFG_DEVICE_ADD(M82C55A_TAG, I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_ctrl_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTC_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))

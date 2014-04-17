@@ -753,7 +753,7 @@ IRQ_CALLBACK_MEMBER( wangpc_state::wangpc_irq_callback )
 
 
 //-------------------------------------------------
-//  I8255A_INTERFACE( ppi_intf )
+//  I8255A INTERFACE
 //-------------------------------------------------
 
 READ8_MEMBER( wangpc_state::ppi_pa_r )
@@ -869,17 +869,6 @@ WRITE8_MEMBER( wangpc_state::ppi_pc_w )
 	m_centronics->write_select_in(BIT(data, 1));
 	m_centronics->write_init(BIT(data, 2));
 }
-
-static I8255A_INTERFACE( ppi_intf )
-{
-	DEVCB_DRIVER_MEMBER(wangpc_state, ppi_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(wangpc_state, ppi_pb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(wangpc_state, ppi_pc_r),
-	DEVCB_DRIVER_MEMBER(wangpc_state, ppi_pc_w)
-};
-
 
 WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 {
@@ -1119,8 +1108,14 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 
 	// devices
 	MCFG_AM9517A_ADD(AM9517A_TAG, 4000000, dmac_intf)
+
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
-	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+
+	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(wangpc_state, ppi_pa_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(wangpc_state, ppi_pb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(wangpc_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wangpc_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(500000)

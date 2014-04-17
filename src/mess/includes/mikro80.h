@@ -75,9 +75,4 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-
-/*----------- defined in machine/mikro80.c -----------*/
-
-extern const i8255_interface mikro80_ppi8255_interface;
-
 #endif /* UT88_H_ */
