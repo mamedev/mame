@@ -129,9 +129,6 @@ private:
 	devcb2_write8       m_out_pa_cb;
 	devcb2_write8       m_out_pb_cb;
 	devcb2_write8       m_out_pc_cb;
-	
-	devcb_resolved_read8        m_in_port_func[3];
-	devcb_resolved_write8       m_out_port_func[3];
 
 	UINT8 m_control;            // mode control word
 	UINT8 m_output[3];          // output latch

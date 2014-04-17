@@ -26,10 +26,21 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1),   // -1 for WORD-addressable
-	m_irq(0),
-	m_program(NULL),
-	m_data(NULL),
-	m_direct(NULL)
+		m_irq(0),
+		m_program(NULL),
+		m_data(NULL),
+		m_direct(NULL),
+		m_in_int_cb(*this),
+		//m_in_si_cb(*this),
+		//m_in_sck_cb(*this),
+		//m_in_sien_cb(*this),
+		//m_in_soen_cb(*this),
+		//m_in_dack_cb(*this),
+		m_out_p0_cb(*this),
+		m_out_p1_cb(*this)
+		//m_out_so_cb(*this),
+		//m_out_sorq_cb(*this),
+		//m_out_drq_cb(*this)
 {
 }
 
@@ -44,35 +55,6 @@ upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void necdsp_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const necdsp_interface *intf = reinterpret_cast<const necdsp_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<necdsp_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_int_cb, 0, sizeof(m_in_int_cb));
-		//memset(&m_in_si_cb, 0, sizeof(m_in_si_cb));
-		//memset(&m_in_sck_cb, 0, sizeof(m_in_sck_cb));
-		//memset(&m_in_sien_cb, 0, sizeof(m_in_sien_cb));
-		//memset(&m_in_soen_cb, 0, sizeof(m_in_soen_cb));
-		//memset(&m_in_dack_cb, 0, sizeof(m_in_dack_cb));
-		memset(&m_out_p0_cb, 0, sizeof(m_out_p0_cb));
-		memset(&m_out_p1_cb, 0, sizeof(m_out_p1_cb));
-		//memset(&m_out_so_cb, 0, sizeof(m_out_so_cb));
-		//memset(&m_out_sorq_cb, 0, sizeof(m_out_sorq_cb));
-		//memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
-	}
-}
 //-------------------------------------------------
 //  device_start - start up the device
 //-------------------------------------------------
@@ -105,17 +87,17 @@ void necdsp_device::device_start()
 	state_add(UPD7725_IDB, "IDB", regs.idb);
 
 	// resolve callbacks
-	m_in_int_func.resolve(m_in_int_cb, *this);
-	//m_in_si_func.resolve(m_in_si_cb, *this);
-	//m_in_sck_func.resolve(m_in_sck_cb, *this);
-	//m_in_sien_func.resolve(m_in_sien_cb, *this);
-	//m_in_soen_func.resolve(m_in_soen_cb, *this);
-	//m_in_dack_func.resolve(m_in_dack_cb, *this);
-	m_out_p0_func.resolve(m_out_p0_cb, *this);
-	m_out_p1_func.resolve(m_out_p1_cb, *this);
-	//m_out_so_func.resolve(m_out_so_cb, *this);
-	//m_out_sorq_func.resolve(m_out_sorq_cb, *this);
-	//m_out_drq_func.resolve(m_out_drq_cb, *this);
+	m_in_int_cb.resolve_safe(0);
+	//m_in_si_cb.resolve_safe(0);
+	//m_in_sck_cb.resolve_safe(0);
+	//m_in_sien_cb.resolve_safe(0);
+	//m_in_soen_cb.resolve_safe(0);
+	//m_in_dack_cb.resolve_safe(0);
+	m_out_p0_cb.resolve_safe();
+	m_out_p1_cb.resolve_safe();
+	//m_out_so_cb.resolve_safe();
+	//m_out_sorq_cb.resolve_safe();
+	//m_out_drq_cb.resolve_safe();
 
 	// save state registrations
 	save_item(NAME(regs.pc));
@@ -568,8 +550,8 @@ void necdsp_device::exec_ld(UINT32 opcode) {
 	case  5: regs.rp = id; break;
 	case  6: regs.dr = id; regs.sr.rqm = 1; break;
 	case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
-				m_out_p0_func(regs.sr&0x1);
-				m_out_p1_func((regs.sr&0x2)>>1);
+				m_out_p0_cb(regs.sr&0x1);
+				m_out_p1_cb((regs.sr&0x2)>>1);
 				break;
 	case  8: regs.so = id; break;  //LSB
 	case  9: regs.so = id; break;  //MSB

@@ -137,14 +137,6 @@
 /*
    Devices and handlers
  */
-//upd7720 (TODO: hook up p0, p1, int)
-static NECDSP_INTERFACE( upd7720_config )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /*****************************************************************************
  USART 8251 and Terminal stuff
@@ -409,10 +401,10 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
+	/* TODO: hook up p0, p1, int */
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
-	MCFG_CPU_CONFIG(upd7720_config)
 
 	/* PIC 8259 */
 	MCFG_PIC8259_ADD("pic8259", WRITELINE(tsispch_state,pic8259_set_int_line), VCC, NULL)

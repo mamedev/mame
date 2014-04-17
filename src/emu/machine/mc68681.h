@@ -170,12 +170,6 @@ private:
 	void update_interrupts();
 
 	mc68681_channel *get_channel(int chan);
-
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_a_tx_func;
-	devcb_resolved_write_line   m_out_b_tx_func;
-	devcb_resolved_read8        m_in_port_func;
-	devcb_resolved_write8       m_out_port_func;
 };
 
 extern const device_type MC68681;
