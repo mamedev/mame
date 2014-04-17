@@ -291,21 +291,27 @@ void palette_device::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool no
 //  potentially modified palette entries
 //-------------------------------------------------
 
-inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modified)
+inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modified, bool indirect)
 {
+	assert((m_indirect_entries != 0) == indirect);
+
 	// determine how many entries were modified
 	int bpe = m_paletteram.bytes_per_entry();
 	assert(bpe != 0);
 	int count = (bytes_modified + bpe - 1) / bpe;
 
-	// for each entry modified, fetch the palette data and set the pen color
+	// for each entry modified, fetch the palette data and set the pen color or indirect color
 	offs_t base = byte_offset / bpe;
 	for (int index = 0; index < count; index++)
 	{
 		UINT32 data = m_paletteram.read(base + index);
 		if (m_paletteram_ext.base() != NULL)
 			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
-		m_palette->entry_set_color(base + index, m_raw_to_rgb(data));
+
+		if (indirect)
+			set_indirect_color(base + index, m_raw_to_rgb(data));
+		else
+			m_palette->entry_set_color(base + index, m_raw_to_rgb(data));
 	}
 }
 
@@ -364,6 +370,30 @@ WRITE16_MEMBER(palette_device::write_ext)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
+}
+
+
+//-------------------------------------------------
+//  write_indirect - write a byte to the base
+//  paletteram, updating indirect colors
+//-------------------------------------------------
+
+WRITE8_MEMBER(palette_device::write_indirect)
+{
+	m_paletteram.write8(offset, data);
+	update_for_write(offset, 1, true);
+}
+
+
+//-------------------------------------------------
+//  write_ext - write a byte to the extended
+//  paletteram, updating indirect colors
+//-------------------------------------------------
+
+WRITE8_MEMBER(palette_device::write_indirect_ext)
+{
+	m_paletteram_ext.write8(offset, data);
+	update_for_write(offset, 1, true);
 }
 
 

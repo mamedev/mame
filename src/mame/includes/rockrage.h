@@ -20,8 +20,7 @@ public:
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_rombank(*this, "rombank"),
-		m_paletteram(*this, "paletteram") { }
+		m_rombank(*this, "rombank") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -34,7 +33,6 @@ public:
 
 	/* memory pointers */
 	required_memory_bank m_rombank;
-	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	int        m_layer_colorbase[2];
@@ -50,7 +48,6 @@ public:
 	DECLARE_PALETTE_INIT(rockrage);
 	UINT32 screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rockrage_interrupt);
-	void set_pens();
 	K007342_CALLBACK_MEMBER(rockrage_tile_callback);
 	K007420_CALLBACK_MEMBER(rockrage_sprite_callback);
 

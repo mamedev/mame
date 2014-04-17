@@ -10,7 +10,6 @@ public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
-		m_paletteram(*this, "paletteram"),
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -19,7 +18,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoctrl;
 	UINT8 *  m_scrollram;
-	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -51,7 +49,6 @@ public:
 	DECLARE_PALETTE_INIT(jackal);
 	UINT32 screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackal_interrupt);
-	void set_pens(  );
 	void jackal_mark_tile_dirty( int offset );
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank );

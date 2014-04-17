@@ -107,7 +107,7 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)                                              /* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)                                              /* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_RAM AM_SHARE("paletteram")                                      /* palette */
+	AM_RANGE(0x1800, 0x187f) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")  /* palette */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddribble_fg_videoram_w) AM_SHARE("fg_videoram")   /* Video RAM 1 */
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("spriteram_1")                             /* Object RAM 1 */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("sharedram")                                   /* shared RAM with CPU #1 */
@@ -289,6 +289,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)
 
 	/* sound hardware */

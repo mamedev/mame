@@ -84,21 +84,6 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 }
 
 
-void combatsc_state::set_pens(  )
-{
-	int i;
-
-	for (i = 0x00; i < 0x100; i += 2)
-	{
-		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 
 /***************************************************************************
 
@@ -381,8 +366,6 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	set_pens();
-
 	address_space &space = machine().driver_data()->generic_space();
 	if (m_k007121_1->ctrlram_r(space, 1) & 0x02)
 	{
@@ -538,8 +521,6 @@ void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-
-	set_pens();
 
 	for (i = 0; i < 32; i++)
 	{

@@ -38,21 +38,6 @@ PALETTE_INIT_MEMBER(hcastle_state, hcastle)
 }
 
 
-void hcastle_state::set_pens()
-{
-	int i;
-
-	for (i = 0x00; i < 0x100; i += 2)
-	{
-		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 
 /***************************************************************************
 
@@ -216,8 +201,6 @@ UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 
 	UINT8 ctrl_2_1 = m_k007121_2->ctrlram_r(space, 1);
 	UINT8 ctrl_2_2 = m_k007121_2->ctrlram_r(space, 2);
 	UINT8 ctrl_2_3 = m_k007121_2->ctrlram_r(space, 3);
-
-	set_pens();
 
 	m_pf1_bankbase = 0x0000;
 	m_pf2_bankbase = 0x4000 * ((m_gfx_bank & 2) >> 1);

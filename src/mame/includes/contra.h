@@ -11,7 +11,6 @@ class contra_state : public driver_device
 public:
 	contra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
 		m_fg_cram(*this, "fg_cram"),
 		m_fg_vram(*this, "fg_vram"),
 		m_tx_cram(*this, "tx_cram"),
@@ -30,7 +29,6 @@ public:
 	/* memory pointers */
 	UINT8 *        m_buffered_spriteram;
 	UINT8 *        m_buffered_spriteram_2;
-	required_shared_ptr<UINT8> m_paletteram;
 	required_shared_ptr<UINT8> m_fg_cram;
 	required_shared_ptr<UINT8> m_fg_vram;
 	required_shared_ptr<UINT8> m_tx_cram;
@@ -71,7 +69,6 @@ public:
 	DECLARE_PALETTE_INIT(contra);
 	UINT32 screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(contra_interrupt);
-	void set_pens(  );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("paletteram")  // self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")  // self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM                     // SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -372,6 +372,8 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackal)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x200)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
 
 	/* sound hardware */

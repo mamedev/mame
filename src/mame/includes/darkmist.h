@@ -40,7 +40,6 @@ public:
 	DECLARE_PALETTE_INIT(darkmist);
 	UINT32 screen_update_darkmist(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(darkmist_scanline);
-	void set_pens();
 	void decrypt_gfx();
 	void decrypt_snd();
 };

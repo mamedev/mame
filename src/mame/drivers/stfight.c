@@ -253,8 +253,8 @@ TODO:
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
+	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")
@@ -559,6 +559,7 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stfight)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_INIT_OWNER(stfight_state, stfight)
 
 	/* sound hardware */

@@ -68,9 +68,10 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 0x400; i++)
+	palette.set_indirect_color(0x100, rgb_t::black);
+
+	for (int i = 0; i < 0x400; i++)
 	{
 		int ctabentry;
 
@@ -94,23 +95,6 @@ PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 }
 
 
-void darkmist_state::set_pens()
-{
-	int i;
-
-	for (i = 0; i < 0x100; i++)
-	{
-		int r = pal4bit(m_generic_paletteram_8[i | 0x200] >> 0);
-		int g = pal4bit(m_generic_paletteram_8[i | 0x000] >> 4);
-		int b = pal4bit(m_generic_paletteram_8[i | 0x000] >> 0);
-
-		m_palette->set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	m_palette->set_indirect_color(0x100, rgb_t::black);
-}
-
-
 void darkmist_state::video_start()
 {
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
@@ -125,8 +109,6 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 	UINT8 *spriteram = m_spriteram;
 
 #define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
-
-	set_pens();
 
 	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
 	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));

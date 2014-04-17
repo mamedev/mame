@@ -20,21 +20,6 @@ PALETTE_INIT_MEMBER(fastlane_state, fastlane)
 }
 
 
-void fastlane_state::set_pens(  )
-{
-	int i;
-
-	for (i = 0x00; i < 0x800; i += 2)
-	{
-		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 
 /***************************************************************************
 
@@ -150,8 +135,6 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 
 	finalclip0 &= cliprect;
 	finalclip1 &= cliprect;
-
-	set_pens();
 
 	/* set scroll registers */
 	address_space &space = machine().driver_data()->generic_space();

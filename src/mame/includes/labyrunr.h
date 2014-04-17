@@ -15,7 +15,6 @@ public:
 		m_k007121(*this, "k007121"),
 		m_maincpu(*this,"maincpu"),
 		m_scrollram(*this, "scrollram"),
-		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
@@ -29,7 +28,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_paletteram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram1;
 	required_shared_ptr<UINT8> m_videoram2;
@@ -55,5 +53,4 @@ public:
 	UINT32 screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(labyrunr_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(labyrunr_timer_interrupt);
-	void set_pens(  );
 };

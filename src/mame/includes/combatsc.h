@@ -12,7 +12,6 @@ class combatsc_state : public driver_device
 public:
 	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
@@ -26,7 +25,6 @@ public:
 	UINT8 *    m_videoram;
 	UINT8 *    m_scrollram;
 	UINT8 *    m_io_ram;
-	required_shared_ptr<UINT8> m_paletteram;
 	UINT8 *    m_spriteram[2];
 
 	/* video-related */
@@ -98,7 +96,6 @@ public:
 	DECLARE_PALETTE_INIT(combatscb);
 	UINT32 screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_pens(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, bitmap_ind8 &priority_bitmap, UINT32 pri_mask );
 	void bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit );
 };

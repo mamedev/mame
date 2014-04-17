@@ -37,21 +37,6 @@ PALETTE_INIT_MEMBER(jackal_state, jackal)
 }
 
 
-void jackal_state::set_pens(  )
-{
-	int i;
-
-	for (i = 0; i < 0x400; i += 2)
-	{
-		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 void jackal_state::jackal_mark_tile_dirty( int offset )
 {
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -217,7 +202,6 @@ void jackal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 UINT32 jackal_state::screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens();
 	draw_background(screen, bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;

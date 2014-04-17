@@ -20,9 +20,7 @@ public:
 		m_k007420(*this, "k007420"),
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_rombank(*this, "rombank"),
-		m_paletteram(*this, "paletteram") { }
+		m_rombank(*this, "rombank") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -30,11 +28,9 @@ public:
 	required_device<k007420_device> m_k007420;
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	/* memory pointers */
 	required_memory_bank m_rombank;
-	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	int        m_spritebank;
@@ -55,7 +51,6 @@ public:
 	DECLARE_PALETTE_INIT(bladestl);
 	UINT32 screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
-	void set_pens();
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
 };

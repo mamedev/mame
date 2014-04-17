@@ -65,19 +65,6 @@ PALETTE_INIT_MEMBER(stfight_state, stfight)
 }
 
 
-void stfight_state::set_pens()
-{
-	int i;
-
-	for (i = 0; i < 0x100; i++)
-	{
-		UINT16 data = m_generic_paletteram_8[i] | (m_generic_paletteram2_8[i] << 8);
-		rgb_t color = rgb_t(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
-
-		m_palette->set_indirect_color(i, color);
-	}
-}
-
 
 /***************************************************************************
 
@@ -313,8 +300,6 @@ void stfight_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens();
-
 	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);   /* in case m_bg_tilemap is disabled */
@@ -357,8 +342,6 @@ void stfight_state::cshooter_draw_sprites(screen_device &screen, bitmap_ind16 &b
 
 UINT32 stfight_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens();
-
 	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);   /* in case m_bg_tilemap is disabled */

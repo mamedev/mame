@@ -369,6 +369,8 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE8_MEMBER(write_ext);
+	DECLARE_WRITE8_MEMBER(write_indirect);
+	DECLARE_WRITE8_MEMBER(write_indirect_ext);
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_WRITE16_MEMBER(write_ext);
@@ -402,7 +404,7 @@ protected:
 	void allocate_color_tables();
 	void allocate_shadow_tables();
 
-	void update_for_write(offs_t byte_offset, int bytes_modified);
+	void update_for_write(offs_t byte_offset, int bytes_modified, bool indirect = false);
 public: // needed by konamigx
 	void set_shadow_dRGB32(int mode, int dr, int dg, int db, bool noclip);
 protected:

@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0418, 0x0418) AM_READWRITE(hcastle_gfxbank_r, hcastle_gfxbank_w)
-	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x0700, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(hcastle_pf1_video_w) AM_SHARE("pf1_videoram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("spriteram")
@@ -211,6 +211,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hcastle)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
 
 

@@ -27,20 +27,6 @@ PALETTE_INIT_MEMBER(ddribble_state, ddribble)
 }
 
 
-void ddribble_state::set_pens(  )
-{
-	int i;
-
-	for (i = 0x00; i < 0x80; i += 2)
-	{
-		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 WRITE8_MEMBER(ddribble_state::K005885_0_w)
 {
 	switch (offset)
@@ -239,8 +225,6 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens();
-
 	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 

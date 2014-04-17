@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0d00, 0x0d0d) AM_READWRITE(fastlane_k1_k007232_r, fastlane_k1_k007232_w) /* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_READWRITE(fastlane_k2_k007232_r, fastlane_k2_k007232_w) /* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)                                    /* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("paletteram")                                      /* Palette RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM                                                             /* Work RAM */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_SHARE("videoram1")       /* Video RAM (chip 1) */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_SHARE("videoram2")       /* Video RAM (chip 2) */
@@ -211,6 +211,7 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastlane)
 	MCFG_PALETTE_ADD("palette", 1024*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)
 
 	MCFG_K007121_ADD("k007121")

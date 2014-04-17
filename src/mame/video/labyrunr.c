@@ -38,21 +38,6 @@ PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 }
 
 
-void labyrunr_state::set_pens(  )
-{
-	int i;
-
-	for (i = 0x00; i < 0x100; i += 2)
-	{
-		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 
 /***************************************************************************
 
@@ -174,8 +159,6 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 ctrl_0 = m_k007121->ctrlram_r(space, 0);
 	rectangle finalclip0, finalclip1;
-
-	set_pens();
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);

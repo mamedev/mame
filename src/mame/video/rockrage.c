@@ -24,20 +24,6 @@ PALETTE_INIT_MEMBER(rockrage_state, rockrage)
 }
 
 
-void rockrage_state::set_pens()
-{
-	int i;
-
-	for (i = 0x00; i < 0x80; i += 2)
-	{
-		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
 
 /***************************************************************************
 
@@ -89,8 +75,6 @@ WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
 
 UINT32 rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens();
-
 	m_k007342->tilemap_update();
 
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);

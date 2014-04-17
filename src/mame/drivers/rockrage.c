@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)                    /* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)                    /* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_RAM AM_SHARE("paletteram")                      /* Palette */
+	AM_RANGE(0x2400, 0x247f) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)                          /* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
@@ -270,6 +270,8 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)
 	MCFG_PALETTE_ADD("palette", 64 + 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_PALETTE_INIT_OWNER(rockrage_state, rockrage)
 
 	/* sound hardware */

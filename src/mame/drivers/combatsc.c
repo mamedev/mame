@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_WRITE(watchdog_reset_w)         /* watchdog reset? */
 
-	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_SHARE("paletteram")      /* palette */
+	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM                             /* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combatsc_video_r, combatsc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM area */
@@ -374,7 +374,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
-	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_SHARE("paletteram")      /* palette */
+	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combatsc_video_r, combatsc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM/RAM area */
@@ -734,6 +734,8 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatsc)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
@@ -782,6 +784,8 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatscb)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 

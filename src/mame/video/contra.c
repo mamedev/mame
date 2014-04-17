@@ -49,21 +49,6 @@ PALETTE_INIT_MEMBER(contra_state, contra)
 }
 
 
-void contra_state::set_pens(  )
-{
-	int i;
-
-	for (i = 0x00; i < 0x100; i += 2)
-	{
-		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
-
-		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-
-		m_palette->set_indirect_color(i >> 1, color);
-	}
-}
-
-
 
 /***************************************************************************
 
@@ -304,8 +289,6 @@ UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &b
 	bg_finalclip &= cliprect;
 	fg_finalclip &= cliprect;
 	tx_finalclip &= cliprect;
-
-	set_pens();
 
 	m_fg_tilemap->set_scrollx(0, ctrl_1_0 - 40);
 	m_fg_tilemap->set_scrolly(0, ctrl_1_2);
