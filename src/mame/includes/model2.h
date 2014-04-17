@@ -117,6 +117,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
+	DECLARE_READ32_MEMBER(model2o_fifoctrl_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);

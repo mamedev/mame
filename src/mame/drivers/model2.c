@@ -1561,6 +1561,12 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 	return (special_res >> ((offset & 1)*8)) & 0xff;
 }
 
+/* Apparently original Model 2 doesn't have fifo control? */
+READ32_MEMBER(model2_state::model2o_fifoctrl_r)
+{
+	return 0xffffffff;
+}
+
 /* original Model 2 overrides */
 static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
@@ -1571,6 +1577,7 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
+	AM_RANGE(0x00980004, 0x00980007) AM_READ(model2o_fifoctrl_r)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2o_serial_w)
 
