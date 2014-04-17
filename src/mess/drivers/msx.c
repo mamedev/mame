@@ -1367,6 +1367,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( ax170, msx_pal )
 	MCFG_MSX_LAYOUT(ax170)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Canon V-10 */
@@ -1385,6 +1388,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( canonv10, msx_pal )
 	MCFG_MSX_LAYOUT(canonv10)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Canon V-20 */
@@ -1402,6 +1408,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( canonv20, msx_pal )
 	MCFG_MSX_LAYOUT(canonv20)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Casio PV-16 */
@@ -1421,6 +1430,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( pv16, msx_ntsc )
 	MCFG_MSX_LAYOUT(pv16)
+	// AY8910
+	// FDC: None, 0 drives
+	// 1 Cartridge slot
+	// No printer port
 MACHINE_CONFIG_END
 
 /* MSX - Daewoo DPC-100 */
@@ -1441,6 +1454,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( dpc100, msx_ntsc )
 	MCFG_MSX_LAYOUT(dpc100)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Daewoo DPC-180 */
@@ -1461,6 +1477,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( dpc180, msx_ntsc )
 	MCFG_MSX_LAYOUT(dpc180)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Daewoo DPC-200 */
@@ -1481,6 +1500,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( dpc200, msx_ntsc )
 	MCFG_MSX_LAYOUT(dpc200)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Goldstar FC-200 */
@@ -1500,6 +1522,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( gsfc200, msx_pal )
 	MCFG_MSX_LAYOUT(gsfc200)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Gradiente Expert 1.0 */
@@ -1518,6 +1543,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expert10, msx_ntsc )
 	MCFG_MSX_LAYOUT(expert10)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Gradiente Expert 1.1 */
@@ -1535,6 +1563,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expert11, msx_ntsc )
 	MCFG_MSX_LAYOUT(expert11)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Gradiente Expert 1.3 */
@@ -1552,6 +1583,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expert13, msx_ntsc )
 	MCFG_MSX_LAYOUT(expert13)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Gradiente Expert DDPlus */
@@ -1571,6 +1605,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expertdp, msx_ntsc )
 	MCFG_MSX_LAYOUT(expertdp)
+	// AY8910/YM2149?
+	// FDC: wd2793, 1 3.5" DD drive
+	// 2 Cartridge slots
+	// MSX Engine T7937A
 MACHINE_CONFIG_END
 
 /* MSX - Gradiente Expert Plus */
@@ -1591,6 +1629,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expertpl, msx_ntsc )
 	MCFG_MSX_LAYOUT(expertpl)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// MSX Engine T7937A
 MACHINE_CONFIG_END
 
 /* MSX - JVC HC-7GB */
@@ -1609,6 +1651,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( jvchc7gb, msx_pal )
 	MCFG_MSX_LAYOUT(jvchc7gb)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Mitsubishi ML-F80 */
@@ -1627,6 +1672,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mlf80, msx_pal )
 	MCFG_MSX_LAYOUT(mlf80)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Mitsubishi ML-FX1 */
@@ -1645,6 +1693,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mlfx1, msx_pal )
 	MCFG_MSX_LAYOUT(mlfx1)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National CF-1200 */
@@ -1663,6 +1714,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cf1200, msx_ntsc )
 	MCFG_MSX_LAYOUT(cf1200)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National CF-2000 */
@@ -1681,6 +1735,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cf2000, msx_ntsc )
 	MCFG_MSX_LAYOUT(cf2000)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National CF-2700 */
@@ -1698,6 +1755,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cf2700, msx_ntsc )
 	MCFG_MSX_LAYOUT(cf2700)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National CF-3000 */
@@ -1716,6 +1776,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cf3000, msx_ntsc )
 	MCFG_MSX_LAYOUT(cf3000)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National CF-3300 */
@@ -1735,6 +1798,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cf3300, msx_ntsc )
 	MCFG_MSX_LAYOUT(cf3300)
+	// AY8910/YM2149?
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National FS-1300 */
@@ -1753,6 +1819,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs1300, msx_ntsc )
 	MCFG_MSX_LAYOUT(fs1300)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - National FS-4000 */
@@ -1776,6 +1845,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs4000, msx_ntsc )
 	MCFG_MSX_LAYOUT(fs4000)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /*MSX - Olympia PHC-2*/
@@ -1794,6 +1866,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc2, msx_pal )
 	MCFG_MSX_LAYOUT(phc2)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Olympia PHC-28 */
@@ -1812,6 +1887,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc28, msx_pal )
 	MCFG_MSX_LAYOUT(phc28)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Panasonic CF-2700G */
@@ -1830,6 +1908,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cf2700g, msx_pal )
 	MCFG_MSX_LAYOUT(cf2700g)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Philips NMS-801 */
@@ -1848,6 +1929,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms801, msx_pal )
 	MCFG_MSX_LAYOUT(nms801)
+	// AY8910
+	// FDC: None, 0 drives
+	// 0 Cartridge slots
+	// No printer port
 MACHINE_CONFIG_END
 
 /* MSX - Philips VG-8000 */
@@ -1866,6 +1951,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8000, msx_pal )
 	MCFG_MSX_LAYOUT(vg8000)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// No printer port
 MACHINE_CONFIG_END
 
 /* MSX - Philips VG-8010 */
@@ -1884,6 +1973,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8010, msx_pal )
 	MCFG_MSX_LAYOUT(vg8010)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// No printer port
 MACHINE_CONFIG_END
 
 /* MSX - Philips VG-8010F */
@@ -1902,6 +1995,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8010f, msx_pal )
 	MCFG_MSX_LAYOUT(vg8010f)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// No printer port
 MACHINE_CONFIG_END
 
 /* MSX - Philips VG-8020-00 */
@@ -1920,6 +2017,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg802000, msx_pal )
 	MCFG_MSX_LAYOUT(vg802000)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Philips VG-8020-20 */
@@ -1938,6 +2038,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg802020, msx_pal )
 	MCFG_MSX_LAYOUT(vg802020)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX - Philips VG-8020F */
@@ -1956,6 +2060,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8020f, msx_pal )
 	MCFG_MSX_LAYOUT(vg8020f)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX - Pioneer PX-7 */
@@ -1977,6 +2085,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( piopx7, msx_pal )
 	MCFG_MSX_LAYOUT(piopx7)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Samsung SPC-800 */
@@ -1997,6 +2108,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( spc800, msx_ntsc )
 	MCFG_MSX_LAYOUT(spc800)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sanyo MPC-64 */
@@ -2015,6 +2129,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mpc64, msx_ntsc )
 	MCFG_MSX_LAYOUT(mpc64)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sanyo MPC-100 */
@@ -2033,6 +2150,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mpc100, msx_pal )
 	MCFG_MSX_LAYOUT(mpc100)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sanyo PHC-28L */
@@ -2051,6 +2171,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc28l, msx_pal )
 	MCFG_MSX_LAYOUT(phc28l)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sanyo PHC-28S */
@@ -2069,6 +2192,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc28s, msx_pal )
 	MCFG_MSX_LAYOUT(phc28s)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sanyo Wavy MPC-10 */
@@ -2087,6 +2213,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mpc10, msx_pal )
 	MCFG_MSX_LAYOUT(mpc10)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sharp Epcom HotBit 1.1 */
@@ -2105,6 +2234,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hotbit11, msx_ntsc )
 	MCFG_MSX_LAYOUT(hotbit11)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sharp Epcom HotBit 1.2 */
@@ -2123,6 +2255,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hotbit12, msx_ntsc )
 	MCFG_MSX_LAYOUT(hotbit12)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sharp Epcom HotBit 1.3b */
@@ -2141,6 +2276,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hotbi13b, msx_ntsc )
 	MCFG_MSX_LAYOUT(hotbi13b)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sharp Epcom HotBit 1.3p */
@@ -2159,6 +2297,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hotbi13p, msx_ntsc )
 	MCFG_MSX_LAYOUT(hotbi13p)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-10P */
@@ -2177,6 +2318,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb10p, msx_pal )
 	MCFG_MSX_LAYOUT(hb10p)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-20P */
@@ -2195,6 +2339,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb20p, msx_pal )
 	MCFG_MSX_LAYOUT(hb20p)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-201 */
@@ -2216,6 +2363,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb201, msx_ntsc )
 	MCFG_MSX_LAYOUT(hb201)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-201P */
@@ -2236,6 +2386,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb201p, msx_pal )
 	MCFG_MSX_LAYOUT(hb201p)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-501P */
@@ -2254,6 +2407,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb501p, msx_pal )
 	MCFG_MSX_LAYOUT(hb501p)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-55D */
@@ -2274,6 +2430,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb55d, msx_pal )
 	MCFG_MSX_LAYOUT(hb55d)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-55P */
@@ -2295,6 +2454,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb55p, msx_pal )
 	MCFG_MSX_LAYOUT(hb55p)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-75D */
@@ -2315,6 +2477,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb75d, msx_pal )
 	MCFG_MSX_LAYOUT(hb75d)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Sony HB-75P */
@@ -2336,6 +2501,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hb75p, msx_pal )
 	MCFG_MSX_LAYOUT(hb75p)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Spectravideo SVI-728 */
@@ -2356,6 +2524,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( svi728, msx_pal )
 	MCFG_MSX_LAYOUT(svi728)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Spectravideo SVI-738 */
@@ -2379,6 +2550,11 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( svi738, msx_pal )
 	MCFG_MSX_LAYOUT(svi738)
+	// AY8910
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
+	// builtin 80 columns card (V9938)
+	// RS-232C interface
 MACHINE_CONFIG_END
 
 /* MSX - Spectravideo SVI-738 Swedish */
@@ -2402,6 +2578,11 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( svi738sw, msx_pal )
 	MCFG_MSX_LAYOUT(svi738sw)
+	// AY8910
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
+	// builtin 80 columns card (V9938)
+	// RS-232C interface
 MACHINE_CONFIG_END
 
 /* MSX - Spectravideo SVI-738 Poland*/
@@ -2425,6 +2606,11 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( svi738pl, msx_pal )
 	MCFG_MSX_LAYOUT(svi738pl)
+	// AY8910
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
+	// builtin 80 columns card (V9938)
+	// RS-232C interface
 MACHINE_CONFIG_END
 
 /* MSX - Talent DPC-200 / Daewoo DPC-200E */
@@ -2443,6 +2629,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( tadpc200, msx_pal )
 	MCFG_MSX_LAYOUT(tadpc200)
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Talent DPC-200A */
@@ -2461,6 +2650,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( tadpc20a, msx_pal )
 	MCFG_MSX_LAYOUT(tadpc20a)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Toshiba HX-10 */
@@ -2480,6 +2672,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hx10, msx_pal )
 	MCFG_MSX_LAYOUT(hx10)
+	// AY8910
+	// FDC: None, 0 drives
+	// 1 Cartridge slot, 1 Toshiba Expension slot
 MACHINE_CONFIG_END
 
 /* MSX - Toshiba HX-10S */
@@ -2498,6 +2693,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hx10s, msx_pal )
 	MCFG_MSX_LAYOUT(hx10s)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Toshiba HX-20 */
@@ -2519,6 +2717,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hx20, msx_pal )
 	MCFG_MSX_LAYOUT(hx20)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// T6950 VDP instead of TMS9928A
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha CX5M / Yamaha CX5M-2 */
@@ -2531,14 +2733,17 @@ ROM_END
 
 MSX_LAYOUT_INIT (cx5m)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 2, RAM, 0x8000, 0x8000)   /* 32KB RAM */
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 2, ROM, 0x8000, 0x8000)
-	MSX_LAYOUT_SLOT (3, 0, 2, 2, RAM, 0x8000, 0x0000)   /* 32KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 2, ROM, 0x8000, 0x8000)  /* SFG */
 MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cx5m, msx_pal )
 	MCFG_MSX_LAYOUT(cx5m)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha CX5M-128 */
@@ -2563,6 +2768,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cx5m128, msx_pal )
 	MCFG_MSX_LAYOUT(cx5m128)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha CX5MII */
@@ -2585,6 +2793,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cx5m2, msx_pal )
 	MCFG_MSX_LAYOUT(cx5m2)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS303 */
@@ -2605,6 +2816,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( yis303, msx_pal )
 	MCFG_MSX_LAYOUT(yis303)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS503 */
@@ -2625,6 +2839,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( yis503, msx_pal )
 	MCFG_MSX_LAYOUT(yis503)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS503F */
@@ -2643,6 +2860,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( yis503f, msx_pal )
 	MCFG_MSX_LAYOUT(yis503f)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS503II */
@@ -2661,6 +2881,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( yis503ii, msx_pal )
 	MCFG_MSX_LAYOUT(yis503ii)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS503IIR Russian */
@@ -2683,6 +2906,12 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( y503iir, msx_pal )
 	MCFG_MSX_LAYOUT(y503iir)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
+	// RTC
+	// V9938 VDP
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS503IIR Estonian */
@@ -2705,6 +2934,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( y503iir2, msx_pal )
 	MCFG_MSX_LAYOUT(y503iir2)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yamaha YIS503M */
@@ -2725,6 +2957,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( yis503m, msx_pal )
 	MCFG_MSX_LAYOUT(yis503m)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Yashica YC-64 */
@@ -2743,6 +2978,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( yc64, msx_pal )
 	MCFG_MSX_LAYOUT(yc64)
+	// YM2149
+	// FDC: None, 0 drives
+	// 1 Cartridge slot (slot 1)
 MACHINE_CONFIG_END
 
 /* MSX - Yeno MX64 */
@@ -2761,6 +2999,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mx64, msx_ntsc )
 	MCFG_MSX_LAYOUT(mx64)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX - Frael Bruc 100-1 */
@@ -2779,6 +3020,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( bruc100, msx_pal )
 	MCFG_MSX_LAYOUT(bruc100)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 
@@ -2837,6 +3081,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( ax350, msx2_pal )
 	MCFG_MSX_LAYOUT(ax350)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af?, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Al Alamiah AX-370 */
@@ -2868,6 +3115,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( ax370, msx2_pal )
 	MCFG_MSX_LAYOUT(ax370)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Daewoo CPC-300 */
@@ -2893,6 +3143,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cpc300, msx2 )
 	MCFG_MSX_LAYOUT(cpc300)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Daewoo CPC-300E */
@@ -2919,6 +3173,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cpc300e, msx2 )
 	MCFG_MSX_LAYOUT(cpc300e)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Daewoo CPC-400 */
@@ -2947,6 +3204,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cpc400, msx2 )
 	MCFG_MSX_LAYOUT(cpc400)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af?, 1 3.5" DS?DD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Daewoo CPC-400S */
@@ -2976,6 +3236,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cpc400s, msx2 )
 	MCFG_MSX_LAYOUT(cpc400s)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DS?DD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Gradiente Expert 2.0 */
@@ -3003,6 +3267,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expert20, msx2_pal )
 	MCFG_MSX_LAYOUT(expert20)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af?, 1? 3.5"? DS?DD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Mitsubishi ML-G30 Model 1/Model 2 */
@@ -3026,6 +3293,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mlg30, msx2 )
 	MCFG_MSX_LAYOUT(mlg30)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af?, 1 or 2? 3.5" DSDD drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - National FS-4500 */
@@ -3065,6 +3335,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs4500, msx2 )
 	MCFG_MSX_LAYOUT(fs4500)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - National FS-4600 */
@@ -3102,6 +3376,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs4600, msx2 )
 	MCFG_MSX_LAYOUT(fs4600)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - National FS-4700 */
@@ -3143,6 +3421,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs4700, msx2 )
 	MCFG_MSX_LAYOUT(fs4700)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - National FS-5000 */
@@ -3177,9 +3459,15 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs5000, msx2 )
 	MCFG_MSX_LAYOUT(fs5000)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - National FS-5500F1/F2*/
+/* F1 has 1 floppy drive */
+/* F2 has 2 floppy drives */
 
 ROM_START (fs5500)
 	ROM_REGION (0x50000, "maincpu",0)
@@ -3210,6 +3498,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fs5500, msx2 )
 	MCFG_MSX_LAYOUT(fs5500)
+	// YM2149 in (S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Panasonic FS-A1 */
@@ -3236,6 +3528,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1, msx2 )
 	MCFG_MSX_LAYOUT(fsa1)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Panasonic FS-A1 (a) */
@@ -3262,6 +3557,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1a, msx2 )
 	MCFG_MSX_LAYOUT(fsa1a)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Panasonic FS-A1F */
@@ -3293,6 +3591,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1f, msx2 )
 	MCFG_MSX_LAYOUT(fsa1f)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Panasonic FS-A1FM */
@@ -3325,6 +3626,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1fm, msx2 )
 	MCFG_MSX_LAYOUT(fsa1fm)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// Integrated 1200baud modem
 MACHINE_CONFIG_END
 
 /* MSX2 - Panasonic FS-A1MK2 */
@@ -3354,6 +3659,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1mk2, msx2 )
 	MCFG_MSX_LAYOUT(fsa1mk2)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8220 - 2 possible sets (/00 /16) */
@@ -3379,6 +3687,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8220, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8220)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8220 (a) */
@@ -3404,6 +3716,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8220a, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8220a)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8245 - 2 possible sets (/00 /16) */
@@ -3427,6 +3743,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8245, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8245)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8245F */
@@ -3450,6 +3770,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8245f, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8245f)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8250 */
@@ -3476,6 +3800,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8250, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8250)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8250J */
@@ -3499,6 +3827,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8250j, msx2 )
 	MCFG_MSX_LAYOUT(nms8250j)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8255 */
@@ -3524,6 +3855,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8255, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8255)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8280 - 2 possible sets (/00 /16) */
@@ -3549,6 +3884,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8280, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8280)
+	// AY8910/YM2149?
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips NMS-8280G */
@@ -3574,6 +3912,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( nms8280g, msx2_pal )
 	MCFG_MSX_LAYOUT(nms8280g)
+	// AY8910/YM2149?
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips VG-8230 (u11 - exp, u12 - basic, u13 - disk */
@@ -3599,6 +3940,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8230, msx2_pal )
 	MCFG_MSX_LAYOUT(vg8230)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips VG-8230J */
@@ -3624,6 +3969,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8230j, msx2 )
 	MCFG_MSX_LAYOUT(vg8230j)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 3.5" SSDD drive?
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips VG-8235 3 psosible basic and ext roms (/00 /02 /19) */
@@ -3649,6 +3997,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8235, msx2_pal )
 	MCFG_MSX_LAYOUT(vg8235)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips VG-8235F */
@@ -3674,6 +4026,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8235f, msx2_pal )
 	MCFG_MSX_LAYOUT(vg8235f)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 2 Cartridge slots
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Philips VG-8240 */
@@ -3699,6 +4055,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( vg8240, msx2_pal )
 	MCFG_MSX_LAYOUT(vg8240)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sanyo MPC-2300 */
@@ -3721,6 +4080,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mpc2300, msx2 )
 	MCFG_MSX_LAYOUT(mpc2300)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sanyo Wavy MPC-25FD */
@@ -3743,9 +4105,13 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( mpc25fd, msx2 )
 	MCFG_MSX_LAYOUT(mpc25fd)
+	// YM2149 (in S-3527 MSX Engine)
+	// FDC: wd2793, 1 drive
+	// 1 Cartridge slot (slot 1)
+	// S-3527 MSX Engine
 MACHINE_CONFIG_END
 
-/* MSX2 - Sanyo Wavy PHC-23 */
+/* MSX2 - Sanyo Wavy PHC-23 = PHC-23J(B)*/
 
 ROM_START (phc23)
 	ROM_REGION (0x20000, "maincpu",0)
@@ -3765,6 +4131,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc23, msx2 )
 	MCFG_MSX_LAYOUT(phc23)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sharp Epcom HotBit 2.0 */
@@ -3792,6 +4162,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hotbit20, msx2_pal )
 	MCFG_MSX_LAYOUT(hotbit20)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af, 1 or 2 drives?
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F1 */
@@ -3820,6 +4193,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf1, msx2 )
 	MCFG_MSX_LAYOUT(hbf1)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F1II */
@@ -3849,6 +4225,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf12, msx2 )
 	MCFG_MSX_LAYOUT(hbf12)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F1XD */
@@ -3874,6 +4253,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf1xd, msx2 )
 	MCFG_MSX_LAYOUT(hbf1xd)
+	// YM2149 (in S-1895 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F1XDMK2 */
@@ -3899,6 +4282,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf1xdm2, msx2 )
 	MCFG_MSX_LAYOUT(hbf1xdm2)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F5 */
@@ -3921,6 +4307,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf5, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf5)
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F500 */
@@ -3948,6 +4337,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf500, msx2 )
 	MCFG_MSX_LAYOUT(hbf500)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F500P */
@@ -3973,6 +4365,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf500p, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf500p)
+	// AY8910/YM2149?
+	// FDC: wd2793/tc8566af/None, 1 3.5" DSDD drive
+	// 3 Cartridge slots or 2 Cartridge slots and 1 expansion slot ?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F700D */
@@ -3997,6 +4392,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf700d, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf700d)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F700F */
@@ -4021,6 +4420,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf700f, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf700f)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 3.5" DSDD drive
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F700P */
@@ -4045,6 +4447,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf700p, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf700p)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F700S */
@@ -4069,6 +4475,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf700s, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf700s)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 3.5" DSDD drive
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F900 */
@@ -4097,6 +4506,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf900, msx2 )
 	MCFG_MSX_LAYOUT(hbf900)
+	// AY8910/YM2149?
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F900 (a) */
@@ -4125,6 +4537,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf900a, msx2 )
 	MCFG_MSX_LAYOUT(hbf900a)
+	// AY8910/YM2149?
+	// FDC: wd2793, 2 3.5" DSDD drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F9P */
@@ -4151,6 +4566,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf9p, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf9p)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F9P Russian */
@@ -4166,11 +4585,15 @@ MSX_LAYOUT_INIT (hbf9pr)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
-	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB?? Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)   /* 128KB Mapper RAM */
 MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf9pr, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf9pr)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-F9S */
@@ -4197,6 +4620,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf9s, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf9s)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-G900AP */
@@ -4232,6 +4659,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbg900ap, msx2_pal )
 	MCFG_MSX_LAYOUT(hbg900ap)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Sony HB-G900P - 3x 32KB ROMs */
@@ -4261,6 +4691,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbg900p, msx2_pal )
 	MCFG_MSX_LAYOUT(hbg900p)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Talent TPC-310 */
@@ -4289,6 +4722,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( tpc310, msx2_pal )
 	MCFG_MSX_LAYOUT(tpc310)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: None, 0 drives
+	// 1 Cartridge slot (slot 2)
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2 - Talent TPP-311 */
@@ -4309,6 +4746,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( tpp311, msx2_pal )
 	MCFG_MSX_LAYOUT(tpp311)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 0 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Talent TPS-312 */
@@ -4333,6 +4773,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( tps312, msx2_pal )
 	MCFG_MSX_LAYOUT(tps312)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Toshiba HX-23 */
@@ -4360,6 +4803,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hx23, msx2_pal )
 	MCFG_MSX_LAYOUT(hx23)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Toshiba HX-23F */
@@ -4386,6 +4832,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hx23f, msx2_pal )
 	MCFG_MSX_LAYOUT(hx23f)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Yamaha CX7M */
@@ -4411,6 +4860,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cx7m, msx2_pal )
 	MCFG_MSX_LAYOUT(cx7m)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2 - Yamaha CX7M-128 */
@@ -4438,6 +4890,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( cx7m128, msx2_pal )
 	MCFG_MSX_LAYOUT(cx7m128)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /********************************  MSX 2+ **********************************/
@@ -4494,6 +4949,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expert3i, msx2p )
 	MCFG_MSX_LAYOUT(expert3i)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 or 2? drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2+ - Ciel Expert 3 Turbo */
@@ -4521,6 +4979,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expert3t, msx2p )
 	MCFG_MSX_LAYOUT(expert3t)
+	// AY8910
+	// FDC: wd2793?, 1 or 2? drives
+	// 4 Cartridge/Expansion slots?
+	// FM/YM2413 built-in
 MACHINE_CONFIG_END
 
 /* MSX2+ - Gradiente Expert AC88+ */
@@ -4547,6 +5009,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expertac, msx2p )
 	MCFG_MSX_LAYOUT(expertac)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 1 or 2? drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2+ - Gradiente Expert DDX+ */
@@ -4573,6 +5038,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( expertdx, msx2p )
 	MCFG_MSX_LAYOUT(expertdx)
+	// AY8910/YM2149?
+	// FDC: wd2793?, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2+ - Panasonic FS-A1FX */
@@ -4604,6 +5072,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1fx, msx2p )
 	MCFG_MSX_LAYOUT(fsa1fx)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX2+ - Panasonic FS-A1WSX */
@@ -4638,6 +5109,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1wsx, msx2p )
 	MCFG_MSX_LAYOUT(fsa1wsx)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// FM built-in
 MACHINE_CONFIG_END
 
 /* MSX2+ - Panasonic FS-A1WX */
@@ -4672,6 +5147,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1wx, msx2p )
 	MCFG_MSX_LAYOUT(fsa1wx)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// FM built-in
 MACHINE_CONFIG_END
 
 /* MSX2+ - Panasonic FS-A1WX (a) */
@@ -4705,6 +5184,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1wxa, msx2p )
 	MCFG_MSX_LAYOUT(fsa1wxa)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots?
+	// FM built-in
 MACHINE_CONFIG_END
 
 /* MSX2+ - Sanyo Wavy PHC-35J */
@@ -4732,6 +5215,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc35j, msx2p )
 	MCFG_MSX_LAYOUT(phc35j)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
 /* MSX2+ - Sanyo Wavy PHC-70FD1 */
@@ -4765,6 +5251,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc70fd, msx2p )
 	MCFG_MSX_LAYOUT(phc70fd)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// FM built-in
 MACHINE_CONFIG_END
 
 /* MSX2+ - Sanyo Wavy PHC-70FD2 */
@@ -4797,6 +5287,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( phc70fd2, msx2p )
 	MCFG_MSX_LAYOUT(phc70fd2)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 2 3.5" DSDD drives
+	// 2 Cartridge slots
+	// FM built-in
 MACHINE_CONFIG_END
 
 /* MSX2+ - Sony HB-F1XDJ */
@@ -4831,6 +5325,11 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf1xdj, msx2p )
 	MCFG_MSX_LAYOUT(hbf1xdj)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// FM built-in
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2+ - Sony HB-F1XV */
@@ -4865,6 +5364,11 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf1xv, msx2p )
 	MCFG_MSX_LAYOUT(hbf1xv)
+	// YM2149 (in S-1985 MSX Engine)
+	// FDC: wd2793, 1 3.5" DSDD drives
+	// 2 Cartridge slots
+	// FM built-in
+	// S-1985 MSX Engine
 MACHINE_CONFIG_END
 
 /* MSX2+ - Sony HB-F9S+ */
@@ -4889,6 +5393,9 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( hbf9sp, msx2p )
 	MCFG_MSX_LAYOUT(hbf9sp)
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
 /* MSX Turbo-R - Panasonic FS-A1GT */
@@ -4920,6 +5427,11 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1gt, msx2 )
 	MCFG_MSX_LAYOUT(fsa1gt)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// FM built-in
+	// MIDI
 MACHINE_CONFIG_END
 
 /* MSX Turbo-R - Panasonic FS-A1ST */
@@ -4951,6 +5463,10 @@ MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( fsa1st, msx2 )
 	MCFG_MSX_LAYOUT(fsa1st)
+	// AY8910/YM2149?
+	// FDC: tc8566af, 1 3.5" DSDD drive
+	// 2 Cartridge slots
+	// FM built-in
 MACHINE_CONFIG_END
 
 
