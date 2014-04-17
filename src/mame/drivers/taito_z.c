@@ -4027,7 +4027,7 @@ ROM_START( chasehq )
 	ROM_LOAD( "pal20l8b-b52-121.ic57",  0x2000, 0x0144, CRC(7056fd1d) SHA1(fc032f24b95ff7a8bf5a7badddef51c5447c445d) )
 	ROM_LOAD( "pal16l8b-b52-122.ic124", 0x2200, 0x0104, CRC(04c0fb04) SHA1(53dfeb747e213c67a78c1407e43cdad4cec2cb7e) )
 	ROM_LOAD( "pal16l8b-b52-123.ic125", 0x2400, 0x0104, CRC(3865d1c8) SHA1(2d77326be4fb047243c3d5c33c442b009bf6fc04) )
-	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, NO_DUMP )   /* read protected */
+	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, CRC(d448a25a) SHA1(9339a7969418af30493f4c14cd9bce47d030d1ad) )   /* is this read protected? - taken from chasehqju */
 	ROM_LOAD( "pal16l8b-b52-125.ic112", 0x2800, 0x0104, CRC(7628c557) SHA1(11bf628e091dc02e0c2e17ae726061ac04705a54) )
 ROM_END
 
@@ -4107,7 +4107,7 @@ ROM_START( chasehqj )
 	ROM_LOAD( "pal20l8b-b52-121.ic57",  0x2000, 0x0144, CRC(7056fd1d) SHA1(fc032f24b95ff7a8bf5a7badddef51c5447c445d) )
 	ROM_LOAD( "pal16l8b-b52-122.ic124", 0x2200, 0x0104, CRC(04c0fb04) SHA1(53dfeb747e213c67a78c1407e43cdad4cec2cb7e) )
 	ROM_LOAD( "pal16l8b-b52-123.ic125", 0x2400, 0x0104, CRC(3865d1c8) SHA1(2d77326be4fb047243c3d5c33c442b009bf6fc04) )
-	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, NO_DUMP )   /* read protected */
+	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, CRC(d448a25a) SHA1(9339a7969418af30493f4c14cd9bce47d030d1ad) )   /* is this read protected? - taken from chasehqju */
 	ROM_LOAD( "pal16l8b-b52-125.ic112", 0x2800, 0x0104, CRC(7628c557) SHA1(11bf628e091dc02e0c2e17ae726061ac04705a54) )
 ROM_END
 
@@ -4269,7 +4269,7 @@ ROM_START( chasehqu )
 	ROM_LOAD( "pal20l8b-b52-121.ic57",  0x2000, 0x0144, CRC(7056fd1d) SHA1(fc032f24b95ff7a8bf5a7badddef51c5447c445d) )
 	ROM_LOAD( "pal16l8b-b52-122.ic124", 0x2200, 0x0104, CRC(04c0fb04) SHA1(53dfeb747e213c67a78c1407e43cdad4cec2cb7e) )
 	ROM_LOAD( "pal16l8b-b52-123.ic125", 0x2400, 0x0104, CRC(3865d1c8) SHA1(2d77326be4fb047243c3d5c33c442b009bf6fc04) )
-	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, NO_DUMP )   /* read protected */
+	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, CRC(d448a25a) SHA1(9339a7969418af30493f4c14cd9bce47d030d1ad) )   /* is this read protected? - taken from chasehqju */
 	ROM_LOAD( "pal16l8b-b52-125.ic112", 0x2800, 0x0104, CRC(7628c557) SHA1(11bf628e091dc02e0c2e17ae726061ac04705a54) )
 ROM_END
 
