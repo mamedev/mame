@@ -468,21 +468,6 @@ WRITE_LINE_MEMBER( grip_device::speaker_w )
 	m_speaker->level_w(level);
 }
 
-static Z80STI_INTERFACE( sti_intf )
-{
-	0,                                                      // serial receive clock
-	0,                                                      // serial transmit clock
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),         // interrupt
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, sti_gpio_r),    // GPIO read
-	DEVCB_NULL,                                             // GPIO write
-	DEVCB_NULL,                                             // serial output
-	DEVCB_NULL,                                             // timer A output
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, grip_device, speaker_w),    // timer B output
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80sti_device, tc_w),                                // timer C output
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80sti_device, rc_w)                                 // timer D output
-};
-
-
 //-------------------------------------------------
 //  z80_daisy_config grip_daisy_chain
 //-------------------------------------------------
@@ -551,7 +536,12 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	MCFG_I8255_IN_PORTB_CB(READ8(grip_device, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(grip_device, ppi_pc_w))
 
-	MCFG_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, sti_intf)
+	MCFG_DEVICE_ADD(Z80STI_TAG, Z80STI, XTAL_16MHz/4)
+	MCFG_Z80STI_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80STI_IN_GPIO_CB(READ8(grip_device, sti_gpio_r))
+	MCFG_Z80STI_OUT_TBO_CB(WRITELINE(grip_device, speaker_w))
+	MCFG_Z80STI_OUT_TCO_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, tc_w))
+	MCFG_Z80STI_OUT_TDO_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, tc_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(grip_device, write_centronics_busy))

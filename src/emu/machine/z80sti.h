@@ -42,62 +42,61 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_Z80STI_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), Z80STI, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_Z80STI_RXCLOCK(_clock) \
+	z80sti_device::set_rx_clock(*device, _clock);
 
-#define Z80STI_INTERFACE(name) \
-	const z80sti_interface (name) =
+#define MCFG_Z80STI_TXCLOCK(_clock) \
+	z80sti_device::set_tx_clock(*device, _clock);
 
+#define MCFG_Z80STI_OUT_INT_CB(_devcb) \
+	devcb = &z80sti_device::set_out_int_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_Z80STI_IN_GPIO_CB(_devcb) \
+	devcb = &z80sti_device::set_in_gpio_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80STI_OUT_GPIO_CB(_devcb) \
+	devcb = &z80sti_device::set_out_gpio_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80STI_OUT_SO_CB(_devcb) \
+	devcb = &z80sti_device::set_out_so_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80STI_OUT_TAO_CB(_devcb) \
+	devcb = &z80sti_device::set_out_tao_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80STI_OUT_TBO_CB(_devcb) \
+	devcb = &z80sti_device::set_out_tbo_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80STI_OUT_TCO_CB(_devcb) \
+	devcb = &z80sti_device::set_out_tco_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80STI_OUT_TDO_CB(_devcb) \
+	devcb = &z80sti_device::set_out_tdo_callback(*device, DEVCB2_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> z80sti_interface
-
-struct z80sti_interface
-{
-	int m_rx_clock;         // serial receive clock
-	int m_tx_clock;         // serial transmit clock
-
-	// this gets called on each change of the _INT pin (pin 17)
-	devcb_write_line        m_out_int_cb;
-
-	// this is called on each read of the GPIO pins
-	devcb_read8             m_in_gpio_cb;
-
-	// this is called on each write of the GPIO pins
-	devcb_write8            m_out_gpio_cb;
-
-	// this gets called for each change of the SO pin (pin 37)
-	devcb_write_line        m_out_so_cb;
-
-	// this gets called for each change of the TAO pin (pin 1)
-	devcb_write_line        m_out_tao_cb;
-
-	// this gets called for each change of the TBO pin (pin 2)
-	devcb_write_line        m_out_tbo_cb;
-
-	// this gets called for each change of the TCO pin (pin 3)
-	devcb_write_line        m_out_tco_cb;
-
-	// this gets called for each change of the TDO pin (pin 4)
-	devcb_write_line        m_out_tdo_cb;
-};
-
-
 // ======================> z80sti_device
 
 class z80sti_device :   public device_t,
 						public device_serial_interface,
-						public device_z80daisy_interface,
-						public z80sti_interface
+						public device_z80daisy_interface
 {
 public:
 	// construction/destruction
 	z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_in_gpio_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_gpio_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_so_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_so_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tao_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(object); }
+	
+	static void set_rx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_rx_clock = clock; }
+	static void set_tx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_tx_clock = clock; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -181,7 +180,6 @@ private:
 	static const int PRESCALER[];
 
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -203,11 +201,17 @@ private:
 	void gpip_input(int bit, int state);
 
 	// device callbacks
-	devcb_resolved_read8                m_in_gpio_func;
-	devcb_resolved_write8               m_out_gpio_func;
-	devcb_resolved_write_line           m_out_so_func;
-	devcb_resolved_write_line           m_out_timer_func[4];
-	devcb_resolved_write_line           m_out_int_func;
+	devcb2_write_line        m_out_int_cb;	// this gets called on each change of the _INT pin (pin 17)
+	devcb2_read8             m_in_gpio_cb;	// this is called on each read of the GPIO pins
+	devcb2_write8            m_out_gpio_cb;	// this is called on each write of the GPIO pins
+	devcb2_write_line        m_out_so_cb;	// this gets called for each change of the SO pin (pin 37)
+	devcb2_write_line        m_out_tao_cb;	// this gets called for each change of the TAO pin (pin 1)
+	devcb2_write_line        m_out_tbo_cb;	// this gets called for each change of the TBO pin (pin 2)
+	devcb2_write_line        m_out_tco_cb;	// this gets called for each change of the TCO pin (pin 3)
+	devcb2_write_line        m_out_tdo_cb;	// this gets called for each change of the TDO pin (pin 4)
+	
+	int m_rx_clock;                     // serial receive clock
+	int m_tx_clock;                     // serial transmit clock
 
 	// I/O state
 	UINT8 m_gpip;                       // general purpose I/O register
