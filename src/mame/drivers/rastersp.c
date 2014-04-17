@@ -20,7 +20,7 @@
 #include "machine/mc146818.h"
 #include "machine/nscsi_hd.h"
 #include "sound/dac.h"
-#include "mcfglgcy.h"
+#include "machine/nvram.h"
 
 
 /*************************************
@@ -54,7 +54,8 @@ public:
 			m_dac_r(*this, "dac_r"),
 			m_tms_timer1(*this, "tms_timer1"),
 			m_tms_tx_timer(*this, "tms_tx_timer"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_nvram(*this, "nvram")
 	{}
 
 	#define VIDEO_ADDR_MASK     0x3fffffff
@@ -101,6 +102,7 @@ public:
 	required_device<timer_device>   m_tms_timer1;
 	required_device<timer_device>   m_tms_tx_timer;
 	required_device<palette_device> m_palette;
+	required_device<nvram_device> 	m_nvram;
 
 	DECLARE_WRITE32_MEMBER(cyrix_cache_w);
 	DECLARE_READ8_MEMBER(nvram_r);
@@ -157,7 +159,7 @@ void rastersp_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rastersp_state::irq_callback),this));
 
 	m_nvram8 = auto_alloc_array(machine(), UINT8, NVRAM_SIZE);
-
+	m_nvram->set_base(m_nvram8,NVRAM_SIZE);
 	m_paletteram = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	membank("bank1")->set_base(m_dram);
@@ -453,25 +455,6 @@ WRITE32_MEMBER( rastersp_state:: port3_w )
  *  NVRAM
  *
  *************************************/
-
-static NVRAM_HANDLER( rastersp )
-{
-	rastersp_state *state = machine.driver_data<rastersp_state>();
-
-	if (read_or_write)
-	{
-		file->write(state->m_nvram8, NVRAM_SIZE);
-	}
-	else if (file)
-	{
-		file->read(state->m_nvram8, NVRAM_SIZE);
-	}
-	else
-	{
-		memcpy(state->m_nvram8, machine.root_device().memregion("nvram")->base(), NVRAM_SIZE);
-	}
-}
-
 
 WRITE8_MEMBER( rastersp_state::nvram_w )
 {
@@ -893,7 +876,7 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
 	MCFG_TIMER_DRIVER_ADD("tms_tx_timer", rastersp_state, tms_tx_timer)
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
-	MCFG_NVRAM_HANDLER(rastersp)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", rastersp_scsi_devices, "harddisk", true)
