@@ -30,7 +30,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 #include "machine/bcreader.h"
-
+#include "machine/memcard.h"
 
 
 /***************************************************************************
@@ -131,8 +131,11 @@ void ui_menu_main::populate()
 		item_append("Cheat", NULL, 0, (void *)CHEAT);
 
 	/* add memory card menu */
-	if (machine().config().m_memcard_handler != NULL)
+	memcard_device_iterator memiter(machine().root_device());
+	if (memiter.first() != NULL)
+	{
 		item_append("Memory Card", NULL, 0, (void *)MEMORY_CARD);
+	}
 
 	/* add reset and exit menus */
 	menu_text.printf("Select New %s",emulator_info::get_capstartgamenoun());

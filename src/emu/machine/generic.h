@@ -23,13 +23,6 @@
 /* total # of coin counters */
 #define COIN_COUNTERS           8
 
-/* memory card actions */
-#define MEMCARD_CREATE          0
-#define MEMCARD_INSERT          1
-#define MEMCARD_EJECT           2
-
-
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -68,23 +61,6 @@ int coin_lockout_get_state(running_machine &machine, int num);
 
 /* enable/disable global coin lockout */
 void coin_lockout_global_w(running_machine &machine, int on);
-
-
-/* ----- memory card management ----- */
-
-/* create a new memory card with the given index */
-int memcard_create(running_machine &machine, int index, int overwrite);
-
-/* "insert" a memory card with the given index and load its data */
-int memcard_insert(running_machine &machine, int index);
-
-/* "eject" a memory card and save its data */
-void memcard_eject(running_machine &machine);
-
-/* returns the index of the current memory card, or -1 if none */
-int memcard_present(running_machine &machine);
-
-
 
 /* ----- miscellaneous bits & pieces ----- */
 

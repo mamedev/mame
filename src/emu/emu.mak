@@ -167,6 +167,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/keyboard.o    \
 	$(EMUMACHINE)/laserdsc.o    \
 	$(EMUMACHINE)/latch.o       \
+	$(EMUMACHINE)/memcard.o     \
 	$(EMUMACHINE)/netlist.o     \
 	$(EMUMACHINE)/nvram.o       \
 	$(EMUMACHINE)/ram.o         \

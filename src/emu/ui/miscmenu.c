@@ -23,6 +23,7 @@
 #include <ctype.h>
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
+#include "machine/memcard.h"
 
 
 
@@ -1492,6 +1493,8 @@ void ui_menu_memory_card::handle()
 {
 	/* process the menu */
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
+	memcard_device_iterator memiter(machine().root_device());
+	memcard_device *memcard = memiter.first();
 
 	/* if something was selected, act on it */
 	if (menu_event != NULL && menu_event->itemref != NULL)
@@ -1505,7 +1508,7 @@ void ui_menu_memory_card::handle()
 			{
 				/* handle card loading; if we succeed, clear the menus */
 				case MEMCARD_ITEM_LOAD:
-					if (memcard_insert(machine(), cardnum) == 0)
+					if (memcard->insert(cardnum) == 0)
 					{
 						popmessage("Memory card loaded");
 						ui_menu::stack_reset(machine());
@@ -1516,13 +1519,13 @@ void ui_menu_memory_card::handle()
 
 				/* handle card ejecting */
 				case MEMCARD_ITEM_EJECT:
-					memcard_eject(machine());
+					memcard->eject();
 					popmessage("Memory card ejected");
 					break;
 
 				/* handle card creating */
 				case MEMCARD_ITEM_CREATE:
-					if (memcard_create(machine(), cardnum, false) == 0)
+					if (memcard->create(cardnum, false) == 0)
 						popmessage("Memory card created");
 					else
 						popmessage("Error creating memory card\n(Card may already exist)");
@@ -1563,6 +1566,8 @@ ui_menu_memory_card::ui_menu_memory_card(running_machine &machine, render_contai
 
 void ui_menu_memory_card::populate()
 {
+	memcard_device_iterator memiter(machine().root_device());
+	memcard_device *memcard = memiter.first();
 	char tempstring[20];
 	UINT32 flags = 0;
 
@@ -1576,7 +1581,7 @@ void ui_menu_memory_card::populate()
 
 	/* add the remaining items */
 	item_append("Load Selected Card", NULL, 0, (void *)MEMCARD_ITEM_LOAD);
-	if (memcard_present(machine()) != -1)
+	if (memcard->present() != -1)
 		item_append("Eject Current Card", NULL, 0, (void *)MEMCARD_ITEM_EJECT);
 	item_append("Create New Card", NULL, 0, (void *)MEMCARD_ITEM_CREATE);
 }

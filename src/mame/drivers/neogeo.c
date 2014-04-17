@@ -773,14 +773,11 @@ WRITE16_MEMBER(neogeo_state::save_ram_w)
  *
  *************************************/
 
-#define MEMCARD_SIZE    0x0800
-
-
 CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 {
 	// D0 and D1 are memcard 1 and 2 presence indicators, D2 indicates memcard
 	// write protect status (we are always write enabled)
-	return (memcard_present(machine()) == -1) ? 0x07 : 0x00;
+	return (m_memcard->present() == -1) ? 0x07 : 0x00;
 }
 
 
@@ -790,8 +787,8 @@ READ16_MEMBER(neogeo_state::memcard_r)
 
 	UINT16 ret;
 
-	if (memcard_present(machine()) != -1)
-		ret = m_memcard_data[offset] | 0xff00;
+	if (m_memcard->present() != -1)
+		ret = m_memcard->read(space, offset) | 0xff00;
 	else
 		ret = 0xffff;
 
@@ -805,33 +802,10 @@ WRITE16_MEMBER(neogeo_state::memcard_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if (memcard_present(machine()) != -1)
-			m_memcard_data[offset] = data;
+		if (m_memcard->present() != -1)
+			 m_memcard->write(space, offset, data);
 	}
 }
-
-
-MEMCARD_HANDLER( neogeo )
-{
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	switch (action)
-	{
-	case MEMCARD_CREATE:
-		memset(state->m_memcard_data, 0, MEMCARD_SIZE);
-		file.write(state->m_memcard_data, MEMCARD_SIZE);
-		break;
-
-	case MEMCARD_INSERT:
-		file.read(state->m_memcard_data, MEMCARD_SIZE);
-		break;
-
-	case MEMCARD_EJECT:
-		file.write(state->m_memcard_data, MEMCARD_SIZE);
-		break;
-	}
-}
-
-
 
 /*************************************
  *
@@ -1138,9 +1112,6 @@ void neogeo_state::machine_start()
 
 	create_interrupt_timers();
 
-	/* initialize the memcard data structure */
-	m_memcard_data = auto_alloc_array_clear(machine(), UINT8, MEMCARD_SIZE);
-
 	/* irq levels for MVS / AES */
 	m_vblank_level = 1;
 	m_raster_level = 2;
@@ -1166,7 +1137,6 @@ void neogeo_state::machine_start()
 	save_item(NAME(m_controller_select));
 	save_item(NAME(m_main_cpu_bank_address));
 	save_item(NAME(m_save_ram_unlocked));
-	save_pointer(NAME(m_memcard_data), 0x800);
 	save_item(NAME(m_output_data));
 	save_item(NAME(m_output_latch));
 	save_item(NAME(m_el_value));
@@ -1835,7 +1805,7 @@ static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
 	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
-	MCFG_MEMCARD_HANDLER(neogeo)
+	MCFG_MEMCARD_ADD("memcard", 0x800)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mvs, neogeo )

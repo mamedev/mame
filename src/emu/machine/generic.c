@@ -35,9 +35,6 @@ struct generic_machine_private
 	UINT32      coin_count[COIN_COUNTERS];
 	UINT32      coinlockedout[COIN_COUNTERS];
 	UINT32      lastcoin[COIN_COUNTERS];
-
-	/* memory card status */
-	int         memcard_inserted;
 };
 
 
@@ -72,18 +69,8 @@ void generic_machine_init(running_machine &machine)
 	machine.save().save_item(NAME(state->coinlockedout));
 	machine.save().save_item(NAME(state->lastcoin));
 
-	/* reset memory card info */
-	state->memcard_inserted = -1;
-
 	/* register for configuration */
 	config_register(machine, "counters", config_saveload_delegate(FUNC(counters_load), &machine), config_saveload_delegate(FUNC(counters_save), &machine));
-
-	/* for memory cards, request save state and an exit callback */
-	if (machine.config().m_memcard_handler != NULL)
-	{
-		machine.save().save_item(NAME(state->memcard_inserted));
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(memcard_eject), &machine));
-	}
 }
 
 
@@ -268,137 +255,6 @@ void coin_lockout_global_w(running_machine &machine, int on)
 	for (i = 0; i < ARRAY_LENGTH(state->coinlockedout); i++)
 		coin_lockout_w(machine, i, on);
 }
-
-
-
-/***************************************************************************
-    MEMORY CARD MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    memcard_name - determine the name of a memcard
-    file
--------------------------------------------------*/
-
-INLINE void memcard_name(int index, char *buffer)
-{
-	sprintf(buffer, "memcard.%03d", index);
-}
-
-
-/*-------------------------------------------------
-    memcard_create - create a new memory card with
-    the given index
--------------------------------------------------*/
-
-int memcard_create(running_machine &machine, int index, int overwrite)
-{
-	char name[16];
-
-	/* create a name */
-	memcard_name(index, name);
-
-	/* if we can't overwrite, fail if the file already exists */
-	astring fname(machine.basename(), PATH_SEPARATOR, name);
-	if (!overwrite)
-	{
-		emu_file testfile(machine.options().memcard_directory(), OPEN_FLAG_READ);
-		if (testfile.open(fname) == FILERR_NONE)
-			return 1;
-	}
-
-	/* create a new file */
-	emu_file file(machine.options().memcard_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(fname);
-	if (filerr != FILERR_NONE)
-		return 1;
-
-	/* initialize and then save the card */
-	if (machine.config().m_memcard_handler)
-		(*machine.config().m_memcard_handler)(machine, file, MEMCARD_CREATE);
-
-	/* close the file */
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    memcard_insert - insert an existing memory card
-    with the given index
--------------------------------------------------*/
-
-int memcard_insert(running_machine &machine, int index)
-{
-	generic_machine_private *state = machine.generic_machine_data;
-	char name[16];
-
-	/* if a card is already inserted, eject it first */
-	if (state->memcard_inserted != -1)
-		memcard_eject(machine);
-	assert(state->memcard_inserted == -1);
-
-	/* create a name */
-	memcard_name(index, name);
-
-	/* open the file; if we can't, it's an error */
-	emu_file file(machine.options().memcard_directory(), OPEN_FLAG_READ);
-	file_error filerr = file.open(machine.basename(), PATH_SEPARATOR, name);
-	if (filerr != FILERR_NONE)
-		return 1;
-
-	/* initialize and then load the card */
-	if (machine.config().m_memcard_handler)
-		(*machine.config().m_memcard_handler)(machine, file, MEMCARD_INSERT);
-
-	/* close the file */
-	state->memcard_inserted = index;
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    memcard_eject - eject a memory card, saving
-    its contents along the way
--------------------------------------------------*/
-
-void memcard_eject(running_machine &machine)
-{
-	generic_machine_private *state = machine.generic_machine_data;
-	char name[16];
-
-	/* if no card is preset, just ignore */
-	if (state->memcard_inserted == -1)
-		return;
-
-	/* create a name */
-	memcard_name(state->memcard_inserted, name);
-
-	/* open the file; if we can't, it's an error */
-	emu_file file(machine.options().memcard_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(machine.basename(), PATH_SEPARATOR, name);
-	if (filerr != FILERR_NONE)
-		return;
-
-	/* initialize and then load the card */
-	if (machine.config().m_memcard_handler)
-		(*machine.config().m_memcard_handler)(machine, file, MEMCARD_EJECT);
-
-	/* close the file */
-	state->memcard_inserted = -1;
-}
-
-
-/*-------------------------------------------------
-    memcard_present - return the currently loaded
-    card index, or -1 if none
--------------------------------------------------*/
-
-int memcard_present(running_machine &machine)
-{
-	generic_machine_private *state = machine.generic_machine_data;
-	return state->memcard_inserted;
-}
-
 
 
 /***************************************************************************

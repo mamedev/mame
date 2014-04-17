@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/upd1990a.h"
+#include "machine/memcard.h"
 
 #define NEOGEO_MASTER_CLOCK                     (24000000)
 #define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
@@ -37,7 +38,8 @@ public:
 		m_upd4990a(*this, "upd4990a"),
 		m_save_ram(*this, "saveram"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_memcard(*this, "memcard")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(io_control_w);
@@ -141,10 +143,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 
 	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	// this has to be public for the legacy MEMCARD_HANDLER
-	UINT8      *m_memcard_data;
-
 protected:
 	void neogeo_postload();
 	void update_interrupts();
@@ -333,7 +331,8 @@ protected:
 
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-
+	optional_device<memcard_device> m_memcard;
+	
 	// configuration
 	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;
 
@@ -423,4 +422,3 @@ protected:
 /*----------- defined in drivers/neogeo.c -----------*/
 
 MACHINE_CONFIG_EXTERN( neogeo_base );
-MEMCARD_HANDLER( neogeo );
