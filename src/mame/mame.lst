@@ -5351,8 +5351,8 @@ undefeat        // 2005.10 Under Defeat
 radirgya        // 2005.12 Radirgy (Rev A)
 				// 2005.?? Dragon Treasure 3 (Rev A)
 				// 2005.?? ExZeus
-mushik2e        // 2005.?? Mushiking The King Of Beetles II ENG
-mushi2ea        // 2005.?? Mushiking The King Of Beetles II ENG
+mushik2e        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 1.001)
+mushi2ea        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 2.001)
 				// 2005.?? MushiKing The King Of Beetle III
 kurucham        // 2006.03 Kurukuru Chameleon
 trgheart        // 2006.05 Trigger Heart Exelica (Rev A)
@@ -5430,7 +5430,7 @@ initdexp        // 2002.?? Initial D Arcade Stage (Export)
 clubkprz        // 2003.?? Club Kart Prize
 initdv3j        // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb       // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
-clubkpzb        // 2004.?? Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
+clubkpzb        // 2004.01 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
 initdv3e        // 2004.05 Initial D Arcade Stage Ver. 3 (Export)
 				// 2004.06 World Club Champion Football Serie A 2002-2003 Ver.2
 				// 2004.07 Virtua Fighter 4 Final Tuned

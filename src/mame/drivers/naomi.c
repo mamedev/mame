@@ -204,7 +204,7 @@ Naomi 2 / GD-ROM             |           |              |
 
 NAOMI ROM cart usage
 -------------------------
-There are 5 known types of carts manufactured by Sega: 171-7885A, 171-7919A, 171-7978B, 171-8132B, 171-8346C
+There are 6 known types of carts manufactured by Sega: 171-7885A, 171-7919A, 171-7930B, 171-7978B, 171-8132B, 171-8346C
 There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 
 837-14124  171-7885A (C) Sega 1998
@@ -257,6 +257,7 @@ Game                                 on cart    IC22#   # of SOP56  IC37#    IC4
 Crackin' DJ part 2                   840-0068C  23674   20 (64Mb)   present  present   317-0311-COM
 Inu No Osanpo / Dog Walking (Rev A)  840-0073C  22294A  16 (64Mb)   present  present   317-0316-JPN
 Soul Surfer (Rev A)                  840-0095C  23838C  21 (64Mb)   present  present   not present   todo: verify if it's Rev A or Rev C
+Star Horse (server)                  840-0055C  23626   17 (64Mb)   present  present   not present
 The King of Route 66 (Rev A)         840-0087C  23819A  20 (64Mb)   present  present   not present
 
 
@@ -300,7 +301,7 @@ Airline Pilots (Rev A)                          840-0005C  21739A  11 (64Mb)   p
 Airline Pilots Deluxe (Rev B)                   ?          21787B  11 (64Mb)   present  315-6213  317-0251-COM   2 know BIOS 21801 (USA), 21802 (EXP)
 Cosmic Smash                                    840-0044C  23428    8 (64Mb)   ?        315-6213  317-0289-COM   joystick + 2 buttons
 Cosmic Smash (Rev A)                            840-0044C  23428A   8 (64Mb)   ?        315-6213  317-0289-COM   joystick + 2 buttons
-Crazy Taxi                                      840-0002C  21684   15 (64Mb)   ?        315-6213  317-0248-COM
+Crazy Taxi                                      840-0002C  21684   13 (64Mb)*  ?        315-6213  317-0248-COM   * ic8 and ic9 are not present
 Dead Or Alive 2                                 841-0003C  22121   21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
 Dead Or Alive 2 Millennium                      841-0003C  DOA2 M  21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
 Death Crimson OX                                841-0016C  23524   10 (64Mb)   present  315-6213  317-5066-COM
@@ -336,9 +337,59 @@ Touch de UNO! / Unou Nouryoku Check Machine     840-0008C  22073    4 (64Mb)   p
 Toy Fighter / Waffupu                           840-0011C  22035   10 (64Mb)   present  315-6212  317-0257-COM   joystick + 3 buttons
 Virtua NBA                                      840-0021C  23073   21 (64Mb)   present  315-6213  not present
 Virtua NBA (original)                           840-0021C  23073   21 (64Mb)   ?        315-6213  not present
-Virtua Striker 2 Ver. 2000 (Rev C)              840-0010C  21929C  15 (64Mb)   present  315-6213  317-0258-COM   joystick + 3 buttons (+1x 32Mb)
+Virtua Striker 2 Ver. 2000 (Rev C)              840-0010C  21929C  14 (64Mb)*  present  315-6213  317-0258-COM   joystick + 3 buttons *(+1x 32Mb)
 Virtua Tennis / Power Smash                     840-0015C  22927   11 (64Mb)   present  315-6213  317-0263-COM
 Zombie Revenge                                  840-0003C  21707   19 (64Mb)   ?        315-6213  317-0249-COM   joystick + 3 buttons
+
+
+
+171-7930B (C) Sega 1998
+|------------------------------------------------------------------|
+|        JJJJJJ      SW2                        ----CN2----        -|
+| SW1    PPPPPP                                                     |
+|        134567                                                     |
+|  C                                                                |
+|  N                                                                |
+|  D                                                         IC16   | male side
+|  B    OSC1                        IC41              IC44          |
+|  2            SCSI                          IC40                  |
+|  5            CTRL                                                |
+|                                                                   |
+|        ----CN3----                                                |
+|-------------------------------------------------------------------|
+
+ |------------------------------------------------------------------|
+|-       ----CN2----                                                |
+|                                                                   |
+| IC37S IC35S IC33S IC31S IC29S IC27S IC25S IC23S IC21S IC19S IC17S |
+|                                                                   |
+|                                                                   |
+|       IC36S IC34S IC32S IC30S IC28S IC26S IC24S IC22S IC20S IC18S | female side
+|                                                                   |
+|                                                                   |
+|       IC38S                                                       |
+|                                                                   |
+|        ----CN1----                            ----CN3----         |
+|-------------------------------------------------------------------|
+Notes:
+      OSC1  - oscillator 20.000MHz
+     JP1-7  - JUMPER unknown function
+	   SW1  - PUSHBUTTON
+	   SW2  - 8X2 DIPswitch
+ SCSI-CTRL  - SCSI-II controller MB86604A
+    CNDB25  - DB-25 SCSI-II connector
+IC17S-IC38S - FlashROM (SOP56), 64Mb.
+      IC16  - EPROM (DIP42), not populated.
+      IC40  - FPGA ACTEL A54SX32A (QFP208) SEGA part number 315-6257A
+      IC41  - 8bit CMOS Microcontroller (DIP8) Microchip PIC12C508A (internal EPROM memory 512x12)
+      IC44  - SRAM (SOJ28) 32kx8, CY7C199
+   CN1/2/3  - connectors joining to main board
+
+Games known to use this PCB include....
+                                     Sticker  EPROM        MASKROMs    
+Game                                 on cart  IC16#        # of SOP56  Notes
+----------------------------------------------------------------------------------------------------
+Puyo Puyo Fever (prototype)          *        not present  22 (64Mb)   no cart, only development PCB
 
 
 
@@ -388,15 +439,16 @@ Games known to use this PCB include....
 Game                                           on cart    IC11#   # of SOP44 IC13S#   IC1#          Notes
 ----------------------------------------------------------------------------------------------------------------------------
 Club Kart Prize                                840-0129C  ?       16 (64Mb)  present  317-0368-COM  no sticker on ic11
-Club Kart Prize Ver B                          840-0137C  24149   16 (64Mb)  present  317-0368-COM
+Club Kart Prize Ver. B                         840-0137C  24149   16 (64Mb)  present  317-0368-COM
 Giant Gram 2000                                840-0039C  23377   20 (64Mb)  present  317-0296-COM
 Kick '4' Cash                                  840-0140C  24212   16 (64Mb)  present  317-0397-COM
-Marvel Vs. Capcom 2 New Age of Heroes (Rev A)  841-0007C  23085A  14 (64Mb)  present  317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
+Marvel Vs. Capcom 2 New Age of Heroes (Rev A)  841-0007C  23085A  14 (64Mb)* present  317-5058-COM  *(+2x 32Mb) full cart #:841-0007C-03
 MushiKing The King of Beetles 2K3 2ND          840-0150C  24217    6 (64Mb)  present  317-0394-COM
 Quiz Ah Megamisama                             840-0030C  23227   16 (64Mb)  present  317-0280-JPN
 Shootout Pool                                  840-0098C  23844    4 (64Mb)  present  317-0336-COM
 Shootout Pool - Shootout Pool Prize            840-0128C  24065    4 (64Mb)  present  317-0367-COM
 Shootout Pool Medal                            840-0136C  24148    4 (64Mb)  present  317-0367-COM
+SWP Hopper Board                               840-0130C  24083   20 (64Mb)  present  317-0339-COM  Maskroms are not really used, they are recycled from other games; there is an additional 837-14381 IO board
 Touch de UNO! 2                                840-0022C  23071    6 (64Mb)  present  317-0276-JPN
 Virtua Fighter 4 Evolution                     840-0106B  23934   20 (64Mb)  present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present  317-0320-COM
@@ -452,6 +504,8 @@ Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  3
 Moero Justice Gakuen / Project Justice (Rev A)  841-0015C  23548A  11 (128Mb)  315-6319A  present   317-5065-COM
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  present   not present
 Samba de Amigo Ver. 2000                        840-0047C  23600   21  (64Mb)  315-6319A  present   317-0295-COM
+Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  315-6319   present   not present
+Star Horse (client)                             840-0056C  23627    6 (128Mb)* 315-6319   present   not present   * +1 (64Mb)
 Star Horse Progress (Rev A)                     840-0123C  24122A   7 (128Mb)  315-6319A  present   not present   requires an additional middle board n? 837-13785
 Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  present   317-0310-COM
 Virtua Striker 3 (Rev C)                        840-0061C  23663C  11 (128Mb)  315-6319A  present   317-0310-COM
@@ -495,21 +549,23 @@ Notes:
       CN4   - 6 legs connector for ISP programming
 
    Games known to use this PCB include....
-                                       Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S
-Game                                   on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
-------------------------------------------------------------------------------------------------------------------------------
+                                                    Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S
+Game                                                on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
+-------------------------------------------------------------------------------------------------------------------------------------------
 /Akatsuki Denkou Senki Blitz Kampf
-\Ausf. Achse                           841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
-Dynamite Deka EX / Asian Dynamite      840-0175C  not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
-Illmatic Envelope                      841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
-Mamoru-kun wa Norowarete Shimatta      841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
-Melty Blood Actress Again              841-0061C  not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
-Melty Blood Actress Again (Rev A)      841-0061C  24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
-Mushiking - The King Of Beetles II ENG 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
-Poka Suka Ghost / Manic Panic Ghost    840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
-Radirgy Noa                            841-0062C  not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Shooting Love 2007                     841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
-Touch De Zunou (Rev A)                 840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
+\Ausf. Achse                                        841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
+Dynamite Deka EX / Asian Dynamite                   840-0175C  not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
+Illmatic Envelope                                   841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
+Mamoru-kun wa Norowarete Shimatta                   841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
+Manic Panic Ghost!                                  840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
+Melty Blood Actress Again                           841-0061C  not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
+Melty Blood Actress Again (Rev A)                   841-0061C  24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
+Mushiking - The King Of Beetles II ENG (Ver. 1.001) 840-0164C  not present  2 (512Mb)   present  317-0437-COM  present
+Mushiking - The King Of Beetles II ENG (Ver. 2.001) 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
+Poka Suka Ghost                                     840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
+Radirgy Noa                                         841-0062C  not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Shooting Love 2007                                  841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
+Touch De Zunou (Rev A)                              840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
 
 
@@ -563,8 +619,9 @@ Notes:
 \Code: Veronica (Ver. E)             F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF2
 /Shin Nihon Prowrestling Toukon                                                                                                       /FL0 & FL1 have pin55 raised from PCB.
 \Retsuden 4 Arcade Edition (Ver. A)  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1        \They are connected togheter and go to pin89 on 2K.
-World Kicks (Ver. A)                 F2X   25209801  2 (32Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2-WK3
-World Kicks PCB (Ver. A)             F2X   25509801  2 (32Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  WKC1
+World Kicks PCB (WK1 Ver. A)         F2    25509801  2 (64Mb)   9 (128Mb)  not present  NAODEC1A  NAODEC1B  317-5040-COM  WK1
+World Kicks (WK2 Ver. A)             F2X   25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2
+World Kicks (WK3 Ver. A)             F2X   25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK3
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
