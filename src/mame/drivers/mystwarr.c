@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x482000, 0x48200f) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x482010, 0x48201f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
 	AM_RANGE(0x484000, 0x484007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
-	AM_RANGE(0x48a000, 0x48a01f) AM_WRITE_LEGACY(K054338_word_w)
+	AM_RANGE(0x48a000, 0x48a01f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x48c000, 0x48c03f) AM_DEVWRITE("k056832", k056832_device,word_w)
 	AM_RANGE(0x490000, 0x490001) AM_WRITE(mweeprom_w)
 	AM_RANGE(0x492000, 0x492001) AM_WRITENOP    // watchdog
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
 	AM_RANGE(0x24c000, 0x24ffff) AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x250000, 0x25000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
+	AM_RANGE(0x254000, 0x25401f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)
 	AM_RANGE(0x24c000, 0x24ffff) AM_RAM     // K053250 ram
 	AM_RANGE(0x250000, 0x25000f) AM_RAM     // K053250 reg
-	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
+	AM_RANGE(0x254000, 0x25401f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)         // sprite ROM readback
 	AM_RANGE(0x402010, 0x40201f) AM_DEVWRITE("k055673", k055673_device,k053247_reg_word_w)            // OBJSET2
 	AM_RANGE(0x404000, 0x404007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                // OBJSET1
-	AM_RANGE(0x40a000, 0x40a01f) AM_WRITE_LEGACY(K054338_word_w)                // CLTC
+	AM_RANGE(0x40a000, 0x40a01f) AM_DEVWRITE("k054338", k054338_device, word_w)                // CLTC
 	AM_RANGE(0x40c000, 0x40c03f) AM_DEVWRITE("k056832", k056832_device,word_w)                // VACSET
 	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)      // protection
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(mweeprom_w)
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_RAM                 // sound regs fall-through
-	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE_LEGACY(K054338_word_w)
+	AM_RANGE(0x48c000, 0x48c01f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1") // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
@@ -572,7 +572,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_RAM                             // sound regs fall-through
-	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE_LEGACY(K054338_word_w)
+	AM_RANGE(0x48c000, 0x48c01f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")             // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
@@ -1019,6 +1019,10 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_K054338_ALPHAINV(1)
+	MCFG_K054338_MIXER("k055555")
+	
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 
 	/* sound hardware */

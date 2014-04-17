@@ -364,7 +364,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
 
 	m_k055673->alt_k053247_export_config(&k053247_callback);
-	K054338_export_config(&K054338_shdRGB);
+	m_k054338->export_config(&K054338_shdRGB);
 
 	if (objdma)
 	{
@@ -375,7 +375,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 		m_k055673->k053247_get_ram(&gx_spriteram);
 
 	m_palette->set_shadow_dRGB32(3,-80,-80,-80, 0);
-	K054338_invert_alpha(1);
+	m_k054338->invert_alpha(1);
 }
 
 void konamigx_mixer_primode(int mode)
@@ -410,13 +410,13 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
-	K054338_fill_backcolor(machine(), m_screen, bitmap, konamigx_wrport1_0 & 0x20);
+	m_k054338->fill_backcolor(bitmap, konamigx_wrport1_0 & 0x20);
 
 
 	// abort if video has been disabled
 	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (!disp) return;
-	cltc_shdpri = K054338_read_register(K338_REG_CONTROL);
+	cltc_shdpri = m_k054338->register_r(K338_REG_CONTROL);
 
 
 	if (!rushingheroes_hack) // Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
@@ -494,7 +494,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
-		K054338_update_all_shadows(machine(), rushingheroes_hack, m_palette);
+		m_k054338->update_all_shadows(rushingheroes_hack, m_palette);
 	}
 
 	// pre-sort layers
@@ -750,7 +750,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		*/
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
-			temp4 = K054338_set_alpha_level(temp2);
+			temp4 = m_k054338->set_alpha_level(temp2);
 
 			if (temp4 <= 0) return;
 			if (temp4 < 255) k = TILEMAP_DRAW_ALPHA(temp4);
@@ -787,7 +787,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
-			alpha = temp4 = K054338_set_alpha_level(temp2);
+			alpha = temp4 = m_k054338->set_alpha_level(temp2);
 
 			if (temp4 <= 0) return;
 			if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
@@ -838,7 +838,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
 			//alpha =
-			temp4 = K054338_set_alpha_level(temp2);
+			temp4 = m_k054338->set_alpha_level(temp2);
 
 			if (temp4 <= 0) return;
 			//if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
@@ -920,7 +920,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 			if (drawmode & 2)
 			{
 				alpha = color>>K055555_MIXSHIFT & 3;
-				if (alpha) alpha = K054338_set_alpha_level(alpha);
+				if (alpha) alpha = m_k054338->set_alpha_level(alpha);
 				if (alpha <= 0) continue;
 			}
 			color &= K055555_COLORMASK;
@@ -1168,7 +1168,6 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 {
 	int i;
 
-	K054338_vh_start(machine, m_k055555);
 	m_k055555->K055555_vh_start(machine);
 
 	konamigx_mixer_init(*m_screen, 0);

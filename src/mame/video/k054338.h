@@ -4,19 +4,6 @@
 
 #include "k055555.h"
 
-
-/* K054338 mixer/alpha blender */
-void K054338_vh_start(running_machine &machine, k055555_device* k055555);
-DECLARE_WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
-DECLARE_WRITE32_HANDLER( K054338_long_w );
-int K054338_read_register(int reg);
-void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack, palette_device *palette);          // called at the beginning of SCREEN_UPDATE()
-void K054338_fill_solid_bg(bitmap_ind16 &bitmap);               // solid backcolor fill
-void K054338_fill_backcolor(running_machine &machine, screen_device &screen, bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient
-int  K054338_set_alpha_level(int pblend);                           // blend style 0-2
-void K054338_invert_alpha(int invert);                              // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
-void K054338_export_config(int **shdRGB);
-
 #define K338_REG_BGC_R      0
 #define K338_REG_BGC_GB     1
 #define K338_REG_SHAD1R     2
@@ -41,7 +28,7 @@ public:
 
 	// static configuration
 	static void set_mixer_tag(device_t &device, const char  *tag) { downcast<k054338_device &>(device).m_k055555_tag = tag; }
-	static void set_yinvert(device_t &device, int alpha_inv) { downcast<k054338_device &>(device).m_alpha_inv = alpha_inv; }
+	static void set_alpha_invert(device_t &device, int alpha_inv) { downcast<k054338_device &>(device).m_alpha_inv = alpha_inv; }
 
 	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
 	DECLARE_WRITE32_MEMBER( long_w );
@@ -54,7 +41,7 @@ public:
 	void fill_backcolor(bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient (by using a k055555)
 	int  set_alpha_level(int pblend);                         // blend style 0-2
 	void invert_alpha(int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
-	//void export_config(int **shdRGB);
+	void export_config(int **shdRGB);
 
 protected:
 	// device-level overrides
@@ -80,5 +67,6 @@ extern const device_type K054338;
 #define MCFG_K054338_ALPHAINV(_alphainv) \
 	k054338_device::set_alpha_invert(*device, _alphainv);
 
+#define MCFG_K054338_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif

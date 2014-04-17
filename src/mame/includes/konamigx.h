@@ -22,6 +22,7 @@ public:
 		m_k055673(*this, "k055673"),
 		m_k055555(*this, "k055555"),
 		m_k056832(*this, "k056832"),
+		m_k054338(*this, "k054338"),
 		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
 		m_k053936_0_linectrl(*this,"k053936_0_line",32),
 		m_k053936_0_ctrl_16(*this,"k053936_0_ct16",16),
@@ -52,6 +53,7 @@ public:
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
+	optional_device<k054338_device> m_k054338;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
 	optional_shared_ptr<UINT16> m_k053936_0_linectrl;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl_16;
