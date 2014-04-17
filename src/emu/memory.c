@@ -610,6 +610,17 @@ public:
 		return entry;
 	}
 
+	UINT32 lookup_live_nowp(offs_t byteaddress) const { return m_large ? lookup_live_large_nowp(byteaddress) : lookup_live_small_nowp(byteaddress); }
+	UINT32 lookup_live_small_nowp(offs_t byteaddress) const { return m_table[byteaddress]; }
+
+	UINT32 lookup_live_large_nowp(offs_t byteaddress) const
+	{
+		UINT32 entry = m_table[level1_index_large(byteaddress)];
+		if (entry >= SUBTABLE_BASE)
+			entry = m_table[level2_index_large(entry, byteaddress)];
+		return entry;
+	}
+
 	UINT32 lookup(offs_t byteaddress) const
 	{
 		UINT32 entry = m_live_lookup[level1_index(byteaddress)];
@@ -3970,7 +3981,7 @@ direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress,
 {
 	// determine which entry
 	byteaddress &= m_space.m_bytemask;
-	entry = m_space.read().lookup_live(byteaddress);
+	entry = m_space.read().lookup_live_nowp(byteaddress);
 
 	// scan our table
 	for (direct_range *range = m_rangelist[entry].first(); range != NULL; range = range->next())
@@ -4227,7 +4238,7 @@ void memory_bank::set_base_decrypted(void *base)
 {
 	// NULL is not an option
 	if (base == NULL)
-		throw emu_fatalerror("memory_bank::set_base called NULL base");
+		throw emu_fatalerror("memory_bank::set_base_decrypted called NULL base");
 
 	// set the base and invalidate any referencing spaces
 	*m_basedptr = reinterpret_cast<UINT8 *>(base);
