@@ -264,9 +264,9 @@ WRITE8_MEMBER(apple2gs_state::adbmicro_p3_out)
 }
 #endif
 
-WRITE8_MEMBER(apple2gs_state::a2bus_irq_w)
+WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 {
-	if (data)
+	if (state)
 	{
 		apple2gs_add_irq(IRQ_SLOT);
 	}
@@ -276,24 +276,16 @@ WRITE8_MEMBER(apple2gs_state::a2bus_irq_w)
 	}
 }
 
-WRITE8_MEMBER(apple2gs_state::a2bus_nmi_w)
+WRITE_LINE_MEMBER(apple2gs_state::a2bus_nmi_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, data);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE8_MEMBER(apple2gs_state::a2bus_inh_w)
+WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
 {
-	m_inh_slot = data;
+	m_inh_slot = state;
 	apple2_update_memory();
 }
-
-static const struct a2bus_interface a2bus_intf =
-{
-	// interrupt lines
-	DEVCB_DRIVER_MEMBER(apple2gs_state,a2bus_irq_w),
-	DEVCB_DRIVER_MEMBER(apple2gs_state,a2bus_nmi_w),
-	DEVCB_DRIVER_MEMBER(apple2gs_state,a2bus_inh_w)
-};
 
 static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
@@ -385,7 +377,11 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* slot devices */
-	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
+	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_A2BUS_CPU("maincpu")
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2gs_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2gs_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2gs_state, a2bus_inh_w))
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL)

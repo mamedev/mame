@@ -323,9 +323,9 @@ public:
 	DECLARE_VIDEO_START(apple2c);
 	UINT32 screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
-	DECLARE_WRITE8_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE8_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
+	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);

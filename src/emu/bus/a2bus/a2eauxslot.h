@@ -18,18 +18,20 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_A2EAUXSLOT_BUS_ADD(_tag, _cputag, _config) \
-	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
+#define MCFG_A2EAUXSLOT_CPU(_cputag) \
 	a2eauxslot_device::static_set_cputag(*device, _cputag);
+	
+#define MCFG_A2EAUXSLOT_OUT_IRQ_CB(_devcb) \
+	devcb = &a2eauxslot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_A2EAUXSLOT_OUT_NMI_CB(_devcb) \
+	devcb = &a2eauxslot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+	
 #define MCFG_A2EAUXSLOT_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	a2eauxslot_slot_device::static_set_a2eauxslot_slot(*device, _nbtag, _tag);
 #define MCFG_A2EAUXSLOT_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_A2EAUXSLOT_BUS_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 //**************************************************************************
@@ -59,26 +61,22 @@ protected:
 // device type definition
 extern const device_type A2EAUXSLOT_SLOT;
 
-// ======================> a2eauxslot_interface
-
-struct a2eauxslot_interface
-{
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_nmi_cb;
-};
 
 class device_a2eauxslot_card_interface;
+
 // ======================> a2eauxslot_device
-class a2eauxslot_device : public device_t,
-					public a2eauxslot_interface
+class a2eauxslot_device : public device_t
 {
 public:
 	// construction/destruction
 	a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
-
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<a2eauxslot_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<a2eauxslot_device &>(device).m_out_nmi_cb.set_callback(object); }
+	
 	void add_a2eauxslot_card(device_a2eauxslot_card_interface *card);
 	device_a2eauxslot_card_interface *get_a2eauxslot_card();
 
@@ -92,13 +90,12 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_nmi_func;
+	devcb2_write_line    m_out_irq_cb;
+	devcb2_write_line    m_out_nmi_cb;
 
 	device_a2eauxslot_card_interface *m_device;
 	const char *m_cputag;

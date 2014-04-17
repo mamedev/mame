@@ -47,14 +47,6 @@ static SLOT_INTERFACE_START(apple3_cards)
 	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
 SLOT_INTERFACE_END
 
-static const struct a2bus_interface a2bus_intf =
-{
-	// interrupt lines
-//  DEVCB_DRIVER_MEMBER(apple3_state,a2bus_irq_w),
-//  DEVCB_DRIVER_MEMBER(apple3_state,a2bus_nmi_w)
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* basic machine hardware */
@@ -97,7 +89,11 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple3_state, ay3600_data_ready_w))
 
 	/* slot bus */
-	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
+	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_A2BUS_CPU("maincpu")
+	//MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple3_state, a2bus_irq_w))
+	//MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple3_state, a2bus_nmi_w))
+	//MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple3_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple3_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple3_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple3_cards, NULL)

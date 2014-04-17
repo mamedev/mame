@@ -227,19 +227,19 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #define PADDLE_SENSITIVITY      10
 #define PADDLE_AUTOCENTER       0
 
-WRITE8_MEMBER(apple2_state::a2bus_irq_w)
+WRITE_LINE_MEMBER(apple2_state::a2bus_irq_w)
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, data);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
-WRITE8_MEMBER(apple2_state::a2bus_nmi_w)
+WRITE_LINE_MEMBER(apple2_state::a2bus_nmi_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, data);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE8_MEMBER(apple2_state::a2bus_inh_w)
+WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 {
-	m_inh_slot = data;
+	m_inh_slot = state;
 	apple2_update_memory();
 }
 
@@ -948,21 +948,6 @@ static const cassette_interface apple2_cassette_interface =
 	NULL
 };
 
-static const struct a2bus_interface a2bus_intf =
-{
-	// interrupt lines
-	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_irq_w),
-	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_nmi_w),
-	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_inh_w)
-};
-
-static const struct a2eauxslot_interface a2eauxbus_intf =
-{
-	// interrupt lines
-	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_irq_w),
-	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_nmi_w)
-};
-
 static SLOT_INTERFACE_START(apple2_slot0_cards)
 	SLOT_INTERFACE("lang", A2BUS_LANG)      /* Apple II Language Card */
 SLOT_INTERFACE_END
@@ -1052,7 +1037,11 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2_state, ay3600_data_ready_w))
 
 	/* slot devices */
-	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
+	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_A2BUS_CPU("maincpu")
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl0", apple2_slot0_cards, "lang")
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL)
@@ -1112,7 +1101,10 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_A2BUS_SLOT_REMOVE("sl0")
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
 
-	MCFG_A2EAUXSLOT_BUS_ADD(AUXSLOT_TAG, "maincpu", a2eauxbus_intf)
+	MCFG_DEVICE_ADD(AUXSLOT_TAG, A2EAUXSLOT, 0)
+	MCFG_A2EAUXSLOT_CPU("maincpu")
+	MCFG_A2EAUXSLOT_OUT_IRQ_CB(WRITELINE(apple2_state, a2bus_irq_w))
+	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(apple2_state, a2bus_nmi_w))
 	MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
 MACHINE_CONFIG_END
@@ -1193,7 +1185,7 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NULL)
 
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
-	MCFG_A2EAUXSLOT_BUS_REMOVE(AUXSLOT_TAG)
+	MCFG_DEVICE_REMOVE(AUXSLOT_TAG)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

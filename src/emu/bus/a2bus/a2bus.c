@@ -128,30 +128,6 @@ void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 	a2bus.m_cputag = tag;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void a2bus_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const a2bus_interface *intf = reinterpret_cast<const a2bus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<a2bus_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_inh_cb, 0, sizeof(m_out_inh_cb));
-	}
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -161,12 +137,18 @@ void a2bus_device::device_config_complete()
 //-------------------------------------------------
 
 a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__)
+		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__),
+		m_out_irq_cb(*this),
+		m_out_nmi_cb(*this),
+		m_out_inh_cb(*this)
 {
 }
 
 a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_out_irq_cb(*this),
+		m_out_nmi_cb(*this),
+		m_out_inh_cb(*this)
 {
 }
 //-------------------------------------------------
@@ -178,9 +160,9 @@ void a2bus_device::device_start()
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_inh_func.resolve(m_out_inh_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_out_nmi_cb.resolve_safe();
+	m_out_inh_cb.resolve_safe();
 
 	// clear slots
 	for (int i = 0; i < 8; i++)
@@ -219,22 +201,22 @@ void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
 
 void a2bus_device::set_irq_line(int state)
 {
-	m_out_irq_func(state);
+	m_out_irq_cb(state);
 }
 
 void a2bus_device::set_nmi_line(int state)
 {
-	m_out_nmi_func(state);
+	m_out_nmi_cb(state);
 }
 
 void a2bus_device::set_inh_slotnum(int slot)
 {
-	m_out_inh_func(slot);
+	m_out_inh_cb(slot);
 }
 
 // interrupt request from a2bus card
-WRITE_LINE_MEMBER( a2bus_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_func(state); }
+WRITE_LINE_MEMBER( a2bus_device::irq_w ) { m_out_irq_cb(state); }
+WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A2BUS CARD INTERFACE
