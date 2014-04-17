@@ -36,14 +36,10 @@ static const ay8910_interface arcadeboard_ay8910_interface =
 	DEVCB_NULL
 };
 
-static TMS9928A_INTERFACE(arcadeboard_tms9918a_interface)
-{
-	0x4000,         // 16k of VRAM
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_arcboard_device, tms_irq_w)
-};
-
 MACHINE_CONFIG_FRAGMENT( arcadeboard )
-	MCFG_TMS9928A_ADD( TMS_TAG, TMS9918A, arcadeboard_tms9918a_interface )
+	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_arcboard_device, tms_irq_w))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS_TAG, tms9918a_device, screen_update )
 

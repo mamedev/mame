@@ -265,12 +265,6 @@ WRITE_LINE_MEMBER(svi318_state::vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static TMS9928A_INTERFACE(svi318_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(svi318_state,vdp_interrupt)
-};
-
 static const cassette_interface svi318_cassette_interface =
 {
 	svi_cassette_formats,
@@ -324,7 +318,9 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1], 3072000 )
 
 	/* Video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9929a_device, screen_update )
 
@@ -366,7 +362,9 @@ static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 
 	MCFG_DEVICE_REMOVE("tms9928a")
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, svi318_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
@@ -445,7 +443,9 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_dualhsxs )
 
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi318_state, vdp_interrupt))
 	MCFG_TMS9928A_SET_SCREEN( "screen" )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9929a_device, screen_update )

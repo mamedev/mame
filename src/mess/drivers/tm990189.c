@@ -181,12 +181,6 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 }
 
-static TMS9928A_INTERFACE(tms9918_interface)
-{
-	0x4000,
-	DEVCB_NULL
-};
-
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
 	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
@@ -887,7 +881,8 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9918", TMS9918, tms9918_interface )
+	MCFG_DEVICE_ADD( "tms9918", TMS9918, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
 	MCFG_DEFAULT_LAYOUT(layout_tm990189v)

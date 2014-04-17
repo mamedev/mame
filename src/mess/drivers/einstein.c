@@ -398,12 +398,6 @@ WRITE8_MEMBER(einstein_state::einstein_fire_int_w)
     MACHINE EMULATION
 ***************************************************************************/
 
-static TMS9928A_INTERFACE(einstein_tms9929a_interface)
-{
-	0x4000, /* 16k RAM, provided by IC i040 and i041 */
-	DEVCB_NULL
-};
-
 void einstein_state::machine_start()
 {
 }
@@ -763,7 +757,8 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_DEVICE_ADD("fire_daisy", EINSTEIN_FIRE_DAISY, 0)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, einstein_tms9929a_interface )
+	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)	/* 16k RAM, provided by IC i040 and i041 */
 	MCFG_TMS9928A_SET_SCREEN( "screen" )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )

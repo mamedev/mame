@@ -443,12 +443,6 @@ WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
 	}
 }
 
-static TMS9928A_INTERFACE(m5_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(m5_state,sordm5_video_interrupt_callback)
-};
-
 
 //-------------------------------------------------
 //  I8255 Interface
@@ -669,7 +663,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, m5 )
 	// video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, m5_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -681,7 +677,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, m5 )
 	// video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, m5_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END

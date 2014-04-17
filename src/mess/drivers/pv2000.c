@@ -339,13 +339,6 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 
 /* Machine Initialization */
 
-static TMS9928A_INTERFACE(pv2000_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(pv2000_state, pv2000_vdp_interrupt)
-};
-
-
 void pv2000_state::machine_start()
 {
 }
@@ -410,7 +403,9 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
 
 	// video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pv2000_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(pv2000_state, pv2000_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

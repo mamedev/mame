@@ -205,13 +205,6 @@ WRITE_LINE_MEMBER(pengadvb_state::vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static TMS9928A_INTERFACE(pengadvb_tms9128_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(pengadvb_state,vdp_interrupt)
-};
-
-
 /***************************************************************************
 
   Machine config(s)
@@ -261,7 +254,9 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD("tms9128", TMS9128, pengadvb_tms9128_interface)
+	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL_10_738635MHz / 2)
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(pengadvb_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9128", tms9128_device, screen_update)
 

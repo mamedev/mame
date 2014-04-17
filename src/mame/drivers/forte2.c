@@ -103,12 +103,6 @@ WRITE_LINE_MEMBER(forte2_state::vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static TMS9928A_INTERFACE(forte2_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(forte2_state,vdp_interrupt)
-};
-
 void forte2_state::machine_reset()
 {
 	m_input_mask = 0xff;
@@ -129,7 +123,9 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	MCFG_CPU_IO_MAP(io_mem)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, forte2_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(forte2_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

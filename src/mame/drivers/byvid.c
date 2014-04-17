@@ -107,12 +107,6 @@ WRITE_LINE_MEMBER(by133_state::vdp_interrupt)
 	m_videocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static TMS9928A_INTERFACE(byvid_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,vdp_interrupt)
-};
-
 WRITE_LINE_MEMBER(by133_state::by133_firq)
 {
 	m_videocpu->set_input_line(M6809_FIRQ_LINE, (m_videopia->irq_a_state() || m_videopia->irq_b_state()) ? ASSERT_LINE : CLEAR_LINE);
@@ -163,7 +157,9 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(by133_state, by133_firq))
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, byvid_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(by133_state, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

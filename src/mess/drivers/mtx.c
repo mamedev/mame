@@ -323,13 +323,6 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 	m_z80ctc->trg0(state ? 0 : 1);
 }
 
-static TMS9928A_INTERFACE(mtx_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(mtx_state,mtx_tms9929a_interrupt)
-};
-
-
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -350,7 +343,9 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, mtx_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(mtx_state, mtx_tms9929a_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
 

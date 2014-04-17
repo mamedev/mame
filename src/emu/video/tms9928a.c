@@ -56,6 +56,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
+		m_out_int_line_cb(*this),
 		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
@@ -69,7 +70,9 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 	: device_t( mconfig, TMS9928A, "TMS9928A VDP", tag, owner, clock, "tms9928a", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-	m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
+		m_vram_size(0),
+		m_out_int_line_cb(*this),
+		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = false;
 	m_reva = true;
@@ -128,8 +131,8 @@ void tms9928a_device::check_interrupt()
 	if (b != m_INT)
 	{
 		m_INT = b;
-		if ( !m_irq_changed.isnull() )
-			m_irq_changed( m_INT );
+		if ( !m_out_int_line_cb.isnull() )
+			m_out_int_line_cb( m_INT );
 	}
 }
 
@@ -573,22 +576,6 @@ UINT32 tms9928a_device::screen_update( screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-void tms9928a_device::device_config_complete()
-{
-	const tms9928a_interface *intf = reinterpret_cast<const tms9928a_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<tms9928a_interface *>(this) = *intf;
-	}
-	else
-	{
-		m_vram_size = 0;
-		memset(&m_out_int_line, 0, sizeof(m_out_int_line));
-	}
-}
-
 void tms9928a_device::set_palette()
 {
 	/*
@@ -653,7 +640,7 @@ void tms9928a_device::device_start()
 	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
 	m_vertical_size = m_50hz ? TMS9928A_TOTAL_VERT_PAL : TMS9928A_TOTAL_VERT_NTSC;
 
-	m_irq_changed.resolve( m_out_int_line, *this );
+	m_out_int_line_cb.resolve();
 
 	// Video RAM is allocated as an own address space
 	m_vram_space = &space(AS_DATA);

@@ -333,12 +333,6 @@ INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
 
 }
 
-static TMS9928A_INTERFACE(pachifev_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_NULL
-};
-
 void pachifev_state::machine_start()
 {
 	save_item(NAME(m_power));
@@ -355,7 +349,8 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pachifev_state, pachifev_vblank_irq)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pachifev_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

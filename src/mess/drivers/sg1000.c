@@ -463,12 +463,6 @@ WRITE_LINE_MEMBER(sg1000_state::sg1000_vdp_interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(sg1000_state,sg1000_vdp_interrupt)
-};
-
 /*-------------------------------------------------
     I8255 INTERFACE
 -------------------------------------------------*/
@@ -748,7 +742,9 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_CPU_IO_MAP(sg1000_io_map)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
+	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(sg1000_state, sg1000_vdp_interrupt))	
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
@@ -796,7 +792,9 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CPU_IO_MAP(sc3000_io_map)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
+	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(sg1000_state, sg1000_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
@@ -838,7 +836,9 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_CPU_IO_MAP(sf7000_io_map)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
+	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(sg1000_state, sg1000_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 

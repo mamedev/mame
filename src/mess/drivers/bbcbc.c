@@ -108,12 +108,6 @@ WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static TMS9928A_INTERFACE(tms9129_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(bbcbc_state, tms_interrupt)
-};
-
 /* TODO */
 static Z80PIO_INTERFACE( bbcbc_z80pio_intf )
 {
@@ -175,7 +169,9 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 
 	MCFG_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
 
-	MCFG_TMS9928A_ADD( "tms9129", TMS9129, tms9129_interface )
+	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(bbcbc_state, tms_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9129", tms9928a_device, screen_update )
 

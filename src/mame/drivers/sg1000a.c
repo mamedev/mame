@@ -245,12 +245,6 @@ WRITE_LINE_MEMBER(sg1000a_state::vdp_interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-static TMS9928A_INTERFACE(sg1000a_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(sg1000a_state,vdp_interrupt)
-};
-
 WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 {
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -275,7 +269,10 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(sg1000a_state, sg1000a_coin_counter_w))
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, sg1000a_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(sg1000a_state, vdp_interrupt))	
+	
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

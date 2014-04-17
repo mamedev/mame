@@ -75,12 +75,6 @@ void cortex_state::machine_reset()
 	m_maincpu->set_ready(ASSERT_LINE);
 }
 
-static TMS9928A_INTERFACE(cortex_tms9929a_interface)
-{
-	0x4000,     // vram size
-	DEVCB_NULL  // write line if int changes
-};
-
 static MACHINE_CONFIG_START( cortex, cortex_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
@@ -89,7 +83,8 @@ static MACHINE_CONFIG_START( cortex, cortex_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, cortex_tms9929a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END

@@ -287,12 +287,6 @@ void pencil2_state::machine_reset()
 {
 }
 
-static TMS9928A_INTERFACE(pencil2_tms9929a_interface)
-{
-	0x4000,     // vram size
-	DEVCB_NULL  // write line if int changes
-};
-
 static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
@@ -300,7 +294,8 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_CPU_IO_MAP(pencil2_io)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, pencil2_tms9929a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

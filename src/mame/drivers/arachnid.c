@@ -241,16 +241,6 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    TMS9928a_interface tms9918_intf
--------------------------------------------------*/
-
-static TMS9928A_INTERFACE( vdp_intf )
-{
-	0x4000,
-	DEVCB_CPU_INPUT_LINE(M6809_TAG, INPUT_LINE_IRQ0)
-};
-
-/*-------------------------------------------------
     ptm6840_interface ptm_intf
 -------------------------------------------------*/
 
@@ -454,7 +444,9 @@ static MACHINE_CONFIG_START( arachnid, arachnid_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u17_pcb_w))
 
 	// video hardware
-	MCFG_TMS9928A_ADD( TMS9118_TAG, TMS9118, vdp_intf )
+	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL_10_738635MHz / 2 )
+ 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
 

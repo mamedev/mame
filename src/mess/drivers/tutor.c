@@ -250,13 +250,6 @@ DRIVER_INIT_MEMBER(tutor_state,pyuuta)
 	membank("bank1")->set_entry(1);
 }
 
-
-static TMS9928A_INTERFACE(tutor_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_NULL
-};
-
 void tutor_state::machine_start()
 {
 }
@@ -761,7 +754,8 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, tutor_memmap, tutor_io)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

@@ -941,13 +941,6 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 	m_vdp_nmi = state;
 }
 
-static TMS9928A_INTERFACE( vdc_intf )
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(adam_state, vdc_int_w)
-};
-
-
 //-------------------------------------------------
 //  M6801_INTERFACE( m6801_intf )
 //-------------------------------------------------
@@ -1064,7 +1057,9 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware
-	MCFG_TMS9928A_ADD(TMS9928A_TAG, TMS9928A, vdc_intf)
+	MCFG_DEVICE_ADD(TMS9928A_TAG, TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(adam_state, vdc_int_w))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
 	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
 

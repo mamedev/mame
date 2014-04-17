@@ -131,27 +131,35 @@ protected:
 
 /****************************************************************************/
 
-#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _tmsparam)    \
+#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _vsize, _class, _int)    \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                  \
+	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 )                  \
+	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _tmsparam)     \
+#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _vsize, _class, _int)     \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                      \
+	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 ) \
+	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int))	\
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI998_ADD_NTSC(_tag, _chip, _tmsparam) \
+#define MCFG_TI998_ADD_NTSC(_tag, _chip, _vsize, _class, _int) \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                  \
+	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 )                  \
+	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI998_ADD_PAL(_tag, _chip, _tmsparam)      \
+#define MCFG_TI998_ADD_PAL(_tag, _chip, _vsize, _class, _int)      \
 	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                      \
+	MCFG_DEVICE_ADD( VDP_TAG, _chip, XTAL_10_738635MHz / 2 )                      \
+	MCFG_TMS9928A_VRAM_SIZE(_vsize) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(_class,_int)) \
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
@@ -166,6 +174,7 @@ protected:
 	MCFG_SCREEN_SIZE(_x, _y)                                                \
 	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)                          \
 	MCFG_SCREEN_PALETTE(VDP_TAG ":palette")
+	
 #define MCFG_TI_SOUND_94624_ADD(_tag)            \
 	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0)
 

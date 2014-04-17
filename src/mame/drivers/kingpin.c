@@ -126,12 +126,6 @@ WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static TMS9928A_INTERFACE(kingpin_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(kingpin_state, vdp_interrupt)
-};
-
 static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -166,7 +160,10 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, kingpin_tms9928a_interface )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(kingpin_state, vdp_interrupt))	
+	
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

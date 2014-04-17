@@ -752,12 +752,6 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 
 /*****************************************************************************/
 
-static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, video_interrupt_in)
-};
-
 /*
     Devices attached to the databus multiplexer. We cannot solve this with
     the common address maps since the multiplexer also inserts wait states
@@ -895,14 +889,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_60hz, ti99_4 )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, 0x4000, ti99_4x_state, video_interrupt_in)
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_50hz, ti99_4 )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, 0x4000, ti99_4x_state, video_interrupt_in)
 MACHINE_CONFIG_END
 
 /**********************************************************************
@@ -993,14 +987,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_60hz, ti99_4a )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in)
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_50hz, ti99_4a )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in)
 MACHINE_CONFIG_END
 
 /************************************************************************
@@ -1028,14 +1022,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in)
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_50hz, ti99_4qi )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in)
 MACHINE_CONFIG_END
 
 /************************************************************************

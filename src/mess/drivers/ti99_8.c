@@ -816,12 +816,6 @@ WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 	if (TRACE_READY) logerror("ti99_8: Setting a not connected line ... ignored\n");
 }
 
-static TMS9928A_INTERFACE(ti99_8_tms9118a_interface)
-{
-	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, video_interrupt)
-};
-
 WRITE8_MEMBER( ti99_8_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
@@ -1044,14 +1038,14 @@ MACHINE_CONFIG_END
     TI-99/8 US version (NTSC, 60 Hz)
 */
 static MACHINE_CONFIG_DERIVED( ti99_8_60hz, ti99_8 )
-	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_8_tms9118a_interface)
+	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, 0x4000, ti99_8_state, video_interrupt)
 MACHINE_CONFIG_END
 
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
 static MACHINE_CONFIG_DERIVED( ti99_8_50hz, ti99_8 )
-	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, ti99_8_tms9118a_interface)
+	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, 0x4000, ti99_8_state, video_interrupt)
 MACHINE_CONFIG_END
 
 /*
