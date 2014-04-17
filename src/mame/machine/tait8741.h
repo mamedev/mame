@@ -156,7 +156,7 @@ public:
 	DECLARE_READ8_MEMBER( read_1 ) { return read(1,offset); }
 	DECLARE_WRITE8_MEMBER( write_1 ) { write(1,offset,data); }
 
-	DECLARE_WRITE8_HANDLER( nmi_enable_w ) { m_nmi_enable = 1; }
+	DECLARE_WRITE8_MEMBER( nmi_enable_w ) { m_nmi_enable = 1; }
 
 	TIMER_CALLBACK_MEMBER( tx );
 protected:
