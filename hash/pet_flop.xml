@@ -700,7 +700,7 @@
 		-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="madison8050_t43_s16_bad.d80" size="533248" crc="91718447" sha1="4ab1983c275c217a0f66facf4db639de04720419" status="baddump" offset="0" />
+				<rom name="madison8050.d80" size="533248" crc="49284f58" sha1="1533504394d8135b21738f8f16f7603fe59de12c" offset="0" />
 			</dataarea>
 		</part>
 
