@@ -67,14 +67,6 @@ Lots of byte-wise registers.  A partial map:
 /* K055555 5-bit-per-pixel priority encoder */
 /* This device has 48 8-bit-wide registers */
 
-
-void k055555_device::K055555_vh_start(running_machine &machine)
-{
-	machine.save().save_item(NAME(m_regs));
-
-	memset(m_regs, 0, 64*sizeof(UINT8));
-}
-
 void k055555_device::K055555_write_reg(UINT8 regnum, UINT8 regdat)
 {
 	static const char *const rnames[46] =

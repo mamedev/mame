@@ -157,9 +157,16 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
+	
+	void fantjour_dma_install();
+
+	void konamigx_mixer_primode(int mode);
 
 	UINT8 m_sound_ctrl;
 	UINT8 m_sound_intck;
+	UINT32 m_fantjour_dma[8];
+	int m_konamigx_current_frame;
+	int m_gx_objdma, m_gx_primode;
 };
 
 
@@ -214,20 +221,3 @@ extern UINT16 konamigx_wrport2;
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
 
-void konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-					tilemap_t *sub1, int sub1flags,
-					tilemap_t *sub2, int sub2flags,
-					int mixerflags, bitmap_ind16* extra_bitmap, int rushingheroes_hack);
-
-void konamigx_mixer_init(screen_device &screen, int objdma);
-void konamigx_mixer_primode(int mode);
-
-extern int konamigx_current_frame;
-
-
-/*----------- defined in machine/konamigx.c -----------*/
-
-// K055550/K053990/ESC protection devices handlers
-
-
-void fantjour_dma_install(running_machine &machine);

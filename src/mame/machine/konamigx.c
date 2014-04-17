@@ -465,33 +465,30 @@ if((data1=obj[0])&0x80000000)\
 #undef EXTRACT_EVEN
 }
 
-static UINT32 fantjour_dma[8];
-
-void fantjour_dma_install(running_machine &machine)
+void konamigx_state::fantjour_dma_install()
 {
-	konamigx_state *state = machine.driver_data<konamigx_state>();
-	machine.save().save_item(NAME(fantjour_dma));
-	state->m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),state));
-	memset(fantjour_dma, 0, sizeof(fantjour_dma));
+	save_item(NAME(m_fantjour_dma));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),this));
+	memset(m_fantjour_dma, 0, sizeof(m_fantjour_dma));
 }
 
 WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
 {
-	COMBINE_DATA(fantjour_dma + offset);
+	COMBINE_DATA(m_fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {
-		UINT32 sa = fantjour_dma[1];
-		//      UINT16 ss = (fantjour_dma[2] & 0xffff0000) >> 16;
-		//      UINT32 sb = ((fantjour_dma[2] & 0xffff) << 16) | ((fantjour_dma[3] & 0xffff0000) >> 16);
+		UINT32 sa = m_fantjour_dma[1];
+		//      UINT16 ss = (m_fantjour_dma[2] & 0xffff0000) >> 16;
+		//      UINT32 sb = ((m_fantjour_dma[2] & 0xffff) << 16) | ((m_fantjour_dma[3] & 0xffff0000) >> 16);
 
-		UINT32 da = ((fantjour_dma[3] & 0xffff) << 16) | ((fantjour_dma[4] & 0xffff0000) >> 16);
-		//      UINT16 ds = fantjour_dma[4] & 0xffff;
-		UINT32 db = fantjour_dma[5];
+		UINT32 da = ((m_fantjour_dma[3] & 0xffff) << 16) | ((m_fantjour_dma[4] & 0xffff0000) >> 16);
+		//      UINT16 ds = m_fantjour_dma[4] & 0xffff;
+		UINT32 db = m_fantjour_dma[5];
 
-		//      UINT8 sz1 = fantjour_dma[0] >> 8;
-		UINT8 sz2 = fantjour_dma[0] >> 16;
-		UINT8 mode = fantjour_dma[0] >> 24;
+		//      UINT8 sz1 = m_fantjour_dma[0] >> 8;
+		UINT8 sz2 = m_fantjour_dma[0] >> 16;
+		UINT8 mode = m_fantjour_dma[0] >> 24;
 
-		UINT32 x   = fantjour_dma[6];
+		UINT32 x   = m_fantjour_dma[6];
 		UINT32 i1, i2;
 
 		if(mode == 0x93)

@@ -98,7 +98,6 @@ public:
 
 
 	/* alt implementation to merge */
-	void K055555_vh_start(running_machine &machine); // "PCU2"
 	void K055555_write_reg(UINT8 regnum, UINT8 regdat);
 	DECLARE_WRITE16_MEMBER( K055555_word_w );
 	DECLARE_WRITE32_MEMBER( K055555_long_w );

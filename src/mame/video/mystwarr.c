@@ -158,8 +158,6 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 
 VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 {
-	m_k055555->K055555_vh_start(machine());	
-
 	m_gametype = 0;
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
@@ -197,8 +195,6 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 
 VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 {
-	m_k055555->K055555_vh_start(machine());	
-
 	m_gametype = 1;
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
@@ -225,8 +221,6 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 
 VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 {
-	m_k055555->K055555_vh_start(machine());	
-
 	m_gametype = 0;
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
@@ -249,8 +243,6 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 {
 	m_gametype = 0;
 
-	m_k055555->K055555_vh_start(machine());	
-
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
@@ -270,8 +262,6 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 {
 	m_gametype = 0;
 
-	m_k055555->K055555_vh_start(machine());	
-
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
@@ -289,8 +279,6 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 VIDEO_START_MEMBER(mystwarr_state,martchmp)
 {
 	m_gametype = 0;
-
-	m_k055555->K055555_vh_start(machine());	
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 

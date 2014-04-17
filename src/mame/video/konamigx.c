@@ -34,7 +34,6 @@ static bitmap_ind16* type3_roz_temp_bitmap;
 static tilemap_t* gx_psac_tilemap_alt;
 
 static int konamigx_has_dual_screen;
-int konamigx_current_frame;
 INLINE void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, UINT16 data);
 static int konamigx_palformat;
 static bitmap_rgb32* dualscreen_left_tempbitmap;
@@ -345,7 +344,6 @@ static void gx_wipezbuf(running_machine &machine, int noshadow)
 
 static struct GX_OBJ { int order, offs, code, color; } *gx_objpool;
 static UINT16 *gx_spriteram;
-static int gx_objdma, gx_primode;
 
 // mirrored K053247 and K054338 settings
 static void (*k053247_callback)(running_machine &machine, int *code,int *color,int *priority);
@@ -356,8 +354,8 @@ static int *K054338_shdRGB;
 
 void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 {
-	gx_objdma = 0;
-	gx_primode = 0;
+	m_gx_objdma = 0;
+	m_gx_primode = 0;
 
 	gx_objzbuf = &screen.priority().pix8(0);
 	gx_shdzbuf = auto_alloc_array(machine(), UINT8, GX_ZBUFSIZE);
@@ -369,7 +367,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	if (objdma)
 	{
 		gx_spriteram = auto_alloc_array(machine(), UINT16, 0x1000/2);
-		gx_objdma = 1;
+		m_gx_objdma = 1;
 	}
 	else
 		m_k055673->k053247_get_ram(&gx_spriteram);
@@ -378,9 +376,9 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	m_k054338->invert_alpha(1);
 }
 
-void konamigx_mixer_primode(int mode)
+void konamigx_state::konamigx_mixer_primode(int mode)
 {
-	gx_primode = mode;
+	m_gx_primode = mode;
 }
 
 void konamigx_state::konamigx_objdma(void)
@@ -388,7 +386,7 @@ void konamigx_state::konamigx_objdma(void)
 	UINT16* k053247_ram;
 	m_k055673->k053247_get_ram(&k053247_ram);
 
-	if (gx_objdma && gx_spriteram && k053247_ram) memcpy(gx_spriteram, k053247_ram, 0x1000);
+	if (m_gx_objdma && gx_spriteram && k053247_ram) memcpy(gx_spriteram, k053247_ram, 0x1000);
 }
 
 void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
@@ -452,7 +450,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	int shdprisel;
 
-	if (gx_primode == -1)
+	if (m_gx_primode == -1)
 	{
 		// Lethal Enforcer hack (requires pixel color comparison)
 		layerpri[2] = m_k055555->K055555_read_register(K55_PRIINP_3) + 0x20;
@@ -644,7 +642,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 		}
 
-		switch (gx_primode & 0xf)
+		switch (m_gx_primode & 0xf)
 		{
 			// Dadandarn zcode suppression
 			case  1:
@@ -1168,8 +1166,6 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 {
 	int i;
 
-	m_k055555->K055555_vh_start(machine);
-
 	konamigx_mixer_init(*m_screen, 0);
 
 	for (i = 0; i < 8; i++)
@@ -1197,7 +1193,7 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 	m_k056832->set_layer_offs(3,  3, 0);
 
 	konamigx_has_dual_screen = 0;
-	konamigx_current_frame = 0;
+	m_konamigx_current_frame = 0;
 }
 
 void konamigx_state::_gxcommoninit(running_machine &machine)
@@ -1652,9 +1648,9 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* the video gets demuxed by a board which plugs into the jamma connector */
-	konamigx_current_frame^=1;
+	m_konamigx_current_frame^=1;
 
-	if (konamigx_current_frame==1)
+	if (m_konamigx_current_frame==1)
 	{
 		int offset=0;
 
@@ -1695,7 +1691,7 @@ UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap
 
 UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (konamigx_current_frame==1)
+	if (m_konamigx_current_frame==1)
 	{
 		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}

@@ -775,7 +775,7 @@ READ32_MEMBER(konamigx_state::type1_roz_r2)
 
 READ32_MEMBER(konamigx_state::type3_sync_r)
 {
-	if(konamigx_current_frame==0)
+	if(m_konamigx_current_frame==0)
 		return -1;  //  return 0xfffffffe | 1;
 	else
 		return 0;// return 0xfffffffe | 0;
@@ -3675,7 +3675,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 					break;
 
 				case 9: // fantjour
-					fantjour_dma_install(machine());
+					fantjour_dma_install();
 					break;
 			}
 		}
