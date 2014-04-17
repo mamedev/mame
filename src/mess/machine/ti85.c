@@ -175,9 +175,9 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	membank("bank2")->set_base(m_bios);
 	membank("bank3")->set_base(m_bios);
 	membank("bank4")->set_base(m_ti8x_ram);
+	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram, sizeof(UINT8)*32*1024);
 
 	machine().scheduler().timer_pulse(attotime::from_hz(200), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
-
 }
 
 
@@ -211,6 +211,7 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	membank("bank2")->set_base(m_bios + 0x04000);
 
 	membank("bank4")->set_base(m_ti8x_ram);
+	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram, sizeof(UINT8)*128*1024);
 
 	machine().scheduler().timer_pulse(attotime::from_hz(200), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
 }
@@ -496,45 +497,6 @@ WRITE8_MEMBER(ti85_state::ti83p_port_0007_w)
 {
 	m_ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
 	update_ti83p_memory();
-}
-
-/* NVRAM functions */
-NVRAM_HANDLER( ti83p )
-{
-	ti85_state *state = machine.driver_data<ti85_state>();
-	if (read_or_write)
-	{
-		file->write(state->m_ti8x_ram, sizeof(unsigned char)*32*1024);
-	}
-	else
-	{
-			if (file)
-			{
-				file->read(state->m_ti8x_ram, sizeof(unsigned char)*32*1024);
-				state->m_maincpu->set_state_int(Z80_PC,0x0c59);
-			}
-			else
-				memset(state->m_ti8x_ram, 0, sizeof(unsigned char)*32*1024);
-	}
-}
-
-NVRAM_HANDLER( ti86 )
-{
-	ti85_state *state = machine.driver_data<ti85_state>();
-	if (read_or_write)
-	{
-		file->write(state->m_ti8x_ram, sizeof(unsigned char)*128*1024);
-	}
-	else
-	{
-			if (file)
-			{
-				file->read(state->m_ti8x_ram, sizeof(unsigned char)*128*1024);
-				state->m_maincpu->set_state_int(Z80_PC,0x0c59);
-			}
-			else
-				memset(state->m_ti8x_ram, 0, sizeof(unsigned char)*128*1024);
-	}
 }
 
 /***************************************************************************

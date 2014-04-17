@@ -10,7 +10,7 @@
 #include "imagedev/snapquik.h"
 #include "video/t6a04.h"
 #include "sound/speaker.h"
-
+#include "machine/nvram.h"
 
 class ti85_state : public driver_device
 {
@@ -111,11 +111,5 @@ public:
 	void ti86_setup_snapshot (UINT8 * data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ti8x );
 };
-
-
-/*----------- defined in machine/ti85.c -----------*/
-NVRAM_HANDLER( ti83p );
-NVRAM_HANDLER( ti86 );
-
 
 #endif /* TI85_H_ */

@@ -188,9 +188,7 @@ TI-86 ports:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/snapquik.h"
-#include "machine/nvram.h"
 #include "includes/ti85.h"
-#include "mcfglgcy.h"
 
 /* port i/o functions */
 
@@ -594,9 +592,6 @@ static MACHINE_CONFIG_DERIVED( ti86, ti85 )
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
-	MCFG_DEVICE_REMOVE("nvram")
-	MCFG_NVRAM_HANDLER( ti86 )
-
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 	//MCFG_TI86SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
@@ -619,9 +614,6 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
-
-	MCFG_DEVICE_REMOVE("nvram")
-	MCFG_NVRAM_HANDLER(ti83p)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
