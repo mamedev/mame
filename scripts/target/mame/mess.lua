@@ -2686,6 +2686,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/ms0515.c",
 	MAME_DIR .. "src/mess/drivers/ms9540.c",
 	MAME_DIR .. "src/mess/drivers/mstation.c",
+	MAME_DIR .. "src/mess/drivers/mt735.c",
 	MAME_DIR .. "src/mess/drivers/mx2178.c",
 	MAME_DIR .. "src/mess/drivers/mycom.c",
 	MAME_DIR .. "src/mess/drivers/myvision.c",
