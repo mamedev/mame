@@ -29,6 +29,7 @@
 #include "machine/intelfsh.h"
 #include "machine/ram.h"
 #include "imagedev/snapquik.h"
+#include "machine/nvram.h"
 
 struct CYBIKO_RS232_PINS
 {
@@ -53,7 +54,8 @@ public:
 	m_speaker(*this, "speaker"),
 	m_rtc(*this, "rtc"),
 	m_ram(*this, RAM_TAG),
-	m_flash1(*this, "flash1")
+	m_flash1(*this, "flash1"),
+	m_nvram(*this, "nvram")
 	{ }
 
 	CYBIKO_RS232 m_rs232;
@@ -85,6 +87,7 @@ public:
 	required_device<pcf8593_device> m_rtc;
 	required_device<ram_device> m_ram;
 	optional_device<at45db041_device> m_flash1;
+	required_device<nvram_device> 	m_nvram;
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybiko);
 	virtual void machine_start();
@@ -93,7 +96,5 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
 };
-
-NVRAM_HANDLER( cybikoxt );
 
 #endif /* CYBIKO_H_ */

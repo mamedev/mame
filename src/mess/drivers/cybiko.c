@@ -18,7 +18,6 @@ ToDo:
 
 #include "includes/cybiko.h"
 #include "rendlay.h"
-#include "mcfglgcy.h"
 
 //  +------------------------------------------------------+
 //  | Cybiko Classic (CY6411)                         | V2 |
@@ -308,6 +307,8 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_PCF8593_ADD("rtc")
 	MCFG_AT45DB041_ADD("flash1")
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -338,9 +339,7 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_CPU_IO_MAP(cybikoxt_io )
 	// machine
 	MCFG_DEVICE_REMOVE("flash1")
-	MCFG_SST_39VF400A_ADD("flashxt")
-
-	MCFG_NVRAM_HANDLER( cybikoxt )
+	MCFG_SST_39VF400A_ADD("flashxt")	
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

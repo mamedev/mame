@@ -58,30 +58,6 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 // MACHINE START //
 ///////////////////
 
-NVRAM_HANDLER( cybikoxt )
-{
-	address_space &space =  machine.driver_data<cybiko_state>()->m_maincpu->space(AS_PROGRAM);
-	dynamic_buffer buffer(RAMDISK_SIZE);
-
-	if (read_or_write)
-	{
-		for (offs_t offs = 0; offs < RAMDISK_SIZE; offs++)
-			buffer[offs] = space.read_byte(0x400000 + offs);
-
-		file->write(buffer, RAMDISK_SIZE);
-	}
-	else
-	{
-		if (file)
-			file->read(buffer, RAMDISK_SIZE);
-		else
-			memset(buffer, 0, RAMDISK_SIZE);
-
-		for (offs_t offs = 0; offs < RAMDISK_SIZE; offs++)
-			space.write_byte(0x400000 + offs, buffer[offs]);
-	}
-}
-
 void cybiko_state::machine_start()
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
@@ -89,6 +65,7 @@ void cybiko_state::machine_start()
 	cybiko_rs232_init();
 	// other
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybiko),this));
+	m_nvram->set_base(m_ram->pointer(), RAMDISK_SIZE);
 }
 
 ///////////////////
