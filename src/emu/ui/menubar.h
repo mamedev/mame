@@ -230,7 +230,7 @@ private:
 	osd_ticks_t				m_last_mouse_move;
 	menubar_visibility_t	m_menubar_visibility;
 	bool					m_first_time;
-	bool					m_shortcuts_enabled;
+	//bool					m_shortcuts_enabled;
 
 	// selection walking
 	bool walk_selection_previous();
