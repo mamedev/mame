@@ -4,7 +4,7 @@
 #include "68340.h"
 
 
-READ32_HANDLER( m68340cpu_device::m68340_internal_serial_r )
+READ32_MEMBER( m68340cpu_device::m68340_internal_serial_r )
 {
 	m68340cpu_device *m68k = this;
 	m68340_serial* serial = m68k->m68340SERIAL;

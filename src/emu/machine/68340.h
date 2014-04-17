@@ -40,7 +40,7 @@ public:
 	WRITE32_MEMBER( m68340_internal_base_w );
 	READ32_MEMBER( m68340_internal_dma_r );
 	WRITE32_MEMBER( m68340_internal_dma_w );
-	READ32_HANDLER( m68340_internal_serial_r );
+	READ32_MEMBER( m68340_internal_serial_r );
 	WRITE32_MEMBER( m68340_internal_serial_w );
 	READ16_MEMBER( m68340_internal_sim_r );
 	READ8_MEMBER( m68340_internal_sim_ports_r );
