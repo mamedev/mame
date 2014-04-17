@@ -47,7 +47,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
 	{ OPTION_CFG_DIRECTORY,                              "cfg",       OPTION_STRING,     "directory to save configurations" },
 	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     OPTION_STRING,     "directory to save nvram contents" },
-	{ OPTION_MEMCARD_DIRECTORY,                          "memcard",   OPTION_STRING,     "directory to save memory card contents" },
 	{ OPTION_INPUT_DIRECTORY,                            "inp",       OPTION_STRING,     "directory to save input device logs" },
 	{ OPTION_STATE_DIRECTORY,                            "sta",       OPTION_STRING,     "directory to save states" },
 	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save screenshots" },

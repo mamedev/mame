@@ -60,7 +60,6 @@ enum
 // core directory options
 #define OPTION_CFG_DIRECTORY        "cfg_directory"
 #define OPTION_NVRAM_DIRECTORY      "nvram_directory"
-#define OPTION_MEMCARD_DIRECTORY    "memcard_directory"
 #define OPTION_INPUT_DIRECTORY      "input_directory"
 #define OPTION_STATE_DIRECTORY      "state_directory"
 #define OPTION_SNAPSHOT_DIRECTORY   "snapshot_directory"
@@ -226,7 +225,6 @@ public:
 	// core directory options
 	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }
 	const char *nvram_directory() const { return value(OPTION_NVRAM_DIRECTORY); }
-	const char *memcard_directory() const { return value(OPTION_MEMCARD_DIRECTORY); }
 	const char *input_directory() const { return value(OPTION_INPUT_DIRECTORY); }
 	const char *state_directory() const { return value(OPTION_STATE_DIRECTORY); }
 	const char *snapshot_directory() const { return value(OPTION_SNAPSHOT_DIRECTORY); }
