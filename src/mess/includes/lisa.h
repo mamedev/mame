@@ -232,10 +232,4 @@ public:
 	void init_lisa1(void);
 };
 
-
-/*----------- defined in machine/lisa.c -----------*/
-
-extern NVRAM_HANDLER(lisa);
-
-
 #endif /* LISA_H_ */
