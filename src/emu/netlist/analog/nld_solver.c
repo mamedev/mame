@@ -274,33 +274,33 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
 	for (int i = 0; i < m_term_num; i++)
 	{
 		terms_t &t = m_terms[i];
-		m_RHS[t.net_this] += t.term->m_Idr;
-		m_A[t.net_this][t.net_this] += t.term->m_gt;
+		RHS[t.net_this] += t.term->m_Idr;
+		A[t.net_this][t.net_this] += t.term->m_gt;
 		if (t.net_other >= 0)
 		{
 			//m_A[t.net_other][t.net_other] += t.term->m_otherterm->m_gt;
-			m_A[t.net_this][t.net_other] += -t.term->m_go;
+			A[t.net_this][t.net_other] += -t.term->m_go;
 			//m_A[t.net_other][t.net_this] += -t.term->m_otherterm->m_go;
 		}
 		else
-			m_RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
+			RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
 	}
 #else
 	for (int i = 0; i < m_rail_start; i++)
 	{
 		terms_t &t = m_terms[i];
 		//printf("A %d %d %s %f %f\n",t.net_this, t.net_other, t.term->name().cstr(), t.term->m_gt, t.term->m_go);
+
 		RHS[t.net_this] += t.term->m_Idr;
 		A[t.net_this][t.net_this] += t.term->m_gt;
-
 		A[t.net_this][t.net_other] += -t.term->m_go;
 	}
 	for (int i = m_rail_start; i < m_term_num; i++)
 	{
 		terms_t &t = m_terms[i];
+
 		RHS[t.net_this] += t.term->m_Idr;
 		A[t.net_this][t.net_this] += t.term->m_gt;
-
 		RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
 	}
 #endif
@@ -325,7 +325,6 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 	for (int i = 0; i < N(); i++) {
 #if 0
 		/* Find the row with the largest first value */
-	    double tmp;
 		int maxrow = i;
 		for (int j = i + 1; j < N(); j++)
 		{
@@ -337,13 +336,13 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 		{
             /* Swap the maxrow and ith row */
             for (int k = i; k < N(); k++) {
-                tmp = A[i][k];
+                const double tmp = A[i][k];
                 A[i][k] = A[maxrow][k];
                 A[maxrow][k] = tmp;
             }
-            tmp = RHS[i];
+            const double tmpR = RHS[i];
             RHS[i] = RHS[maxrow];
-            RHS[maxrow] = tmp;
+            RHS[maxrow] = tmpR;
 		}
 #endif
 		/* Singular matrix? */
@@ -554,13 +553,13 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 	double one_m_w[_storage_N];
 	double RHS[_storage_N];
 
-	for (int k = 0; k < N(); k++)
+	for (int k = 0; k < this->N(); k++)
 	{
 		double gtot_t = 0.0;
 		double gabs_t = 0.0;
 		double RHS_t = 0.0;
 
-		netlist_net_t *net = m_nets[k];
+		netlist_net_t *net = this->m_nets[k];
 		const netlist_net_t::terminal_list_t &terms = net->m_terms;
 		const netlist_net_t::terminal_list_t &rails = net->m_rails;
 		const int term_count = terms.count();
@@ -581,7 +580,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 			RHS_t += terms[i]->m_Idr;
 		}
 
-		gabs_t *= m_params.m_convergence_factor;
+		gabs_t *= this->m_params.m_convergence_factor;
 		if (gabs_t > gtot_t)
 		{
 			// Actually 1.0 / g_tot  * g_tot / (gtot_t + gabs_t)
@@ -596,17 +595,17 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 
 		RHS[k] = RHS_t;
 	}
-    for (int k = 0; k < N(); k++)
-        m_nets[k]->m_new_Analog = m_nets[k]->m_cur_Analog;
+    for (int k = 0; k < this->N(); k++)
+        this->m_nets[k]->m_new_Analog = this->m_nets[k]->m_cur_Analog;
 
 	//NL_VERBOSE_OUT(("%f %d\n", w, m_nets.count());
 	do {
 		resched = false;
 		double cerr = 0.0;
 
-		for (int k = 0; k < N(); k++)
+		for (int k = 0; k < this->N(); k++)
 		{
-			netlist_net_t *net = m_nets[k];
+			netlist_net_t *net = this->m_nets[k];
 			const netlist_net_t::terminal_list_t &terms = net->m_terms;
 			const int term_count = terms.count();
 
@@ -626,22 +625,21 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 
 			net->m_new_Analog = new_val;
 		}
-		if (cerr > m_params.m_accuracy * m_params.m_accuracy)
+		if (cerr > this->m_params.m_accuracy * this->m_params.m_accuracy)
 		{
 			resched = true;
-			//last_resched_net = net;
 		}
 		resched_cnt++;
-	} while (resched && (resched_cnt < m_params.m_gs_loops));
+	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
 	if (resched)
 	{
-	    //netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
-        return m_fallback.solve_non_dynamic();
+	    //this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
+	    return netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic();
 	}
 
-    for (int k = 0; k < N(); k++)
-        m_nets[k]->m_cur_Analog = m_nets[k]->m_new_Analog;
+    for (int k = 0; k < this->N(); k++)
+        this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_new_Analog;
 
 	return resched_cnt;
 }
