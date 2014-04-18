@@ -142,6 +142,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 	file = new cdrom_file();
 	if (file == NULL)
 		return NULL;
+	memset(file, 0, sizeof(cdrom_file));
 
 	/* setup the CDROM module and get the disc info */
 	chd_error err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
@@ -239,6 +240,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	file = new cdrom_file();
 	if (file == NULL)
 		return NULL;
+	memset(file, 0, sizeof(cdrom_file));
 
 	/* fill in the data */
 	file->chd = chd;
@@ -330,32 +332,44 @@ void cdrom_close(cdrom_file *file)
 
 chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
 {
+	chd_error result = CHDERR_NONE;
+	bool needswap = false;
+
 	// if this is pregap info that isn't actually in the file, just return blank data
 	if ((file->cdtoc.tracks[tracknum].pgdatasize == 0) && (lbasector < (file->cdtoc.tracks[tracknum].logframeofs + file->cdtoc.tracks[tracknum].pregap)))
 	{
 //      printf("PG missing sector: LBA %d, trklog %d\n", lbasector, file->cdtoc.tracks[tracknum].logframeofs);
 		memset(dest, 0, length);
-		return CHDERR_NONE;
+		return result;
 	}
 
 	// if a CHD, just read
 	if (file->chd != NULL)
-		return file->chd->read_bytes(UINT64(chdsector) * UINT64(CD_FRAME_SIZE) + startoffs, dest, length);
+	{
+		result = file->chd->read_bytes(UINT64(chdsector) * UINT64(CD_FRAME_SIZE) + startoffs, dest, length);
+		/* swap CDDA in the case of LE GDROMs */
+		if ((file->cdtoc.flags & CD_FLAG_GDROMLE) && (file->cdtoc.tracks[tracknum].trktype == CD_TRACK_AUDIO))
+			needswap = true;
+	}
+	else
+	{
+		// else read from the appropriate file
+		core_file *srcfile = file->fhandle[tracknum];
 
-	// else read from the appropriate file
-	core_file *srcfile = file->fhandle[tracknum];
+		UINT64 sourcefileoffset = file->track_info.track[tracknum].offset;
+		int bytespersector = file->cdtoc.tracks[tracknum].datasize + file->cdtoc.tracks[tracknum].subsize;
 
-	UINT64 sourcefileoffset = file->track_info.track[tracknum].offset;
-	int bytespersector = file->cdtoc.tracks[tracknum].datasize + file->cdtoc.tracks[tracknum].subsize;
+		sourcefileoffset += chdsector * bytespersector + startoffs;
 
-	sourcefileoffset += chdsector * bytespersector + startoffs;
+		//  printf("Reading sector %d from track %d at offset %lld\n", chdsector, tracknum, sourcefileoffset);
 
-//  printf("Reading sector %d from track %d at offset %lld\n", chdsector, tracknum, sourcefileoffset);
+		core_fseek(srcfile, sourcefileoffset, SEEK_SET);
+		core_fread(srcfile, dest, length);
 
-	core_fseek(srcfile, sourcefileoffset, SEEK_SET);
-	core_fread(srcfile, dest, length);
+		needswap = file->track_info.track[tracknum].swap;
+	}
 
-	if (file->track_info.track[tracknum].swap)
+	if (needswap)
 	{
 		UINT8 *buffer = (UINT8 *)dest - startoffs;
 		for (int swapindex = startoffs; swapindex < 2352; swapindex += 2 )
@@ -365,7 +379,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 			buffer[ swapindex + 1 ] = swaptemp;
 		}
 	}
-	return CHDERR_NONE;
+	return result;
 }
 
 
@@ -839,7 +853,12 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 			}
 			else
 			{
-				err = chd->read_metadata(GDROM_TRACK_METADATA_TAG, toc->numtrks, metadata);
+				err = chd->read_metadata(GDROM_OLD_METADATA_TAG, toc->numtrks, metadata);
+				if (err == CHDERR_NONE)
+					/* legacy GDROM track was detected */
+					toc->flags |= CD_FLAG_GDROMLE;
+				else
+					err = chd->read_metadata(GDROM_TRACK_METADATA_TAG, toc->numtrks, metadata);
 
 				if (err == CHDERR_NONE)
 				{

@@ -215,7 +215,8 @@ class chd_chdfile_compressor : public chd_file_compressor
 public:
 	// construction/destruction
 	chd_chdfile_compressor(chd_file &file, UINT64 offset = 0, UINT64 maxoffset = ~0)
-		: m_file(file),
+		: m_toc(NULL),
+			m_file(file),
 			m_offset(offset),
 			m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
 
@@ -230,8 +231,45 @@ public:
 		chd_error err = m_file.read_bytes(offset, dest, length);
 		if (err != CHDERR_NONE)
 			throw err;
+
+		// if we have TOC - detect audio sectors and swap data
+		if (m_toc)
+		{
+			assert(offset % CD_FRAME_SIZE == 0);
+			assert(length % CD_FRAME_SIZE == 0);
+
+			int startlba = offset / CD_FRAME_SIZE;
+			int lenlba = length / CD_FRAME_SIZE;
+			UINT8 *_dest = reinterpret_cast<UINT8 *>(dest);
+
+			for (int chdlba = 0; chdlba < lenlba; chdlba++)
+			{	
+				// find current frame's track number
+				int tracknum = m_toc->numtrks;
+				for (int track = 0; track < m_toc->numtrks; track++)
+					if ((chdlba + startlba) < m_toc->tracks[track + 1].chdframeofs)
+					{
+						tracknum = track;
+						break;
+					}
+				// is it audio ?
+				if (m_toc->tracks[tracknum].trktype != CD_TRACK_AUDIO)
+					continue;
+				// byteswap if yes
+				int dataoffset = chdlba * CD_FRAME_SIZE;
+				for (UINT32 swapindex = dataoffset; swapindex < (dataoffset + CD_MAX_SECTOR_DATA); swapindex += 2)
+				{
+					UINT8 temp = _dest[swapindex];
+					_dest[swapindex] = _dest[swapindex + 1];
+					_dest[swapindex + 1] = temp;
+				}
+			}
+		}
+
 		return length;
 	}
+
+const cdrom_toc *   m_toc;
 
 private:
 	// internal state
@@ -2042,8 +2080,10 @@ static void do_copy(parameters_t &params)
 			memcpy(compression, s_default_ld_compression, sizeof(compression));
 		else if (input_chd.read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
 					input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-					input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
-			memcpy(compression, s_default_cd_compression, sizeof(compression));
+					input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE ||
+					input_chd.read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
+					input_chd.read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+					memcpy(compression, s_default_cd_compression, sizeof(compression));
 		else
 			memcpy(compression, s_default_raw_compression, sizeof(compression));
 	}
@@ -2087,12 +2127,19 @@ static void do_copy(parameters_t &params)
 		UINT8 metaflags;
 		UINT32 index = 0;
 		bool redo_cd = false;
+		bool cdda_swap = false;
 		for (err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags); err == CHDERR_NONE; err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags))
 		{
 			// if this is an old CD-CHD tag, note that we want to re-do it
 			if (metatag == CDROM_OLD_METADATA_TAG || metatag == CDROM_TRACK_METADATA_TAG)
 			{
 				redo_cd = true;
+				continue;
+			}
+			// if this is old GD tag we want re-do it and swap CDDA
+			if (metatag == GDROM_OLD_METADATA_TAG)
+			{
+				cdda_swap = redo_cd = true;
 				continue;
 			}
 
@@ -2112,6 +2159,8 @@ static void do_copy(parameters_t &params)
 			err = cdrom_write_metadata(chd, toc);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error writing upgraded CD metadata: %s", chd_file::error_string(err));
+			if (cdda_swap)
+				chd->m_toc = toc;
 		}
 
 		// compress it generically
@@ -2354,8 +2403,9 @@ static void do_extract_cd(parameters_t &params)
 				// read the data
 				cdrom_read_data(cdrom, cdrom_get_track_start_phys(cdrom, tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype, true);
 
-				// for CDRWin, audio tracks must be reversed
-				if ((mode == MODE_CUEBIN) && (trackinfo.trktype == CD_TRACK_AUDIO))
+				// for CDRWin and GDI audio tracks must be reversed
+				// in the case of GDI and CHD version < 5 we assuming source CHD image is GDROM so audio tracks is already reversed
+				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN)) && (trackinfo.trktype == CD_TRACK_AUDIO))
 					for (int swapindex = 0; swapindex < trackinfo.datasize; swapindex += 2)
 					{
 						UINT8 swaptemp = buffer[bufferoffs + swapindex];

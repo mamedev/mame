@@ -634,6 +634,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		outtoc.tracks[trknum].datasize = 0;
 		outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 		outtoc.tracks[trknum].subsize = 0;
+		outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 
 		tok=strtok(NULL," ");
 		outtoc.tracks[trknum].physframeofs=atoi(tok);
@@ -658,6 +659,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		{
 			outtoc.tracks[trknum].trktype=CD_TRACK_AUDIO;
 			outtoc.tracks[trknum].datasize=2352;
+			outinfo.track[trknum].swap = true;
 		}
 
 		astring name;

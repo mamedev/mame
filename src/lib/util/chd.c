@@ -1412,6 +1412,7 @@ UINT32 chd_file::guess_unitbytes()
 	if (read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
 		read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
 		read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE ||
+		read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
 		read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
 		return CD_FRAME_SIZE;
 
