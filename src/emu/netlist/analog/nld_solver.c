@@ -768,7 +768,7 @@ NETLIB_UPDATE(solver)
     for (int i = 0; i < t_cnt; i++)
     {
         if (m_mat_solvers[i]->is_timestep())
-            if (m_mat_solvers[i]->solve());
+            if (m_mat_solvers[i]->solve())
                 m_mat_solvers[i]->update_inputs();
     }
 #if 0
