@@ -410,7 +410,7 @@ UINT32 core_fread(core_file *file, void *buffer, UINT32 length)
 	file->back_char_tail = 0;
 
 	/* handle real files */
-	if (file->length && file->data == NULL)
+	if (file->file && file->data == NULL)
 	{
 		/* if we're within the buffer, consume that first */
 		if (file->offset >= file->bufferbase && file->offset < file->bufferbase + file->bufferbytes)
