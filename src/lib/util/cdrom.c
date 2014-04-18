@@ -813,6 +813,8 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	chd_error err;
 	int i;
 
+	toc->flags = 0;
+
 	/* start with no tracks */
 	for (toc->numtrks = 0; toc->numtrks < CD_MAX_TRACKS; toc->numtrks++)
 	{
