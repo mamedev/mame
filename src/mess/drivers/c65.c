@@ -505,32 +505,6 @@ READ8_MEMBER(c65_state::c65_c64_mem_r)
 	return m_memory[offset];
 }
 
-static const vic3_interface c65_vic3_ntsc_intf = {
-	"maincpu",
-	VIC4567_NTSC,
-	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_dma_read),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c65_state,c65_vic_interrupt),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_bankswitch_interface),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_c64_mem_r)
-};
-
-static const vic3_interface c65_vic3_pal_intf = {
-	"maincpu",
-	VIC4567_PAL,
-	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_dma_read),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c65_state,c65_vic_interrupt),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_bankswitch_interface),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_c64_mem_r)
-};
-
 INTERRUPT_GEN_MEMBER(c65_state::vic3_raster_irq)
 {
 	m_vic->raster_interrupt_gen();
@@ -560,7 +534,17 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update_c65)
 	MCFG_SCREEN_PALETTE("vic3:palette")
 
-	MCFG_VIC3_ADD("vic3", c65_vic3_ntsc_intf)
+	MCFG_DEVICE_ADD("vic3", VIC3, 0)
+	MCFG_VIC3_CPU("maincpu")
+	MCFG_VIC3_TYPE(VIC4567_NTSC)
+	MCFG_VIC3_LIGHTPEN_X_CB(READ8(c65_state, c65_lightpen_x_cb))
+	MCFG_VIC3_LIGHTPEN_Y_CB(READ8(c65_state, c65_lightpen_y_cb))
+	MCFG_VIC3_LIGHTPEN_BUTTON_CB(READ8(c65_state, c65_lightpen_button_cb))
+	MCFG_VIC3_DMA_READ_CB(READ8(c65_state, c65_dma_read))
+	MCFG_VIC3_DMA_READ_COLOR_CB(READ8(c65_state, c65_dma_read_color))
+	MCFG_VIC3_INTERRUPT_CB(WRITELINE(c65_state, c65_vic_interrupt))
+	MCFG_VIC3_PORT_CHANGED_CB(WRITE8(c65_state, c65_bankswitch_interface))
+	MCFG_VIC3_C64_MEM_R_CB(READ8(c65_state, c65_c64_mem_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -604,8 +588,8 @@ static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 	MCFG_SCREEN_VISIBLE_AREA(VIC6569_STARTVISIBLECOLUMNS, (VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1) * 2, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1)
 	MCFG_SCREEN_PALETTE("vic3:palette")
 
-	MCFG_DEVICE_REMOVE("vic3")
-	MCFG_VIC3_ADD("vic3", c65_vic3_pal_intf)
+	MCFG_DEVICE_MODIFY("vic3")
+	MCFG_VIC3_TYPE(VIC4567_PAL)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("sid_r", MOS8580, 1022727)
