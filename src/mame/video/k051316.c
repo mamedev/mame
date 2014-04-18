@@ -46,7 +46,7 @@ control registers
 const device_type K051316 = &device_creator<k051316_device>;
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051316, "Konami 051316 Video Controller", tag, owner, clock, "k051316", __FILE__),
+	: device_t(mconfig, K051316, "K051316 Video Controller", tag, owner, clock, "k051316", __FILE__),
 	m_ram(NULL),
 	//m_tmap,
 	//m_ctrlram[16],

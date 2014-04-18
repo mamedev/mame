@@ -64,7 +64,7 @@ memory map:
 const device_type K051960 = &device_creator<k051960_device>;
 
 k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051960, "Konami 051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
+	: device_t(mconfig, K051960, "K051960 Sprite Generator", tag, owner, clock, "k051960", __FILE__),
 	m_ram(NULL),
 	m_gfx(NULL),
 	//m_spriterombank[3],

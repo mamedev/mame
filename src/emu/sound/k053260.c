@@ -27,7 +27,7 @@ const device_type K053260 = &device_creator<k053260_device>;
 //-------------------------------------------------
 
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053260, "Konami 053260 PCM", tag, owner, clock, "k053260", __FILE__),
+	: device_t(mconfig, K053260, "K053260 PCM", tag, owner, clock, "k053260", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(NULL),
 		m_mode(0),
@@ -255,7 +255,7 @@ void k053260_device::check_bounds( int channel )
 	int channel_end = channel_start + m_channels[channel].size - 1;
 
 	if ( channel_start > m_rom_size ) {
-		logerror("K53260: Attempting to start playing past the end of the ROM ( start = %06x, end = %06x ).\n", channel_start, channel_end );
+		logerror("K053260: Attempting to start playing past the end of the ROM ( start = %06x, end = %06x ).\n", channel_start, channel_end );
 
 		m_channels[channel].play = 0;
 

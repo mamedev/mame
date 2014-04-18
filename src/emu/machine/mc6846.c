@@ -44,7 +44,7 @@
 const device_type MC6846 = &device_creator<mc6846_device>;
 
 mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock, "mc6846", __FILE__),
+	: device_t(mconfig, MC6846, "MC6846 Programmable Timer", tag, owner, clock, "mc6846", __FILE__),
 	m_out_port_cb(*this),
 	m_out_cp1_cb(*this),
 	m_out_cp2_cb(*this),

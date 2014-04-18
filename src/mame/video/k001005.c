@@ -28,7 +28,7 @@ struct poly_extra_data
 const device_type K001005 = &device_creator<k001005_device>;
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K001005, "Konami 001005 3D Pixel Renderer", tag, owner, clock, "k001005", __FILE__),
+	: device_t(mconfig, K001005, "K001005 3D Pixel Renderer", tag, owner, clock, "k001005", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_cpu(NULL),
 		m_dsp(NULL),

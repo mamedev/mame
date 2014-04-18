@@ -36,7 +36,7 @@ control registers
 const device_type K007342 = &device_creator<k007342_device>;
 
 k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007342, "Konami 007342 Video Controller", tag, owner, clock, "k007342", __FILE__),
+	: device_t(mconfig, K007342, "K007342 Video Controller", tag, owner, clock, "k007342", __FILE__),
 	m_ram(NULL),
 	m_scroll_ram(NULL),
 	m_videoram_0(NULL),
