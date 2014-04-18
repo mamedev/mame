@@ -265,7 +265,7 @@ public:
 	optional_device<cpu_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
 	required_device<adc1038_device> m_adc1038;
-	required_ioport m_analog0, m_analog1, m_analog2, m_analog3;
+	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
 
