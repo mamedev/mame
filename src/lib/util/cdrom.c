@@ -142,7 +142,6 @@ cdrom_file *cdrom_open(const char *inputfile)
 	file = new cdrom_file();
 	if (file == NULL)
 		return NULL;
-	memset(file, 0, sizeof(cdrom_file));
 
 	/* setup the CDROM module and get the disc info */
 	chd_error err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
@@ -240,7 +239,6 @@ cdrom_file *cdrom_open(chd_file *chd)
 	file = new cdrom_file();
 	if (file == NULL)
 		return NULL;
-	memset(file, 0, sizeof(cdrom_file));
 
 	/* fill in the data */
 	file->chd = chd;
