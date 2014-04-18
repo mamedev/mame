@@ -231,6 +231,7 @@ ATTR_COLD void netlist_base_t::reset()
 	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 	{
 		netlist_device_t *dev = entry->object();
+		//printf("step %s\n", dev->name().cstr());
 		dev->update_dev();
 	}
 
@@ -487,7 +488,8 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
 {
-	netlist().remove_save_items(this);
+    if (isInitialized())
+        netlist().remove_save_items(this);
 }
 
 ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)

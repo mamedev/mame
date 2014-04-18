@@ -29,16 +29,18 @@ struct netlist_solver_parameters_t
 {
 	double m_accuracy;
 	double m_convergence_factor;
-	int m_resched_loops;
+	int m_gs_loops;
+	int m_nr_loops;
+    netlist_time m_nt_sync_delay;
 };
 
-class netlist_matrix_solver_t
+class netlist_matrix_solver_t : public netlist_device_t
 {
 public:
 	typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
-	netlist_matrix_solver_t() : m_scheduled(true), m_owner(NULL) {}
+	netlist_matrix_solver_t() : m_owner(NULL) {}
 	virtual ~netlist_matrix_solver_t() {}
 
 	ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
@@ -47,7 +49,7 @@ public:
 	ATTR_HOT virtual int solve_non_dynamic() = 0;
 	ATTR_HOT virtual void step(const netlist_time delta);
 
-	ATTR_HOT void solve();
+	ATTR_HOT bool solve();
 
 	ATTR_HOT void update_inputs();
 	ATTR_HOT void update_dynamic();
@@ -58,14 +60,20 @@ public:
 	ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
 
 	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
-	ATTR_COLD virtual void reset();
+
+
+    ATTR_HOT  void update();
+    ATTR_COLD void start();
+    ATTR_COLD virtual void reset();
 
 	netlist_solver_parameters_t m_params;
-
-	bool m_scheduled;
+    netlist_ttl_output_t m_Q_sync;
 
 protected:
-	netlist_net_t::list_t m_nets;
+
+    netlist_ttl_input_t m_fb_sync;
+
+    netlist_net_t::list_t m_nets;
 	dev_list_t m_dynamic;
 	netlist_core_terminal_t::list_t m_inps;
 	dev_list_t m_steps;
@@ -126,9 +134,10 @@ public:
 
 	ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
 	{
+	    /* FIXME: setup the fallback first, because setup sets m_solver on nets */
+        m_fallback.setup(nets, owner);
 		netlist_matrix_solver_t::setup(nets, owner);
 		m_fallback.m_params = m_params;
-		m_fallback.setup(nets, owner);
 	}
 
 	ATTR_HOT int solve_non_dynamic();
@@ -162,42 +171,30 @@ private:
 NETLIB_DEVICE_WITH_PARAMS(solver,
 		typedef netlist_core_device_t::list_t dev_list_t;
 
-		netlist_ttl_input_t m_fb_sync;
-		netlist_ttl_output_t m_Q_sync;
-
-		netlist_ttl_input_t m_fb_step;
-		netlist_ttl_output_t m_Q_step;
+        netlist_ttl_input_t m_fb_step;
+        netlist_ttl_output_t m_Q_step;
 
 		netlist_param_double_t m_freq;
 		netlist_param_double_t m_sync_delay;
 		netlist_param_double_t m_accuracy;
 		netlist_param_double_t m_convergence;
 		netlist_param_double_t m_gmin;
-		netlist_param_int_t m_resched_loops;
+        netlist_param_int_t m_nr_loops;
+		netlist_param_int_t m_gs_loops;
 		netlist_param_int_t m_parallel;
 
 		netlist_time m_inc;
-		netlist_time m_nt_sync_delay;
 
 		netlist_matrix_solver_t::list_t m_mat_solvers;
 public:
 
 		ATTR_COLD ~NETLIB_NAME(solver)();
 
-		ATTR_HOT inline void schedule();
-
 		ATTR_COLD void post_start();
+        ATTR_COLD void reschedule_all();
 
 		ATTR_HOT inline double gmin() { return m_gmin.Value(); }
 );
-
-ATTR_HOT inline void NETLIB_NAME(solver)::schedule()
-{
-	if (!m_Q_sync.net().is_queued())
-	{
-        m_Q_sync.net().push_to_queue(m_nt_sync_delay);
-	}
-}
 
 ATTR_HOT inline const NETLIB_NAME(solver) &netlist_matrix_solver_t::owner() const
 {

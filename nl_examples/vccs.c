@@ -11,7 +11,7 @@ NETLIST_START(vccs)
     CLOCK(clk, 1000) // 1000 Hz
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-12)
-    PARAM(Solver.RESCHED_LOOPS, 10000)
+    PARAM(Solver.GS_LOOPS, 10000)
 
     VCCS(VV)
     PARAM(VV.G, 100)  // typical OP-AMP amplification

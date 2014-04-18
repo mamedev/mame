@@ -89,12 +89,10 @@ static DipswitchDesc dipswitch1_desc("winning_score", "Winning Score", 0, "11", 
 #endif
 
 CIRCUIT_LAYOUT( pongdoubles )
-SOLVER(Solver)
-PARAM(Solver.FREQ, 48000)
-PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
 	//CHIP("CLOCK", CLOCK_14_318_MHZ)
-    MAINCLOCK(CLOCK)
-    PARAM(CLOCK.FREQ, 14318000.0)
+    MAINCLOCK(CLOCK, 14318000.0)
 
 	ANALOG_INPUT(V5, 5)
 #define VCC "V5", Q

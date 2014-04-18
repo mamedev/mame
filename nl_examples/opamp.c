@@ -14,7 +14,7 @@ NETLIST_START(main)
     SOLVER(Solver, 48000)
     //PARAM(Solver.ACCURACY, 1e-3)
     //PARAM(Solver.CONVERG, 1.0)
-    //PARAM(Solver.RESCHED_LOOPS, 30)
+    //PARAM(Solver.GS_LOOPS, 30)
 
     /* Opamp wired as impedance changer */
     SUBMODEL(op, opamp)

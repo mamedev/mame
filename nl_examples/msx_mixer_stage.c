@@ -14,7 +14,7 @@ NETLIST_START(msx)
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-5)
     //PARAM(Solver.CONVERG, 0.3)
-    PARAM(Solver.RESCHED_LOOPS, 150)
+    PARAM(Solver.GS_LOOPS, 50)
 
     RES(RAY8910, 2345)     // Max Voltage
 
