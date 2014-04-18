@@ -54,7 +54,6 @@ public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bfm_sc45_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_m68307_68681(*this, "m68307_68681"),
 			m_cpuregion(*this, "maincpu"),
 			m_nvram(*this, "nvram"),
 			m_io1(*this, "IN-0"),
@@ -75,7 +74,6 @@ public:
 	}
 
 	required_device<m68307cpu_device> m_maincpu;
-	required_device<mc68681_device> m_m68307_68681;
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
@@ -113,7 +111,6 @@ public:
 	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
 	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
 	DECLARE_READ8_MEMBER(m68307_duart_input_r);
 	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);

@@ -10,9 +10,8 @@
 
 #include "68307sim.h"
 #include "68307bus.h"
-#include "68307ser.h"
 #include "68307tmu.h"
-
+#include "machine/mc68681.h"
 
 
 
@@ -21,12 +20,40 @@ typedef void (*m68307_porta_write_callback)(address_space &space, bool dedicated
 typedef UINT16 (*m68307_portb_read_callback)(address_space &space, bool dedicated, UINT16 line_mask);
 typedef void (*m68307_portb_write_callback)(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
 
+/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
+#define MCFG_MC68307_SERIAL_A_TX_CALLBACK(_cb) \
+	devcb = &m68307cpu_device::set_a_tx_cb(*device, DEVCB2_##_cb);
+
+#define MCFG_MC68307_SERIAL_B_TX_CALLBACK(_cb) \
+	devcb = &m68307cpu_device::set_b_tx_cb(*device, DEVCB2_##_cb);
+
+// deprecated: use ipX_w() instead
+#define MCFG_MC68307_SERIAL_INPORT_CALLBACK(_cb) \
+	devcb = &m68307cpu_device::set_inport_cb(*device, DEVCB2_##_cb);
+
+#define MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(_cb) \
+	devcb = &m68307cpu_device::set_outport_cb(*device, DEVCB2_##_cb);
 
 
 class m68307cpu_device : public m68000_device {
 public:
 	m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
+	template<class _Object> static devcb2_base &set_irq_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_a_tx_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_a_tx.set_callback(object); }
+	template<class _Object> static devcb2_base &set_b_tx_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_b_tx.set_callback(object); }
+	template<class _Object> static devcb2_base &set_inport_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).read_inport.set_callback(object); }
+	template<class _Object> static devcb2_base &set_outport_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_outport.set_callback(object); }
+	
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa){ write_a_tx(state); }
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb){ write_b_tx(state);  }
+	DECLARE_READ8_MEMBER(m68307_duart_input_r){ return read_inport();  }
+	DECLARE_WRITE8_MEMBER(m68307_duart_output_w){ write_outport(data);  }
+	devcb2_write_line write_irq, write_a_tx, write_b_tx;
+	devcb2_read8 read_inport;
+	devcb2_write8 write_outport;
 
 	UINT16 simple_read_immediate_16_m68307(offs_t address);
 
@@ -42,7 +69,7 @@ public:
 	/* 68307 peripheral modules */
 	m68307_sim*    m68307SIM;
 	m68307_mbus*   m68307MBUS;
-	m68307_serial* m68307SERIAL;
+//	m68307_serial* m68307SERIAL;
 	m68307_timer*  m68307TIMER;
 
 	UINT16 m68307_base;
@@ -78,17 +105,19 @@ public:
 
 	virtual UINT32 execute_min_cycles() const { return 4; };
 	virtual UINT32 execute_max_cycles() const { return 158; };
-protected:
 
+	required_device<mc68681_device> m_duart;
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
 
+private:
 };
 
 static const device_type M68307 = &device_creator<m68307cpu_device>;
 
 extern void m68307_set_port_callbacks(m68307cpu_device *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback portb_w);
-extern void m68307_set_duart68681(m68307cpu_device* cpudev, mc68681_device *duart68681);
 extern UINT16 m68307_get_cs(m68307cpu_device *device, offs_t address);
 extern void m68307_timer0_interrupt(m68307cpu_device *cpudev);
 extern void m68307_timer1_interrupt(m68307cpu_device *cpudev);

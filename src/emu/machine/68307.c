@@ -2,17 +2,65 @@
 
 #include "68307.h"
 
+/* 68307 SERIAL Module */
+/* all ports on this are 8-bit? */
+
+/* this is a 68681 'compatible' chip but with only a single channel implemented
+  (writes to the other channel have no effects)
+
+  for now at least we piggyback on the existing 68307 emulation rather than having
+  a custom verson here, that may change later if subtle differences exist.
+
+*/
+READ8_MEMBER( m68307cpu_device::m68307_internal_serial_r )
+{
+	m68307cpu_device *m68k = this;
+	
+	if (offset&1) return m_duart->read(*m68k->program, offset>>1);
+	return 0x0000;
+}
+
+WRITE8_MEMBER(m68307cpu_device::m68307_internal_serial_w)
+{
+	m68307cpu_device *m68k = this;
+
+	if (offset & 1) m_duart->write(*m68k->program, offset >> 1, data);
+}
+
+
+
 static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16, m68307cpu_device )
 	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
 ADDRESS_MAP_END
 
 
+
+static MACHINE_CONFIG_FRAGMENT( 68307fragment )
+	MCFG_MC68681_ADD("internal68681", 16000000/4) // ?? Mhz - should be specified in inline config
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307cpu_device, m68307_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307cpu_device, m68307_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(m68307cpu_device, m68307_duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(m68307cpu_device, m68307_duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(m68307cpu_device, m68307_duart_output_w))
+MACHINE_CONFIG_END
+
+machine_config_constructor m68307cpu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( 68307fragment );
+}
+
+
 m68307cpu_device::m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m68000_device(mconfig, "MC68307", tag, owner, clock, M68307, 16,24, ADDRESS_MAP_NAME(m68307_internal_map), "mc68307", __FILE__)
+	: m68000_device(mconfig, "MC68307", tag, owner, clock, M68307, 16,24, ADDRESS_MAP_NAME(m68307_internal_map), "mc68307", __FILE__),
+	write_irq(*this),
+	write_a_tx(*this),
+	write_b_tx(*this),
+	read_inport(*this),
+	write_outport(*this),
+	m_duart(*this, "internal68681")
 {
 	m68307SIM = 0;
 	m68307MBUS = 0;
-	m68307SERIAL = 0;
 	m68307TIMER = 0;
 	m68307_base = 0;
 	m68307_scrhigh = 0;
@@ -36,7 +84,6 @@ void m68307cpu_device::device_reset()
 
 	if (m68307SIM) m68307SIM->reset();
 	if (m68307MBUS) m68307MBUS->reset();
-	if (m68307SERIAL) m68307SERIAL->reset();
 	if (m68307TIMER) m68307TIMER->reset();
 
 	m68307_base = 0xbfff;
@@ -137,11 +184,6 @@ void m68307_set_port_callbacks(m68307cpu_device *device, m68307_porta_read_callb
 	device->m_m68307_portb_w = portb_w;
 }
 
-void m68307_set_duart68681(m68307cpu_device* cpudev, mc68681_device *duart68681)
-{
-	if (cpudev->m68307SERIAL)
-		cpudev->m68307SERIAL->m68307ser_set_duart68681(duart68681);
-}
 
 
 
@@ -175,10 +217,19 @@ void m68307_timer1_interrupt(m68307cpu_device *cpudev)
 	m68307_set_interrupt(cpudev, prioritylevel, vector);
 }
 
+
 void m68307_serial_interrupt(m68307cpu_device *cpudev, int vector)
 {
 	int prioritylevel = (cpudev->m68307SIM->m_picr & 0x0070)>>4;
 	m68307_set_interrupt(cpudev, prioritylevel, vector);
+}
+
+WRITE_LINE_MEMBER(m68307cpu_device::m68307_duart_irq_handler)
+{
+	if (state == ASSERT_LINE)
+	{
+		m68307_serial_interrupt(this, m_duart->get_irq_vector());
+	}
 }
 
 void m68307_mbus_interrupt(m68307cpu_device *cpudev)
@@ -210,20 +261,24 @@ void m68307cpu_device::device_start()
 
 	m68307SIM    = new m68307_sim();
 	m68307MBUS   = new m68307_mbus();
-	m68307SERIAL = new m68307_serial();
 	m68307TIMER  = new m68307_timer();
 
 	m68307TIMER->init(this);
 
 	m68307SIM->reset();
 	m68307MBUS->reset();
-	m68307SERIAL->reset();
 	m68307TIMER->reset();
 
 	internal = &this->space(AS_PROGRAM);
 	m68307_base = 0xbfff;
 	m68307_scrhigh = 0x0007;
 	m68307_scrlow = 0xf010;
+
+	write_irq.resolve_safe();
+	write_a_tx.resolve_safe();
+	write_b_tx.resolve_safe();
+	read_inport.resolve();
+	write_outport.resolve_safe();
 
 	m68307_set_port_callbacks(this, 0,0,0,0);
 }

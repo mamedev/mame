@@ -610,9 +610,6 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
-	m68307_set_duart68681(m_maincpu, m_m68307_68681);
-
-
 
 	int reels = 6;
 	m_reels=reels;
@@ -672,14 +669,6 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 	awp_draw_reel(5);
 }
 
-WRITE_LINE_MEMBER(sc4_state::m68307_duart_irq_handler)
-{
-	logerror("m68307_duart_irq_handler\n");
-	if (state == ASSERT_LINE)
-	{
-		m68307_serial_interrupt(m_maincpu, m_m68307_68681->get_irq_vector());
-	}
-}
 
 WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 {
@@ -706,13 +695,10 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
+	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(sc4_state, m68307_duart_txa))
+	MCFG_MC68307_SERIAL_INPORT_CALLBACK(READ8(sc4_state, m68307_duart_input_r))
+	MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(WRITE8(sc4_state, m68307_duart_output_w))
 
-	// internal duart of the 68307... paired in machine start
-	MCFG_MC68681_ADD("m68307_68681", 16000000/4) // ?? Mhz
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sc4_state, m68307_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(sc4_state, m68307_duart_txa))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(sc4_state, m68307_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(sc4_state, m68307_duart_output_w))
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 	MCFG_MACHINE_RESET_OVERRIDE(sc4_state, sc4 )
