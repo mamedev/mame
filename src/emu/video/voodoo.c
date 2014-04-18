@@ -2051,7 +2051,11 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 			if (f->holes != 0)
 				logerror("Unexpected CMDFIFO: AMin=%08X AMax=%08X Holes=%d WroteTo:%08X\n",
 						f->amin, f->amax, f->holes, addr);
-			f->amin = f->amax = addr;
+			//f->amin = f->amax = addr;
+			f->holes += (addr - f->base) / 4;
+			f->amin = f->base;
+			f->amax = addr;
+
 			f->depth++;
 		}
 
