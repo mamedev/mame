@@ -621,6 +621,8 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_DEVICE_ADD( "tr1602", AY31015, 0 )
+	MCFG_AY31015_RX_CLOCK(0.0)
+	MCFG_AY31015_TX_CLOCK(0.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model3, model1 )
