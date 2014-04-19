@@ -70,6 +70,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( por_w );
 	DECLARE_WRITE_LINE_MEMBER( test_w );
 
+	// For setting the time at startup
+	void set_counter(UINT32 value);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
