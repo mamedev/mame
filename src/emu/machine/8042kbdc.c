@@ -595,7 +595,8 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			 * the bits low set in the command byte.  The only pulse that has
 			 * an effect currently is bit 0, which pulses the CPU's reset line
 			 */
-			m_system_reset_cb(PULSE_LINE);
+			m_system_reset_cb(ASSERT_LINE);
+			m_system_reset_cb(CLEAR_LINE);
 			at_8042_set_outport(m_outport | 0x02, 0);
 			break;
 		}
