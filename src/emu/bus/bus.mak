@@ -1066,3 +1066,15 @@ BUSOBJS += $(BUSOBJ)/oricext/oricext.o
 BUSOBJS += $(BUSOBJ)/oricext/jasmin.o
 BUSOBJS += $(BUSOBJ)/oricext/microdisc.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/a1bus/a1bus.h,BUSES += A1BUS
+#-------------------------------------------------
+
+ifneq ($(filter A1BUS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/a1bus
+BUSOBJS += $(BUSOBJ)/a1bus/a1bus.o
+BUSOBJS += $(BUSOBJ)/a1bus/a1cassette.o
+endif
+

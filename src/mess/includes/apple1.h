@@ -8,7 +8,6 @@
 #define APPLE1_H_
 
 #include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 typedef short termchar_t;
@@ -34,7 +33,6 @@ public:
 	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
@@ -43,12 +41,9 @@ public:
 	int m_kbd_data;
 	UINT32 m_kbd_last_scan[4];
 	int m_reset_flag;
-	int m_cassette_output_flipflop;
 	terminal_t *m_current_terminal;
 	terminal_t *m_terminal;
 	int m_blink_on;
-	DECLARE_READ8_MEMBER(apple1_cassette_r);
-	DECLARE_WRITE8_MEMBER(apple1_cassette_w);
 	DECLARE_DRIVER_INIT(apple1);
 	TILE_GET_INFO_MEMBER(terminal_gettileinfo);
 	virtual void machine_reset();
@@ -62,7 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dspout);
 	DECLARE_WRITE_LINE_MEMBER(apple1_pia0_dsp_write_signal);
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
 	void terminal_draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, terminal_t *terminal);
 	void verify_coords(terminal_t *terminal, int x, int y);
 	void terminal_putchar(terminal_t *terminal, int x, int y, int ch);
@@ -79,7 +73,6 @@ public:
 	void apple1_vh_dsp_clr ();
 	void apple1_vh_cursor_blink ();
 	int apple1_verify_header (UINT8 *data);
-	void cassette_toggle_output();
 	terminal_t *terminal_create(int gfx, int blank_char, int char_bits,int (*getcursorcode)(int original_code),int num_cols, int num_rows);
 	attotime apple1_vh_dsp_time_to_ready();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );

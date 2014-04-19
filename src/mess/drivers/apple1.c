@@ -129,30 +129,21 @@ When the prompt returns, press Stop.
 #include "machine/6821pia.h"
 #include "includes/apple1.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
 #include "machine/ram.h"
+
+#include "bus/a1bus/a1bus.h"
+#include "bus/a1bus/a1cassette.h"
 
 /* port i/o functions */
 
 /* memory w/r functions */
 
 static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
-	AM_RANGE(0x0000, 0xbfff) AM_NOP
-
-	/* Cassette interface I/O space: */
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(apple1_cassette_r, apple1_cassette_w)
-	/* Cassette interface ROM: */
-	AM_RANGE(0xc100, 0xc1ff) AM_ROM
-
-	AM_RANGE(0xc200, 0xcfff) AM_NOP
-
 	/* In $D000-$DFFF, PIA is selected by address bit 4 being high,
 	   and PIA registers are addressed with address bits 0-1.  All
 	   other address bits are ignored.  Thus $D010-$D013 is mirrored
 	   at all $Dxxx addresses with bit 4 high. */
 	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_DEVREADWRITE("pia",pia6821_device, read, write)
-	/* $Dxxx addresses with bit 4 low are NOPs. */
-	AM_RANGE(0xd000, 0xd00f) AM_NOP AM_MIRROR(0xfe0)
 
 	/* We always include the remapped RAM for cassette BASIC, both for
 	   simplicity and to allow the running of BASIC programs. */
@@ -161,7 +152,7 @@ static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
 	AM_RANGE(0xf000, 0xfeff) AM_NOP
 
 	/* Monitor ROM: */
-	AM_RANGE(0xff00, 0xffff) AM_ROM
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 /* graphics output */
@@ -264,16 +255,9 @@ static INPUT_PORTS_START( apple1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 INPUT_PORTS_END
 
-/* sound output */
-
-static const cassette_interface apple1_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	"apple1_cass",
-	NULL
-};
+static SLOT_INTERFACE_START(apple1_cards)
+	SLOT_INTERFACE("cassette", A1BUS_CASSETTE)
+SLOT_INTERFACE_END
 
 /* machine definition */
 static MACHINE_CONFIG_START( apple1, apple1_state )
@@ -309,10 +293,13 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apple1_state,apple1_pia0_dspout))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(apple1_state,apple1_pia0_dsp_write_signal))
 
+	MCFG_DEVICE_ADD("a1bus", A1BUS, 0)
+	MCFG_A1BUS_CPU("maincpu")
+	MCFG_A1BUS_SLOT_ADD("a1bus", "exp", apple1_cards, "cassette")
+
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
-	MCFG_CASSETTE_ADD("cassette", apple1_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","apple1")
 
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,
@@ -326,13 +313,10 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 MACHINE_CONFIG_END
 
 ROM_START(apple1)
-	ROM_REGION(0x10000, "maincpu",0)
+	ROM_REGION(0x100, "maincpu",0)
 	/* 256-byte main monitor ROM, in two 82s129 or mmi6301 256x4 proms at A1 and A2 called APPLE-A1(bits D3-D0) and APPLE-A2(bits D7-D4) */
-	ROM_LOAD_NIB_HIGH( "apple-a2.a2",    0xFF00, 0x0100, CRC(254bfb95) SHA1(b6468b72295b7d8ac288d104d252f24de1f1d611) )
-	ROM_LOAD_NIB_LOW( "apple-a1.a1",    0xFF00, 0x0100, CRC(434f8ce6) SHA1(9deee2d39903209b20c3fc6b58e16372f8efece1) )
-	/* 256-byte cassette interface ROM, in two 82s129 or mmi6301 256x4 proms at locations 3 and 4 on the cassette interface daughtercard (they are labeled "MMI 6301-IJ // 7623L // APPLE-A3" and "MMI 6301-IJ // 7623L // APPLE-A4") */
-	ROM_LOAD_NIB_HIGH( "apple-a3.3",    0xc100, 0x0100, CRC(6eae8f52) SHA1(71906932727ef70952ef6afe6b08708df15cd67d) )
-	ROM_LOAD_NIB_LOW( "apple-a4.4",    0xc100, 0x0100, CRC(94efa977) SHA1(851f3bd6863859a1a6909179a5e5bf744b3d807e) )
+	ROM_LOAD_NIB_HIGH( "apple-a2.a2",    0x0000, 0x0100, CRC(254bfb95) SHA1(b6468b72295b7d8ac288d104d252f24de1f1d611) )
+	ROM_LOAD_NIB_LOW( "apple-a1.a1",    0x0000, 0x0100, CRC(434f8ce6) SHA1(9deee2d39903209b20c3fc6b58e16372f8efece1) )
 	/* 512-byte Signetics 2513 character generator ROM at location D2-D3 */
 	ROM_REGION(0x0200, "gfx1",0)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid

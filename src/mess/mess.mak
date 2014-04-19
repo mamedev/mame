@@ -520,6 +520,7 @@ MACHINES += WOZFDC
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += A1BUS
 BUSES += A2BUS
 BUSES += ABCBUS
 BUSES += ABCKB
