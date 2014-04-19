@@ -33,45 +33,46 @@
 class pet_state : public driver_device
 {
 public:
-	pet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, M6502_TAG),
-			m_via(*this, M6522_TAG),
-			m_pia1(*this, M6520_1_TAG),
-			m_pia2(*this, M6520_2_TAG),
-			m_crtc(*this, MC6845_TAG),
-			m_ieee(*this, IEEE488_TAG),
-			m_palette(*this, "palette"),
-			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-			m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
-			m_exp(*this, PET_EXPANSION_SLOT_TAG),
-			m_user(*this, PET_USER_PORT_TAG),
-			m_speaker(*this, "speaker"),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, M6502_TAG),
-			m_char_rom(*this, "charom"),
-			m_video_ram(*this, "video_ram"),
-			m_row0(*this, "ROW0"),
-			m_row1(*this, "ROW1"),
-			m_row2(*this, "ROW2"),
-			m_row3(*this, "ROW3"),
-			m_row4(*this, "ROW4"),
-			m_row5(*this, "ROW5"),
-			m_row6(*this, "ROW6"),
-			m_row7(*this, "ROW7"),
-			m_row8(*this, "ROW8"),
-			m_row9(*this, "ROW9"),
-			m_lock(*this, "LOCK"),
-			m_key(0),
-			m_sync(0),
-			m_graphic(0),
-			m_blanktv(0),
-			m_via_irq(CLEAR_LINE),
-			m_pia1a_irq(CLEAR_LINE),
-			m_pia1b_irq(CLEAR_LINE),
-			m_pia2a_irq(CLEAR_LINE),
-			m_pia2b_irq(CLEAR_LINE),
-			m_exp_irq(CLEAR_LINE)
+	pet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, M6502_TAG),
+		m_via(*this, M6522_TAG),
+		m_pia1(*this, M6520_1_TAG),
+		m_pia2(*this, M6520_2_TAG),
+		m_crtc(*this, MC6845_TAG),
+		m_ieee(*this, IEEE488_TAG),
+		m_palette(*this, "palette"),
+		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
+		m_exp(*this, PET_EXPANSION_SLOT_TAG),
+		m_user(*this, PET_USER_PORT_TAG),
+		m_speaker(*this, "speaker"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, M6502_TAG),
+		m_char_rom(*this, "charom"),
+		m_video_ram(*this, "video_ram"),
+		m_row0(*this, "ROW0"),
+		m_row1(*this, "ROW1"),
+		m_row2(*this, "ROW2"),
+		m_row3(*this, "ROW3"),
+		m_row4(*this, "ROW4"),
+		m_row5(*this, "ROW5"),
+		m_row6(*this, "ROW6"),
+		m_row7(*this, "ROW7"),
+		m_row8(*this, "ROW8"),
+		m_row9(*this, "ROW9"),
+		m_lock(*this, "LOCK"),
+		m_key(0),
+		m_sync(0),
+		m_graphic(0),
+		m_blanktv(0),
+		m_via_irq(CLEAR_LINE),
+		m_pia1a_irq(CLEAR_LINE),
+		m_pia1b_irq(CLEAR_LINE),
+		m_pia2a_irq(CLEAR_LINE),
+		m_pia2b_irq(CLEAR_LINE),
+		m_exp_irq(CLEAR_LINE),
+		m_user_diag(1)
 	{ }
 
 	required_device<m6502_device> m_maincpu;
@@ -133,6 +134,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
 
+	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+
 	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
@@ -179,6 +182,7 @@ public:
 	int m_pia2a_irq;
 	int m_pia2b_irq;
 	int m_exp_irq;
+	int m_user_diag;
 };
 
 

@@ -36,6 +36,9 @@
 	MCFG_DEVICE_ADD(_tag, PET_USER_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
+#define MCFG_PET_USER_PORT_2_HANDLER(_devcb) \
+	devcb = &pet_user_port_device::set_2_handler(*device, DEVCB2_##_devcb);
+
 #define MCFG_PET_USER_PORT_3_HANDLER(_devcb) \
 	devcb = &pet_user_port_device::set_3_handler(*device, DEVCB2_##_devcb);
 
@@ -56,6 +59,9 @@
 
 #define MCFG_PET_USER_PORT_9_HANDLER(_devcb) \
 	devcb = &pet_user_port_device::set_9_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_PET_USER_PORT_10_HANDLER(_devcb) \
+	devcb = &pet_user_port_device::set_10_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_PET_USER_PORT_B_HANDLER(_devcb) \
 	devcb = &pet_user_port_device::set_b_handler(*device, DEVCB2_##_devcb);
@@ -100,6 +106,7 @@ class pet_user_port_device : public device_t,
 public:
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_2_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_2_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_3_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_3_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_4_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_4_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_5_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_5_handler.set_callback(object); }
@@ -107,6 +114,7 @@ public:
 	template<class _Object> static devcb2_base &set_7_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_7_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_8_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_8_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_9_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_9_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_10_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_10_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_b_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_b_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_c_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_c_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_d_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_d_handler.set_callback(object); }
@@ -118,6 +126,7 @@ public:
 	template<class _Object> static devcb2_base &set_l_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_l_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_m_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_m_handler.set_callback(object); }
 
+	DECLARE_WRITE_LINE_MEMBER( write_2 );
 	DECLARE_WRITE_LINE_MEMBER( write_3 );
 	DECLARE_WRITE_LINE_MEMBER( write_4 );
 	DECLARE_WRITE_LINE_MEMBER( write_5 );
@@ -125,6 +134,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_7 );
 	DECLARE_WRITE_LINE_MEMBER( write_8 );
 	DECLARE_WRITE_LINE_MEMBER( write_9 );
+	DECLARE_WRITE_LINE_MEMBER( write_10 );
 	DECLARE_WRITE_LINE_MEMBER( write_b );
 	DECLARE_WRITE_LINE_MEMBER( write_c );
 	DECLARE_WRITE_LINE_MEMBER( write_d );
@@ -141,6 +151,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 
+	devcb2_write_line m_2_handler;
 	devcb2_write_line m_3_handler;
 	devcb2_write_line m_4_handler;
 	devcb2_write_line m_5_handler;
@@ -148,6 +159,7 @@ protected:
 	devcb2_write_line m_7_handler;
 	devcb2_write_line m_8_handler;
 	devcb2_write_line m_9_handler;
+	devcb2_write_line m_10_handler;
 	devcb2_write_line m_b_handler;
 	devcb2_write_line m_c_handler;
 	devcb2_write_line m_d_handler;
@@ -172,6 +184,7 @@ public:
 	device_pet_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_pet_user_port_interface();
 
+	DECLARE_WRITE_LINE_MEMBER( output_2 ) { m_slot->m_2_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_3 ) { m_slot->m_3_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_4 ) { m_slot->m_4_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_5 ) { m_slot->m_5_handler(state); }
@@ -179,6 +192,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_7 ) { m_slot->m_7_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_8 ) { m_slot->m_8_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_9 ) { m_slot->m_9_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_10 ) { m_slot->m_10_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_b ) { m_slot->m_b_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_c ) { m_slot->m_c_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_d ) { m_slot->m_d_handler(state); }
@@ -191,6 +205,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_m ) { m_slot->m_m_handler(state); }
 
 protected:
+	virtual DECLARE_WRITE_LINE_MEMBER( input_2 ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_3 ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_4 ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_5 ) {}
@@ -198,6 +213,7 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_7 ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_8 ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_9 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_10 ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_b ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_c ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) {}

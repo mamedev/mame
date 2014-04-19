@@ -448,6 +448,7 @@ BUSOBJS += $(BUSOBJ)/pet/exp.o
 BUSOBJS += $(BUSOBJ)/pet/64k.o
 BUSOBJS += $(BUSOBJ)/pet/superpet.o
 BUSOBJS += $(BUSOBJ)/pet/user.o
+BUSOBJS += $(BUSOBJ)/pet/diag.o
 BUSOBJS += $(BUSOBJ)/pet/petuja.o
 endif
 

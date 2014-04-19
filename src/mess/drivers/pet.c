@@ -921,7 +921,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 	data |= m_ieee->eoi_r() << 6;
 
 	// diagnostic jumper
-	data |= m_exp->diag_r() << 7;
+	data |= (m_user_diag && m_exp->diag_r()) << 7;
 
 	return data;
 }
@@ -1014,6 +1014,12 @@ WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
 
 	check_interrupts();
 }
+
+WRITE_LINE_MEMBER( pet_state::user_diag_w )
+{
+	m_user_diag = state;
+}
+
 
 
 //**************************************************************************
@@ -1300,6 +1306,7 @@ MACHINE_START_MEMBER( pet_state, pet )
 	save_item(NAME(m_pia2a_irq));
 	save_item(NAME(m_pia2b_irq));
 	save_item(NAME(m_exp_irq));
+	save_item(NAME(m_user_diag));
 }
 
 
@@ -1499,6 +1506,7 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
 
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, pet_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(pet_state, user_diag_w))
 	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_PET_USER_PORT_C_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_pa0))
 	MCFG_PET_USER_PORT_D_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_pa1))
