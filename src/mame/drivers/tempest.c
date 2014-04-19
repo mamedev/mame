@@ -329,7 +329,7 @@ public:
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 
-    DECLARE_READ8_MEMBER(rom_read);
+    DECLARE_READ8_MEMBER(rom_ae1f_r);
 
     virtual void machine_start();
 };
@@ -421,17 +421,15 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
  *
  *************************************/
 
-READ8_MEMBER(tempest_state::rom_read)
+READ8_MEMBER(tempest_state::rom_ae1f_r)
 {
-    const UINT8 *rom = m_rom->base();
-    const int real_addr = offset + 0xa800;
+	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
+	// MCFG_QUANTUM_PERFECT_CPU("maincpu") would be very taxing on this driver.
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().abort_timeslice();
 
-    if (real_addr == 0xAE1F)
-    {
-        machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-        machine().scheduler().abort_timeslice();
-    }
-    return rom[real_addr];
+    const UINT8 *rom = m_rom->base();
+    return rom[0xae1f];
 }
 
 
@@ -456,9 +454,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-	AM_RANGE(0x9000, 0xa7ff) AM_ROM
-    AM_RANGE(0xa800, 0xafff) AM_READ(rom_read)
-    AM_RANGE(0xb000, 0xdfff) AM_ROM
+    AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
+    AM_RANGE(0x9000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
@@ -628,9 +625,6 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-
-	/* needed to ensure routine at ae1c passes checks and does not corrupt data */
-	// MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
