@@ -282,6 +282,14 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "sound/pokey.h"
 
 
+#define MASTER_CLOCK (XTAL_12_096MHz)
+#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+
+#define TEMPEST_KNOB_P1_TAG "KNOBP1"
+#define TEMPEST_KNOB_P2_TAG "KNOBP2"
+#define TEMPEST_BUTTONS_P1_TAG  "BUTTONSP1"
+#define TEMPEST_BUTTONS_P2_TAG  "BUTTONSP2"
+
 class tempest_state : public driver_device
 {
 public:
@@ -289,13 +297,27 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
-		m_avg(*this, "avg") { }
+		m_avg(*this, "avg"),
+		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
+        m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
+        m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
+        m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
+        m_in1(*this, "IN1/DSW0"),
+        m_in2(*this, "IN2")
+    { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<avg_tempest_device> m_avg;
 
-	UINT8 m_player_select;
+	required_ioport m_knob_p1;
+    required_ioport m_knob_p2;
+    required_ioport m_buttons_p1;
+    required_ioport m_buttons_p2;
+    required_ioport m_in1;
+    required_ioport m_in2;
+
+    UINT8 m_player_select;
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);
@@ -306,16 +328,6 @@ public:
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 	virtual void machine_start();
 };
-
-
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
-
-#define TEMPEST_KNOB_P1_TAG ("KNOBP1")
-#define TEMPEST_KNOB_P2_TAG ("KNOBP2")
-#define TEMPEST_BUTTONS_P1_TAG  ("BUTTONSP1")
-#define TEMPEST_BUTTONS_P2_TAG  ("BUTTONSP2")
-
 
 
 void tempest_state::machine_start()
@@ -343,12 +355,12 @@ WRITE8_MEMBER(tempest_state::wdclr_w)
 
 CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
 {
-	return ioport((m_player_select == 0) ? TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG)->read();
+	return (m_player_select == 0) ? m_knob_p1->read() : m_knob_p2->read();
 }
 
 CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 {
-	return ioport((m_player_select == 0) ? TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG)->read();
+    return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
 }
 
 
@@ -361,13 +373,13 @@ CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 
 READ8_MEMBER(tempest_state::input_port_1_bit_r)
 {
-	return (ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
+	return (m_in1->read() & (1 << offset)) ? 0 : 228;
 }
 
 
 READ8_MEMBER(tempest_state::input_port_2_bit_r)
 {
-	return (ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
+	return (m_in2->read() & (1 << offset)) ? 0 : 228;
 }
 
 
