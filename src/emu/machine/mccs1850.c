@@ -465,7 +465,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 
 				// increment address counter
 				m_address++;
-				m_address &= 0x7f;
+				m_address |= 0x80;
 			}
 		}
 		else if (!BIT(m_address, 7) && !m_sck && state)
@@ -483,6 +483,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 				m_address++;
 				m_address &= 0x7f;
 				m_shift = read_register(m_address & 0x7f);
+				if (LOG) logerror("MCCS1850 '%s' Data Out %02x\n", tag(), m_shift);
 			}
 		}
 		break;
