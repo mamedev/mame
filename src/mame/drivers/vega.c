@@ -820,10 +820,10 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(vega_state, txtram_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, txtram_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(vega_state, txtram_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(vega_state, txtram_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(vega_state, ppi_pb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(vega_state, randomizer))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, ppi_pc_w))
 
