@@ -7329,6 +7329,34 @@ ROM_START( firehawk )
 	ROM_LOAD( "fhawk_s3.u41", 0x00000, 0x40000, CRC(3fdcfac2) SHA1(c331f2ea6fd682cfb00f73f9a5b995408eaab5cf) )
 ROM_END
 
+ROM_START( firehawkv )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 Code */
+	ROM_LOAD16_BYTE( "fire_hawk_cn1.u53", 0x00001, 0x80000, CRC(c09db3ec) SHA1(5beab9f837d8821fea1ceeac1be01c2c3ceaabf2) )
+	ROM_LOAD16_BYTE( "fire_hawk_cn2.u59", 0x00000, 0x80000, CRC(68b0737c) SHA1(d8eac5b0f4023556f39ffb187f6d75270a5b782f) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 Code */
+	ROM_LOAD( "fhawk_s1.u38", 0x00000, 0x20000, BAD_DUMP CRC(c6609c39) SHA1(fe9b5f6c3ab42c48cb493fecb1181901efabdb58) ) // not verified on this set
+
+	ROM_REGION( 0x200000, "sprites",0 ) /* Sprites, 16x16x4 */
+	ROM_LOAD( "rom.uc1", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "rom.uc2", 0x100000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x400000, "bgtile", 0 ) /* Layer 0, 16x16x8 */
+	ROM_LOAD( "rom.uc3", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "rom.uc4", 0x100000, 0x100000, NO_DUMP )
+	ROM_LOAD( "rom.uc5", 0x200000, 0x100000, NO_DUMP )
+	ROM_LOAD( "rom.uc6", 0x300000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x00100, "fgtile", ROMREGION_ERASEFF )    /* Layer 1, 8x8x4 */
+	// Unused
+
+	ROM_REGION( 0x040000, "oki1", 0 ) /* Samples */
+	ROM_LOAD( "fhawk_s2.u36", 0x00000, 0x40000, BAD_DUMP CRC(d16aaaad) SHA1(96ca173ca433164ed0ae51b41b42343bd3cfb5fe) ) // not verified on this set
+
+	ROM_REGION( 0x040000, "oki2", 0 ) /* Samples */
+	ROM_LOAD( "fhawk_s3.u41", 0x00000, 0x40000, BAD_DUMP CRC(3fdcfac2) SHA1(c331f2ea6fd682cfb00f73f9a5b995408eaab5cf) ) // not verified on this set
+ROM_END
+
 /***************************************************************************
 
 Spectrum 2000 (c) 2000 YONA Tech
@@ -7586,9 +7614,10 @@ GAME( 1999, popspops, 0,        popspops, popspops, nmk16_state,   grdnstrm, ROT
 GAME( 2000, mangchi,  0,        popspops, mangchi, nmk16_state,    bubl2000, ROT0,               "Afega",                             "Mang-Chi", 0 )
 
 // these two are very similar games, but the exact parent/clone relationship is unknown
-GAME( 2000, spec2k,   0,       firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", GAME_IMPERFECT_GRAPHICS ) // the ships scroll off the screen if you insert a coin during the attract demo?  verify it doesn't happen on real hw(!)
+GAME( 2000, spec2k,   0,       firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", GAME_IMPERFECT_GRAPHICS ) // the ships sometimes scroll off the screen if you insert a coin during the attract demo?  verify it doesn't happen on real hw(!)
 GAME( 2000, spec2kh,  spec2k,  firehawk, spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (horizontal, buggy) (Europe)", 0 ) // this has odd bugs even on real hardware, eg glitchy 3 step destruction sequence of some larger enemies
 GAME( 2001, firehawk, spec2k,  firehawk, firehawk, driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (horizontal)", 0 )
+GAME( 2001, firehawkv,spec2k,  firehawk, firehawk, driver_device, 0,        ROT270,             "ESD",                   "Fire Hawk (vertical)", GAME_NOT_WORKING ) // incomplete dump
 
 // bee-oh board - different display / interrupt timing to others?
 GAME( 1991, manybloc, 0,        manybloc, manybloc, driver_device, 0,        ROT270,             "Bee-Oh",                "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
