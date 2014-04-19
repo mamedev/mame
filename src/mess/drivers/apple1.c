@@ -133,6 +133,7 @@ When the prompt returns, press Stop.
 
 #include "bus/a1bus/a1bus.h"
 #include "bus/a1bus/a1cassette.h"
+#include "bus/a1bus/a1cffa.h"
 
 /* port i/o functions */
 
@@ -257,6 +258,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(apple1_cards)
 	SLOT_INTERFACE("cassette", A1BUS_CASSETTE)
+	SLOT_INTERFACE("cffa", A1BUS_CFFA)
 SLOT_INTERFACE_END
 
 /* machine definition */

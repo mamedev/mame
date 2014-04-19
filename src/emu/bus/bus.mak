@@ -1077,5 +1077,6 @@ ifneq ($(filter A1BUS,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/a1bus
 BUSOBJS += $(BUSOBJ)/a1bus/a1bus.o
 BUSOBJS += $(BUSOBJ)/a1bus/a1cassette.o
+BUSOBJS += $(BUSOBJ)/a1bus/a1cffa.o
 endif
 
