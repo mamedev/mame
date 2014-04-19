@@ -598,8 +598,8 @@ READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
 
 static ADDRESS_MAP_START( namcos2_68k_default_cpu_board_am, AS_PROGRAM, 16, namcos2_state )
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM AM_REGION("data_rom", 0)
-	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(namco_tilemapvideoram16_r,namco_tilemapvideoram16_w)
-	AM_RANGE(0x420000, 0x42003f) AM_READWRITE(namco_tilemapcontrol16_r,namco_tilemapcontrol16_w)
+	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(c123_tilemap_videoram_r,c123_tilemap_videoram_w)
+	AM_RANGE(0x420000, 0x42003f) AM_READWRITE(c123_tilemap_control_r,c123_tilemap_control_w)
 	AM_RANGE(0x440000, 0x44ffff) AM_READWRITE(paletteram_word_r,paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x460000, 0x460fff) AM_READWRITE(dpram_word_r,dpram_word_w)
 	AM_RANGE(0x468000, 0x468fff) AM_READWRITE(dpram_word_r,dpram_word_w) /* mirror */

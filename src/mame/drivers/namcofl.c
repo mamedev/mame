@@ -226,15 +226,15 @@ WRITE32_MEMBER(namcofl_state::namcofl_share_w)
 static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x10000000, 0x100fffff) AM_RAMBANK("bank2")
-	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("user1", 0)   /* data */
+	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM AM_SHARE("nvram") /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
 	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE(namcofl_share_r, namcofl_share_w)
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ(fl_network_r ) /* network registers */
 	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
-	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
+	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE16(c123_tilemap_videoram_r,c123_tilemap_videoram_w,0xffffffff)
+	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
 	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
 	AM_RANGE(0x30d00000, 0x30d0001f) AM_READWRITE16(c169_roz_control_r,c169_roz_control_w,0xffffffff)
 	AM_RANGE(0x30e00000, 0x30e1ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
@@ -619,7 +619,7 @@ ROM_START( speedrcr )
 	ROM_LOAD32_WORD("se2mpea4.19a",   0x000000, 0x080000, CRC(95ab3fd7) SHA1(273a536f8512f3c55260ac1b78533bc35b8390ed) )
 	ROM_LOAD32_WORD("se2mpoa4.18a",   0x000002, 0x080000, CRC(5b5ef1eb) SHA1(3e9e4abb1a32269baef772079de825dfe1ea230c) )
 
-	ROM_REGION( 0x200000, "user1", 0 ) // Data
+	ROM_REGION32_LE( 0x200000, "data", 0 ) // Data
 	ROM_LOAD32_BYTE("se1_dat0.13a",   0x000000, 0x080000, CRC(cc5d6ff5) SHA1(6fad40a1fac75bc64d3b7a7562cf7ce2a3abd36a) )
 	ROM_LOAD32_BYTE("se1_dat1.14a",   0x000001, 0x080000, CRC(ddc8b306) SHA1(f169d521b800c108deffdef9fc6b0058621ee909) )
 	ROM_LOAD32_BYTE("se1_dat2.15a",   0x000002, 0x080000, CRC(2a29abbb) SHA1(945419ed61e9a656a340214a63a01818396fbe98) )
@@ -675,7 +675,7 @@ ROM_START( finalapr )
 	ROM_LOAD32_WORD("flr2mpeb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2mpob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
 
-	ROM_REGION( 0x200000, "user1", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
@@ -717,7 +717,7 @@ ROM_START( finalapro )
 	ROM_LOAD32_WORD("flr2mpe.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2mpo.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
-	ROM_REGION( 0x200000, "user1", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
@@ -760,7 +760,7 @@ ROM_START( finalaprj )
 	ROM_LOAD32_WORD("flr1_mpec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
 	ROM_LOAD32_WORD("flr1_mpoc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
-	ROM_REGION( 0x200000, "user1", ROMREGION_ERASEFF ) // Data
+	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )

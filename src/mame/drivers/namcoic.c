@@ -115,14 +115,14 @@ SetTilemapVideoram( int offset, UINT16 newword )
 	}
 } /* SetTilemapVideoram */
 
-WRITE16_MEMBER( namcos2_state::namco_tilemapvideoram16_w )
+WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_w )
 {
 	UINT16 newword = mTilemapInfo.videoram[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapVideoram( offset, newword );
 }
 
-READ16_MEMBER( namcos2_state::namco_tilemapvideoram16_r )
+READ16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_r )
 {
 	return mTilemapInfo.videoram[offset];
 }
@@ -178,81 +178,18 @@ SetTilemapControl( int offset, UINT16 newword )
 	}
 } /* SetTilemapControl */
 
-WRITE16_MEMBER( namcos2_state::namco_tilemapcontrol16_w )
+WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_control_w )
 {
 	UINT16 newword = mTilemapInfo.control[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapControl( offset, newword );
 }
 
-READ16_MEMBER( namcos2_state::namco_tilemapcontrol16_r )
+READ16_MEMBER( namcos2_shared_state::c123_tilemap_control_r )
 {
 	return mTilemapInfo.control[offset];
 }
 
-READ32_HANDLER( namco_tilemapvideoram32_r )
-{
-	offset *= 2;
-	return (mTilemapInfo.videoram[offset]<<16)|mTilemapInfo.videoram[offset+1];
-}
-
-WRITE32_HANDLER( namco_tilemapvideoram32_w )
-{
-	UINT32 v;
-	offset *=2;
-	v = (mTilemapInfo.videoram[offset]<<16)|mTilemapInfo.videoram[offset+1];
-	COMBINE_DATA(&v);
-	SetTilemapVideoram( offset, v>>16 );
-	SetTilemapVideoram( offset+1, v&0xffff );
-}
-
-READ32_HANDLER( namco_tilemapcontrol32_r )
-{
-	offset *= 2;
-	return (mTilemapInfo.control[offset]<<16)|mTilemapInfo.control[offset+1];
-}
-
-WRITE32_HANDLER( namco_tilemapcontrol32_w )
-{
-	UINT32 v;
-	offset *=2;
-	v = (mTilemapInfo.control[offset]<<16)|mTilemapInfo.control[offset+1];
-	COMBINE_DATA(&v);
-	SetTilemapControl( offset, v>>16 );
-	SetTilemapControl( offset+1, v&0xffff );
-}
-
-READ32_HANDLER( namco_tilemapcontrol32_le_r )
-{
-	offset *= 2;
-	return (mTilemapInfo.control[offset+1]<<16)|mTilemapInfo.control[offset];
-}
-
-WRITE32_HANDLER( namco_tilemapcontrol32_le_w )
-{
-	UINT32 v;
-	offset *=2;
-	v = (mTilemapInfo.control[offset+1]<<16)|mTilemapInfo.control[offset];
-	COMBINE_DATA(&v);
-	SetTilemapControl( offset+1, v>>16 );
-	SetTilemapControl( offset, v&0xffff );
-}
-
-READ32_HANDLER( namco_tilemapvideoram32_le_r )
-{
-	offset *= 2;
-	return (mTilemapInfo.videoram[offset+1]<<16)|mTilemapInfo.videoram[offset];
-}
-
-WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
-{
-	UINT32 v;
-	offset *=2;
-	v = (mTilemapInfo.videoram[offset+1]<<16)|mTilemapInfo.videoram[offset];
-	COMBINE_DATA(&v);
-	SetTilemapVideoram( offset+1, v>>16 );
-	SetTilemapVideoram( offset, v&0xffff );
-}
 
 /**************************************************************************************/
 

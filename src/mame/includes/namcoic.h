@@ -100,16 +100,6 @@ C102 - Controls CPU access to ROZ Memory Area.
 void namco_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 void namco_tilemap_invalidate( void );
 
-DECLARE_READ32_HANDLER( namco_tilemapvideoram32_r );
-DECLARE_WRITE32_HANDLER( namco_tilemapvideoram32_w );
-DECLARE_READ32_HANDLER( namco_tilemapcontrol32_r );
-DECLARE_WRITE32_HANDLER( namco_tilemapcontrol32_w );
-
-DECLARE_READ32_HANDLER( namco_tilemapvideoram32_le_r );
-DECLARE_WRITE32_HANDLER( namco_tilemapvideoram32_le_w );
-DECLARE_READ32_HANDLER( namco_tilemapcontrol32_le_r );
-DECLARE_WRITE32_HANDLER( namco_tilemapcontrol32_le_w );
-
 /***********************************************************************************/
 
 #endif
