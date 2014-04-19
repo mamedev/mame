@@ -62,7 +62,7 @@ void centronics_device::device_start()
 	m_autofd_handler.resolve_safe();
 	m_fault_handler.resolve_safe();
 	m_init_handler.resolve_safe();
-	m_select_handler.resolve_safe();
+	m_select_in_handler.resolve_safe();
 
 	// pull up
 	m_strobe_handler(1);
@@ -81,7 +81,7 @@ void centronics_device::device_start()
 	m_autofd_handler(1);
 	m_fault_handler(1);
 	m_init_handler(1);
-	m_select_handler(1);
+	m_select_in_handler(1);
 }
 
 WRITE_LINE_MEMBER( centronics_device::write_strobe ) { if (m_dev) m_dev->input_strobe(state); }
