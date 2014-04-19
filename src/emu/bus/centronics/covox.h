@@ -74,7 +74,7 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { if (state) m_data |= 0x10; else m_data &= ~0x10; update_dac(); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { if (state) m_data |= 0x20; else m_data &= ~0x20; update_dac(); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { if (state) m_data |= 0x40; else m_data &= ~0x40; update_dac(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { if (state) m_data |= 0x80; else m_data &= ~0x80; update_dac(); output_busy(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { if (state) m_data |= 0x80; else m_data &= ~0x80; update_dac(); if (started()) output_busy(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_autofd ) { m_autofd = state; update_dac(); }
 
 private:
