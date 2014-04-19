@@ -19,18 +19,6 @@
 
 
 ///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_MSM6255_ADD(_tag, _clock, _char_clock, _screen_tag, _map) \
-	MCFG_DEVICE_ADD(_tag, MSM6255, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	msm6255_device::static_set_config(*device, _char_clock);
-
-
-
-///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
@@ -66,7 +54,21 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
-	inline UINT8 read_byte(UINT16 ma, UINT8 ra);
+	// registers
+	enum
+	{
+		REGISTER_MOR = 0,
+		REGISTER_PR,
+		REGISTER_HNR,
+		REGISTER_DVR,
+		REGISTER_CPR,
+		REGISTER_SLR,
+		REGISTER_SUR,
+		REGISTER_CLR,
+		REGISTER_CUR
+	};
+
+	UINT8 read_byte(UINT16 ma, UINT8 ra);
 
 	void update_cursor();
 	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ma, UINT8 ra = 0);
@@ -74,7 +76,6 @@ private:
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	const address_space_config m_space_config;
-	int m_char_clock;
 
 	UINT8 m_ir;                     // instruction register
 	UINT8 m_mor;                    // mode control register
