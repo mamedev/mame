@@ -454,34 +454,15 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 
 ATTR_HOT int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 {
-#if 0
 
-	double gtot_t = 0.0;
-	double RHS_t = 0.0;
-
-	netlist_net_t *net = m_nets[0];
-	const netlist_net_t::terminal_list_t &rails = net->m_rails;
-	int rail_count = rails.count();
-
-	for (int i = 0; i < rail_count; i++)
-	{
-		gtot_t += rails[i]->m_gt;
-		RHS_t += rails[i]->m_Idr;
-		RHS_t += rails[i]->m_go * rails[i]->m_otherterm->net().Q_Analog();
-	}
-
-	double iIdr = RHS_t;
-	double new_val = iIdr / gtot_t;
-
-#else
-	netlist_net_t *net = m_nets[0];
+    netlist_net_t *net = m_nets[0];
 	double m_A[1][1] = { {0.0} };
 	double m_RHS[1] = { 0.0 };
 	build_LE(m_A, m_RHS);
 	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
 	double new_val =  m_RHS[0] / m_A[0][0];
-#endif
+
 	double e = (new_val - net->m_cur_Analog);
 	double cerr = e * e;
 
@@ -508,8 +489,6 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::solve_non_dynamic()
 	double RHS[2] = { 0.0 };
 
 	build_LE(A, RHS);
-
-	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
 	const double a = A[0][0];
 	const double b = A[0][1];
@@ -598,7 +577,6 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
     for (int k = 0; k < this->N(); k++)
         this->m_nets[k]->m_new_Analog = this->m_nets[k]->m_cur_Analog;
 
-	//NL_VERBOSE_OUT(("%f %d\n", w, m_nets.count());
 	do {
 		resched = false;
 		double cerr = 0.0;
@@ -614,7 +592,6 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 			for (int i = 0; i < term_count; i++)
 			{
                 iIdr += terms[i]->m_go * terms[i]->m_otherterm->net().m_new_Analog;
-                //iIdr += terms[i]->m_go * terms[i]->m_otherterm->net().Q_Analog();
 			}
 
 			//double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
@@ -688,10 +665,8 @@ ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_n
 NETLIB_START(solver)
 {
 	register_output("Q_step", m_Q_step);
-	//register_input("FB", m_feedback);
 
     register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
-	//register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_US(10).as_double());
 
 	register_param("FREQ", m_freq, 48000.0);
 	m_inc = netlist_time::from_hz(m_freq.Value());
@@ -706,16 +681,12 @@ NETLIB_START(solver)
 	// internal staff
 
 	register_input("FB_step", m_fb_step);
-
 	connect(m_fb_step, m_Q_step);
-
-	//save(NAME(m_last_step));
 
 }
 
 NETLIB_RESET(solver)
 {
-	//m_last_step = netlist_time::zero;
 	for (int i = 0; i < m_mat_solvers.count(); i++)
 		m_mat_solvers[i]->reset();
 }
@@ -769,13 +740,6 @@ NETLIB_UPDATE(solver)
             if (m_mat_solvers[i]->solve())
                 m_mat_solvers[i]->update_inputs();
     }
-#if 0
-    for (int i = 0; i < t_cnt; i++)
-    {
-        if (m_mat_solvers[i]->is_timestep())
-            m_mat_solvers[i]->update_inputs();
-    }
-#endif
 #endif
 
     /* step circuit */
