@@ -558,8 +558,7 @@ static NETLIST_START(pong_schematics)
 	SWITCH2(sw1a)
 	PARAM(sw1a.POS, 0)
 
-	NET_C(sw1a.1, high)
-	//NET_C(sw1a.1, V5)
+	NET_C(sw1a.1, V5)
 	NET_C(sw1a.2, ic_c7.QC)
 
 	TTL_7410_NAND(ic_d8a, ic_c7.QA, sw1a.Q, ic_c8a.Q)       // would be nand2 for 11 instead of 15 points, need a switch dev!
@@ -578,8 +577,7 @@ static NETLIST_START(pong_schematics)
 	SWITCH2(sw1b)
 	PARAM(sw1b.POS, 0)
 
-	NET_C(sw1b.1, high)
-	//NET_C(sw1b.1, V5)
+	NET_C(sw1b.1, V5)
 	NET_C(sw1b.2, ic_d7.QC)
 
 
