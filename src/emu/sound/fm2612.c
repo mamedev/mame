@@ -883,7 +883,6 @@ INLINE void set_timers( FM_OPN *OPN, FM_ST *ST, void *n, int v )
 	/* b2 = timer enable a */
 	/* b1 = load b */
 	/* b0 = load a */
-	ST->mode = v;
 
 	if ((OPN->ST.mode ^ v) & 0xC0)
 	{
@@ -902,48 +901,24 @@ INLINE void set_timers( FM_OPN *OPN, FM_ST *ST, void *n, int v )
 		}
 	}
 
-	/* reset Timer b flag */
-	if( v & 0x20 )
-		FM_STATUS_RESET(ST,0x02);
-	/* reset Timer a flag */
-	if( v & 0x10 )
-		FM_STATUS_RESET(ST,0x01);
-	/* load b */
-	if( v & 0x02 )
+	/* reload Timers */
+	if ((v&1) && !(ST->mode&1))
 	{
-		if( ST->TBC == 0 )
-		{
-			ST->TBC = ( 256-ST->TB)<<4;
-			/* External timer handler */
-			if (ST->timer_handler) (ST->timer_handler)(n,1,ST->TBC * ST->timer_prescaler,ST->clock);
-		}
+		ST->TAC = (1024-ST->TA);
+		/* External timer handler */
+		if (ST->timer_handler) (ST->timer_handler)(n,0,ST->TAC * ST->timer_prescaler,ST->clock);
 	}
-	else
-	{   /* stop timer b */
-		if( ST->TBC != 0 )
-		{
-			ST->TBC = 0;
-			if (ST->timer_handler) (ST->timer_handler)(n,1,0,ST->clock);
-		}
-	}
-	/* load a */
-	if( v & 0x01 )
+	if ((v&2) && !(ST->mode&2))
 	{
-		if( ST->TAC == 0 )
-		{
-			ST->TAC = (1024-ST->TA);
-			/* External timer handler */
-			if (ST->timer_handler) (ST->timer_handler)(n,0,ST->TAC * ST->timer_prescaler,ST->clock);
-		}
+		ST->TBC = ( 256-ST->TB)<<4;
+		/* External timer handler */
+		if (ST->timer_handler) (ST->timer_handler)(n,1,ST->TBC * ST->timer_prescaler,ST->clock);
 	}
-	else
-	{   /* stop timer a */
-		if( ST->TAC != 0 )
-		{
-			ST->TAC = 0;
-			if (ST->timer_handler) (ST->timer_handler)(n,0,0,ST->clock);
-		}
-	}
+
+	/* reset Timers flags */
+	ST->status &= (~v >> 4); 
+
+	ST->mode = v;
 }
 
 
