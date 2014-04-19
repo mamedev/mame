@@ -298,6 +298,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
 		m_avg(*this, "avg"),
+		m_rom(*this, "maincpu"),
 		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
         m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
         m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
@@ -309,6 +310,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<avg_tempest_device> m_avg;
+	required_memory_region m_rom;
 
 	required_ioport m_knob_p1;
     required_ioport m_knob_p2;
@@ -326,7 +328,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
-	virtual void machine_start();
+
+    DECLARE_READ8_MEMBER(rom_read);
+
+    virtual void machine_start();
 };
 
 
@@ -416,6 +421,20 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
  *
  *************************************/
 
+READ8_MEMBER(tempest_state::rom_read)
+{
+    const UINT8 *rom = m_rom->base();
+    const int real_addr = offset + 0xa800;
+
+    if (real_addr == 0xAE1F)
+    {
+        machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+        machine().scheduler().abort_timeslice();
+    }
+    return rom[real_addr];
+}
+
+
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("colorram")
@@ -437,7 +456,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-	AM_RANGE(0x9000, 0xdfff) AM_ROM
+	AM_RANGE(0x9000, 0xa7ff) AM_ROM
+    AM_RANGE(0xa800, 0xafff) AM_READ(rom_read)
+    AM_RANGE(0xb000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
@@ -609,7 +630,7 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* needed to ensure routine at ae1c passes checks and does not corrupt data */
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	// MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
