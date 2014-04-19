@@ -897,4 +897,4 @@ DRIVER_INIT_MEMBER(vega_state, vega)
 	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
 }
 
-GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", 0 )
+GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
