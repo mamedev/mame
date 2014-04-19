@@ -4,13 +4,7 @@
 
     TODO:
 
-    - Find out why we get a segfault in the middle of the install
-
-    - Hook up the mouse (not before the system boots though, see the first problem)
-
-    - Find why the kernel doesn't manage to change the nvram at boot (readback error)
-
-    - Hook up the sound output, it seems to be shared with the keyboard port somehow
+    - Hook up the sound output, it is shared with the keyboard port
 
     - Implement more of the scc and its dma interactions so that the
       start up test passes, but not before sound out is done (if the scc
@@ -18,6 +12,8 @@
       infloops)
 
     - Really implement the MO, it's only faking it for the startup test right now
+
+	- Fix the networking
 
     - Find out why netbsd goes to hell even before loading the kernel
 
@@ -203,7 +199,7 @@ READ32_MEMBER( next_state::scr1_r )
 // remote    16    5 *
 // bus       15    5 *
 // dsp4      14    4
-// disk      13    3
+// disk/cvid 13    3
 // scsi      12    3 *
 // printer   11    3
 // enetx     10    3 *
@@ -866,6 +862,14 @@ void next_state::machine_reset()
 	dma_drq_w(4, true); // soundout
 }
 
+void next_state::vblank_w(screen_device &screen, bool vblank_state)
+{
+	if(screen_color)
+		irq_set(13, vblank_state);
+	else
+		irq_set(5, vblank_state);
+}
+
 static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
@@ -973,6 +977,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
 	MCFG_SCREEN_SIZE(1120, 900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
+	MCFG_SCREEN_VBLANK_DRIVER(next_state, vblank_w)
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
@@ -983,8 +988,8 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(next_state, keyboard_irq))
 	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(next_state, power_irq))
 	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(next_state, nmi_irq))
-	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, false)

@@ -4,16 +4,22 @@
 const device_type NEXTKBD = &device_creator<nextkbd_device>;
 
 DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
-	AM_RANGE(0x0, 0x3) AM_READWRITE(ctrl_r,  ctrl_w)
-	AM_RANGE(0x4, 0x7) AM_READWRITE(ctrl2_r, ctrl2_w)
-	AM_RANGE(0x8, 0xb) AM_READWRITE(data_r,  data_w)
+	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_snd_r, ctrl_snd_w, 0xff000000)
+	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_kms_r, ctrl_kms_w, 0x00ff0000)
+	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_dma_r, ctrl_dma_w, 0x0000ff00)
+	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_cmd_r, ctrl_cmd_w, 0x000000ff)
+	AM_RANGE(0x4, 0x7) AM_READWRITE(cdata_r,  cdata_w)
+	AM_RANGE(0x8, 0xb) AM_READWRITE(kmdata_r, kmdata_w)
 ADDRESS_MAP_END
 
 nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock, "nextkbd", __FILE__),
 	int_change_cb(*this),
 	int_power_cb(*this),
-	int_nmi_cb(*this)
+	int_nmi_cb(*this),
+	mousex(*this, "mousex"),
+	mousey(*this, "mousey"),
+	mousebtn(*this, "mousebtn")
 {
 }
 
@@ -23,51 +29,89 @@ void nextkbd_device::device_start()
 	int_power_cb.resolve_safe();
 	int_nmi_cb.resolve_safe();
 
-	kbd_timer = timer_alloc(0);
+	poll_timer = timer_alloc(0);
 
-	save_item(NAME(control));
-	save_item(NAME(control2));
-	save_item(NAME(data));
+	save_item(NAME(ctrl_snd));
+	save_item(NAME(ctrl_kms));
+	save_item(NAME(ctrl_dma));
+	save_item(NAME(ctrl_cmd));
+	save_item(NAME(cdata));
+	save_item(NAME(kmdata));
 	save_item(NAME(fifo_ir));
 	save_item(NAME(fifo_iw));
 	save_item(NAME(fifo_size));
 	save_item(NAME(fifo));
 	save_item(NAME(modifiers_state));
-	save_item(NAME(nmi_active));
+	save_item(NAME(prev_mousex));
+	save_item(NAME(prev_mousey));
+	save_item(NAME(prev_mousebtn));
 }
 
 void nextkbd_device::device_reset()
 {
-	control = 0;
-	control2 = 0;
-	data = 0;
+	ctrl_snd = 0x00;
+	ctrl_kms = 0x00;
+	ctrl_dma = 0x00;
+	ctrl_cmd = 0x00;
+	cdata = 0;
+	kmdata = 0;
 	fifo_ir = 0;
 	fifo_iw = 0;
 	fifo_size = 0;
 	memset(fifo, 0, sizeof(fifo));
 	modifiers_state = 0;
-	nmi_active = false;
+	poll_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
 }
 
 void nextkbd_device::send()
 {
-	if(control & FLAG_DATA)
+	if(ctrl_kms & C_KBD_DATA)
 		return;
 
-	data = fifo_pop();
-	control |= FLAG_DATA;
-	if(!(control & FLAG_INT)) {
-		control |= FLAG_INT;
+	kmdata = fifo_pop();
+	ctrl_kms |= C_KBD_DATA;
+	if(!(ctrl_kms & C_KBD_INTERRUPT)) {
+		ctrl_kms |= C_KBD_INTERRUPT;
 		int_change_cb(true);
 	}
 }
 
-void nextkbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nextkbd_device::update_mouse(bool force_update)
 {
-	if(fifo_empty())
+	UINT32 cur_mousex   = mousex->read();
+	UINT32 cur_mousey   = mousey->read();
+	UINT32 cur_mousebtn = mousebtn->read();
+
+	if(!force_update && cur_mousex == prev_mousex && cur_mousey == prev_mousey && cur_mousebtn == prev_mousebtn)
 		return;
 
+	INT32 deltax = -(cur_mousex - prev_mousex);
+	INT32 deltay = -(cur_mousey - prev_mousey);
+
+	prev_mousex   = cur_mousex;
+	prev_mousey   = cur_mousey;
+	prev_mousebtn = cur_mousebtn;
+
+	if(deltax < -0x40)
+		deltax = -0x40;
+	if(deltax > 0x3f)
+		deltax = 0x3f;
+	if(deltay < -0x40)
+		deltay = -0x40;
+	if(deltay > 0x3f)
+		deltay = 0x3f;
+
+	UINT32 base = ((deltax & 0x7f) << 1) | ((deltay & 0x7f) << 9) | cur_mousebtn;
+	fifo_push(km_address | D_SECONDARY | base);
 	send();
+}
+
+void nextkbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(!fifo_empty())
+		send();
+
+	update_mouse(false);
 }
 
 void nextkbd_device::fifo_push(UINT32 val)
@@ -79,8 +123,6 @@ void nextkbd_device::fifo_push(UINT32 val)
 	fifo[fifo_iw++] = val;
 	if(fifo_iw == FIFO_SIZE)
 		fifo_iw = 0;
-	if(fifo_size == 1)
-		kbd_timer->adjust(attotime::from_hz(1000));
 }
 
 UINT32 nextkbd_device::fifo_pop()
@@ -92,8 +134,6 @@ UINT32 nextkbd_device::fifo_pop()
 	UINT32 res = fifo[fifo_ir++];
 	if(fifo_ir == FIFO_SIZE)
 		fifo_ir = 0;
-	if(fifo_size == 0)
-		kbd_timer->adjust(attotime::never);
 
 	return res;
 }
@@ -103,48 +143,94 @@ bool nextkbd_device::fifo_empty() const
 	return !fifo_size;
 }
 
-READ32_MEMBER( nextkbd_device::ctrl_r )
+READ8_MEMBER( nextkbd_device::status_snd_r )
 {
-	//  logerror("nextkbd: ctrl_r %08x @ %08x\n", control, mem_mask);
-	return control;
+	logerror("%s: status_snd_r %02x (%08x)\n", tag(), ctrl_snd, (unsigned int)space.device().safe_pc());
+	return ctrl_snd;
 }
 
-READ32_MEMBER( nextkbd_device::ctrl2_r )
+READ8_MEMBER( nextkbd_device::status_kms_r )
 {
-	return control2;
+	logerror("%s: status_kms_r %02x (%08x)\n", tag(), ctrl_kms, (unsigned int)space.device().safe_pc());
+	return ctrl_kms;
 }
 
-READ32_MEMBER( nextkbd_device::data_r )
+READ8_MEMBER( nextkbd_device::status_dma_r )
 {
-	UINT32 old = control;
-	control &= ~(FLAG_DATA|FLAG_INT);
-	if(old & FLAG_INT)
+	logerror("%s: status_dma_r %02x (%08x)\n", tag(), ctrl_dma, (unsigned int)space.device().safe_pc());
+	return ctrl_dma;
+}
+
+READ8_MEMBER( nextkbd_device::status_cmd_r )
+{
+	logerror("%s: status_cmd_r %02x (%08x)\n", tag(), ctrl_cmd, (unsigned int)space.device().safe_pc());
+	return ctrl_cmd;
+}
+
+READ32_MEMBER( nextkbd_device::cdata_r )
+{
+	logerror("%s: cdata_r %08x @ %08x (%08x)\n", tag(), cdata, mem_mask, (unsigned int)space.device().safe_pc());
+	return cdata;
+}
+
+READ32_MEMBER( nextkbd_device::kmdata_r )
+{
+	UINT8 old = ctrl_kms;
+	ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
+	if(old & C_KBD_INTERRUPT)
 		int_change_cb(false);
-	return data;
+	logerror("%s: kmdata_r %08x @ %08x (%08x)\n", tag(), kmdata, mem_mask, (unsigned int)space.device().safe_pc());
+	return kmdata;
 }
 
-WRITE32_MEMBER( nextkbd_device::ctrl_w )
+WRITE8_MEMBER( nextkbd_device::ctrl_snd_w )
 {
-	UINT32 diff;
-	if(data & FLAG_RESET) {
-		diff = control;
-		device_reset();
-	} else {
-		diff = control ^ data;
-		control = data;
+	UINT8 old = ctrl_snd;
+	ctrl_snd = (ctrl_snd & ~C_SOUND_WMASK) | (data & C_SOUND_WMASK);
+	UINT8 diff = old ^ ctrl_snd;
+
+	logerror("%s: ctrl_snd_w %02x | %02x (%08x)\n", tag(), ctrl_snd, diff, (unsigned int)space.device().safe_pc());
+}
+
+WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
+{
+	UINT8 old = ctrl_kms;
+	ctrl_kms = (ctrl_kms & ~C_KMS_WMASK) | (data & C_KMS_WMASK);
+	UINT8 diff = old ^ ctrl_kms;
+
+	logerror("%s: ctrl_kms_w %02x | %02x (%08x)\n", tag(), ctrl_kms, diff, (unsigned int)space.device().safe_pc());
+
+	if((data & C_KBD_NMI) && (ctrl_kms & C_KBD_NMI)) {
+		ctrl_kms &= ~C_KBD_NMI;
+		int_nmi_cb(false);
 	}
-	if(diff & FLAG_INT)
-		int_change_cb(control & FLAG_INT);
-	//  logerror("nextkbd: ctrl_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER( nextkbd_device::ctrl2_w )
+WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
 {
-	//  logerror("nextkbd: ctrl2_w %08x @ %08x\n", data, mem_mask);
+	UINT8 old = ctrl_dma;
+	ctrl_dma = (ctrl_dma & ~C_WMASK) | (data & C_WMASK);
+	UINT8 diff = old ^ ctrl_dma;
+
+	logerror("%s: ctrl_dma_w %02x | %02x (%08x)\n", tag(), ctrl_dma, diff, (unsigned int)space.device().safe_pc());
 }
 
-WRITE32_MEMBER( nextkbd_device::data_w )
+WRITE8_MEMBER( nextkbd_device::ctrl_cmd_w )
 {
+	ctrl_cmd = data;
+	logerror("%s: ctrl_cmd_w %02x (%08x)\n", tag(), ctrl_cmd, (unsigned int)space.device().safe_pc());
+}
+
+WRITE32_MEMBER( nextkbd_device::cdata_w )
+{
+	COMBINE_DATA(&cdata);
+	logerror("%s: cdata_w %08x @ %08x (%08x)\n", tag(), data, mem_mask, (unsigned int)space.device().safe_pc());
+	handle_command();
+}
+
+WRITE32_MEMBER( nextkbd_device::kmdata_w )
+{
+	logerror("%s: kmdata_w %08x @ %08x (%08x)\n", tag(), data, mem_mask, (unsigned int)space.device().safe_pc());
 }
 
 INPUT_CHANGED_MEMBER( nextkbd_device::update )
@@ -158,17 +244,14 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 				break;
 		assert(index != 32);
 		index += bank*32;
-		UINT16 val = index | modifiers_state | KEYVALID;
+		UINT16 val = index | modifiers_state | D_KBD_VALID;
 		if(!newval)
-			val |= KEYDOWN;
+			val |= D_KBD_KEYDOWN;
 		if(val == 0x8826 || val == 0x884a) {
-			nmi_active = true;
+			ctrl_kms &= ~C_KBD_NMI;
 			int_nmi_cb(true);
-		} else if(nmi_active) {
-			nmi_active = false;
-			int_nmi_cb(false);
 		}
-		fifo_push(val | (1<<28));
+		fifo_push(val | D_MASTER | km_address);
 		send();
 		break;
 	}
@@ -178,13 +261,63 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 			modifiers_state |= field.mask();
 		else
 			modifiers_state &= ~field.mask();
-		fifo_push(modifiers_state | (1<<28));
+		fifo_push(modifiers_state | D_MASTER | km_address);
+
 		send();
 		break;
 
 	case 4:
 		if(field.mask() & 1)
 			int_power_cb(newval & 1);
+		break;
+	}
+}
+
+void nextkbd_device::handle_fifo_command()
+{
+	logerror("%s: Fifo command %08x?\n", tag(), cdata);
+	fifo_ir = 0;
+	fifo_iw = 0;
+	fifo_size = 0;
+	memset(fifo, 0, sizeof(fifo));
+	if(ctrl_kms & C_KBD_INTERRUPT)
+		int_change_cb(false);
+	ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
+}
+
+void nextkbd_device::handle_kbd_command()
+{
+	switch(cdata >> 24) {
+	case 0x00:
+		logerror("%s: Keyboard LED control %06x?\n", tag(), cdata & 0xffffff);
+		ctrl_kms |= C_KBD_DATA; // Hmmmm.  The rom wants it, but I'm not sure if data is actually expected
+		break;
+
+	case 0xef:
+		logerror("%s: Set keyboard/mouse address to %d\n", tag(), (cdata >> 17) & 7);
+		km_address = ((cdata >> 17) & 7) << 25;
+		ctrl_kms |= C_KBD_DATA; // Hmmmm.  The rom wants it, but I'm not sure if data is actually expected
+		break;
+
+	default:
+		logerror("%s: Unhandled keyboard command %02x.%06x\n", tag(), cdata >> 24, cdata & 0xffffff);
+		break;
+	}
+}
+
+void nextkbd_device::handle_command()
+{
+	switch(ctrl_cmd) {
+	case 0xc5:
+		handle_kbd_command();
+		break;
+
+	case 0xc6:
+		handle_fifo_command();
+		break;
+
+	default:
+		logerror("%s: Unhandled command %02x.%08x\n", tag(), ctrl_cmd, cdata);
 		break;
 	}
 }
@@ -291,6 +424,16 @@ static INPUT_PORTS_START(nextkbd_keymap)
 	PORT_START("special")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 4) PORT_CODE(KEYCODE_HOME)       PORT_NAME("Power")
 	PORT_BIT(0xfffffffe, IP_ACTIVE_HIGH, IPT_UNUSED)   PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 4)
+
+	PORT_START("mousex")
+	PORT_BIT( 0x007f, 0, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START("mousey")
+	PORT_BIT( 0x007f, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START("mousebtn")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 ioport_constructor nextkbd_device::device_input_ports() const

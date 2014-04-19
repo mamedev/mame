@@ -814,7 +814,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 						mdata.m_bits = entry_bits;
 
 					UINT64 mask = 0;
-					if (entry_bits != m_databits)
+					if (mdata.m_bits != m_databits)
 					{
 						UINT64 unitmask = mdata.m_mask ? mdata.m_mask : entry_mask;
 						for (int slot = start_slot; slot <= end_slot; slot++)

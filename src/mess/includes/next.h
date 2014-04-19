@@ -115,6 +115,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	static const cdrom_interface cdrom_intf;
+	void vblank_w(screen_device &screen, bool vblank_state);
 
 protected:
 	struct dma_slot {
