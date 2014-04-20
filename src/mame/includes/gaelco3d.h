@@ -12,6 +12,7 @@
 #include "video/poly.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
+#include "cpu/adsp2100/adsp2100.h"
 
 #define SOUND_CHANNELS  4
 
@@ -74,7 +75,7 @@ public:
 	required_shared_ptr<UINT16> m_adsp_control_regs;
 	required_shared_ptr<UINT16> m_adsp_fastram_base;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_adsp;
+	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
@@ -137,4 +138,5 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
+	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
 };

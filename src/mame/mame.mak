@@ -615,6 +615,7 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/segacrp2.o \
 	$(MACHINE)/ticket.o \
 	$(VIDEO)/avgdvg.o \
+	$(AUDIO)/dcs.o \
 	$(AUDIO)/decobsmt.o \
 	$(AUDIO)/segam1audio.o \
 
@@ -1330,7 +1331,6 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/vegas.o $(DRIVERS)/wmg.o \
 	$(DRIVERS)/williams.o $(MACHINE)/williams.o $(AUDIO)/williams.o $(VIDEO)/williams.o \
 	$(MACHINE)/midwayic.o \
-	$(AUDIO)/dcs.o \
 	$(AUDIO)/gorf.o \
 	$(AUDIO)/midway.o \
 	$(AUDIO)/wow.o \

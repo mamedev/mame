@@ -56,23 +56,11 @@
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/cage.h"
 #include "includes/atarigt.h"
 
 
 #define LOG_PROTECTION      (0)
 #define HACK_TMEK_CONTROLS  (0)
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static void cage_irq_callback(running_machine &machine, int reason);
-
 
 
 /*************************************
@@ -103,18 +91,13 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
  *
  *************************************/
 
-static void cage_irq_callback(running_machine &machine, int reason)
+WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 {
-	atarigen_state *atarigen = machine.driver_data<atarigen_state>();
-	address_space &space = atarigen->m_maincpu->space(AS_PROGRAM);
-
-	if (reason)
-		atarigen->sound_int_gen(atarigen->m_maincpu);
+	if (data)
+		sound_int_gen(m_maincpu);
 	else
-		atarigen->sound_int_ack_w(space,0,0);
+		sound_int_ack_w(space,0,0);
 }
-
-
 
 /*************************************
  *
@@ -259,9 +242,9 @@ READ32_MEMBER(atarigt_state::sound_data_r)
 	UINT32 result = 0;
 
 	if (ACCESSING_BITS_0_15)
-		result |= cage_control_r(machine());
+		result |= m_cage->control_r();
 	if (ACCESSING_BITS_16_31)
-		result |= cage_main_r(space) << 16;
+		result |= m_cage->main_r() << 16;
 	return result;
 }
 
@@ -269,9 +252,9 @@ READ32_MEMBER(atarigt_state::sound_data_r)
 WRITE32_MEMBER(atarigt_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(machine(), data);
+		m_cage->control_w(data);
 	if (ACCESSING_BITS_16_31)
-		cage_main_w(space, data >> 16);
+		m_cage->main_w(data >> 16);
 }
 
 
@@ -847,11 +830,28 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 
 	MCFG_ATARIRLE_ADD("rle", modesc)
 
-	/* sound hardware */
-	MCFG_FRAGMENT_ADD(cage)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tmek, atarigt )
+	/* sound hardware */
+	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
+	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))	
+MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( primrage, atarigt )
+	/* sound hardware */
+	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
+	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))	
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( primrage20, atarigt )
+	/* sound hardware */
+	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
+	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))	
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -1307,9 +1307,6 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 {
 	m_is_primrage = 0;
 
-	cage_init(machine(), 0x4fad);
-	cage_set_irq_handler(cage_irq_callback);
-
 	/* setup protection */
 	m_protection_r = &atarigt_state::tmek_protection_r;
 	m_protection_w = &atarigt_state::tmek_protection_w;
@@ -1319,20 +1316,14 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 }
 
 
-void atarigt_state::primrage_init_common(offs_t cage_speedup)
+DRIVER_INIT_MEMBER(atarigt_state,primrage)
 {
 	m_is_primrage = 1;
-
-	cage_init(machine(), cage_speedup);
-	cage_set_irq_handler(cage_irq_callback);
 
 	/* install protection */
 	m_protection_r = &atarigt_state::primrage_protection_r;
 	m_protection_w = &atarigt_state::primrage_protection_w;
 }
-
-DRIVER_INIT_MEMBER(atarigt_state,primrage)  { primrage_init_common(0x42f2); }
-DRIVER_INIT_MEMBER(atarigt_state,primrage20) { primrage_init_common(0x48a4); }
 
 /*************************************
  *
@@ -1340,10 +1331,10 @@ DRIVER_INIT_MEMBER(atarigt_state,primrage20) { primrage_init_common(0x48a4); }
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, prototype)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.5)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.4)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
-GAME( 1994, primrage,   0,        atarigt,  primrage, atarigt_state, primrage,   ROT0, "Atari Games", "Primal Rage (version 2.3)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, primrage20, primrage, atarigt,  primrage, atarigt_state, primrage20, ROT0, "Atari Games", "Primal Rage (version 2.0)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek,       0,        tmek,  	 tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek51p,    tmek,     tmek,  	 tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, prototype)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek45,     tmek,     tmek,  	 tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.5)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek44,     tmek,     tmek, 	 tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.4)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek20,     tmek,     tmek,  	 tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage,   ROT0, "Atari Games", "Primal Rage (version 2.3)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, primrage20, primrage, primrage20,primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", GAME_UNEMULATED_PROTECTION )

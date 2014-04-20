@@ -890,9 +890,9 @@ static const mips3_config config =
 
 static const adsp21xx_config adsp_config =
 {
-	NULL,                       /* callback for serial receive */
-	0,//sound_tx_callback,      /* callback for serial transmit */
-	0,//timer_enable_callback   /* callback for timer fired */
+	DEVCB_NULL,                       /* callback for serial receive */
+	DEVCB_NULL,//sound_tx_callback,      /* callback for serial transmit */
+	DEVCB_NULL,//timer_enable_callback   /* callback for timer fired */
 };
 
 static const voodoo_config voodoo_1_intf =

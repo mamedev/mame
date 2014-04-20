@@ -15,11 +15,6 @@
 #include "midwayic.h"
 
 
-/* prototype */
-static void midxunit_dcs_output_full(running_machine &machine, int state);
-
-
-
 /*************************************
  *
  *  State saving
@@ -101,7 +96,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 	int offs = offset / 0x40000;
 
 	if (offs == 1 && ACCESSING_BITS_0_7)
-		dcs_reset_w(machine(), data & 2);
+		m_dcs->reset_w(data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
 		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", space.device().safe_pc(), offs, data & 0xff);
@@ -155,7 +150,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_analog_select_w)
 READ16_MEMBER(midxunit_state::midxunit_status_r)
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (midway_serial_pic_status_r() << 1) | 1;
+	return (m_midway_serial_pic->status_r(space,0) << 1) | 1;
 }
 
 
@@ -166,12 +161,11 @@ READ16_MEMBER(midxunit_state::midxunit_status_r)
  *
  *************************************/
 
-static void midxunit_dcs_output_full(running_machine &machine, int state)
+WRITE_LINE_MEMBER(midxunit_state::midxunit_dcs_output_full)
 {
-	midxunit_state *drvstate = machine.driver_data<midxunit_state>();
 	/* only signal if not in loopback state */
-	if (drvstate->m_uart[1] != 0x66)
-		drvstate->m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	if (m_uart[1] != 0x66)
+		m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -267,7 +261,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 			break;
 
 		case 5: /* register 5 write seems to reset things */
-			dcs_data_r(machine());
+			m_dcs->data_r();
 			break;
 
 		default: /* everyone else just stores themselves */
@@ -294,15 +288,7 @@ DRIVER_INIT_MEMBER(midxunit_state,revx)
 {
 	/* register for state saving */
 	register_state_saving();
-
-	/* init sound */
-	dcs_init(machine());
-
-	/* serial prefixes 419, 420 */
-	midway_serial_pic_init(machine(), 419);
 }
-
-
 
 /*************************************
  *
@@ -315,14 +301,14 @@ MACHINE_RESET_MEMBER(midxunit_state,midxunit)
 	int i;
 
 	/* reset sound */
-	dcs_reset_w(machine(), 1);
-	dcs_reset_w(machine(), 0);
+	m_dcs->reset_w(1);
+	m_dcs->reset_w(0);
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
 
-	dcs_set_io_callbacks(midxunit_dcs_output_full, NULL);
+	m_dcs->set_io_callbacks(write_line_delegate(FUNC(midxunit_state::midxunit_dcs_output_full),this), write_line_delegate());
 }
 
 
@@ -335,7 +321,7 @@ MACHINE_RESET_MEMBER(midxunit_state,midxunit)
 
 READ16_MEMBER(midxunit_state::midxunit_security_r)
 {
-	return midway_serial_pic_r(space);
+	return m_midway_serial_pic->read(space,0);
 }
 
 WRITE16_MEMBER(midxunit_state::midxunit_security_w)
@@ -348,7 +334,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_w)
 WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(space, ((~data & 2) << 3) | m_security_bits);
+		m_midway_serial_pic->write(space, 0, ((~data & 2) << 3) | m_security_bits);
 }
 
 
@@ -363,13 +349,13 @@ READ16_MEMBER(midxunit_state::midxunit_sound_r)
 {
 	logerror("%08X:Sound read\n", space.device().safe_pc());
 
-	return dcs_data_r(machine()) & 0xff;
+	return m_dcs->data_r() & 0xff;
 }
 
 
 READ16_MEMBER(midxunit_state::midxunit_sound_state_r)
 {
-	return dcs_control_r(machine());
+	return m_dcs->control_r();
 }
 
 
@@ -386,6 +372,6 @@ WRITE16_MEMBER(midxunit_state::midxunit_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
-		dcs_data_w(machine(), data & 0xff);
+		m_dcs->data_w(data & 0xff);
 	}
 }

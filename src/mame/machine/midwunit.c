@@ -12,7 +12,6 @@
 #include "audio/dcs.h"
 #include "includes/midtunit.h"
 #include "includes/midwunit.h"
-#include "midwayic.h"
 
 /*************************************
  *
@@ -87,10 +86,10 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 			logerror("%08X:Control W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
 
 			/* bit 4 reset sound CPU */
-			dcs_reset_w(machine(), newword & 0x10);
+			m_dcs->reset_w(newword & 0x10);
 
 			/* bit 5 (active low) reset security chip */
-			midway_serial_pic_reset_w(newword & 0x20);
+			m_midway_serial_pic->reset_w(newword & 0x20);
 			break;
 
 		case 3:
@@ -130,7 +129,7 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 			return ioport(portnames[offset])->read();
 
 		case 4:
-			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(space,0,0xffff);
+			return (m_midway_serial_pic->status_r(space,0) << 12) | midwunit_sound_state_r(space,0,0xffff);
 
 		default:
 			logerror("%08X:Unknown I/O read from %d\n", space.device().safe_pc(), offset);
@@ -151,9 +150,6 @@ void midwunit_state::init_wunit_generic()
 {
 	/* register for state saving */
 	register_state_saving();
-
-	/* init sound */
-	dcs_init(machine());
 }
 
 
@@ -201,7 +197,7 @@ void midwunit_state::init_mk3_common()
 	init_wunit_generic();
 
 	/* serial prefixes 439, 528 */
-	midway_serial_pic_init(machine(), 528);
+	//midway_serial_pic_init(machine(), 528);
 }
 
 DRIVER_INIT_MEMBER(midwunit_state,mk3)
@@ -240,7 +236,7 @@ DRIVER_INIT_MEMBER(midwunit_state,openice)
 	init_wunit_generic();
 
 	/* serial prefixes 438, 528 */
-	midway_serial_pic_init(machine(), 528);
+	//midway_serial_pic_init(machine(), 528);
 }
 
 
@@ -252,7 +248,7 @@ DRIVER_INIT_MEMBER(midwunit_state,nbahangt)
 	init_wunit_generic();
 
 	/* serial prefixes 459, 470, 528 */
-	midway_serial_pic_init(machine(), 528);
+	//midway_serial_pic_init(machine(), 528);
 }
 
 
@@ -316,7 +312,7 @@ DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),this));
 
 	/* serial prefixes 430, 528 */
-	midway_serial_pic_init(machine(), 528);
+	//midway_serial_pic_init(machine(), 528);
 }
 
 
@@ -328,7 +324,7 @@ DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
 	init_wunit_generic();
 
 	/* serial prefixes 465, 528 */
-	midway_serial_pic_init(machine(), 528);
+	//midway_serial_pic_init(machine(), 528);
 }
 
 
@@ -343,8 +339,8 @@ MACHINE_RESET_MEMBER(midwunit_state,midwunit)
 	int i;
 
 	/* reset sound */
-	dcs_reset_w(machine(), 1);
-	dcs_reset_w(machine(), 0);
+	m_dcs->reset_w(1);
+	m_dcs->reset_w(0);
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
@@ -361,14 +357,14 @@ MACHINE_RESET_MEMBER(midwunit_state,midwunit)
 
 READ16_MEMBER(midwunit_state::midwunit_security_r)
 {
-	return midway_serial_pic_r(space);
+	return m_midway_serial_pic->read(space,0);
 }
 
 
 WRITE16_MEMBER(midwunit_state::midwunit_security_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(space, data);
+		m_midway_serial_pic->write(space, 0, data);
 }
 
 
@@ -383,13 +379,13 @@ READ16_MEMBER(midwunit_state::midwunit_sound_r)
 {
 	logerror("%08X:Sound read\n", space.device().safe_pc());
 
-	return dcs_data_r(machine()) & 0xff;
+	return m_dcs->data_r() & 0xff;
 }
 
 
 READ16_MEMBER(midwunit_state::midwunit_sound_state_r)
 {
-	return dcs_control_r(machine());
+	return m_dcs->control_r();
 }
 
 
@@ -406,6 +402,6 @@ WRITE16_MEMBER(midwunit_state::midwunit_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
-		dcs_data_w(machine(), data & 0xff);
+		m_dcs->data_w(data & 0xff);
 	}
 }

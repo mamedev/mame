@@ -150,30 +150,29 @@ INPUT_PORTS_END
 
 READ8_MEMBER(wpc_dcs_state::wpc_dcs_sound_ctrl_r)
 {
-	return dcs_control_r(machine());
+	return m_dcs->control_r();
 }
 
 WRITE8_MEMBER(wpc_dcs_state::wpc_dcs_sound_ctrl_w)
 {
-	dcs_reset_w(machine(),1);
-	dcs_reset_w(machine(),0);
+	m_dcs->reset_w(1);
+	m_dcs->reset_w(0);
 }
 
 READ8_MEMBER(wpc_dcs_state::wpc_dcs_sound_data_r)
 {
-	return dcs_data_r(machine());
+	return m_dcs->data_r();
 }
 
 WRITE8_MEMBER(wpc_dcs_state::wpc_dcs_sound_data_w)
 {
-	dcs_data_w(machine(),data << 8);
+	m_dcs->data_w(data << 8);
 }
 
 
 DRIVER_INIT_MEMBER(wpc_dcs_state,wpc_dcs)
 {
 	wpc_flip2_state::init_wpc_flip2();
-	dcs_init(machine());
 	m_send = false;
 }
 
@@ -192,7 +191,7 @@ static MACHINE_CONFIG_START( wpc_dcs, wpc_dcs_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_FRAGMENT_ADD(dcs_audio_wpc)
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(128, 32)

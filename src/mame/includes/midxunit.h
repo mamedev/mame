@@ -6,14 +6,18 @@
 
 **************************************************************************/
 
+#include "machine/midwayic.h"
+
 class midxunit_state : public midtunit_state
 {
 public:
 	midxunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midtunit_state(mconfig, type, tag),
-			m_nvram(*this, "nvram") { }
+			m_nvram(*this, "nvram"),
+			m_midway_serial_pic(*this, "serial_pic") { }
 
 	required_shared_ptr<UINT16> m_nvram;
+	required_device<midway_serial_pic_device> m_midway_serial_pic;
 	UINT8 m_cmos_write_enable;
 	UINT16 m_iodata[8];
 	UINT8 m_ioshuffle[16];
@@ -36,6 +40,7 @@ public:
 	DECLARE_READ16_MEMBER(midxunit_sound_r);
 	DECLARE_READ16_MEMBER(midxunit_sound_state_r);
 	DECLARE_WRITE16_MEMBER(midxunit_sound_w);
+	DECLARE_WRITE_LINE_MEMBER(midxunit_dcs_output_full);
 	DECLARE_DRIVER_INIT(revx);
 	DECLARE_MACHINE_RESET(midxunit);
 	DECLARE_VIDEO_START(midxunit);

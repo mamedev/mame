@@ -393,16 +393,7 @@ void midtunit_state::init_tunit_generic(int sound)
 
 	/* load sound ROMs and set up sound handlers */
 	chip_type = sound;
-	switch (sound)
-	{
-		case SOUND_ADPCM:
-		case SOUND_ADPCM_LARGE:
-			break;
 
-		case SOUND_DCS:
-			dcs_init(machine());
-			break;
-	}
 
 	/* default graphics functionality */
 	midtunit_gfx_rom_large = 0;
@@ -541,8 +532,8 @@ MACHINE_RESET_MEMBER(midtunit_state,midtunit)
 			break;
 
 		case SOUND_DCS:
-			dcs_reset_w(machine(), 1);
-			dcs_reset_w(machine(), 0);
+			m_dcs->reset_w(1);
+			m_dcs->reset_w(0);
 			break;
 	}
 }
@@ -560,7 +551,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 /*  logerror("%08X:Sound status read\n", space.device().safe_pc());*/
 
 	if (chip_type == SOUND_DCS)
-		return dcs_control_r(machine()) >> 4;
+		return m_dcs->control_r() >> 4;
 
 	if (fake_sound_state)
 	{
@@ -575,7 +566,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_r)
 	logerror("%08X:Sound data read\n", space.device().safe_pc());
 
 	if (chip_type == SOUND_DCS)
-		return dcs_data_r(machine()) & 0xff;
+		return m_dcs->data_r() & 0xff;
 
 	return ~0;
 }
@@ -604,8 +595,8 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 
 			case SOUND_DCS:
 				logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
-				dcs_reset_w(machine(), ~data & 0x100);
-				dcs_data_w(machine(), data & 0xff);
+				m_dcs->reset_w(~data & 0x100);
+				m_dcs->data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				fake_sound_state = 128;
 				break;

@@ -32,10 +32,8 @@ Known to exist but not dumped:
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
 #include "machine/ataintf.h"
-#include "machine/midwayic.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
-#include "mcfglgcy.h"
 
 
 #define CPU_CLOCK       50000000
@@ -61,8 +59,8 @@ void midvunit_state::machine_start()
 
 void midvunit_state::machine_reset()
 {
-	dcs_reset_w(machine(), 1);
-	dcs_reset_w(machine(), 0);
+	m_dcs->reset_w(1);
+	m_dcs->reset_w(0);
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
@@ -74,8 +72,8 @@ void midvunit_state::machine_reset()
 
 MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 {
-	dcs_reset_w(machine(), 1);
-	dcs_reset_w(machine(), 0);
+	m_dcs->reset_w(1);
+	m_dcs->reset_w(0);
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
@@ -197,7 +195,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 		watchdog_reset_w(space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
-	dcs_reset_w(machine(), (~m_control_data >> 1) & 1);
+	m_dcs->reset_w((~m_control_data >> 1) & 1);
 
 	/* log anything unusual */
 	if ((olddata ^ m_control_data) & ~0x00e8)
@@ -211,7 +209,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 11 is the DCS sound reset */
-	dcs_reset_w(machine(), (~m_control_data >> 11) & 1);
+	m_dcs->reset_w((~m_control_data >> 11) & 1);
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0200)
@@ -228,7 +226,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
 {
 	logerror("Sound W = %02X\n", data);
-	dcs_data_w(machine(), data & 0xff);
+	m_dcs->data_w(data & 0xff);
 }
 
 
@@ -293,17 +291,16 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
  *
  *************************************/
 
-#if 0
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
-	int status = midway_serial_pic_status_r();
+	int status = m_midway_serial_pic->status_r(space,0);
 	return (ioport("991030")->read() & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
-	return midway_serial_pic_r() << 16;
+	return m_midway_serial_pic->read(space,0) << 16;
 }
 
 
@@ -311,12 +308,11 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 {
 	if ((data & 0xf0000) == 0x10000)
 	{
-		midway_serial_pic_reset_w(1);
-		midway_serial_pic_reset_w(0);
+		m_midway_serial_pic->reset_w(1);
+		m_midway_serial_pic->reset_w(0);
 	}
-	midway_serial_pic_w(data >> 16);
+	m_midway_serial_pic->write(space,0,data >> 16);
 }
-#endif
 
 
 /*************************************
@@ -359,20 +355,20 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	int status = midway_serial_pic2_status_r(space);
+	int status = m_midway_serial_pic2->status_r(space,0);
 	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
-	return midway_serial_pic2_r(space) << 16;
+	return m_midway_serial_pic2->read(space, 0) << 16;
 }
 
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
-	midway_serial_pic2_w(space, data >> 16);
+	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
 
@@ -508,7 +504,7 @@ static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x980040, 0x980040) AM_READWRITE(midvunit_page_control_r, midvunit_page_control_w)
 	AM_RANGE(0x980080, 0x980080) AM_NOP
 	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
@@ -1032,8 +1028,23 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs_audio_2k)
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( crusnwld, midvunit )
+	/* valid values are 450 or 460 */	
+	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)	
+	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( offroadc, midvunit )
+	/* valid values are 230 or 234 */
+	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)	
+	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
+	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)	
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 
@@ -1044,12 +1055,18 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")
-	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
 
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
+	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
+	
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
 MACHINE_CONFIG_END
 
 
@@ -1712,7 +1729,6 @@ READ32_MEMBER(midvunit_state::generic_speedup_r)
 
 void midvunit_state::init_crusnusa_common(offs_t speedup)
 {
-	dcs_init(machine());
 	m_adc_shift = 24;
 
 	/* speedups */
@@ -1725,17 +1741,14 @@ DRIVER_INIT_MEMBER(midvunit_state,crusnu21)  { init_crusnusa_common(0xc051); }
 
 void midvunit_state::init_crusnwld_common(offs_t speedup)
 {
-	dcs_init(machine());
 	m_adc_shift = 16;
 
 	/* control register is different */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32_delegate(FUNC(midvunit_state::crusnwld_control_w),this));
 
-	/* valid values are 450 or 460 */
-	midway_serial_pic_init(machine(), 450);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::offroadc_serial_status_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x996000, 0x996000, write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::crusnwld_serial_status_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::crusnwld_serial_data_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x996000, 0x996000, write32_delegate(FUNC(midvunit_state::crusnwld_serial_data_w),this));
 
 	/* install strange protection device */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9d0000, 0x9d1fff, read32_delegate(FUNC(midvunit_state::bit_data_r),this));
@@ -1753,14 +1766,11 @@ DRIVER_INIT_MEMBER(midvunit_state,crusnw13)  { init_crusnwld_common(0); }
 
 DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 {
-	dcs_init(machine());
 	m_adc_shift = 16;
 
 	/* control register is different */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32_delegate(FUNC(midvunit_state::crusnwld_control_w),this));
 
-	/* valid values are 230 or 234 */
-	midway_serial_pic2_init(machine(), 230, 94);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::offroadc_serial_status_r),this));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),this), write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),this));
 
@@ -1774,8 +1784,6 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
 	UINT8 default_nvram[256];
 
 	/* initialize the subsystems */
-	dcs2_init(machine(), 2, 0x3839);
-	midway_ioasic_init(machine(), 0, 452/* no alternates */, 94, NULL);
 	m_adc_shift = 16;
 
 	/* we need proper VRAM */
@@ -1787,7 +1795,7 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
 	default_nvram[0x12] = default_nvram[0x32] = 0xaf;
 	default_nvram[0x17] = default_nvram[0x37] = 0xd8;
 	default_nvram[0x18] = default_nvram[0x38] = 0xe7;
-	midway_serial_pic2_set_default_nvram(default_nvram);
+	machine().device<midway_ioasic_device>("ioasic")->set_default_nvram(default_nvram);
 
 	/* speedups */
 	m_generic_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
@@ -1805,19 +1813,19 @@ GAME( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, crusnusa, 
 GAME( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", GAME_SUPPORTS_SAVE )
 GAME( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", GAME_SUPPORTS_SAVE )
 
-GAME( 1996, crusnwld,   0,        midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", GAME_SUPPORTS_SAVE )
-GAME( 1996, crusnwld24, crusnwld, midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", GAME_SUPPORTS_SAVE )
-GAME( 1996, crusnwld23, crusnwld, midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", GAME_SUPPORTS_SAVE )
-GAME( 1996, crusnwld20, crusnwld, midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", GAME_SUPPORTS_SAVE )
-GAME( 1996, crusnwld19, crusnwld, midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", GAME_SUPPORTS_SAVE )
-GAME( 1996, crusnwld17, crusnwld, midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", GAME_SUPPORTS_SAVE )
-GAME( 1996, crusnwld13, crusnwld, midvunit, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", GAME_SUPPORTS_SAVE )
 
-GAME( 1997, offroadc,  0,        midvunit, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", GAME_SUPPORTS_SAVE )
-GAME( 1997, offroadc5, offroadc, midvunit, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", GAME_SUPPORTS_SAVE )
-GAME( 1997, offroadc4, offroadc, midvunit, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", GAME_SUPPORTS_SAVE )
-GAME( 1997, offroadc3, offroadc, midvunit, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", GAME_SUPPORTS_SAVE )
-GAME( 1997, offroadc1, offroadc, midvunit, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", GAME_SUPPORTS_SAVE )
+GAME( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", GAME_SUPPORTS_SAVE )
+GAME( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", GAME_SUPPORTS_SAVE )
+GAME( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", GAME_SUPPORTS_SAVE )
+GAME( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", GAME_SUPPORTS_SAVE )
+GAME( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", GAME_SUPPORTS_SAVE )
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", GAME_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", GAME_SUPPORTS_SAVE )

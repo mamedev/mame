@@ -634,7 +634,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tunit_dcs, tunit_core )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(dcs_audio_2k)
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 

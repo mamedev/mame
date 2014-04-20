@@ -424,6 +424,15 @@ public:
 	DECLARE_READ16_MEMBER( hdadsp_speedup_r );
 	DECLARE_READ16_MEMBER( hdds3_speedup_r );
 
+
+	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
+	DECLARE_WRITE32_MEMBER(hdds3sdsp_serial_tx_callback);
+	DECLARE_READ32_MEMBER(hdds3sdsp_serial_rx_callback);
+
+	DECLARE_WRITE_LINE_MEMBER(hdds3xdsp_timer_enable_callback);
+	DECLARE_WRITE32_MEMBER(hdds3xdsp_serial_tx_callback);
+	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
+
 	/*----------- defined in video/harddriv.c -----------*/
 	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
@@ -452,16 +461,7 @@ void hdmsp_irq_gen(device_t *device, int state);
 
 /* DS III/IV board */
 TIMER_DEVICE_CALLBACK( ds3sdsp_internal_timer_callback );
-void hdds3sdsp_timer_enable_callback(adsp21xx_device &device, int enable);
-
-void hdds3sdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data);
-INT32 hdds3sdsp_serial_rx_callback(adsp21xx_device &device, int port);
-
 TIMER_DEVICE_CALLBACK( ds3xdsp_internal_timer_callback );
-void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable);
-
-void hdds3xdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data);
-INT32 hdds3xdsp_serial_rx_callback(adsp21xx_device &device, int port);
 
 
 /*----------- defined in video/harddriv.c -----------*/

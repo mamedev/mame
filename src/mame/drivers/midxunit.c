@@ -278,9 +278,13 @@ static MACHINE_CONFIG_START( midxunit, midxunit_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_VIDEO_START_OVERRIDE(midxunit_state,midxunit)
+	
+	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
+	/* serial prefixes 419, 420 */
+	MCFG_MIDWAY_SERIAL_PIC_UPPER(419);
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs_audio_2k_uart)
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K_UART, 0)
 MACHINE_CONFIG_END
 
 

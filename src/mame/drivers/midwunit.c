@@ -655,8 +655,11 @@ static MACHINE_CONFIG_START( wunit, midwunit_state )
 
 	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
 
+	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
+	MCFG_MIDWAY_SERIAL_PIC_UPPER(528);
+
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs_audio_8k)
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 
 

@@ -475,7 +475,9 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_rambase(*this, "rambase"),
 		m_nile_regs(*this, "nile_regs"),
-		m_rombase(*this, "rombase") { }
+		m_rombase(*this, "rombase"),
+		m_dcs(*this, "dcs"),
+		m_ioasic(*this, "ioasic") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<m48t37_device> m_timekeeper;
@@ -484,6 +486,9 @@ public:
 	required_shared_ptr<UINT32> m_rambase;
 	required_shared_ptr<UINT32> m_nile_regs;
 	required_shared_ptr<UINT32> m_rombase;
+	required_device<dcs_audio_device> m_dcs;
+	required_device<midway_ioasic_device> m_ioasic;
+	
 	UINT16 m_nile_irq_state;
 	UINT16 m_ide_irq_state;
 	UINT32 m_pci_bridge_regs[0x40];
@@ -526,10 +531,8 @@ public:
 	void update_nile_irqs();
 	void update_sio_irqs();
 	inline void _add_dynamic_address(offs_t start, offs_t end, read32_delegate read, write32_delegate write);
-	inline void _add_legacy_dynamic_address(offs_t start, offs_t end, read32_space_func read, write32_space_func write, const char *rdname, const char *wrname);
 	inline void _add_legacy_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname);
 
-	void init_common(int ioasic, int serialnum);
 	DECLARE_WRITE32_MEMBER( cmos_unlock_w );
 	DECLARE_WRITE32_MEMBER(timekeeper_w);
 	DECLARE_READ32_MEMBER(timekeeper_r);
@@ -565,6 +568,7 @@ public:
 	DECLARE_WRITE32_MEMBER( ethernet_w );
 	DECLARE_WRITE32_MEMBER( dcs3_fifo_full_w );
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 };
 
 
@@ -637,10 +641,10 @@ void vegas_state::machine_reset()
 	memset(m_pci_3dfx_regs, 0, sizeof(m_pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (machine().device("dcs2") != NULL || machine().device("dsio") != NULL || machine().device("denver") != NULL)
+	if (machine().device("dcs") != NULL)
 	{
-		dcs_reset_w(machine(), 1);
-		dcs_reset_w(machine(), 0);
+		m_dcs->reset_w(1);
+		m_dcs->reset_w(0);
 	}
 
 	/* initialize IRQ states */
@@ -1313,16 +1317,14 @@ WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 }
 
 
-static void ioasic_irq(running_machine &machine, int state)
+WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
 {
-	vegas_state *drvstate = machine.driver_data<vegas_state>();
 	if (state)
-		drvstate->m_sio_irq_state |= 0x04;
+		m_sio_irq_state |= 0x04;
 	else
-		drvstate->m_sio_irq_state &= ~0x04;
-	drvstate->update_sio_irqs();
+		m_sio_irq_state &= ~0x04;
+	update_sio_irqs();
 }
-
 
 WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
 {
@@ -1349,8 +1351,8 @@ WRITE32_MEMBER( vegas_state::sio_irq_clear_w )
 		/* bit 0x01 seems to be used to reset the IOASIC */
 		if (!(data & 0x01))
 		{
-			midway_ioasic_reset(space.machine());
-			dcs_reset_w(space.machine(), data & 0x01);
+			m_ioasic->ioasic_reset();
+			m_dcs->reset_w(data & 0x01);
 		}
 
 		/* they toggle bit 0x08 low to reset the VBLANK */
@@ -1479,7 +1481,7 @@ WRITE32_MEMBER( vegas_state::vegas_watchdog_w )
 
 WRITE32_MEMBER( vegas_state::asic_fifo_w )
 {
-	midway_ioasic_fifo_w(space.machine(), data);
+	m_ioasic->fifo_w(data);
 }
 
 
@@ -1541,7 +1543,7 @@ WRITE32_MEMBER( vegas_state::ethernet_w )
 
 WRITE32_MEMBER( vegas_state::dcs3_fifo_full_w )
 {
-	midway_ioasic_fifo_full_w(space.machine(), data);
+	m_ioasic->fifo_full_w(data);
 }
 
 
@@ -1554,7 +1556,6 @@ WRITE32_MEMBER( vegas_state::dcs3_fifo_full_w )
 
 #define add_dynamic_address(s,e,r,w)         _add_dynamic_address(s,e,r,w)
 
-#define add_legacy_dynamic_address(s,e,r,w)         _add_legacy_dynamic_address(s,e,r,w,#r,#w)
 #define add_legacy_dynamic_device_address(d,s,e,r,w)    _add_legacy_dynamic_device_address(d,s,e,r,w,#r,#w)
 
 inline void vegas_state::_add_dynamic_address(offs_t start, offs_t end, read32_delegate read, write32_delegate write)
@@ -1565,21 +1566,6 @@ inline void vegas_state::_add_dynamic_address(offs_t start, offs_t end, read32_d
 	dynamic[m_dynamic_count].read = read;
 	dynamic[m_dynamic_count].write = write;
 	m_dynamic_count++;
-}
-
-inline void vegas_state::_add_legacy_dynamic_address(offs_t start, offs_t end, read32_space_func read, write32_space_func write, const char *rdname, const char *wrname)
-{
-	legacy_dynamic_address *l_dynamic = m_legacy_dynamic;
-	l_dynamic[m_legacy_dynamic_count].start = start;
-	l_dynamic[m_legacy_dynamic_count].end = end;
-	l_dynamic[m_legacy_dynamic_count].mread = read;
-	l_dynamic[m_legacy_dynamic_count].mwrite = write;
-	l_dynamic[m_legacy_dynamic_count].dread = NULL;
-	l_dynamic[m_legacy_dynamic_count].dwrite = NULL;
-	l_dynamic[m_legacy_dynamic_count].device = NULL;
-	l_dynamic[m_legacy_dynamic_count].rdname = rdname;
-	l_dynamic[m_legacy_dynamic_count].wrname = wrname;
-	m_legacy_dynamic_count++;
 }
 
 inline void vegas_state::_add_legacy_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
@@ -1651,14 +1637,14 @@ void vegas_state::remap_dynamic_addresses()
 	base = m_nile_regs[NREG_DCS6] & 0x1fffff00;
 	if (base >= m_rambase.bytes())
 	{
-		add_legacy_dynamic_address(base + 0x0000, base + 0x003f, midway_ioasic_packed_r, midway_ioasic_packed_w);
+		add_dynamic_address(base + 0x0000, base + 0x003f, read32_delegate(FUNC(midway_ioasic_device::packed_r),(midway_ioasic_device*)m_ioasic), write32_delegate(FUNC(midway_ioasic_device::packed_w),(midway_ioasic_device*)m_ioasic));
 		add_dynamic_address(base + 0x1000, base + 0x1003, read32_delegate(), write32_delegate(FUNC(vegas_state::asic_fifo_w), this));
 		if (m_dcs_idma_cs != 0)
 			add_dynamic_address(base + 0x3000, base + 0x3003, read32_delegate(), write32_delegate(FUNC(vegas_state::dcs3_fifo_full_w), this));
 		if (m_dcs_idma_cs == 6)
 		{
-			add_legacy_dynamic_address(base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
-			add_legacy_dynamic_address(base + 0x7000, base + 0x7003, dsio_idma_data_r, dsio_idma_data_w);
+			add_dynamic_address(base + 0x5000, base + 0x5003, read32_delegate(), write32_delegate(FUNC(dcs_audio_device::dsio_idma_addr_w),(dcs_audio_device*)m_dcs));
+			add_dynamic_address(base + 0x7000, base + 0x7003, read32_delegate(FUNC(dcs_audio_device::dsio_idma_data_r),(dcs_audio_device*)m_dcs), write32_delegate(FUNC(dcs_audio_device::dsio_idma_data_w),(dcs_audio_device*)m_dcs));
 		}
 	}
 
@@ -1669,8 +1655,8 @@ void vegas_state::remap_dynamic_addresses()
 		add_dynamic_address(base + 0x1000, base + 0x100f, read32_delegate(FUNC(vegas_state::ethernet_r), this), write32_delegate(FUNC(vegas_state::ethernet_w), this));
 		if (m_dcs_idma_cs == 7)
 		{
-			add_legacy_dynamic_address(base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
-			add_legacy_dynamic_address(base + 0x7000, base + 0x7003, dsio_idma_data_r, dsio_idma_data_w);
+			add_dynamic_address(base + 0x5000, base + 0x5003, read32_delegate(), write32_delegate(FUNC(dcs_audio_device::dsio_idma_addr_w),(dcs_audio_device*)m_dcs));
+			add_dynamic_address(base + 0x7000, base + 0x7003, read32_delegate(FUNC(dcs_audio_device::dsio_idma_data_r),(dcs_audio_device*)m_dcs), write32_delegate(FUNC(dcs_audio_device::dsio_idma_data_w),(dcs_audio_device*)m_dcs));
 		}
 	}
 
@@ -2318,21 +2304,16 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegas, vegascore )
-	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegas250, vegascore )
-	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(SYSTEM_CLOCK*2.5)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegas32m, vegascore )
-	MCFG_FRAGMENT_ADD(dcs2_audio_dsio)
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 MACHINE_CONFIG_END
@@ -2349,8 +2330,6 @@ static const voodoo_config vegasban_voodoo_intf =
 	DEVCB_NULL//             stall;
 };
 static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
-	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
@@ -2370,8 +2349,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( denver, vegascore )
-	MCFG_FRAGMENT_ADD(dcs2_audio_denver)
-
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
@@ -2380,6 +2357,144 @@ static MACHINE_CONFIG_DERIVED( denver, vegascore )
 	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, vegasban_voodoo_intf)
 MACHINE_CONFIG_END
 
+// Per driver configs
+
+static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
+	MCFG_MIDWAY_IOASIC_UPPER(340/* 340=39", 322=27", others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
+	MCFG_MIDWAY_IOASIC_UPPER(346/* 347, others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
+	MCFG_MIDWAY_IOASIC_UPPER(337/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
+	MCFG_MIDWAY_IOASIC_UPPER(330/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( roadburn, vegas32m )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_IOASIC_UPPER(325/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nbashowt, vegasban )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
+	MCFG_MIDWAY_IOASIC_UPPER(528/* or 478 or 487 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
+	MCFG_MIDWAY_IOASIC_UPPER(498/* or 478 or 487 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sf2049 , denver )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_IOASIC_UPPER(336/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sf2049se, denver )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
+	MCFG_MIDWAY_IOASIC_UPPER(336/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sf2049te, denver )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
+	MCFG_MIDWAY_IOASIC_UPPER(348/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( cartfury, vegasv3 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)	
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
+	MCFG_MIDWAY_IOASIC_UPPER(495/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -2540,19 +2655,8 @@ ROM_END
  *
  *************************************/
 
-void vegas_state::init_common(int ioasic, int serialnum)
-{
-	/* initialize the subsystems */
-	midway_ioasic_init(machine(), ioasic, serialnum, 80, ioasic_irq);
-	midway_ioasic_set_auto_ack(1);
-}
-
-
 DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 {
-	dcs2_init(machine(), 4, 0x0b5d);
-	init_common(MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
-
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x80015430, 0x8CC38060, 250);     /* confirmed */
 	mips3drc_add_hotspot(m_maincpu, 0x80015464, 0x3C09801E, 250);     /* confirmed */
@@ -2563,9 +2667,6 @@ DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 
 DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 {
-	dcs2_init(machine(), 4, 0x0b5d);
-	init_common(MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
-
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
 	mips3drc_add_hotspot(m_maincpu, 0x800158EC, 0x3C0C8022, 250);     /* confirmed */
@@ -2576,9 +2677,6 @@ DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 
 DRIVER_INIT_MEMBER(vegas_state,warfa)
 {
-	dcs2_init(machine(), 4, 0x0b5d);
-	init_common(MIDWAY_IOASIC_MACE, 337/* others? */);
-
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x8009436C, 0x0C031663, 250);     /* confirmed */
 }
@@ -2586,9 +2684,6 @@ DRIVER_INIT_MEMBER(vegas_state,warfa)
 
 DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 {
-	dcs2_init(machine(), 4, 0x0afb);
-	init_common(MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
-
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x80051CD8, 0x0C023C15, 250);     /* confirmed */
 	mips3drc_add_hotspot(m_maincpu, 0x8005E674, 0x3C028017, 250);     /* confirmed */
@@ -2599,51 +2694,36 @@ DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 
 DRIVER_INIT_MEMBER(vegas_state,roadburn)
 {
-	dcs2_init(machine(), 4, 0); /* no place to hook :-( */
-	init_common(MIDWAY_IOASIC_STANDARD, 325/* others? */);
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,nbashowt)
 {
-	dcs2_init(machine(), 4, 0);
-	init_common(MIDWAY_IOASIC_MACE, 528/* or 478 or 487 */);
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,nbanfl)
 {
-	dcs2_init(machine(), 4, 0);
-	init_common(MIDWAY_IOASIC_BLITZ99, 498/* or 478 or 487 */);
-	/* NOT: MACE */
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,sf2049)
 {
-	dcs2_init(machine(), 8, 0);
-	init_common(MIDWAY_IOASIC_STANDARD, 336/* others? */);
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,sf2049se)
 {
-	dcs2_init(machine(), 8, 0);
-	init_common(MIDWAY_IOASIC_SFRUSHRK, 336/* others? */);
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,sf2049te)
 {
-	dcs2_init(machine(), 8, 0);
-	init_common(MIDWAY_IOASIC_SFRUSHRK, 348/* others? */);
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,cartfury)
 {
-	dcs2_init(machine(), 4, 0);
-	init_common(MIDWAY_IOASIC_CARNEVIL, 495/* others? */);
 }
 
 
@@ -2655,26 +2735,26 @@ DRIVER_INIT_MEMBER(vegas_state,cartfury)
  *************************************/
 
 /* Vegas + Vegas SIO + Voodoo 2 */
-GAME( 1998, gauntleg,   0,        vegas,    gauntleg, vegas_state, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.6)", GAME_SUPPORTS_SAVE )
-GAME( 1998, gauntleg12, gauntleg, vegas,    gauntleg, vegas_state, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1998, tenthdeg, 0,        vegas,    tenthdeg, vegas_state, tenthdeg, ROT0, "Atari Games",  "Tenth Degree (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1998, gauntleg,   0,        gauntleg,    gauntleg, vegas_state, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.6)", GAME_SUPPORTS_SAVE )
+GAME( 1998, gauntleg12, gauntleg, gauntleg,    gauntleg, vegas_state, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1998, tenthdeg, 0,        tenthdeg,    tenthdeg, vegas_state, tenthdeg, ROT0, "Atari Games",  "Tenth Degree (prototype)", GAME_SUPPORTS_SAVE )
 
 /* Durango + Vegas SIO + Voodoo 2 */
-GAME( 1999, gauntdl,  0,        vegas,    gauntdl, vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", GAME_SUPPORTS_SAVE )
-GAME( 1999, gauntdl24,gauntdl,  vegas,    gauntdl, vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", GAME_SUPPORTS_SAVE )
-GAME( 1999, warfa,    0,        vegas250, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, gauntdl,  0,        gauntdl,    gauntdl, vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gauntdl24,gauntdl,  gauntdl,    gauntdl, vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", GAME_SUPPORTS_SAVE )
+GAME( 1999, warfa,    0,        warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + DSIO + Voodoo 2 */
-GAME( 1999, roadburn, 0,        vegas32m, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, roadburn, 0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
-GAME( 1998, nbashowt, 0,        vegasban, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1999, nbanfl,   0,        vegasban, nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games", "NBA Showtime / NFL Blitz 2000", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, nbashowt, 0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, nbanfl,   0,        nbanfl, nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games", "NBA Showtime / NFL Blitz 2000", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + Denver SIO + Voodoo 3 */
-GAME( 1998, sf2049,   0,        denver,   sf2049, vegas_state,   sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, sf2049se, sf2049,   denver,   sf2049se, vegas_state, sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, sf2049te, sf2049,   denver,   sf2049te, vegas_state, sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
+GAME( 1998, sf2049,   0,        sf2049,   sf2049, vegas_state,   sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, sf2049se, sf2049,   sf2049se,   sf2049se, vegas_state, sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, sf2049te, sf2049,   sf2049te,   sf2049te, vegas_state, sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 
 /* Durango + Vegas SIO + Voodoo 3 */
-GAME( 2000, cartfury, 0,        vegasv3,  cartfury, vegas_state, cartfury, ROT0, "Midway Games", "Cart Fury", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2000, cartfury, 0,        cartfury,  cartfury, vegas_state, cartfury, ROT0, "Midway Games", "Cart Fury", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

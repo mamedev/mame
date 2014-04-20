@@ -433,7 +433,10 @@ public:
 		m_rombase(*this, "rombase"),
 		m_maincpu(*this, "maincpu"),
 		m_ide(*this, "ide"),
-		m_ethernet(*this, "ethernet")
+		m_ethernet(*this, "ethernet"),
+		m_cage(*this, "cage"),
+		m_dcs(*this, "dcs"),
+		m_ioasic(*this, "ioasic")
 	{
 	}
 
@@ -446,6 +449,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<bus_master_ide_controller_device> m_ide;
 	optional_device<smc91c94_device> m_ethernet;
+	optional_device<atari_cage_seattle_device> m_cage;
+	optional_device<dcs_audio_device> m_dcs;
+	required_device<midway_ioasic_device> m_ioasic;
 	galileo_data m_galileo;
 	widget_data m_widget;
 	device_t *m_voodoo;
@@ -509,6 +515,7 @@ public:
 	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 	void update_vblank_irq();
 	UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type);
 	void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
@@ -522,7 +529,7 @@ public:
 	void galileo_reset();
 	void widget_reset();
 	void update_widget_irq();
-	void init_common(int ioasic, int serialnum, int yearoffs, int config);
+	void init_common(int config);
 };
 
 /*************************************
@@ -604,15 +611,15 @@ void seattle_state::machine_reset()
 	m_cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs2") != NULL)
+	if (machine().device("dcs") != NULL)
 	{
-		dcs_reset_w(machine(), 1);
-		dcs_reset_w(machine(), 0);
+		m_dcs->reset_w(1);
+		m_dcs->reset_w(0);
 	}
 	else if (machine().device("cage") != NULL)
 	{
-		cage_control_w(machine(), 0);
-		cage_control_w(machine(), 3);
+		m_cage->control_w(0);
+		m_cage->control_w(3);
 	}
 
 	/* reset the other devices */
@@ -662,12 +669,10 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
  *
  *************************************/
 
-static void ioasic_irq(running_machine &machine, int state)
+WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
 {
-	seattle_state *drvstate = machine.driver_data<seattle_state>();
-	drvstate->m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
+	m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
 }
-
 
 
 /*************************************
@@ -1665,13 +1670,13 @@ WRITE32_MEMBER(seattle_state::asic_reset_w)
 {
 	COMBINE_DATA(m_asic_reset);
 	if (!(*m_asic_reset & 0x0002))
-		midway_ioasic_reset(machine());
+		m_ioasic->ioasic_reset();
 }
 
 
 WRITE32_MEMBER(seattle_state::asic_fifo_w)
 {
-	midway_ioasic_fifo_w(machine(), data);
+	m_ioasic->fifo_w(data);
 }
 
 
@@ -1784,7 +1789,7 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
-	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x16000000, 0x1600003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE(seattle_watchdog_w)
@@ -2540,14 +2545,11 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(seattle_state, screen_update_seattle)
-
 	/* sound hardware */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( phoenixsa, seattle_common )
-	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
-
 	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
@@ -2555,8 +2557,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
-	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
-
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
@@ -2570,8 +2570,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle200, seattle_common )
-	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
-
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
@@ -2595,8 +2593,6 @@ static const voodoo_config voodoo_2_intf =
 };
 
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
-	MCFG_FRAGMENT_ADD(cage_seattle)
-
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
@@ -2608,7 +2604,153 @@ static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_2_intf)
 MACHINE_CONFIG_END
 
+// Per game configurations
 
+static MACHINE_CONFIG_DERIVED( wg3dh, phoenixsa )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_IOASIC_UPPER(310/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( mace, seattle150 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
+	MCFG_MIDWAY_IOASIC_UPPER(319/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sfrush, flagstaff )
+	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
+	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sfrushrk, flagstaff )
+	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
+	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
+	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( calspeed, seattle150_widget )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c0)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
+	MCFG_MIDWAY_IOASIC_UPPER(328/* others? */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( vaportrx, seattle200_widget )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_VAPORTRX)
+	MCFG_MIDWAY_IOASIC_UPPER(324/* 334? unknown */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( biofreak, seattle150 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3835)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_IOASIC_UPPER(231/* no alternates */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( blitz, seattle150 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
+	MCFG_MIDWAY_IOASIC_UPPER(444/* or 528 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( blitz99, seattle150 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
+	MCFG_MIDWAY_IOASIC_UPPER(481/* or 484 or 520 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( blitz2k, seattle150 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
+	MCFG_MIDWAY_IOASIC_UPPER(494/* or 498 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( carnevil, seattle150 )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
+	MCFG_MIDWAY_IOASIC_UPPER(469/* 469 or 486 or 528 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( hyprdriv, seattle200_widget )
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_HYPRDRIV)
+	MCFG_MIDWAY_IOASIC_UPPER(469/* unknown */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -2839,11 +2981,8 @@ ROM_END
  *
  *************************************/
 
-void seattle_state::init_common(int ioasic, int serialnum, int yearoffs, int config)
+void seattle_state::init_common(int config)
 {
-	/* initialize the subsystems */
-	midway_ioasic_init(machine(),ioasic, serialnum, yearoffs, ioasic_irq);
-
 	/* switch off the configuration */
 	m_board_config = config;
 	switch (config)
@@ -2871,8 +3010,7 @@ void seattle_state::init_common(int ioasic, int serialnum, int yearoffs, int con
 
 DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 {
-	dcs2_init(machine(), 2, 0x3839);
-	init_common(MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
+	init_common(PHOENIX_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x8004413C, 0x0C0054B4, 250);     /* confirmed */
@@ -2883,8 +3021,7 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 
 DRIVER_INIT_MEMBER(seattle_state,mace)
 {
-	dcs2_init(machine(), 2, 0x3839);
-	init_common(MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
+	init_common(SEATTLE_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x800108F8, 0x8C420000, 250);     /* confirmed */
@@ -2893,8 +3030,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 
 DRIVER_INIT_MEMBER(seattle_state,sfrush)
 {
-	cage_init(machine(), 0x5236);
-	init_common(MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
+	init_common(FLAGSTAFF_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x80059F34, 0x3C028012, 250);     /* confirmed */
@@ -2905,8 +3041,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 
 DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 {
-	cage_init(machine(), 0x5329);
-	init_common(MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
+	init_common(FLAGSTAFF_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x800343E8, 0x3C028012, 250);     /* confirmed */
@@ -2918,9 +3053,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 
 DRIVER_INIT_MEMBER(seattle_state,calspeed)
 {
-	dcs2_init(machine(), 2, 0x39c0);
-	init_common(MIDWAY_IOASIC_CALSPEED, 328/* others? */, 100, SEATTLE_WIDGET_CONFIG);
-	midway_ioasic_set_auto_ack(1);
+	init_common(SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x80032534, 0x02221024, 250);     /* confirmed */
@@ -2930,8 +3063,7 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 
 DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 {
-	dcs2_init(machine(), 2, 0x39c2);
-	init_common(MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
+	init_common(SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x80049F14, 0x3C028020, 250);     /* confirmed */
@@ -2942,17 +3074,13 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 
 DRIVER_INIT_MEMBER(seattle_state,biofreak)
 {
-	dcs2_init(machine(), 2, 0x3835);
-	init_common(MIDWAY_IOASIC_STANDARD, 231/* no alternates */, 80, SEATTLE_CONFIG);
-
-	/* speedups */
+	init_common(SEATTLE_CONFIG);
 }
 
 
 DRIVER_INIT_MEMBER(seattle_state,blitz)
 {
-	dcs2_init(machine(), 2, 0x39c2);
-	init_common(MIDWAY_IOASIC_BLITZ99, 444/* or 528 */, 80, SEATTLE_CONFIG);
+	init_common(SEATTLE_CONFIG);
 
 	/* for some reason, the code in the ROM appears buggy; this is a small patch to fix it */
 	m_rombase[0x934/4] += 4;
@@ -2965,8 +3093,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 
 DRIVER_INIT_MEMBER(seattle_state,blitz99)
 {
-	dcs2_init(machine(), 2, 0x0afb);
-	init_common(MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
+	init_common(SEATTLE_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x8014E41C, 0x3C038025, 250);     /* confirmed */
@@ -2976,8 +3103,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 
 DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 {
-	dcs2_init(machine(), 2, 0x0b5d);
-	init_common(MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
+	init_common(SEATTLE_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x8015773C, 0x3C038025, 250);     /* confirmed */
@@ -2987,8 +3113,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 
 DRIVER_INIT_MEMBER(seattle_state,carnevil)
 {
-	dcs2_init(machine(), 2, 0x0af7);
-	init_common(MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
+	init_common(SEATTLE_CONFIG);
 
 	/* set up the gun */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
@@ -3001,8 +3126,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 
 DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 {
-	dcs2_init(machine(), 2, 0x0af7);
-	init_common(MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
+	init_common(SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(m_maincpu, 0x801643BC, 0x3C03801B, 250);     /* confirmed */
@@ -3019,22 +3143,22 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
  *************************************/
 
 /* Atari */
-GAME( 1996, wg3dh,    0,        phoenixsa,         wg3dh, seattle_state,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", GAME_SUPPORTS_SAVE )
-GAME( 1996, mace,     0,        seattle150,        mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", GAME_SUPPORTS_SAVE )
-GAME( 1997, macea,    mace,     seattle150,        mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", GAME_SUPPORTS_SAVE )
-GAME( 1996, sfrush,   0,        flagstaff,         sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", GAME_SUPPORTS_SAVE )
-GAME( 1996, sfrushrk, 0,        flagstaff,         sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, calspeed, 0,        seattle150_widget, calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a, 4/17/98)", GAME_SUPPORTS_SAVE )
-GAME( 1998, calspeeda,calspeed, seattle150_widget, calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a 3/4/98)", GAME_SUPPORTS_SAVE )
-GAME( 1998, vaportrx, 0,        seattle200_widget, vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", GAME_SUPPORTS_SAVE )
-GAME( 1998, vaportrxp,vaportrx, seattle200_widget, vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1996, wg3dh,    0,        wg3dh,         	   wg3dh, seattle_state,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", GAME_SUPPORTS_SAVE )
+GAME( 1996, mace,     0,        mace,        	   mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", GAME_SUPPORTS_SAVE )
+GAME( 1997, macea,    mace,     mace,       	   mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", GAME_SUPPORTS_SAVE )
+GAME( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", GAME_SUPPORTS_SAVE )
+GAME( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeed, 0,        calspeed, 		   calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a, 4/17/98)", GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeeda,calspeed, calspeed, 		   calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a 3/4/98)", GAME_SUPPORTS_SAVE )
+GAME( 1998, vaportrx, 0,        vaportrx, 		   vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", GAME_SUPPORTS_SAVE )
+GAME( 1998, vaportrxp,vaportrx, vaportrx, 		   vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", GAME_SUPPORTS_SAVE )
 
 /* Midway */
-GAME( 1997, biofreak, 0,        seattle150,        biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1997, blitz,    0,        seattle150,        blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", GAME_SUPPORTS_SAVE )
-GAME( 1997, blitz11,  blitz,    seattle150,        blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", GAME_SUPPORTS_SAVE )
-GAME( 1998, blitz99,  0,        seattle150,        blitz99, seattle_state,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99", GAME_SUPPORTS_SAVE )
-GAME( 1999, blitz2k,  0,        seattle150,        blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", GAME_SUPPORTS_SAVE )
-GAME( 1998, carnevil, 0,        seattle150,        carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", GAME_SUPPORTS_SAVE )
-GAME( 1998, carnevil1,carnevil, seattle150,        carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", GAME_SUPPORTS_SAVE )
-GAME( 1998, hyprdriv, 0,        seattle200_widget, hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", GAME_SUPPORTS_SAVE )
+GAME( 1997, biofreak, 0,        biofreak,          biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1997, blitz,    0,        blitz,        	   blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", GAME_SUPPORTS_SAVE )
+GAME( 1997, blitz11,  blitz,    blitz,        	   blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", GAME_SUPPORTS_SAVE )
+GAME( 1998, blitz99,  0,        blitz99,           blitz99, seattle_state,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99", GAME_SUPPORTS_SAVE )
+GAME( 1999, blitz2k,  0,        blitz2k,           blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevil, 0,        carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevil1,carnevil, carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", GAME_SUPPORTS_SAVE )
+GAME( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", GAME_SUPPORTS_SAVE )

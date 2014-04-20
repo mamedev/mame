@@ -153,10 +153,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/adsp2100/adsp2100.h"
 #include "dcs.h"
-#include "sound/dmadac.h"
-#include "machine/midwayic.h"
 
 
 #define LOG_DCS_TRANSFERS           (0)
@@ -176,15 +173,15 @@
 #define LCTRL_OUTPUT_EMPTY          0x400
 #define LCTRL_INPUT_EMPTY           0x800
 
-#define IS_OUTPUT_EMPTY()           (dcs.latch_control & LCTRL_OUTPUT_EMPTY)
-#define IS_OUTPUT_FULL()            (!(dcs.latch_control & LCTRL_OUTPUT_EMPTY))
-#define SET_OUTPUT_EMPTY()          (dcs.latch_control |= LCTRL_OUTPUT_EMPTY)
-#define SET_OUTPUT_FULL()           (dcs.latch_control &= ~LCTRL_OUTPUT_EMPTY)
+#define IS_OUTPUT_EMPTY()           (m_latch_control & LCTRL_OUTPUT_EMPTY)
+#define IS_OUTPUT_FULL()            (!(m_latch_control & LCTRL_OUTPUT_EMPTY))
+#define SET_OUTPUT_EMPTY()          (m_latch_control |= LCTRL_OUTPUT_EMPTY)
+#define SET_OUTPUT_FULL()           (m_latch_control &= ~LCTRL_OUTPUT_EMPTY)
 
-#define IS_INPUT_EMPTY()            (dcs.latch_control & LCTRL_INPUT_EMPTY)
-#define IS_INPUT_FULL()             (!(dcs.latch_control & LCTRL_INPUT_EMPTY))
-#define SET_INPUT_EMPTY()           (dcs.latch_control |= LCTRL_INPUT_EMPTY)
-#define SET_INPUT_FULL()            (dcs.latch_control &= ~LCTRL_INPUT_EMPTY)
+#define IS_INPUT_EMPTY()            (m_latch_control & LCTRL_INPUT_EMPTY)
+#define IS_INPUT_FULL()             (!(m_latch_control & LCTRL_INPUT_EMPTY))
+#define SET_INPUT_EMPTY()           (m_latch_control |= LCTRL_INPUT_EMPTY)
+#define SET_INPUT_FULL()            (m_latch_control &= ~LCTRL_INPUT_EMPTY)
 
 
 /* These are the some of the control register, we dont use them all */
@@ -219,208 +216,45 @@ enum
 
 
 /* these macros are used to reference the SDRC ASIC */
-#define SDRC_ROM_ST     ((dcs.sdrc.reg[0] >> 0) & 3)    /* 0=0000, 1=3000, 2=3400, 3=none */
-#define SDRC_ROM_SZ     ((dcs.sdrc.reg[0] >> 4) & 1)    /* 0=4k, 1=1k */
-#define SDRC_ROM_MS     ((dcs.sdrc.reg[0] >> 5) & 1)    /* 0=/BMS, 1=/DMS */
-#define SDRC_ROM_PG     ((dcs.sdrc.reg[0] >> 7) & 7)
-#define SDRC_SM_EN      ((dcs.sdrc.reg[0] >> 11) & 1)
-#define SDRC_SM_BK      ((dcs.sdrc.reg[0] >> 12) & 1)
-#define SDRC_SMODE      ((dcs.sdrc.reg[0] >> 13) & 7)
+#define SDRC_ROM_ST     ((m_sdrc.reg[0] >> 0) & 3)    /* 0=0000, 1=3000, 2=3400, 3=none */
+#define SDRC_ROM_SZ     ((m_sdrc.reg[0] >> 4) & 1)    /* 0=4k, 1=1k */
+#define SDRC_ROM_MS     ((m_sdrc.reg[0] >> 5) & 1)    /* 0=/BMS, 1=/DMS */
+#define SDRC_ROM_PG     ((m_sdrc.reg[0] >> 7) & 7)
+#define SDRC_SM_EN      ((m_sdrc.reg[0] >> 11) & 1)
+#define SDRC_SM_BK      ((m_sdrc.reg[0] >> 12) & 1)
+#define SDRC_SMODE      ((m_sdrc.reg[0] >> 13) & 7)
 
-#define SDRC_DM_ST      ((dcs.sdrc.reg[1] >> 0) & 3)    /* 0=none, 1=0000, 2=3000, 3=3400 */
-#define SDRC_DM_REF     ((dcs.sdrc.reg[1] >> 4) & 3)
-#define SDRC_DM_3WS     ((dcs.sdrc.reg[1] >> 7) & 1)
-#define SDRC_TFS_INV    ((dcs.sdrc.reg[1] >> 8) & 1)
-#define SDRC_RES_TFS    ((dcs.sdrc.reg[1] >> 10) & 3)
-#define SDRC_LED        ((dcs.sdrc.reg[1] >> 13) & 1)
-#define SDRC_MUTE       ((dcs.sdrc.reg[1] >> 14) & 1)
-#define SDRC_AREF_ACT   ((dcs.sdrc.reg[1] >> 15) & 1)
+#define SDRC_DM_ST      ((m_sdrc.reg[1] >> 0) & 3)    /* 0=none, 1=0000, 2=3000, 3=3400 */
+#define SDRC_DM_REF     ((m_sdrc.reg[1] >> 4) & 3)
+#define SDRC_DM_3WS     ((m_sdrc.reg[1] >> 7) & 1)
+#define SDRC_TFS_INV    ((m_sdrc.reg[1] >> 8) & 1)
+#define SDRC_RES_TFS    ((m_sdrc.reg[1] >> 10) & 3)
+#define SDRC_LED        ((m_sdrc.reg[1] >> 13) & 1)
+#define SDRC_MUTE       ((m_sdrc.reg[1] >> 14) & 1)
+#define SDRC_AREF_ACT   ((m_sdrc.reg[1] >> 15) & 1)
 
-#define SDRC_DM_PG      ((dcs.sdrc.reg[2] >> 0) & 0x7ff)
-#define SDRC_EPM_PG     ((dcs.sdrc.reg[2] >> 0) & 0x1fff)
+#define SDRC_DM_PG      ((m_sdrc.reg[2] >> 0) & 0x7ff)
+#define SDRC_EPM_PG     ((m_sdrc.reg[2] >> 0) & 0x1fff)
 
 
 /* these macros are used to reference the DSIO ASIC */
-#define DSIO_EMPTY_FIFO ((dcs.dsio.reg[1] >> 0) & 1)
-#define DSIO_CUR_OUTPUT ((dcs.dsio.reg[1] >> 4) & 1)
-#define DSIO_RES_TFS    ((dcs.dsio.reg[1] >> 10) & 1)
-#define DSIO_LED        ((dcs.dsio.reg[1] >> 13) & 1)
-#define DSIO_MUTE       ((dcs.dsio.reg[1] >> 14) & 1)
+#define DSIO_EMPTY_FIFO ((m_dsio.reg[1] >> 0) & 1)
+#define DSIO_CUR_OUTPUT ((m_dsio.reg[1] >> 4) & 1)
+#define DSIO_RES_TFS    ((m_dsio.reg[1] >> 10) & 1)
+#define DSIO_LED        ((m_dsio.reg[1] >> 13) & 1)
+#define DSIO_MUTE       ((m_dsio.reg[1] >> 14) & 1)
 
-#define DSIO_DM_PG      ((dcs.dsio.reg[2] >> 0) & 0x7ff)
+#define DSIO_DM_PG      ((m_dsio.reg[2] >> 0) & 0x7ff)
 
 
 /* these macros are used to reference the DENVER ASIC */
-#define DENV_DSP_SPEED  ((dcs.dsio.reg[1] >> 2) & 3)    /* read only: 1=33.33MHz */
-#define DENV_RES_TFS    ((dcs.dsio.reg[1] >> 10) & 1)
-#define DENV_CHANNELS   ((dcs.dsio.reg[1] >> 11) & 3)   /* 0=2ch, 1=4ch, 2=6ch */
-#define DENV_LED        ((dcs.dsio.reg[1] >> 13) & 1)
-#define DENV_MUTE       ((dcs.dsio.reg[1] >> 14) & 1)
+#define DENV_DSP_SPEED  ((m_dsio.reg[1] >> 2) & 3)    /* read only: 1=33.33MHz */
+#define DENV_RES_TFS    ((m_dsio.reg[1] >> 10) & 1)
+#define DENV_CHANNELS   ((m_dsio.reg[1] >> 11) & 3)   /* 0=2ch, 1=4ch, 2=6ch */
+#define DENV_LED        ((m_dsio.reg[1] >> 13) & 1)
+#define DENV_MUTE       ((m_dsio.reg[1] >> 14) & 1)
 
-#define DENV_DM_PG      ((dcs.dsio.reg[2] >> 0) & 0x7ff)
-
-
-
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
-
-struct sdrc_state
-{
-	UINT16      reg[4];
-	UINT8       seed;
-};
-
-
-struct dsio_state
-{
-	UINT16      reg[4];
-	UINT8       start_on_next_write;
-	UINT16      channelbits;
-};
-
-
-struct hle_transfer_state
-{
-	UINT8       hle_enabled;
-	INT32       dcs_state;
-	INT32       state;
-	INT32       start;
-	INT32       stop;
-	INT32       type;
-	INT32       temp;
-	INT32       writes_left;
-	UINT16      sum;
-	INT32       fifo_entries;
-	timer_device *watchdog;
-};
-
-
-struct dcs_state
-{
-	adsp21xx_device *cpu;
-	address_space *program;
-	address_space *data;
-	UINT8       rev;
-	offs_t      polling_offset;
-	UINT32      polling_count;
-
-	/* sound output */
-	UINT8       channels;
-	UINT16      size;
-	UINT16      incs;
-	dmadac_sound_device *dmadac[6];
-	timer_device *reg_timer;
-	timer_device *sport_timer;
-	timer_device *internal_timer;
-	INT32       ireg;
-	UINT16      ireg_base;
-	UINT16      control_regs[32];
-
-	/* memory access/booting */
-	UINT16 *    bootrom;
-	UINT32      bootrom_words;
-	UINT16 *    sounddata;
-	UINT32      sounddata_words;
-	UINT32      sounddata_banks;
-	UINT16      sounddata_bank;
-
-	/* I/O with the host */
-	UINT8       auto_ack;
-	UINT16      latch_control;
-	UINT16      input_data;
-	UINT16      output_data;
-	UINT16      output_control;
-	UINT64      output_control_cycles;
-	UINT8       last_output_full;
-	UINT8       last_input_empty;
-	UINT16      progflags;
-	void        (*output_full_cb)(running_machine &, int);
-	void        (*input_empty_cb)(running_machine &, int);
-	UINT16      (*fifo_data_r)(device_t *device);
-	UINT16      (*fifo_status_r)(device_t *device);
-
-	/* timers */
-	UINT8       timer_enable;
-	UINT8       timer_ignore;
-	UINT64      timer_start_cycles;
-	UINT32      timer_start_count;
-	UINT32      timer_scale;
-	UINT32      timer_period;
-	UINT32      timers_fired;
-
-	UINT16 *sram;
-	UINT16 *polling_base;
-	UINT32 *internal_program_ram;
-	UINT32 *external_program_ram;
-
-	sdrc_state sdrc;
-	dsio_state dsio;
-	hle_transfer_state transfer;
-};
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static dcs_state dcs;
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-static DECLARE_READ16_HANDLER( dcs_dataram_r );
-static DECLARE_WRITE16_HANDLER( dcs_dataram_w );
-static DECLARE_WRITE16_HANDLER( dcs_data_bank_select_w );
-
-static void sdrc_reset(running_machine &machine);
-static DECLARE_READ16_HANDLER( sdrc_r );
-static DECLARE_WRITE16_HANDLER( sdrc_w );
-
-static void dsio_reset(running_machine &machine);
-static DECLARE_READ16_HANDLER( dsio_r );
-static DECLARE_WRITE16_HANDLER( dsio_w );
-
-static void denver_reset(running_machine &machine);
-static DECLARE_READ16_HANDLER( denver_r );
-static DECLARE_WRITE16_HANDLER( denver_w );
-
-static DECLARE_READ16_HANDLER( adsp_control_r );
-static DECLARE_WRITE16_HANDLER( adsp_control_w );
-
-static DECLARE_READ16_HANDLER( latch_status_r );
-static DECLARE_READ16_HANDLER( fifo_input_r );
-static DECLARE_READ16_HANDLER( input_latch_r );
-static DECLARE_WRITE16_HANDLER( input_latch_ack_w );
-static DECLARE_WRITE16_HANDLER( output_latch_w );
-static DECLARE_READ16_HANDLER( output_control_r );
-static DECLARE_WRITE16_HANDLER( output_control_w );
-
-static void timer_enable_callback(adsp21xx_device &device, int enable);
-static TIMER_DEVICE_CALLBACK( internal_timer_callback );
-static TIMER_DEVICE_CALLBACK( dcs_irq );
-static TIMER_DEVICE_CALLBACK( sport0_irq );
-static void recompute_sample_rate(running_machine &machine);
-static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data);
-
-static DECLARE_READ16_HANDLER( dcs_polling_r );
-static DECLARE_WRITE16_HANDLER( dcs_polling_w );
-
-static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback );
-static int preprocess_write(running_machine &machine, UINT16 data);
-
-static void sdrc_remap_memory(running_machine &machine);
-
+#define DENV_DM_PG      ((m_dsio.reg[2] >> 0) & 0x7ff)
 
 
 /*************************************
@@ -430,69 +264,66 @@ static void sdrc_remap_memory(running_machine &machine);
  *************************************/
 
 /* DCS 2k memory map */
-static ADDRESS_MAP_START( dcs_2k_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( dcs_2k_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_2k_data_map, AS_DATA, 16, driver_device )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
+static ADDRESS_MAP_START( dcs_2k_data_map, AS_DATA, 16, dcs_audio_device )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
-	AM_RANGE(0x3400, 0x37ff) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
+	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
 /* DCS 2k with UART memory map */
-static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16, driver_device )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
+static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16, dcs_audio_device )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3400, 0x3402) AM_NOP                             /* UART (ignored) */
-	AM_RANGE(0x3403, 0x3403) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
+	AM_RANGE(0x3403, 0x3403) AM_READWRITE(input_latch_r, output_latch_w)
 	AM_RANGE(0x3404, 0x3405) AM_NOP                             /* UART (ignored) */
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
 /* DCS 8k memory map */
-static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, driver_device )
+static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
-	AM_RANGE(0x3400, 0x37ff) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
+	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-// to be removed once DCS is modernised
-#define AM_READWRITE16_LEGACY(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask);
 
 /* Williams WPC DCS/Security Pinball */
-static ADDRESS_MAP_START( dcs_wpc_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( dcs_wpc_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x2fff) AM_RAM AM_SHARE("dcsext")
-	AM_RANGE(0x3000, 0x3001) AM_READWRITE16_LEGACY(input_latch_r, output_latch_w,0xffff)
+	AM_RANGE(0x3000, 0x3001) AM_READWRITE16(input_latch_r, output_latch_w,0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_wpc_data_map, AS_DATA, 16, driver_device )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
+static ADDRESS_MAP_START( dcs_wpc_data_map, AS_DATA, 16, dcs_audio_device )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -501,39 +332,39 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16, driver_device )
+static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(sdrc_r, sdrc_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE(sdrc_r, sdrc_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs2_2104_data_map, AS_DATA, 16, driver_device )
+static ADDRESS_MAP_START( dcs2_2104_data_map, AS_DATA, 16, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(sdrc_r, sdrc_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE(sdrc_r, sdrc_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
@@ -544,28 +375,28 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsio_data_map, AS_DATA, 16, driver_device )
+static ADDRESS_MAP_START( dsio_data_map, AS_DATA, 16, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0400, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsio_io_map, AS_IO, 16, driver_device )
+static ADDRESS_MAP_START( dsio_io_map, AS_IO, 16, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(dsio_r, dsio_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE(dsio_r, dsio_w)
 ADDRESS_MAP_END
 
 
@@ -576,28 +407,28 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32, driver_device )
+static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denver_data_map, AS_DATA, 16, driver_device )
+static ADDRESS_MAP_START( denver_data_map, AS_DATA, 16, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0800, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denver_io_map, AS_IO, 16, driver_device )
+static ADDRESS_MAP_START( denver_io_map, AS_IO, 16, dcs_audio_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(denver_r, denver_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE(denver_r, denver_w)
 ADDRESS_MAP_END
 
 
@@ -610,9 +441,9 @@ ADDRESS_MAP_END
 
 static const adsp21xx_config adsp_config =
 {
-	NULL,                   /* callback for serial receive */
-	sound_tx_callback,      /* callback for serial transmit */
-	timer_enable_callback   /* callback for timer fired */
+	DEVCB_NULL,                   /* callback for serial receive */
+	DEVCB_DEVICE_MEMBER32(DEVICE_SELF_OWNER, dcs_audio_device, sound_tx_callback),      /* callback for serial transmit */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, dcs_audio_device,timer_enable_callback)   /* callback for timer fired */
 };
 
 
@@ -630,8 +461,8 @@ MACHINE_CONFIG_FRAGMENT( dcs_audio_2k )
 	MCFG_CPU_PROGRAM_MAP(dcs_2k_program_map)
 	MCFG_CPU_DATA_MAP(dcs_2k_data_map)
 
-	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
-	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -675,10 +506,10 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_2115 )
 	MCFG_CPU_PROGRAM_MAP(dcs2_2115_program_map)
 	MCFG_CPU_DATA_MAP(dcs2_2115_data_map)
 
-	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
-	MCFG_TIMER_ADD("dcs_sport_timer", sport0_irq)
-	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
-	MCFG_TIMER_ADD("dcs_hle_timer", transfer_watchdog_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_hle_timer", DEVICE_SELF, dcs_audio_device, transfer_watchdog_callback)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -712,8 +543,8 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
 	MCFG_CPU_DATA_MAP(dsio_data_map)
 	MCFG_CPU_IO_MAP(dsio_io_map)
 
-	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
-	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -739,8 +570,8 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
 	MCFG_CPU_DATA_MAP(denver_data_map)
 	MCFG_CPU_IO_MAP(denver_io_map)
 
-	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
-	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -771,54 +602,54 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static void dcs_boot(running_machine &machine)
+void dcs_audio_device::dcs_boot()
 {
 	UINT8 buffer[0x1000];
 //  UINT32 max_banks;
 	UINT16 *base;
 	int i;
 
-	switch (dcs.rev)
+	switch (m_rev)
 	{
 		/* rev 1: use the last set data bank to boot from */
 		case 1:
 
 			/* determine the base */
-//          max_banks = dcs.bootrom_words / 0x1000;
-			base = dcs.bootrom + ((dcs.sounddata_bank * 0x1000) % dcs.bootrom_words);
+//          max_banks = m_bootrom_words / 0x1000;
+			base = m_bootrom + ((m_sounddata_bank * 0x1000) % m_bootrom_words);
 
 			/* convert from 16-bit data to 8-bit data and boot */
 			for (i = 0; i < 0x1000; i++)
 				buffer[i] = base[i];
-			dcs.cpu->load_boot_data(buffer, dcs.internal_program_ram);
+			m_cpu->load_boot_data(buffer, m_internal_program_ram);
 			break;
 
 		/* rev 2: use the ROM page in the SDRC to boot from */
 		case 2:
 
 			/* determine the base */
-			if (dcs.bootrom == dcs.sounddata)
+			if (m_bootrom == m_sounddata)
 			{
 				/* EPROM case: page is selected from the page register */
-				base = dcs.bootrom + ((SDRC_EPM_PG * 0x1000) % dcs.bootrom_words);
+				base = m_bootrom + ((SDRC_EPM_PG * 0x1000) % m_bootrom_words);
 			}
 			else
 			{
 				/* DRAM case: page is selected from the ROM page register */
-				base = dcs.bootrom + ((SDRC_ROM_PG * 0x1000) % dcs.bootrom_words);
+				base = m_bootrom + ((SDRC_ROM_PG * 0x1000) % m_bootrom_words);
 			}
 
 			/* convert from 16-bit data to 8-bit data and boot */
 			for (i = 0; i < 0x1000; i++)
 				buffer[i] = base[i];
-			dcs.cpu->load_boot_data(buffer, dcs.internal_program_ram);
+			m_cpu->load_boot_data(buffer, m_internal_program_ram);
 			break;
 
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
 		case 3:
 		case 4:
-			dcs.cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-			dcs.dsio.start_on_next_write = 0;
+			m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_dsio.start_on_next_write = 0;
 			break;
 	}
 }
@@ -831,71 +662,69 @@ static void dcs_boot(running_machine &machine)
  *
  *************************************/
 
-static TIMER_CALLBACK( dcs_reset )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 {
 	if (LOG_DCS_IO)
 		logerror("dcs_reset\n");
 
 	/* reset the memory banking */
-	switch (dcs.rev)
+	switch (m_rev)
 	{
 		/* rev 1: just reset the bank to 0 */
 		case 1:
-			dcs.sounddata_bank = 0;
-			machine.root_device().membank("databank")->set_entry(0);
+			m_sounddata_bank = 0;
+			membank("databank")->set_entry(0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
 		case 2:
-			sdrc_reset(machine);
+			sdrc_reset();
 			break;
 
 		/* rev 3: reset the DSIO ASIC */
 		case 3:
-			dsio_reset(machine);
+			dsio_reset();
 			break;
 
 		/* rev 4: reset the Denver ASIC */
 		case 4:
-			denver_reset(machine);
+			denver_reset();
 			break;
 	}
-
 	/* initialize our state structure and install the transmit callback */
-	dcs.size = 0;
-	dcs.incs = 0;
-	dcs.ireg = 0;
+	m_size = 0;
+	m_incs = 0;
+	m_ireg = 0;
 
 	/* initialize the ADSP control regs */
-	memset(dcs.control_regs, 0, sizeof(dcs.control_regs));
-
+	memset(m_control_regs, 0, sizeof(m_control_regs));
 	/* clear all interrupts */
-	dcs.cpu->set_input_line(ADSP2105_IRQ0, CLEAR_LINE);
-	dcs.cpu->set_input_line(ADSP2105_IRQ1, CLEAR_LINE);
-	dcs.cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
+	m_cpu->set_input_line(ADSP2105_IRQ0, CLEAR_LINE);
+	m_cpu->set_input_line(ADSP2105_IRQ1, CLEAR_LINE);
+	m_cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
 
 	/* initialize the comm bits */
 	SET_INPUT_EMPTY();
 	SET_OUTPUT_EMPTY();
-	if (!dcs.last_input_empty && dcs.input_empty_cb)
-		(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 1);
-	if (dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(machine, dcs.last_output_full = 0);
+	if (!m_last_input_empty && !m_input_empty_cb.isnull())
+		m_input_empty_cb(m_last_input_empty = 1);
+	if (m_last_output_full && !m_output_full_cb.isnull())
+		m_output_full_cb(m_last_output_full = 0);
 
 	/* boot */
-	dcs_boot(machine);
+	dcs_boot();
 
 	/* reset timers */
-	dcs.timer_enable = 0;
-	dcs.timer_scale = 1;
-	dcs.internal_timer->reset();
+	m_timer_enable = 0;
+	m_timer_scale = 1;
+	m_internal_timer->reset();
 
 	/* start the SPORT0 timer */
-	if (dcs.sport_timer != NULL)
-		dcs.sport_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+	if (m_sport_timer != NULL)
+		m_sport_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 
 	/* reset the HLE transfer states */
-	dcs.transfer.dcs_state = dcs.transfer.state = 0;
+	m_transfer.dcs_state = m_transfer.state = 0;
 }
 
 
@@ -906,179 +735,237 @@ static TIMER_CALLBACK( dcs_reset )
  *
  *************************************/
 
-static void dcs_register_state(running_machine &machine)
+void dcs_audio_device::dcs_register_state()
 {
-	machine.save().save_item(NAME(dcs.sdrc.reg));
-	machine.save().save_item(NAME(dcs.sdrc.seed));
+	save_item(NAME(m_sdrc.reg));
+	save_item(NAME(m_sdrc.seed));
 
-	machine.save().save_item(NAME(dcs.dsio.reg));
-	machine.save().save_item(NAME(dcs.dsio.start_on_next_write));
-	machine.save().save_item(NAME(dcs.dsio.channelbits));
+	save_item(NAME(m_dsio.reg));
+	save_item(NAME(m_dsio.start_on_next_write));
+	save_item(NAME(m_dsio.channelbits));
 
-	machine.save().save_item(NAME(dcs.channels));
-	machine.save().save_item(NAME(dcs.size));
-	machine.save().save_item(NAME(dcs.incs));
-	machine.save().save_item(NAME(dcs.ireg));
-	machine.save().save_item(NAME(dcs.ireg_base));
-	machine.save().save_item(NAME(dcs.control_regs));
+	save_item(NAME(m_channels));
+	save_item(NAME(m_size));
+	save_item(NAME(m_incs));
+	save_item(NAME(m_ireg));
+	save_item(NAME(m_ireg_base));
+	save_item(NAME(m_control_regs));
 
-	machine.save().save_item(NAME(dcs.sounddata_bank));
+	save_item(NAME(m_sounddata_bank));
 
-	machine.save().save_item(NAME(dcs.auto_ack));
-	machine.save().save_item(NAME(dcs.latch_control));
-	machine.save().save_item(NAME(dcs.input_data));
-	machine.save().save_item(NAME(dcs.output_data));
-	machine.save().save_item(NAME(dcs.output_control));
-	machine.save().save_item(NAME(dcs.output_control_cycles));
-	machine.save().save_item(NAME(dcs.last_output_full));
-	machine.save().save_item(NAME(dcs.last_input_empty));
-	machine.save().save_item(NAME(dcs.progflags));
+	save_item(NAME(m_auto_ack));
+	save_item(NAME(m_latch_control));
+	save_item(NAME(m_input_data));
+	save_item(NAME(m_output_data));
+	save_item(NAME(m_output_control));
+	save_item(NAME(m_output_control_cycles));
+	save_item(NAME(m_last_output_full));
+	save_item(NAME(m_last_input_empty));
+	save_item(NAME(m_progflags));
 
-	machine.save().save_item(NAME(dcs.timer_enable));
-	machine.save().save_item(NAME(dcs.timer_ignore));
-	machine.save().save_item(NAME(dcs.timer_start_cycles));
-	machine.save().save_item(NAME(dcs.timer_start_count));
-	machine.save().save_item(NAME(dcs.timer_scale));
-	machine.save().save_item(NAME(dcs.timer_period));
-	machine.save().save_item(NAME(dcs.timers_fired));
+	save_item(NAME(m_timer_enable));
+	save_item(NAME(m_timer_ignore));
+	save_item(NAME(m_timer_start_cycles));
+	save_item(NAME(m_timer_start_count));
+	save_item(NAME(m_timer_scale));
+	save_item(NAME(m_timer_period));
+	save_item(NAME(m_timers_fired));
 
-	machine.save().save_item(NAME(dcs.transfer.dcs_state));
-	machine.save().save_item(NAME(dcs.transfer.state));
-	machine.save().save_item(NAME(dcs.transfer.start));
-	machine.save().save_item(NAME(dcs.transfer.stop));
-	machine.save().save_item(NAME(dcs.transfer.type));
-	machine.save().save_item(NAME(dcs.transfer.temp));
-	machine.save().save_item(NAME(dcs.transfer.writes_left));
-	machine.save().save_item(NAME(dcs.transfer.sum));
-	machine.save().save_item(NAME(dcs.transfer.fifo_entries));
+	save_item(NAME(m_transfer.dcs_state));
+	save_item(NAME(m_transfer.state));
+	save_item(NAME(m_transfer.start));
+	save_item(NAME(m_transfer.stop));
+	save_item(NAME(m_transfer.type));
+	save_item(NAME(m_transfer.temp));
+	save_item(NAME(m_transfer.writes_left));
+	save_item(NAME(m_transfer.sum));
+	save_item(NAME(m_transfer.fifo_entries));
 
-	if (dcs.sram != NULL)
-		machine.save().save_pointer(NAME(dcs.sram), 0x8000*4 / sizeof(dcs.sram[0]));
+	if (m_sram != NULL)
+		save_pointer(NAME(m_sram), 0x8000*4 / sizeof(m_sram[0]));
 
-	if (dcs.rev == 2)
-		machine.save().register_postload(save_prepost_delegate(FUNC(sdrc_remap_memory), &machine));
+	if (m_rev == 2)
+		machine().save().register_postload(save_prepost_delegate(FUNC(dcs_audio_device::sdrc_remap_memory), this));
 }
 
-void dcs_init(running_machine &machine)
-{
-	memset(&dcs, 0, sizeof(dcs));
-	dcs.sram = NULL;
+ 
+//-------------------------------------------------
+//  dcs_audio_device - constructor
+//-------------------------------------------------
 
-	dcs.internal_program_ram = (UINT32 *)machine.root_device().memshare("dcsint")->ptr();
-	dcs.external_program_ram = (UINT32 *)machine.root_device().memshare("dcsext")->ptr();
+dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_cpu(NULL),
+	m_program(NULL),
+	m_data(NULL),
+	m_rev(0),
+	m_polling_offset(0),
+	m_polling_count(0),
+	m_channels(0),
+	m_size(0),
+	m_incs(0),
+	m_reg_timer(NULL),
+	m_sport_timer(NULL),
+	m_internal_timer(NULL),
+	m_ireg(0),
+	m_ireg_base(0),
+	m_bootrom(NULL),
+	m_bootrom_words(0),
+	m_sounddata(NULL),
+	m_sounddata_words(0),
+	m_sounddata_banks(0),
+	m_sounddata_bank(0),
+	m_auto_ack(0),
+	m_latch_control(0),
+	m_input_data(0),
+	m_output_data(0),
+	m_output_control(0),
+	m_output_control_cycles(0),
+	m_last_output_full(0),
+	m_last_input_empty(0),
+	m_progflags(0),
+	m_timer_enable(0),
+	m_timer_ignore(0),
+	m_timer_start_cycles(0),
+	m_timer_start_count(0),
+	m_timer_scale(0),
+	m_timer_period(0),
+	m_timers_fired(0),
+	m_sram(NULL),
+	m_polling_base(NULL),
+	m_internal_program_ram(NULL),
+	m_external_program_ram(NULL),
+	m_dram_in_mb(0)
+{
+	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = NULL;
+	memset(m_control_regs, 0, sizeof(m_control_regs));
+	memset(&m_sdrc, 0, sizeof(m_sdrc));
+	memset(&m_dsio, 0, sizeof(m_dsio));
+	memset(&m_transfer, 0, sizeof(m_transfer));
+}
+
+
+void dcs_audio_device::device_start()
+{
+	m_sram = NULL;
+
+	m_internal_program_ram = (UINT32 *)memshare("dcsint")->ptr();
+	m_external_program_ram = (UINT32 *)memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = machine.device<adsp21xx_device>("dcs");
-	dcs.program = &dcs.cpu->space(AS_PROGRAM);
-	dcs.data = &dcs.cpu->space(AS_DATA);
-	dcs.rev = 1;
-	dcs.channels = 1;
-	dcs.dmadac[0] = machine.device<dmadac_sound_device>("dac");
+	m_cpu = subdevice<adsp21xx_device>("dcs");
+	if (m_cpu != NULL && !m_cpu->started())
+		throw device_missing_dependencies();
+
+	m_program = &m_cpu->space(AS_PROGRAM);
+	m_data = &m_cpu->space(AS_DATA);
+	m_rev = 1;
+	m_channels = 1;
+	m_dmadac[0] = subdevice<dmadac_sound_device>("dac");
 
 	/* configure boot and sound ROMs */
-	dcs.bootrom = (UINT16 *)machine.root_device().memregion("dcs")->base();
-	dcs.bootrom_words = machine.root_device().memregion("dcs")->bytes() / 2;
-	dcs.sounddata = dcs.bootrom;
-	dcs.sounddata_words = dcs.bootrom_words;
-	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
-	machine.root_device().membank("databank")->configure_entries(0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
+	m_bootrom = (UINT16 *)machine().root_device().memregion("dcs")->base();
+	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
+	m_sounddata = m_bootrom;
+	m_sounddata_words = m_bootrom_words;
+	m_sounddata_banks = m_sounddata_words / 0x1000;
+	membank("databank")->configure_entries(0, m_sounddata_banks, m_sounddata, 0x1000*2);
 
 	/* create the timers */
-	dcs.internal_timer = machine.device<timer_device>("dcs_int_timer");
-	dcs.reg_timer = machine.device<timer_device>("dcs_reg_timer");
+	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
+	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
 
 	/* non-RAM based automatically acks */
-	dcs.auto_ack = TRUE;
-
+	m_auto_ack = TRUE;
 	/* register for save states */
-	dcs_register_state(machine);
-
+	dcs_register_state();
 	/* reset the system */
-	dcs_reset(machine, NULL, 0);
+	dcs_reset(NULL, 0);
 }
 
 
-void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
+void dcs2_audio_device::device_start()
 {
 	int soundbank_words;
 
-	memset(&dcs, 0, sizeof(dcs));
-	dcs.internal_program_ram = (UINT32 *)machine.root_device().memshare("dcsint")->ptr();
-	dcs.external_program_ram = (UINT32 *)machine.root_device().memshare("dcsext")->ptr();
+	m_internal_program_ram = (UINT32 *)memshare("dcsint")->ptr();
+	m_external_program_ram = (UINT32 *)memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = machine.device<adsp21xx_device>("dcs2");
-	dcs.rev = 2;
+	m_cpu = subdevice<adsp21xx_device>("dcs2");
+	m_rev = 2;
 	soundbank_words = 0x1000;
-	if (dcs.cpu == NULL)
+	if (m_cpu == NULL)
 	{
-		dcs.cpu = machine.device<adsp21xx_device>("dsio");
-		dcs.rev = 3;
+		m_cpu = subdevice<adsp21xx_device>("dsio");
+		m_rev = 3;
 		soundbank_words = 0x400;
 	}
-	if (dcs.cpu == NULL)
+	if (m_cpu == NULL)
 	{
-		dcs.cpu = machine.device<adsp21xx_device>("denver");
-		dcs.rev = 4;
+		m_cpu = subdevice<adsp21xx_device>("denver");
+		m_rev = 4;
 		soundbank_words = 0x800;
 	}
-	dcs.program = &dcs.cpu->space(AS_PROGRAM);
-	dcs.data = &dcs.cpu->space(AS_DATA);
-	dcs.channels = 2;
-	dcs.dmadac[0] = machine.device<dmadac_sound_device>("dac1");
-	dcs.dmadac[1] = machine.device<dmadac_sound_device>("dac2");
+	if (m_cpu != NULL && !m_cpu->started())
+		throw device_missing_dependencies();
+	
+	m_program = &m_cpu->space(AS_PROGRAM);
+	m_data = &m_cpu->space(AS_DATA);
+	m_channels = 2;
+	m_dmadac[0] = subdevice<dmadac_sound_device>("dac1");
+	m_dmadac[1] = subdevice<dmadac_sound_device>("dac2");
 
 	/* always boot from the base of "dcs" */
-	dcs.bootrom = (UINT16 *)machine.root_device().memregion("dcs")->base();
-	dcs.bootrom_words = machine.root_device().memregion("dcs")->bytes() / 2;
+	m_bootrom = (UINT16 *)machine().root_device().memregion("dcs")->base();
+	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
 
 	/* supports both RAM and ROM variants */
-	if (dram_in_mb != 0)
+	if (m_dram_in_mb != 0)
 	{
-		dcs.sounddata = auto_alloc_array(machine, UINT16, dram_in_mb << (20-1));
-		dcs.sounddata_words = (dram_in_mb << 20) / 2;
+		m_sounddata = auto_alloc_array(machine(), UINT16, m_dram_in_mb << (20-1));
+		m_sounddata_words = (m_dram_in_mb << 20) / 2;
 	}
 	else
 	{
-		dcs.sounddata = dcs.bootrom;
-		dcs.sounddata_words = dcs.bootrom_words;
+		m_sounddata = m_bootrom;
+		m_sounddata_words = m_bootrom_words;
 	}
-	dcs.sounddata_banks = dcs.sounddata_words / soundbank_words;
-	if (dcs.rev != 2)
-		machine.root_device().membank("databank")->configure_entries(0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
+	m_sounddata_banks = m_sounddata_words / soundbank_words;
+	if (m_rev != 2)
+		membank("databank")->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
-	dcs.sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
+	m_sram = auto_alloc_array(machine(), UINT16, 0x8000*4/2);
 
 	/* create the timers */
-	dcs.internal_timer = machine.device<timer_device>("dcs_int_timer");
-	dcs.reg_timer = machine.device<timer_device>("dcs_reg_timer");
-	dcs.sport_timer = machine.device<timer_device>("dcs_sport_timer");
+	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
+	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
+	m_sport_timer = subdevice<timer_device>("dcs_sport_timer");
 
 	/* we don't do auto-ack by default */
-	dcs.auto_ack = FALSE;
+	m_auto_ack = FALSE;
 
 	/* install the speedup handler */
-	dcs.polling_offset = polling_offset;
-	if (polling_offset)
-		dcs.polling_base = dcs.cpu->space(AS_DATA).install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
+	if (m_polling_offset)
+		m_polling_base = m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
 
 	/* allocate a watchdog timer for HLE transfers */
-	dcs.transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
-	if (dcs.transfer.hle_enabled)
-		dcs.transfer.watchdog = machine.device<timer_device>("dcs_hle_timer");
+	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0);
+	if (m_transfer.hle_enabled)
+		m_transfer.watchdog = subdevice<timer_device>("dcs_hle_timer");
 
 	/* register for save states */
-	dcs_register_state(machine);
+	dcs_register_state();
 
 	/* reset the system */
-	dcs_reset(machine, NULL, 0);
+	dcs_reset(NULL, 0);
 }
 
 
-void dcs_set_auto_ack(running_machine &machine, int state)
+void dcs_audio_device::set_auto_ack(int state)
 {
-	dcs.auto_ack = state;
+	m_auto_ack = state;
 }
 
 
@@ -1089,28 +976,28 @@ void dcs_set_auto_ack(running_machine &machine, int state)
  *
  *************************************/
 
-static READ16_HANDLER( dcs_dataram_r )
+READ16_MEMBER( dcs_audio_device::dcs_dataram_r )
 {
-	return dcs.external_program_ram[offset] >> 8;
+	return m_external_program_ram[offset] >> 8;
 }
 
 
-static WRITE16_HANDLER( dcs_dataram_w )
+WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
 {
-	UINT16 newdata = dcs.external_program_ram[offset] >> 8;
+	UINT16 newdata = m_external_program_ram[offset] >> 8;
 	COMBINE_DATA(&newdata);
-	dcs.external_program_ram[offset] = (newdata << 8) | (dcs.external_program_ram[offset] & 0xff);
+	m_external_program_ram[offset] = (newdata << 8) | (m_external_program_ram[offset] & 0xff);
 }
 
 
-static WRITE16_HANDLER( dcs_data_bank_select_w )
+WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
 {
-	dcs.sounddata_bank = data & 0x7ff;
-	space.machine().root_device().membank("databank")->set_entry(dcs.sounddata_bank % dcs.sounddata_banks);
+	m_sounddata_bank = data & 0x7ff;
+	membank("databank")->set_entry(m_sounddata_bank % m_sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
-	set_led_status(space.machine(), 2, data & 0x800);
+	set_led_status(machine(), 2, data & 0x800);
 #endif
 }
 
@@ -1122,61 +1009,61 @@ static WRITE16_HANDLER( dcs_data_bank_select_w )
  *
  *************************************/
 
-INLINE void sdrc_update_bank_pointers(running_machine &machine)
+void dcs_audio_device::sdrc_update_bank_pointers()
 {
 	if (SDRC_SM_EN != 0)
 	{
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
 
 		/* update the bank pointer based on whether we are ROM-based or RAM-based */
-		if (dcs.bootrom == dcs.sounddata)
+		if (m_bootrom == m_sounddata)
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				machine.root_device().membank("rompage")->set_base(&dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
+				membank("rompage")->set_base(&m_sounddata[(SDRC_EPM_PG * pagesize) % m_sounddata_words]);
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				machine.root_device().membank("rompage")->set_base(&dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
+				membank("rompage")->set_base(&m_bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % m_bootrom_words]);
 			if (SDRC_DM_ST != 0)
-				machine.root_device().membank("drampage")->set_base(&dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
+				membank("drampage")->set_base(&m_sounddata[(SDRC_DM_PG * 1024) % m_sounddata_words]);
 		}
 	}
 }
 
 
-static void sdrc_remap_memory(running_machine &machine)
+void dcs_audio_device::sdrc_remap_memory()
 {
 	/* if SRAM disabled, clean it out */
 	if (SDRC_SM_EN == 0)
 	{
-		dcs.program->unmap_readwrite(0x0800, 0x3fff);
-		dcs.data->unmap_readwrite(0x0800, 0x37ff);
+		m_program->unmap_readwrite(0x0800, 0x3fff);
+		m_data->unmap_readwrite(0x0800, 0x37ff);
 	}
 
 	/* otherwise, map the SRAM */
 	else
 	{
 		/* first start with a clean program map */
-		dcs.program->install_ram(0x0800, 0x3fff, dcs.sram + 0x4800);
+		m_program->install_ram(0x0800, 0x3fff, m_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			dcs.data->install_ram(0x0800, 0x17ff, dcs.sram + 0x0000);
-			dcs.data->install_ram(0x1800, 0x27ff, dcs.sram + 0x1000);
-			dcs.data->install_ram(0x2800, 0x37ff, dcs.sram + 0x2000);
+			m_data->install_ram(0x0800, 0x17ff, m_sram + 0x0000);
+			m_data->install_ram(0x1800, 0x27ff, m_sram + 0x1000);
+			m_data->install_ram(0x2800, 0x37ff, m_sram + 0x2000);
 		}
 
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
-			dcs.data->unmap_readwrite(0x0800, 0x17ff);
-			dcs.data->install_ram(0x1800, 0x27ff, dcs.sram + 0x3000);
-			dcs.data->install_ram(0x2800, 0x37ff, dcs.sram + 0x2000);
+			m_data->unmap_readwrite(0x0800, 0x17ff);
+			m_data->install_ram(0x1800, 0x27ff, m_sram + 0x3000);
+			m_data->install_ram(0x2800, 0x37ff, m_sram + 0x2000);
 		}
 	}
 
@@ -1185,29 +1072,29 @@ static void sdrc_remap_memory(running_machine &machine)
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		dcs.data->install_read_bank(baseaddr, baseaddr + pagesize - 1, "rompage");
+		m_data->install_read_bank(baseaddr, baseaddr + pagesize - 1, "rompage");
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		dcs.data->install_readwrite_bank(baseaddr, baseaddr + 0x3ff, "drampage");
+		m_data->install_readwrite_bank(baseaddr, baseaddr + 0x3ff, "drampage");
 	}
 
 	/* update the bank pointers */
-	sdrc_update_bank_pointers(machine);
+	sdrc_update_bank_pointers();
 
 	/* reinstall the polling hotspot */
-	if (dcs.polling_offset)
-		dcs.polling_base = dcs.cpu->space(AS_DATA).install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
+	if (m_polling_offset)
+		m_polling_base = m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
 }
 
 
-static void sdrc_reset(running_machine &machine)
+void dcs_audio_device::sdrc_reset()
 {
-	memset(dcs.sdrc.reg, 0, sizeof(dcs.sdrc.reg));
-	sdrc_remap_memory(machine);
+	memset(m_sdrc.reg, 0, sizeof(m_sdrc.reg));
+	sdrc_remap_memory();
 }
 
 
@@ -1218,9 +1105,9 @@ static void sdrc_reset(running_machine &machine)
  *
  *************************************/
 
-static READ16_HANDLER( sdrc_r )
+READ16_MEMBER( dcs_audio_device::sdrc_r )
 {
-	sdrc_state &sdrc = dcs.sdrc;
+	sdrc_state &sdrc = m_sdrc;
 	UINT16 result = sdrc.reg[offset];
 
 	/* offset 3 is for security */
@@ -1267,9 +1154,9 @@ static READ16_HANDLER( sdrc_r )
 }
 
 
-static WRITE16_HANDLER( sdrc_w )
+WRITE16_MEMBER( dcs_audio_device::sdrc_w )
 {
-	sdrc_state &sdrc = dcs.sdrc;
+	sdrc_state &sdrc = m_sdrc;
 	UINT16 diff = sdrc.reg[offset] ^ data;
 
 	switch (offset)
@@ -1278,24 +1165,24 @@ static WRITE16_HANDLER( sdrc_w )
 		case 0:
 			sdrc.reg[0] = data;
 			if (diff & 0x1833)
-				sdrc_remap_memory(space.machine());
+				sdrc_remap_memory();
 			if (diff & 0x0380)
-				sdrc_update_bank_pointers(space.machine());
+				sdrc_update_bank_pointers();
 			break;
 
 		/* offset 1 controls RAM mapping */
 		case 1:
 			sdrc.reg[1] = data;
-			//dmadac_enable(&dcs.dmadac[0], dcs.channels, SDRC_MUTE);
+			//dmadac_enable(&m_dmadac[0], m_channels, SDRC_MUTE);
 			if (diff & 0x0003)
-				sdrc_remap_memory(space.machine());
+				sdrc_remap_memory();
 			break;
 
 		/* offset 2 controls paging */
 		case 2:
 			sdrc.reg[2] = data;
 			if (diff & 0x1fff)
-				sdrc_update_bank_pointers(space.machine());
+				sdrc_update_bank_pointers();
 			break;
 
 		/* offset 3 controls security */
@@ -1342,15 +1229,15 @@ static WRITE16_HANDLER( sdrc_w )
  *
  *************************************/
 
-static void dsio_reset(running_machine &machine)
+void dcs_audio_device::dsio_reset()
 {
-	memset(&dcs.dsio, 0, sizeof(dcs.dsio));
+	memset(&m_dsio, 0, sizeof(m_dsio));
 }
 
 
-static READ16_HANDLER( dsio_r )
+READ16_MEMBER( dcs_audio_device::dsio_r )
 {
-	dsio_state &dsio = dcs.dsio;
+	dsio_state &dsio = m_dsio;
 	UINT16 result = dsio.reg[offset];
 
 	if (offset == 1)
@@ -1363,9 +1250,9 @@ static READ16_HANDLER( dsio_r )
 }
 
 
-static WRITE16_HANDLER( dsio_w )
+WRITE16_MEMBER( dcs_audio_device::dsio_w )
 {
-	dsio_state &dsio = dcs.dsio;
+	dsio_state &dsio = m_dsio;
 
 	switch (offset)
 	{
@@ -1374,16 +1261,17 @@ static WRITE16_HANDLER( dsio_w )
 			dsio.reg[1] = data;
 
 			/* determine /MUTE and number of channels */
-			dmadac_enable(&dcs.dmadac[0], dcs.channels, DSIO_MUTE);
+			dmadac_enable(&m_dmadac[0], m_channels, DSIO_MUTE);
 
 			/* bit 0 resets the FIFO */
-			midway_ioasic_fifo_reset_w(space.machine(), DSIO_EMPTY_FIFO ^ 1);
+			if (!m_fifo_reset_w.isnull())
+				m_fifo_reset_w(DSIO_EMPTY_FIFO ^ 1);
 			break;
 
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			space.machine().root_device().membank("databank")->set_entry(DSIO_DM_PG % dcs.sounddata_banks);
+			membank("databank")->set_entry(DSIO_DM_PG % m_sounddata_banks);
 			break;
 	}
 }
@@ -1396,15 +1284,15 @@ static WRITE16_HANDLER( dsio_w )
  *
  *************************************/
 
-static void denver_reset(running_machine &machine)
+void dcs_audio_device::denver_reset()
 {
-	memset(&dcs.dsio, 0, sizeof(dcs.dsio));
+	memset(&m_dsio, 0, sizeof(m_dsio));
 }
 
 
-static READ16_HANDLER( denver_r )
+READ16_MEMBER( dcs_audio_device::denver_r )
 {
-	UINT16 result = dcs.dsio.reg[offset];
+	UINT16 result = m_dsio.reg[offset];
 
 	if (offset == 3)
 	{
@@ -1415,9 +1303,9 @@ static READ16_HANDLER( denver_r )
 }
 
 
-static WRITE16_HANDLER( denver_w )
+WRITE16_MEMBER( dcs_audio_device::denver_w )
 {
-	dsio_state &dsio = dcs.dsio;
+	dsio_state &dsio = m_dsio;
 	int enable, channels, chan;
 
 	switch (offset)
@@ -1431,31 +1319,32 @@ static WRITE16_HANDLER( denver_w )
 			channels = 2 + 2 * DENV_CHANNELS;
 
 			/* if the number of channels has changed, adjust */
-			if (channels != dcs.channels)
+			if (channels != m_channels)
 			{
-				dcs.channels = channels;
-				for (chan = 0; chan < dcs.channels; chan++)
+				m_channels = channels;
+				for (chan = 0; chan < m_channels; chan++)
 				{
 					char buffer[10];
 					sprintf(buffer, "dac%d", chan + 1);
-					dcs.dmadac[chan] = space.machine().device<dmadac_sound_device>(buffer);
+					m_dmadac[chan] = subdevice<dmadac_sound_device>(buffer);
 				}
-				dmadac_enable(&dcs.dmadac[0], dcs.channels, enable);
-				if (dcs.channels < 6)
-					dmadac_enable(&dcs.dmadac[dcs.channels], 6 - dcs.channels, FALSE);
-				recompute_sample_rate(space.machine());
+				dmadac_enable(&m_dmadac[0], m_channels, enable);
+				if (m_channels < 6)
+					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, FALSE);
+				recompute_sample_rate();
 			}
 			break;
 
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			space.machine().root_device().membank("databank")->set_entry(DENV_DM_PG % dcs.sounddata_banks);
+			membank("databank")->set_entry(DENV_DM_PG % m_sounddata_banks);
 			break;
 
 		/* offset 3 controls FIFO reset */
 		case 3:
-			midway_ioasic_fifo_reset_w(space.machine(), 1);
+			if (!m_fifo_reset_w.isnull())
+				m_fifo_reset_w(1);
 			break;
 	}
 }
@@ -1468,47 +1357,47 @@ static WRITE16_HANDLER( denver_w )
  *
  *************************************/
 
-WRITE32_HANDLER( dsio_idma_addr_w )
+WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
 {
-	dsio_state &dsio = dcs.dsio;
+	dsio_state &dsio = m_dsio;
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_addr = %04X\n", space.device().safe_pc(), data);
-	downcast<adsp2181_device *>(dcs.cpu)->idma_addr_w(data);
+	downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
 }
 
 
-WRITE32_HANDLER( dsio_idma_data_w )
+WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 {
-	dsio_state &dsio = dcs.dsio;
+	dsio_state &dsio = m_dsio;
 	UINT32 pc = space.device().safe_pc();
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), data & 0xffff);
-		downcast<adsp2181_device *>(dcs.cpu)->idma_data_w(data & 0xffff);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
+		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), data >> 16);
-		downcast<adsp2181_device *>(dcs.cpu)->idma_data_w(data >> 16);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
+		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data >> 16);
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
 		logerror("Starting DSIO CPU\n");
-		dcs.cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
 
-READ32_HANDLER( dsio_idma_data_r )
+READ32_MEMBER( dcs_audio_device::dsio_idma_data_r )
 {
 	UINT32 result;
-	result = downcast<adsp2181_device *>(dcs.cpu)->idma_data_r();
+	result = downcast<adsp2181_device *>(m_cpu)->idma_data_r();
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", space.device().safe_pc(), downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), result);
+		logerror("%08X:IDMA_data_r(%04X) = %04X\n", space.device().safe_pc(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), result);
 	return result;
 }
 
@@ -1518,66 +1407,67 @@ READ32_HANDLER( dsio_idma_data_r )
     DCS COMMUNICATIONS
 ****************************************************************************/
 
-void dcs_set_io_callbacks(void (*output_full_cb)(running_machine &, int), void (*input_empty_cb)(running_machine &, int))
+void dcs_audio_device::set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb)
 {
-	dcs.input_empty_cb = input_empty_cb;
-	dcs.output_full_cb = output_full_cb;
+	m_input_empty_cb = input_empty_cb;
+	m_output_full_cb = output_full_cb;
 }
 
 
-void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(device_t *device), UINT16 (*fifo_status_r)(device_t *device))
+void dcs_audio_device::set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w)
 {
-	dcs.fifo_data_r = fifo_data_r;
-	dcs.fifo_status_r = fifo_status_r;
+	m_fifo_data_r = fifo_data_r;
+	m_fifo_status_r = fifo_status_r;
+	m_fifo_reset_w = fifo_reset_w;
 }
 
 
-int dcs_control_r(running_machine &machine)
+int dcs_audio_device::control_r()
 {
 	/* only boost for DCS2 boards */
-	if (!dcs.auto_ack && !dcs.transfer.hle_enabled)
-		machine.scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
-	return dcs.latch_control;
+	if (!m_auto_ack && !m_transfer.hle_enabled)
+		machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
+	return m_latch_control;
 }
 
 
-void dcs_reset_w(running_machine &machine, int state)
+void dcs_audio_device::reset_w(int state)
 {
 	/* going high halts the CPU */
 	if (state)
 	{
-		logerror("%s: DCS reset = %d\n", machine.describe_context(), state);
+		logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
 
 		/* just run through the init code again */
-		machine.scheduler().synchronize(FUNC(dcs_reset));
-		dcs.cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_reset),this));
+		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	/* going low resets and reactivates the CPU */
 	else
-		dcs.cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
-static READ16_HANDLER( latch_status_r )
+READ16_MEMBER( dcs_audio_device::latch_status_r )
 {
 	int result = 0;
 	if (IS_INPUT_FULL())
 		result |= 0x80;
 	if (IS_OUTPUT_EMPTY())
 		result |= 0x40;
-	if (dcs.fifo_status_r != NULL && (!dcs.transfer.hle_enabled || dcs.transfer.state == 0))
-		result |= (*dcs.fifo_status_r)(dcs.cpu) & 0x38;
-	if (dcs.transfer.hle_enabled && dcs.transfer.state != 0)
+	if (!m_fifo_status_r.isnull() && (!m_transfer.hle_enabled || m_transfer.state == 0))
+		result |= m_fifo_status_r(space, 0, 0xffff) & 0x38;
+	if (m_transfer.hle_enabled && m_transfer.state != 0)
 		result |= 0x08;
 	return result;
 }
 
 
-static READ16_HANDLER( fifo_input_r )
+READ16_MEMBER( dcs_audio_device::fifo_input_r )
 {
-	if (dcs.fifo_data_r)
-		return (*dcs.fifo_data_r)(dcs.cpu);
+	if (!m_fifo_data_r.isnull())
+		return m_fifo_data_r(space,0, 0xffff);
 	else
 		return 0xffff;
 }
@@ -1588,63 +1478,63 @@ static READ16_HANDLER( fifo_input_r )
     INPUT LATCH (data from host to DCS)
 ****************************************************************************/
 
-static void dcs_delayed_data_w(running_machine &machine, int data)
+void dcs_audio_device::dcs_delayed_data_w(int data)
 {
 	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_w(%04X)\n", machine.describe_context(), data);
+		logerror("%s:dcs_data_w(%04X)\n", machine().describe_context(), data);
 
 	/* boost the interleave temporarily */
-	machine.scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
+	machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
 
 	/* set the IRQ line on the ADSP */
-	dcs.cpu->set_input_line(ADSP2105_IRQ2, ASSERT_LINE);
+	m_cpu->set_input_line(ADSP2105_IRQ2, ASSERT_LINE);
 
 	/* indicate we are no longer empty */
-	if (dcs.last_input_empty && dcs.input_empty_cb)
-		(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 0);
+	if (m_last_input_empty && !m_input_empty_cb.isnull())
+		m_input_empty_cb(m_last_input_empty = 0);
 	SET_INPUT_FULL();
 
 	/* set the data */
-	dcs.input_data = data;
+	m_input_data = data;
 }
 
 
-static TIMER_CALLBACK( dcs_delayed_data_w_callback )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_delayed_data_w_callback )
 {
-	dcs_delayed_data_w(machine, param);
+	dcs_delayed_data_w(param);
 }
 
 
-void dcs_data_w(running_machine &machine, int data)
+void dcs_audio_device::data_w(int data)
 {
 	/* preprocess the write */
-	if (preprocess_write(machine, data))
+	if (preprocess_write(data))
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
-	if (dcs.sport_timer == NULL)
-		machine.scheduler().synchronize(FUNC(dcs_delayed_data_w_callback), data);
+	if (m_sport_timer == NULL)
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_delayed_data_w_callback),this), data);
 	else
-		dcs_delayed_data_w(machine, data);
+		dcs_delayed_data_w(data);
 }
 
 
-static WRITE16_HANDLER( input_latch_ack_w )
+WRITE16_MEMBER( dcs_audio_device::input_latch_ack_w )
 {
-	if (!dcs.last_input_empty && dcs.input_empty_cb)
-		(*dcs.input_empty_cb)(space.machine(), dcs.last_input_empty = 1);
+	if (!m_last_input_empty && !m_input_empty_cb.isnull())
+		m_input_empty_cb(m_last_input_empty = 1);
 	SET_INPUT_EMPTY();
-	dcs.cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
+	m_cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
 }
 
 
-static READ16_HANDLER( input_latch_r )
+READ16_MEMBER( dcs_audio_device::input_latch_r )
 {
-	if (dcs.auto_ack)
+	if (m_auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
 	if (LOG_DCS_IO)
-		logerror("%08X:input_latch_r(%04X)\n", space.device().safe_pc(), dcs.input_data);
-	return dcs.input_data;
+		logerror("%08X:input_latch_r(%04X)\n", space.device().safe_pc(), m_input_data);
+	return m_input_data;
 }
 
 
@@ -1653,52 +1543,52 @@ static READ16_HANDLER( input_latch_r )
     OUTPUT LATCH (data from DCS to host)
 ****************************************************************************/
 
-static TIMER_CALLBACK( latch_delayed_w )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
 {
-	if (!dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(machine, dcs.last_output_full = 1);
+	if (!m_last_output_full && !m_output_full_cb.isnull())
+		m_output_full_cb(m_last_output_full = 1);
 	SET_OUTPUT_FULL();
-	dcs.output_data = param;
+	m_output_data = param;
 }
 
 
-static WRITE16_HANDLER( output_latch_w )
+WRITE16_MEMBER( dcs_audio_device::output_latch_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", space.device().safe_pc(), data, IS_OUTPUT_EMPTY());
-	space.machine().scheduler().synchronize(FUNC(latch_delayed_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data);
 }
 
 
-static void delayed_ack_w(running_machine &machine)
+void dcs_audio_device::delayed_ack_w()
 {
 	SET_OUTPUT_EMPTY();
 }
 
 
-static TIMER_CALLBACK( delayed_ack_w_callback )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::delayed_ack_w_callback )
 {
-	delayed_ack_w(machine);
+	delayed_ack_w();
 }
 
 
-void dcs_ack_w(running_machine &machine)
+void dcs_audio_device::ack_w()
 {
-	machine.scheduler().synchronize(FUNC(delayed_ack_w_callback));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::delayed_ack_w_callback),this));
 }
 
 
-int dcs_data_r(running_machine &machine)
+int dcs_audio_device::data_r()
 {
 	/* data is actually only 8 bit (read from d8-d15) */
-	if (dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(machine, dcs.last_output_full = 0);
-	if (dcs.auto_ack)
-		delayed_ack_w(machine);
+	if (m_last_output_full && !m_output_full_cb.isnull())
+		m_output_full_cb(m_last_output_full = 0);
+	if (m_auto_ack)
+		delayed_ack_w();
 
 	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_r(%04X)\n", machine.describe_context(), dcs.output_data);
-	return dcs.output_data;
+		logerror("%s:dcs_data_r(%04X)\n", machine().describe_context(), m_output_data);
+	return m_output_data;
 }
 
 
@@ -1707,33 +1597,33 @@ int dcs_data_r(running_machine &machine)
     OUTPUT CONTROL BITS (has 3 additional lines to the host)
 ****************************************************************************/
 
-static TIMER_CALLBACK( output_control_delayed_w )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
 {
 	if (LOG_DCS_IO)
 		logerror("output_control = %04X\n", param);
-	dcs.output_control = param;
-	dcs.output_control_cycles = 0;
+	m_output_control = param;
+	m_output_control_cycles = 0;
 }
 
 
-static WRITE16_HANDLER( output_control_w )
+WRITE16_MEMBER( dcs_audio_device::output_control_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%04X:output_control = %04X\n", space.device().safe_pc(), data);
-	space.machine().scheduler().synchronize(FUNC(output_control_delayed_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::output_control_delayed_w),this), data);
 }
 
 
-static READ16_HANDLER( output_control_r )
+READ16_MEMBER( dcs_audio_device::output_control_r )
 {
-	dcs.output_control_cycles = dcs.cpu->total_cycles();
-	return dcs.output_control;
+	m_output_control_cycles = m_cpu->total_cycles();
+	return m_output_control;
 }
 
 
-int dcs_data2_r(running_machine &machine)
+int dcs_audio_device::data2_r()
 {
-	return dcs.output_control;
+	return m_output_control;
 }
 
 
@@ -1744,100 +1634,100 @@ int dcs_data2_r(running_machine &machine)
  *
  *************************************/
 
-static void update_timer_count(running_machine &machine)
+void dcs_audio_device::update_timer_count()
 {
 	UINT64 periods_since_start;
 	UINT64 elapsed_cycles;
 	UINT64 elapsed_clocks;
 
 	/* if not enabled, skip */
-	if (!dcs.timer_enable)
+	if (!m_timer_enable)
 		return;
 
 	/* count cycles */
-	elapsed_cycles = dcs.cpu->total_cycles() - dcs.timer_start_cycles;
-	elapsed_clocks = elapsed_cycles / dcs.timer_scale;
+	elapsed_cycles = m_cpu->total_cycles() - m_timer_start_cycles;
+	elapsed_clocks = elapsed_cycles / m_timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
-	if (elapsed_clocks < dcs.timer_start_count + 1)
-		dcs.control_regs[TIMER_COUNT_REG] = dcs.timer_start_count - elapsed_clocks;
+	if (elapsed_clocks < m_timer_start_count + 1)
+		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count - elapsed_clocks;
 
 	/* otherwise, count how many periods */
 	else
 	{
-		elapsed_clocks -= dcs.timer_start_count + 1;
-		periods_since_start = elapsed_clocks / (dcs.timer_period + 1);
-		elapsed_clocks -= periods_since_start * (dcs.timer_period + 1);
-		dcs.control_regs[TIMER_COUNT_REG] = dcs.timer_period - elapsed_clocks;
+		elapsed_clocks -= m_timer_start_count + 1;
+		periods_since_start = elapsed_clocks / (m_timer_period + 1);
+		elapsed_clocks -= periods_since_start * (m_timer_period + 1);
+		m_control_regs[TIMER_COUNT_REG] = m_timer_period - elapsed_clocks;
 	}
 }
 
 
-static TIMER_DEVICE_CALLBACK( internal_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
 {
 	INT64 target_cycles;
 
 	/* compute the absolute cycle when the next one should fire */
 	/* we do this to avoid drifting */
-	dcs.timers_fired++;
-	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (UINT64)(dcs.timer_period + 1));
-	target_cycles -= dcs.cpu->total_cycles();
+	m_timers_fired++;
+	target_cycles = m_timer_start_cycles + m_timer_scale * (m_timer_start_count + 1 + m_timers_fired * (UINT64)(m_timer_period + 1));
+	target_cycles -= m_cpu->total_cycles();
 
 	/* set the next timer, but only if it's for a reasonable number */
-	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer.adjust(dcs.cpu->cycles_to_attotime(target_cycles));
+	if (!m_timer_ignore && (m_timer_period > 10 || m_timer_scale > 1))
+		timer.adjust(m_cpu->cycles_to_attotime(target_cycles));
 
 	/* the IRQ line is edge triggered */
-	dcs.cpu->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
-	dcs.cpu->set_input_line(ADSP2105_TIMER, CLEAR_LINE);
+	m_cpu->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
+	m_cpu->set_input_line(ADSP2105_TIMER, CLEAR_LINE);
 }
 
 
-static void reset_timer(running_machine &machine)
+void dcs_audio_device::reset_timer()
 {
 	/* if not enabled, skip */
-	if (!dcs.timer_enable)
+	if (!m_timer_enable)
 		return;
 
 	/* compute the time until the first firing */
-	dcs.timer_start_cycles = dcs.cpu->total_cycles();
-	dcs.timers_fired = 0;
+	m_timer_start_cycles = m_cpu->total_cycles();
+	m_timers_fired = 0;
 
 	/* if this is the first timer, check the IRQ routine for the DRAM refresh stub */
 	/* if that's all the timer does, we don't really need to fire */
-	if (!dcs.timer_ignore)
+	if (!m_timer_ignore)
 	{
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
-		if (dcs.program->read_dword(0x18*4) == 0x0c0030 &&      /* ENA SEC_REG */
-			dcs.program->read_dword(0x19*4) == 0x804828 &&      /* SI = DM($0482) */
-			dcs.program->read_dword(0x1a*4) == 0x904828 &&      /* DM($0482) = SI */
-			dcs.program->read_dword(0x1b*4) == 0x0C0020 &&      /* DIS SEC_REG */
-			dcs.program->read_dword(0x1c*4) == 0x0A001F)            /* RTI */
+		if (m_program->read_dword(0x18*4) == 0x0c0030 &&      /* ENA SEC_REG */
+			m_program->read_dword(0x19*4) == 0x804828 &&      /* SI = DM($0482) */
+			m_program->read_dword(0x1a*4) == 0x904828 &&      /* DM($0482) = SI */
+			m_program->read_dword(0x1b*4) == 0x0C0020 &&      /* DIS SEC_REG */
+			m_program->read_dword(0x1c*4) == 0x0A001F)            /* RTI */
 		{
-			dcs.timer_ignore = TRUE;
+			m_timer_ignore = TRUE;
 		}
 	}
 
 	/* adjust the timer if not optimized */
-	if (!dcs.timer_ignore)
-		dcs.internal_timer->adjust(dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_start_count + 1)));
+	if (!m_timer_ignore)
+		m_internal_timer->adjust(m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_start_count + 1)));
 }
 
 
-static void timer_enable_callback(adsp21xx_device &device, int enable)
+WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 {
-	dcs.timer_enable = enable;
-	dcs.timer_ignore = 0;
-	if (enable)
+	m_timer_enable = state;
+	m_timer_ignore = 0;
+	if (state)
 	{
-		//osd_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
-		reset_timer(device.machine());
+		//osd_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)));
+		reset_timer();
 	}
 	else
 	{
 		//osd_printf_debug("Timer disabled\n");
-		dcs.internal_timer->reset();
+		m_internal_timer->reset();
 	}
 }
 
@@ -1866,7 +1756,7 @@ static void timer_enable_callback(adsp21xx_device &device, int enable)
     0x3c00-0x3fff = Memory Mapped control registers & reserved.
 */
 
-static READ16_HANDLER( adsp_control_r )
+READ16_MEMBER( dcs_audio_device::adsp_control_r )
 {
 	UINT16 result = 0xffff;
 
@@ -1875,29 +1765,29 @@ static READ16_HANDLER( adsp_control_r )
 		case PROG_FLAG_DATA_REG:
 			/* Denver waits for this & 0x000e == 0x0000 */
 			/* Denver waits for this & 0x000e == 0x0006 */
-			result = dcs.progflags ^= 0x0006;
+			result = m_progflags ^= 0x0006;
 			break;
 
 		case IDMA_CONTROL_REG:
-			result = downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r();
+			result = downcast<adsp2181_device *>(m_cpu)->idma_addr_r();
 			break;
 
 		case TIMER_COUNT_REG:
-			update_timer_count(space.machine());
-			result = dcs.control_regs[offset];
+			update_timer_count();
+			result = m_control_regs[offset];
 			break;
 
 		default:
-			result = dcs.control_regs[offset];
+			result = m_control_regs[offset];
 			break;
 	}
 	return result;
 }
 
 
-static WRITE16_HANDLER( adsp_control_w )
+WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 {
-	dcs.control_regs[offset] = data;
+	m_control_regs[offset] = data;
 
 	switch (offset)
 	{
@@ -1906,16 +1796,16 @@ static WRITE16_HANDLER( adsp_control_w )
 			if (data & 0x0200)
 			{
 				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", space.device().safe_pc());
-				dcs.cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-				dcs_boot(space.machine());
-				dcs.control_regs[SYSCONTROL_REG] = 0;
+				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				dcs_boot();
+				m_control_regs[SYSCONTROL_REG] = 0;
 			}
 
 			/* see if SPORT1 got disabled */
 			if ((data & 0x0800) == 0)
 			{
-				dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
-				dcs.reg_timer->reset();
+				dmadac_enable(&m_dmadac[0], m_channels, 0);
+				m_reg_timer->reset();
 			}
 			break;
 
@@ -1923,8 +1813,8 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
 			{
-				dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
-				dcs.reg_timer->reset();
+				dmadac_enable(&m_dmadac[0], m_channels, 0);
+				m_reg_timer->reset();
 			}
 			break;
 
@@ -1937,30 +1827,30 @@ static WRITE16_HANDLER( adsp_control_w )
 
 		case TIMER_SCALE_REG:
 			data = (data & 0xff) + 1;
-			if (data != dcs.timer_scale)
+			if (data != m_timer_scale)
 			{
-				update_timer_count(space.machine());
-				dcs.timer_scale = data;
-				reset_timer(space.machine());
+				update_timer_count();
+				m_timer_scale = data;
+				reset_timer();
 			}
 			break;
 
 		case TIMER_COUNT_REG:
-			dcs.timer_start_count = data;
-			reset_timer(space.machine());
+			m_timer_start_count = data;
+			reset_timer();
 			break;
 
 		case TIMER_PERIOD_REG:
-			if (data != dcs.timer_period)
+			if (data != m_timer_period)
 			{
-				update_timer_count(space.machine());
-				dcs.timer_period = data;
-				reset_timer(space.machine());
+				update_timer_count();
+				m_timer_period = data;
+				reset_timer();
 			}
 			break;
 
 		case IDMA_CONTROL_REG:
-			downcast<adsp2181_device *>(dcs.cpu)->idma_addr_w(data);
+			downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
 			break;
 	}
 }
@@ -1970,115 +1860,115 @@ static WRITE16_HANDLER( adsp_control_w )
     DCS IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( dcs_irq )
+TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 {
 	/* get the index register */
-	int reg = dcs.cpu->state_int(ADSP2100_I0 + dcs.ireg);
+	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg);
 
 	/* copy the current data into the buffer */
 	{
-		int count = dcs.size / 2;
+		int count = m_size / 2;
 		INT16 buffer[0x400];
 		int i;
 
 		for (i = 0; i < count; i++)
 		{
-			buffer[i] = dcs.data->read_word(reg * 2);
-			reg += dcs.incs;
+			buffer[i] = m_data->read_word(reg * 2);
+			reg += m_incs;
 		}
 
-		if (dcs.channels)
-			dmadac_transfer(&dcs.dmadac[0], dcs.channels, 1, dcs.channels, (dcs.size / 2) / dcs.channels, buffer);
+		if (m_channels)
+			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, (m_size / 2) / m_channels, buffer);
 	}
 
 	/* check for wrapping */
-	if (reg >= dcs.ireg_base + dcs.size)
+	if (reg >= m_ireg_base + m_size)
 	{
 		/* reset the base pointer */
-		reg = dcs.ireg_base;
+		reg = m_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		dcs.cpu->machine().driver_data()->generic_pulse_irq_line(*dcs.cpu,  ADSP2105_IRQ1, 1);
+		m_cpu->machine().driver_data()->generic_pulse_irq_line(*m_cpu,  ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */
-	dcs.cpu->set_state_int(ADSP2100_I0 + dcs.ireg, reg);
+	m_cpu->set_state_int(ADSP2100_I0 + m_ireg, reg);
 }
 
 
-static TIMER_DEVICE_CALLBACK( sport0_irq )
+TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
 {
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	if ((dcs.cpu->total_cycles() - dcs.output_control_cycles) > 5)
+	if ((m_cpu->total_cycles() - m_output_control_cycles) > 5)
 	{
-		dcs.cpu->set_input_line(ADSP2115_SPORT0_RX, ASSERT_LINE);
-		dcs.cpu->set_input_line(ADSP2115_SPORT0_RX, CLEAR_LINE);
+		m_cpu->set_input_line(ADSP2115_SPORT0_RX, ASSERT_LINE);
+		m_cpu->set_input_line(ADSP2115_SPORT0_RX, CLEAR_LINE);
 	}
 }
 
 
-static void recompute_sample_rate(running_machine &machine)
+void dcs_audio_device::recompute_sample_rate()
 {
 	/* calculate how long until we generate an interrupt */
 
 	/* frequency the time per each bit sent */
-	attotime sample_period = attotime::from_hz(dcs.cpu->unscaled_clock()) * (2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
+	attotime sample_period = attotime::from_hz(m_cpu->unscaled_clock()) * (2 * (m_control_regs[S1_SCLKDIV_REG] + 1));
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
-	sample_period = sample_period * (16 * dcs.channels);
-	dmadac_set_frequency(&dcs.dmadac[0], dcs.channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
-	dmadac_enable(&dcs.dmadac[0], dcs.channels, 1);
+	sample_period = sample_period * (16 * m_channels);
+	dmadac_set_frequency(&m_dmadac[0], m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+	dmadac_enable(&m_dmadac[0], m_channels, 1);
 
 	/* fire off a timer wich will hit every half-buffer */
-	if (dcs.incs)
+	if (m_incs)
 	{
-		attotime period = (sample_period * dcs.size) / (2 * dcs.channels * dcs.incs);
-		dcs.reg_timer->adjust(period, 0, period);
+		attotime period = (sample_period * m_size) / (2 * m_channels * m_incs);
+		m_reg_timer->adjust(period, 0, period);
 	}
 }
 
 
-static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
+WRITE32_MEMBER(dcs_audio_device::sound_tx_callback)
 {
 	/* check if it's for SPORT1 */
-	if (port != 1)
+	if (offset != 1)
 		return;
 
 	/* check if SPORT1 is enabled */
-	if (dcs.control_regs[SYSCONTROL_REG] & 0x0800) /* bit 11 */
+	if (m_control_regs[SYSCONTROL_REG] & 0x0800) /* bit 11 */
 	{
 		/* we only support autobuffer here (wich is what this thing uses), bail if not enabled */
-		if (dcs.control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
+		if (m_control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
 		{
 			/* get the autobuffer registers */
 			int     mreg, lreg;
 			UINT16  source;
 
-			dcs.ireg = (dcs.control_regs[S1_AUTOBUF_REG] >> 9) & 7;
-			mreg = (dcs.control_regs[S1_AUTOBUF_REG] >> 7) & 3;
-			mreg |= dcs.ireg & 0x04; /* msb comes from ireg */
-			lreg = dcs.ireg;
+			m_ireg = (m_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
+			mreg = (m_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
+			mreg |= m_ireg & 0x04; /* msb comes from ireg */
+			lreg = m_ireg;
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = device.state_int(ADSP2100_I0 + dcs.ireg);
-			dcs.incs = device.state_int(ADSP2100_M0 + mreg);
-			dcs.size = device.state_int(ADSP2100_L0 + lreg);
+			source = m_cpu->state_int(ADSP2100_I0 + m_ireg);
+			m_incs = m_cpu->state_int(ADSP2100_M0 + mreg);
+			m_size = m_cpu->state_int(ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
-			source -= dcs.incs;
+			source -= m_incs;
 
 			/* make it go back one so we dont lose the first sample */
-			device.set_state_int(ADSP2100_I0 + dcs.ireg, source);
+			m_cpu->set_state_int(ADSP2100_I0 + m_ireg, source);
 
 			/* save it as it is now */
-			dcs.ireg_base = source;
+			m_ireg_base = source;
 
 			/* recompute the sample rate and timer */
-			recompute_sample_rate(device.machine());
+			recompute_sample_rate();
 			return;
 		}
 		else
@@ -2086,10 +1976,10 @@ static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
 	}
 
 	/* if we get there, something went wrong. Disable playing */
-	dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
+	dmadac_enable(&m_dmadac[0], m_channels, 0);
 
 	/* remove timer */
-	dcs.reg_timer->reset();
+	m_reg_timer->reset();
 }
 
 
@@ -2098,18 +1988,18 @@ static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
     VERY BASIC & SAFE OPTIMIZATIONS
 ****************************************************************************/
 
-static READ16_HANDLER( dcs_polling_r )
+READ16_MEMBER( dcs_audio_device::dcs_polling_r )
 {
-	if (dcs.polling_count++ > 5)
+	if (m_polling_count++ > 5)
 		space.device().execute().eat_cycles(10000);
-	return *dcs.polling_base;
+	return *m_polling_base;
 }
 
 
-static WRITE16_HANDLER( dcs_polling_w )
+WRITE16_MEMBER( dcs_audio_device::dcs_polling_w )
 {
-	dcs.polling_count = 0;
-	COMBINE_DATA(dcs.polling_base);
+	m_polling_count = 0;
+	COMBINE_DATA(m_polling_base);
 }
 
 
@@ -2118,12 +2008,12 @@ static WRITE16_HANDLER( dcs_polling_w )
     DATA TRANSFER HLE MECHANISM
 ****************************************************************************/
 
-void dcs_fifo_notify(running_machine &machine, int count, int max)
+void dcs_audio_device::fifo_notify(int count, int max)
 {
-	hle_transfer_state &transfer = dcs.transfer;
+	hle_transfer_state &transfer = m_transfer;
 
 	/* skip if not in mid-transfer */
-	if (!transfer.hle_enabled || transfer.state == 0 || !dcs.fifo_data_r)
+	if (!transfer.hle_enabled || transfer.state == 0 || m_fifo_data_r.isnull())
 	{
 		transfer.fifo_entries = 0;
 		return;
@@ -2134,56 +2024,56 @@ void dcs_fifo_notify(running_machine &machine, int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(machine, (*dcs.fifo_data_r)(dcs.cpu));
+			preprocess_write(m_fifo_data_r(machine().driver_data()->generic_space(),0, 0xffff));
 	}
 }
 
 
-static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 {
-	hle_transfer_state &transfer = dcs.transfer;
+	hle_transfer_state &transfer = m_transfer;
 	int starting_writes_left = param;
 
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(timer.machine(), (*dcs.fifo_data_r)(dcs.cpu));
+			preprocess_write(m_fifo_data_r(machine().driver_data()->generic_space(),0, 0xffff));
 	}
 	if (transfer.watchdog != NULL)
 		transfer.watchdog->adjust(attotime::from_msec(1), transfer.writes_left);
 }
 
 
-static TIMER_CALLBACK( s1_ack_callback2 )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2), param);
+		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this), param);
 		return;
 	}
-	output_latch_w(dcs.cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
+	output_latch_w(m_cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
 }
 
 
-static TIMER_CALLBACK( s1_ack_callback1 )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), param);
+		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), param);
 		return;
 	}
-	output_latch_w(dcs.cpu->space(AS_PROGRAM), 0, param, 0xffff);
+	output_latch_w(m_cpu->space(AS_PROGRAM), 0, param, 0xffff);
 
 	/* chain to the next word we need to write back */
-	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2));
+	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this));
 }
 
 
-static int preprocess_stage_1(running_machine &machine, UINT16 data)
+int dcs_audio_device::preprocess_stage_1(UINT16 data)
 {
-	hle_transfer_state &transfer = dcs.transfer;
+	hle_transfer_state &transfer = m_transfer;
 
 	switch (transfer.state)
 	{
@@ -2192,7 +2082,7 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 			if (data == 0x001a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS Transfer command %04X\n", machine.describe_context(), data);
+					logerror("%s:DCS Transfer command %04X\n", machine().describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2202,7 +2092,7 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 			else if (data == 0x002a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS State change %04X\n", machine.describe_context(), data);
+					logerror("%s:DCS State change %04X\n", machine().describe_context(), data);
 				transfer.dcs_state = 1;
 			}
 
@@ -2256,13 +2146,13 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 			{
 				if (transfer.type == 1 && SDRC_SM_BK == 1)
 				{
-					dcs.sdrc.reg[0] &= ~0x1000;
-					sdrc_remap_memory(machine);
+					m_sdrc.reg[0] &= ~0x1000;
+					sdrc_remap_memory();
 				}
 				if (transfer.type == 2 && SDRC_SM_BK == 0)
 				{
-					dcs.sdrc.reg[0] |= 0x1000;
-					sdrc_remap_memory(machine);
+					m_sdrc.reg[0] |= 0x1000;
+					sdrc_remap_memory();
 				}
 				return 1;
 			}
@@ -2288,14 +2178,14 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 					if (transfer.writes_left & 1)
 						transfer.temp = data;
 					else
-						dcs.program->write_dword(transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
+						m_program->write_dword(transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
 				}
 				else
-					dcs.data->write_word(transfer.start++ * 2, data);
+					m_data->write_word(transfer.start++ * 2, data);
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), transfer.sum);
+					machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), transfer.sum);
 				return 1;
 			}
 			break;
@@ -2304,24 +2194,24 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 }
 
 
-static TIMER_CALLBACK( s2_ack_callback )
+TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 {
-	address_space &space = dcs.cpu->space(AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s2_ack_callback), param);
+		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), param);
 		return;
 	}
 	output_latch_w(space, 0, param, 0xffff);
-	output_control_w(space, 0, (dcs.output_control & ~0xff00) | 0x0300, 0xffff);
+	output_control_w(space, 0, (m_output_control & ~0xff00) | 0x0300, 0xffff);
 }
 
 
-static int preprocess_stage_2(running_machine &machine, UINT16 data)
+int dcs_audio_device::preprocess_stage_2(UINT16 data)
 {
-	hle_transfer_state &transfer = dcs.transfer;
+	hle_transfer_state &transfer = m_transfer;
 
 	switch (transfer.state)
 	{
@@ -2330,7 +2220,7 @@ static int preprocess_stage_2(running_machine &machine, UINT16 data)
 			if (data == 0x55d0 || data == 0x55d1)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS Transfer command %04X\n", machine.describe_context(), data);
+					logerror("%s:DCS Transfer command %04X\n", machine().describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2340,7 +2230,7 @@ static int preprocess_stage_2(running_machine &machine, UINT16 data)
 			else
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:Command: %04X\n", machine.describe_context(), data);
+					logerror("%s:Command: %04X\n", machine().describe_context(), data);
 			}
 			break;
 
@@ -2405,12 +2295,12 @@ static int preprocess_stage_2(running_machine &machine, UINT16 data)
 			if (transfer.hle_enabled)
 			{
 				/* write the new data to memory */
-				dcs.sounddata[transfer.start++] = data;
+				m_sounddata[transfer.start++] = data;
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s2_ack_callback), transfer.sum);
+					machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), transfer.sum);
 					transfer.watchdog->reset();
 				}
 				return 1;
@@ -2421,28 +2311,171 @@ static int preprocess_stage_2(running_machine &machine, UINT16 data)
 }
 
 
-static int preprocess_write(running_machine &machine, UINT16 data)
+int dcs_audio_device::preprocess_write(UINT16 data)
 {
-	hle_transfer_state &transfer = dcs.transfer;
+	hle_transfer_state &transfer = m_transfer;
 	int result;
 
 	/* if we're not DCS2, skip */
-	if (dcs.sport_timer == NULL)
+	if (m_sport_timer == NULL)
 		return 0;
 
 	/* state 0 - initialization phase */
 	if (transfer.dcs_state == 0)
-		result = preprocess_stage_1(machine, data);
+		result = preprocess_stage_1(data);
 	else
-		result = preprocess_stage_2(machine, data);
+		result = preprocess_stage_2(data);
 
 	/* if we did the write, toggle the full/not full state so interrupts are generated */
-	if (result && dcs.input_empty_cb)
+	if (result && !m_input_empty_cb.isnull())
 	{
-		if (dcs.last_input_empty)
-			(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 0);
-		if (!dcs.last_input_empty)
-			(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 1);
+		if (m_last_input_empty)
+			m_input_empty_cb(m_last_input_empty = 0);
+		if (!m_last_input_empty)
+			m_input_empty_cb(m_last_input_empty = 1);
 	}
 	return result;
 }
+
+const device_type DCS_AUDIO_2K = &device_creator<dcs_audio_2k_device>;
+
+//-------------------------------------------------
+//  dcs_audio_2k_device - constructor
+//-------------------------------------------------
+
+dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs_audio_device(mconfig, DCS_AUDIO_2K, "DCS Audio 2K", tag, owner, clock, "dcs_audio_2k", __FILE__)
+{
+}
+
+machine_config_constructor dcs_audio_2k_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs_audio_2k );
+}
+
+const device_type DCS_AUDIO_2K_UART = &device_creator<dcs_audio_2k_uart_device>;
+
+//-------------------------------------------------
+//  dcs_audio_2k_uart_device - constructor
+//-------------------------------------------------
+
+dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, "DCS Audio 2K UART", tag, owner, clock, "dcs_audio_2k_uart", __FILE__)
+{
+}
+
+machine_config_constructor dcs_audio_2k_uart_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs_audio_2k_uart );
+}
+
+const device_type DCS_AUDIO_8K = &device_creator<dcs_audio_8k_device>;
+
+//-------------------------------------------------
+//  dcs_audio_8k_device - constructor
+//-------------------------------------------------
+
+dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs_audio_device(mconfig, DCS_AUDIO_8K, "DCS Audio 8K", tag, owner, clock, "dcs_audio_8k", __FILE__)
+{
+}
+
+machine_config_constructor dcs_audio_8k_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs_audio_8k );
+}
+
+const device_type DCS_AUDIO_WPC = &device_creator<dcs_audio_wpc_device>;
+
+//-------------------------------------------------
+//  dcs_audio_wpc_device - constructor
+//-------------------------------------------------
+
+dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs_audio_device(mconfig, DCS_AUDIO_WPC, "DCS Audio WPC", tag, owner, clock, "dcs_audio_wpc", __FILE__)
+{
+}
+
+machine_config_constructor dcs_audio_wpc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs_audio_wpc );
+}
+
+
+
+//-------------------------------------------------
+//  dcs2_audio_device - constructor
+//-------------------------------------------------
+
+dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	dcs_audio_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+	
+const device_type DCS2_AUDIO_2115 = &device_creator<dcs2_audio_2115_device>;
+
+//-------------------------------------------------
+//  dcs2_audio_2115_device - constructor
+//-------------------------------------------------
+
+dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, "DCS2 Audio 2115", tag, owner, clock, "dcs2_audio_2115", __FILE__)
+{
+}
+
+machine_config_constructor dcs2_audio_2115_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs2_audio_2115 );
+}
+
+const device_type DCS2_AUDIO_2104 = &device_creator<dcs2_audio_2104_device>;
+
+//-------------------------------------------------
+//  dcs2_audio_2104_device - constructor
+//-------------------------------------------------
+
+dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, "DCS2 Audio 2104", tag, owner, clock, "dcs2_audio_2104", __FILE__)
+{
+}
+
+machine_config_constructor dcs2_audio_2104_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs2_audio_2104 );
+}
+
+
+const device_type DCS2_AUDIO_DSIO = &device_creator<dcs2_audio_dsio_device>;
+
+//-------------------------------------------------
+//  dcs2_audio_dsio_device - constructor
+//-------------------------------------------------
+
+dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, "DCS2 Audio DSIO", tag, owner, clock, "dcs2_audio_dsio", __FILE__)
+{
+}
+
+machine_config_constructor dcs2_audio_dsio_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs2_audio_dsio );
+}
+
+const device_type DCS2_AUDIO_DENVER = &device_creator<dcs2_audio_denver_device>;
+
+//-------------------------------------------------
+//  dcs2_audio_denver_device - constructor
+//-------------------------------------------------
+
+dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, "DCS2 Audio Denver", tag, owner, clock, "dcs2_audio_denver", __FILE__)
+{
+}
+
+machine_config_constructor dcs2_audio_denver_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( dcs2_audio_denver );
+}
+
+

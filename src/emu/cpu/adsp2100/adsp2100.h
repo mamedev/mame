@@ -193,22 +193,14 @@ enum
 
 class adsp21xx_device;
 
-// transmit and receive data callbacks types
-typedef INT32 (*adsp21xx_rx_func)(adsp21xx_device &device, int port);
-typedef void  (*adsp21xx_tx_func)(adsp21xx_device &device, int port, INT32 data);
-typedef void  (*adsp21xx_timer_func)(adsp21xx_device &device, int enable);
-
-
 // ======================> adsp21xx_config
 
 struct adsp21xx_config
 {
-	adsp21xx_rx_func        m_sport_rx_callback;    // callback for serial receive
-	adsp21xx_tx_func        m_sport_tx_callback;    // callback for serial transmit
-	adsp21xx_timer_func     m_timer_fired;          // callback for timer fired
+	devcb_read32        	m_sport_rx_callback;    // callback for serial receive
+	devcb_write32        	m_sport_tx_callback;    // callback for serial transmit
+	devcb_write_line     	m_timer_fired;          // callback for timer fired
 };
-
-
 
 // ======================> adsp21xx_device
 
@@ -468,6 +460,10 @@ protected:
 	UINT8               m_condition_table[0x1000];
 	UINT16              m_mask_table[0x4000];
 	UINT16              m_reverse_table[0x4000];
+
+	devcb_resolved_read32 m_sport_rx_func;
+	devcb_resolved_write32 m_sport_tx_func;
+	devcb_resolved_write_line m_timer_fired_func;
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS

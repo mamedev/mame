@@ -135,7 +135,6 @@ Notes:
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
-#include "machine/midwayic.h"
 #include "audio/dcs.h"
 
 
@@ -154,7 +153,8 @@ public:
 		m_control(*this, "control"),
 		m_rombase(*this, "rombase"),
 		m_maincpu(*this, "maincpu"),
-		m_ata(*this, "ata" )
+		m_ata(*this, "ata"),
+		m_dcs(*this, "dcs")
 	{
 	}
 
@@ -179,6 +179,7 @@ public:
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	required_device<cpu_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
+	required_device<dcs_audio_2k_device> m_dcs;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -362,7 +363,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 		case 2:     /* $90 -- sound return */
 			result = ioport(portnames[offset])->read();
 			result &= ~0x0002;
-			if (dcs_control_r(machine()) & 0x800)
+			if (m_dcs->control_r() & 0x800)
 				result |= 0x0002;
 			break;
 
@@ -402,12 +403,12 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 			break;
 
 		case 1:     /* $88 - sound reset */
-			dcs_reset_w(machine(), ~data & 0x01);
+			m_dcs->reset_w(~data & 0x01);
 			break;
 
 		case 2:     /* $90 - sound control */
 			if (!(olddata & 0x02) && (m_control[offset] & 0x02))
-				dcs_data_w(machine(), m_control[3]);
+				m_dcs->data_w(m_control[3]);
 			break;
 
 		case 3:     /* $98 - sound data */
@@ -699,7 +700,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs_audio_2k)
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 
@@ -911,8 +912,6 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 {
 	static const UINT8 kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
-	dcs_init(machine());
-
 	/* set up the control register mapping */
 	m_control_map = kinst_control_map;
 }
@@ -928,8 +927,6 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
 	// write: $90 on ki2 = $88 on ki
 	// write: $98 on ki2 = $80 on ki
 	// write: $a0 on ki2 = $98 on ki
-
-	dcs_init(machine());
 
 	/* set up the control register mapping */
 	m_control_map = kinst2_control_map;

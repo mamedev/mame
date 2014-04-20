@@ -6,14 +6,18 @@
 
 **************************************************************************/
 
+#include "machine/midwayic.h"
+
 class midwunit_state : public midtunit_state
 {
 public:
 	midwunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midtunit_state(mconfig, type, tag),
-			m_nvram(*this, "nvram") { }
+			m_nvram(*this, "nvram"),
+			m_midway_serial_pic(*this, "serial_pic") { }
 
 	required_shared_ptr<UINT16> m_nvram;
+	required_device<midway_serial_pic_device> m_midway_serial_pic;
 	UINT8 m_cmos_write_enable;
 	UINT16 m_iodata[8];
 	UINT8 m_ioshuffle[16];

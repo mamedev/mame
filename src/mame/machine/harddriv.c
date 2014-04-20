@@ -1249,16 +1249,14 @@ void harddriv_state::hdds3sdsp_reset_timer()
 	m_ds3sdsp_internal_timer->adjust(m_ds3sdsp->cycles_to_attotime(count * scale));
 }
 
-void hdds3sdsp_timer_enable_callback(adsp21xx_device &device, int enable)
+WRITE_LINE_MEMBER(harddriv_state::hdds3sdsp_timer_enable_callback)
 {
-	harddriv_state *state = device.machine().driver_data<harddriv_state>();
+	m_ds3sdsp_timer_en = state;
 
-	state->m_ds3sdsp_timer_en = enable;
-
-	if (enable)
-		state->hdds3sdsp_reset_timer();
+	if (state)
+		hdds3sdsp_reset_timer();
 	else
-		state->m_ds3sdsp_internal_timer->adjust(attotime::never);
+		m_ds3sdsp_internal_timer->adjust(attotime::never);
 }
 
 
@@ -1289,16 +1287,14 @@ void harddriv_state::hdds3xdsp_reset_timer()
 }
 
 
-void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable)
+WRITE_LINE_MEMBER(harddriv_state::hdds3xdsp_timer_enable_callback)
 {
-	harddriv_state *state = device.machine().driver_data<harddriv_state>();
+	m_ds3xdsp_timer_en = state;
 
-	state->m_ds3xdsp_timer_en = enable;
-
-	if (enable)
-		state->hdds3xdsp_reset_timer();
+	if (state)
+		hdds3xdsp_reset_timer();
 	else
-		state->m_ds3xdsp_internal_timer->adjust(attotime::never);
+		m_ds3xdsp_internal_timer->adjust(attotime::never);
 }
 
 
@@ -1312,50 +1308,42 @@ static TIMER_CALLBACK( xsdp_sport1_irq_off_callback )
 }
 
 
-void hdds3sdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data)
+WRITE32_MEMBER(harddriv_state::hdds3sdsp_serial_tx_callback)
 {
-	harddriv_state *state = device.machine().driver_data<harddriv_state>();
-
-	if ((state->m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
+	if ((m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return;
 
-	state->m_ds3sdsp_sdata = data;
+	m_ds3sdsp_sdata = data;
 
-	state->m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
-	device.machine().scheduler().timer_set(attotime::from_nsec(200), FUNC(xsdp_sport1_irq_off_callback));
+	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_nsec(200), FUNC(xsdp_sport1_irq_off_callback));
 }
 
 
-INT32 hdds3sdsp_serial_rx_callback(adsp21xx_device &device, int port)
+READ32_MEMBER(harddriv_state::hdds3sdsp_serial_rx_callback)
 {
-	harddriv_state *state = device.machine().driver_data<harddriv_state>();
-
-	if ((state->m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
+	if ((m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return 0xff;
 
-	return state->m_ds3xdsp_sdata;
+	return m_ds3xdsp_sdata;
 }
 
 
-void hdds3xdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data)
+WRITE32_MEMBER(harddriv_state::hdds3xdsp_serial_tx_callback)
 {
-	harddriv_state *state = device.machine().driver_data<harddriv_state>();
-
-	if ((state->m_ds3xdsp_regs[0x1f] & 0xc00) != 0xc00)
+	if ((m_ds3xdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return;
 
-	state->m_ds3xdsp_sdata = data;
+	m_ds3xdsp_sdata = data;
 }
 
 
-INT32 hdds3xdsp_serial_rx_callback(adsp21xx_device &device, int port)
+READ32_MEMBER(harddriv_state::hdds3xdsp_serial_rx_callback)
 {
-	harddriv_state *state = device.machine().driver_data<harddriv_state>();
-
-	state->m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
-	state->m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
-	state->m_ds3xdsp->signal_interrupt_trigger();
-	return state->m_ds3sdsp_sdata;
+	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
+	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
+	m_ds3xdsp->signal_interrupt_trigger();
+	return m_ds3sdsp_sdata;
 }
 
 

@@ -171,10 +171,6 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 	memset(&m_irq_state, 0, sizeof(m_irq_state));
 	memset(&m_irq_latch, 0, sizeof(m_irq_latch));
 
-	m_sport_rx_callback = NULL;
-	m_sport_tx_callback = NULL;
-	m_timer_fired = NULL;
-
 	// create the tables
 	create_tables();
 
@@ -415,6 +411,10 @@ UINT16 adsp2181_device::idma_data_r()
 
 void adsp21xx_device::device_start()
 {
+	m_sport_rx_func.resolve(m_sport_rx_callback, *this);
+	m_sport_tx_func.resolve(m_sport_tx_callback, *this);
+	m_timer_fired_func.resolve(m_timer_fired, *this);
+
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();

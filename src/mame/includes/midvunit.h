@@ -7,6 +7,8 @@
 **************************************************************************/
 
 #include "video/poly.h"
+#include "audio/dcs.h"
+#include "machine/midwayic.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
 
@@ -56,7 +58,11 @@ public:
 			m_textureram(*this, "textureram") ,
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_midway_serial_pic(*this, "serial_pic"),
+		m_midway_serial_pic2(*this, "serial_pic2"),
+		m_midway_ioasic(*this, "ioasic"),
+		m_dcs(*this, "dcs") { }
 
 	optional_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
@@ -135,7 +141,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
+	optional_device<midway_serial_pic_device> m_midway_serial_pic;
+	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
+	optional_device<midway_ioasic_device> m_midway_ioasic;
+	required_device<dcs_audio_device> m_dcs;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

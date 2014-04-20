@@ -45,12 +45,14 @@ class atlantis_state : public driver_device
 public:
 	atlantis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dcs(*this, "dcs") { }
 	DECLARE_DRIVER_INIT(mwskins);
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<dcs2_audio_denver_device> m_dcs;
 };
 
 
@@ -76,8 +78,8 @@ void atlantis_state::machine_start()
 
 void atlantis_state::machine_reset()
 {
-	dcs_reset_w(machine(), 1);
-	dcs_reset_w(machine(), 0);
+	m_dcs->reset_w(1);
+	m_dcs->reset_w(0);
 }
 
 
@@ -157,7 +159,8 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs2_audio_denver)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 MACHINE_CONFIG_END
 
 
@@ -200,7 +203,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atlantis_state,mwskins)
 {
-	dcs2_init(machine(), 8, 0);
 }
 
 /*************************************

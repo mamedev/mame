@@ -1288,16 +1288,16 @@ INPUT_PORTS_END
 
 static const adsp21xx_config ds3sdsp_config =
 {
-	hdds3sdsp_serial_rx_callback, /* callback for serial receive */
-	hdds3sdsp_serial_tx_callback, /* callback for serial transmit */
-	hdds3sdsp_timer_enable_callback /* callback for timer fired */
+	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3sdsp_serial_rx_callback), /* callback for serial receive */
+	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3sdsp_serial_tx_callback), /* callback for serial transmit */
+	DEVCB_DRIVER_LINE_MEMBER(harddriv_state, hdds3sdsp_timer_enable_callback) /* callback for timer fired */
 };
 
 static const adsp21xx_config ds3xdsp_config =
 {
-	hdds3xdsp_serial_rx_callback, /* callback for serial receive */
-	hdds3xdsp_serial_tx_callback, /* callback for serial transmit */
-	hdds3xdsp_timer_enable_callback /* callback for timer fired */
+	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3xdsp_serial_rx_callback), /* callback for serial receive */
+	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3xdsp_serial_tx_callback), /* callback for serial transmit */
+	DEVCB_DRIVER_LINE_MEMBER(harddriv_state, hdds3xdsp_timer_enable_callback) /* callback for timer fired */
 };
 
 

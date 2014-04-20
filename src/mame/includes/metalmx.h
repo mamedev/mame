@@ -12,7 +12,8 @@ public:
 			m_gsp(*this, "gsp"),
 			m_adsp(*this, "adsp"),
 			m_dsp32c_1(*this, "dsp32c_1"),
-			m_dsp32c_2(*this, "dsp32c_2") ,
+			m_dsp32c_2(*this, "dsp32c_2"),
+			m_cage(*this, "cage"),
 		m_adsp_internal_program_ram(*this, "adsp_intprog"),
 		m_gsp_dram(*this, "gsp_dram"),
 		m_gsp_vram(*this, "gsp_vram"){ }
@@ -22,6 +23,7 @@ public:
 	required_device<adsp2105_device> m_adsp;
 	required_device<dsp32c_device> m_dsp32c_1;
 	required_device<dsp32c_device> m_dsp32c_2;
+	required_device<atari_cage_device> m_cage;
 
 	required_shared_ptr<UINT32> m_adsp_internal_program_ram;
 	required_shared_ptr<UINT16> m_gsp_dram;
@@ -46,6 +48,7 @@ public:
 	DECLARE_WRITE32_MEMBER(host_vram_w);
 	DECLARE_WRITE32_MEMBER(timer_w);
 	DECLARE_DRIVER_INIT(metalmx);
+	DECLARE_WRITE8_MEMBER(cage_irq_callback);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

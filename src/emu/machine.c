@@ -1208,21 +1208,6 @@ astring &running_machine::nvram_filename(astring &result, device_t &device)
 
 void running_machine::nvram_load()
 {
-	if (config().m_nvram_handler != NULL)
-	{
-		astring filename;
-		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(filename, root_device()), ".nv") == FILERR_NONE)
-		{
-			(*config().m_nvram_handler)(*this, &file, FALSE);
-			file.close();
-		}
-		else
-		{
-			(*config().m_nvram_handler)(*this, NULL, FALSE);
-		}
-	}
-
 	nvram_interface_iterator iter(root_device());
 	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
 	{
@@ -1245,17 +1230,6 @@ void running_machine::nvram_load()
 
 void running_machine::nvram_save()
 {
-	if (config().m_nvram_handler != NULL)
-	{
-		astring filename;
-		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(filename, root_device()), ".nv") == FILERR_NONE)
-		{
-			(*config().m_nvram_handler)(*this, &file, TRUE);
-			file.close();
-		}
-	}
-
 	nvram_interface_iterator iter(root_device());
 	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
 	{

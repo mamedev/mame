@@ -157,8 +157,6 @@ REF. 970429
 
 
 
-static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data);
-
 WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 {
 	if (state)
@@ -634,60 +632,58 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, reg);
 }
 
-
-static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
+WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 {
-	gaelco3d_state *state = device.machine().driver_data<gaelco3d_state>();
 	/* check if it's for SPORT1 */
-	if (port != 1)
+	if (offset != 1)
 		return;
 
 	/* check if SPORT1 is enabled */
-	if (state->m_adsp_control_regs[SYSCONTROL_REG] & 0x0800) /* bit 11 */
+	if (m_adsp_control_regs[SYSCONTROL_REG] & 0x0800) /* bit 11 */
 	{
 		/* we only support autobuffer here (wich is what this thing uses), bail if not enabled */
-		if (state->m_adsp_control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
+		if (m_adsp_control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
 		{
 			/* get the autobuffer registers */
 			int     mreg, lreg;
 			UINT16  source;
 			attotime sample_period;
 
-			state->m_adsp_ireg = (state->m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
-			mreg = (state->m_adsp_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
-			mreg |= state->m_adsp_ireg & 0x04; /* msb comes from ireg */
-			lreg = state->m_adsp_ireg;
+			m_adsp_ireg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
+			mreg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
+			mreg |= m_adsp_ireg & 0x04; /* msb comes from ireg */
+			lreg = m_adsp_ireg;
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = device.state_int(ADSP2100_I0 + state->m_adsp_ireg);
-			state->m_adsp_incs = device.state_int(ADSP2100_M0 + mreg);
-			state->m_adsp_size = device.state_int(ADSP2100_L0 + lreg);
+			source = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
+			m_adsp_incs = m_adsp->state_int(ADSP2100_M0 + mreg);
+			m_adsp_size = m_adsp->state_int(ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
-			source -= state->m_adsp_incs;
+			source -= m_adsp_incs;
 
 			/* make it go back one so we dont lose the first sample */
-			device.set_state_int(ADSP2100_I0 + state->m_adsp_ireg, source);
+			m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, source);
 
 			/* save it as it is now */
-			state->m_adsp_ireg_base = source;
+			m_adsp_ireg_base = source;
 
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime::from_hz(device.clock()) * (2 * (state->m_adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime::from_hz(m_adsp->clock()) * (2 * (m_adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period *= 16 * SOUND_CHANNELS;
 
-			dmadac_set_frequency(&state->m_dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
-			dmadac_enable(&state->m_dmadac[0], SOUND_CHANNELS, 1);
+			dmadac_set_frequency(&m_dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+			dmadac_enable(&m_dmadac[0], SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */
-			sample_period = (sample_period * state->m_adsp_size) / (SOUND_CHANNELS * state->m_adsp_incs);
+			sample_period = (sample_period * m_adsp_size) / (SOUND_CHANNELS * m_adsp_incs);
 
-			state->m_adsp_autobuffer_timer->adjust(sample_period, 0, sample_period);
+			m_adsp_autobuffer_timer->adjust(sample_period, 0, sample_period);
 
 			return;
 		}
@@ -696,10 +692,10 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 	}
 
 	/* if we get there, something went wrong. Disable playing */
-	dmadac_enable(&state->m_dmadac[0], SOUND_CHANNELS, 0);
+	dmadac_enable(&m_dmadac[0], SOUND_CHANNELS, 0);
 
 	/* remove timer */
-	state->m_adsp_autobuffer_timer->reset();
+	m_adsp_autobuffer_timer->reset();
 }
 
 
@@ -955,9 +951,9 @@ INPUT_PORTS_END
 
 static const adsp21xx_config adsp_config =
 {
-	NULL,                   /* callback for serial receive */
-	adsp_tx_callback,       /* callback for serial transmit */
-	NULL                    /* callback for timer fired */
+	DEVCB_NULL,                   /* callback for serial receive */
+	DEVCB_DRIVER_MEMBER32(gaelco3d_state, adsp_tx_callback),       /* callback for serial transmit */
+	DEVCB_NULL                    /* callback for timer fired */
 };
 
 static const tms3203x_config tms_config =

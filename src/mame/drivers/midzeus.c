@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
 	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_SHARE("zeusbase")
 	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP        // watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
@@ -580,7 +580,7 @@ static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus2_state )
 	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_SHARE("linkram")
 	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP        // watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(zeus2_timekeeper_r, zeus2_timekeeper_w)
@@ -1103,7 +1103,17 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
+		
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)	
+	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)	
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mk4, midzeus )
+	MCFG_DEVICE_MODIFY("ioasic")
+	MCFG_MIDWAY_IOASIC_UPPER(461/* or 474 */)
+	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(midzeus_state::PIC16C5X_T0_clk_r)
@@ -1117,9 +1127,11 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_DERIVED( invasn, midzeus )
-
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
 	MCFG_CPU_IO_MAP(pic_io_map)
+	
+	MCFG_DEVICE_MODIFY("ioasic")
+	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
@@ -1142,11 +1154,25 @@ static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
 	MCFG_VIDEO_START_OVERRIDE(midzeus2_state,midzeus2)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 
 	MCFG_M48T35_ADD( "m48t35" )
+	
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(99)
+	MCFG_MIDWAY_IOASIC_UPPER(474)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( crusnexo, midzeus2 )
+	MCFG_DEVICE_MODIFY("ioasic")
+	MCFG_MIDWAY_IOASIC_UPPER(472/* or 476,477,478,110 */)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( thegrid, midzeus2 )
+	MCFG_DEVICE_MODIFY("ioasic")
+	MCFG_MIDWAY_IOASIC_UPPER(474/* or 491 */)
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -1471,24 +1497,17 @@ ROM_END
 
 DRIVER_INIT_MEMBER(midzeus_state,mk4)
 {
-	dcs2_init(machine(), 0, 0);
-	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 94, NULL);
-	midway_ioasic_set_shuffle_state(1);
 }
 
 
 DRIVER_INIT_MEMBER(midzeus_state,invasn)
 {
-	dcs2_init(machine(), 0, 0);
-	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
 {
-	dcs2_init(machine(), 0, 0);
-	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
@@ -1497,8 +1516,6 @@ DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
 
 DRIVER_INIT_MEMBER(midzeus_state,thegrid)
 {
-	dcs2_init(machine(), 0, 0);
-	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
 }
 
@@ -1510,16 +1527,16 @@ DRIVER_INIT_MEMBER(midzeus_state,thegrid)
  *
  *************************************/
 
-GAME(  1997, mk4,      0,        midzeus,  mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  1997, mk4a,     mk4,      midzeus,  mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  1997, mk4b,     mk4,      midzeus,  mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1997, mk4,      0,        mk4, 	   mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1997, mk4a,     mk4,      mk4,  	   mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1997, mk4b,     mk4,      mk4,  	   mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAMEL( 1999, crusnexo, 0,        midzeus2, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoa,crusnexo, midzeus2, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexob,crusnexo, midzeus2, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoc,crusnexo, midzeus2, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,crusnexo, midzeus2, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
-GAME(  2001, thegrid,  0,        midzeus2, thegrid,  midzeus_state, thegrid,  ROT0, "Midway", "The Grid (version 1.2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  2001, thegrida, thegrid,  midzeus2, thegrid,  midzeus_state, thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
+GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus_state, thegrid,  ROT0, "Midway", "The Grid (version 1.2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus_state, thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
