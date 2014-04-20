@@ -908,16 +908,40 @@ INLINE void set_timers( FM_OPN *OPN, FM_ST *ST, void *n, int v )
 		/* External timer handler */
 		if (ST->timer_handler) (ST->timer_handler)(n,0,ST->TAC * ST->timer_prescaler,ST->clock);
 	}
+	else if (!(v & 1))
+	{
+		if( ST->TAC != 0 )
+		{
+			ST->TAC = 0;
+			if (ST->timer_handler) (ST->timer_handler)(n,0,0,ST->clock);
+		}
+	}
+
 	if ((v&2) && !(ST->mode&2))
 	{
 		ST->TBC = ( 256-ST->TB)<<4;
 		/* External timer handler */
 		if (ST->timer_handler) (ST->timer_handler)(n,1,ST->TBC * ST->timer_prescaler,ST->clock);
 	}
+	else if (!(v & 2))
+	{
+		if( ST->TBC != 0 )
+		{
+			ST->TBC = 0;
+			if (ST->timer_handler) (ST->timer_handler)(n,1,0,ST->clock);
+		}
+	}
 
 	/* reset Timers flags */
-	ST->status &= (~v >> 4); 
+	ST->status &= (~v >> 4);
 
+	/* if IRQ should be lowered now, do so */
+	if ( (ST->irq) && !(ST->status & ST->irqmask) )
+	{
+		ST->irq = 0;
+		/* callback user interrupt handler (IRQ is ON to OFF) */
+		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->param, 0);
+	}
 	ST->mode = v;
 }
 
