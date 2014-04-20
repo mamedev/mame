@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-Goldstar Famicom FC-100
+Goldstar FC-100 (FC stands for Famicom)
 
 2014/04/20 Skeleton driver.
 
@@ -466,5 +466,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS          INIT    COMPANY   FULLNAME       STATUS                     FLAGS */
-CONS( 1982, fc100,  0,      0,       fc100,   fc100,  driver_device,   0,   "Goldstar", "Famicom FC-100", GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS          INIT    COMPANY    FULLNAME  FLAGS */
+CONS( 1982, fc100,  0,      0,       fc100,   fc100,  driver_device,   0,   "Goldstar", "FC-100", GAME_NOT_WORKING )

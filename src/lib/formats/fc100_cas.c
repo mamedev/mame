@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /********************************************************************
 
-Support for Goldstar Famicom FC-100 cassette images
+Support for Goldstar FC-100 cassette images
 
 
 We don't actually have any info on the cassette frequencies, so

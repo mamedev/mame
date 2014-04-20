@@ -4,7 +4,7 @@
 
     fc100_cas.h
 
-    Format code for Goldstar Famicom-100 cassette images (CAS format)
+    Format code for Goldstar FC-100 cassette images (CAS format)
 
 *********************************************************************/
 
