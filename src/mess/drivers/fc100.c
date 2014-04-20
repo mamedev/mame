@@ -29,6 +29,12 @@ public:
 
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 
+	UINT8 *m_p_chargen;
+	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
+	{
+		fc100_state *state = machine.driver_data<fc100_state>();
+		return state->m_p_chargen[(ch&0x7F)*16+line];
+	}
 private:
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -52,7 +58,7 @@ private:
 static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
+	AM_RANGE( 0x6000, 0xBFFF ) AM_RAM
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -128,6 +134,7 @@ void fc100_state::machine_start()
 
 void fc100_state::machine_reset()
 {
+	m_p_chargen = memregion("chargen")->base();
 }
 
 #if 0
@@ -189,9 +196,10 @@ READ8_MEMBER( fc100_state::mc6847_videoram_r )
 	}
 
 	// Standard text
-	UINT8 data = m_videoram[offset % 0xc00];
+	UINT8 data = m_videoram[offset];
+	UINT8 attr = m_videoram[offset+0x200];
 
-	m_s68047p->inv_w( ( data & 0x80 ) ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->inv_w( BIT( attr, 0 ));
 
 	return data;
 }
@@ -208,11 +216,10 @@ static const mc6847_interface fc100_mc6847_interface =
 	DEVCB_NULL,                 /* GM0 */
 	DEVCB_NULL,                 /* CSS */
 	DEVCB_NULL,                 /* AS */
-	DEVCB_NULL,                 /* INTEXT */
+	DEVCB_LINE_VCC,             /* INTEXT */
 	DEVCB_NULL,                 /* INV */
 
-	NULL,
-	false
+	&fc100_state::get_char_rom
 };
 
 
@@ -221,7 +228,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CPU_ADD("maincpu",Z80, 9159090/2)
 	MCFG_CPU_PROGRAM_MAP(fc100_mem)
 	MCFG_CPU_IO_MAP(fc100_io)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", fc100_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fc100_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_MC6847_ADD("s68047p", S68047, 9159090/3, fc100_mc6847_interface )  // Clock not verified
