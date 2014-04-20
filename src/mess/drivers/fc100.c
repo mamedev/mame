@@ -6,8 +6,19 @@ Goldstar Famicom FC-100
 
 2014/04/20 Skeleton driver.
 
+No manuals or schematics available.
+Shift-Run to BREAK out of CLOAD.
+Cassette uses the uart.
+
 TODO:
-- Everything
+- Sound
+- Cassette
+- Hookup Graphics modes
+- Unknown i/o ports
+- Does it have a cart slot?
+- Expansion?
+- It misses keystrokes if you type quickly
+
 
 ****************************************************************************/
 
@@ -28,7 +39,8 @@ public:
 		, m_videoram(*this, "videoram")
 	{ }
 
-	DECLARE_READ8_MEMBER( mc6847_videoram_r );
+	DECLARE_READ8_MEMBER(mc6847_videoram_r);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 	UINT8 *m_p_chargen;
 	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
@@ -286,6 +298,11 @@ READ8_MEMBER( fc100_state::mc6847_videoram_r )
 	return data;
 }
 
+// irq is inverted in emulation, so we need this trampoline
+WRITE_LINE_MEMBER( fc100_state::irq_w )
+{
+	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
+}
 
 static const mc6847_interface fc100_mc6847_interface =
 {
@@ -310,10 +327,10 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CPU_ADD("maincpu",Z80, 9159090/2)
 	MCFG_CPU_PROGRAM_MAP(fc100_mem)
 	MCFG_CPU_IO_MAP(fc100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fc100_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_MC6847_ADD("s68047p", S68047, 9159090/3, fc100_mc6847_interface )  // Clock not verified
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(fc100_state, irq_w))
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
 
 	/* Devices */
