@@ -60,6 +60,7 @@ void nextkbd_device::device_reset()
 	fifo_size = 0;
 	memset(fifo, 0, sizeof(fifo));
 	modifiers_state = 0;
+	nmi_active = false;
 	poll_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
 }
 
@@ -87,6 +88,15 @@ void nextkbd_device::update_mouse(bool force_update)
 
 	INT32 deltax = -(cur_mousex - prev_mousex);
 	INT32 deltay = -(cur_mousey - prev_mousey);
+
+	if(deltax >= 128)
+		deltax -= 256;
+	if(deltax < -128)
+		deltax += 256;
+	if(deltay >= 128)
+		deltay -= 256;
+	if(deltay < -128)
+		deltay += 256;
 
 	prev_mousex   = cur_mousex;
 	prev_mousey   = cur_mousey;
@@ -199,11 +209,6 @@ WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
 	UINT8 diff = old ^ ctrl_kms;
 
 	logerror("%s: ctrl_kms_w %02x | %02x (%08x)\n", tag(), ctrl_kms, diff, (unsigned int)space.device().safe_pc());
-
-	if((data & C_KBD_NMI) && (ctrl_kms & C_KBD_NMI)) {
-		ctrl_kms &= ~C_KBD_NMI;
-		int_nmi_cb(false);
-	}
 }
 
 WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
@@ -248,8 +253,11 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 		if(!newval)
 			val |= D_KBD_KEYDOWN;
 		if(val == 0x8826 || val == 0x884a) {
-			ctrl_kms &= ~C_KBD_NMI;
+			nmi_active = true;
 			int_nmi_cb(true);
+		} else if(nmi_active) {
+			nmi_active = false;
+			int_nmi_cb(false);
 		}
 		fifo_push(val | D_MASTER | km_address);
 		send();
@@ -426,10 +434,10 @@ static INPUT_PORTS_START(nextkbd_keymap)
 	PORT_BIT(0xfffffffe, IP_ACTIVE_HIGH, IPT_UNUSED)   PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 4)
 
 	PORT_START("mousex")
-	PORT_BIT( 0x007f, 0, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
 	PORT_START("mousey")
-	PORT_BIT( 0x007f, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
 	PORT_START("mousebtn")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)

@@ -868,10 +868,12 @@ void next_state::machine_reset()
 
 void next_state::vblank_w(screen_device &screen, bool vblank_state)
 {
+#if 1
 	if(screen_color)
 		irq_set(13, vblank_state);
 	else
 		irq_set(5, vblank_state);
+#endif
 }
 
 static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
