@@ -2056,6 +2056,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/eti660.o    \
 	$(MESS_DRIVERS)/fanucs15.o  \
 	$(MESS_DRIVERS)/fanucspmg.o \
+	$(MESS_DRIVERS)/fc100.o     \
 	$(MESS_DRIVERS)/fk1.o       \
 	$(MESS_DRIVERS)/ft68m.o     \
 	$(MESS_DRIVERS)/grfd2301.o  \
