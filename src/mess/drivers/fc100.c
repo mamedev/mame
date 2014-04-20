@@ -11,7 +11,8 @@ Shift-Run to BREAK out of CLOAD.
 Cassette uses the uart.
 
 TODO:
-- Hookup Graphics modes
+- Cassette frequencies are guesses, need to be verified
+- Hookup Graphics modes and colours
 - Unknown i/o ports
 - Does it have a cart slot? Yes. What address?
 - Expansion?
@@ -29,6 +30,7 @@ TODO:
 #include "sound/ay8910.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "formats/fc100_cas.h"
 
 
 class fc100_state : public driver_device
@@ -382,16 +384,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 	}
 }
 
-#if 0
 static const cassette_interface fc100_cassette_interface =
 {
-	cassette_default_formats,
+	fc100_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"fc100_cass",
+	NULL,
 	NULL
 };
-#endif
+
 
 //******************** MACHINE ******************************
 
@@ -423,12 +424,12 @@ void fc100_state::machine_reset()
 
 static MACHINE_CONFIG_START( fc100, fc100_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 9159090/2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fc100_mem)
 	MCFG_CPU_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_MC6847_ADD("s68047p", S68047, 9159090/3, fc100_mc6847_interface )  // Clock not verified
+	MCFG_MC6847_ADD("s68047p", S68047, XTAL_7_15909MHz/3, fc100_mc6847_interface )  // Clock not verified
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(fc100_state, irq_w))
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
@@ -438,12 +439,12 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("psg", AY8910, 9159090/3/2)  /* AY-3-8910 - clock not verified */
+	MCFG_SOUND_ADD("psg", AY8910, XTAL_7_15909MHz/3/2)  /* AY-3-8910 - clock not verified */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
-	MCFG_CASSETTE_ADD("cassette", default_cassette_interface) //fc100_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", fc100_cassette_interface)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16) // gives 19200
