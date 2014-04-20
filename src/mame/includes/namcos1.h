@@ -19,7 +19,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"),
+		m_subcpu(*this, "subcpu"),
 		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
 		m_dac(*this, "dac"),
@@ -59,6 +59,10 @@ public:
 	int m_reset;
 	int m_wdog;
 	int m_chip[16];
+	int m_input_count;
+	int m_strobe;
+	int m_strobe_count;
+	int m_stored_input[2];
 	UINT8 *m_videoram;
 	UINT8 m_cus116[0x10];
 	UINT8 *m_spriteram;

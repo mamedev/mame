@@ -657,10 +657,7 @@ void namcos1_state::set_bank(int banknum, const bankhandler *handler)
 		{ write8_delegate(FUNC(namcos1_state::bank13_w),this) }, { write8_delegate(FUNC(namcos1_state::bank14_w),this) }, { write8_delegate(FUNC(namcos1_state::bank15_w),this) }, { write8_delegate(FUNC(namcos1_state::bank16_w),this) }
 	};
 
-
-	static const char *const cputags[] = { "maincpu", "sub" };
-
-	address_space &space = machine().device(cputags[(banknum >> 3) & 1])->memory().space(AS_PROGRAM);
+	address_space &space = (((banknum & 8) == 0) ? m_maincpu : m_subcpu)->space(AS_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
@@ -1180,6 +1177,11 @@ DRIVER_INIT_MEMBER(namcos1_state,tankfrce)
 
 DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
 {
+	m_input_count = 0;
+	m_strobe_count = 0;
+	m_stored_input[0] = 0;
+	m_stored_input[1] = 0;
+
 	static const struct namcos1_specific tankfrce_specific=
 	{
 		read8_delegate(FUNC(namcos1_state::key_type3_r),this), write8_delegate(FUNC(namcos1_state::key_type3_w),this), 185, 5,-1, 1,-1, 2,-1
@@ -1244,18 +1246,16 @@ DRIVER_INIT_MEMBER(namcos1_state,soukobdx)
 *******************************************************************************/
 READ8_MEMBER( namcos1_state::quester_paddle_r )
 {
-	static int qnum=0, qstrobe=0;
-
 	if (offset == 0)
 	{
 		int ret;
 
-		if (!qnum)
-			ret = (ioport("CONTROL0")->read()&0x90) | qstrobe | (ioport("PADDLE0")->read()&0x0f);
+		if (!(m_strobe & 0x20))
+			ret = (ioport("CONTROL0")->read()&0x90) | (m_strobe & 0x40) | (ioport("PADDLE0")->read()&0x0f);
 		else
-			ret = (ioport("CONTROL0")->read()&0x90) | qstrobe | (ioport("PADDLE1")->read()&0x0f);
+			ret = (ioport("CONTROL0")->read()&0x90) | (m_strobe & 0x40) | (ioport("PADDLE1")->read()&0x0f);
 
-		qstrobe ^= 0x40;
+		m_strobe ^= 0x40;
 
 		return ret;
 	}
@@ -1263,12 +1263,12 @@ READ8_MEMBER( namcos1_state::quester_paddle_r )
 	{
 		int ret;
 
-		if (!qnum)
-			ret = (ioport("CONTROL1")->read()&0x90) | qnum | (ioport("PADDLE0")->read()>>4);
+		if (!(m_strobe & 0x20))
+			ret = (ioport("CONTROL1")->read()&0x90) | 0x00 | (ioport("PADDLE0")->read()>>4);
 		else
-			ret = (ioport("CONTROL1")->read()&0x90) | qnum | (ioport("PADDLE1")->read()>>4);
+			ret = (ioport("CONTROL1")->read()&0x90) | 0x20 | (ioport("PADDLE1")->read()>>4);
 
-		if (!qstrobe) qnum ^= 0x20;
+		if (!(m_strobe & 0x40)) m_strobe ^= 0x20;
 
 		return ret;
 	}
@@ -1276,6 +1276,7 @@ READ8_MEMBER( namcos1_state::quester_paddle_r )
 
 DRIVER_INIT_MEMBER(namcos1_state,quester)
 {
+	m_strobe = 0;
 	namcos1_driver_init(NULL);
 	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::quester_paddle_r), this));
 }
@@ -1289,12 +1290,10 @@ DRIVER_INIT_MEMBER(namcos1_state,quester)
 READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 {
 	int res;
-	static int input_count, strobe, strobe_count;
-
 
 	if (offset == 0)
 	{
-		int inp = input_count;
+		int inp = m_input_count;
 
 		if (inp == 4) res = ioport("CONTROL0")->read();
 		else
@@ -1346,18 +1345,18 @@ READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 		   much time reading the inputs and won't have enough cycles to play two
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
-		if (++strobe_count > 4)
+		if (++m_strobe_count > 4)
 		{
-			strobe_count = 0;
-			strobe ^= 0x40;
-			if (strobe == 0)
+			m_strobe_count = 0;
+			m_strobe ^= 0x40;
+			if (m_strobe == 0)
 			{
-				input_count = (input_count + 1) % 5;
-				if (input_count == 3) res |= 0x10;
+				m_input_count = (m_input_count + 1) % 5;
+				if (m_input_count == 3) res |= 0x10;
 			}
 		}
 
-		res |= strobe;
+		res |= m_strobe;
 
 		return res;
 	}
@@ -1365,6 +1364,9 @@ READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 
 DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 {
+	m_input_count = 0;
+	m_strobe = 0;
+	m_strobe_count = 0;
 	namcos1_driver_init(NULL);
 	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::berabohm_buttons_r), this));
 }
@@ -1380,11 +1382,10 @@ DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 READ8_MEMBER( namcos1_state::faceoff_inputs_r )
 {
 	int res;
-	static int input_count, strobe_count, stored_input[2];
 
 	if (offset == 0)
 	{
-		res = (ioport("CONTROL0")->read() & 0x80) | stored_input[0];
+		res = (ioport("CONTROL0")->read() & 0x80) | m_stored_input[0];
 
 		return res;
 	}
@@ -1396,39 +1397,39 @@ READ8_MEMBER( namcos1_state::faceoff_inputs_r )
 		   much time reading the inputs and won't have enough cycles to play two
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
-		if (++strobe_count > 8)
+		if (++m_strobe_count > 8)
 		{
-			strobe_count = 0;
+			m_strobe_count = 0;
 
-			res |= input_count;
+			res |= m_input_count;
 
-			switch (input_count)
+			switch (m_input_count)
 			{
 				case 0:
-					stored_input[0] = ioport("IN0")->read() & 0x1f;
-					stored_input[1] = (ioport("IN3")->read() & 0x07) << 3;
+					m_stored_input[0] = ioport("IN0")->read() & 0x1f;
+					m_stored_input[1] = (ioport("IN3")->read() & 0x07) << 3;
 					break;
 
 				case 3:
-					stored_input[0] = ioport("IN2")->read() & 0x1f;
+					m_stored_input[0] = ioport("IN2")->read() & 0x1f;
 					break;
 
 				case 4:
-					stored_input[0] = ioport("IN1")->read() & 0x1f;
-					stored_input[1] = ioport("IN3")->read() & 0x18;
+					m_stored_input[0] = ioport("IN1")->read() & 0x1f;
+					m_stored_input[1] = ioport("IN3")->read() & 0x18;
 					break;
 
 				default:
-					stored_input[0] = 0x1f;
-					stored_input[1] = 0x1f;
+					m_stored_input[0] = 0x1f;
+					m_stored_input[1] = 0x1f;
 					break;
 			}
 
-			input_count = (input_count + 1) & 7;
+			m_input_count = (m_input_count + 1) & 7;
 		}
 		else
 		{
-			res |= 0x40 | stored_input[1];
+			res |= 0x40 | m_stored_input[1];
 		}
 
 		return res;
@@ -1437,6 +1438,11 @@ READ8_MEMBER( namcos1_state::faceoff_inputs_r )
 
 DRIVER_INIT_MEMBER(namcos1_state,faceoff)
 {
+	m_input_count = 0;
+	m_strobe_count = 0;
+	m_stored_input[0] = 0;
+	m_stored_input[1] = 0;
+
 	namcos1_driver_init(NULL);
 	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
 }
