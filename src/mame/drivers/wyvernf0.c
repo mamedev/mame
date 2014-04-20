@@ -496,7 +496,9 @@ static INPUT_PORTS_START( wyvernf0 )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )	// *
-	PORT_DIPUNKNOWN( 0x08, 0x08 )	// *
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) /* Music at every other title screen */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
