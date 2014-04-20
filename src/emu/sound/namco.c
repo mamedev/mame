@@ -34,7 +34,7 @@ const device_type NAMCO_15XX = &device_creator<namco_15xx_device>;
 const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
 
 namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, NAMCO, "Namco", tag, owner, clock, "namco", __FILE__),
+	: device_t(mconfig, type, name, tag, owner, clock, "namco", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_last_channel(NULL),
 		m_soundregs(NULL),
@@ -56,12 +56,12 @@ namco_device::namco_device(const machine_config &mconfig, const char *tag, devic
 }
 
 namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:namco_audio_device(mconfig, NAMCO, "Namco 15XX", tag, owner, clock, "namco 15xx", __FILE__)
+	:namco_audio_device(mconfig, NAMCO_15XX, "Namco 15XX", tag, owner, clock, "namco 15xx", __FILE__)
 {
 }
 
 namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: namco_audio_device(mconfig, NAMCO, "Namco CUS30", tag, owner, clock, "namco cus30", __FILE__)
+	: namco_audio_device(mconfig, NAMCO_CUS30, "Namco CUS30", tag, owner, clock, "namco cus30", __FILE__)
 {
 }
 
