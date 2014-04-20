@@ -1462,7 +1462,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
@@ -2368,7 +2368,7 @@ GAME( 1990, tfrceacj,  tfrceac,  segac2, tfrceac, segac2_state,  tfrceac,  ROT0,
 GAME( 1990, tfrceacb,  tfrceac,  segac2, tfrceac, segac2_state,  tfrceacb, ROT0,   "bootleg", "Thunder Force AC (bootleg)", 0 )
 
 GAME( 1990, borench,   0,        segac2, borench, segac2_state,  borench,  ROT0,   "Sega", "Borench (set 1)", 0 )
-GAME( 1990, borencha,  borench,  segac2, borench, segac2_state,  borench,  ROT0,   "Sega", "Borench (set 2)", GAME_NO_SOUND ) // why doesn't the sound play on this set?
+GAME( 1990, borencha,  borench,  segac2, borench, segac2_state,  borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
 
 GAME( 1991, twinsqua,  0,        segac2, twinsqua, segac2_state, twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
