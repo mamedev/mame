@@ -129,31 +129,30 @@ enum {
 
 
 #define COPRO_FIFOIN_SIZE   32000
-static int copro_fifoin_pop(device_t *device, UINT32 *result)
+bool model2_state::copro_fifoin_pop(device_t *device, UINT32 *result,UINT32 offset, UINT32 mem_mask)
 {
-	model2_state *state = device->machine().driver_data<model2_state>();
 	UINT32 r;
 
-	if (state->m_copro_fifoin_num == 0)
+	if (m_copro_fifoin_num == 0)
 	{
-		if (state->m_dsp_type == DSP_TYPE_TGP)
-			return 0;
+		if (m_dsp_type == DSP_TYPE_TGP)
+			return false;
 
 		fatalerror("Copro FIFOIN underflow (at %08X)\n", device->safe_pc());
-		return 0;
+		return false;
 	}
 
-	r = state->m_copro_fifoin_data[state->m_copro_fifoin_rpos++];
+	r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
 
-	if (state->m_copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
+	if (m_copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
 	{
-		state->m_copro_fifoin_rpos = 0;
+		m_copro_fifoin_rpos = 0;
 	}
 
-	state->m_copro_fifoin_num--;
-	if (state->m_dsp_type == DSP_TYPE_SHARC)
+	m_copro_fifoin_num--;
+	if (m_dsp_type == DSP_TYPE_SHARC)
 	{
-		if (state->m_copro_fifoin_num == 0)
+		if (m_copro_fifoin_num == 0)
 		{
 			dynamic_cast<adsp21062_device *>(device)->set_flag_input(0, ASSERT_LINE);
 		}
@@ -165,7 +164,7 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 
 	*result = r;
 
-	return 1;
+	return true;
 }
 
 READ_LINE_MEMBER(model2_state::copro_tgp_fifoin_pop_ok)
@@ -195,10 +194,9 @@ READ32_MEMBER(model2_state::copro_tgp_fifoin_pop)
 }
 
 
-static void copro_fifoin_push(device_t *device, UINT32 data)
+void model2_state::copro_fifoin_push(device_t *device, UINT32 data, UINT32 offset, UINT32 mem_mask)
 {
-	model2_state *state = device->machine().driver_data<model2_state>();
-	if (state->m_copro_fifoin_num == COPRO_FIFOIN_SIZE)
+	if (m_copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
 		fatalerror("Copro FIFOIN overflow (at %08X)\n", device->safe_pc());
 		return;
@@ -206,16 +204,16 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 
 	//printf("COPRO FIFOIN at %08X, %08X, %f\n", device->safe_pc(), data, *(float*)&data);
 
-	state->m_copro_fifoin_data[state->m_copro_fifoin_wpos++] = data;
-	if (state->m_copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
+	m_copro_fifoin_data[m_copro_fifoin_wpos++] = data;
+	if (m_copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
 	{
-		state->m_copro_fifoin_wpos = 0;
+		m_copro_fifoin_wpos = 0;
 	}
 
-	state->m_copro_fifoin_num++;
+	m_copro_fifoin_num++;
 
 	// clear FIFO empty flag on SHARC
-	if (state->m_dsp_type == DSP_TYPE_SHARC)
+	if (m_dsp_type == DSP_TYPE_SHARC)
 	{
 		dynamic_cast<adsp21062_device *>(device)->set_flag_input(0, CLEAR_LINE);
 	}
@@ -223,12 +221,11 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 
 
 #define COPRO_FIFOOUT_SIZE  32000
-static UINT32 copro_fifoout_pop(address_space &space)
+UINT32 model2_state::copro_fifoout_pop(address_space &space,UINT32 offset, UINT32 mem_mask)
 {
-	model2_state *state = space.machine().driver_data<model2_state>();
 	UINT32 r;
 
-	if (state->m_copro_fifoout_num == 0)
+	if (m_copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
 		downcast<i960_cpu_device &>(space.device()).i960_stall();
@@ -239,21 +236,21 @@ static UINT32 copro_fifoout_pop(address_space &space)
 		return 0;
 	}
 
-	r = state->m_copro_fifoout_data[state->m_copro_fifoout_rpos++];
+	r = m_copro_fifoout_data[m_copro_fifoout_rpos++];
 
-	if (state->m_copro_fifoout_rpos == COPRO_FIFOOUT_SIZE)
+	if (m_copro_fifoout_rpos == COPRO_FIFOOUT_SIZE)
 	{
-		state->m_copro_fifoout_rpos = 0;
+		m_copro_fifoout_rpos = 0;
 	}
 
-	state->m_copro_fifoout_num--;
+	m_copro_fifoout_num--;
 
 //  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,state->m_copro_fifoout_num);
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
-	if (state->m_dsp_type == DSP_TYPE_SHARC)
+	if (m_dsp_type == DSP_TYPE_SHARC)
 	{
-		if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+		if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
 			space.machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
 		}
@@ -266,11 +263,9 @@ static UINT32 copro_fifoout_pop(address_space &space)
 	return r;
 }
 
-static void copro_fifoout_push(device_t *device, UINT32 data)
+void model2_state::copro_fifoout_push(device_t *device, UINT32 data,UINT32 offset,UINT32 mem_mask)
 {
-	model2_state *state = device->machine().driver_data<model2_state>();
-	//if (state->m_copro_fifoout_wpos == state->m_copro_fifoout_rpos)
-	if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+	if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
 		fatalerror("Copro FIFOOUT overflow (at %08X)\n", device->safe_pc());
 		return;
@@ -278,18 +273,18 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 
 //  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,state->m_copro_fifoout_num);
 
-	state->m_copro_fifoout_data[state->m_copro_fifoout_wpos++] = data;
-	if (state->m_copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
+	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;
+	if (m_copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
 	{
-		state->m_copro_fifoout_wpos = 0;
+		m_copro_fifoout_wpos = 0;
 	}
 
-	state->m_copro_fifoout_num++;
+	m_copro_fifoout_num++;
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
-	if (state->m_dsp_type == DSP_TYPE_SHARC)
+	if (m_dsp_type == DSP_TYPE_SHARC)
 	{
-		if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+		if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
 			dynamic_cast<adsp21062_device *>(device)->set_flag_input(1, ASSERT_LINE);
 
@@ -736,15 +731,15 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 	if (m_dsp_type == DSP_TYPE_SHARC)
-		copro_fifoin_push(machine().device("dsp"), d);
+		copro_fifoin_push(machine().device("dsp"), d,offset,mem_mask);
 	else
-		copro_fifoin_push(machine().device("tgp"), d);
+		copro_fifoin_push(machine().device("tgp"), d,offset,mem_mask);
 }
 
 READ32_MEMBER(model2_state::copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop(space);
+	return copro_fifoout_pop(space,offset,mem_mask);
 }
 
 WRITE32_MEMBER(model2_state::copro_fifo_w)
@@ -769,9 +764,9 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 
 		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
-			copro_fifoin_push(machine().device("dsp"), data);
+			copro_fifoin_push(machine().device("dsp"), data,offset,mem_mask);
 		else
-			copro_fifoin_push(machine().device("tgp"), data);
+			copro_fifoin_push(machine().device("tgp"), data,offset,mem_mask);
 	}
 }
 
@@ -1122,7 +1117,7 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 	model2_check_irqack_state(data ^ 0xffffffff);
 }
 
-/* TODO: rewrite this part. */
+/* TODO: rewrite this part. It's a 8251-compatible chip */
 READ32_MEMBER(model2_state::model2_serial_r)
 {
 	if ((offset == 0) && (mem_mask == 0xffff0000))
@@ -1489,6 +1484,8 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE("workram")
+	// "extra" data
+	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("user1", 0x1000000)
 
 	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE(geo_r, geo_w)
 	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
@@ -1503,6 +1500,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
 	AM_RANGE(0x00980030, 0x0098003f) AM_READ8(tgpid_r,0xffffffff)
 
+	AM_RANGE(0x00e00000, 0x00e00037) AM_RAM // CPU control (wait-states)
 	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
 
 	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
@@ -1520,9 +1518,6 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
-
-	// "extra" data
-	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("user1", 0x1000000)
 
 	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE(mode_w)
 
@@ -1663,10 +1658,13 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x11200000, 0x112fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
 	AM_RANGE(0x11300000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
 	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM AM_SHARE("lumaram")     // polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM AM_SHARE("lumaram") // polygon "luma" RAM
 
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
+	AM_RANGE(0x01c00008, 0x01c0000b) AM_READNOP AM_WRITENOP
+	AM_RANGE(0x01c0000c, 0x01c0000f) AM_READNOP
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_unk_r )
@@ -1850,56 +1848,6 @@ static INPUT_PORTS_START( vcop )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) // <- one bit here enables "debug mode"
-
-	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
 
 	PORT_START("P1_X")
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
@@ -2198,16 +2146,19 @@ WRITE8_MEMBER(model2_state::scsp_irq)
 READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
 	UINT32 result = 0;
+	bool type;
 	//osd_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
 
-	copro_fifoin_pop(machine().device("dsp"), &result);
+	type = copro_fifoin_pop(machine().device("dsp"), &result,offset,mem_mask);
+	if(type == false)
+		printf("Read from empty FIFO?\n");
 	return result;
 }
 
 WRITE32_MEMBER(model2_state::copro_sharc_output_fifo_w)
 {
 	//osd_printf_debug("SHARC FIFOOUT push %08X\n", data);
-	copro_fifoout_push(machine().device("dsp"), data);
+	copro_fifoout_push(machine().device("dsp"), data,offset,mem_mask);
 }
 
 READ32_MEMBER(model2_state::copro_sharc_buffer_r)
