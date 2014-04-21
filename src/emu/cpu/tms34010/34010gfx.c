@@ -106,13 +106,15 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 			SET_V_LOG(tms, 1);
 		}
 
+
 		/* clip Y */
 		diff = WSTART_Y(tms) - sy;
 		if (diff > 0)
 		{
-#if 1 // littlerb and megaphx do not work correctly with this enabled, see items dropping into playfield from top, battletoads however needs this logic, see screen after player select
-			if (srcaddr)
-				*srcaddr += diff * SPTCH(tms);
+#if 1
+			if (sy>=0)  // littlerb and megaphx need this check for many items leaving / entering the top of the playfield with negative sy coordinates eg. jam jars, keys in littlerb, player shots, stage 2/3 birds in megaphx.  battletoads requires the code to execute for positive sy co-ordinates eg. screen after player select
+				if (srcaddr)
+					*srcaddr += diff * SPTCH(tms);
 #endif
 			sy += diff;
 			SET_V_LOG(tms, 1);
