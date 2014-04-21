@@ -29922,8 +29922,8 @@ static const stepper_interface* sc4dnd_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step, // 12 pos
+	&starpointrm20_interface_48step, // 16 pos
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dnd)
@@ -29932,15 +29932,87 @@ DRIVER_INIT_MEMBER(sc4_state,sc4dnd)
 	m_reel_setup = sc4dnd_reel_configs;
 }
 
+
+INPUT_PORTS_START( sc4dnd )
+	PORT_INCLUDE( sc4_raw )
+	SC4_STANDARD_BLANK_DIPS
+
+	PORT_MODIFY("IN-1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold2") 
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold3")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold4")
+
+	PORT_MODIFY("IN-2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Cstake")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Transfer") 
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Refill")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+
+	PORT_MODIFY("IN-3") // the Stake key
+	PORT_DIPNAME( 0x1c, 0x00, "IN 3-2:4 (Stake Key)" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x14, "5" )
+	PORT_DIPSETTING(    0x18, "6" )
+	PORT_DIPSETTING(    0x1c, "7" )
+	
+	PORT_MODIFY("IN-6") // the %age key
+	PORT_DIPNAME( 0x0f, 0x00, "IN 6-0:3 (Percentage Key)" ) // (PERC1 6.0)
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "a" )
+	PORT_DIPSETTING(    0x0b, "b" )
+	PORT_DIPSETTING(    0x0c, "c" )
+	PORT_DIPSETTING(    0x0d, "d" )
+	PORT_DIPSETTING(    0x0e, "e" )
+	PORT_DIPSETTING(    0x0f, "f" )
+
+	PORT_MODIFY("IN-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("No Deal")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Deal")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("C Or B")
+
+	PORT_MODIFY("IN-20")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Green Button (Service?)") // next to the dips on the MB
+	PORT_DIPNAME( 0x0002, 0x0000, "Door Lock" ) // DORLOK20.1
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, "Service Door" ) // SERDOR20.2
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, "Cashbox Door" ) // CSHDOR20.3	
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, "Hopper DMP" ) // HOPDMP20.4
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( sc4dnd25 )
-	PORT_INCLUDE( sc4_base )
+	PORT_INCLUDE( sc4dnd )
+
 	PORT_MODIFY("IN-5")
 	PORT_DIPNAME( 0x0f, 0x0a, "Jackpot Key" ) // default to 25GBP key
 	SC4_JACKPOT_KEY_SETTINGS
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sc4dnd35 )
-	PORT_INCLUDE( sc4_base )
+	PORT_INCLUDE( sc4dnd )
+
 	PORT_MODIFY("IN-5")
 	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
 	SC4_JACKPOT_KEY_SETTINGS
