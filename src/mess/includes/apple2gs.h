@@ -14,6 +14,7 @@
 #include "includes/apple2.h"
 #include "sound/es5503.h"
 #include "machine/nvram.h"
+#include "cpu/g65816/g65816.h"
 #if RUN_ADB_MICRO
 #include "cpu/m6502/m5074x.h"
 #endif
@@ -102,7 +103,7 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<g65816_device> m_maincpu;
 	required_device<es5503_device> m_es5503;
 	required_device<applefdc_base_device> m_fdc;
 	#if RUN_ADB_MICRO

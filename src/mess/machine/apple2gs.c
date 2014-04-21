@@ -2002,7 +2002,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	apple2eplus_init_common(NULL);
 
 	/* set up Apple IIgs vectoring */
-	g65816_set_read_vector_callback(m_maincpu, read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));
+	m_maincpu->set_read_vector_callback(read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));
 
 	/* setup globals */
 	m_is_rom3 = true;

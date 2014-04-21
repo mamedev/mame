@@ -9,11 +9,11 @@
 
 
 #undef G65816_CALL_DEBUGGER
-#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(cpustate->device, x)
+#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(this, x)
 
-#define g65816_read_8(addr)             cpustate->program->read_byte(addr)
-#define g65816_write_8(addr,data)       cpustate->program->write_byte(addr,data)
-#define g65816_read_8_immediate(A)      cpustate->program->read_byte(A)
+#define g65816_read_8(addr)             m_program->read_byte(addr)
+#define g65816_write_8(addr,data)       m_program->write_byte(addr,data)
+#define g65816_read_8_immediate(A)      m_program->read_byte(A)
 #define g65816_jumping(A)
 #define g65816_branching(A)
 
@@ -66,101 +66,43 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ================================== CPU ================================= */
 /* ======================================================================== */
 
-/* CPU Structure */
-struct g65816i_cpu_struct
-{
-	uint a;             /* Accumulator */
-	uint b;             /* holds high byte of accumulator */
-	uint x;             /* Index Register X */
-	uint y;             /* Index Register Y */
-	uint s;             /* Stack Pointer */
-	uint pc;            /* Program Counter */
-	uint ppc;           /* Previous Program Counter */
-	uint pb;            /* Program Bank (shifted left 16) */
-	uint db;            /* Data Bank (shifted left 16) */
-	uint d;             /* Direct Register */
-	uint flag_e;        /* Emulation Mode Flag */
-	uint flag_m;        /* Memory/Accumulator Select Flag */
-	uint flag_x;        /* Index Select Flag */
-	uint flag_n;        /* Negative Flag */
-	uint flag_v;        /* Overflow Flag */
-	uint flag_d;        /* Decimal Mode Flag */
-	uint flag_i;        /* Interrupt Mask Flag */
-	uint flag_z;        /* Zero Flag (inverted) */
-	uint flag_c;        /* Carry Flag */
-	uint line_irq;      /* Status of the IRQ line */
-	uint line_nmi;      /* Status of the NMI line */
-	uint fastROM;       /* SNES specific */
-	uint ir;            /* Instruction Register */
-	uint irq_delay;     /* delay 1 instruction before checking irq */
-	device_irq_acknowledge_callback int_ack; /* Interrupt Acknowledge */
-	legacy_cpu_device *device;
-	address_space *program;
-	read8_delegate read_vector; /* Read vector override */
-	uint stopped;       /* Sets how the CPU is stopped */
-	void (*const *opcodes)(g65816i_cpu_struct *cpustate);
-	uint (*get_reg)(g65816i_cpu_struct *cpustate, int regnum);
-	void (*set_reg)(g65816i_cpu_struct *cpustate, int regnum, uint val);
-	void (*set_line)(g65816i_cpu_struct *cpustate, int line, int state);
-	int  (*execute)(g65816i_cpu_struct *cpustate, int cycles);
-	int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr);
-	uint source;
-	uint destination;
-	int ICount;
-	int cpu_type;
-	UINT8 rw8_cycles, rw16_cycles, rw24_cycles;
 
-	/* 5A22 specific registers */
-	UINT8 wrmpya, wrmpyb;
-	UINT16 rdmpy;
-	UINT16 wrdiv;
-	UINT8 dvdd;
-	UINT16 rddiv;
-};
+#define REGISTER_A      m_a     /* Accumulator */
+#define REGISTER_B      m_b     /* Accumulator hi byte */
+#define REGISTER_X      m_x     /* Index X Register */
+#define REGISTER_Y      m_y     /* Index Y Register */
+#define REGISTER_S      m_s     /* Stack Pointer */
+#define REGISTER_PC     m_pc        /* Program Counter */
+#define REGISTER_PPC        m_ppc       /* Previous Program Counter */
+#define REGISTER_PB     m_pb        /* Program Bank */
+#define REGISTER_DB     m_db        /* Data Bank */
+#define REGISTER_D      m_d     /* Direct Register */
+#define FLAG_E          m_flag_e    /* Emulation Mode Flag */
+#define FLAG_M          m_flag_m    /* Memory/Accumulator Select Flag */
+#define FLAG_X          m_flag_x    /* Index Select Flag */
+#define FLAG_N          m_flag_n    /* Negative Flag */
+#define FLAG_V          m_flag_v    /* Overflow Flag */
+#define FLAG_D          m_flag_d    /* Decimal Mode Flag */
+#define FLAG_I          m_flag_i    /* Interrupt Mask Flag */
+#define FLAG_Z          m_flag_z    /* Zero Flag (inverted) */
+#define FLAG_C          m_flag_c    /* Carry Flag */
+#define LINE_IRQ        m_line_irq  /* Status of the IRQ line */
+#define LINE_NMI        m_line_nmi  /* Status of the NMI line */
+#define REGISTER_IR     m_ir        /* Instruction Register */
+#define INT_ACK         m_int_ack   /* Interrupt Acknowledge function pointer */
+#define READ_VECTOR     m_read_vector   /* Vector reading override */
+#define CLOCKS          m_ICount        /* Clock cycles remaining */
+#define IRQ_DELAY       m_irq_delay /* Delay 1 instruction before checking IRQ */
+#define CPU_STOPPED         m_stopped   /* Stopped status of the CPU */
 
-extern void (*const *const g65816i_opcodes[])(g65816i_cpu_struct *cpustate);
-extern uint (*const g65816i_get_reg[])(g65816i_cpu_struct *cpustate, int regnum);
-extern void (*const g65816i_set_reg[])(g65816i_cpu_struct *cpustate, int regnum, uint val);
-extern void (*const g65816i_set_line[])(g65816i_cpu_struct *cpustate, int line, int state);
-extern int (*const g65816i_execute[])(g65816i_cpu_struct *cpustate, int cycles);
-extern int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr);
+#define FTABLE_OPCODES  m_opcodes
+#define FTABLE_GET_REG  m_get_reg
+#define FTABLE_SET_REG  m_set_reg
+#define FTABLE_SET_LINE m_set_line
+#define FTABLE_EXECUTE  m_execute
 
-#define REGISTER_A      cpustate->a     /* Accumulator */
-#define REGISTER_B      cpustate->b     /* Accumulator hi byte */
-#define REGISTER_X      cpustate->x     /* Index X Register */
-#define REGISTER_Y      cpustate->y     /* Index Y Register */
-#define REGISTER_S      cpustate->s     /* Stack Pointer */
-#define REGISTER_PC     cpustate->pc        /* Program Counter */
-#define REGISTER_PPC        cpustate->ppc       /* Previous Program Counter */
-#define REGISTER_PB     cpustate->pb        /* Program Bank */
-#define REGISTER_DB     cpustate->db        /* Data Bank */
-#define REGISTER_D      cpustate->d     /* Direct Register */
-#define FLAG_E          cpustate->flag_e    /* Emulation Mode Flag */
-#define FLAG_M          cpustate->flag_m    /* Memory/Accumulator Select Flag */
-#define FLAG_X          cpustate->flag_x    /* Index Select Flag */
-#define FLAG_N          cpustate->flag_n    /* Negative Flag */
-#define FLAG_V          cpustate->flag_v    /* Overflow Flag */
-#define FLAG_D          cpustate->flag_d    /* Decimal Mode Flag */
-#define FLAG_I          cpustate->flag_i    /* Interrupt Mask Flag */
-#define FLAG_Z          cpustate->flag_z    /* Zero Flag (inverted) */
-#define FLAG_C          cpustate->flag_c    /* Carry Flag */
-#define LINE_IRQ        cpustate->line_irq  /* Status of the IRQ line */
-#define LINE_NMI        cpustate->line_nmi  /* Status of the NMI line */
-#define REGISTER_IR     cpustate->ir        /* Instruction Register */
-#define INT_ACK         cpustate->int_ack   /* Interrupt Acknowledge function pointer */
-#define READ_VECTOR     cpustate->read_vector   /* Vector reading override */
-#define CLOCKS          cpustate->ICount        /* Clock cycles remaining */
-#define IRQ_DELAY       cpustate->irq_delay /* Delay 1 instruction before checking IRQ */
-#define CPU_STOPPED         cpustate->stopped   /* Stopped status of the CPU */
-
-#define FTABLE_OPCODES  cpustate->opcodes
-#define FTABLE_GET_REG  cpustate->get_reg
-#define FTABLE_SET_REG  cpustate->set_reg
-#define FTABLE_SET_LINE cpustate->set_line
-#define FTABLE_EXECUTE  cpustate->execute
-
-#define SRC             cpustate->source        /* Source Operand */
-#define DST             cpustate->destination   /* Destination Operand */
+#define SRC             m_source        /* Source Operand */
+#define DST             m_destination   /* Destination Operand */
 
 #define STOP_LEVEL_WAI  1
 #define STOP_LEVEL_STOP 2
@@ -170,17 +112,6 @@ extern int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr);
 #define EXECUTION_MODE_M1X0 2
 #define EXECUTION_MODE_M1X1 3
 #define EXECUTION_MODE_E    4
-
-INLINE void g65816i_set_execution_mode(g65816i_cpu_struct *cpustate, uint mode)
-{
-	FTABLE_OPCODES = g65816i_opcodes[mode];
-	FTABLE_GET_REG = g65816i_get_reg[mode];
-	FTABLE_SET_REG = g65816i_set_reg[mode];
-	FTABLE_SET_LINE = g65816i_set_line[mode];
-	FTABLE_EXECUTE = g65816i_execute[mode];
-}
-
-
 
 #define VECTOR_RESET    0xfffc      /* Reset */
 #define VECTOR_IRQ_E    0xfffe      /* Interrupt Request */
@@ -201,14 +132,14 @@ INLINE void g65816i_set_execution_mode(g65816i_cpu_struct *cpustate, uint mode)
 /* ======================================================================== */
 
 #define CLK_OP          1
-#define CLK_R8          cpustate->rw8_cycles
-#define CLK_R16         cpustate->rw16_cycles
-#define CLK_R24         cpustate->rw24_cycles
-#define CLK_W8          cpustate->rw8_cycles
-#define CLK_W16         cpustate->rw16_cycles
-#define CLK_W24         cpustate->rw24_cycles
-#define CLK_RMW8        cpustate->rw8_cycles+cpustate->rw8_cycles + 1
-#define CLK_RMW16       cpustate->rw16_cycles+cpustate->rw16_cycles + 1
+#define CLK_R8          m_rw8_cycles
+#define CLK_R16         m_rw16_cycles
+#define CLK_R24         m_rw24_cycles
+#define CLK_W8          m_rw8_cycles
+#define CLK_W16         m_rw16_cycles
+#define CLK_W24         m_rw24_cycles
+#define CLK_RMW8        m_rw8_cycles+m_rw8_cycles + 1
+#define CLK_RMW16       m_rw16_cycles+m_rw16_cycles + 1
 
 #define CLK_IMPLIED     1
 #define CLK_IMPLIED     1
@@ -253,7 +184,7 @@ INLINE void g65816i_set_execution_mode(g65816i_cpu_struct *cpustate, uint mode)
 #define CLK_W_S         2
 #define CLK_W_SIY       5
 
-#define CLK(A)          CLOCKS -= (cpustate->cpu_type == CPU_TYPE_G65816 ? A : A*6)
+#define CLK(A)          CLOCKS -= (m_cpu_type == CPU_TYPE_G65816 ? A : A*6)
 #define CLK_BUS(A)      CLOCKS -= A
 #define USE_ALL_CLKS()  CLOCKS = 0
 
