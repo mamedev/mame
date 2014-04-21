@@ -410,10 +410,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 #define AM_MIRROR(_mirror) \
 	curentry->set_mirror(_mirror);
 
-// legacy space reads
-#define AM_READ_LEGACY(_handler) \
-	curentry->set_handler(_handler, #_handler);
-
 // legacy space writes
 #define AM_WRITE_LEGACY(_handler) \
 	curentry->set_handler(_handler, #_handler);
@@ -437,10 +433,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 // legacy device reads/writes
 #define AM_DEVREADWRITE_LEGACY(_tag, _rhandler, _whandler) \
 	curentry->set_handler(device, read_delegate(&_rhandler, #_rhandler, _tag, (device_t *)0), write_delegate(&_whandler, #_whandler, _tag, (device_t *)0));
-#define AM_DEVREADWRITE8_LEGACY(_tag, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, read8_delegate(&_rhandler, #_rhandler, _tag, (device_t *)0), write8_delegate(&_whandler, #_whandler, _tag, (device_t *)0), _unitmask);
-#define AM_DEVREADWRITE16_LEGACY(_tag, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, read16_delegate(&_rhandler, #_rhandler, _tag, (device_t *)0), write16_delegate(&_whandler, #_whandler, _tag, (device_t *)0), _unitmask);
 
 // driver data reads
 #define AM_READ(_handler) \
