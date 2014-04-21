@@ -6,9 +6,19 @@ Goldstar FC-100 (FC stands for Famicom)
 
 2014/04/20 Skeleton driver.
 
+Known chips: M5C6847P, AY-3-8910, 8251. XTALS 7.15909, 4.9152
+
 No manuals or schematics available.
 Shift-Run to BREAK out of CLOAD.
 Cassette uses the uart.
+
+
+Test of semigraphic 6
+10 SCREEN 2:CLS
+20 FOR I=0 TO 360
+30 PSET(128+SIN(I)*90,91-COS(I)*90), 1
+40 NEXT
+
 
 TODO:
 - Cassette frequencies are guesses, need to be verified
@@ -38,7 +48,7 @@ public:
 	fc100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_s68047p(*this, "s68047p")
+		, m_vdg(*this, "vdg")
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
 		, m_uart(*this, "uart")
@@ -78,7 +88,7 @@ private:
 	UINT8 m_kbd_count;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<s68047_device> m_s68047p;
+	required_device<mc6847_base_device> m_vdg;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	required_device<i8251_device> m_uart;
@@ -126,7 +136,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( fc100 )
 	PORT_START("00")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_NAME("Graph") // does nothing
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Ctrl")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Caps")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("[") PORT_CHAR('[') PORT_CHAR('{')
@@ -255,12 +265,12 @@ WRITE8_MEMBER( fc100_state::ay_port_a_w )
 	m_gm0 = BIT(data, 3);
 	m_css = m_ag;
 
-	m_s68047p->ag_w( m_ag ? ASSERT_LINE : CLEAR_LINE );
-	m_s68047p->gm2_w( m_gm2 ? ASSERT_LINE : CLEAR_LINE );
-	m_s68047p->gm1_w( m_gm1 ? ASSERT_LINE : CLEAR_LINE );
-	m_s68047p->gm0_w( m_gm0 ? ASSERT_LINE : CLEAR_LINE );
-	m_s68047p->css_w( m_css ? ASSERT_LINE : CLEAR_LINE );
-	m_s68047p->hack_black_becomes_blue( BIT(data, 1) );
+	m_vdg->ag_w( m_ag ? ASSERT_LINE : CLEAR_LINE );
+	m_vdg->gm2_w( m_gm2 ? ASSERT_LINE : CLEAR_LINE );
+	m_vdg->gm1_w( m_gm1 ? ASSERT_LINE : CLEAR_LINE );
+	m_vdg->gm0_w( m_gm0 ? ASSERT_LINE : CLEAR_LINE );
+	m_vdg->css_w( m_css ? ASSERT_LINE : CLEAR_LINE );
+	m_vdg->hack_black_becomes_blue( BIT(data, 1) );
 }
 
 
@@ -305,7 +315,10 @@ READ8_MEMBER( fc100_state::mc6847_videoram_r )
 	UINT8 data = m_p_videoram[offset];
 	UINT8 attr = m_p_videoram[offset+0x200];
 
-	m_s68047p->inv_w( BIT( attr, 0 ));
+	// unknown bits 1,2,4,7
+	m_vdg->inv_w( BIT( attr, 0 ));
+	m_vdg->css_w( BIT( attr, 1)); // guess
+	m_vdg->as_w( BIT( attr, 6 ));
 
 	return data;
 }
@@ -468,8 +481,8 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CPU_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_MC6847_ADD("s68047p", S68047, XTAL_7_15909MHz/3, fc100_mc6847_interface )  // Clock not verified
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
+	MCFG_MC6847_ADD("vdg", MC6847_NTSC, XTAL_7_15909MHz/3, fc100_mc6847_interface )  // Clock not verified
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("f4palette")
 
