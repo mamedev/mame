@@ -288,6 +288,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
 	MCFG_CPU_IO_MAP( cybikov1_io )
+
 	// screen
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -323,6 +324,7 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem )
 	MCFG_CPU_IO_MAP(cybikov2_io )
+
 	// machine
 	MCFG_SST_39VF020_ADD("flash2")
 
@@ -337,6 +339,11 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL_18_432MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )
 	MCFG_CPU_IO_MAP(cybikoxt_io )
+
+	// setup loopback
+	MCFG_DEVICE_MODIFY("maincpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("sci1", h8_sci_device, rx_w));
+
 	// machine
 	MCFG_DEVICE_REMOVE("flash1")
 	MCFG_SST_39VF400A_ADD("flashxt")	
@@ -349,7 +356,6 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_DEVICE_REMOVE("quickload")
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybikoxt, "bin,nv", 0)
 MACHINE_CONFIG_END
-
 
 /////////
 // ROM //
