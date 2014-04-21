@@ -239,8 +239,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_acia6850_0(*this, "acia6850_2"),
-		m_acia6850_1(*this, "acia6850_2"),
+		m_acia6850_0(*this, "acia6850_0"),
+		m_acia6850_1(*this, "acia6850_1"),
 		m_acia6850_2(*this, "acia6850_2"),
 		m_upd7759(*this, "upd"),
 		m_palette(*this, "palette")
