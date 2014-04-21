@@ -24,25 +24,15 @@
 //**************************************************************************
 
 // macros for a timer callback functions
-#define TIMER_DEVICE_CALLBACK(name)     void name(device_t *, timer_device &timer, void *ptr, INT32 param)
 #define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, INT32 param)
 
 //**************************************************************************
 //  TIMER DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TIMER_ADD(_tag, _callback) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_callback, #_callback));
 #define MCFG_TIMER_ADD_NONE(_tag) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
 	timer_device::static_configure_generic(*device, timer_device_expired_delegate());
-#define MCFG_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_callback, #_callback), _period);
-#define MCFG_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_callback, #_callback), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
 	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
@@ -64,8 +54,6 @@
 #define MCFG_TIMER_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
-#define MCFG_TIMER_CALLBACK(_callback) \
-	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_callback, #_callback));
 #define MCFG_TIMER_DRIVER_CALLBACK(_class, _callback) \
 	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
 #define MCFG_TIMER_START_DELAY(_start_delay) \

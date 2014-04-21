@@ -450,6 +450,11 @@ public:
 
 	/* DSK board */
 	DECLARE_WRITE32_MEMBER(hddsk_update_pif);
+
+	/* DS III/IV board */
+	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER( ds3xdsp_internal_timer_callback );
+	
 };
 
 
@@ -459,9 +464,6 @@ public:
 void hdgsp_irq_gen(device_t *device, int state);
 void hdmsp_irq_gen(device_t *device, int state);
 
-/* DS III/IV board */
-TIMER_DEVICE_CALLBACK( ds3sdsp_internal_timer_callback );
-TIMER_DEVICE_CALLBACK( ds3xdsp_internal_timer_callback );
 
 
 /*----------- defined in video/harddriv.c -----------*/

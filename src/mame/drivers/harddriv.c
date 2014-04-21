@@ -1424,13 +1424,13 @@ static MACHINE_CONFIG_FRAGMENT( ds3 )
 	MCFG_ADSP21XX_CONFIG(ds3sdsp_config)
 	MCFG_CPU_PROGRAM_MAP(ds3sdsp_program_map)
 	MCFG_CPU_DATA_MAP(ds3sdsp_data_map)
-	MCFG_TIMER_ADD("ds3sdsp_timer", ds3sdsp_internal_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("ds3sdsp_timer", harddriv_state, ds3sdsp_internal_timer_callback)
 
 	MCFG_CPU_ADD("ds3xdsp", ADSP2105, XTAL_10MHz)
 	MCFG_ADSP21XX_CONFIG(ds3xdsp_config)
 	MCFG_CPU_PROGRAM_MAP(ds3xdsp_program_map)
 	MCFG_CPU_DATA_MAP(ds3xdsp_data_map)
-	MCFG_TIMER_ADD("ds3xdsp_timer", ds3xdsp_internal_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("ds3xdsp_timer", harddriv_state, ds3xdsp_internal_timer_callback)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

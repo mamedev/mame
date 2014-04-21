@@ -205,6 +205,9 @@ public:
 	DECLARE_DRIVER_INIT(vbowl);
 	DECLARE_DRIVER_INIT(vbowlj);
 	DECLARE_DRIVER_INIT(ryukobou);
+	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);	
 	virtual void video_start();
 	UINT32 screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);
@@ -3950,18 +3953,16 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 MACHINE_CONFIG_END
 
 
-static TIMER_DEVICE_CALLBACK ( lev5_timer_irq_cb )
+TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
 {
-	igs011_state *state = timer.machine().driver_data<igs011_state>();
-
-	state->m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgnwrld)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -3982,30 +3983,27 @@ INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
 	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK ( lhb_timer_irq_cb )
+TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
 {
-	igs011_state *state = timer.machine().driver_data<igs011_state>();
-	if (!state->m_lhb_irq_enable)
+	if (!m_lhb_irq_enable)
 		return;
 
-	state->m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, lhb_vblank_irq)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lhb_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lhb_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 	// irq 3 points to an apparently unneeded routine
 MACHINE_CONFIG_END
 
 
 
-static TIMER_DEVICE_CALLBACK ( lev3_timer_irq_cb )
+TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
 {
-	igs011_state *state = timer.machine().driver_data<igs011_state>();
-
-	state->m_maincpu->set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 
@@ -4013,7 +4011,7 @@ static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wlcc)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
 
@@ -4022,7 +4020,7 @@ static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xymg)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
 
@@ -4031,7 +4029,7 @@ static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb2)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
@@ -4045,7 +4043,7 @@ static MACHINE_CONFIG_DERIVED( nkishusp, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nkishusp)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
@@ -4066,7 +4064,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vbowl)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 

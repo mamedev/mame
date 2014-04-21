@@ -1223,18 +1223,16 @@ WRITE16_MEMBER( harddriv_state::hdds3_xdsp_control_w )
 	}
 }
 
-TIMER_DEVICE_CALLBACK( ds3sdsp_internal_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( harddriv_state::ds3sdsp_internal_timer_callback )
 {
-	harddriv_state *state = timer.machine().driver_data<harddriv_state>();
+	UINT16 period = m_ds3sdsp_regs[0x1d];
+	UINT16 scale = m_ds3sdsp_regs[0x1b] + 1;
 
-	UINT16 period = state->m_ds3sdsp_regs[0x1d];
-	UINT16 scale = state->m_ds3sdsp_regs[0x1b] + 1;
-
-	state->m_ds3sdsp_internal_timer->adjust(state->m_ds3sdsp->cycles_to_attotime(period * scale));
+	m_ds3sdsp_internal_timer->adjust(m_ds3sdsp->cycles_to_attotime(period * scale));
 
 	/* the IRQ line is edge triggered */
-	state->m_ds3sdsp->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
-	state->m_ds3sdsp->set_input_line(ADSP2105_TIMER, CLEAR_LINE);
+	m_ds3sdsp->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
+	m_ds3sdsp->set_input_line(ADSP2105_TIMER, CLEAR_LINE);
 }
 
 
@@ -1260,18 +1258,16 @@ WRITE_LINE_MEMBER(harddriv_state::hdds3sdsp_timer_enable_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK( ds3xdsp_internal_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( harddriv_state::ds3xdsp_internal_timer_callback )
 {
-	harddriv_state *state = timer.machine().driver_data<harddriv_state>();
+	UINT16 period = m_ds3xdsp_regs[0x1d];
+	UINT16 scale = m_ds3xdsp_regs[0x1b] + 1;
 
-	UINT16 period = state->m_ds3xdsp_regs[0x1d];
-	UINT16 scale = state->m_ds3xdsp_regs[0x1b] + 1;
-
-	state->m_ds3xdsp_internal_timer->adjust(state->m_ds3xdsp->cycles_to_attotime(period * scale));
+	m_ds3xdsp_internal_timer->adjust(m_ds3xdsp->cycles_to_attotime(period * scale));
 
 	/* the IRQ line is edge triggered */
-	state->m_ds3xdsp->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
-	state->m_ds3xdsp->set_input_line(ADSP2105_TIMER, CLEAR_LINE);
+	m_ds3xdsp->set_input_line(ADSP2105_TIMER, ASSERT_LINE);
+	m_ds3xdsp->set_input_line(ADSP2105_TIMER, CLEAR_LINE);
 }
 
 
