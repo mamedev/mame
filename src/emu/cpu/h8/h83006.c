@@ -233,6 +233,10 @@ void h83006_device::internal_update(UINT64 current_time)
 	add_event(event_time, sci0->internal_update(current_time));
 	add_event(event_time, sci1->internal_update(current_time));
 	add_event(event_time, sci2->internal_update(current_time));
+	add_event(event_time, timer8_0->internal_update(current_time));
+	add_event(event_time, timer8_1->internal_update(current_time));
+	add_event(event_time, timer8_2->internal_update(current_time));
+	add_event(event_time, timer8_3->internal_update(current_time));
 	add_event(event_time, timer16_0->internal_update(current_time));
 	add_event(event_time, timer16_1->internal_update(current_time));
 	add_event(event_time, timer16_2->internal_update(current_time));

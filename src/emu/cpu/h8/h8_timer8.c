@@ -290,7 +290,7 @@ void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
 	}
 
 	if(event_delay != 0xffffffff)
-		event_time = ((((cur_time + clock_divider) >> clock_divider) + event_delay - 1) << clock_divider) + clock_divider/2;
+		event_time = ((((cur_time + clock_divider) / clock_divider) + event_delay - 1) * clock_divider) + clock_divider/2;
 	else
 		event_time = 0;
 

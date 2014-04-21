@@ -240,8 +240,10 @@ void h8_timer16_channel_device::update_counter(UINT64 cur_time)
 
 void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 {
-	if(!channel_active)
+	if(!channel_active) {
+		event_time = 0;
 		return;
+	}
 
 	bool update_cpu = cur_time == 0;
 	UINT64 old_event_time = event_time;
@@ -288,6 +290,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 				if(event_delay > new_delay)
 					event_delay = new_delay;
 			}
+
 		if(event_delay != 0xffffffff)
 			event_time = ((((cur_time + (1ULL << clock_divider) - phase) >> clock_divider) + event_delay - 1) << clock_divider) + phase;
 		else
