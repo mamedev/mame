@@ -16,7 +16,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_bufferram(*this, "bufferram"),
-		m_paletteram32(*this, "paletteram32"),
 		m_colorxlat(*this, "colorxlat"),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
@@ -37,7 +36,7 @@ public:
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
-	required_shared_ptr<UINT32> m_paletteram32;
+	UINT16 *m_palram;
 	required_shared_ptr<UINT32> m_colorxlat;
 	required_shared_ptr<UINT32> m_textureram0;
 	required_shared_ptr<UINT32> m_textureram1;
@@ -113,7 +112,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
-	DECLARE_WRITE32_MEMBER(pal32_w);
+	DECLARE_READ16_MEMBER(model2_palette_r);
+	DECLARE_WRITE16_MEMBER(model2_palette_w);
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);

@@ -2713,6 +2713,9 @@ VIDEO_START_MEMBER(model2_state,model2)
 
 	/* initialize the geometry engine */
 	geo_init( machine(), (UINT32*)memregion("user2")->base() );
+
+	/* init various video-related pointers */
+	m_palram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
 }
 
 UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2733,7 +2736,7 @@ UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &b
 	/* tell the rasterizer we're starting a frame */
 	model2_3d_frame_start(this);
 
-	/* let the geometry engine do it's thing */
+	/* let the geometry engine do it's thing */ /* TODO: don't do it here! */
 	geo_parse(this);
 
 	/* have the rasterizer output the frame */

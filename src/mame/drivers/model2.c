@@ -464,13 +464,15 @@ static void chcolor(palette_device &palette, pen_t color, UINT16 data)
 	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
-WRITE32_MEMBER(model2_state::pal32_w)
+WRITE16_MEMBER(model2_state::model2_palette_w)
 {
-	COMBINE_DATA(m_paletteram32 + offset);
-	if(ACCESSING_BITS_0_15)
-		chcolor(m_palette, offset * 2, m_paletteram32[offset]);
-	if(ACCESSING_BITS_16_31)
-		chcolor(m_palette, offset * 2 + 1, m_paletteram32[offset] >> 16);
+	COMBINE_DATA(&m_palram[offset]);
+	chcolor(m_palette, offset, m_palram[offset]);
+}
+
+READ16_MEMBER(model2_state::model2_palette_r)
+{
+	return m_palram[offset];
 }
 
 WRITE32_MEMBER(model2_state::ctrl0_w)
@@ -1512,7 +1514,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)        // Video synchronization switch
 	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE("tile", segas24_tile, char32_r, char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_SHARE("paletteram32")
+	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(model2_palette_r,model2_palette_w,0xffffffff)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_SHARE("colorxlat")
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
