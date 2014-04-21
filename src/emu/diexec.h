@@ -114,7 +114,7 @@ typedef device_delegate<void (device_t &)> device_interrupt_delegate;
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
 typedef device_delegate<int (device_t &, int)> device_irq_acknowledge_delegate;
-ATTR_DEPRECATED typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum);
+/*ATTR_DEPRECATED*/ typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum);
 
 
 
