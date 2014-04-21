@@ -285,11 +285,11 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, maxaflex_state )
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)    /* self test */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* game cartridge */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
 ADDRESS_MAP_END

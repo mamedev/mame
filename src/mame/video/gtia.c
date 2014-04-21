@@ -157,11 +157,11 @@ static int is_ntsc(running_machine &machine)
 static void gtia_reset(running_machine &machine)
 {
 	int i;
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	atari_common_state *state = machine.driver_data<atari_common_state>();
 
 	/* reset the GTIA read/write/helper registers */
 	for (i = 0; i < 32; i++)
-		atari_gtia_w(space,i,0);
+		state->atari_gtia_w(state->generic_space(),i,0);
 	memset(&gtia.r, 0, sizeof(gtia.r));
 	if (is_ntsc(machine))
 		gtia.r.pal = 0xff;
@@ -190,7 +190,7 @@ static void gtia_reset(running_machine &machine)
  *
  **************************************************************/
 
-READ8_HANDLER( atari_gtia_r )
+READ8_MEMBER( atari_common_state::atari_gtia_r )
 {
 	switch (offset & 31)
 	{
@@ -384,7 +384,7 @@ static void recalc_m3(void)
 
 
 
-WRITE8_HANDLER( atari_gtia_w )
+WRITE8_MEMBER( atari_common_state::atari_gtia_w )
 {
 	/* used for mixing hue/lum of different colors */
 //  static UINT8 lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;

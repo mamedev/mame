@@ -53,7 +53,7 @@ void antic_reset(void)
  * Read ANTIC hardware registers
  *
  **************************************************************/
-READ8_HANDLER ( atari_antic_r )
+READ8_MEMBER ( atari_common_state::atari_antic_r )
 {
 	UINT8 data = 0xff;
 
@@ -119,7 +119,7 @@ READ8_HANDLER ( atari_antic_r )
  *
  **************************************************************/
 
-WRITE8_HANDLER ( atari_antic_w )
+WRITE8_MEMBER ( atari_common_state::atari_antic_w )
 {
 	int temp;
 

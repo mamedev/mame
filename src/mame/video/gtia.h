@@ -134,8 +134,6 @@ struct gtia_struct
 extern gtia_struct gtia;
 
 void gtia_init(running_machine &machine, const gtia_interface *intf);
-DECLARE_READ8_HANDLER( atari_gtia_r );
-DECLARE_WRITE8_HANDLER( atari_gtia_w );
 
 ANTIC_RENDERER( gtia_mode_1_32 );
 ANTIC_RENDERER( gtia_mode_1_40 );

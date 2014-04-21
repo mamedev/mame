@@ -37,6 +37,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( a5200_interrupt );
 
 	DECLARE_PALETTE_INIT(atari);
+	
+	DECLARE_READ8_MEMBER( atari_gtia_r );
+	DECLARE_WRITE8_MEMBER( atari_gtia_w );
+	
+	DECLARE_READ8_MEMBER ( atari_antic_r );
+	DECLARE_WRITE8_MEMBER ( atari_antic_w );
 
 private:
 	UINT32 tv_artifacts ;
@@ -560,8 +566,6 @@ extern ANTIC antic;
 
 void antic_reset(void);
 
-	DECLARE_READ8_HANDLER ( atari_antic_r );
-DECLARE_WRITE8_HANDLER ( atari_antic_w );
 
 #define ANTIC_RENDERER(name) void name(address_space &space, VIDEO *video)
 
