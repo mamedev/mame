@@ -79,15 +79,9 @@ bitmap_ind16* ::x68k_get_gfx_page(int pri,int type)
 void x68k_state::x68k_crtc_text_copy(int src, int dest)
 {
 	// copys one raster in T-VRAM to another raster
-	UINT16* tvram;
 	int src_ram = src * 256;  // 128 bytes per scanline
 	int dest_ram = dest * 256;
 	int line;
-
-	if(m_is_32bit)
-		tvram = (UINT16*)m_tvram32.target();
-	else
-		tvram = (UINT16*)m_tvram16.target();
 
 	if(dest > 250)
 		return;  // for some reason, Salamander causes a SIGSEGV in a debug build in this function.
@@ -95,10 +89,10 @@ void x68k_state::x68k_crtc_text_copy(int src, int dest)
 	for(line=0;line<8;line++)
 	{
 		// update RAM in each plane
-		memcpy(tvram+dest_ram,tvram+src_ram,128);
-		memcpy(tvram+dest_ram+0x10000,tvram+src_ram+0x10000,128);
-		memcpy(tvram+dest_ram+0x20000,tvram+src_ram+0x20000,128);
-		memcpy(tvram+dest_ram+0x30000,tvram+src_ram+0x30000,128);
+		memcpy(m_tvram+dest_ram,m_tvram+src_ram,128);
+		memcpy(m_tvram+dest_ram+0x10000,m_tvram+src_ram+0x10000,128);
+		memcpy(m_tvram+dest_ram+0x20000,m_tvram+src_ram+0x20000,128);
+		memcpy(m_tvram+dest_ram+0x30000,m_tvram+src_ram+0x30000,128);
 
 		src_ram+=64;
 		dest_ram+=64;
@@ -437,10 +431,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
-			if(m_is_32bit)
-				memset(m_gvram32,0,0x40000);
-			else
-				memset(m_gvram16,0,0x40000);
+			memset(m_gvram,0,0x40000);
 			timer_set(attotime::from_msec(10), TIMER_X68K_CRTC_OPERATION_END, 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
@@ -481,7 +472,6 @@ READ16_MEMBER(x68k_state::x68k_crtc_r )
 
 WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 {
-	UINT16* gvram;
 //  int xloc,yloc,pageoffset;
 	/*
 	   G-VRAM usage is determined by colour depth and "real" screen size.
@@ -498,16 +488,11 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 	   Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
 	*/
 
-	if(m_is_32bit)
-		gvram = (UINT16*)m_gvram32.target();
-	else
-		gvram = (UINT16*)m_gvram16.target();
-
 	// handle different G-VRAM page setups
 	if(m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
 	{
 		if(offset < 0x40000)
-			COMBINE_DATA(gvram+offset);
+			COMBINE_DATA(m_gvram+offset);
 	}
 	else
 	{
@@ -515,34 +500,34 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 		{
 			case 0x0300:
 				if(offset < 0x40000)
-					COMBINE_DATA(gvram+offset);
+					COMBINE_DATA(m_gvram+offset);
 				break;
 			case 0x0100:
 				if(offset < 0x40000)
 				{
-					gvram[offset] = (gvram[offset] & 0xff00) | (data & 0x00ff);
+					m_gvram[offset] = (m_gvram[offset] & 0xff00) | (data & 0x00ff);
 				}
 				if(offset >= 0x40000 && offset < 0x80000)
 				{
-					gvram[offset-0x40000] = (gvram[offset-0x40000] & 0x00ff) | ((data & 0x00ff) << 8);
+					m_gvram[offset-0x40000] = (m_gvram[offset-0x40000] & 0x00ff) | ((data & 0x00ff) << 8);
 				}
 				break;
 			case 0x0000:
 				if(offset < 0x40000)
 				{
-					gvram[offset] = (gvram[offset] & 0xfff0) | (data & 0x000f);
+					m_gvram[offset] = (m_gvram[offset] & 0xfff0) | (data & 0x000f);
 				}
 				if(offset >= 0x40000 && offset < 0x80000)
 				{
-					gvram[offset-0x40000] = (gvram[offset-0x40000] & 0xff0f) | ((data & 0x000f) << 4);
+					m_gvram[offset-0x40000] = (m_gvram[offset-0x40000] & 0xff0f) | ((data & 0x000f) << 4);
 				}
 				if(offset >= 0x80000 && offset < 0xc0000)
 				{
-					gvram[offset-0x80000] = (gvram[offset-0x80000] & 0xf0ff) | ((data & 0x000f) << 8);
+					m_gvram[offset-0x80000] = (m_gvram[offset-0x80000] & 0xf0ff) | ((data & 0x000f) << 8);
 				}
 				if(offset >= 0xc0000 && offset < 0x100000)
 				{
-					gvram[offset-0xc0000] = (gvram[offset-0xc0000] & 0x0fff) | ((data & 0x000f) << 12);
+					m_gvram[offset-0xc0000] = (m_gvram[offset-0xc0000] & 0x0fff) | ((data & 0x000f) << 12);
 				}
 				break;
 			default:
@@ -553,13 +538,7 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 
 WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 {
-	UINT16* tvram;
 	UINT16 text_mask;
-
-	if(m_is_32bit)
-		tvram = (UINT16*)m_tvram32.target();
-	else
-		tvram = (UINT16*)m_tvram16.target();
 
 	text_mask = ~(m_crtc.reg[23]) & mem_mask;
 
@@ -577,54 +556,48 @@ WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 		{
 			if(wr & (1 << plane))
 			{
-				COMBINE_DATA(tvram+offset+(0x10000*plane));
+				COMBINE_DATA(m_tvram+offset+(0x10000*plane));
 			}
 		}
 	}
 	else
 	{
-		COMBINE_DATA(tvram+offset);
+		COMBINE_DATA(m_tvram+offset);
 	}
 }
 
 READ16_MEMBER(x68k_state::x68k_gvram_r )
 {
-	const UINT16* gvram;
 	UINT16 ret = 0;
 
-	if(m_is_32bit)
-		gvram = (const UINT16*)m_gvram32.target();
-	else
-		gvram = (const UINT16*)m_gvram16.target();
-
 	if(m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
-		return gvram[offset];
+		return m_gvram[offset];
 
 	switch(m_crtc.reg[20] & 0x0300)  // colour setup determines G-VRAM use
 	{
 		case 0x0300: // 65,536 colour (RGB) - 16-bits per word
 			if(offset < 0x40000)
-				ret = gvram[offset];
+				ret = m_gvram[offset];
 			else
 				ret = 0xffff;
 			break;
 		case 0x0100:  // 256 colour (paletted) - 8 bits per word
 			if(offset < 0x40000)
-				ret = gvram[offset] & 0x00ff;
+				ret = m_gvram[offset] & 0x00ff;
 			if(offset >= 0x40000 && offset < 0x80000)
-				ret = (gvram[offset-0x40000] & 0xff00) >> 8;
+				ret = (m_gvram[offset-0x40000] & 0xff00) >> 8;
 			if(offset >= 0x80000)
 				ret = 0xffff;
 			break;
 		case 0x0000:  // 16 colour (paletted) - 4 bits per word
 			if(offset < 0x40000)
-				ret = gvram[offset] & 0x000f;
+				ret = m_gvram[offset] & 0x000f;
 			if(offset >= 0x40000 && offset < 0x80000)
-				ret = (gvram[offset-0x40000] & 0x00f0) >> 4;
+				ret = (m_gvram[offset-0x40000] & 0x00f0) >> 4;
 			if(offset >= 0x80000 && offset < 0xc0000)
-				ret = (gvram[offset-0x80000] & 0x0f00) >> 8;
+				ret = (m_gvram[offset-0x80000] & 0x0f00) >> 8;
 			if(offset >= 0xc0000 && offset < 0x100000)
-				ret = (gvram[offset-0xc0000] & 0xf000) >> 12;
+				ret = (m_gvram[offset-0xc0000] & 0xf000) >> 12;
 			break;
 		default:
 			logerror("G-VRAM read while layer setup is undefined.\n");
@@ -636,62 +609,7 @@ READ16_MEMBER(x68k_state::x68k_gvram_r )
 
 READ16_MEMBER(x68k_state::x68k_tvram_r )
 {
-	const UINT16* tvram;
-
-	if(m_is_32bit)
-		tvram = (const UINT16*)m_tvram32.target();
-	else
-		tvram = (const UINT16*)m_tvram16.target();
-
-	return tvram[offset];
-}
-
-READ32_MEMBER(x68k_state::x68k_tvram32_r )
-{
-	UINT32 ret = 0;
-
-	if(ACCESSING_BITS_0_15)
-		ret |= (x68k_tvram_r(space,(offset*2)+1,0xffff));
-	if(ACCESSING_BITS_16_31)
-		ret |= x68k_tvram_r(space,offset*2,0xffff) << 16;
-
-	return ret;
-}
-
-READ32_MEMBER(x68k_state::x68k_gvram32_r )
-{
-	UINT32 ret = 0;
-
-	if(ACCESSING_BITS_0_15)
-		ret |= x68k_gvram_r(space,offset*2+1,0xffff);
-	if(ACCESSING_BITS_16_31)
-		ret |= x68k_gvram_r(space,offset*2,0xffff) << 16;
-
-	return ret;
-}
-
-WRITE32_MEMBER(x68k_state::x68k_tvram32_w )
-{
-	if(ACCESSING_BITS_0_7)
-		x68k_tvram_w(space,(offset*2)+1,data,0x00ff);
-	if(ACCESSING_BITS_8_15)
-		x68k_tvram_w(space,(offset*2)+1,data,0xff00);
-	if(ACCESSING_BITS_16_23)
-		x68k_tvram_w(space,offset*2,data >> 16,0x00ff);
-	if(ACCESSING_BITS_24_31)
-		x68k_tvram_w(space,offset*2,data >> 16,0xff00);
-}
-
-WRITE32_MEMBER(x68k_state::x68k_gvram32_w )
-{
-	if(ACCESSING_BITS_0_7)
-		x68k_gvram_w(space,(offset*2)+1,data,0x00ff);
-	if(ACCESSING_BITS_8_15)
-		x68k_gvram_w(space,(offset*2)+1,data,0xff00);
-	if(ACCESSING_BITS_16_23)
-		x68k_gvram_w(space,offset*2,data >> 16,0x00ff);
-	if(ACCESSING_BITS_24_31)
-		x68k_gvram_w(space,offset*2,data >> 16,0xff00);
+	return m_tvram[offset];
 }
 
 WRITE16_MEMBER(x68k_state::x68k_spritereg_w )
@@ -780,16 +698,10 @@ READ16_MEMBER(x68k_state::x68k_spriteram_r )
 
 void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect)
 {
-	const UINT16* tvram;
 	unsigned int line,pixel; // location on screen
 	UINT32 loc;  // location in TVRAM
 	UINT32 colour;
 	int bit;
-
-	if(m_is_32bit)
-		tvram = (const UINT16*)m_tvram32.target();
-	else
-		tvram = (const UINT16*)m_tvram16.target();
 
 	for(line=rect.min_y;line<=rect.max_y;line++)  // per scanline
 	{
@@ -800,10 +712,10 @@ void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectan
 		bit = 15 - (xscr & 0x0f);
 		for(pixel=rect.min_x;pixel<=rect.max_x;pixel++)  // per pixel
 		{
-			colour = (((tvram[loc] >> bit) & 0x01) ? 1 : 0)
-				+ (((tvram[loc+0x10000] >> bit) & 0x01) ? 2 : 0)
-				+ (((tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
-				+ (((tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
+			colour = (((m_tvram[loc] >> bit) & 0x01) ? 1 : 0)
+				+ (((m_tvram[loc+0x10000] >> bit) & 0x01) ? 2 : 0)
+				+ (((m_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
+				+ (((m_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
 			if(m_video.text_pal[colour] != 0x0000)  // any colour but black
 			{
 				// Colour 0 is displayable if the text layer is at the priority level 2
@@ -826,7 +738,6 @@ void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectan
 
 void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
 {
-	const UINT16* gvram;
 	int pixel;
 	int page;
 	UINT32 loc;  // location in GVRAM
@@ -835,11 +746,6 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 	UINT16 colour = 0;
 	int shift;
 	int scanline;
-
-	if(m_is_32bit)
-		gvram = (const UINT16*)m_gvram32.target();
-	else
-		gvram = (const UINT16*)m_gvram16.target();
 
 	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)  // per scanline
 	{
@@ -857,16 +763,16 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					switch(lineoffset & 0xc0000)
 					{
 					case 0x00000:
-						colour = gvram[lineoffset + (loc & 0x3ff)] & 0x000f;
+						colour = m_gvram[lineoffset + (loc & 0x3ff)] & 0x000f;
 						break;
 					case 0x40000:
-						colour = (gvram[(lineoffset - 0x40000) + (loc & 0x3ff)] & 0x00f0) >> 4;
+						colour = (m_gvram[(lineoffset - 0x40000) + (loc & 0x3ff)] & 0x00f0) >> 4;
 						break;
 					case 0x80000:
-						colour = (gvram[(lineoffset - 0x80000) + (loc & 0x3ff)] & 0x0f00) >> 8;
+						colour = (m_gvram[(lineoffset - 0x80000) + (loc & 0x3ff)] & 0x0f00) >> 8;
 						break;
 					case 0xc0000:
-						colour = (gvram[(lineoffset - 0xc0000) + (loc & 0x3ff)] & 0xf000) >> 12;
+						colour = (m_gvram[(lineoffset - 0xc0000) + (loc & 0x3ff)] & 0xf000) >> 12;
 						break;
 					}
 					if(colour != 0)
@@ -892,7 +798,7 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					shift = 4;
 					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
-						colour = ((gvram[lineoffset + loc] >> page*shift) & 0x000f);
+						colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
 						if(colour != 0)
 							bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour & 0x0f] >> 1);
 						loc++;
@@ -909,7 +815,7 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 						shift = 4;
 						for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 						{
-							colour = ((gvram[lineoffset + loc] >> page*shift) & 0x00ff);
+							colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
 							if(colour != 0)
 								bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour & 0xff] >> 1);
 							loc++;
@@ -924,7 +830,7 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					loc = xscr & 0x1ff;
 					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
-						colour = gvram[lineoffset + loc];
+						colour = m_gvram[lineoffset + loc];
 						if(colour != 0)
 							bitmap.pix16(scanline, pixel) = 512 + (colour >> 1);
 						loc++;

@@ -70,6 +70,7 @@ void serial_keyboard_device::device_reset()
 	output_dcd(0);
 	output_dsr(0);
 	output_cts(0);
+	receive_register_reset();
 }
 
 void serial_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

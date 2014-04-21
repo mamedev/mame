@@ -59,12 +59,6 @@ public:
 			m_scc(*this, "scc"),
 			m_ym2151(*this, "ym2151"),
 			m_ppi(*this, "ppi8255"),
-			m_nvram16(*this, "nvram16"),
-			m_nvram32(*this, "nvram32"),
-			m_gvram16(*this, "gvram16"),
-			m_tvram16(*this, "tvram16"),
-			m_gvram32(*this, "gvram32"),
-			m_tvram32(*this, "tvram32"),
 			m_options(*this, "options"),
 			m_mouse1(*this, "mouse1"), 
 			m_mouse2(*this, "mouse2"), 
@@ -75,7 +69,11 @@ public:
 			m_joy2(*this, "joy2"),
 			m_md3b(*this, "md3b"),
 			m_md6b(*this, "md6b"),
-			m_md6b_extra(*this, "md6b_extra")
+			m_md6b_extra(*this, "md6b_extra"),
+			m_nvram(0x4000/sizeof(UINT16)),
+			m_tvram(0x80000/sizeof(UINT16)),
+			m_gvram(0x80000/sizeof(UINT16)),
+			m_spritereg(0x8000/sizeof(UINT16), 0)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -90,14 +88,6 @@ public:
 	required_device<ym2151_device> m_ym2151;
 	required_device<i8255_device> m_ppi;
 
-	optional_shared_ptr<UINT16> m_nvram16;
-	optional_shared_ptr<UINT32> m_nvram32;
-
-	optional_shared_ptr<UINT16> m_gvram16;
-	optional_shared_ptr<UINT16> m_tvram16;
-	optional_shared_ptr<UINT32> m_gvram32;
-	optional_shared_ptr<UINT32> m_tvram32;
-	
 	required_ioport m_options;
 	required_ioport m_mouse1;
 	required_ioport m_mouse2;
@@ -110,7 +100,10 @@ public:
 	required_ioport m_md6b;
 	required_ioport m_md6b_extra;
 
-	DECLARE_WRITE_LINE_MEMBER( mfp_tbo_w );
+	dynamic_array<UINT16> m_nvram;
+	dynamic_array<UINT16> m_tvram;
+	dynamic_array<UINT16> m_gvram;
+	dynamic_array<UINT16> m_spritereg;
 
 	void floppy_load_unload();
 	int floppy_load(floppy_image_device *dev);
@@ -220,7 +213,6 @@ public:
 		int seq2;  // part of 6-button input sequence.
 		emu_timer* io_timeout2;
 	} m_mdctrl;
-	UINT16* m_sram;
 	UINT8 m_ppi_port[3];
 	int m_current_vector[8];
 	UINT8 m_current_irq_line;
@@ -238,7 +230,6 @@ public:
 	emu_timer* m_fdc_tc;
 	emu_timer* m_adpcm_timer;
 	UINT16* m_spriteram;
-	UINT16* m_spritereg;
 	tilemap_t* m_bg0_8;
 	tilemap_t* m_bg1_8;
 	tilemap_t* m_bg0_16;
@@ -312,8 +303,6 @@ public:
 	DECLARE_READ16_MEMBER(x68k_ppi_r);
 	DECLARE_WRITE16_MEMBER(x68k_sram_w);
 	DECLARE_READ16_MEMBER(x68k_sram_r);
-	DECLARE_READ32_MEMBER(x68k_sram32_r);
-	DECLARE_WRITE32_MEMBER(x68k_sram32_w);
 	DECLARE_WRITE16_MEMBER(x68k_vid_w);
 	DECLARE_READ16_MEMBER(x68k_vid_r);
 	DECLARE_READ16_MEMBER(x68k_areaset_r);
@@ -337,10 +326,6 @@ public:
 	DECLARE_READ16_MEMBER(x68k_gvram_r);
 	DECLARE_WRITE16_MEMBER(x68k_tvram_w);
 	DECLARE_READ16_MEMBER(x68k_tvram_r);
-	DECLARE_WRITE32_MEMBER(x68k_gvram32_w);
-	DECLARE_READ32_MEMBER(x68k_gvram32_r);
-	DECLARE_WRITE32_MEMBER(x68k_tvram32_w);
-	DECLARE_READ32_MEMBER(x68k_tvram32_r);
 	IRQ_CALLBACK_MEMBER(x68k_int_ack);
 
 private:
