@@ -10,7 +10,7 @@
 #ifndef RECURSIVE_INCLUDE
 
 
-#define LOG_GFX_OPS 1
+#define LOG_GFX_OPS 0
 #define LOGGFX(x) do { if (LOG_GFX_OPS && tms->device->machine().input().code_pressed(KEYCODE_L)) logerror x; } while (0)
 
 
@@ -110,7 +110,7 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 		diff = WSTART_Y(tms) - sy;
 		if (diff > 0)
 		{
-#if 0 // littlerb and megaphx do not work correctly with this enabled, see items dropping into playfield from top
+#if 1 // littlerb and megaphx do not work correctly with this enabled, see items dropping into playfield from top, battletoads however needs this logic, see screen after player select
 			if (srcaddr)
 				*srcaddr += diff * SPTCH(tms);
 #endif
