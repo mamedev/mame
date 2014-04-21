@@ -722,15 +722,6 @@ static const tms9901_interface sys9901reset_param =
     0x3000-0x3fff: 4kb onboard ROM
 */
 
-// MZ: needs to be fixed once the RS232 support is complete
-static const tms9902_interface tms9902_params =
-{
-	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
-	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
-	DEVCB_DRIVER_MEMBER(tm990189_state, xmit_callback),         /* called when a character is transmitted */
-	DEVCB_NULL              /* called for setting interface parameters and line states */
-};
-
 static ADDRESS_MAP_START( tm990_189_memmap, AS_PROGRAM, 8, tm990189_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                 /* RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_ROM                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
@@ -864,7 +855,8 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_TMS9901_P15_HANDLER( WRITELINE( tm990189_state, sys9901_tapewdata_w) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, sys9901_interrupt_callback) )
 
-	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
+	MCFG_DEVICE_ADD("tms9902", TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
+	MCFG_TMS9902_XMIT_CB(WRITE8(tm990189_state, xmit_callback))         /* called when a character is transmitted */
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	// Need to delay the timer, or it will spoil the initial LOAD
@@ -923,7 +915,8 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_TMS9901_P15_HANDLER( WRITELINE( tm990189_state, sys9901_tapewdata_w) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, sys9901_interrupt_callback) )
 
-	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
+	MCFG_DEVICE_ADD("tms9902", TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
+	MCFG_TMS9902_XMIT_CB(WRITE8(tm990189_state, xmit_callback))         /* called when a character is transmitted */
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))

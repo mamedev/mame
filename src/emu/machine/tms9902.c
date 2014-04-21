@@ -61,7 +61,11 @@ enum
     Constructor
 */
 tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TMS9902, "TMS9902 ACC", tag, owner, clock, "tms9902", __FILE__)
+	: device_t(mconfig, TMS9902, "TMS9902 ACC", tag, owner, clock, "tms9902", __FILE__),
+		m_int_cb(*this),
+		m_rcv_cb(*this),
+		m_xmit_cb(*this),
+		m_ctrl_cb(*this)
 {
 }
 
@@ -82,7 +86,7 @@ void tms9902_device::field_interrupts()
 		// Only consider edges
 		m_INT = new_int;
 		if (VERBOSE>3) LOG("TMS9902: /INT = %s\n", (m_INT)? "asserted" : "cleared");
-		int_callback(m_INT? ASSERT_LINE : CLEAR_LINE);
+		m_int_cb(m_INT? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -248,7 +252,7 @@ void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	//  depending on CLK4M. With this timer, reception of characters becomes
 	//  possible.
 	case RECVTIMER:
-		rcv_callback(ASSERT_LINE);
+		m_rcv_cb(ASSERT_LINE);
 		break;
 
 	case SENDTIMER:
@@ -291,7 +295,7 @@ void tms9902_device::send_break(bool state)
 		if (VERBOSE>2) LOG("TMS9902: Sending BREAK=%d\n", state? 1:0);
 
 		// Signal BRK (on/off) to the remote site
-		ctrl_callback((EXCEPT | BRK), state? 1:0);
+		m_ctrl_cb((offs_t)(EXCEPT | BRK), state? 1:0);
 	}
 }
 
@@ -334,7 +338,7 @@ void tms9902_device::set_receive_data_rate()
 	if (VERBOSE>3) LOG ("TMS9902: baudpoll = %lf\n", m_baudpoll);
 
 	m_last_config_value = value;
-	ctrl_callback(CONFIG, RATERECV);
+	m_ctrl_cb((offs_t)CONFIG, RATERECV);
 }
 
 /*
@@ -346,7 +350,7 @@ void tms9902_device::set_transmit_data_rate()
 	int value = (m_CLK4M? 0x800 : 0) | (m_XDV8? 0x400 : 0) | m_XDR;
 	if (VERBOSE>3) LOG("TMS9902: set transmit rate = %04x\n", value);
 	m_last_config_value = value;
-	ctrl_callback(CONFIG, RATEXMIT);
+	m_ctrl_cb((offs_t)CONFIG, RATEXMIT);
 }
 
 void tms9902_device::set_stop_bits()
@@ -354,7 +358,7 @@ void tms9902_device::set_stop_bits()
 	int value = m_STOPB;
 	if (VERBOSE>3) LOG("TMS9902: set stop bits = %02x\n", value);
 	m_last_config_value = value;
-	ctrl_callback(CONFIG, STOPBITS);
+	m_ctrl_cb((offs_t)CONFIG, STOPBITS);
 }
 
 void tms9902_device::set_data_bits()
@@ -362,7 +366,7 @@ void tms9902_device::set_data_bits()
 	int value = m_RCL;
 	if (VERBOSE>3) LOG("TMS9902: set data bits = %02x\n", value);
 	m_last_config_value = value;
-	ctrl_callback(CONFIG, DATABITS);
+	m_ctrl_cb((offs_t)CONFIG, DATABITS);
 }
 
 void tms9902_device::set_parity()
@@ -370,7 +374,7 @@ void tms9902_device::set_parity()
 	int value = (m_PENB? 2:0) | (m_ODDP? 1:0);
 	if (VERBOSE>3) LOG("TMS9902: set parity = %02x\n", value);
 	m_last_config_value = value;
-	ctrl_callback(CONFIG, PARITY);
+	m_ctrl_cb((offs_t)CONFIG, PARITY);
 }
 
 void tms9902_device::transmit_line_state()
@@ -379,7 +383,7 @@ void tms9902_device::transmit_line_state()
 	// The 9902 only outputs RTS and BRK
 	if (VERBOSE>3) LOG("TMS9902: transmitting line state (only RTS) = %02x\n", (m_RTSout)? 1:0);
 	m_last_config_value = (m_RTSout)? RTS : 0;
-	ctrl_callback(LINES, RTS);
+	m_ctrl_cb((offs_t)LINES, RTS);
 }
 
 void tms9902_device::set_rts(line_state state)
@@ -423,7 +427,7 @@ void tms9902_device::initiate_transmit()
 
 			if (VERBOSE>4) LOG("TMS9902: transmit XSR=%02x, RCL=%02x\n", m_XSR, m_RCL);
 
-			xmit_callback(0, m_XSR & (0xff >> (3-m_RCL)));
+			m_xmit_cb((offs_t)0, m_XSR & (0xff >> (3-m_RCL)));
 
 			// Should store that somewhere (but the CPU is fast enough, can afford to recalc :-) )
 			double fint = m_clock_rate / ((m_CLK4M) ? 4.0 : 3.0);
@@ -828,14 +832,12 @@ void tms9902_device::device_reset()
 
 void tms9902_device::device_start()
 {
-	const tms9902_interface *intf = reinterpret_cast<const tms9902_interface *>(static_config());
-
 	m_clock_rate = clock();
 
-	int_callback.resolve(intf->int_callback, *this);
-	rcv_callback.resolve(intf->rcv_callback, *this);
-	xmit_callback.resolve(intf->xmit_callback, *this);
-	ctrl_callback.resolve(intf->ctrl_callback, *this);
+	m_int_cb.resolve_safe();
+	m_rcv_cb.resolve_safe();
+	m_xmit_cb.resolve_safe();
+	m_ctrl_cb.resolve_safe();
 
 	m_dectimer = timer_alloc(DECTIMER);
 	m_recvtimer = timer_alloc(RECVTIMER);

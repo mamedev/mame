@@ -131,23 +131,6 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 
 }
 
-// Communication with Reel MCU
-static const tms9902_interface tms9902_uart4_ic10_params =
-{
-	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
-	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
-	DEVCB_NULL,             /* called when a character is transmitted */
-	DEVCB_NULL              /* called for setting interface parameters and line states */
-};
-
-// Communication with Security / Printer
-static const tms9902_interface tms9902_uart2_ic5_params =
-{
-	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
-	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
-	DEVCB_NULL,             /* called when a character is transmitted */
-	DEVCB_NULL              /* called for setting interface parameters and line states */
-};
 
 // these are wrong
 #define MAIN_CLOCK 2000000
@@ -185,8 +168,8 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
 
-	MCFG_TMS9902_ADD("tms9902_ic10", tms9902_uart4_ic10_params, DUART_CLOCK)
-	MCFG_TMS9902_ADD("tms9902_ic5",  tms9902_uart2_ic5_params,  DUART_CLOCK)
+	MCFG_DEVICE_ADD("tms9902_ic10", TMS9902, DUART_CLOCK) // Communication with Reel MCU
+	MCFG_DEVICE_ADD("tms9902_ic5", TMS9902, DUART_CLOCK) // Communication with Security / Printer
 
 	MCFG_MACHINE_START_OVERRIDE(jpmmps_state,jpmmps)
 

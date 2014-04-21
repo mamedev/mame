@@ -81,14 +81,6 @@ static const ay8910_interface ay8910_interface_jpm =
 #define SOUND_CLOCK 2000000
 #define DUART_CLOCK 2000000
 
-static const tms9902_interface tms9902_config =
-{
-	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
-	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
-	DEVCB_NULL,             /* called when a character is transmitted */
-	DEVCB_NULL              /* called for setting interface parameters and line states */
-};
-
 void jpms80_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
@@ -100,7 +92,7 @@ static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_TMS9902_ADD("tms9902duart", tms9902_config,    DUART_CLOCK)
+	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_CONFIG(ay8910_interface_jpm)

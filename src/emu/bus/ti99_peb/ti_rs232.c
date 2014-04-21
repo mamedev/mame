@@ -1014,22 +1014,6 @@ WRITE8_MEMBER( ti_rs232_pio_device::ctrl1_callback )
 	ctrl_callback(1, offset, data);
 }
 
-static const tms9902_interface tms9902_params0 =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, int0_callback),            /* called when interrupt pin state changes */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, rcv0_callback),            /* called when a character is received */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, xmit0_callback),            /* called when a character is transmitted */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, ctrl0_callback)
-};
-
-static const tms9902_interface tms9902_params1 =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, int1_callback),            /* called when interrupt pin state changes */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, rcv1_callback),            /* called when a character is received */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, xmit1_callback),            /* called when a character is transmitted */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, ctrl1_callback)
-};
-
 void ti_rs232_pio_device::device_start()
 {
 	m_dsrrom = memregion(DSRROM)->base();
@@ -1097,8 +1081,16 @@ void ti_rs232_pio_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
-	MCFG_TMS9902_ADD("tms9902_0", tms9902_params0, 3000000)
-	MCFG_TMS9902_ADD("tms9902_1", tms9902_params1, 3000000)
+	MCFG_DEVICE_ADD("tms9902_0", TMS9902, 3000000)
+	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int0_callback))            /* called when interrupt pin state changes */
+	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv0_callback))            /* called when a character is received */
+	MCFG_TMS9902_XMIT_CB(WRITE8(ti_rs232_pio_device, xmit0_callback))            /* called when a character is transmitted */
+	MCFG_TMS9902_CTRL_CB(WRITE8(ti_rs232_pio_device, ctrl0_callback))
+	MCFG_DEVICE_ADD("tms9902_0", TMS9902, 3000000)
+	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int1_callback))            /* called when interrupt pin state changes */
+	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv1_callback))            /* called when a character is received */
+	MCFG_TMS9902_XMIT_CB(WRITE8(ti_rs232_pio_device, xmit1_callback))            /* called when a character is transmitted */
+	MCFG_TMS9902_CTRL_CB(WRITE8(ti_rs232_pio_device, ctrl1_callback))
 	MCFG_DEVICE_ADD("serdev0", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("serdev1", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("piodev", TI99_PIO_DEV, 0)
