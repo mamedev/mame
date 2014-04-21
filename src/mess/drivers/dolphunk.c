@@ -108,6 +108,7 @@ private:
 	UINT8 m_cass_data;
 	UINT8 m_last_key;
 	bool m_cass_state;
+	bool m_cassold;
 	bool m_speaker_state;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -164,6 +165,12 @@ READ8_MEMBER( dauphin_state::port07_r )
 TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
 {
 	m_cass_data++;
+
+	if (m_cass_state != m_cassold)
+	{
+		m_cass_data = 0;
+		m_cassold = m_cass_state;
+	}
 
 	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data, 1) ? -1.0 : +1.0); // 1000Hz

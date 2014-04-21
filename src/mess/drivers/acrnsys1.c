@@ -78,6 +78,7 @@ private:
 	UINT8 m_digit;
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
+	bool m_cassold;
 };
 
 
@@ -115,6 +116,12 @@ WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
 TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_c)
 {
 	m_cass_data[3]++;
+
+	if (m_cass_state != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cass_state;
+	}
 
 	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz

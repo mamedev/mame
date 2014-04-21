@@ -85,6 +85,7 @@ public:
 private:
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
+	bool m_cassold;
 	UINT8 m_video_index;
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cass;
@@ -196,6 +197,12 @@ WRITE_LINE_MEMBER( a6809_state::cass_w )
 TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_c)
 {
 	m_cass_data[3]++;
+
+	if (m_cass_state != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cass_state;
+	}
 
 	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz

@@ -74,6 +74,7 @@ private:
 	UINT8 m_inv;
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
+	bool m_cassold;
 	UINT8 m_kbd_count;
 
 	required_device<cpu_device> m_maincpu;
@@ -372,6 +373,12 @@ WRITE_LINE_MEMBER( fc100_state::uart_clock_w )
 TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
 {
 	m_cass_data[3]++;
+
+	if (m_cass_state != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cass_state;
+	}
 
 	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz

@@ -86,6 +86,7 @@ private:
 	UINT8 m_timer_bit;
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
+	bool m_cassold;
 	emu_timer* m_sys_timer;
 	virtual void video_start();
 	virtual void machine_start();
@@ -434,6 +435,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_c)
 {
 	m_cass_data[3]++;
 
+	if (m_cass_state != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cass_state;
+	}
+
 	if (m_cass_state)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
@@ -494,7 +501,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19225)
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19200)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)

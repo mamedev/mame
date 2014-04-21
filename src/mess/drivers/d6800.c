@@ -94,6 +94,7 @@ protected:
 private:
 	UINT8 m_rtc;
 	bool m_cb2;
+	bool m_cassold;
 	UINT8 m_cass_data[4];
 	UINT8 m_portb;
 	virtual void machine_start();
@@ -211,6 +212,12 @@ UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bit
 TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_c)
 {
 	m_cass_data[3]++;
+
+	if (BIT(m_portb, 0) != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = BIT(m_portb, 0);
+	}
 
 	if (BIT(m_portb, 0))
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
