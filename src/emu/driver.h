@@ -98,9 +98,6 @@ class gfxdecode_device;
 class palette_device;
 typedef delegate<void ()> driver_callback_delegate;
 
-// legacy callback functions
-/*ATTR_DEPRECATED*/ typedef void (*legacy_callback_func)(running_machine &machine);
-
 
 // ======================> driver_device
 
@@ -130,7 +127,6 @@ public:
 
 	// inline configuration helpers
 	static void static_set_game(device_t &device, const game_driver &game);
-	ATTR_DEPRECATED static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
 	// generic helpers
@@ -291,7 +287,6 @@ private:
 	// internal state
 	const game_driver *     m_system;                   // pointer to the game driver
 	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
-	legacy_callback_func    m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
 
 	// generic audio
 	UINT16                  m_latch_clear_value;
