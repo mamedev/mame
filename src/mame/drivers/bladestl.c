@@ -50,14 +50,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
  *  Memory handlers
  *
  *************************************/
+const char * const bladestl_state::trackball_tags[] =
+	{ "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P2_2" };
 
 READ8_MEMBER(bladestl_state::trackball_r)
 {
-	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P2_2" };
-	int curr, delta;
-
-	curr = ioport(port[offset])->read();
-	delta = (curr - m_last_track[offset]) & 0xff;
+	int curr = m_trackball[offset]->read();
+	int delta = (curr - m_last_track[offset]) & 0xff;
 	m_last_track[offset] = curr;
 
 	return (delta & 0x80) | (curr >> 1);

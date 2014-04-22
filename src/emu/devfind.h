@@ -240,6 +240,48 @@ public:
 };
 
 
+// ======================> ioport_array_finder
+
+// ioport array finder template
+template<int _Count, bool _Required>
+class ioport_array_finder
+{
+	typedef ioport_finder<_Required> ioport_finder_type;
+
+public:
+	// construction/destruction
+	ioport_array_finder(device_t &base, const char * const *tags)
+	{
+		for (int index = 0; index < _Count; index++)
+			m_array[index].reset(global_alloc(ioport_finder_type(base, tags[index])));
+	}
+
+	// array accessors
+	const ioport_finder_type &operator[](int index) const { assert(index < _Count); return *m_array[index]; }
+	ioport_finder_type &operator[](int index) { assert(index < _Count); return *m_array[index]; }
+
+protected:
+	// internal state
+	auto_pointer<ioport_finder_type> m_array[_Count];
+};
+
+// optional ioport array finder
+template<int _Count>
+class optional_ioport_array: public ioport_array_finder<_Count, false>
+{
+public:
+	optional_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, false>(base, tags) { }
+};
+
+// required ioport array finder
+template<int _Count>
+class required_ioport_array: public ioport_array_finder<_Count, true>
+{
+public:
+	required_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, true>(base, tags) { }
+};
+
+
 // ======================> shared_ptr_finder
 
 // shared pointer finder template

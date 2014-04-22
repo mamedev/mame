@@ -10,6 +10,7 @@
 
 class bladestl_state : public driver_device
 {
+	static const char * const trackball_tags[];
 public:
 	bladestl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -20,6 +21,7 @@ public:
 		m_k007420(*this, "k007420"),
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_trackball(*this, trackball_tags),
 		m_rombank(*this, "rombank") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -28,6 +30,7 @@ public:
 	required_device<k007420_device> m_k007420;
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_ioport_array<4> m_trackball;
 
 	/* memory pointers */
 	required_memory_bank m_rombank;
