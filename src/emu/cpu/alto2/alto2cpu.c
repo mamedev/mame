@@ -147,8 +147,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ucode_crom(0),
 	m_const_data(0),
 	m_icount(0),
-	m_task_mpc(),
-	m_task_next2(),
 	m_task(0),
 	m_next_task(0),
 	m_next2_task(0),
@@ -164,8 +162,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_d_loadl(0),
 	m_next(0),
 	m_next2(0),
-	m_r(),
-	m_s(),
 	m_bus(0),
 	m_t(0),
 	m_alu(0),
@@ -176,12 +172,9 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_m(0),
 	m_cram_addr(0),
 	m_task_wakeup(0),
-	m_active_callback(),
 	m_reset_mode(0xffff),
 	m_rdram_flag(false),
 	m_wrtram_flag(false),
-	m_s_reg_bank(),
-	m_bank_reg(),
 	m_ether_enable(false),
 	m_ewfct(false),
 	m_dsp_time(0),
@@ -197,20 +190,11 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_madr_a65(0),
 	m_madr_a90(0),
 	m_madr_a91(0),
-	m_bs(),
-	m_f1(),
-	m_f2(),
-	m_ram_related(),
 	m_cycle(0),
 	m_ether_id(0),
 	m_hw(),
 	m_mouse(),
-	m_drive(),
 	m_dsk(),
-	m_sysclka0(),
-	m_sysclka1(),
-	m_sysclkb0(),
-	m_sysclkb1(),
 	m_dsp(),
 	m_disp_a38(0),
 	m_disp_a63(0),
@@ -223,6 +207,22 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_eth()
 {
 	m_is_octal = true;
+	memset(m_task_mpc, 0x00, sizeof(m_task_mpc));
+	memset(m_task_next2, 0x00, sizeof(m_task_next2));
+	memset(m_r, 0x00, sizeof(m_r));
+	memset(m_s, 0x00, sizeof(m_s));
+	memset(m_active_callback, 0x00, sizeof(m_active_callback));
+	memset(m_s_reg_bank, 0x00, sizeof(m_s_reg_bank));
+	memset(m_bank_reg, 0x00, sizeof(m_bank_reg));
+	memset(m_bs, 0x00, sizeof(m_bs));
+	memset(m_f1, 0x00, sizeof(m_f1));
+	memset(m_f2, 0x00, sizeof(m_f2));
+	memset(m_ram_related, 0x00, sizeof(m_ram_related));
+	memset(m_drive, 0x00, sizeof(m_drive));
+	memset(m_sysclka0, 0x00, sizeof(m_sysclka0));
+	memset(m_sysclka1, 0x00, sizeof(m_sysclka1));
+	memset(m_sysclkb0, 0x00, sizeof(m_sysclkb0));
+	memset(m_sysclkb1, 0x00, sizeof(m_sysclkb1));
 }
 
 alto2_cpu_device::~alto2_cpu_device()
@@ -2236,6 +2236,10 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 	case SMC(1,1,1,1, 1, 0): // 1111: A
 	case SMC(1,1,1,1, 1, 1):
 		f = (a) | cout;
+		break;
+	
+	default:
+		f = 0;
 		break;
 	}
 	return f;

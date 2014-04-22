@@ -66,7 +66,6 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 #endif
 	m_diablo31(true),
 	m_unit(0),
-	m_description(),
 	m_packs(1),
 	m_rotation_time(),
 	m_sector_time(),
@@ -103,6 +102,7 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_handle(0),
 	m_disk(0)
 {
+	memset(m_description, 0x00, ARRAY_LENGTH(m_description));
 }
 
 /**
