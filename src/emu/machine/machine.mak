@@ -1829,3 +1829,11 @@ ifneq ($(filter WOZFDC,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/wozfdc.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/machine/diablo_hd.h,MACHINES += DIABLO_HD
+#-------------------------------------------------
+ifneq ($(filter DIABLO_HD,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/diablo_hd.o
+endif
+

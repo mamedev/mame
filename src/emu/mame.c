@@ -219,8 +219,19 @@ void CLIB_DECL logerror(const char *format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
+	vlogerror(format, arg);
+	va_end(arg);
+}
+
+
+/*-------------------------------------------------
+    vlogerror - log to the debugger and any other
+    OSD-defined output streams
+-------------------------------------------------*/
+
+void CLIB_DECL vlogerror(const char *format, va_list arg)
+{
 	if (global_machine != NULL)
 		global_machine->vlogerror(format, arg);
-	va_end(arg);
 }
 

@@ -128,6 +128,7 @@ CPUS += ES5510
 CPUS += SCUDSP
 CPUS += IE15
 CPUS += 8X300
+CPUS += ALTO2
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -515,6 +516,7 @@ MACHINES += TI99_HD
 MACHINES += STRATA
 MACHINES += CORVUSHD
 MACHINES += WOZFDC
+MACHINES += DIABLO_HD
 
 #-------------------------------------------------
 # specify available bus cores
@@ -1992,6 +1994,7 @@ $(MESSOBJ)/wavemate.a:          \
 $(MESSOBJ)/xerox.a:             \
 	$(MESS_DRIVERS)/xerox820.o  \
 	$(MESS_DRIVERS)/bigbord2.o  \
+	$(MESS_DRIVERS)/alto2.o     \
 
 $(MESSOBJ)/xussrpc.a:            \
 	$(MESS_DRIVERS)/ec184x.o    \
