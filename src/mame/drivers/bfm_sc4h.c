@@ -112,7 +112,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 READ16_MEMBER(sc4_state::sc4_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68307_get_cs(m_maincpu, offset * 2);
+	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 //  if (!(debugger_access())) printf("cs is %d\n", cs);
 	UINT16 retvalue;
@@ -233,8 +233,6 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	return 0x0000;
 }
 
-static DECLARE_WRITE8_HANDLER( bfm_sc4_reel4_w );
-
 WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 {
 	int i;
@@ -268,7 +266,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68307_get_cs(m_maincpu, offset * 2);
+	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 
 	switch ( cs )
@@ -443,111 +441,101 @@ ADDRESS_MAP_END
 
 
 
-void bfm_sc4_reset_serial_vfd(running_machine &machine)
+void bfm_sc45_state::bfm_sc4_reset_serial_vfd()
 {
-	bfm_sc45_state *state = machine.driver_data<bfm_sc45_state>();
-
-	state->m_vfd0->reset();
-	state->vfd_old_clock = false;
+	m_vfd0->reset();
+	vfd_old_clock = false;
 }
 
-void bfm_sc45_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data)
+void bfm_sc45_state::bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data)
 {
-	bfm_sc45_state *state = machine.driver_data<bfm_sc45_state>();
-
 	// if we're turned on
 	if ( cs )
 	{
-		if ( !state->vfd_enabled )
+		if ( !vfd_enabled )
 		{
-			bfm_sc4_reset_serial_vfd(machine);
-			state->vfd_old_clock = clock;
-			state->vfd_enabled = true;
+			bfm_sc4_reset_serial_vfd();
+			vfd_old_clock = clock;
+			vfd_enabled = true;
 		}
 		else
 		{
 			// if the clock line changes
-			if ( clock != state->vfd_old_clock )
+			if ( clock != vfd_old_clock )
 			{
 				if ( !clock )
 				{
 				//Should move to the internal serial process when DM01 is device-ified
 //                  m_vfd0->shift_data(!data);
-					state->vfd_ser_value <<= 1;
-					if (data) state->vfd_ser_value |= 1;
+					vfd_ser_value <<= 1;
+					if (data) vfd_ser_value |= 1;
 
-					state->vfd_ser_count++;
-					if ( state->vfd_ser_count == 8 )
+					vfd_ser_count++;
+					if ( vfd_ser_count == 8 )
 					{
-						state->vfd_ser_count = 0;
-						if (machine.device("matrix"))
+						vfd_ser_count = 0;
+						if (machine().device("matrix"))
 						{
-							state->m_dm01->writedata(state->vfd_ser_value);
+							m_dm01->writedata(vfd_ser_value);
 						}
 						else
 						{
-							state->m_vfd0->write_char(state->vfd_ser_value);
+							m_vfd0->write_char(vfd_ser_value);
 						}
 					}
 				}
-				state->vfd_old_clock = clock;
+				vfd_old_clock = clock;
 			}
 		}
 	}
 	else
 	{
-		state->vfd_enabled = false;
+		vfd_enabled = false;
 	}
 }
 
 
-void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)
+void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)
 {
-	sc4_state *state = space.machine().driver_data<sc4_state>();
+	m_reel12_latch = data;
 
-	state->m_reel12_latch = data;
+	if ( stepper_update(0, data&0x0f   ) ) m_reel_changed |= 0x01;
+	if ( stepper_update(1, (data>>4))&0x0f ) m_reel_changed |= 0x02;
 
-	if ( stepper_update(0, data&0x0f   ) ) state->m_reel_changed |= 0x01;
-	if ( stepper_update(1, (data>>4))&0x0f ) state->m_reel_changed |= 0x02;
-
-	if ( stepper_optic_state(0) ) state->m_optic_pattern |=  0x01;
-	else                          state->m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) state->m_optic_pattern |=  0x02;
-	else                          state->m_optic_pattern &= ~0x02;
+	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
+	else                          m_optic_pattern &= ~0x01;
+	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
+	else                          m_optic_pattern &= ~0x02;
 
 	awp_draw_reel(0);
 	awp_draw_reel(1);
 }
 
-static WRITE8_HANDLER( bfm_sc4_reel3_w )
+WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 {
-	sc4_state *state = space.machine().driver_data<sc4_state>();
+	m_reel3_latch = data;
 
-	state->m_reel3_latch = data;
+	if ( stepper_update(2, data&0x0f ) ) m_reel_changed |= 0x04;
 
-	if ( stepper_update(2, data&0x0f ) ) state->m_reel_changed |= 0x04;
-
-	if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
-	else                          state->m_optic_pattern &= ~0x04;
+	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
+	else                          m_optic_pattern &= ~0x04;
 
 	awp_draw_reel(2);
 }
 
-static WRITE8_HANDLER( bfm_sc4_reel4_w )
+WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 {
-	sc4_state *state = space.machine().driver_data<sc4_state>();
+	m_reel4_latch = data;
 
-	state->m_reel4_latch = data;
+	if ( stepper_update(3, data&0x0f ) ) m_reel_changed |= 0x08;
 
-	if ( stepper_update(3, data&0x0f ) ) state->m_reel_changed |= 0x08;
-
-	if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
-	else                          state->m_optic_pattern &= ~0x08;
+	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
+	else                          m_optic_pattern &= ~0x08;
 
 	awp_draw_reel(3);
 }
 
-void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)
+void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)
 {
 //  if (dedicated == false)
 	{
@@ -556,20 +544,20 @@ void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UI
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
 
-		bfm_sc45_write_serial_vfd(space.machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
+		bfm_sc45_write_serial_vfd((data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
 
 		bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8, 0xff);
 	}
 
 }
-UINT8 bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask)
+UINT8 sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask)
 {
 	int pc = space.device().safe_pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
-	return space.machine().rand();
+	return machine().rand();
 }
 
-UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask)
+UINT16 sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask)
 {
 	if (dedicated==false)
 	{
@@ -605,11 +593,11 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
 
-	m68307_set_port_callbacks(m_maincpu,
-		bfm_sc4_68307_porta_r,
-		bfm_sc4_68307_porta_w,
-		bfm_sc4_68307_portb_r,
-		bfm_sc4_68307_portb_w );
+	m_maincpu->set_port_callbacks(
+		m68307_porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r),this),
+		m68307_porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w),this),
+		m68307_portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r),this),
+		m68307_portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w),this) );
 
 	int reels = 6;
 	m_reels=reels;
@@ -635,7 +623,7 @@ WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_irq_handler)
 	logerror("bfm_sc4_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_licr2_interrupt(m_maincpu);
+		m_maincpu->licr2_interrupt();
 	}
 }
 

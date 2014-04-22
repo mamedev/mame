@@ -153,7 +153,7 @@ UINT16 m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, UINT
 {
 	int pc = space.device().safe_pc();
 
-	if (m68k->m_m68307_porta_r)
+	if (!m68k->m_m68307_porta_r.isnull())
 	{
 		// for general purpose bits, if configured as 'output' then anything output gets latched
 		// and anything configured as input is read from the port
@@ -180,7 +180,7 @@ void m68307_sim::write_padat(m68307cpu_device* m68k, address_space &space, UINT1
 	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_padat);
 
-	if (m68k->m_m68307_porta_w)
+	if (!m68k->m_m68307_porta_w.isnull())
 	{
 		m68k->m_m68307_porta_w(space, false, data, 0xff);
 	}
@@ -204,7 +204,7 @@ UINT16 m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, UINT
 {
 	int pc = space.device().safe_pc();
 
-	if (m68k->m_m68307_portb_r)
+	if (!m68k->m_m68307_portb_r.isnull())
 	{
 		// for general purpose bits, if configured as 'output' then anything output gets latched
 		// and anything configured as input is read from the port
@@ -231,7 +231,7 @@ void m68307_sim::write_pbdat(m68307cpu_device* m68k, address_space &space, UINT1
 	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_pbdat);
 
-	if (m68k->m_m68307_portb_w)
+	if (!m68k->m_m68307_portb_w.isnull())
 	{
 		m68k->m_m68307_portb_w(space, false, data, mem_mask);
 	}

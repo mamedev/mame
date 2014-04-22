@@ -105,7 +105,7 @@ static TIMER_CALLBACK( m68307_timer0_callback )
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
-	m68307_timer0_interrupt(m68k);
+	m68k->timer0_interrupt();
 
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 }
@@ -116,7 +116,7 @@ static TIMER_CALLBACK( m68307_timer1_callback )
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
-	m68307_timer1_interrupt(m68k);
+	m68k->timer1_interrupt();
 
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 

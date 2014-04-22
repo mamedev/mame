@@ -42,7 +42,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);
 	DECLARE_WRITE8_MEMBER(mux_output2_w);
-
+	void bfm_sc4_reset_serial_vfd();
+	void bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data);
 };
 
 void bfm_sc45_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data);
@@ -533,6 +534,15 @@ public:
 	DECLARE_MACHINE_RESET(sc4);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_irqhandler);
+	
+	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
+	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
+	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
+	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
+	UINT8 bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask);
+	UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask);
+
+
 protected:
 	required_ioport m_io1;
 	required_ioport m_io2;

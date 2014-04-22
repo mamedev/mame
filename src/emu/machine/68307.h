@@ -14,11 +14,11 @@
 #include "machine/mc68681.h"
 
 
+typedef device_delegate<UINT8 (address_space &space, bool dedicated, UINT8 line_mask)> m68307_porta_read_delegate;
+typedef device_delegate<void (address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)> m68307_porta_write_delegate;
+typedef device_delegate<UINT16 (address_space &space, bool dedicated, UINT16 line_mask)> m68307_portb_read_delegate;
+typedef device_delegate<void (address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)> m68307_portb_write_delegate;
 
-typedef UINT8 (*m68307_porta_read_callback)(address_space &space, bool dedicated, UINT8 line_mask);
-typedef void (*m68307_porta_write_callback)(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
-typedef UINT16 (*m68307_portb_read_callback)(address_space &space, bool dedicated, UINT16 line_mask);
-typedef void (*m68307_portb_write_callback)(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
 
 /* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
 #define MCFG_MC68307_SERIAL_A_TX_CALLBACK(_cb) \
@@ -92,10 +92,19 @@ public:
 
 
 	/* callbacks for internal ports */
-	m68307_porta_read_callback m_m68307_porta_r;
-	m68307_porta_write_callback m_m68307_porta_w;
-	m68307_portb_read_callback m_m68307_portb_r;
-	m68307_portb_write_callback m_m68307_portb_w;
+	void set_port_callbacks(m68307_porta_read_delegate porta_r, m68307_porta_write_delegate porta_w, m68307_portb_read_delegate portb_r, m68307_portb_write_delegate portb_w);
+	void set_interrupt(int level, int vector);
+	UINT16 get_cs(offs_t address);	
+	void timer0_interrupt();
+	void timer1_interrupt();
+	void serial_interrupt(int vector);
+	void mbus_interrupt();
+	void licr2_interrupt();
+
+	m68307_porta_read_delegate m_m68307_porta_r;
+	m68307_porta_write_delegate m_m68307_porta_w;
+	m68307_portb_read_delegate m_m68307_portb_r;
+	m68307_portb_write_delegate m_m68307_portb_w;
 
 	void init16_m68307(address_space &space);
 	void init_cpu_m68307(void);
@@ -117,12 +126,5 @@ private:
 
 static const device_type M68307 = &device_creator<m68307cpu_device>;
 
-extern void m68307_set_port_callbacks(m68307cpu_device *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback portb_w);
-extern UINT16 m68307_get_cs(m68307cpu_device *device, offs_t address);
-extern void m68307_timer0_interrupt(m68307cpu_device *cpudev);
-extern void m68307_timer1_interrupt(m68307cpu_device *cpudev);
-extern void m68307_serial_interrupt(m68307cpu_device *cpudev, int vector);
-extern void m68307_mbus_interrupt(m68307cpu_device *cpudev);
-extern void m68307_licr2_interrupt(m68307cpu_device *cpudev);
 
 #endif
