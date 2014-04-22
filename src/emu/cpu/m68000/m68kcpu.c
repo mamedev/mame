@@ -1696,9 +1696,9 @@ void m68000_base_device::set_rte_callback(write_line_delegate callback)
 	rte_instr_callback = callback;
 }
 
-void m68000_base_device::set_tas_callback(read_line_delegate callback)
+void m68000_base_device::set_tas_write_callback(write8_delegate callback)
 {
-	tas_instr_callback = callback;
+	tas_write_callback = callback;
 }
 
 UINT16 m68000_base_device::get_fc()

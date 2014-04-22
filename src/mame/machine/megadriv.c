@@ -1017,9 +1017,9 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 MACHINE_CONFIG_END
 
 
-READ_LINE_MEMBER(md_base_state::megadriv_tas_callback)
+WRITE8_MEMBER(md_base_state::megadriv_tas_callback)
 {
-	return 0; // writeback not allowed
+	return; // writeback not allowed
 }
 
 void md_base_state::megadriv_init_common()
@@ -1034,7 +1034,7 @@ void md_base_state::megadriv_init_common()
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
 
-	m_maincpu->set_tas_callback(read_line_delegate(FUNC(md_base_state::megadriv_tas_callback),this));
+	m_maincpu->set_tas_write_callback(write8_delegate(FUNC(md_base_state::megadriv_tas_callback),this));
 
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);

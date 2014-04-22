@@ -123,7 +123,7 @@ public:
 	UINT32 screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megadriv(screen_device &screen, bool state);
 	
-	READ_LINE_MEMBER(megadriv_tas_callback);
+	DECLARE_WRITE8_MEMBER(megadriv_tas_callback);
 };
 
 
