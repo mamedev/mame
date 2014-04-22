@@ -54,7 +54,7 @@ hangman - works
 pinball - works
 movblock - works
 rocket patrol - works, some bad colours
-space destroyer - works but you must use -ram 9K option
+space destroyer - works but you must use -ram 1K option
 ufo - works
 
 

@@ -24,8 +24,7 @@ TODO:
 - Cassette frequencies are guesses, need to be verified
 - Hookup Graphics modes and colours
 - Unknown i/o ports
-- Does it have a cart slot? Yes. What address?
-- Expansion?
+- Need software
 
 
 ****************************************************************************/
@@ -37,6 +36,7 @@ TODO:
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "sound/ay8910.h"
+#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "formats/fc100_cas.h"
@@ -98,7 +98,8 @@ private:
 static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x6000, 0xBFFF ) AM_RAM
+	AM_RANGE( 0x6000, 0x7fff ) AM_ROM AM_REGION("cart", 0)
+	AM_RANGE( 0x8000, 0xBFFF ) AM_RAM // expansion ram pack
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -530,6 +531,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(2400)) // cass write
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(20000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
+	MCFG_CARTSLOT_ADD("cart")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -541,6 +543,9 @@ ROM_START( fc100 )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "cg-04-01.u53",  0x0000, 0x1000, CRC(2de75b7f) SHA1(464369d98cbae92ffa322ebaa4404cf5b26825f1) )
+
+	ROM_REGION(0x2000,"cart", ROMREGION_ERASEFF)
+	ROM_CART_LOAD("cart", 0x0000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 /* Driver */
