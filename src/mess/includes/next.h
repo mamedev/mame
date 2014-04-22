@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE32_MEMBER( timer_data_w );
 	DECLARE_READ32_MEMBER( timer_ctrl_r );
 	DECLARE_WRITE32_MEMBER( timer_ctrl_w );
+	DECLARE_WRITE8_MEMBER( ramdac_w );
 
 	UINT32 scr1;
 	UINT32 scr2;
@@ -152,6 +153,7 @@ protected:
 
 	int screen_sx, screen_sy, screen_skip;
 	bool screen_color;
+	bool vbl_enabled;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -171,6 +173,7 @@ protected:
 	void dma_check_end(int slot, bool eof);
 	void dma_done(int slot);
 	void dma_end(int slot);
+
 public:
 	DECLARE_DRIVER_INIT(nexts2);
 	DECLARE_DRIVER_INIT(next);

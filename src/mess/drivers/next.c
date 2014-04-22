@@ -277,7 +277,7 @@ const char *next_state::dma_targets[0x20] = {
 
 const int next_state::dma_irqs[0x20] = {
 	-1, 26, -1, -1, 23, 25, -1, -1, 22, 24, -1, -1, 21, 20, -1, -1,
-	-1, 28, -1, -1, -1, 27, -1, -1, -2, -1, -1, -1, 18, 19, -1, -1
+	-1, 28, -1, -1, -1, 27, -1, -1,  5, -1, -1, -1, 18, 19, -1, -1
 };
 
 const bool next_state::dma_has_saved[0x20] = {
@@ -528,7 +528,7 @@ void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 {
 	const char *name = dma_name(slot);
 #if 0
-	fprintf(stderr, "dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->safe_pc());
+	fprintf(stderr, "dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->pc());
 
 	fprintf(stderr, "  ->%s%s%s%s%s%s%s\n",
 			data & DMA_SETENABLE ? " enable" : "",
@@ -803,6 +803,35 @@ WRITE_LINE_MEMBER(next_state::scsi_drq)
 	dma_drq_w(1, state);
 }
 
+WRITE8_MEMBER(next_state::ramdac_w)
+{
+	switch(offset) {
+	case 0:
+		switch(data) {
+		case 0x05:
+			if(screen_color)
+				irq_set(13, false);
+			else
+				irq_set(5, false);
+			vbl_enabled = false;
+			break;
+
+		case 0x06:
+			vbl_enabled = true;
+			break;
+
+		default:
+			fprintf(stderr, "ramdac_w %d, %02x\n", offset, data);
+			break;
+		}
+		break;
+
+	default:
+		fprintf(stderr, "ramdac_w %d, %02x\n", offset, data);
+		break;
+	}
+}
+
 void next_state::setup(UINT32 _scr1, int size_x, int size_y, int skip, bool color)
 {
 	scr1 = _scr1;
@@ -863,17 +892,18 @@ void next_state::machine_reset()
 	timer_data = 0;
 	timer_next_data = 0;
 	timer_ctrl = 0;
+	vbl_enabled = true;
 	dma_drq_w(4, true); // soundout
 }
 
 void next_state::vblank_w(screen_device &screen, bool vblank_state)
 {
-#if 1
-	if(screen_color)
-		irq_set(13, vblank_state);
-	else
-		irq_set(5, vblank_state);
-#endif
+	if(vbl_enabled) {
+		if(screen_color)
+			irq_set(13, vblank_state);
+		else
+			irq_set(5, vblank_state);
+	}
 }
 
 static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
@@ -900,8 +930,6 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x02016004, 0x02016007) AM_MIRROR(0x300000) AM_READWRITE(timer_ctrl_r, timer_ctrl_w)
 	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", scc8530_t, reg_r, reg_w, 0xffffffff)
 //  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
-//  AM_RANGE(0x02018100, 0x02018103) AM_MIRROR(0x300000) Color RAMDAC
-//  AM_RANGE(0x02018104, 0x02018107) AM_MIRROR(0x300000) Color CSR
 //  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
 //  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
 	AM_RANGE(0x0201a000, 0x0201a003) AM_MIRROR(0x300000) AM_READ(event_counter_r) // EVENTC
@@ -918,7 +946,7 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 //  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0b_nofdc_mem, AS_PROGRAM, 32, next_state )
+static ADDRESS_MAP_START( next_0b_m_nofdc_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_mem)
@@ -931,20 +959,28 @@ static ADDRESS_MAP_START( next_fdc_mem, AS_PROGRAM, 32, next_state )
 	AM_IMPORT_FROM(next_mem)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0b_mem, AS_PROGRAM, 32, next_state )
+static ADDRESS_MAP_START( next_0b_m_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_0c_mem, AS_PROGRAM, 32, next_state )
+static ADDRESS_MAP_START( next_0c_m_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_2c_mem, AS_PROGRAM, 32, next_state )
+static ADDRESS_MAP_START( next_0c_c_mem, AS_PROGRAM, 32, next_state )
+	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x02018180, 0x02018183) AM_MIRROR(0x300000) AM_WRITE8(ramdac_w, 0xffffffff)
+
+	AM_IMPORT_FROM(next_fdc_mem)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( next_2c_c_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x02018180, 0x02018183) AM_MIRROR(0x300000) AM_WRITE8(ramdac_w, 0xffffffff)
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
@@ -1017,7 +1053,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next, next_base )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_25MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0b_nofdc_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0b_m_nofdc_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
@@ -1032,39 +1068,39 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nexts, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0b_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nexts2, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0b_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nextsc, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
-	MCFG_CPU_PROGRAM_MAP(next_2c_mem)
+	MCFG_CPU_PROGRAM_MAP(next_2c_c_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nextst, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0b_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nextstc, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0c_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nextct, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0c_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0c_m_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nextctc, next_fdc_base )
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
-	MCFG_CPU_PROGRAM_MAP(next_0c_mem)
+	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
 MACHINE_CONFIG_END
