@@ -102,7 +102,7 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_handle(0),
 	m_disk(0)
 {
-	memset(m_description, 0x00, ARRAY_LENGTH(m_description));
+	memset(m_description, 0x00, sizeof(m_description));
 }
 
 /**
