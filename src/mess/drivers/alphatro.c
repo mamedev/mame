@@ -32,7 +32,6 @@
 
 
     ToDo:
-    - Fix cassette loading (broke during devcb2 conversion)
     - Add fdc, then connect up software list
 
 ***************************************************************************/
@@ -76,8 +75,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_PALETTE_INIT(alphatro);
-	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_flashcnt;
@@ -391,10 +390,9 @@ void alphatro_state::machine_reset()
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
 	m_timer_bit = 0;
-	m_cass_state = 1;
-	m_cass_data[0] = 0;
-	m_cass_data[1] = 0;
-	m_cass_data[3] = 0;
+	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
+	m_cass_state = 0;
+	m_cassold = 0;
 	m_usart->write_rxd(0);
 	m_beep->set_state(0);
 	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
@@ -431,7 +429,7 @@ static MC6845_INTERFACE( alphatro_crtc6845_interface )
 	NULL
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_c)
+TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_c)
 {
 	m_cass_data[3]++;
 
@@ -447,7 +445,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_c)
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_p)
+TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -501,12 +499,12 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19200)
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("alphatro_c", alphatro_state, alphatro_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("alphatro_p", alphatro_state, alphatro_p, attotime::from_hz(40000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
