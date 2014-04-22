@@ -321,6 +321,20 @@ Yeno MX64 - MSX1 - mx64
 PCB Layouts missing
 
 
+===================================================
+
+External floppy drives:
+Philips VY-0010 - WD2793
+Sharp Epcom HB-3600 - WD2793
+Sony HBD-20W (drive+interface?) - xxxxxx - 1 3.5" DSDD drive
+Sony HBD-30X/30W (drive only?) (- xxxxxx) - 1 3.5" DSDD drive
+Sony HBD-50 (drive only?) (- WD2793) - 1 3.5" SSDD drive
+Sony HBD-F1 (interface only?) - WD2793 (- 1 3.5" DSDD)
+Sony HBK-30 (interface only, meant for 30W) - WD2793
+National FS-FD35 - MB8877A
+Panasonic FS-FD1 - TC8566AF
+Panasonic FS-FD1A - TC8566AF
+
 */
 
 
@@ -1603,7 +1617,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( expertdp, msx_ntsc )
 	MCFG_MSX_LAYOUT(expertdp)
 	// AY8910/YM2149?
-	// FDC: wd2793, 1 3.5" DD drive
+	// FDC: mb8877a, 1 3.5" DD drive
 	// 2 Cartridge slots
 	// MSX Engine T7937A
 MACHINE_CONFIG_END
@@ -1796,7 +1810,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( cf3300, msx_ntsc )
 	MCFG_MSX_LAYOUT(cf3300)
 	// AY8910/YM2149?
-	// FDC: wd2793, 1 3.5" SSDD drive
+	// FDC: mb8877a, 1 3.5" SSDD drive
 	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
@@ -2548,7 +2562,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( svi738, msx_pal )
 	MCFG_MSX_LAYOUT(svi738)
 	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
+	// FDC: wd1793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
@@ -3202,7 +3216,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( cpc400, msx2 )
 	MCFG_MSX_LAYOUT(cpc400)
 	// AY8910/YM2149?
-	// FDC: wd2793/tc8566af?, 1 3.5" DS?DD drive
+	// FDC: mb8877a, 1 3.5" DS?DD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -3234,7 +3248,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( cpc400s, msx2 )
 	MCFG_MSX_LAYOUT(cpc400s)
 	// YM2149 (in S-1985 MSX Engine)
-	// FDC: wd2793, 1 3.5" DS?DD drive
+	// FDC: mb8877a, 1 3.5" DS?DD drive
 	// 2 Cartridge slots
 	// S-1985 MSX Engine
 MACHINE_CONFIG_END
@@ -3374,7 +3388,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( fs4600, msx2 )
 	MCFG_MSX_LAYOUT(fs4600)
 	// YM2149 (in S-1985 MSX Engine)
-	// FDC: wd2793, 1 3.5" DSDD drive
+	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
 	// S-1985 MSX Engine
 MACHINE_CONFIG_END
@@ -3419,7 +3433,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( fs4700, msx2 )
 	MCFG_MSX_LAYOUT(fs4700)
 	// YM2149 (in S-1985 MSX Engine)
-	// FDC: wd2793, 1 3.5" DSDD drive
+	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
 	// S-1985 MSX Engine
 MACHINE_CONFIG_END
@@ -3496,7 +3510,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( fs5500, msx2 )
 	MCFG_MSX_LAYOUT(fs5500)
 	// YM2149 in (S-1985 MSX Engine)
-	// FDC: wd2793, 1 3.5" DSDD drive
+	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
 	// S-1985 MSX Engine
 MACHINE_CONFIG_END
@@ -3825,7 +3839,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( nms8250j, msx2 )
 	MCFG_MSX_LAYOUT(nms8250j)
 	// AY8910/YM2149?
-	// FDC: wd2793/tc8566af, 1 3.5" DSDD drive
+	// FDC: wd2793?, 1 3.5" DSDD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -4053,7 +4067,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( vg8240, msx2_pal )
 	MCFG_MSX_LAYOUT(vg8240)
 	// AY8910/YM2149?
-	// FDC: wd2793/tc8566af, 0 drives
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -4280,7 +4294,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbf1xdm2, msx2 )
 	MCFG_MSX_LAYOUT(hbf1xdm2)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -4335,7 +4349,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbf500, msx2 )
 	MCFG_MSX_LAYOUT(hbf500)
 	// AY8910/YM2149?
-	// FDC: wd2793/tc8566af, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -4363,7 +4377,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbf500p, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf500p)
 	// AY8910/YM2149?
-	// FDC: wd2793/tc8566af/None, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 3 Cartridge slots or 2 Cartridge slots and 1 expansion slot ?
 MACHINE_CONFIG_END
 
@@ -4418,7 +4432,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbf700f, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf700f)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
@@ -4473,7 +4487,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbf700s, msx2_pal )
 	MCFG_MSX_LAYOUT(hbf700s)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots
 MACHINE_CONFIG_END
 
@@ -4657,7 +4671,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbg900ap, msx2_pal )
 	MCFG_MSX_LAYOUT(hbg900ap)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -4689,7 +4703,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( hbg900p, msx2_pal )
 	MCFG_MSX_LAYOUT(hbg900p)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 1 3.5" DSDD drive
+	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
@@ -4947,7 +4961,7 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( expert3i, msx2p )
 	MCFG_MSX_LAYOUT(expert3i)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 1 or 2? drives
+	// FDC: wd2793, 1 or 2? drives
 	// 2 Cartridge slots?
 MACHINE_CONFIG_END
 
