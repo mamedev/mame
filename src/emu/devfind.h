@@ -250,6 +250,12 @@ class ioport_array_finder
 
 public:
 	// construction/destruction
+	ioport_array_finder(device_t &base, const char *basetag)
+	{
+		for (int index = 0; index < _Count; index++)
+			m_array[index].reset(global_alloc(ioport_finder_type(base, m_tag[index].format("%s.%d", basetag, index))));
+	}
+
 	ioport_array_finder(device_t &base, const char * const *tags)
 	{
 		for (int index = 0; index < _Count; index++)
@@ -263,6 +269,7 @@ public:
 protected:
 	// internal state
 	auto_pointer<ioport_finder_type> m_array[_Count];
+	astring m_tag[_Count];
 };
 
 // optional ioport array finder
@@ -270,6 +277,7 @@ template<int _Count>
 class optional_ioport_array: public ioport_array_finder<_Count, false>
 {
 public:
+	optional_ioport_array(device_t &base, const char *basetag) : ioport_array_finder<_Count, false>(base, basetag) { }
 	optional_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, false>(base, tags) { }
 };
 
@@ -278,6 +286,7 @@ template<int _Count>
 class required_ioport_array: public ioport_array_finder<_Count, true>
 {
 public:
+	required_ioport_array(device_t &base, const char *basetag) : ioport_array_finder<_Count, true>(base, basetag) { }
 	required_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, true>(base, tags) { }
 };
 
@@ -379,7 +388,7 @@ template<class _PointerType, int _Count>
 class optional_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, false>
 {
 public:
-	optional_shared_ptr_array(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
+	optional_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
 };
 
 // required shared pointer array finder
@@ -387,7 +396,7 @@ template<class _PointerType, int _Count>
 class required_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, true>
 {
 public:
-	required_shared_ptr_array(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
+	required_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
 };
 
 

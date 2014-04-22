@@ -32,14 +32,8 @@ public:
 		m_user1(*this, "user1"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
-		m_key0(*this, "KEY0"),
-		m_key1(*this, "KEY1"),
-		m_key2(*this, "KEY2"),
-		m_key3(*this, "KEY3"),
-		m_key4(*this, "KEY4"),
-		m_key5(*this, "KEY5"),
-		m_joy0(*this, "JOY0"),
-		m_joy1(*this, "JOY1") { }
+		m_keyboard(*this, "KEY"),
+		m_joysticks(*this, "JOY") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
@@ -87,14 +81,8 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 
-	required_ioport m_key0;
-	required_ioport m_key1;
-	required_ioport m_key2;
-	required_ioport m_key3;
-	required_ioport m_key4;
-	required_ioport m_key5;
-	required_ioport m_joy0;
-	required_ioport m_joy1;
+	required_ioport_array<6> m_keyboard;
+	required_ioport_array<2> m_joysticks;
 
 	void switch_banks();
 };
@@ -155,7 +143,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( odyssey2 )
-	PORT_START("KEY0")      /* IN0 */
+	PORT_START("KEY.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
@@ -165,7 +153,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 
-	PORT_START("KEY1")      /* IN1 */
+	PORT_START("KEY.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("?? :") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -175,7 +163,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 
-	PORT_START("KEY2")      /* IN2 */
+	PORT_START("KEY.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
@@ -185,7 +173,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 
-	PORT_START("KEY3")      /* IN3 */
+	PORT_START("KEY.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
@@ -195,7 +183,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 
-	PORT_START("KEY4")      /* IN4 */
+	PORT_START("KEY.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
@@ -205,7 +193,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 
-	PORT_START("KEY5")      /* IN5 */
+	PORT_START("KEY.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('/')
@@ -215,7 +203,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLR") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENT") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 
-	PORT_START("JOY0")      /* IN6 */
+	PORT_START("JOY.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   PORT_PLAYER(1)
@@ -223,7 +211,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1)         PORT_PLAYER(1)
 	PORT_BIT( 0xe0, 0xe0,    IPT_UNUSED )
 
-	PORT_START("JOY1")      /* IN7 */
+	PORT_START("JOY.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   PORT_PLAYER(2)
@@ -588,13 +576,12 @@ READ8_MEMBER(odyssey2_state::p2_read)
 {
 	UINT8 h = 0xFF;
 	int i, j;
-	ioport_port* ioports[] = { m_key0, m_key1, m_key2, m_key3, m_key4, m_key5 };
 
 	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
 	{
 		if ((m_p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
 		{
-			h &= ioports[m_p2 & P2_KEYBOARD_SELECT_MASK]->read();
+			h &= m_keyboard[m_p2 & P2_KEYBOARD_SELECT_MASK]->read();
 		}
 
 		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
@@ -641,12 +628,12 @@ READ8_MEMBER(odyssey2_state::bus_read)
 
 	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
 	{
-		data &= m_joy0->read();       /* read joystick 1 */
+		data &= m_joysticks[0]->read();
 	}
 
 	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
 	{
-		data &= m_joy1->read();       /* read joystick 2 */
+		data &= m_joysticks[1]->read();
 	}
 
 	return data;
