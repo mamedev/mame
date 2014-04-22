@@ -18,7 +18,7 @@ Test of semigraphic 6
 20 FOR I=0 TO 360
 30 PSET(128+SIN(I)*90,91-COS(I)*90), 1
 40 NEXT
-
+RUN
 
 TODO:
 - Cassette frequencies are guesses, need to be verified
@@ -85,7 +85,7 @@ private:
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
-	UINT8 m_kbd_count;
+	bool m_key_pressed;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -270,6 +270,32 @@ static INPUT_PORTS_START( fc100 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+// The timer frequency controls the auto-repeat delay and speed
+TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
+{
+	/* scan the keyboard */
+	UINT8 i;
+	char kbdrow[6];
+
+	for (i = 0; i < 16; i++)
+	{
+		sprintf(kbdrow,"0%X", i);
+		if ((ioport(kbdrow)->read()) < 255)
+		{
+			// IRQ if key pressed
+			m_key_pressed = 1;
+			m_maincpu->set_input_line(0, HOLD_LINE);
+			return;
+		}
+	}
+
+	if (m_key_pressed) // IRQ for key released
+	{
+		m_key_pressed = 0;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
+}
+
 
 //********************* AUDIO **********************************
 #if 0
@@ -433,28 +459,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
-{
-	/* scan the keyboard */
-	UINT8 i;
-	char kbdrow[6];
-
-	for (i = 0; i < 16; i++)
-	{
-		sprintf(kbdrow,"0%X", i);
-		if ((ioport(kbdrow)->read() & 15) < 15)
-		{
-			// IRQ if key pressed
-			m_maincpu->set_input_line(0, HOLD_LINE);
-			return;
-		}
-	}
-	m_kbd_count++;
-
-	// also needs to know if no key pressed
-	m_maincpu->set_input_line(0, BIT(m_kbd_count, 2) ? HOLD_LINE : CLEAR_LINE);
-}
-
 static const cassette_interface fc100_cassette_interface =
 {
 	fc100_cassette_formats,
@@ -491,10 +495,10 @@ void fc100_state::machine_start()
 void fc100_state::machine_reset()
 {
 	m_p_chargen = memregion("chargen")->base();
-	m_kbd_count = 0;
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cass_state = 0;
 	m_cassold = 0;
+	m_key_pressed = 1; // force irq to be cleared
 }
 
 static MACHINE_CONFIG_START( fc100, fc100_state )
@@ -525,7 +529,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(fc100_state, uart_clock_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(2400)) // cass write
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(20000)) // cass read
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(200)) // keyb scan
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
 MACHINE_CONFIG_END
 
 /* ROM definition */
