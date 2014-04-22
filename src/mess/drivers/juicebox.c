@@ -303,18 +303,6 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 	// do nothing
 }
 
-static S3C44B0_INTERFACE( juicebox_s3c44b0_intf )
-{
-	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(juicebox_state,s3c44b0_gpio_port_r), DEVCB_DRIVER_MEMBER32(juicebox_state,s3c44b0_gpio_port_w) },
-	// I2C (scl write / sda read / sda write)
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	// ADC (data read)
-	{ DEVCB_NULL },
-	// I2S (data write)
-	{ DEVCB_DRIVER_MEMBER16(juicebox_state,s3c44b0_i2s_data_w) }
-};
-
 static MACHINE_CONFIG_START( juicebox, juicebox_state )
 	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
 	MCFG_CPU_PROGRAM_MAP(juicebox_map)
@@ -335,7 +323,10 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MCFG_S3C44B0_ADD("s3c44b0", 10000000, juicebox_s3c44b0_intf)
+	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
+	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(juicebox_state, s3c44b0_gpio_port_r))
+	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(juicebox_state, s3c44b0_gpio_port_w))
+	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16(juicebox_state, s3c44b0_i2s_data_w))
 
 	MCFG_SMARTMEDIA_ADD("smartmedia")
 	MCFG_SMARTMEDIA_INTERFACE("smartmedia")

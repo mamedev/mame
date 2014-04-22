@@ -31,7 +31,14 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 const device_type S3C44B0 = &device_creator<s3c44b0_device>;
 
 s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock, "s3c44b0", __FILE__)
+				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock, "s3c44b0", __FILE__),
+					m_port_r_cb(*this),
+					m_port_w_cb(*this),
+					m_scl_w_cb(*this),
+					m_sda_r_cb(*this),
+					m_sda_w_cb(*this),
+					m_data_r_cb(*this),
+					m_data_w_cb(*this)
 {
 	memset(&m_irq, 0, sizeof(s3c44b0_irq_t));
 	memset(m_zdma, 0, sizeof(s3c44b0_dma_t)*2);
@@ -50,25 +57,6 @@ s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void s3c44b0_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const s3c44b0_interface *intf = reinterpret_cast<const s3c44b0_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<s3c44b0_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -76,13 +64,13 @@ void s3c44b0_device::device_start()
 {
 	m_cpu = machine().device<cpu_device>("maincpu");
 
-	m_port_r.resolve(gpio_itf.port_r, *this);
-	m_port_w.resolve(gpio_itf.port_w, *this);
-	m_scl_w.resolve(i2c_itf.scl_w, *this);
-	m_sda_r.resolve(i2c_itf.sda_r, *this);
-	m_sda_w.resolve(i2c_itf.sda_w, *this);
-	m_adc_data_r.resolve(adc_itf.data_r, *this);
-	m_i2s_data_w.resolve(i2s_itf.data_w, *this);
+	m_port_r_cb.resolve();
+	m_port_w_cb.resolve();
+	m_scl_w_cb.resolve();
+	m_sda_r_cb.resolve();
+	m_sda_w_cb.resolve();
+	m_data_r_cb.resolve_safe(0);
+	m_data_w_cb.resolve();
 
 
 	for (int i = 0; i < 6; i++) m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::pwm_timer_exp),this));
@@ -1060,20 +1048,20 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::pwm_timer_exp )
 
 inline void s3c44b0_device::iface_i2c_scl_w(int state)
 {
-	if (!m_scl_w.isnull())
-		(m_scl_w)( state);
+	if (!m_scl_w_cb.isnull())
+		(m_scl_w_cb)( state);
 }
 
 inline void s3c44b0_device::iface_i2c_sda_w(int state)
 {
-	if (!m_sda_w.isnull())
-		(m_sda_w)( state);
+	if (!m_sda_w_cb.isnull())
+		(m_sda_w_cb)( state);
 }
 
 inline int s3c44b0_device::iface_i2c_sda_r()
 {
-	if (!m_sda_r.isnull())
-		return (m_sda_r)();
+	if (!m_sda_r_cb.isnull())
+		return (m_sda_r_cb)();
 	else
 		return 0;
 }
@@ -1282,16 +1270,16 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::iic_timer_exp )
 
 inline UINT32 s3c44b0_device::iface_gpio_port_r(int port)
 {
-	if (!m_port_r.isnull())
-		return (m_port_r)(port);
+	if (!m_port_r_cb.isnull())
+		return (m_port_r_cb)(port);
 	else
 		return 0;
 }
 
 inline void s3c44b0_device::iface_gpio_port_w(int port, UINT32 data)
 {
-	if (!m_port_w.isnull())
-		(m_port_w)(port, data);
+	if (!m_port_w_cb.isnull())
+		(m_port_w_cb)(port, data, 0xffff);
 }
 
 READ32_MEMBER( s3c44b0_device::gpio_r )
@@ -1720,8 +1708,8 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::sio_timer_exp )
 
 inline void s3c44b0_device::iface_i2s_data_w(address_space &space, int ch, UINT16 data)
 {
-	if (!m_i2s_data_w.isnull())
-		(m_i2s_data_w)(ch, data, 0);
+	if (!m_data_w_cb.isnull())
+		(m_data_w_cb)(ch, data, 0);
 }
 
 void s3c44b0_device::iis_start()
