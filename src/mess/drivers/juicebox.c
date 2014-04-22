@@ -32,12 +32,14 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_dac(*this, "dac"),
-			m_s3c44b0(*this, "s3c44b0")
+			m_s3c44b0(*this, "s3c44b0"),
+			m_smartmedia(*this, "smartmedia")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_device<s3c44b0_device> m_s3c44b0;
+	required_device<smartmedia_image_device> m_smartmedia;
 	UINT32 port[9];
 	smc_t smc;
 
@@ -96,11 +98,10 @@ void juicebox_state::smc_init( )
 
 UINT8 juicebox_state::smc_read( )
 {
-	smartmedia_image_device *smartmedia = machine().device<smartmedia_image_device>( "smartmedia");
 	UINT8 data;
-	if (smartmedia->is_present())
+	if (m_smartmedia->is_present())
 	{
-		data = smartmedia->data_r();
+		data = m_smartmedia->data_r();
 	}
 	else
 	{
@@ -112,24 +113,23 @@ UINT8 juicebox_state::smc_read( )
 
 void juicebox_state::smc_write( UINT8 data)
 {
-	smartmedia_image_device *smartmedia = machine().device<smartmedia_image_device>( "smartmedia");
 	verboselog(5, "smc_write %08X\n", data);
-	if (smartmedia->is_present())
+	if (m_smartmedia->is_present())
 	{
 		if (smc.cmd_latch)
 		{
 			verboselog(5, "smartmedia_command_w %08X\n", data);
-			smartmedia->command_w(data);
+			m_smartmedia->command_w(data);
 		}
 		else if (smc.add_latch)
 		{
 			verboselog(5, "smartmedia_address_w %08X\n", data);
-			smartmedia->address_w(data);
+			m_smartmedia->address_w(data);
 		}
 		else
 		{
 			verboselog(5, "smartmedia_data_w %08X\n", data);
-			smartmedia->data_w(data);
+			m_smartmedia->data_w(data);
 		}
 	}
 }
