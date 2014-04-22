@@ -54,16 +54,12 @@
 //**************************************************************************
 
 #define MACHINE_START_NAME(name)    machine_start_##name
-#define MACHINE_START(name)         void MACHINE_START_NAME(name)(running_machine &machine) // legacy
 #define MACHINE_START_CALL_MEMBER(name) MACHINE_START_NAME(name)()
-#define MACHINE_START_CALL_LEGACY(name) MACHINE_START_NAME(name)(machine())
 #define DECLARE_MACHINE_START(name) void MACHINE_START_NAME(name)()
 #define MACHINE_START_MEMBER(cls,name) void cls::MACHINE_START_NAME(name)()
 
 #define MACHINE_RESET_NAME(name)    machine_reset_##name
-#define MACHINE_RESET(name)         void MACHINE_RESET_NAME(name)(running_machine &machine) // legacy
 #define MACHINE_RESET_CALL_MEMBER(name) MACHINE_RESET_NAME(name)()
-#define MACHINE_RESET_CALL_LEGACY(name) MACHINE_RESET_NAME(name)(machine())
 #define DECLARE_MACHINE_RESET(name) void MACHINE_RESET_NAME(name)()
 #define MACHINE_RESET_MEMBER(cls,name) void cls::MACHINE_RESET_NAME(name)()
 
@@ -77,7 +73,6 @@
 #define SOUND_RESET_MEMBER(cls,name) void cls::SOUND_RESET_NAME(name)()
 
 #define VIDEO_START_NAME(name)      video_start_##name
-#define VIDEO_START(name)           void VIDEO_START_NAME(name)(running_machine &machine) // legacy
 #define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
 #define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)()
 #define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()

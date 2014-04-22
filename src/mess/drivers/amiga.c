@@ -490,7 +490,7 @@ WRITE8_MEMBER(a1200_state::ami1200_cia_0_portb_w)
 MACHINE_START_MEMBER(cdtv_state,cdtv)
 {
 	MACHINE_START_CALL_MEMBER(amiga);
-	MACHINE_START_CALL_LEGACY( amigacd );
+	amigacd_start(machine());
 }
 
 
@@ -499,7 +499,7 @@ MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 	MACHINE_RESET_CALL_MEMBER( amiga );
 
 	/* initialize the cdrom controller */
-	MACHINE_RESET_CALL_LEGACY( amigacd );
+	amigacd_reset(machine());
 }
 
 READ8_MEMBER(a1200_state::a1200_cia_0_portA_r)

@@ -2,8 +2,8 @@
 #define __AMIGACD_H__
 
 
-MACHINE_START( amigacd );
-MACHINE_RESET( amigacd );
+void amigacd_start(running_machine &machine);
+void amigacd_reset(running_machine &machine);
 
 
 #endif /* __AMIGACD_H__ */

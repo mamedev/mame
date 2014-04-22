@@ -524,7 +524,7 @@ static void cdrom_subcode_ready( running_machine &machine, int level )
 	tpi->i1_w(level);
 }
 
-MACHINE_START( amigacd )
+void amigacd_start(running_machine &machine)
 {
 	/* initialize the dmac */
 	memset( &dmac_data, 0, sizeof( dmac_data ) );
@@ -538,7 +538,7 @@ MACHINE_START( amigacd )
 	matsucd_init( machine.device<cdrom_image_device>("cdrom"), "cdda" );
 }
 
-MACHINE_RESET( amigacd )
+void amigacd_reset(running_machine &machine)
 {
 	/* initialize the cdrom */
 	matsucd_set_status_enabled_callback( cdrom_status_enabled );

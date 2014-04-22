@@ -65,17 +65,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 //  MACROS
 //**************************************************************************
 
-// NULL versions
-#define machine_start_0             NULL
-#define machine_reset_0             NULL
-#define sound_start_0               NULL
-#define sound_reset_0               NULL
-#define video_start_0               NULL
-#define video_reset_0               NULL
-#define palette_init_0              NULL
-
-
-
 // global allocation helpers
 #define auto_alloc(m, t)                pool_alloc(static_cast<running_machine &>(m).respool(), t)
 #define auto_alloc_clear(m, t)          pool_alloc_clear(static_cast<running_machine &>(m).respool(), t)
