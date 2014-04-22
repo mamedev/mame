@@ -949,13 +949,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const adsp21xx_config adsp_config =
-{
-	DEVCB_NULL,                   /* callback for serial receive */
-	DEVCB_DRIVER_MEMBER32(gaelco3d_state, adsp_tx_callback),       /* callback for serial transmit */
-	DEVCB_NULL                    /* callback for timer fired */
-};
-
 static const tms3203x_config tms_config =
 {
 	true,
@@ -977,7 +970,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_CPU_PROGRAM_MAP(tms_map)
 
 	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)
-	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(gaelco3d_state, adsp_tx_callback))
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 

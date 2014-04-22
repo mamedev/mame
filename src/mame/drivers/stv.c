@@ -1146,12 +1146,6 @@ static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, stv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static const adsp21xx_config adsp_config =
-{
-	DEVCB_NULL,                       /* callback for serial receive */
-	DEVCB_NULL,//sound_tx_callback,      /* callback for serial transmit */
-	DEVCB_NULL,//timer_enable_callback   /* callback for timer fired */
-};
 
 MACHINE_RESET_MEMBER(stv_state,batmanfr)
 {
@@ -1174,7 +1168,6 @@ MACHINE_RESET_MEMBER(stv_state,batmanfr)
 
 static MACHINE_CONFIG_DERIVED( batmanfr, stv )
 	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_ADSP21XX_CONFIG(adsp_config)
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 	MCFG_CPU_IO_MAP(adsp_io_map)

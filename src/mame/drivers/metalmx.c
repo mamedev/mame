@@ -688,13 +688,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const adsp21xx_config adsp_config =
-{
-	DEVCB_NULL,                   /* callback for serial receive */
-	DEVCB_NULL,                   /* callback for serial transmit */
-	DEVCB_NULL,                   /* callback for timer fired */
-};
-
 static const tms34010_config gsp_config =
 {
 	TRUE,                   /* halt on reset */
@@ -718,7 +711,6 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_CPU_ADD("adsp", ADSP2105, XTAL_10MHz)
-	MCFG_ADSP21XX_CONFIG(adsp_config)
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 

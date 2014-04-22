@@ -154,7 +154,10 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 		m_icount(0),
 		m_mstat_mask((m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x7f : 0x0f),
 		m_imask_mask((m_chip_type >= CHIP_TYPE_ADSP2181) ? 0x3ff :
-					(m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f)
+					(m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f),
+		m_sport_rx_cb(*this),
+		m_sport_tx_cb(*this),
+		m_timer_fired_cb(*this)
 {
 	// initialize remaining state
 	memset(&m_core, 0, sizeof(m_core));
@@ -292,18 +295,6 @@ adsp21xx_device::~adsp21xx_device()
 
 
 //-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void adsp21xx_device::static_set_config(device_t &device, const adsp21xx_config &config)
-{
-	adsp21xx_device &adsp = downcast<adsp21xx_device &>(device);
-	static_cast<adsp21xx_config &>(adsp) = config;
-}
-
-
-//-------------------------------------------------
 //  load_boot_data - load the boot data from an
 //  8-bit ROM
 //-------------------------------------------------
@@ -411,9 +402,9 @@ UINT16 adsp2181_device::idma_data_r()
 
 void adsp21xx_device::device_start()
 {
-	m_sport_rx_func.resolve(m_sport_rx_callback, *this);
-	m_sport_tx_func.resolve(m_sport_tx_callback, *this);
-	m_timer_fired_func.resolve(m_timer_fired, *this);
+	m_sport_rx_cb.resolve();
+	m_sport_tx_cb.resolve();
+	m_timer_fired_cb.resolve();
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);

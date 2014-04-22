@@ -888,13 +888,6 @@ static const mips3_config config =
 };
 #endif
 
-static const adsp21xx_config adsp_config =
-{
-	DEVCB_NULL,                       /* callback for serial receive */
-	DEVCB_NULL,//sound_tx_callback,      /* callback for serial transmit */
-	DEVCB_NULL,//timer_enable_callback   /* callback for timer fired */
-};
-
 static const voodoo_config voodoo_1_intf =
 {
 	2, //               fbmem;
@@ -928,7 +921,6 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_CPU_PROGRAM_MAP(magictg_map)
 
 	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_ADSP21XX_CONFIG(adsp_config)
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 	MCFG_CPU_IO_MAP(adsp_io_map)

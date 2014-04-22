@@ -1279,29 +1279,6 @@ static INPUT_PORTS_START( hdrivair )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  CPU configuration
- *
- *************************************/
-
-static const adsp21xx_config ds3sdsp_config =
-{
-	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3sdsp_serial_rx_callback), /* callback for serial receive */
-	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3sdsp_serial_tx_callback), /* callback for serial transmit */
-	DEVCB_DRIVER_LINE_MEMBER(harddriv_state, hdds3sdsp_timer_enable_callback) /* callback for timer fired */
-};
-
-static const adsp21xx_config ds3xdsp_config =
-{
-	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3xdsp_serial_rx_callback), /* callback for serial receive */
-	DEVCB_DRIVER_MEMBER32(harddriv_state, hdds3xdsp_serial_tx_callback), /* callback for serial transmit */
-	DEVCB_DRIVER_LINE_MEMBER(harddriv_state, hdds3xdsp_timer_enable_callback) /* callback for timer fired */
-};
-
-
-
 /*************************************
  *
  *  Main board pieces
@@ -1421,13 +1398,17 @@ static MACHINE_CONFIG_FRAGMENT( ds3 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_CPU_ADD("ds3sdsp", ADSP2105, XTAL_10MHz)
-	MCFG_ADSP21XX_CONFIG(ds3sdsp_config)
+	MCFG_ADSP21XX_SPORT_RX_CB(READ32(harddriv_state, hdds3sdsp_serial_rx_callback))
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(harddriv_state, hdds3sdsp_serial_tx_callback))
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(harddriv_state, hdds3sdsp_timer_enable_callback))
 	MCFG_CPU_PROGRAM_MAP(ds3sdsp_program_map)
 	MCFG_CPU_DATA_MAP(ds3sdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3sdsp_timer", harddriv_state, ds3sdsp_internal_timer_callback)
 
 	MCFG_CPU_ADD("ds3xdsp", ADSP2105, XTAL_10MHz)
-	MCFG_ADSP21XX_CONFIG(ds3xdsp_config)
+	MCFG_ADSP21XX_SPORT_RX_CB(READ32(harddriv_state, hdds3xdsp_serial_rx_callback))
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(harddriv_state, hdds3xdsp_serial_tx_callback))
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(harddriv_state, hdds3xdsp_timer_enable_callback))
 	MCFG_CPU_PROGRAM_MAP(ds3xdsp_program_map)
 	MCFG_CPU_DATA_MAP(ds3xdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3xdsp_timer", harddriv_state, ds3xdsp_internal_timer_callback)
