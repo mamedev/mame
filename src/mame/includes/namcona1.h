@@ -25,6 +25,7 @@ enum
 
 class namcona1_state : public driver_device
 {
+	static const char * const ioport_tags[];
 public:
 	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -34,6 +35,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_c140(*this, "c140"),
+		m_ioport(*this, ioport_tags),
+		m_io_p3(*this, "P3"),
 		m_workram(*this,"workram"),
 		m_vreg(*this,"vreg"),
 		m_paletteram(*this, "paletteram"),
@@ -49,6 +52,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<c140_device> m_c140;
+	required_ioport_array<4> m_ioport;
+	required_ioport          m_io_p3;
 	required_shared_ptr<UINT16> m_workram;
 	required_shared_ptr<UINT16> m_vreg;
 	required_shared_ptr<UINT16> m_paletteram;

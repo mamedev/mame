@@ -661,24 +661,14 @@ WRITE8_MEMBER(namcona1_state::port6_w)
 	m_mcu_port6 = data;
 }
 
+const char * const namcona1_state::ioport_tags[] = { "P4", "DSW", "P1", "P2" };
+
 READ8_MEMBER(namcona1_state::port7_r)
 {
-	switch (m_mcu_port6 & 0xe0)
-	{
-		case 0x40:
-			return ioport("P1")->read();
-
-		case 0x60:
-			return ioport("P2")->read();
-
-		case 0x20:
-			return ioport("DSW")->read();
-
-		case 0x00:
-			return ioport("P4")->read();
-	}
-
-	return 0xff;
+	if ((m_mcu_port6 & 0x80) == 0)
+		return m_ioport[m_mcu_port6 >> 5]->read();
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER(namcona1_state::port7_w)
@@ -713,7 +703,6 @@ void namcona1_state::machine_reset()
 	m_mcu_port5 = 1;
 }
 
-// "encrypt" player 3 inputs
 // each bit of player 3's inputs is split across one of the 8 analog input ports
 // bit 6 => port 0
 // bit 5 => port 1
@@ -726,7 +715,7 @@ void namcona1_state::machine_reset()
 READ8_MEMBER(namcona1_state::portana_r)
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = ioport("P3")->read();
+	UINT8 port = m_io_p3->read();
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
