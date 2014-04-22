@@ -8,7 +8,7 @@
  *
  *****************************************************************************/
 #ifndef _CPU_ALTO2_H_
-#define _CPU_ALTO2_H
+#define _CPU_ALTO2_H_
 
 #define ALTO2_TAG "alto2"
 
