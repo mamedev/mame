@@ -925,19 +925,3 @@ UINT16 legacy_mos6526_device::cia_timer::get_count()
 ***************************************************************************/
 
 void cia_set_port_mask_value(device_t *device, int port, int data) { downcast<legacy_mos6526_device *>(device)->set_port_mask_value(port, data); }
-
-READ8_DEVICE_HANDLER( mos6526_r ) { return downcast<legacy_mos6526_device *>(device)->reg_r(offset); }
-WRITE8_DEVICE_HANDLER( mos6526_w ) { downcast<legacy_mos6526_device *>(device)->reg_w(offset, data); }
-
-READ8_DEVICE_HANDLER( mos6526_pa_r ) { return downcast<legacy_mos6526_device *>(device)->pa_r(offset); }
-READ8_DEVICE_HANDLER( mos6526_pb_r ) { return downcast<legacy_mos6526_device *>(device)->pb_r(offset); }
-
-READ_LINE_DEVICE_HANDLER( mos6526_irq_r ) { return downcast<legacy_mos6526_device *>(device)->irq_r(); }
-
-WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w ) { downcast<legacy_mos6526_device *>(device)->tod_w(state); }
-
-READ_LINE_DEVICE_HANDLER( mos6526_cnt_r ) { return downcast<legacy_mos6526_device *>(device)->cnt_r(); }
-WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w ) { downcast<legacy_mos6526_device *>(device)->cnt_w(state); }
-
-READ_LINE_DEVICE_HANDLER( mos6526_sp_r ) { return downcast<legacy_mos6526_device *>(device)->sp_r(); }
-WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w ) { downcast<legacy_mos6526_device *>(device)->sp_w(state); }
