@@ -15,7 +15,7 @@ it's all a guess.
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 
-#define FC100_WAV_FREQUENCY   9600
+#define FC100_WAV_FREQUENCY   4800
 #define FC100_HEADER_BYTES    16
 
 // image size

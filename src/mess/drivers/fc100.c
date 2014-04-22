@@ -394,14 +394,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
 	}
 
 	if (m_cass_state)
-		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 1200Hz
 	else
-		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); //  600Hz
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 {
-	/* cassette - turn 1200/2400Hz to a bit */
+	/* cassette - turn 600/1200Hz to a bit */
 	m_cass_data[1]++;
 	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
@@ -472,6 +472,9 @@ void fc100_state::machine_reset()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_kbd_count = 0;
+	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
+	m_cass_state = 0;
+	m_cassold = 0;
 }
 
 static MACHINE_CONFIG_START( fc100, fc100_state )
@@ -498,10 +501,10 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CASSETTE_ADD("cassette", fc100_cassette_interface)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16) // gives 19200
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16/2) // gives 9600
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(fc100_state, uart_clock_w))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(2400)) // cass write
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(20000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(200)) // keyb scan
 MACHINE_CONFIG_END
 
