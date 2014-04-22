@@ -232,6 +232,9 @@ public:
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
+	
+	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
+	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
 private:
 	UINT32 ptm_counter;

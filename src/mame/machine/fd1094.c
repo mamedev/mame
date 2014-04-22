@@ -720,8 +720,8 @@ void fd1094_device::device_start()
 	m_cache.configure(0x000000, m_srcbytes, 0x000000);
 
 	// register for the state changing callbacks we need in the m68000
-	m68k_set_cmpild_callback(this, &fd1094_device::cmp_callback);
-	m68k_set_rte_callback(this, &fd1094_device::rte_callback);
+	set_cmpild_callback(write32_delegate(FUNC(fd1094_device::cmp_callback),this));
+	set_rte_callback(write_line_delegate(FUNC(fd1094_device::rte_callback),this));
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fd1094_device::irq_callback),this));
 
 	// save state
@@ -976,10 +976,10 @@ void fd1094_device::default_state_change(UINT8 state)
 //  (state change)
 //-------------------------------------------------
 
-void fd1094_device::cmp_callback(device_t *device, UINT32 val, UINT8 reg)
+WRITE32_MEMBER(fd1094_device::cmp_callback)
 {
-	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff)
-		downcast<fd1094_device *>(device)->change_state(val >> 16);
+	if (offset == 0 && (data & 0x0000ffff) == 0x0000ffff)
+		change_state(data >> 16);
 }
 
 
@@ -1000,9 +1000,9 @@ IRQ_CALLBACK_MEMBER( fd1094_device::irq_callback )
 //  is encountered
 //-------------------------------------------------
 
-void fd1094_device::rte_callback(device_t *device)
+WRITE_LINE_MEMBER(fd1094_device::rte_callback)
 {
-	downcast<fd1094_device *>(device)->change_state(STATE_RTE);
+	change_state(STATE_RTE);
 }
 
 

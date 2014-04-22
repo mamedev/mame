@@ -59,7 +59,7 @@ void deco102_decrypt_cpu(running_machine &machine, const char *cputag, int addre
 	memcpy(buf, rom, size);
 
 	space.set_decrypted_region(0, size - 1, opcodes);
-	m68k_set_encrypted_opcode_range((m68000_base_device*)machine.device(cputag), 0, size);
+	((m68000_base_device*)machine.device(cputag))->set_encrypted_opcode_range(0, size);
 
 	for (i = 0; i < size / 2; i++)
 	{

@@ -390,7 +390,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 {
 	if(!space.debugger_access())
 	{
-		m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,0,m68k_get_fc(m_maincpu));
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -401,7 +401,7 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 {
 	if(!space.debugger_access())
 	{
-		m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,1,m68k_get_fc(m_maincpu));
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}

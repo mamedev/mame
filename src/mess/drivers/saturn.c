@@ -651,7 +651,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 
 	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sat_console_state::stv_rtc_increment),this));
 
-	m68k_set_reset_callback(m_audiocpu, &sat_console_state::m68k_reset_callback);
+	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(sat_console_state::m68k_reset_callback),this));
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */

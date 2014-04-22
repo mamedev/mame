@@ -8457,7 +8457,7 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 
 	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps_state::gigaman2_dummyqsound_w), this)); // no qsound..
 	space.set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
-	m68k_set_encrypted_opcode_range(m_maincpu, 0, length);
+	m_maincpu->set_encrypted_opcode_range(0, length);
 
 	/* no digital volume switches on this? */
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);

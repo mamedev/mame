@@ -374,12 +374,10 @@ MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 }
 
 
-static void toaplan2_reset(device_t *device)
+WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 {
-	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
-
-	if (state->m_audiocpu != NULL)
-		state->m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	if (m_audiocpu != NULL)
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -390,7 +388,7 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
 	// when leaving service mode if the sound CPU is not reset.
-	m68k_set_reset_callback(m_maincpu, toaplan2_reset);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan2_state::toaplan2_reset),this));
 }
 
 

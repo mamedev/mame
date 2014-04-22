@@ -721,7 +721,7 @@ static void cps2_decrypt(running_machine &machine, const UINT32 *master_key, UIN
 	}
 
 	space.set_decrypted_region(0x000000, length - 1, dec);
-	m68k_set_encrypted_opcode_range((m68000_base_device*)machine.device("maincpu"), 0, length);
+	((m68000_base_device*)machine.device("maincpu"))->set_encrypted_opcode_range(0, length);
 }
 
 

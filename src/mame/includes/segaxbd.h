@@ -103,7 +103,7 @@ protected:
 
 	// internal helpers
 	void update_main_irqs();
-	static void m68k_reset_callback(device_t *device);
+	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 
 	// custom I/O
 	void generic_iochip0_lamps_w(UINT8 data);

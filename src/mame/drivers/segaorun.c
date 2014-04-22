@@ -571,7 +571,7 @@ void segaorun_state::machine_reset()
 	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
-	m68k_set_reset_callback(m_maincpu, m68k_reset_callback);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaorun_state::m68k_reset_callback),this));
 
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
@@ -875,10 +875,9 @@ void segaorun_state::update_main_irqs()
 //  main 68000 is reset
 //-------------------------------------------------
 
-void segaorun_state::m68k_reset_callback(device_t *device)
+WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 {
-	segaorun_state *state = device->machine().driver_data<segaorun_state>();
-	state->m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 

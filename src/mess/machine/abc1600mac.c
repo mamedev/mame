@@ -321,7 +321,7 @@ void abc1600_mac_device::write_supervisor_memory(address_space &space, offs_t of
 
 int abc1600_mac_device::get_fc()
 {
-	UINT16 fc = m68k_get_fc(m_cpu);
+	UINT16 fc = m_cpu->get_fc();
 
 	m_ifc2 = !(!(MAGIC || FC0) || FC2);
 

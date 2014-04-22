@@ -639,7 +639,7 @@ public:
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 
-	static void m68k_reset_callback(device_t *device);
+	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 	int DectoBCD(int num);
 
 	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);

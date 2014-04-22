@@ -222,7 +222,7 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;

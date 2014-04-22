@@ -840,8 +840,8 @@ inline void m68000_base_device::cpu_execute(void)
 			debugger_instruction_hook(this, REG_PC(this));
 
 			/* call external instruction hook (independent of debug mode) */
-			if (instruction_hook != NULL)
-				instruction_hook(this, REG_PC(this));
+			if (!instruction_hook.isnull())
+				instruction_hook(*program, REG_PC(this), 0xffffffff);
 
 			/* Record previous program counter */
 			REG_PPC(this) = REG_PC(this);
@@ -1085,11 +1085,6 @@ void m68000_base_device::reset_cpu(void)
 		// clear instruction cache
 		m68ki_ic_clear(this);
 	}
-
-	// disable instruction hook
-	instruction_hook = NULL;
-
-
 }
 
 
@@ -1239,20 +1234,20 @@ void m68000_base_device::state_string_export(const device_state_entry &entry, as
 
 /* global access */
 
-void m68k_set_encrypted_opcode_range(m68000_base_device *device, offs_t start, offs_t end)
+void m68000_base_device::set_encrypted_opcode_range(offs_t start, offs_t end)
 {
-	device->encrypted_start = start;
-	device->encrypted_end = end;
+	encrypted_start = start;
+	encrypted_end = end;
 }
 
-void m68k_set_hmmu_enable(m68000_base_device *device, int enable)
+void m68000_base_device::set_hmmu_enable(int enable)
 {
-	device->hmmu_enabled = enable;
+	hmmu_enabled = enable;
 }
 
-void m68k_set_instruction_hook(m68000_base_device *device, instruction_hook_t ihook)
+void m68000_base_device::set_instruction_hook(read32_delegate ihook)
 {
-	device->instruction_hook = ihook;
+	instruction_hook = ihook;
 }
 
 /****************************************************************************
@@ -1676,39 +1671,39 @@ void m68000_base_device::init32hmmu(address_space &space)
 	write32 = m68k_write32_delegate(FUNC(m68000_base_device::writelong_d32_hmmu), this);
 }
 
-void m68k_set_reset_callback(m68000_base_device *device, m68k_reset_func callback)
+void m68000_base_device::set_reset_callback(write_line_delegate callback)
 {
-	device->reset_instr_callback = callback;
+	reset_instr_callback = callback;
 }
 
 // fault_addr = address to indicate fault at
 // rw = 0 for read, 1 for write
 // fc = 3-bit function code of access (usually you'd just put what m68k_get_fc() returns here)
-void m68k_set_buserror_details(m68000_base_device *device, UINT32 fault_addr, UINT8 rw, UINT8 fc)
+void m68000_base_device::set_buserror_details(UINT32 fault_addr, UINT8 rw, UINT8 fc)
 {
-	device->aerr_address = fault_addr;
-	device->aerr_write_mode = rw;
-	device->aerr_fc = fc;
+	aerr_address = fault_addr;
+	aerr_write_mode = rw;
+	aerr_fc = fc;
 }
 
-void m68k_set_cmpild_callback(m68000_base_device *device, m68k_cmpild_func callback)
+void m68000_base_device::set_cmpild_callback(write32_delegate callback)
 {
-	device->cmpild_instr_callback = callback;
+	cmpild_instr_callback = callback;
 }
 
-void m68k_set_rte_callback(m68000_base_device *device, m68k_rte_func callback)
+void m68000_base_device::set_rte_callback(write_line_delegate callback)
 {
-	device->rte_instr_callback = callback;
+	rte_instr_callback = callback;
 }
 
-void m68k_set_tas_callback(m68000_base_device *device, m68k_tas_func callback)
+void m68000_base_device::set_tas_callback(read_line_delegate callback)
 {
-	device->tas_instr_callback = callback;
+	tas_instr_callback = callback;
 }
 
-UINT16 m68k_get_fc(m68000_base_device *device)
+UINT16 m68000_base_device::get_fc()
 {
-	return device->mmu_tmp_fc;
+	return mmu_tmp_fc;
 }
 
 /****************************************************************************
@@ -2417,12 +2412,6 @@ void m68000_base_device::clear_all()
 	cyc_exception = 0;
 
 	int_ack_callback = 0;
-	bkpt_ack_callback = 0;
-	reset_instr_callback = 0;
-	cmpild_instr_callback = 0;
-	rte_instr_callback = 0;
-	tas_instr_callback = 0;
-
 	program = 0;
 
 	opcode_xor = 0;
@@ -2477,8 +2466,6 @@ void m68000_base_device::clear_all()
 		ic_data[i] = 0;
 
 	internal = 0;
-
-	instruction_hook = 0;
 }
 
 

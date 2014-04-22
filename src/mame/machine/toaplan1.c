@@ -366,11 +366,9 @@ WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
 	}
 }
 
-static void toaplan1_reset_callback(device_t *device)
+WRITE_LINE_MEMBER(toaplan1_state::toaplan1_reset_callback)
 {
-	toaplan1_state *state = device->machine().driver_data<toaplan1_state>();
-
-	state->toaplan1_reset_sound();
+	toaplan1_reset_sound();
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
@@ -384,7 +382,7 @@ MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 MACHINE_RESET_MEMBER(toaplan1_state,zerowing)
 {
 	MACHINE_RESET_CALL_MEMBER(toaplan1);
-	m68k_set_reset_callback(m_maincpu, toaplan1_reset_callback);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::toaplan1_reset_callback),this));
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
@@ -401,7 +399,7 @@ MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 	m_vimana_coins[0] = m_vimana_coins[1] = 0;
 	m_vimana_credits = 0;
 	m_vimana_latch = 0;
-	m68k_set_reset_callback(m_maincpu, toaplan1_reset_callback);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::toaplan1_reset_callback),this));
 }
 
 

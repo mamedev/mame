@@ -350,6 +350,7 @@ public:
 	void dectalk_clear_all_fifos(  );
 	void dectalk_semaphore_w ( UINT16 data );
 	UINT16 dectalk_outfifo_r (  );
+	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -458,33 +459,32 @@ UINT16 dectalk_state::dectalk_outfifo_r (  )
 }
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
-static void dectalk_reset(device_t *device)
+WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
-	dectalk_state *state = device->machine().driver_data<dectalk_state>();
-	state->m_hack_self_test = 0; // hack
+	m_hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	device->machine().device<x2212_device>("x2212")->recall(0);
-	device->machine().device<x2212_device>("x2212")->recall(1);
-	device->machine().device<x2212_device>("x2212")->recall(0); // nvram recall
-	state->m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
-	state->m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	device->machine().device("duartn68681")->reset(); // reset the DUART
+	machine().device<x2212_device>("x2212")->recall(0);
+	machine().device<x2212_device>("x2212")->recall(1);
+	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
+	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
+	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
+	machine().device("duartn68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
-	state->dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	state->dectalk_semaphore_w(0); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
-	state->m_spc_error_latch = 0; // spc error latch is cleared on /reset
-	state->m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
-	state->m_tlc_tonedetect = 0; // TODO, needed for selftest pass
-	state->m_tlc_ringdetect = 0; // TODO
-	state->m_tlc_dtmf = 0; // TODO
-	state->m_duart_inport = 0xF;
-	state->m_duart_outport = 0;
+	dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
+	dectalk_semaphore_w(0); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	m_spc_error_latch = 0; // spc error latch is cleared on /reset
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+	m_tlc_tonedetect = 0; // TODO, needed for selftest pass
+	m_tlc_ringdetect = 0; // TODO
+	m_tlc_dtmf = 0; // TODO
+	m_duart_inport = 0xF;
+	m_duart_outport = 0;
 }
 
 void dectalk_state::machine_reset()
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m68k_set_reset_callback(m_maincpu, dectalk_reset);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(dectalk_state::dectalk_reset),this));
 }
 
 /* Begin 68k i/o handlers */

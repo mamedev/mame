@@ -1334,7 +1334,7 @@ MACHINE_START_MEMBER(stv_state,stv)
 
 	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(stv_state::stv_rtc_increment),this));
 
-	m68k_set_reset_callback(m_audiocpu, &saturn_state::m68k_reset_callback);
+	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(stv_state::m68k_reset_callback),this));
 }
 
 

@@ -221,17 +221,15 @@ UINT32 apollo_get_node_id(void) {
   apollo_instruction_hook
   must be called by the CPU core before executing each instruction
 ***************************************************************************/
-int apollo_instruction_hook(m68000_base_device *device, offs_t curpc)
+READ32_MEMBER(apollo_state::apollo_instruction_hook)
 {
-	m68000_base_device *m68k = device;
-
 	static UINT16 idle_counter = 0;
 
-	// m68k->ir still has previous instruction
-	UINT16 last_ir = m68k->ir;
+	// m_maincpu->ir still has previous instruction
+	UINT16 last_ir = m_maincpu->ir;
 
 	// get next instruction (or 0 if unavailable)
-	UINT16 next_ir = (m68k->pref_addr == REG_PC(m68k)) ? m68k->pref_data : 0;
+	UINT16 next_ir = (m_maincpu->pref_addr == REG_PC(m_maincpu)) ? m_maincpu->pref_data : 0;
 
 	// check for NULLPROC:
 	// 027C F8FF AND.W #F8FF,SR
@@ -240,7 +238,7 @@ int apollo_instruction_hook(m68000_base_device *device, offs_t curpc)
 	if ((next_ir == 0x60fa && last_ir == 0x027c) || (next_ir == 0x027c  && last_ir == 0x60fa))
 	{
 		// we are within the idle loop, slow down CPU to reduce power usage
-		m68k->remaining_cycles -= 500;
+		m_maincpu->remaining_cycles -= 500;
 
 		if (apollo_config(APOLLO_CONF_IDLE_SLEEP) && apollo_is_dsp3x00() && ++idle_counter >= 1000)
 		{
@@ -256,19 +254,19 @@ int apollo_instruction_hook(m68000_base_device *device, offs_t curpc)
 		idle_counter = 0;
 	}
 
-	if (!m68k->has_fpu && !m68k->pmmu_enabled && (m68k->ir & 0xff00) == 0xf200)
+	if (!m_maincpu->has_fpu && !m_maincpu->pmmu_enabled && (m_maincpu->ir & 0xff00) == 0xf200)
 	{
 		// set APOLLO_CSR_SR_FP_TRAP in cpu status register for /sau7/self_test
 		apollo_csr_set_status_register(APOLLO_CSR_SR_FP_TRAP, APOLLO_CSR_SR_FP_TRAP);
 	}
 
-	if (m68k->t1_flag && !m68k->s_flag)
+	if (m_maincpu->t1_flag && !m_maincpu->s_flag)
 	{
 		// FIXME: trace emulation is disabled in m68kcpu.h; why???
-		m68ki_exception_trace(m68k);
+		m68ki_exception_trace(m_maincpu);
 	}
 
-	return apollo_debug_instruction_hook(device, curpc);
+	return apollo_debug_instruction_hook(m_maincpu, offset);
 }
 
 /***************************************************************************
@@ -930,26 +928,23 @@ void apollo_state::machine_reset()
 	}
 	#endif
 
-	m68k_set_instruction_hook(m_maincpu, apollo_instruction_hook);
+	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
 }
 
-static void apollo_reset_instr_callback(device_t *device)
+WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 {
-	running_machine &machine = device->machine();
-	apollo_state *apollo = machine.driver_data<apollo_state>();
-
-	DLOG1(("apollo_reset_instr_callback"));
+	MLOG1(("apollo_reset_instr_callback"));
 
 	// reset the CPU board devices
-	apollo->MACHINE_RESET_CALL_MEMBER(apollo);
+	MACHINE_RESET_CALL_MEMBER(apollo);
 
 	// reset the ISA bus devices
-	apollo->m_isa->reset();
+	m_isa->reset();
 
 	if (!apollo_is_dsp3x00())
 	{
-		machine.device(APOLLO_SCREEN_TAG)->reset();
-		machine.device(APOLLO_KBD_TAG )->reset();
+		machine().device(APOLLO_SCREEN_TAG)->reset();
+		machine().device(APOLLO_KBD_TAG )->reset();
 	}
 }
 
@@ -978,7 +973,7 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apollo_state::apollo_irq_acknowledge),this));
 
 	/* hook the RESET line, which resets a slew of other components */
-	m68k_set_reset_callback(m_maincpu, apollo_reset_instr_callback);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(apollo_state::apollo_reset_instr_callback),this));
 
 	ram_base_address = DN3500_RAM_BASE;
 	ram_end_address = DN3500_RAM_END;

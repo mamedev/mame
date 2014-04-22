@@ -297,6 +297,7 @@ public:
 	DECLARE_READ16_MEMBER( characteriser16_r );
 	DECLARE_WRITE16_MEMBER( bwb_characteriser16_w );
 	DECLARE_READ16_MEMBER( bwb_characteriser16_r );
+	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 };
 
 /*************************************
@@ -1251,11 +1252,10 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
-static void video_reset(device_t *device)
+WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	state->m_ptm->reset();
-	state->m_acia_1->reset();
+	m_ptm->reset();
+	m_acia_1->reset();
 }
 
 /* machine start (called only once) */
@@ -1271,7 +1271,7 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	MechMtr_config(machine(),8);
 
 	/* Hook the reset line */
-	m68k_set_reset_callback(m_videocpu, ::video_reset);
+	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
 MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)

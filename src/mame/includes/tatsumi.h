@@ -137,6 +137,7 @@ public:
 	INTERRUPT_GEN_MEMBER(roundup5_interrupt);
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
+	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<m68000_base_device> m_subcpu;

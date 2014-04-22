@@ -304,8 +304,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 			case 0x00:
 				if (m_model == MODEL_MAC_LC)
 				{
-					m68000_base_device *m68k = downcast<m68000_base_device *>(m_maincpu.target());
-					m68k_set_hmmu_enable(m68k, (data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
+					m_maincpu->set_hmmu_enable((data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
 				}
 				break;
 

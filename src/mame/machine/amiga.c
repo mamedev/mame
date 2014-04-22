@@ -256,27 +256,26 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 }
 
 
-static void amiga_m68k_reset(device_t *device)
+WRITE_LINE_MEMBER(amiga_state::amiga_m68k_reset)
 {
-	amiga_state *state = device->machine().driver_data<amiga_state>();
-	address_space &space = device->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	logerror("Executed RESET at PC=%06x\n", space.device().safe_pc());
 
 	/* Initialize the various chips */
-	state->m_cia_0->reset();
-	state->m_cia_1->reset();
-	custom_reset(device->machine());
-	autoconfig_reset(device->machine());
+	m_cia_0->reset();
+	m_cia_1->reset();
+	custom_reset(machine());
+	autoconfig_reset(machine());
 
 	/* set the overlay bit */
-	if ( IS_AGA(state->m_intf) )
+	if ( IS_AGA(m_intf) )
 	{
 		space.write_byte( 0xbfa001, 1 );
 	}
 	else
 	{
-		state->amiga_cia_w(space, 0x1001/2, 1, 0xffff);
+		amiga_cia_w(space, 0x1001/2, 1, 0xffff);
 	}
 }
 
@@ -288,9 +287,9 @@ MACHINE_START_MEMBER(amiga_state,amiga)
 MACHINE_RESET_MEMBER(amiga_state,amiga)
 {
 	/* set m68k reset  function */
-	m68k_set_reset_callback(m_maincpu, amiga_m68k_reset);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(amiga_state::amiga_m68k_reset),this));
 
-	amiga_m68k_reset(m_maincpu);
+	amiga_m68k_reset(1);
 
 	/* call the system-specific callback */
 	if (m_intf->reset_callback)
