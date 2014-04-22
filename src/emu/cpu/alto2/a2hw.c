@@ -186,7 +186,7 @@ WRITE16_MEMBER( alto2_cpu_device::mouse_buttons_w ) { X_WRBITS(m_hw.utilin,16,13
  * @brief printer paper strobe bit
  * Paper strobe bit. Toggling this bit causes a paper scrolling operation.
  */
-static inline UINT16 GET_PPPSTR(UINT16 utilout) { return X_RDBITS(utilout,16,0,0); }
+//static inline UINT16 GET_PPPSTR(UINT16 utilout) { return X_RDBITS(utilout,16,0,0); }
 
 /**
  * @brief printer retstore bit
@@ -194,26 +194,26 @@ static inline UINT16 GET_PPPSTR(UINT16 utilout) { return X_RDBITS(utilout,16,0,0
  * the "check" condition if present) and moves the carriage to the
  * left margin.
  */
-static inline UINT16 GET_PREST(UINT16 utilout) { return X_RDBITS(utilout,16,1,1); }
+//static inline UINT16 GET_PREST(UINT16 utilout) { return X_RDBITS(utilout,16,1,1); }
 
 /**
  * @brief printer ribbon bit
  * Ribbon bit. When this bit is 1 the ribbon is up (in printing
  * position); when 0, it is down.
  */
-static inline UINT16 GET_PRIB(UINT16 utilout) { return X_RDBITS(utilout,16,2,2); }
+//static inline UINT16 GET_PRIB(UINT16 utilout) { return X_RDBITS(utilout,16,2,2); }
 
 /**
  * @brief printer daisy strobe bit
  * Daisy strobe bit. Toggling this bit causes a character to be printed.
  */
-static inline UINT16 GET_PCHSTR(UINT16 utilout) { return X_RDBITS(utilout,16,3,3); }
+//static inline UINT16 GET_PCHSTR(UINT16 utilout) { return X_RDBITS(utilout,16,3,3); }
 
 /**
  * @brief printer carriage strobe bit
  * Carriage strobe bit. Toggling this bit causes a horizontal position operation.
  */
-static inline UINT16 GET_PCARSTR(UINT16 utilout) { return X_RDBITS(utilout,16,4,4); }
+//static inline UINT16 GET_PCARSTR(UINT16 utilout) { return X_RDBITS(utilout,16,4,4); }
 
 /**
  * @brief printer data
@@ -227,7 +227,7 @@ static inline UINT16 GET_PCARSTR(UINT16 utilout) { return X_RDBITS(utilout,16,4,
  * represented as sign-magnitude (i.e., bit 5 is 1 for negative numbers, 0 for
  * positive; bits 6-15 are the absolute value of the number).
  */
-static inline UINT16 GET_PDATA(UINT16 utilout) { return X_RDBITS(utilout,16,5,15); }
+//static inline UINT16 GET_PDATA(UINT16 utilout) { return X_RDBITS(utilout,16,5,15); }
 
 /**
  * @brief read the UTILIN port
