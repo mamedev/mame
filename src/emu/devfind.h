@@ -328,8 +328,8 @@ public:
 
 protected:
 	// internal state
-	auto_pointer<shared_ptr_type> m_array[_Count+1];
-	astring m_tag[_Count+1];
+	auto_pointer<shared_ptr_type> m_array[_Count];
+	astring m_tag[_Count];
 };
 
 // optional shared pointer array finder
