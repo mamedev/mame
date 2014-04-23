@@ -65,7 +65,15 @@ void cybiko_state::machine_start()
 	cybiko_rs232_init();
 	// other
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybiko),this));
-	m_nvram->set_base(m_ram->pointer(), RAMDISK_SIZE);
+
+	int nvram_size = RAMDISK_SIZE;
+
+	if (m_ram->size() < nvram_size)
+	{
+		nvram_size = m_ram->size();
+	}
+
+	m_nvram->set_base(m_ram->pointer(), nvram_size);
 }
 
 ///////////////////
@@ -213,6 +221,7 @@ READ16_MEMBER( cybiko_state::cybikoxt_key_r )
 	return cybiko_key_r(offset, mem_mask);
 }
 
+#if 0
 READ16_MEMBER( cybiko_state::cybikov1_io_reg_r )
 {
 	UINT16 data = 0;
@@ -469,6 +478,7 @@ WRITE16_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 	}
 #endif
 }
+#endif
 
 // Cybiko Xtreme writes following byte pairs to 0x200003/0x200000
 // 00/01, 00/C0, 0F/32, 0D/03, 0B/03, 09/50, 07/D6, 05/00, 04/00, 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01

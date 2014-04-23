@@ -94,21 +94,59 @@ static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0xe00000, 0xefffff ) AM_READ( cybikoxt_key_r )
 ADDRESS_MAP_END
 
+READ16_MEMBER(cybiko_state::serflash_r)
+{
+	if (m_flash1->so_r())
+	{
+		return 0x08;
+	}
+
+	return 0;
+}
+
+READ16_MEMBER(cybiko_state::clock_r)
+{
+	if (m_rtc->sda_r())
+	{
+		return (0x01|0x04);
+	}
+
+	return 0x04;
+}
+
+READ16_MEMBER(cybiko_state::xtclock_r)
+{
+	if (m_rtc->sda_r())
+	{
+		return 0x40;
+	}
+
+	return 0;
+}
+
+READ16_MEMBER(cybiko_state::xtpower_r)
+{
+	// bit 7 = on/off button
+	// bit 6 = battery charged if "1"
+	return 0xc0c0;
+}
+
 //////////////////////
 // ADDRESS MAP - IO //
 //////////////////////
 
 static ADDRESS_MAP_START( cybikov1_io, AS_IO, 16, cybiko_state )
-	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov1_io_reg_r, cybikov1_io_reg_w )
+	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READ(serflash_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
-	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov2_io_reg_r, cybikov2_io_reg_w )
+	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READ(serflash_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 16, cybiko_state )
-	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikoxt_io_reg_r, cybikoxt_io_reg_w )
-ADDRESS_MAP_END
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READ(xtpower_r)
+	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READ(xtclock_r)
+ADDRESS_MAP_END 								 
 
 /////////////////
 // INPUT PORTS //
@@ -339,10 +377,6 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL_18_432MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )
 	MCFG_CPU_IO_MAP(cybikoxt_io )
-
-	// setup loopback
-	MCFG_DEVICE_MODIFY("maincpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("sci1", h8_sci_device, rx_w));
 
 	// machine
 	MCFG_DEVICE_REMOVE("flash1")
