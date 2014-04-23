@@ -330,11 +330,9 @@ public:
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
-	DECLARE_WRITE_LINE_MEMBER(towns_pic_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	IRQ_CALLBACK_MEMBER(towns_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	void towns_crtc_refresh_mode();

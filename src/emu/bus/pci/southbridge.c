@@ -141,11 +141,6 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
  *
  **********************************************************/
 
-IRQ_CALLBACK_MEMBER(southbridge_device::at_irq_callback)
-{
-	return m_pic8259_master->inta_r();
-}
-
 /// HACK: the memory system cannot cope with mixing the  8 bit device map from the fdc with a 32 bit handler
 READ8_MEMBER(southbridge_device::ide_read_cs1_r)
 {
@@ -217,7 +212,7 @@ void southbridge_device::device_reset()
 READ8_MEMBER( southbridge_device::get_slave_ack )
 {
 	if (offset==2) // IRQ = 2
-		return m_pic8259_slave->inta_r();
+		return m_pic8259_slave->acknowledge();
 
 	return 0x00;
 }

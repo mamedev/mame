@@ -222,11 +222,6 @@ WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
 	m_b2m_romdisk_msb = data & 0x7f;
 }
 
-WRITE_LINE_MEMBER(b2m_state::b2m_pic_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
-}
-
 /* Driver initialization */
 DRIVER_INIT_MEMBER(b2m_state,b2m)
 {
@@ -289,11 +284,6 @@ void b2m_state::machine_start()
 	save_item(NAME(m_vblank_state));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_state::b2m_postload), this));
-}
-
-IRQ_CALLBACK_MEMBER(b2m_state::b2m_irq_callback)
-{
-	return m_pic->acknowledge();
 }
 
 INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)

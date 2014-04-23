@@ -124,7 +124,6 @@ public:
 	DECLARE_DRIVER_INIT(filetto);
 	virtual void machine_reset();
 	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	UINT8 pcxt_speaker_get_spk();
 	void pcxt_speaker_set_spkrdata(UINT8 data);
 	required_device<cpu_device> m_maincpu;
@@ -569,11 +568,6 @@ static I8237_INTERFACE( dma8237_1_config )
 8259 IRQ controller
 ******************/
 
-IRQ_CALLBACK_MEMBER(pcxt_state::irq_callback)
-{
-	return m_pic8259_1->acknowledge();
-}
-
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
 	AM_RANGE(0xa0000, 0xbffff) AM_RAM //CGA VRAM
@@ -716,7 +710,7 @@ static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcxt_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */

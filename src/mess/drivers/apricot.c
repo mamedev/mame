@@ -94,8 +94,6 @@ public:
 
 	virtual void machine_start();
 
-	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_pic->inta_r(); }
-
 	int m_data_selector_dtr;
 	int m_data_selector_rts;
 
@@ -356,7 +354,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CPU_ADD("ic91", I8086, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(apricot_mem)
 	MCFG_CPU_IO_MAP(apricot_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apricot_state,irq_callback)	
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ic31", pic8259_device, inta_cb)
 
 	// i/o cpu
 	MCFG_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)

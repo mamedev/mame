@@ -166,8 +166,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	IRQ_CALLBACK_MEMBER(wangpc_irq_callback);
-
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 

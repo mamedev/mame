@@ -582,6 +582,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy1000_state )
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map)
 	MCFG_CPU_IO_MAP(tandy1000_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 
@@ -603,6 +604,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy1000_state )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_16_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_bank_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 
@@ -624,6 +626,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy1000_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 

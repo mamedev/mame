@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_nit_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcat_nit_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(bonanza_map)
 	MCFG_CPU_IO_MAP(bonanza_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcat_nit_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )

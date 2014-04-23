@@ -174,7 +174,8 @@ DEVICE_INPUT_DEFAULTS_END
 #define MCFG_CPU_PC(mem, port, type, clock) \
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
-	MCFG_CPU_IO_MAP(port##_io)
+	MCFG_CPU_IO_MAP(port##_io) \
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 static MACHINE_CONFIG_START( pccga, pc_state )
 	/* basic machine hardware */

@@ -119,7 +119,7 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 	MCFG_CPU_ADD("maincpu", I486, 75000000) /* I486DX4, 75 or 100 Mhz */
 	MCFG_CPU_PROGRAM_MAP(photoply_map)
 	MCFG_CPU_IO_MAP(photoply_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(photoply_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

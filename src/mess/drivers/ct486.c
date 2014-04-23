@@ -41,8 +41,6 @@ public:
 
 	virtual void machine_start();
 
-	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_cs4031->int_ack_r(); }
-
 	DECLARE_READ16_MEMBER( cs4031_ior );
 	DECLARE_WRITE16_MEMBER( cs4031_iow );
 	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
@@ -105,7 +103,7 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
 	MCFG_CPU_IO_MAP(ct486_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ct486_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
 
 	MCFG_CS4031_ADD("cs4031", XTAL_25MHz, "maincpu", "isa", "bios", "keybc")
 	// cpu connections

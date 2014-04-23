@@ -131,7 +131,6 @@ public:
 	}m_keyb;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
-	DECLARE_WRITE_LINE_MEMBER(apc_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(apc_tc_w);
@@ -149,8 +148,6 @@ public:
 
 	int m_dack;
 	UINT8 m_dma_offset[4];
-
-	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -738,11 +735,6 @@ CASETBL:
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 INPUT_PORTS_END
 
-IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
-{
-	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
-}
-
 void apc_state::machine_start()
 {
 	m_fdc->set_rate(500000);
@@ -825,13 +817,6 @@ ir5 Option
 ir6 Option
 ir7 APU
 */
-
-WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
-{
-	//printf("%02x\n",interrupt);
-//  printf("irq %d\n",state);
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
 
 READ8_MEMBER(apc_state::get_slave_ack)
 {
@@ -949,7 +934,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(apc_map)
 	MCFG_CPU_IO_MAP(apc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apc_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK) /* heartbeat IRQ */
@@ -957,7 +942,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
 	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(apc_state, apc_master_set_int_line), VCC, READ8(apc_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(apc_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: check ir7_w
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
 

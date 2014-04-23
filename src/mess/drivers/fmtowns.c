@@ -2052,11 +2052,6 @@ READ8_MEMBER(towns_state::towns_41ff_r)
 	return 0x01;
 }
 
-IRQ_CALLBACK_MEMBER(towns_state::towns_irq_callback)
-{
-	return m_pic_master->acknowledge();
-}
-
 // YM3438 interrupt (IRQ 13)
 WRITE_LINE_MEMBER(towns_state::towns_fm_irq)
 {
@@ -2087,12 +2082,6 @@ RF5C68_SAMPLE_END_CB_MEMBER(towns_state::towns_pcm_irq)
 		m_pic_slave->ir5_w(1);
 		if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
 	}
-}
-
-WRITE_LINE_MEMBER(towns_state::towns_pic_irq)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-//  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
 WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
@@ -2705,7 +2694,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
 
 	/* video hardware */
@@ -2746,7 +2735,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_PIT8253_CLK1(307200) // RS-232
 	MCFG_PIT8253_CLK2(307200) // reserved
 
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(towns_state,towns_pic_irq), VCC, READ8(towns_state,get_slave_ack))
+	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(towns_state,get_slave_ack))
 
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
 
@@ -2793,7 +2782,7 @@ static MACHINE_CONFIG_START( townsux, towns16_state )
 	MCFG_CPU_PROGRAM_MAP(ux_mem)
 	MCFG_CPU_IO_MAP(towns16_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -2808,7 +2797,7 @@ static MACHINE_CONFIG_DERIVED( townssj, towns )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")
@@ -2820,7 +2809,7 @@ static MACHINE_CONFIG_DERIVED( townshr, towns )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -2834,7 +2823,7 @@ static MACHINE_CONFIG_START( marty, marty_state )
 	MCFG_CPU_PROGRAM_MAP(marty_mem)
 	MCFG_CPU_IO_MAP(towns16_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6M")

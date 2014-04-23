@@ -469,7 +469,7 @@ void cs4031_device::nmi()
 READ8_MEMBER( cs4031_device::intc1_slave_ack_r )
 {
 	if (offset == 2) // IRQ 2
-		return m_intc2->inta_r();
+		return m_intc2->acknowledge();
 
 	return 0x00;
 }

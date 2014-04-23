@@ -158,8 +158,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ual_w );
 	DECLARE_WRITE8_MEMBER( tcl_w );
 
-	IRQ_CALLBACK_MEMBER(trs80m16_irq_callback);
-
 	UINT16 m_ual;
 	UINT8 m_limit[2];
 	UINT8 m_offset[2];

@@ -890,16 +890,6 @@ WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out1)
 }
 
 
-WRITE_LINE_MEMBER(pk8020_state::pk8020_pic_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-IRQ_CALLBACK_MEMBER(pk8020_state::pk8020_irq_callback)
-{
-	return m_pic8259->acknowledge();
-}
-
 void pk8020_state::machine_start()
 {
 	static const char *const keynames[] = {

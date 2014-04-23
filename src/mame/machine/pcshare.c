@@ -151,12 +151,6 @@ READ8_MEMBER( pcat_base_state::get_slave_ack )
 	return 0x00;
 }
 
-IRQ_CALLBACK_MEMBER(pcat_base_state::irq_callback)
-{
-	return m_pic8259_1->acknowledge();
-}
-
-
 WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 {
 	m_pit_out2 = state;

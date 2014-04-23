@@ -176,8 +176,6 @@ public:
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
-	DECLARE_WRITE_LINE_MEMBER(pasogo_pic8259_set_int_line);
-	IRQ_CALLBACK_MEMBER(pasogo_irq_callback);
 	void vg230_reset();
 	void vg230_init();
 	DECLARE_READ8_MEMBER( page_r );
@@ -672,11 +670,6 @@ INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 //  m_maincpu->set_input_line(UPD7810_INTFE1, PULSE_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)
-{
-	return m_pic8259->acknowledge();
-}
-
 void pasogo_state::machine_reset()
 {
 	m_u73_q2 = 0;
@@ -934,19 +927,13 @@ WRITE8_MEMBER( pasogo_state::ppi_portb_w )
 }
 
 
-WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MCFG_CPU_ADD("maincpu", V30, XTAL_32_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
 	MCFG_CPU_IO_MAP( pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pasogo_state,pasogo_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
@@ -956,7 +943,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pasogo_state, pit8253_out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pasogo_state, pasogo_pic8259_set_int_line), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, dma8237_config )
 

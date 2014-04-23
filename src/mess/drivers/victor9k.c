@@ -348,12 +348,6 @@ WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
 
 */
 
-IRQ_CALLBACK_MEMBER( victor9k_state::victor9k_irq_callback )
-{
-	return m_pic->inta_r();
-}
-
-
 //-------------------------------------------------
 //  UPD7201_INTERFACE( mpsc_intf )
 //-------------------------------------------------
@@ -925,7 +919,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MCFG_CPU_PROGRAM_MAP(victor9k_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(victor9k_state,victor9k_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
 
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_CPU_IO_MAP(floppy_io)

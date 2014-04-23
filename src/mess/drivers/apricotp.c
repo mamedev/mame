@@ -408,11 +408,6 @@ INPUT_PORTS_END
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
-	IRQ_CALLBACK_MEMBER(fp_state::fp_irq_callback)
-{
-	return m_pic->inta_r();
-}
-
 /*
 
     INT0    TIMER
@@ -551,7 +546,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(fp_mem)
 	MCFG_CPU_IO_MAP(fp_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fp_state,fp_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
 
 	MCFG_CPU_ADD(HD63B01V1_TAG, HD6301, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)

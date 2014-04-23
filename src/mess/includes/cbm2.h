@@ -214,8 +214,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
 
-	IRQ_CALLBACK_MEMBER( pic_irq_callback );
-
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
 	// memory state
 	int m_dramon;

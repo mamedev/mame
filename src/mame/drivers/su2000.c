@@ -65,8 +65,6 @@ public:
 		: pcat_base_state(mconfig, type, tag){ }
 
 	UINT32      *m_pc_ram;
-	DECLARE_WRITE_LINE_MEMBER(su2000_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
 };
@@ -116,28 +114,6 @@ static void ide_interrupt(device_t *device, int state)
 #endif
 
 
-/*************************************************************
- *
- * PIC8259 Configuration
- *
- *************************************************************/
-
-WRITE_LINE_MEMBER(su2000_state::su2000_pic8259_1_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(su2000_state::get_slave_ack)
-{
-	if (offset == 2)
-	{
-		// IRQ = 2
-		//logerror("pic8259_slave_ACK!\n");
-		return m_pic8259_2->acknowledge();
-	}
-	return 0x00;
-}
-
 /*************************************
  *
  *  Initialization
@@ -177,7 +153,7 @@ static MACHINE_CONFIG_START( su2000, su2000_state )
 	MCFG_CPU_ADD("maincpu", I486, I486_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(su2000_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 #if 0
 	MCFG_CPU_ADD("tracker", TMS32031, TMS320C1_CLOCK)

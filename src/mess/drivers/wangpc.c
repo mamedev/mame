@@ -746,12 +746,6 @@ void wangpc_state::check_level2_interrupts()
 	m_pic->ir2_w(state);
 }
 
-IRQ_CALLBACK_MEMBER( wangpc_state::wangpc_irq_callback )
-{
-	return m_pic->inta_r();
-}
-
-
 //-------------------------------------------------
 //  I8255A INTERFACE
 //-------------------------------------------------
@@ -1101,7 +1095,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(wangpc_state,wangpc_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
 	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
 
 	// devices

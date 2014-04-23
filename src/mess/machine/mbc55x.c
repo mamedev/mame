@@ -109,11 +109,6 @@ WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 	m_pic->write(space, offset>>1, data);
 }
 
-IRQ_CALLBACK_MEMBER(mbc55x_state::mbc55x_irq_callback)
-{
-	return m_pic->inta_r();
-}
-
 READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
 	return m_pit->read(space, offset >> 1);

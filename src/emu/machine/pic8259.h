@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ir6_w ) { set_irq_line(6, state); }
 	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { set_irq_line(7, state); }
 
-	UINT8 inta_r();
+	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
 	// device-level overrides

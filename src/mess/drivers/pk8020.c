@@ -205,7 +205,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_CPU_PROGRAM_MAP(pk8020_mem)
 	MCFG_CPU_IO_MAP(pk8020_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pk8020_state,pk8020_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_PIT8253_CLK2((XTAL_20MHz / 8) / 164)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
 
-	MCFG_PIC8259_ADD("pic8259", WRITELINE(pk8020_state,pk8020_pic_set_int_line), VCC, NULL)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
 	MCFG_DEVICE_ADD("rs232", I8251, 0)
 	MCFG_DEVICE_ADD("lan", I8251, 0)
 

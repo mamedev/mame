@@ -146,7 +146,7 @@ UINT32 pic8259_device::acknowledge()
 }
 
 
-UINT8 pic8259_device::inta_r()
+IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 {
 	return acknowledge();
 }

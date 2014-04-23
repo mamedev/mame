@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
 	MCFG_CPU_PROGRAM_MAP(mediagx_map)
 	MCFG_CPU_IO_MAP(mediagx_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mediagx_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

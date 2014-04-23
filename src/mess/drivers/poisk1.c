@@ -178,11 +178,6 @@ static const cassette_interface p1_cassette_interface =
 	NULL
 };
 
-IRQ_CALLBACK_MEMBER( p1_state::p1_irq_callback )
-{
-	return m_pic8259->acknowledge();
-}
-
 DRIVER_INIT_MEMBER( p1_state, poisk1 )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -237,7 +232,7 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_CPU_ADD("maincpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(poisk1_map)
 	MCFG_CPU_IO_MAP(poisk1_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(p1_state,p1_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )

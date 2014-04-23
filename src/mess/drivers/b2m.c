@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_CPU_PROGRAM_MAP(b2m_mem)
 	MCFG_CPU_IO_MAP(b2m_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(b2m_state,b2m_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(b2m_state, b2m_romdisk_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(b2m_state, b2m_romdisk_portc_w))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(b2m_state,b2m_pic_set_int_line), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

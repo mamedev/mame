@@ -28,14 +28,12 @@ public:
 	required_device<palette_device> m_palette;
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
-	DECLARE_WRITE_LINE_MEMBER(multi16_set_int_line);
 	required_shared_ptr<UINT16> m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(multi16_irq_callback);
 };
 
 
@@ -119,17 +117,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( multi16 )
 INPUT_PORTS_END
 
-IRQ_CALLBACK_MEMBER(multi16_state::multi16_irq_callback)
-{
-	return machine().device<pic8259_device>("pic8259")->acknowledge();
-}
-
-WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
-{
-	//printf("%02x\n",interrupt);
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
 void multi16_state::machine_start()
 {
 }
@@ -160,7 +147,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(multi16_map)
 	MCFG_CPU_IO_MAP(multi16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(multi16_state,multi16_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -175,7 +162,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(multi16_state, multi16_set_int_line), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NULL )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -144,7 +144,6 @@ public:
 	DECLARE_PALETTE_INIT(qx10);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
@@ -496,7 +495,7 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 READ8_MEMBER( qx10_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return m_pic_s->inta_r();
+		return m_pic_s->acknowledge();
 	}
 	return 0x00;
 }
@@ -514,11 +513,6 @@ READ8_MEMBER( qx10_state::get_slave_ack )
     IR7     External interrupt #5
 
 */
-
-IRQ_CALLBACK_MEMBER(qx10_state::irq_callback)
-{
-	return m_pic_m->acknowledge();
-}
 
 #if 0
 READ8_MEMBER( qx10_state::upd7201_r )
@@ -787,7 +781,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
 	MCFG_CPU_IO_MAP(qx10_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(qx10_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

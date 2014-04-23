@@ -16,7 +16,7 @@
 READ8_MEMBER( at_state::get_slave_ack )
 {
 	if (offset==2) // IRQ = 2
-		return m_pic8259_slave->inta_r();
+		return m_pic8259_slave->acknowledge();
 
 	return 0x00;
 }
@@ -314,11 +314,6 @@ DRIVER_INIT_MEMBER(at_state,atvga)
 
 DRIVER_INIT_MEMBER(at586_state,at586)
 {
-}
-
-IRQ_CALLBACK_MEMBER(at_state::at_irq_callback)
-{
-	return m_pic8259_master->inta_r();
 }
 
 MACHINE_START_MEMBER(at_state,at)

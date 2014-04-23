@@ -712,7 +712,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 
 READ8_MEMBER( tandy2k_state::irq_callback )
 {
-	return (offset ? m_pic1 : m_pic0)->inta_r();
+	return (offset ? m_pic1 : m_pic0)->acknowledge();
 }
 
 // Machine Initialization

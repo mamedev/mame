@@ -51,8 +51,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 

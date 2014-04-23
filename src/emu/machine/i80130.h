@@ -70,7 +70,7 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	UINT8 inta_r() { return m_pic->inta_r(); }
+	UINT8 inta_r() { return m_pic->acknowledge(); }
 
 	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { m_pic->ir0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { m_pic->ir1_w(state); }

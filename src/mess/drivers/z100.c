@@ -184,7 +184,6 @@ public:
 	DECLARE_WRITE8_MEMBER(z100_6845_data_w);
 	DECLARE_READ8_MEMBER(z207_fdc_r);
 	DECLARE_WRITE8_MEMBER(z207_fdc_w);
-	DECLARE_WRITE_LINE_MEMBER(z100_pic_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(video_pia_A_w);
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
@@ -208,7 +207,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(z100_irq_callback);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -597,21 +595,10 @@ INPUT_PORTS_START( z100 )
 	PORT_CONFSETTING( 0x01, "Color" )
 INPUT_PORTS_END
 
-IRQ_CALLBACK_MEMBER(z100_state::z100_irq_callback)
-{
-	return m_picm->inta_r();
-}
-
-WRITE_LINE_MEMBER( z100_state::z100_pic_irq )
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-//  logerror("PIC#1: set IRQ line to %i\n",interrupt);
-}
-
 READ8_MEMBER( z100_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return m_pics->inta_r();
+		return m_pics->acknowledge();
 	}
 	return 0;
 }
@@ -726,7 +713,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
 	MCFG_CPU_IO_MAP(z100_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(z100_state,z100_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -742,7 +729,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8, mc6845_intf)    /* unknown clock, hand tuned to get ~50/~60 fps */
 
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(z100_state, z100_pic_irq), VCC, READ8(z100_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(z100_state, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir3_w), GND, NULL )
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)

@@ -70,10 +70,8 @@ public:
 	DECLARE_READ8_MEMBER(b2m_romdisk_porta_r);
 	DECLARE_WRITE8_MEMBER(b2m_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(b2m_romdisk_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(b2m_pic_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(b2m_fdc_drq);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
-	IRQ_CALLBACK_MEMBER(b2m_irq_callback);
 	void b2m_postload();
 	void b2m_set_bank(int bank);
 };

@@ -20,8 +20,6 @@ public:
 	{
 	}
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dma8237_1;
 	required_device<am9517a_device> m_dma8237_2;

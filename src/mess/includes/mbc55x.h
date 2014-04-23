@@ -161,7 +161,6 @@ public:
 	DECLARE_PALETTE_INIT(mbc55x);
 	void screen_eof_mbc55x(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
-	IRQ_CALLBACK_MEMBER(mbc55x_irq_callback);
 	void keyboard_reset();
 	void scan_keyboard();
 	void set_ram_size();

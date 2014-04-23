@@ -574,11 +574,6 @@ void ibm5160_mb_device::device_start()
 		membank( "bank10" )->set_base( m_ram->pointer() );
 }
 
-IRQ_CALLBACK_MEMBER(ibm5160_mb_device::pc_irq_callback)
-{
-	return m_pic8259->inta_r();
-}
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

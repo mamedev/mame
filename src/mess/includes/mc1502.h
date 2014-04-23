@@ -51,7 +51,6 @@ public:
 	DECLARE_MACHINE_START(mc1502);
 	DECLARE_MACHINE_RESET(mc1502);
 
-	IRQ_CALLBACK_MEMBER(mc1502_irq_callback);
 	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
 
 	struct {

@@ -50,7 +50,6 @@ protected:
 		virtual void device_reset();
 public:
 
-		IRQ_CALLBACK_MEMBER(at_irq_callback);
 		required_device<cpu_device> m_maincpu;
 		required_device<pic8259_device> m_pic8259_master;
 		required_device<pic8259_device> m_pic8259_slave;

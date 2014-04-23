@@ -1591,16 +1591,6 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 
 
 //-------------------------------------------------
-//  pic8259_interface ext_pic_intf
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(cbm2_state::pic_irq_callback)
-{
-	return m_ext_pic->inta_r();
-}
-
-
-//-------------------------------------------------
 //  tpi6525_interface ext_tpi_intf
 //-------------------------------------------------
 
@@ -2431,7 +2421,7 @@ static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cbm2_state,pic_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
 
 	MCFG_PIC8259_ADD(EXT_I8259A_TAG, INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)
@@ -2494,7 +2484,7 @@ static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cbm2_state,pic_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
 
 	MCFG_PIC8259_ADD(EXT_I8259A_TAG, INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)

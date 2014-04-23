@@ -49,8 +49,6 @@ public:
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
-	IRQ_CALLBACK_MEMBER(p1_irq_callback);
-
 	DECLARE_PALETTE_INIT(p1);
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

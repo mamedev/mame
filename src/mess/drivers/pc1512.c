@@ -972,16 +972,6 @@ static I8237_INTERFACE( dmac_intf )
 
 
 //-------------------------------------------------
-//  pic8259_interface pic_intf
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(pc1512_state::pc1512_irq_callback)
-{
-	return m_pic->inta_r();
-}
-
-
-//-------------------------------------------------
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
@@ -1252,7 +1242,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1512_mem)
 	MCFG_CPU_IO_MAP(pc1512_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc1512_state,pc1512_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
 
 	// video
 	MCFG_FRAGMENT_ADD(pc1512_video)
@@ -1356,7 +1346,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1640_mem)
 	MCFG_CPU_IO_MAP(pc1640_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc1512_state,pc1512_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")

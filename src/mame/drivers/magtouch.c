@@ -181,7 +181,7 @@ static MACHINE_CONFIG_START( magtouch, magtouch_state )
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)
 	MCFG_CPU_IO_MAP(magtouch_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(magtouch_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

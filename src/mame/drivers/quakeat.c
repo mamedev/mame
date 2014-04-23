@@ -119,7 +119,7 @@ static MACHINE_CONFIG_START( quake, quakeat_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
 	MCFG_CPU_PROGRAM_MAP(quake_map)
 	MCFG_CPU_IO_MAP(quake_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(quakeat_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

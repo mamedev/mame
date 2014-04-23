@@ -269,6 +269,7 @@ static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
 	MCFG_CPU_PROGRAM_MAP(lindbergh_map)
 	MCFG_CPU_IO_MAP(lindbergh_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

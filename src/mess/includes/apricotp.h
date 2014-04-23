@@ -109,7 +109,6 @@ public:
 	// video state
 	optional_shared_ptr<UINT16> m_video_ram;
 	UINT8 m_video;
-	IRQ_CALLBACK_MEMBER(fp_irq_callback);
 
 	int m_centronics_busy;
 	int m_centronics_select;

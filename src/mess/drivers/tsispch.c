@@ -163,19 +163,6 @@ WRITE8_MEMBER( tsispch_state::i8251_rxd )
 }
 
 /*****************************************************************************
- PIC 8259 stuff
-*****************************************************************************/
-WRITE_LINE_MEMBER(tsispch_state::pic8259_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-IRQ_CALLBACK_MEMBER(tsispch_state::irq_callback)
-{
-	return machine().device<pic8259_device>("pic8259")->acknowledge();
-}
-
-/*****************************************************************************
  LED/dipswitch stuff
 *****************************************************************************/
 READ8_MEMBER( tsispch_state::dsw_r )
@@ -397,7 +384,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
 	MCFG_CPU_PROGRAM_MAP(i8086_mem)
 	MCFG_CPU_IO_MAP(i8086_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(tsispch_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
@@ -407,7 +394,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
 	/* PIC 8259 */
-	MCFG_PIC8259_ADD("pic8259", WRITELINE(tsispch_state,pic8259_set_int_line), VCC, NULL)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
 
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)

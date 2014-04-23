@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
 	MCFG_CPU_PROGRAM_MAP(taitowlf_map)
 	MCFG_CPU_IO_MAP(taitowlf_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitowlf_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

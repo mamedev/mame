@@ -145,7 +145,6 @@ public:
 	DECLARE_WRITE8_MEMBER(r232_ctrl_porta_w);
 	DECLARE_WRITE8_MEMBER(r232_ctrl_portb_w);
 	DECLARE_WRITE8_MEMBER(r232_ctrl_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_pic_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 //  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
@@ -166,7 +165,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
-	IRQ_CALLBACK_MEMBER(pc88va_irq_callback);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1632,17 +1630,6 @@ WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
 	// ...
 }
 
-IRQ_CALLBACK_MEMBER(pc88va_state::pc88va_irq_callback)
-{
-	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
-}
-
-WRITE_LINE_MEMBER(pc88va_state::pc88va_pic_irq)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-//  logerror("PIC#1: set IRQ line to %i\n",interrupt);
-}
-
 READ8_MEMBER(pc88va_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
@@ -1803,7 +1790,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_CPU_PROGRAM_MAP(pc88va_map)
 	MCFG_CPU_IO_MAP(pc88va_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc88va_state, pc88va_vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc88va_state,pc88va_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 #if TEST_SUBFDC
 	MCFG_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
@@ -1843,7 +1830,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, fdc_8255_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, fdc_8255_c_w))
 
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pc88va_state, pc88va_pic_irq), VCC, READ8(pc88va_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc88va_state,get_slave_ack) )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL )
 

@@ -100,7 +100,6 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_porta_w);
 	DECLARE_READ8_MEMBER(rtc_portc_r);
 	DECLARE_WRITE8_MEMBER(rtc_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(pc100_set_int_line);
 	UINT16 *m_kanji_rom;
 	UINT16 *m_vram;
 	UINT16 m_kanji_addr;
@@ -124,7 +123,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
-	IRQ_CALLBACK_MEMBER(pc100_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 
@@ -410,17 +408,6 @@ WRITE8_MEMBER( pc100_state::crtc_bank_w )
 	m_bank_r = (data & 0x30) >> 4;
 }
 
-IRQ_CALLBACK_MEMBER(pc100_state::pc100_irq_callback)
-{
-	return device.machine().device<pic8259_device>( "pic8259" )->acknowledge();
-}
-
-WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
-{
-	//printf("%02x\n",interrupt);
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
 void pc100_state::machine_start()
 {
 	m_kanji_rom = (UINT16 *)(*memregion("kanji"));
@@ -487,7 +474,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_CPU_PROGRAM_MAP(pc100_map)
 	MCFG_CPU_IO_MAP(pc100_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc100_state,pc100_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
@@ -504,7 +491,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc100_state, upper_mask_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, crtc_bank_w))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pc100_state, pc100_set_int_line), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NULL )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 

@@ -712,18 +712,6 @@ static const z80_daisy_config trs80m2_daisy_chain[] =
 	{ NULL }
 };
 
-
-//-------------------------------------------------
-//  pic8259_interface pic_intf
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(trs80m16_state::trs80m16_irq_callback)
-{
-	return m_pic->inta_r();
-}
-
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -856,7 +844,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(m16_z80_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(trs80m16_state,trs80m16_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, pic8259_device, inta_cb)
 
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m68000_mem)

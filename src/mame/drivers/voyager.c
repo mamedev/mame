@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
 	MCFG_CPU_PROGRAM_MAP(voyager_map)
 	MCFG_CPU_IO_MAP(voyager_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(voyager_state,irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

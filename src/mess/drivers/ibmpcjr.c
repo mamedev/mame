@@ -57,8 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	IRQ_CALLBACK_MEMBER(pc_irq_callback) { return m_pic8259->acknowledge(); }
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pcjr_cartridge );
 	void pc_speaker_set_spkrdata(UINT8 data);
 
@@ -611,7 +609,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_CPU_ADD("maincpu", I8088, 4900000)
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
 	MCFG_CPU_IO_MAP(ibmpcjr_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcjr_state,pc_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 /*
   On the PC Jr the input for clock 1 seems to be selectable
@@ -699,7 +697,6 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcjr_state,pc_irq_callback)
 
 	MCFG_DEVICE_REMOVE("fdc:0");
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)

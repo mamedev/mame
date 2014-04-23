@@ -179,7 +179,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( gatea20_w );
 	DECLARE_WRITE_LINE_MEMBER( kbrst_w );
 
-	UINT8 int_ack_r() { return m_intc1->inta_r(); }
+	IRQ_CALLBACK_MEMBER(int_ack_r) { return m_intc1->acknowledge(); }
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
