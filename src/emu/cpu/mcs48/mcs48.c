@@ -206,6 +206,7 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
 		, ( ( ram_size == 64 ) ? ADDRESS_MAP_NAME(data_6bit) : ( ( ram_size == 128 ) ? ADDRESS_MAP_NAME(data_7bit) : ADDRESS_MAP_NAME(data_8bit) ) ))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9, 0)
+	, m_psw(0)
 	, m_feature_mask(feature_mask)
 	, m_int_rom_size(rom_size)
 {
