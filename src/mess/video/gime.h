@@ -29,7 +29,7 @@
 	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
 #define MCFG_GIME_FIRQ_CALLBACK(_write) \
-	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &gime_base_device::set_firq_wr_callback(*device, DEVCB2_##_write);
 
 #define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
 	devcb = &gime_base_device::set_floating_bus_rd_callback(*device, DEVCB2_##_read);
