@@ -21,7 +21,7 @@ Test of semigraphic 6
 RUN
 
 TODO:
-- Cassette frequencies are guesses, need to be verified
+- Cassette can be 600 or 1200 baud, how is 600 baud selected?
 - Hookup Graphics modes and colours
 - Unknown i/o ports
 - Need software
@@ -441,14 +441,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
 	}
 
 	if (m_cass_state)
-		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 1200Hz
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
-		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); //  600Hz
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 {
-	/* cassette - turn 600/1200Hz to a bit */
+	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
 	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
@@ -526,10 +526,10 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CASSETTE_ADD("cassette", fc100_cassette_interface)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16/2) // gives 9600
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16) // gives 19200
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(fc100_state, uart_clock_w))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(2400)) // cass write
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(20000)) // cass read
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_CARTSLOT_ADD("cart")
 MACHINE_CONFIG_END
