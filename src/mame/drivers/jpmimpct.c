@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(jpmimpct_state, payen_a_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(jpmimpct_state, hopper_b_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(jpmimpct_state, hopper_c_r))
