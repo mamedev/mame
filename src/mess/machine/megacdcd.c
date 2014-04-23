@@ -30,6 +30,8 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	SCD_CURLBA = 0;
 
 	CDC_REG0 = 0;
+
+	segacd_irq_mask = 0;
 }
 
 void lc89510_temp_device::dummy_interrupt_callback(void)
