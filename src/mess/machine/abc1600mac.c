@@ -114,7 +114,8 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 		m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
 		m_rom(*this, "boot"),
 		m_segment_ram(*this, "segment_ram"),
-		m_page_ram(*this, "page_ram")
+		m_page_ram(*this, "page_ram"),
+		m_task(0)
 {
 }
 
