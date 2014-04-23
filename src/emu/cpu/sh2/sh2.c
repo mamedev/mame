@@ -184,6 +184,7 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_interrupt(NULL)
 	, m_nocode(NULL)
 	, m_out_of_cycles(NULL)
+	, m_debugger_temp(0)
 {
 	m_isdrc = mconfig.options().drc() ? true : false;
 }
