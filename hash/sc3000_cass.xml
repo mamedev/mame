@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sc3000_cass" description="SEGA Computer 3000 cassettes">
+
+	<software name="vortexbl">
+		<description>Vortex Blaster 2</description>
+		<year>1984</year>
+		<publisher>Trident Technological System</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="31128834">
+				<rom name="vortex blaster 2.wav" size="31128834" crc="242851df" sha1="5a0be3c35317ff39e2e687c72bb1ea73e3b6cd28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+		
+</softwarelist>

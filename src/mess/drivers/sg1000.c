@@ -548,7 +548,7 @@ const cassette_interface sc3000_cassette_interface =
 	sc3000_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"sc3000_cass",
 	NULL
 };
 
@@ -819,6 +819,8 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	MCFG_SOFTWARE_LIST_ADD("sc3k_cart_list","sc3000_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","sc3000_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

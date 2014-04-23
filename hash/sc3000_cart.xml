@@ -1,0 +1,324 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="sc3000_cart" description="SEGA Computer 3000 cartridges">
+
+	<software name="basic3">
+		<description>BASIC Level III (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />
+			<dataarea name="rom" size="32768">
+				<rom name="basic3.bin" size="32768" crc="a46e3c73" sha1="b1a8585a9afff962e8fd0e79b3305199da4e4562" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic3e" cloneof="basic3">
+		<description>BASIC Level III (Export)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />
+			<dataarea name="rom" size="32768">
+				<rom name="basic3e.bin" size="32768" crc="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic2" cloneof="basic3">
+		<description>BASIC Level 2 (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="basic2.bin" size="32768" crc="f691f9c7" sha1="1fa9f4ec347681d7909415b6d06179e44b0fcd5e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- SC-3000 Educational carts -->
+
+	<software name="music">
+		<description>Sega Music Editor (Euro?)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="music_editor" />
+			<dataarea name="rom" size="32768">
+				<rom name="music.bin" size="32768" crc="622010e1" sha1="61f40e4b7576d4d55322f3d6eef2038aa784336e" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="10240">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicj" cloneof="music">
+		<description>Music (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-101"/>
+		<info name="alt_title" value="ミュージック"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="music_editor" />
+			<dataarea name="rom" size="32768">
+				<rom name="music (jp).bin" size="32768" crc="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="10240">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueit1n">
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 1-Nen (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-103"/>
+		<info name="alt_title" value="中学必修英単語 (中学一年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eitango (chuugaku 1-nen) (jp).bin" size="16384" crc="6ccb297a" sha1="63cf03f62516d4228a023fff496f2ffa6581d3dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis1n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-104"/>
+		<info name="alt_title" value="中学必修英作文 (中学一年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp).bin" size="16384" crc="9bafd9e9" sha1="0081205a3e2fa9322a348ab8a096c282bbbbcc21" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis1na" cloneof="chueis1n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-104"/>
+		<info name="alt_title" value="中学必修英作文(中学一年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp) [40k map].bin" size="40960" crc="975106b6" sha1="ebc8544bf8a36840a639bb7a2698f984429f4762" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueib1n">
+		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 1-Nen (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-105"/>
+		<info name="alt_title" value="中学必修英文法 (中学一年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="chuugaku hisshuu eibunpou (chuugaku 1-nen) (jp).bin" size="8192" crc="345c8bc8" sha1="eaab51616a87fd29f0383a8b3ea365971bceb56b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan4j">
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-106"/>
+		<info name="alt_title" value="楽しい算数 (小学四年上)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tanoshii sansuu (shougaku 4-nen jou) (jp).bin" size="16384" crc="573e04dd" sha1="59c7c6d0e373f78961a0e501a533ea271b15abdb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan4ja" cloneof="tansan4j">
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-106"/>
+		<info name="alt_title" value="楽しい算数 (小学四年上)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="tanoshii sansuu (shougaku 4-nen jou) [40k map] (jp).bin" size="40960" crc="7c400e3b" sha1="8a693531a3cfd0cef01d6b2ac900a2c95ff4f75e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kagaku">
+		<description>Kagaku ~ Gensokigou Master (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-107"/>
+		<info name="alt_title" value="化学 (元素記号マスター)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="kagaku (gensokigou master) (jp).bin" size="8192" crc="f9c81fe1" sha1="6b35016742db0a06947c679f41b8130c28d2de7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nihonshi">
+		<description>Nihonshi Nenpyou (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-108"/>
+		<info name="alt_title" value="日本史年表"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="nihonshi nenpyou (jp).bin" size="16384" crc="129d6359" sha1="9a9363004d77037a0bbc9a8bcae1bb05138ffc36" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sekaishi">
+		<description>Sekaishi Nenpyou ~ Monbushou Shidouyouryou Junkyo (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-109"/>
+		<info name="alt_title" value="世界史年表 (文部省指導要領準拠)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="sekaishi nenpyou (jp).bin" size="16384" crc="3274ee48" sha1="388fdff0cf2ad276e07a419239710632c376e1db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueit2n">
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-110"/>
+		<info name="alt_title" value="中学必修英単語 (中学二年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eitango (chuugaku 2-nen) (jp).bin" size="16384" crc="8507216b" sha1="931b404c809b39a68cdc4b74ad905a008d46143d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueit2na" cloneof="chueit2n">
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-110"/>
+		<info name="alt_title" value="中学必修英単語 (中学二年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="chuugaku hisshuu eitango (chuugaku 2-nen) [40k map] (jp).bin" size="40960" crc="4f599483" sha1="09515ce5c8b598020f4c6b97540a7020abb6f596" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis2n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-111"/>
+		<info name="alt_title" value="中学必修英作文 (中学二年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 2-nen) (jp).bin" size="16384" crc="581dce41" sha1="058f3efd1ae2a0dde4ee2b327a2faea663354411" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis2na" cloneof="chueis2n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-111"/>
+		<info name="alt_title" value="中学必修英作文 (中学二年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 2-nen) [40k map] (jp).bin" size="40960" crc="3657b285" sha1="312ce1b510a90a96bca63d028e96ed732ab6a043" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueib2n">
+		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 2-Nen (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-112"/>
+		<info name="alt_title" value="中学必修英文法 (中学二年)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="chuugaku hisshuu eibunpou (chuugaku 2-nen) (jp).bin" size="8192" crc="d4c473b2" sha1="efe8a2852344f094806039019314ebe9c49e53f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan4g">
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Ge (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-113"/>
+		<info name="alt_title" value="楽しい算数 (小学四年下)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tanoshii sansuu (shougaku 4-nen ge) (jp).bin" size="16384" crc="5fde25bb" sha1="5500a59f4474833687e7d2d7bbd09cf0fb925684" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan5g">
+		<description>Tanoshii Sansu ~ Shougaku 5-Nen Ge (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-114"/>
+		<info name="alt_title" value="楽しい算数 (小学五年下)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tanoshii sansuu (shougaku 5-nen ge) (jp).bin" size="16384" crc="6a96978d" sha1="751d82119e19d46a20165c8debbfe95b3241a701" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan6g">
+		<description>Tanoshii Sansu ~ Shougaku 6-Nen Ge (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-115"/>
+		<info name="alt_title" value="楽しい算数 (小学六年下)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tanoshii sansuu (shougaku 6-nen ge) (jp).bin" size="32768" crc="d0d18e70" sha1="c3428ec915a172992a7c643da662eb1469cd37d4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan5j">
+		<description>Tanoshii Sansuu ~ Shougaku 5-Nen Jou (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-116"/>
+		<info name="alt_title" value="楽しい算数 (小学五年上)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tanoshii sansuu (shougaku 5-nen jou) (jp).bin" size="32768" crc="419d75d5" sha1="3d99878e901e0095df7fc6ae2ef0915c9b00dcfb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan6j">
+		<description>Tanoshii Sansuu ~ Shougaku 6-Nen Jou (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="E-117"/>
+		<info name="alt_title" value="楽しい算数 (小学六年上)"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tanoshii sansuu (shougaku 6-nen jou) (jp).bin" size="32768" crc="8b5e6e1b" sha1="103fcb058b6f9671e5ca969a5cbd4bd171caddc3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
