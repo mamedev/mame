@@ -64,6 +64,10 @@ void amiga_sound_device::device_start()
 	{
 		m_channel[i].index = i;
 		m_channel[i].irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_sound_device::signal_irq), this));
+		m_channel[i].curticks = 0;
+		m_channel[i].latched = 0;
+		m_channel[i].manualmode = 0;
+		m_channel[i].curlocation = 0;
 	}
 
 	/* create the stream */
