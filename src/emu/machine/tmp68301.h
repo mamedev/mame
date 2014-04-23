@@ -49,6 +49,7 @@ public:
 	DECLARE_READ16_MEMBER(pdir_r);
 	DECLARE_WRITE16_MEMBER(pdir_w);
 
+	IRQ_CALLBACK_MEMBER(irq_callback);
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -69,7 +70,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER( timer_callback );
 	void update_timer( int i );
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq_state();
 
 	UINT16 m_imr;

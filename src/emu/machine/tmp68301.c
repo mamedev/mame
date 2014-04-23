@@ -129,8 +129,6 @@ void tmp68301_device::device_reset()
 	for (i = 0; i < 3; i++)
 		m_IE[i] = 0;
 
-	machine().firstcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback),this));
-
 	m_imr = 0x7f7; // mask all irqs
 }
 

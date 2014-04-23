@@ -407,9 +407,6 @@ SLOT_INTERFACE_END
 
 void jaguar_state::machine_reset()
 {
-	if (!m_is_cojag)
-		m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(jaguar_state::jaguar_irq_callback),this));
-
 	m_protection_check = 0;
 
 	/* 68020 only: copy the interrupt vectors into RAM */
@@ -1854,6 +1851,7 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(jaguar_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jaguar_state,jaguar_irq_callback)
 
 	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))

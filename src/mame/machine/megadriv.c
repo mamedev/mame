@@ -927,6 +927,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+
 	/* IRQs are handled via the timers */
 
 	MCFG_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
@@ -974,6 +976,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
 	/* IRQs are handled via the timers */
 
 	MCFG_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
@@ -1031,8 +1034,6 @@ void md_base_state::megadriv_init_common()
 		m_genz80.z80_prgram = auto_alloc_array(machine(), UINT8, 0x2000);
 		membank("bank1")->set_base(m_genz80.z80_prgram);
 	}
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
 
 	m_maincpu->set_tas_write_callback(write8_delegate(FUNC(md_base_state::megadriv_tas_callback),this));
 
