@@ -24,7 +24,8 @@ public:
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
 			m_rombank1(*this, "rombank1"),
-			m_rombank2(*this, "rombank2") { }
+			m_rombank2(*this, "rombank2"),
+			m_generic_paletteram_16(*this, "paletteram") { }
 
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
@@ -48,6 +49,7 @@ public:
 
 	required_shared_ptr<UINT16> m_rombank1;
 	required_shared_ptr<UINT16> m_rombank2;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	UINT8           m_sound_reset_state;
 

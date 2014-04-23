@@ -139,12 +139,14 @@ class gal3_state : public namcos2_shared_state
 public:
 	gal3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag) ,
-		m_rso_shared_ram(*this, "rso_shared_ram"){ }
+		m_rso_shared_ram(*this, "rso_shared_ram"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	UINT32 *m_mpSharedRAM0;
 	//UINT32 *m_mpSharedRAM1;
 	UINT16 m_namcos21_video_enable;
 	required_shared_ptr<UINT16> m_rso_shared_ram;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	UINT32 m_led_mst;
 	UINT32 m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);

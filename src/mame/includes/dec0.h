@@ -20,7 +20,9 @@ public:
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_generic_paletteram2_16(*this, "paletteram2") { }
 
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -103,6 +105,8 @@ public:
 	optional_device<cpu_device> m_mcu;
 	optional_device<msm5205_device> m_msm;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<UINT16> m_generic_paletteram2_16;	
 };
 
 

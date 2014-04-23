@@ -89,7 +89,8 @@ public:
 		m_vbowl_trackball(*this, "vbowl_trackball"),
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_priority_ram;
@@ -227,6 +228,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 

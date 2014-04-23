@@ -23,7 +23,8 @@ public:
 		m_k051316(*this, "k051316"),
 		m_upd7759_1(*this, "upd1"),
 		m_upd7759_2(*this, "upd2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_generic_paletteram_8(*this, "paletteram") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_banked_rom;
@@ -61,6 +62,7 @@ public:
 	UINT32 screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(k88games_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
 };
 
 /*----------- defined in video/88games.c -----------*/

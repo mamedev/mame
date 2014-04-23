@@ -21,7 +21,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_systemram(*this, "systemram"),
 		m_sprgen(*this, "spritegen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram")
 	{ }
 
 	/* devices */
@@ -36,6 +37,7 @@ public:
 	required_shared_ptr<UINT32> m_systemram;
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);

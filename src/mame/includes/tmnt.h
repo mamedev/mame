@@ -39,7 +39,8 @@ public:
 		m_upd7759(*this, "upd"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -89,6 +90,7 @@ public:
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	/* memory buffers */
 	INT16      m_sampledata[0x40000];

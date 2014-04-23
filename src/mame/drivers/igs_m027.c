@@ -39,7 +39,8 @@ public:
 		m_igs_bg_videoram(*this, "igs_bg_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	optional_shared_ptr<UINT32> m_igs_mainram;
 	optional_shared_ptr<UINT32> m_igs_cg_videoram;
@@ -78,6 +79,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 

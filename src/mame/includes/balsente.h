@@ -49,7 +49,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_68k(*this, "68k"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_8(*this, "paletteram") { }
 
 	required_device<timer_device> m_scanline_timer;
 
@@ -227,6 +228,7 @@ public:
 	optional_device<cpu_device> m_68k;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
 };
 
 

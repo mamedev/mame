@@ -247,7 +247,8 @@ public:
 		m_analog3(*this, "ANALOG3"),
 		m_analog4(*this, "ANALOG4"),
 		m_analog5(*this, "ANALOG5"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram") { }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -263,6 +264,7 @@ public:
 	required_device<adc12138_device> m_adc12138;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;

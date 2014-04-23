@@ -112,7 +112,8 @@ public:
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_okim6376(*this, "oki"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
 	UINT16 m_vblank_bit;
@@ -156,6 +157,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 

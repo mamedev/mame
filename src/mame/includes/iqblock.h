@@ -5,11 +5,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_rambase(*this, "rambase"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_generic_paletteram2_8(*this, "paletteram2") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_rambase;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<UINT8> m_generic_paletteram2_8;
+
 	UINT8 *m_bgvideoram;
 	UINT8 *m_fgvideoram;
 	int m_videoenable;

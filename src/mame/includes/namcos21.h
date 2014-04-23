@@ -37,7 +37,8 @@ public:
 		m_mpSharedRAM1(*this,"mpsharedram1"),
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_master_dsp_code(*this,"master_dsp_code"),
-		m_dsp(*this, "dsp") { }
+		m_dsp(*this, "dsp"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	optional_shared_ptr<UINT16> m_winrun_dspbios;
 	optional_shared_ptr<UINT16> m_winrun_polydata;
@@ -48,6 +49,7 @@ public:
 	optional_shared_ptr<UINT16> m_master_dsp_code;
 
 	optional_device<cpu_device> m_dsp;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	UINT8 *m_videoram;
 	UINT16 *m_winrun_dspcomram;

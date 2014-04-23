@@ -22,13 +22,15 @@ public:
 		: namcos2_shared_state(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"mcu"),
-		m_shareram(*this, "shareram"){ }
+		m_shareram(*this, "shareram"),
+		m_generic_paletteram_32(*this, "paletteram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	emu_timer *m_raster_interrupt_timer;
 	UINT32 *m_workram;
 	required_shared_ptr<UINT16> m_shareram;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 	UINT8 m_mcu_port6;
 	UINT32 m_sprbank;
 

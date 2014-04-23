@@ -101,8 +101,9 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_generic_paletteram2_8(*this, "paletteram2") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -111,6 +112,8 @@ public:
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<UINT8> m_generic_paletteram2_8;
 
 	tilemap_t *m_txtilemap;
 	int m_coin_stat;

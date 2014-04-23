@@ -1375,7 +1375,8 @@ public:
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1399,7 +1400,7 @@ public:
 	required_ioport m_p2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	c404_t m_c404;
 	c361_t m_c361;

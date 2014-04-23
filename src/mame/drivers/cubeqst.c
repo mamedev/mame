@@ -34,7 +34,8 @@ public:
 			m_rotatecpu(*this, "rotate_cpu"),
 			m_linecpu(*this, "line_cpu"),
 			m_soundcpu(*this, "sound_cpu"),
-			m_screen(*this, "screen") { }
+			m_screen(*this, "screen"),
+			m_generic_paletteram_16(*this, "paletteram") { }
 
 	UINT8 *m_depth_buffer;
 	int m_video_field;
@@ -45,6 +46,7 @@ public:
 	required_device<cquestlin_cpu_device> m_linecpu;
 	required_device<cquestsnd_cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	rgb_t *m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);

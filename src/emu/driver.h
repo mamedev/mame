@@ -254,16 +254,6 @@ protected:
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-public:
-	// generic pointers
-	optional_shared_ptr<UINT8> m_generic_paletteram_8;
-	optional_shared_ptr<UINT8> m_generic_paletteram2_8;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
-	optional_shared_ptr<UINT16> m_generic_paletteram2_16;
-	optional_shared_ptr<UINT32> m_generic_paletteram_32;
-	optional_shared_ptr<UINT32> m_generic_paletteram2_32;
-
 private:
 	// helpers
 	void irq_pulse_clear(void *ptr, INT32 param);

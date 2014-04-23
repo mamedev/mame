@@ -165,7 +165,8 @@ public:
 		m_kaneko_spr(*this, "kan_spr"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
 	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
@@ -187,6 +188,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(expro02_scanline);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 

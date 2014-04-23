@@ -14,7 +14,8 @@ public:
 		m_k055555(*this, "k055555"),
 		m_ata(*this, "ata"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram")
 	{
 	}
 
@@ -73,6 +74,7 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 };
 
 /*----------- defined in video/djmain.c -----------*/

@@ -36,7 +36,8 @@ public:
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_8(*this, "paletteram")
 	{ }
 
 	// these should be required but can't because mcr68 shares with us
@@ -56,6 +57,7 @@ public:
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);

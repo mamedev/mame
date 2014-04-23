@@ -26,7 +26,8 @@ public:
 		m_bgstripesram(*this, "bgstripesram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_8(*this, "paletteram") { }
 
 	int m_int_delay_kludge;
 	UINT8 m_sound_cmd;
@@ -93,6 +94,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

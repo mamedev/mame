@@ -612,7 +612,8 @@ public:
 		m_k001604(*this, "k001604"),
 		m_ata(*this, "ata"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram")
 	{
 	}
 
@@ -624,6 +625,7 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);

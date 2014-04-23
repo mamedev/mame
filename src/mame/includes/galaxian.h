@@ -54,7 +54,8 @@ public:
 			m_videoram(*this, "videoram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette") { }
+			m_palette(*this, "palette"),
+			m_generic_paletteram_16(*this, "paletteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -73,6 +74,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	int m_bullets_base;
 	int m_sprites_base;

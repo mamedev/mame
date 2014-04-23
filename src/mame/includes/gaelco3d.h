@@ -67,7 +67,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_tms(*this, "tms"),
 		m_serial(*this, "serial"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_generic_paletteram_32(*this, "paletteram")	{ }
 
 	required_shared_ptr<UINT32> m_adsp_ram_base;
 	required_shared_ptr<UINT16> m_m68k_ram_base;
@@ -80,6 +82,8 @@ public:
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	UINT16 m_sound_data;
 	UINT8 m_sound_status;

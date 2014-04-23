@@ -23,9 +23,11 @@ class vegaeo_state : public eolith_state
 {
 public:
 	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state(mconfig, type, tag) { }
+		: eolith_state(mconfig, type, tag),
+		  m_generic_paletteram_32(*this, "paletteram") { }
 
-	UINT32 *m_vega_vram;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
+    UINT32 *m_vega_vram;
 	UINT8 m_vega_vbuffer;
 	DECLARE_WRITE32_MEMBER(vega_vram_w);
 	DECLARE_READ32_MEMBER(vega_vram_r);

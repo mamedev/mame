@@ -32,7 +32,8 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
-		m_namconb_shareram(*this, "namconb_share"){ }
+		m_namconb_shareram(*this, "namconb_share"),
+		m_generic_paletteram_32(*this, "paletteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -40,6 +41,7 @@ public:
 	required_shared_ptr<UINT32> m_spritebank32;
 	optional_shared_ptr<UINT32> m_tilebank32;
 	required_shared_ptr<UINT16> m_namconb_shareram;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	UINT8 m_namconb_cpureg[32];
 	int m_vblank_irq_active;

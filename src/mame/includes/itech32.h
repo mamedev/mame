@@ -34,7 +34,9 @@ public:
 		m_dsp1(*this, "dsp1"),
 		m_dsp2(*this, "dsp2"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_generic_paletteram_32(*this, "paletteram") { }
 
 	optional_shared_ptr<UINT16> m_main_ram;
 	optional_shared_ptr<UINT16> m_nvram;
@@ -197,4 +199,6 @@ public:
 	optional_device<cpu_device> m_dsp2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;	
 };

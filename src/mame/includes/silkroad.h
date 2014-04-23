@@ -13,7 +13,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki1(*this, "oki1"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram") { }
 
 	required_shared_ptr<UINT32> m_vidram;
 	required_shared_ptr<UINT32> m_vidram2;
@@ -39,4 +40,5 @@ public:
 	required_device<okim6295_device> m_oki1;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 };

@@ -253,7 +253,8 @@ public:
 		m_analog2(*this, "AN2"),
 		m_analog3(*this, "AN3"),
 		m_eeprom(*this, "eeprom"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram")  { }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -268,6 +269,7 @@ public:
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);

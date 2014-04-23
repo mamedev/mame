@@ -21,7 +21,8 @@ public:
 		m_k051960(*this, "k051960"),
 		m_k051316_1(*this, "k051316_1"),
 		m_k051316_2(*this, "k051316_2"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_8(*this, "paletteram") { }
 
 	/* memory pointers */
 	UINT8 *    m_ram;
@@ -47,6 +48,8 @@ public:
 	required_device<k051316_device> m_k051316_1;
 	required_device<k051316_device> m_k051316_2;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	
 	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
 	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);

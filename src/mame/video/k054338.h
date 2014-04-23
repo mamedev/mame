@@ -56,6 +56,7 @@ private:
 	const char  *m_k055555_tag;
 
 	k055555_device *m_k055555;  /* used to fill BG color */
+	optional_shared_ptr<UINT32> m_generic_paletteram_32;
 };
 
 extern const device_type K054338;

@@ -113,7 +113,9 @@ public:
 		m_reelscroll4(*this, "reelscroll4"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_generic_paletteram2_8(*this, "paletteram2") { }
 
 	tilemap_t *m_tmap;
 	required_shared_ptr<UINT8> m_videoram;
@@ -169,6 +171,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<UINT8> m_generic_paletteram2_8;	
 };
 
 

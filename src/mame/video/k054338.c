@@ -22,7 +22,8 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K054338, "K054338 Mixer Device", tag, owner, clock, "k054338", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
-	m_k055555_tag(NULL)
+	m_k055555_tag(NULL),
+	m_generic_paletteram_32(*this, "^paletteram")
 	//m_regs[32],
 	//m_shd_rgb[9],
 {
@@ -137,7 +138,7 @@ void k054338_device::fill_backcolor( bitmap_rgb32 &bitmap, int mode ) // (see p.
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
-	pal_ptr = machine().driver_data()->m_generic_paletteram_32;
+	pal_ptr = m_generic_paletteram_32;
 
 	if (!mode || m_k055555 == NULL)
 	{

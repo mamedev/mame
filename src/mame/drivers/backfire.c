@@ -40,7 +40,8 @@ public:
 		m_io_in1(*this, "IN1"),
 		m_io_in2(*this, "IN2"),
 		m_io_in3(*this, "IN3"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	/* memory pointers */
@@ -104,6 +105,7 @@ public:
 	required_ioport m_io_in2;
 	required_ioport m_io_in3;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 

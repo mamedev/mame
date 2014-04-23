@@ -33,7 +33,8 @@ public:
 			m_oki1(*this, "oki1"),
 			m_oki2(*this, "oki2"),
 			m_sprgen(*this, "spritegen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	/* devices */
@@ -43,6 +44,7 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	/* memory */
 	UINT16   m_pf1_rowscroll[0x800/2];

@@ -35,7 +35,8 @@ public:
 		m_drmath(*this, "drmath"),
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
-		m_duart68681(*this, "duart68681") { }
+		m_duart68681(*this, "duart68681"),
+		m_generic_paletteram_16(*this, "paletteram") { }
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	UINT8               m_m68681_tx0;
@@ -144,6 +145,7 @@ public:
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
 	required_device<mc68681_device> m_duart68681;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

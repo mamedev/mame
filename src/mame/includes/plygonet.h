@@ -22,7 +22,8 @@ public:
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -38,6 +39,8 @@ public:
 	required_shared_ptr<UINT16> m_dsp56k_p_8000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	
 	ioport_port *m_inputs[4];
 	UINT8 m_sys0;
 	UINT8 m_sys1;

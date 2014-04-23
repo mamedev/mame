@@ -34,12 +34,6 @@ ADDRESS_MAP_END
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0, "", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram2_8(*this, "paletteram2"),
-		m_generic_paletteram_16(*this, "paletteram"),
-		m_generic_paletteram2_16(*this, "paletteram2"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_generic_paletteram2_32(*this, "paletteram2"),
 		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(generic)),
 		m_system(NULL),
 		m_latch_clear_value(0),

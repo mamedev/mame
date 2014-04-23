@@ -62,7 +62,8 @@ public:
 		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
-		m_dcs(*this, "dcs") { }
+		m_dcs(*this, "dcs"),
+		m_generic_paletteram_32(*this, "paletteram") { }
 
 	optional_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
@@ -145,6 +146,7 @@ public:
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	required_device<dcs_audio_device> m_dcs;
+	required_shared_ptr<UINT32> m_generic_paletteram_32;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
