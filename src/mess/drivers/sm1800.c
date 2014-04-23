@@ -77,7 +77,6 @@ IRQ_CALLBACK_MEMBER(sm1800_state::sm1800_irq_callback)
 
 void sm1800_state::machine_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sm1800_state::sm1800_irq_callback),this));
 }
 
 INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)
@@ -168,6 +167,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
 	MCFG_CPU_IO_MAP(sm1800_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(sm1800_state,sm1800_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

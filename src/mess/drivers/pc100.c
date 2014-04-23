@@ -423,7 +423,6 @@ WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
 
 void pc100_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc100_state::pc100_irq_callback),this));
 	m_kanji_rom = (UINT16 *)(*memregion("kanji"));
 	m_vram = (UINT16 *)(*memregion("vram"));
 }
@@ -488,6 +487,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_CPU_PROGRAM_MAP(pc100_map)
 	MCFG_CPU_IO_MAP(pc100_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc100_state,pc100_irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))

@@ -255,6 +255,7 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device,segacd_sub_int_callback)
 
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
@@ -1716,8 +1717,6 @@ void sega_segacd_device::device_start()
 	space.install_readwrite_handler(0xa12020, 0xa1202f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part2_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part2_w),this));
 
 
-
-	m_scdcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sega_segacd_device::segacd_sub_int_callback),this));
 
 	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(FUNC(sega_segacd_device::scd_hint_vector_r),this) );
 

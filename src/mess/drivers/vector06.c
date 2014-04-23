@@ -166,7 +166,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
 	MCFG_CPU_IO_MAP(vector06_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

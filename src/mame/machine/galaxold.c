@@ -81,7 +81,6 @@ MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
 MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
 	machine_reset_common(0);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxold_state::hunchbkg_irq_callback),this));
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)

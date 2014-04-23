@@ -172,7 +172,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_CPU_PROGRAM_MAP(poly88_mem)
 	MCFG_CPU_IO_MAP(poly88_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(poly88_state,poly88_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

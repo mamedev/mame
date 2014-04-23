@@ -1961,9 +1961,6 @@ void st_state::machine_start()
 	// configure RAM banking
 	configure_memory();
 
-	// set CPU interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
-
 	// allocate timers
 	if(m_mousex) {
 		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
@@ -2022,9 +2019,6 @@ void ste_state::machine_start()
 	/* configure RAM banking */
 	configure_memory();
 
-	/* set CPU interrupt callback */
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
-
 	/* allocate timers */
 	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
 	m_microwire_timer = timer_alloc(TIMER_MICROWIRE_TICK);
@@ -2067,9 +2061,6 @@ void stbook_state::machine_start()
 		break;
 	}
 
-	/* set CPU interrupt callback */
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
-
 	/* register for state saving */
 	ste_state::state_save();
 
@@ -2100,6 +2091,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(st_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
 	MCFG_CPU_ADD(HD6301V1_TAG, HD6301, Y2/8)
 	MCFG_CPU_PROGRAM_MAP(ikbd_map)
@@ -2186,6 +2178,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(megast_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
 	MCFG_CPU_ADD(HD6301V1_TAG, HD6301, Y2/8)
 	MCFG_CPU_PROGRAM_MAP(ikbd_map)
@@ -2273,6 +2266,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(ste_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
 	MCFG_CPU_ADD(HD6301V1_TAG, HD6301, Y2/8)
 	MCFG_CPU_PROGRAM_MAP(ikbd_map)
@@ -2384,6 +2378,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, U517/2)
 	MCFG_CPU_PROGRAM_MAP(stbook_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
 	//MCFG_CPU_ADD(COP888_TAG, COP888, Y700)
 

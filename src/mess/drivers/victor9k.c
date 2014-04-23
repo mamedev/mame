@@ -895,9 +895,6 @@ SLOT_INTERFACE_END
 
 void victor9k_state::machine_start()
 {
-	// set interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(victor9k_state::victor9k_irq_callback),this));
-
 	// set floppy callbacks
 	m_floppy0->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor9k_state::ready0_cb), this));
 	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(victor9k_state::load0_cb), this));
@@ -928,6 +925,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MCFG_CPU_PROGRAM_MAP(victor9k_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(victor9k_state,victor9k_irq_callback)
 
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_CPU_IO_MAP(floppy_io)

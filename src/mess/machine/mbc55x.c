@@ -330,7 +330,6 @@ void mbc55x_state::machine_reset()
 {
 	set_ram_size();
 	keyboard_reset();
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mbc55x_state::mbc55x_irq_callback),this));
 }
 
 void mbc55x_state::machine_start()

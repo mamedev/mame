@@ -755,9 +755,6 @@ void trs80m16_state::machine_start()
 {
 	trs80m2_state::machine_start();
 
-	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(trs80m16_state::trs80m16_irq_callback),this));
-
 	// register for state saving
 	save_item(NAME(m_ual));
 	save_item(NAME(m_limit));
@@ -859,6 +856,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(m16_z80_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(trs80m16_state,trs80m16_irq_callback)
 
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m68000_mem)

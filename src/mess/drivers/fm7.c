@@ -1822,8 +1822,6 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 	m_subtimer = timer_alloc(TIMER_FM7_SUBTIMER_IRQ);
 	m_keyboard_timer = timer_alloc(TIMER_FM7_KEYBOARD_POLL);
 	m_fm77av_vsync_timer = timer_alloc(TIMER_FM77AV_VSYNC);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_irq_ack),this));
-	m_sub->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_sub_irq_ack),this));
 }
 
 MACHINE_START_MEMBER(fm7_state,fm7)
@@ -2019,10 +2017,12 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(fm7_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2071,10 +2071,12 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1200000)  // 1.2MHz 68A09
 	MCFG_CPU_PROGRAM_MAP(fm8_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2117,10 +2119,12 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
 	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(fm77av_sub_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2170,10 +2174,12 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // 2MHz 68B09E
 	MCFG_CPU_PROGRAM_MAP(fm11_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)  // 2MHz 68B09
 	MCFG_CPU_PROGRAM_MAP(fm11_sub_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_CPU_ADD("x86", I8088, XTAL_8MHz)  // 8MHz i8088
@@ -2224,6 +2230,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_CPU_PROGRAM_MAP(fm16_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 

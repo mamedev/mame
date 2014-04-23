@@ -584,8 +584,6 @@ void crystal_state::machine_start()
 {
 	int i;
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
-
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
 
@@ -614,7 +612,6 @@ void crystal_state::machine_reset()
 	memset(m_vidregs, 0, 0x10000);
 	m_FlipCount = 0;
 	m_IntHigh = 0;
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
 	m_Bank = 0;
 	membank("bank1")->set_base(memregion("user1")->base() + 0);
 	m_FlashCmd = 0xff;
@@ -899,6 +896,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(crystal_state, icallback)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

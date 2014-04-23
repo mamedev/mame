@@ -132,7 +132,6 @@ WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
 
 void multi16_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(multi16_state::multi16_irq_callback),this));
 }
 
 
@@ -161,7 +160,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(multi16_map)
 	MCFG_CPU_IO_MAP(multi16_io)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(multi16_state,multi16_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

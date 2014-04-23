@@ -315,7 +315,6 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 void ssv_state::machine_reset()
 {
 	m_requested_int = 0;
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ssv_state::ssv_irq_callback),this));
 	membank("bank1")->set_base(memregion("user1")->base());
 }
 
@@ -2585,6 +2584,8 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,ssv_irq_callback)
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, ssv_interrupt, "screen", 0, 1)
 
 	/* video hardware */

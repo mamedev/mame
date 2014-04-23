@@ -184,7 +184,6 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 	if (ioport("ROM2")->read())
 		membank("bank10")->set_base(memregion("maincpu")->base() + 0x1000);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxy_state::galaxy_irq_callback),this));
 	m_interrupts_enabled = TRUE;
 }
 
@@ -197,8 +196,6 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxy_state::galaxy_irq_callback),this));
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;

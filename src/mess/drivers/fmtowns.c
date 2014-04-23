@@ -2591,7 +2591,6 @@ void towns_state::driver_start()
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(towns_state::towns_irq_callback),this));
 	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,0xffffffff,0,NULL);
 }
 
@@ -2706,7 +2705,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
 	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
 
 	/* video hardware */
@@ -2794,6 +2793,7 @@ static MACHINE_CONFIG_START( townsux, towns16_state )
 	MCFG_CPU_PROGRAM_MAP(ux_mem)
 	MCFG_CPU_IO_MAP(towns16_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -2808,6 +2808,7 @@ static MACHINE_CONFIG_DERIVED( townssj, towns )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")
@@ -2819,6 +2820,7 @@ static MACHINE_CONFIG_DERIVED( townshr, towns )
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -2832,6 +2834,7 @@ static MACHINE_CONFIG_START( marty, marty_state )
 	MCFG_CPU_PROGRAM_MAP(marty_mem)
 	MCFG_CPU_IO_MAP(towns16_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(towns_state,towns_irq_callback)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6M")

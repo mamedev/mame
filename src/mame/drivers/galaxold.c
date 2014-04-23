@@ -2591,6 +2591,7 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 
 	MCFG_CPU_PROGRAM_MAP(hunchbkg)
 	MCFG_CPU_IO_MAP(hunchbkg_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
 
 	MCFG_DEVICE_MODIFY("7474_9m_1")
 	/* the nmi line seems to be inverted on the cpu plugin board */

@@ -279,7 +279,6 @@ void esq5505_state::machine_reset()
 
 	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
 	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(esq5505_state::maincpu_irq_acknowledge_callback),this));
 
 	// Default analog values:
 	m_analog_values[0] = 0x7fff; // pitch mod: start in the center
@@ -620,6 +619,7 @@ static const es5505_interface es5505_config =
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
@@ -690,6 +690,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()

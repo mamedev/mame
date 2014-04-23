@@ -156,8 +156,6 @@ protected:
 
 void rastersp_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rastersp_state::irq_callback),this));
-
 	m_nvram8 = auto_alloc_array(machine(), UINT8, NVRAM_SIZE);
 	m_nvram->set_base(m_nvram8,NVRAM_SIZE);
 	m_paletteram = auto_alloc_array(machine(), UINT16, 0x8000);
@@ -867,6 +865,7 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastersp_state, vblank_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rastersp_state,irq_callback)
 
 	MCFG_CPU_ADD("dsp", TMS32031, 33330000)
 	MCFG_TMS3203X_CONFIG(tms_config)

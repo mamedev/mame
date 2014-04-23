@@ -2393,8 +2393,6 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 void pc8801_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc8801_state::pc8801_irq_callback),this));
-
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
 	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
 	machine().device<upd765a_device>("upd765")->set_rate(250000);
@@ -2609,6 +2607,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
 	MCFG_CPU_IO_MAP(pc8801_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc8801_state,  pc8801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
 
 	/* sub CPU(5 inch floppy drive) */
 	MCFG_CPU_ADD("fdccpu", Z80, MASTER_CLOCK)       /* 4 MHz */

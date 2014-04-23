@@ -130,7 +130,6 @@ IRQ_CALLBACK_MEMBER(mod8_state::mod8_irq_callback)
 
 void mod8_state::machine_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mod8_state::mod8_irq_callback),this));
 }
 
 WRITE8_MEMBER( mod8_state::kbd_put )
@@ -144,6 +143,7 @@ static MACHINE_CONFIG_START( mod8, mod8_state )
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(mod8_mem)
 	MCFG_CPU_IO_MAP(mod8_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)

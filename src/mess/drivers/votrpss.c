@@ -179,7 +179,6 @@ INPUT_PORTS_END
 
 void votrpss_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(votrpss_state::irq_ack),this));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( votrpss_state::irq_timer )
@@ -266,6 +265,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
 	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
 	MCFG_CPU_IO_MAP(votrpss_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_votrpss)

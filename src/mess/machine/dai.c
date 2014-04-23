@@ -77,8 +77,6 @@ IRQ_CALLBACK_MEMBER(dai_state::int_ack)
 
 void dai_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(dai_state::int_ack),this));
-
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
 	timer_set(attotime::zero, TIMER_BOOTSTRAP);
 	timer_set(attotime::from_hz(100), TIMER_TMS5501);

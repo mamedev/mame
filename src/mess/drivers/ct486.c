@@ -57,7 +57,6 @@ public:
 
 void ct486_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ct486_state::irq_callback), this));
 }
 
 READ16_MEMBER( ct486_state::cs4031_ior )
@@ -106,6 +105,7 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
 	MCFG_CPU_IO_MAP(ct486_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ct486_state,irq_callback)
 
 	MCFG_CS4031_ADD("cs4031", XTAL_25MHz, "maincpu", "isa", "bios", "keybc")
 	// cpu connections

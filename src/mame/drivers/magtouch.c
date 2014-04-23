@@ -172,8 +172,6 @@ INPUT_PORTS_END
 
 void magtouch_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(magtouch_state::irq_callback),this));
-
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
 }
@@ -183,6 +181,7 @@ static MACHINE_CONFIG_START( magtouch, magtouch_state )
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)
 	MCFG_CPU_IO_MAP(magtouch_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(magtouch_state,irq_callback)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

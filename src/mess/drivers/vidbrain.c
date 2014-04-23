@@ -502,9 +502,6 @@ void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void vidbrain_state::machine_start()
 {
-	// register IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vidbrain_state::vidbrain_int_ack),this));
-
 	// allocate timers
 	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);
 
@@ -540,6 +537,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
 	MCFG_CPU_IO_MAP(vidbrain_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vidbrain_state,vidbrain_int_ack)
 
 	// video hardware
 	MCFG_DEFAULT_LAYOUT(layout_vidbrain)

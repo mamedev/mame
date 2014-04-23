@@ -823,8 +823,6 @@ void funkball_state::machine_start()
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT8, 0x20000);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(funkball_state::irq_callback),this));
-
 	/* defaults, otherwise it won't boot */
 	m_unk_ram[0x010/4] = 0x2f8d85ff;
 	m_unk_ram[0x018/4] = 0x000018c5;
@@ -864,6 +862,7 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(funkball_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

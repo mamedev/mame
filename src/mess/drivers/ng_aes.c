@@ -1038,9 +1038,6 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data, 0x2000);
 	save_pointer(NAME(m_meminternal_data), 0x2000);
 
-	// for custom vectors
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ng_aes_state::neocd_int_callback),this));
-
 	m_bank_vectors->set_entry(0); // default to the BIOS vectors
 
 	m_tempcdc->reset_cd();
@@ -1475,6 +1472,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ng_aes_state,neocd_int_callback)
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_audio_map)

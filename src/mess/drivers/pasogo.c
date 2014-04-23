@@ -679,7 +679,6 @@ IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)
 
 void pasogo_state::machine_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pasogo_state::pasogo_irq_callback),this));
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
@@ -947,6 +946,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
 	MCFG_CPU_IO_MAP( pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pasogo_state,pasogo_irq_callback)
 
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */

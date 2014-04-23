@@ -352,6 +352,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -391,6 +392,7 @@ static MACHINE_CONFIG_START( ibmps1, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ps1_286_map)
 	MCFG_CPU_IO_MAP(ps1_286_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -415,6 +417,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -440,6 +443,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ps2m30286_map)
 	MCFG_CPU_IO_MAP(ps1_286_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -465,6 +469,7 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -489,6 +494,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -512,6 +518,7 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12500000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -534,6 +541,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(at386_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -568,6 +576,7 @@ static MACHINE_CONFIG_DERIVED( at486, at386 )
 	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(at386_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 MACHINE_CONFIG_END
 
 
@@ -576,6 +585,7 @@ static MACHINE_CONFIG_START( k286i, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
@@ -638,7 +648,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
-	MCFG_CPU_IO_MAP(at586_io)
+	MCFG_CPU_IO_MAP(at586_io)	
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -662,18 +672,21 @@ static MACHINE_CONFIG_DERIVED( at386sx, atvga )
 	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)     /* 386SX */
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ct386sx, neat )
 	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megapc, at386 )
 	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(megapc_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
@@ -683,6 +696,7 @@ static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_REPLACE("maincpu", I486, 66000000 / 2)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(megapc_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(at_state,at_irq_callback)
 MACHINE_CONFIG_END
 
 

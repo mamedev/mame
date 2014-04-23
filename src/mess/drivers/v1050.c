@@ -972,9 +972,6 @@ void v1050_state::machine_start()
 	// initialize RTC
 	m_rtc->cs1_w(1);
 
-	// set CPU interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v1050_state::v1050_int_ack),this));
-
 	// setup memory banking
 	UINT8 *ram = m_ram->pointer();
 
@@ -1031,6 +1028,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(v1050_mem)
 	MCFG_CPU_IO_MAP(v1050_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(v1050_state,v1050_int_ack)
+
 	MCFG_QUANTUM_PERFECT_CPU(Z80_TAG)
 
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_15_36MHz/16)

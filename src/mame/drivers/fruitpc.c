@@ -109,7 +109,6 @@ INPUT_PORTS_END
 
 void fruitpc_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fruitpc_state::irq_callback),this));
 }
 
 void fruitpc_state::machine_reset()
@@ -120,6 +119,7 @@ static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
 	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
 	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
 	MCFG_CPU_IO_MAP(fruitpc_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fruitpc_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

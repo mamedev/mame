@@ -745,8 +745,6 @@ IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
 
 void apc_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apc_state::irq_callback),this));
-
 	m_fdc->set_rate(500000);
 
 	m_rtc->cs_w(1);
@@ -951,6 +949,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(apc_map)
 	MCFG_CPU_IO_MAP(apc_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apc_state,irq_callback)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK) /* heartbeat IRQ */

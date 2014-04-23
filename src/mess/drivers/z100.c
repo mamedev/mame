@@ -702,7 +702,6 @@ static const floppy_interface z100_floppy_interface =
 
 void z100_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(z100_state::z100_irq_callback),this));
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 
@@ -727,7 +726,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
 	MCFG_CPU_IO_MAP(z100_io)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(z100_state,z100_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

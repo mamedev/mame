@@ -686,7 +686,6 @@ INPUT_PORTS_END
 
 void qx10_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(qx10_state::irq_callback),this));
 }
 
 void qx10_state::machine_reset()
@@ -788,6 +787,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
 	MCFG_CPU_IO_MAP(qx10_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(qx10_state,irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

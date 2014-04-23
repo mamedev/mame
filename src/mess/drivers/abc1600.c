@@ -862,9 +862,6 @@ IRQ_CALLBACK_MEMBER( abc1600_state::abc1600_int_ack )
 
 void abc1600_state::machine_start()
 {
-	// interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(abc1600_state::abc1600_int_ack),this));
-
 	// state saving
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
@@ -910,6 +907,8 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(abc1600_state,abc1600_int_ack)
+
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 
 	// video hardware

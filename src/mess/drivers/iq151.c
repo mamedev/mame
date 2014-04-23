@@ -347,8 +347,6 @@ DRIVER_INIT_MEMBER(iq151_state,iq151)
 	membank("boot")->configure_entry(0, RAM + 0xf800);
 	membank("boot")->configure_entry(1, RAM + 0x0000);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(iq151_state::iq151_irq_callback),this));
-
 	// keep machine pointers to slots
 	m_carts[0] = machine().device<iq151cart_slot_device>("slot1");
 	m_carts[1] = machine().device<iq151cart_slot_device>("slot2");
@@ -405,6 +403,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
 	MCFG_CPU_IO_MAP(iq151_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", iq151_state,  iq151_vblank_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(iq151_state,iq151_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

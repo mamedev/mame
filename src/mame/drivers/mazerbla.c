@@ -1462,8 +1462,6 @@ void mazerbla_state::machine_reset()
 	}
 
 	memset(m_lookup_ram, 0, ARRAY_LENGTH(m_lookup_ram));
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mazerbla_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
@@ -1472,6 +1470,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_map)
 	MCFG_CPU_IO_MAP(mazerbla_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mazerbla_state,irq_callback)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)  /* 4 MHz, NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu2_map)
@@ -1513,6 +1512,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_map)
 	MCFG_CPU_IO_MAP(greatgun_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mazerbla_state,irq_callback)
 
 	MCFG_CPU_ADD("sub", Z80, SOUND_CLOCK / 4)   /* 3.579500 MHz, NMI - caused by sound command write, periodic INT */
 	MCFG_CPU_PROGRAM_MAP(greatgun_sound_map)

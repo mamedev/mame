@@ -47,6 +47,7 @@ static MACHINE_CONFIG_FRAGMENT( mie )
 	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(mie_map)
 	MCFG_CPU_IO_MAP(mie_port)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device,irq_callback)
 MACHINE_CONFIG_END
 
 ROM_START( mie )
@@ -95,7 +96,6 @@ void mie_device::device_start()
 	maple_device::device_start();
 	cpu = subdevice<z80_device>("mie");
 	timer = timer_alloc(0);
-	cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mie_device::irq_callback),this));
 	jvs = machine().device<mie_jvs_device>(jvs_name);
 
 	save_item(NAME(gpiodir));

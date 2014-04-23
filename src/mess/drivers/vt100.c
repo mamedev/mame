@@ -360,8 +360,6 @@ void vt100_state::machine_reset()
 	output_set_value("l4_led", 1);
 
 	m_key_scan = 0;
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vt100_state::vt100_irq_callback),this));
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
@@ -404,7 +402,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -456,8 +454,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( vt102, vt100 )
 	MCFG_CPU_REPLACE("maincpu",I8085A, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
+	MCFG_CPU_IO_MAP(vt100_io)	
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
 MACHINE_CONFIG_END
 
 /* VT1xx models:

@@ -109,7 +109,6 @@ DRIVER_INIT_MEMBER(pcjr_state, pcjr)
 	m_pc_int_delay_timer = timer_alloc(TIMER_IRQ_DELAY);
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
 	m_keyb_signal_timer = timer_alloc(TIMER_KB_SIGNAL);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcjr_state::pc_irq_callback),this));
 }
 
 void pcjr_state::machine_reset()
@@ -612,6 +611,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_CPU_ADD("maincpu", I8088, 4900000)
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
 	MCFG_CPU_IO_MAP(ibmpcjr_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcjr_state,pc_irq_callback)
 
 /*
   On the PC Jr the input for clock 1 seems to be selectable
@@ -699,6 +699,7 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcjr_state,pc_irq_callback)
 
 	MCFG_DEVICE_REMOVE("fdc:0");
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)

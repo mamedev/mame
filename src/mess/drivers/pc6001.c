@@ -2096,7 +2096,6 @@ void pc6001_state::machine_reset()
 
 	m_port_c_8255=0;
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc6001_state::pc6001_irq_callback),this));
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 	m_timer_irq_mask = 1;
@@ -2113,7 +2112,6 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 
 	m_port_c_8255=0;
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc6001_state::pc6001_irq_callback),this));
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 
@@ -2148,7 +2146,6 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 
 	m_port_c_8255=0;
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc6001_state::pc6001_irq_callback),this));
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 
@@ -2305,6 +2302,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_CPU_PROGRAM_MAP(pc6001_map)
 	MCFG_CPU_IO_MAP(pc6001_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state,pc6001_irq_callback)
 
 //  MCFG_CPU_ADD("subcpu", I8049, 7987200)
 
@@ -2388,6 +2386,7 @@ static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
 	MCFG_CPU_PROGRAM_MAP(pc6001m2_map)
 	MCFG_CPU_IO_MAP(pc6601_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state,pc6001_irq_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
@@ -2402,6 +2401,7 @@ static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
 	MCFG_CPU_PROGRAM_MAP(pc6001sr_map)
 	MCFG_CPU_IO_MAP(pc6001sr_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001sr_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state,pc6001_irq_callback)
 MACHINE_CONFIG_END
 
 /* ROM definition */

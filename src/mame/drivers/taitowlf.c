@@ -343,7 +343,6 @@ INPUT_PORTS_END
 
 void taitowlf_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitowlf_state::irq_callback),this));
 }
 
 void taitowlf_state::machine_reset()
@@ -370,6 +369,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
 	MCFG_CPU_PROGRAM_MAP(taitowlf_map)
 	MCFG_CPU_IO_MAP(taitowlf_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitowlf_state,irq_callback)
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

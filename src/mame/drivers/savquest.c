@@ -643,7 +643,6 @@ void savquest_state::machine_start()
 	m_bios_e8000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_bios_ec000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(savquest_state::irq_callback),this));
 	intel82439tx_init();
 }
 
@@ -675,6 +674,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(savquest_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

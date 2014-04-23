@@ -155,8 +155,6 @@ WRITE8_MEMBER(scramble_state::frogger_filter_w)
 
 void scramble_state::sh_init()
 {
-	m_audiocpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(scramble_state::scramble_sh_irq_callback),this));
-
 	/* PR is always 0, D is always 1 */
 	m_konami_7474->d_w(1);
 }
@@ -331,6 +329,7 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)
 	MCFG_CPU_IO_MAP(ad2083_sound_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
 	MCFG_DEVICE_CONFIG(prom_intf)

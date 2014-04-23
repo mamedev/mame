@@ -1106,7 +1106,6 @@ MACHINE_START_MEMBER(cat_state,cat)
 
 MACHINE_RESET_MEMBER(cat_state,cat)
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
 	m_floppy_control = 0;
@@ -1221,6 +1220,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_19_968MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cat_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)

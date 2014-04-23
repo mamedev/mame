@@ -200,6 +200,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(dai_mem)
 	MCFG_CPU_IO_MAP(dai_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)

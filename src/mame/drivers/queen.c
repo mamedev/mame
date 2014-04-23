@@ -252,7 +252,6 @@ void queen_state::machine_start()
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 	m_bios_ext_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(queen_state::irq_callback),this));
 	intel82439tx_init();
 }
 
@@ -268,6 +267,7 @@ static MACHINE_CONFIG_START( queen, queen_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
 	MCFG_CPU_PROGRAM_MAP(queen_map)
 	MCFG_CPU_IO_MAP(queen_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(queen_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

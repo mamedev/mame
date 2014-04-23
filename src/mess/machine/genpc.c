@@ -586,8 +586,6 @@ IRQ_CALLBACK_MEMBER(ibm5160_mb_device::pc_irq_callback)
 
 void ibm5160_mb_device::device_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ibm5160_mb_device::pc_irq_callback),this));
-
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;

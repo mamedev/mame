@@ -379,8 +379,6 @@ void fk1_state::machine_reset()
 	membank("bank2")->set_base(ram + 0x10000); // VRAM
 	membank("bank3")->set_base(ram + 0x8000);
 	membank("bank4")->set_base(ram + 0xc000);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fk1_state::fk1_irq_callback),this));
 }
 
 UINT32 fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -408,6 +406,7 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fk1_mem)
 	MCFG_CPU_IO_MAP(fk1_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

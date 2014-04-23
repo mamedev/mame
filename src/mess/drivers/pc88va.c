@@ -1653,8 +1653,6 @@ READ8_MEMBER(pc88va_state::get_slave_ack)
 
 void pc88va_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc88va_state::pc88va_irq_callback),this));
-
 	m_t3_mouse_timer = timer_alloc(TIMER_T3_MOUSE_CALLBACK);
 	m_t3_mouse_timer->adjust(attotime::never);
 	floppy_image_device *floppy;
@@ -1805,6 +1803,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_CPU_PROGRAM_MAP(pc88va_map)
 	MCFG_CPU_IO_MAP(pc88va_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc88va_state, pc88va_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc88va_state,pc88va_irq_callback)
 
 #if TEST_SUBFDC
 	MCFG_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */

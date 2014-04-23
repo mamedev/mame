@@ -1289,7 +1289,6 @@ void ms32_state::irq_init()
 {
 	m_irqreq = 0;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ms32_state::irq_callback),this));
 }
 
 void ms32_state::irq_raise(int level)
@@ -1389,6 +1388,8 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
 	MCFG_CPU_PROGRAM_MAP(ms32_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)

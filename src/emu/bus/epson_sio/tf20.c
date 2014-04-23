@@ -111,6 +111,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device,irq_callback)
 
 	// 64k internal ram
 	MCFG_RAM_ADD("ram")
@@ -172,8 +173,6 @@ void epson_tf20_device::device_start()
 
 	m_timer_serial = timer_alloc(0, NULL);
 	m_timer_tc = timer_alloc(1, NULL);
-
-	m_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(epson_tf20_device::irq_callback),this));
 
 	m_fd0 = subdevice<floppy_connector>("5a:0")->get_device();
 	m_fd1 = subdevice<floppy_connector>("5a:1")->get_device();

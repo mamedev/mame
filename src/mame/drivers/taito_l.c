@@ -291,7 +291,6 @@ IRQ_CALLBACK_MEMBER(taitol_state::irq_callback)
 TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 {
 	int scanline = param;
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitol_state::irq_callback),this));
 
 	/* kludge to make plgirls boot */
 	if (m_maincpu->state_int(Z80_IM) != 2)
@@ -1787,6 +1786,8 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(fhawk_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state,irq_callback)
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* verified on pcb */
@@ -1888,6 +1889,8 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(kurikint_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state,irq_callback)
+	
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)        /* verified on pcb */
@@ -1939,6 +1942,7 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(plotting_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state,irq_callback)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
@@ -2024,6 +2028,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state,irq_callback)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* not verified */

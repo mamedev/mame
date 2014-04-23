@@ -1796,8 +1796,6 @@ void seibuspi_state::init_rise11()
 
 void seibuspi_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
-
 	// use this to determine the region code when adding a new SPI cartridge clone set
 	logerror("Game region code: %02X\n", memregion("maincpu")->base()[0x1ffffc]);
 
@@ -1824,6 +1822,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(spi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/4) // Z84C0008PEC, 7.159MHz
 	MCFG_CPU_PROGRAM_MAP(spi_soundmap)
@@ -1935,6 +1934,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
 	MCFG_CPU_PROGRAM_MAP(sys386i_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1985,6 +1985,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(sys386f_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

@@ -749,9 +749,6 @@ void portfolio_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	/* set CPU interrupt vector callback */
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(portfolio_state::portfolio_int_ack),this));
-
 	/* memory expansions */
 	switch (m_ram->size())
 	{
@@ -821,6 +818,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(portfolio_mem)
 	MCFG_CPU_IO_MAP(portfolio_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(portfolio_state,portfolio_int_ack)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)

@@ -300,7 +300,6 @@ WRITE_LINE_MEMBER( paso1600_state::paso1600_set_int_line )
 
 void paso1600_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(paso1600_state::paso1600_irq_callback),this));
 }
 
 
@@ -342,7 +341,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(paso1600_map)
 	MCFG_CPU_IO_MAP(paso1600_io)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(paso1600_state,paso1600_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

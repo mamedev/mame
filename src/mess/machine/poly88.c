@@ -226,7 +226,6 @@ DRIVER_INIT_MEMBER(poly88_state,poly88)
 
 void poly88_state::machine_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(poly88_state::poly88_irq_callback),this));
 	m_intr = 0;
 	m_last_code = 0;
 }

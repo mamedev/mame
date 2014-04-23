@@ -167,7 +167,6 @@ IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
 void photon_state::machine_reset()
 {
 	pk8000_set_bank(0);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photon_state::pk8000_irq_callback),this));
 }
 
 void photon_state::video_start()
@@ -186,7 +185,7 @@ static MACHINE_CONFIG_START( photon, photon_state )
 	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
 	MCFG_CPU_IO_MAP(pk8000_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", photon_state,  pk8000_interrupt)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(photon_state,pk8000_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -119,13 +119,13 @@ INPUT_PORTS_END
 
 void gammagic_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( gammagic, gammagic_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
 	MCFG_CPU_PROGRAM_MAP(gammagic_map)
 	MCFG_CPU_IO_MAP(gammagic_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(gammagic_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

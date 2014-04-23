@@ -423,8 +423,6 @@ void prestige_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(prestige_state::prestige_int_ack),this));
-
 	m_bank1->configure_entries(0, 64, rom,  0x4000);
 	m_bank1->configure_entries(64,32, cart, 0x4000);
 	m_bank2->configure_entries(0, 64, rom,  0x4000);
@@ -484,6 +482,7 @@ static MACHINE_CONFIG_START( prestige_base, prestige_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(prestige_mem)
 	MCFG_CPU_IO_MAP(prestige_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_msec(10))
 

@@ -36,7 +36,6 @@ IRQ_CALLBACK_MEMBER(aztarac_state::aztarac_irq_callback)
 
 void aztarac_state::machine_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(aztarac_state::aztarac_irq_callback),this));
 }
 
 
@@ -149,6 +148,7 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aztarac_state,  irq4_line_hold)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(aztarac_state,aztarac_irq_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

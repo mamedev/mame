@@ -970,8 +970,6 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 {
 //  MLOG1(("driver_init_dn3500"));
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apollo_state::apollo_irq_acknowledge),this));
-
 	/* hook the RESET line, which resets a slew of other components */
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(apollo_state::apollo_reset_instr_callback),this));
 
@@ -1055,6 +1053,8 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_CPU_PROGRAM_MAP(dn3500_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_FRAGMENT_ADD( apollo )
@@ -1073,6 +1073,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dsp3500, apollo_state )
 	MCFG_CPU_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_CPU_PROGRAM_MAP(dsp3500_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_FRAGMENT_ADD( apollo_terminal )
@@ -1109,6 +1110,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3000, dn3500 )
 	MCFG_CPU_REPLACE(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_CPU_PROGRAM_MAP(dn3000_map)
 	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
 	MCFG_RAM_MODIFY("messram")
@@ -1118,6 +1120,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dsp3000, apollo_state )
 	MCFG_CPU_ADD(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_CPU_PROGRAM_MAP(dsp3000_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1164,6 +1167,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dsp5500, apollo_state )
 	MCFG_CPU_ADD(MAINCPU, M68040, 25000000) /* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(dsp5500_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_FRAGMENT_ADD(apollo_terminal)

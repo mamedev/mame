@@ -205,6 +205,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_CPU_PROGRAM_MAP(pk8020_mem)
 	MCFG_CPU_IO_MAP(pk8020_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pk8020_state,pk8020_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

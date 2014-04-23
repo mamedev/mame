@@ -1884,9 +1884,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 {
-	// register CPU IRQ callback
-	m_ext_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cbm2_state::pic_irq_callback),this));
-
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
 
@@ -1900,9 +1897,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 {
-	// register CPU IRQ callback
-	m_ext_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cbm2_state::pic_irq_callback),this));
-
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
 
@@ -2437,6 +2431,7 @@ static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cbm2_state,pic_irq_callback)
 
 	MCFG_PIC8259_ADD(EXT_I8259A_TAG, INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)
@@ -2499,6 +2494,7 @@ static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cbm2_state,pic_irq_callback)
 
 	MCFG_PIC8259_ADD(EXT_I8259A_TAG, INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)

@@ -166,7 +166,6 @@ INPUT_PORTS_END
 
 void pangofun_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pangofun_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( pangofun, pangofun_state )
@@ -174,6 +173,7 @@ static MACHINE_CONFIG_START( pangofun, pangofun_state )
 	MCFG_CPU_ADD("maincpu", I486, 25000000 )    /* I486 ?? Mhz (25 according to POST) */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pangofun_state,irq_callback)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

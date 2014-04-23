@@ -423,8 +423,6 @@ void gamecstl_state::machine_start()
 void gamecstl_state::machine_reset()
 {
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gamecstl_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
@@ -432,6 +430,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000)
 	MCFG_CPU_PROGRAM_MAP(gamecstl_map)
 	MCFG_CPU_IO_MAP(gamecstl_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(gamecstl_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

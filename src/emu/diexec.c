@@ -127,6 +127,21 @@ void device_execute_interface::static_set_periodic_int(device_t &device, device_
 
 
 //-------------------------------------------------
+//  set_irq_acknowledge_callback - configuration helper
+//  to setup callback for IRQ acknowledge
+//-------------------------------------------------
+
+void device_execute_interface::static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback)
+{
+	device_execute_interface *exec;
+	if (!device.interface(exec))
+		throw emu_fatalerror("MCFG_DEVICE_IRQ_ACKNOWLEDGE called on device '%s' with no execute interface", device.tag());
+	exec->m_driver_irq = callback;
+	exec->m_driver_irq_legacy = NULL;
+}
+
+
+//-------------------------------------------------
 //  executing - return true if this device is
 //  within its execute function
 //-------------------------------------------------
@@ -483,7 +498,7 @@ void device_execute_interface::interface_pre_start()
 	// bind delegates
 	m_vblank_interrupt.bind_relative_to(*device().owner());
 	m_timed_interrupt.bind_relative_to(*device().owner());
-	m_driver_irq.bind_relative_to(device());
+	m_driver_irq.bind_relative_to(*device().owner());
 
 	// fill in the initial states
 	device_iterator iter(device().machine().root_device());

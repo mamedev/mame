@@ -4457,7 +4457,6 @@ void chihiro_state::machine_start()
 	smbus_register_device(0x10,smbus_callback_pic16lc);
 	smbus_register_device(0x45,smbus_callback_cx25871);
 	smbus_register_device(0x54,smbus_callback_eeprom);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(chihiro_state::irq_callback),this));
 	chihiro_devs.pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
 	chihiro_devs.pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
 	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>( "ide" );
@@ -4503,6 +4502,7 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(chihiro_state,irq_callback)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

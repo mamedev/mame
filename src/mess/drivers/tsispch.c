@@ -260,7 +260,6 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) m_infifo[i] = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tsispch_state::irq_callback),this));
 	fprintf(stderr,"machine reset\n");
 }
 
@@ -398,6 +397,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
 	MCFG_CPU_PROGRAM_MAP(i8086_mem)
 	MCFG_CPU_IO_MAP(i8086_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(tsispch_state,irq_callback)
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */

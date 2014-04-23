@@ -3334,8 +3334,6 @@ IRQ_CALLBACK_MEMBER(pc9801_state::irq_callback)
 
 MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc9801_state::irq_callback),this));
-
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
@@ -3584,6 +3582,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
 	MCFG_CPU_IO_MAP(pc9801_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc9801_state,irq_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
@@ -3684,6 +3683,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc9801_state,irq_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
@@ -3772,7 +3772,7 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_CPU_IO_MAP(pc9801ux_io)
 	MCFG_80286_A20(pc9801_state, pc9801_286_a20)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc9801_state,irq_callback)
 //  MCFG_I8237_REPLACE("i8237", 10000000, pc9801rs_dmac_intf) // unknown clock
 MACHINE_CONFIG_END
 
@@ -3781,6 +3781,7 @@ static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801bx2_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc9801_state,irq_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
 MACHINE_CONFIG_END
@@ -3790,6 +3791,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc9801_state,irq_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
@@ -3877,6 +3879,7 @@ static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc9801_state,irq_callback)
 MACHINE_CONFIG_END
 
 /* took from "raw" memory dump, uncomment ROM_FILL if you want to play with it */

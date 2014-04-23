@@ -695,9 +695,6 @@ IRQ_CALLBACK_MEMBER(vixen_state::vixen_int_ack)
 
 void vixen_state::machine_start()
 {
-	// interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vixen_state::vixen_int_ack),this));
-
 	// configure memory banking
 	UINT8 *ram = m_ram->pointer();
 
@@ -759,6 +756,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)
 	MCFG_CPU_IO_MAP(vixen_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

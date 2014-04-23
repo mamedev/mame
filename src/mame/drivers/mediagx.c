@@ -852,9 +852,6 @@ void mediagx_state::machine_start()
 void mediagx_state::machine_reset()
 {
 	UINT8 *rom = memregion("bios")->base();
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mediagx_state::irq_callback),this));
-
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
 
@@ -876,6 +873,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
 	MCFG_CPU_PROGRAM_MAP(mediagx_map)
 	MCFG_CPU_IO_MAP(mediagx_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mediagx_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

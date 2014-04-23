@@ -699,7 +699,6 @@ void pcxt_state::machine_reset()
 {
 	m_bank = -1;
 	m_lastvalue = -1;
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcxt_state::irq_callback),this));
 
 	m_pc_spkrdata = 0;
 	m_pit_out2 = 0;
@@ -717,6 +716,7 @@ static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcxt_state,irq_callback)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */

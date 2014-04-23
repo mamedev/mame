@@ -332,7 +332,6 @@ void pk8000_state::machine_start()
 void pk8000_state::machine_reset()
 {
 	pk8000_set_bank(0);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pk8000_state::pk8000_irq_callback),this));
 }
 
 void pk8000_state::video_start()
@@ -360,6 +359,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
 	MCFG_CPU_IO_MAP(pk8000_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8000_state,  pk8000_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pk8000_state,pk8000_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

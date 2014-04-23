@@ -823,8 +823,6 @@ void m20_state::machine_reset()
 	else
 		m_port21 = 0xff;
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(m20_state::m20_irq_callback),this));
-
 	m_fd1797->reset();
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
@@ -896,6 +894,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
 	MCFG_CPU_DATA_MAP(m20_data_mem)
 	MCFG_CPU_IO_MAP(m20_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("160K")

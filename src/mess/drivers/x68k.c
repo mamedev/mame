@@ -1641,8 +1641,6 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	// copy last half of BIOS to a user region, to use for inital startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x68k_state::x68k_int_ack),this));
-
 	m_scanline_timer = timer_alloc(TIMER_X68K_HSYNC);
 	m_raster_irq = timer_alloc(TIMER_X68K_CRTC_RASTER_IRQ);
 	m_vblank_irq = timer_alloc(TIMER_X68K_CRTC_VBLANK_IRQ);
@@ -1690,6 +1688,8 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
+	
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68000 )
@@ -1814,6 +1814,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( x68030, x68ksupr )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )

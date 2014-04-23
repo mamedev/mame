@@ -378,7 +378,6 @@ void xtom3d_state::machine_start()
 	m_isa_ram1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_isa_ram2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(xtom3d_state::irq_callback),this));
 	intel82439tx_init();
 }
 
@@ -397,6 +396,8 @@ static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(xtom3d_state,irq_callback)
+
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

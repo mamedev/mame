@@ -1122,9 +1122,6 @@ SLOT_INTERFACE_END
 
 void pc1512_state::machine_start()
 {
-	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
-
 	// set RAM size
 	size_t ram_size = m_ram->size();
 
@@ -1202,9 +1199,6 @@ void pc1512_state::machine_reset()
 
 void pc1640_state::machine_start()
 {
-	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
-
 	// state saving
 	save_item(NAME(m_pit1));
 	save_item(NAME(m_pit2));
@@ -1258,6 +1252,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1512_mem)
 	MCFG_CPU_IO_MAP(pc1512_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc1512_state,pc1512_irq_callback)
 
 	// video
 	MCFG_FRAGMENT_ADD(pc1512_video)
@@ -1361,6 +1356,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1640_mem)
 	MCFG_CPU_IO_MAP(pc1640_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc1512_state,pc1512_irq_callback)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")

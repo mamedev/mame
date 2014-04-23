@@ -628,8 +628,6 @@ void calchase_state::machine_start()
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 	m_bios_ext_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(calchase_state::irq_callback),this));
 }
 
 void calchase_state::machine_reset()
@@ -643,6 +641,7 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(calchase_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

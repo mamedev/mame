@@ -1009,9 +1009,6 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 
 void wangpc_state::machine_start()
 {
-	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(wangpc_state::wangpc_irq_callback),this));
-
 	// connect floppy callbacks
 	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk0_load), this));
 	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
@@ -1104,6 +1101,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(wangpc_state,wangpc_irq_callback)
 	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
 
 	// devices

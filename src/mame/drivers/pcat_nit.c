@@ -223,8 +223,6 @@ INPUT_PORTS_END
 
 void pcat_nit_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcat_nit_state::irq_callback),this));
-
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
 }
@@ -234,6 +232,7 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_nit_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcat_nit_state,irq_callback)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
@@ -250,6 +249,7 @@ static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(bonanza_map)
 	MCFG_CPU_IO_MAP(bonanza_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcat_nit_state,irq_callback)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )

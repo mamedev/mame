@@ -56,7 +56,6 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_pic_0->inta_r(); }
-	void driver_start() { m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(isbc_state::irq_callback),this)); }
 };
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -223,6 +222,8 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
 	MCFG_CPU_IO_MAP(isbc_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isbc_state,irq_callback)
+	
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -253,6 +254,8 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
 	MCFG_CPU_IO_MAP(rpc86_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isbc_state,irq_callback)
+	
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -286,6 +289,8 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
 	MCFG_CPU_IO_MAP(isbc286_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isbc_state,irq_callback)
+	
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, READ8(isbc_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
 

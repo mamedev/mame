@@ -2933,7 +2933,6 @@ void amstrad_state::amstrad_common_init()
 		(const UINT8*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(amstrad_state::amstrad_cpu_acknowledge_int),this));
 }
 
 TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)

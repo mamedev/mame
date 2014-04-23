@@ -430,8 +430,6 @@ IRQ_CALLBACK_MEMBER( compucolor2_state::int_ack )
 
 void compucolor2_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compucolor2_state::int_ack), this));
-
 	// state saving
 	save_item(NAME(m_xo));
 }
@@ -455,6 +453,7 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
 	MCFG_CPU_IO_MAP(compucolor2_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(compucolor2_state, compucolor2)

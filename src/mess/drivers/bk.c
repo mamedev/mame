@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( bk0010, bk_state )
 	MCFG_CPU_ADD("maincpu", T11, 3000000)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_CPU_PROGRAM_MAP(bk0010_mem)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

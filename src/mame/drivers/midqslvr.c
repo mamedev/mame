@@ -390,8 +390,6 @@ void midqslvr_state::machine_start()
 	m_bios_ext4_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_isa_ram1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_isa_ram2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(midqslvr_state::irq_callback),this));
 	intel82439tx_init();
 
 }
@@ -411,6 +409,7 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000) // actually Celeron 333
 	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
 	MCFG_CPU_IO_MAP(midqslvr_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(midqslvr_state,irq_callback)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 

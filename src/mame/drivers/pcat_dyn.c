@@ -106,7 +106,6 @@ INPUT_PORTS_END
 
 void pcat_dyn_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcat_dyn_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
@@ -114,6 +113,7 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	MCFG_CPU_ADD("maincpu", I486, 40000000) /* Am486 DX-40 */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pcat_dyn_state,irq_callback)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

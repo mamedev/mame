@@ -315,9 +315,6 @@ void apricot_state::machine_start()
 	m_cpu->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 	m_iop->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 
-	// setup interrupt acknowledge callback for the main cpu
-	m_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
-
 	// motor on is connected to gnd
 	m_floppy0->get_device()->mon_w(0);
 	m_floppy1->get_device()->mon_w(0);
@@ -359,6 +356,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CPU_ADD("ic91", I8086, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(apricot_mem)
 	MCFG_CPU_IO_MAP(apricot_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apricot_state,irq_callback)	
 
 	// i/o cpu
 	MCFG_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)

@@ -849,6 +849,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
 	MCFG_CPU_IO_MAP(amstrad_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -934,6 +935,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
 	MCFG_CPU_IO_MAP(amstrad_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1003,6 +1005,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
 	MCFG_CPU_IO_MAP(amstrad_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

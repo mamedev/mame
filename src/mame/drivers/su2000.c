@@ -159,8 +159,6 @@ void su2000_state::machine_start()
 	space.install_read_bank(0x100000, ram_limit - 1, "hma_bank");
 	space.install_write_bank(0x100000, ram_limit - 1, "hma_bank");
 	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(su2000_state::irq_callback),this));
 }
 
 void su2000_state::machine_reset()
@@ -179,6 +177,7 @@ static MACHINE_CONFIG_START( su2000, su2000_state )
 	MCFG_CPU_ADD("maincpu", I486, I486_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(su2000_state,irq_callback)
 
 #if 0
 	MCFG_CPU_ADD("tracker", TMS32031, TMS320C1_CLOCK)

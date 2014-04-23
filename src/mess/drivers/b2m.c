@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_CPU_PROGRAM_MAP(b2m_mem)
 	MCFG_CPU_IO_MAP(b2m_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(b2m_state,b2m_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

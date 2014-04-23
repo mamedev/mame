@@ -93,8 +93,6 @@ void dcheese_state::machine_start()
 {
 	m_bsmt = machine().device("bsmt");
 
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(dcheese_state::irq_callback),this));
-
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_soundlatch_full));
 	save_item(NAME(m_sound_control));
@@ -401,6 +399,7 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(dcheese_state,irq_callback)
 
 	MCFG_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)

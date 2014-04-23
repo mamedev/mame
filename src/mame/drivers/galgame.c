@@ -313,8 +313,6 @@ void galaxygame_state::machine_reset()
 	m_point_work_list_index = 0;
 	m_point_display_list_index = 0;
 	m_interrupt = 0;
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxygame_state::galaxygame_irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
@@ -323,6 +321,7 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_CPU_PROGRAM_MAP(galaxygame_map)
 	MCFG_T11_INITIAL_MODE(5 << 13)
 	MCFG_CPU_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
