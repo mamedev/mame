@@ -264,8 +264,17 @@ void mb8795_device::receive()
 			rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5],
 			rxlen, rxmode & 3, keep ? "kept" : "dropped");
 	if(!keep)
-		rxlen = false;
+		rxlen = 0;
 	else {
+		// Minimal ethernet packet size
+		if(rxlen < 64) {
+			memset(rxbuf+rxlen, 0, 64-rxlen);
+			rxlen = 64;
+		}
+		// Checksum?  In any case, it's there
+		memset(rxbuf+rxlen, 0, 4);
+		rxlen += 4;
+
 		rxstat |= EN_RXS_OK;
 		check_irq();
 		timer_rx->adjust(attotime::zero);
