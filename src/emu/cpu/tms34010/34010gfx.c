@@ -111,11 +111,9 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 		diff = WSTART_Y(tms) - sy;
 		if (diff > 0)
 		{
-#if 1
-			if (sy>=0)  // littlerb and megaphx need this check for many items leaving / entering the top of the playfield with negative sy coordinates eg. jam jars, keys in littlerb, player shots, stage 2/3 birds in megaphx.  battletoads requires the code to execute for positive sy co-ordinates eg. screen after player select
-				if (srcaddr)
-					*srcaddr += diff * SPTCH(tms);
-#endif
+			if (srcaddr)
+				*srcaddr += diff * tms->convsp;
+
 			sy += diff;
 			SET_V_LOG(tms, 1);
 		}
@@ -1099,11 +1097,13 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 		/* handle flipping the addresses */
 		yreverse = (IOREG(tms, REG_CONTROL) >> 9) & 1;
 		if (!src_is_linear || !dst_is_linear)
+		{
 			if (yreverse)
 			{
-				saddr += (dy - 1) * SPTCH(tms);
-				daddr += (dy - 1) * DPTCH(tms);
+				saddr += (dy - 1) * tms->convsp;
+				daddr += (dy - 1) * tms->convdp;
 			}
+		}
 
 		tms->st |= STBIT_P;
 
@@ -1453,8 +1453,8 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 			daddr += dx * BITS_PER_PIXEL;
 			if (yreverse)
 			{
-				saddr += (dy - 1) * SPTCH(tms);
-				daddr += (dy - 1) * DPTCH(tms);
+				saddr += (dy - 1) * tms->convsp;
+				daddr += (dy - 1) * tms->convdp;
 			}
 		}
 
