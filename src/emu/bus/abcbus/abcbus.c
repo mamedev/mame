@@ -52,7 +52,8 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 	m_write_xint2(*this),
 	m_write_xint3(*this),
 	m_write_xint4(*this),
-	m_write_xint5(*this)
+	m_write_xint5(*this),
+	m_trrq(0)
 {
 }
 
