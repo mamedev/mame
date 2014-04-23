@@ -86,7 +86,11 @@ legacy_mos6526_device::legacy_mos6526_device(const machine_config &mconfig, devi
 		m_write_pa(*this),
 		m_read_pb(*this),
 		m_write_pb(*this),
-		m_tod_clock(0)
+		m_tod_clock(0),
+		m_flag(0),
+		m_cnt(0),
+		m_shift(0),
+		m_serial(0)
 {
 }
 

@@ -158,7 +158,15 @@ private:
 	struct cia_timer
 	{
 	public:
-		cia_timer() { }
+		cia_timer() 
+			: m_clock(0)
+			, m_latch(0)
+			, m_count(0)
+			, m_mode(0)
+			, m_irq(0)
+			, m_timer(NULL)
+			, m_cia(NULL)
+		{ }
 
 		UINT16 get_count();
 		void update(int which, INT32 new_count);
