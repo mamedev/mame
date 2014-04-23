@@ -40,6 +40,8 @@ TODO:
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "formats/fc100_cas.h"
+#include "machine/buffer.h"
+#include "bus/centronics/ctronics.h"
 
 
 class fc100_state : public driver_device
@@ -52,11 +54,13 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
 		, m_uart(*this, "uart")
+		, m_centronics(*this, "centronics")
 	{ }
 
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port33_w);
+	DECLARE_WRITE8_MEMBER(port43_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
@@ -92,6 +96,7 @@ private:
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	required_device<i8251_device> m_uart;
+	required_device<centronics_device> m_centronics;
 };
 
 
@@ -127,6 +132,9 @@ static ADDRESS_MAP_START( fc100_io, AS_IO, 8, fc100_state )
 	AM_RANGE(0x23, 0x23) AM_DEVWRITE("psg", ay8910_device, address_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(port31_w)
 	AM_RANGE(0x33, 0x33) AM_WRITE(port33_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("cent_data_out", output_latch_device, write)
+	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD("cent_status_in", input_buffer_device, read)
 	// AM_RANGE(0x60, 0x61)   writes 0 to both ports at boot
 	AM_RANGE(0x70, 0x70) AM_WRITENOP //  each screen character also gets written here
 	// AM_RANGE(0x71, 0x71)   writes 0 at boot
@@ -405,6 +413,14 @@ static GFXDECODE_START( fc100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u53_charlayout, 0, 1 )
 GFXDECODE_END
 
+//********************** CENTRONICS PRINTER ***********************************
+
+WRITE8_MEMBER( fc100_state::port43_w )
+{
+	m_centronics->write_strobe(BIT(data, 2));
+	m_centronics->write_init(BIT(data, 3));
+}
+
 //********************** UART/CASSETTE ***********************************
 
 WRITE8_MEMBER( fc100_state::port31_w )
@@ -532,6 +548,11 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
