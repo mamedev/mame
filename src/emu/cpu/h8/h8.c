@@ -417,11 +417,17 @@ void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *op
 		break;
 
 	case DASM_abs16:
-		buffer += sprintf(buffer, "@%08x", INT16((oprom[offset-2] << 8) | oprom[offset-1]));
+		if(offset >= 6)
+			buffer += sprintf(buffer, "@%08x", INT16((oprom[offset-4] << 8) | oprom[offset-3]));
+		else
+			buffer += sprintf(buffer, "@%08x", INT16((oprom[offset-2] << 8) | oprom[offset-1]));
 		break;
 
 	case DASM_abs32:
-		buffer += sprintf(buffer, "@%08x", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1]);
+		if(offset >= 8)
+			buffer += sprintf(buffer, "@%08x", (oprom[offset-6] << 24) | (oprom[offset-5] << 16) | (oprom[offset-4] << 8) | oprom[offset-3]);
+		else
+			buffer += sprintf(buffer, "@%08x", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1]);
 		break;
 
 	case DASM_abs8i:
