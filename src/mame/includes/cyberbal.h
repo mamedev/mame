@@ -32,10 +32,7 @@ public:
 			m_alpha2_tilemap(*this, "alpha2"),
 			m_mob2(*this, "mob2"),
 			m_lscreen(*this, "lscreen"),
-			m_rscreen(*this, "rscreen"),
-			m_paletteram_0(*this, "paletteram_0"),
-			m_paletteram_1(*this, "paletteram_1"),
-			m_palette(*this, "palette") { }
+			m_rscreen(*this, "rscreen") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<m6502_device> m_audiocpu;
@@ -52,9 +49,7 @@ public:
 	optional_device<atari_motion_objects_device> m_mob2;
 	optional_device<screen_device> m_lscreen;
 	optional_device<screen_device> m_rscreen;
-	optional_shared_ptr<UINT16> m_paletteram_0;
-	optional_shared_ptr<UINT16> m_paletteram_1;
-	required_device<palette_device> m_palette;
+
 	UINT16          m_current_slip[2];
 	UINT8           m_playfield_palette_bank[2];
 	UINT16          m_playfield_xscroll[2];
@@ -96,10 +91,6 @@ public:
 	UINT32 screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_68k_irq_gen);
-	DECLARE_READ16_MEMBER(paletteram_0_r);
-	DECLARE_READ16_MEMBER(paletteram_1_r);
-	DECLARE_WRITE16_MEMBER(paletteram_0_w);
-	DECLARE_WRITE16_MEMBER(paletteram_1_w);
 
 	static const atari_motion_objects_config s_mob_config;
 
