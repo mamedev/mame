@@ -432,22 +432,6 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-static const tmsprom_interface prom_intf =
-{
-	"5110ctrl",                     /* prom memory region - sound region is automatically assigned */
-	0x1000,                         /* individual rom_size */
-	1,                              /* bit # of pdc line */
-	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	8,                              /* bit # of ctl1 line */
-	2,                              /* bit # of ctl2 line */
-	8,                              /* bit # of ctl4 line */
-	2,                              /* bit # of ctl8 line */
-	6,                              /* bit # of rom reset */
-	7,                              /* bit # of stop */
-	DEVCB_DEVICE_LINE_MEMBER("tms", tms5110_device, pdc_w),        /* tms pdc func */
-	DEVCB_DEVICE_MEMBER("tms", tms5110_device, ctl_w)      /* tms ctl func */
-};
-
 INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
 {
 	if(m_irq_mask)
@@ -478,8 +462,19 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, 640000 / 2)  /* rom clock */
-	MCFG_DEVICE_CONFIG(prom_intf)
-
+	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
+	MCFG_TMSPROM_ROM_SIZE(0x1000)   /* individual rom_size */
+	MCFG_TMSPROM_PDC_BIT(1)         /* bit # of pdc line */
+	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
+	MCFG_TMSPROM_CTL1_BIT(8)        /* bit # of ctl1 line */
+	MCFG_TMSPROM_CTL2_BIT(2)        /* bit # of ctl2 line */
+	MCFG_TMSPROM_CTL4_BIT(8)        /* bit # of ctl4 line */
+	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
+	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
+	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
+	MCFG_TMSPROM_PDC_CB(DEVWRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
+	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
