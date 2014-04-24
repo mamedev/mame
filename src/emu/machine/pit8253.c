@@ -60,6 +60,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, d
 	{
 		m_timers[i].gate = 1;
 		m_timers[i].phase = 0;
+		m_timers[i].clock = 0;
 	}
 }
 
@@ -76,6 +77,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, 
 	{
 		m_timers[i].gate = 1;
 		m_timers[i].phase = 0;
+		m_timers[i].clock = 0;
 	}
 }
 
