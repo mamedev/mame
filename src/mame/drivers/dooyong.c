@@ -1496,6 +1496,39 @@ ROM_START( polluxa2 )
 	ROM_LOAD16_BYTE( "pollux4.bin",  0x00001, 0x10000, CRC(2c6bd3be) SHA1(6648264be83588a01f264e7ec72d84e29e0d4795) )
 ROM_END
 
+ROM_START( polluxn )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_LOAD( "polluxntc_2.3g",  0x00000, 0x10000, CRC(96d3e3af) SHA1(fc0e7a60bee0ed74c28d403a97a852eb677f8189) )
+	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
+	ROM_LOAD( "polluxntc_3.6t",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_LOAD( "polluxntc_1.3r",  0x08000, 0x08000, CRC(7f7135da) SHA1(0f77841e52b3d7e731d5142fba9ed5cd57343305) )
+	ROM_CONTINUE(             0x00000, 0x08000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD16_WORD_SWAP( "polluxntc_dy-pl-m2_be023.3t", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD16_WORD_SWAP( "polluxntc_dy-pl-m1_be002.8a", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles */
+	ROM_LOAD16_BYTE( "polluxntc_6.8m",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
+	ROM_LOAD16_BYTE( "polluxntc_7.8l",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
+	ROM_FILL(                        0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x20000, "gfx5", 0 )    /* bg tilemaps */
+	ROM_LOAD16_BYTE( "polluxntc_9.8b",  0x00000, 0x10000, CRC(378d8914) SHA1(ef95903971673bc26774fe2aff17e1581a7f0eb9) )
+	ROM_LOAD16_BYTE( "polluxntc_8.8j",  0x00001, 0x10000, CRC(8859fa70) SHA1(7b1b9edde3f762c7ae1f0b847aa17e30140e9ffa) )
+
+	ROM_REGION( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_LOAD16_BYTE( "polluxntc_5.8p",  0x00000, 0x10000, CRC(ac090d34) SHA1(6b554450d8d46165e25fd6f12ab4c4b9b63dcd35) )
+	ROM_LOAD16_BYTE( "polluxntc_4.8r",  0x00001, 0x10000, BAD_DUMP CRC(0195dc4e) SHA1(c87c90a38b382f11ee3377683c0becda745341e0) ) // need to confirm as bad, the same as other sets except it has some bits of data blanked out with 0xFF
+ROM_END
+
+
 ROM_START( bluehawk )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "rom19",        0x00000, 0x20000, CRC(24149246) SHA1(458fd429a895353b8636c717dcd58d57b8723012) )
@@ -2026,6 +2059,7 @@ GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "D
 GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
+GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Pollux (Japan, NTC license)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
