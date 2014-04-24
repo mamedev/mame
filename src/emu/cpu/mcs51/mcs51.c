@@ -2313,6 +2313,8 @@ void mcs51_cpu_device::device_reset()
 	m_uart.tx_clk = 0;
 	m_uart.bits_to_send = 0;
 	m_uart.delay_cycles = 0;
+
+	m_recalc_parity = 0;
 }
 
 
