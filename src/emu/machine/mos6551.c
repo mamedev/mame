@@ -23,6 +23,7 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 	m_rxc_handler(*this),
 	m_rts_handler(*this),
 	m_dtr_handler(*this),
+	m_control(0),
 	m_irq(0),
 	m_txd(0),
 	m_rxc(0),
