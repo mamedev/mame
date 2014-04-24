@@ -3112,6 +3112,7 @@ void i386_device::i386_common_init(int tlbsize)
 	m_io = &space(AS_IO);
 	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
+	m_debugger_temp = 0;
 
 	zero_state();
 
