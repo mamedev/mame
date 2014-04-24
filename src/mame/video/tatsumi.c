@@ -79,36 +79,6 @@ bit 0:  3.9kOhm resistor
 }
 
 
-WRITE16_MEMBER(tatsumi_state::apache3_palette_w)
-{
-//  static int hack=0;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-//  if (offset==0xbfe)
-//      hack++;
-
-//  if (hack>1)
-//      return;
-
-/*
-apache 3 schematics state
-
-bit 4:  250
-bit 3:  500
-bit 2:  1k
-bit 1:  2k
-bit 0:  3.9kOhm resistor
-
-*/
-
-//  logerror("PAL: %04x %02x\n",offset,data);
-
-	data = m_generic_paletteram_16[offset];
-	m_palette->set_pen_color(offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
-}
-
-
 WRITE16_MEMBER(tatsumi_state::roundup5_text_w)
 {
 	UINT16 *videoram = m_videoram;

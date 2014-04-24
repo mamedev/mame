@@ -79,7 +79,6 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_READ16_MEMBER(cyclwarr_cpu_bb_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_cpu_bb_w);
-	DECLARE_READ16_MEMBER(cyclwarr_palette_r);
 	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sprite_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);
@@ -113,7 +112,6 @@ public:
 	DECLARE_READ16_MEMBER(roundup5_vram_r);
 	DECLARE_WRITE16_MEMBER(roundup5_vram_w);
 	DECLARE_WRITE16_MEMBER(roundup5_palette_w);
-	DECLARE_WRITE16_MEMBER(apache3_palette_w);
 	DECLARE_WRITE16_MEMBER(roundup5_text_w);
 	DECLARE_READ16_MEMBER(cyclwarr_videoram0_r);
 	DECLARE_READ16_MEMBER(cyclwarr_videoram1_r);
@@ -146,7 +144,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 /*----------- defined in machine/tatsumi.c -----------*/

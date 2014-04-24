@@ -165,11 +165,6 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_cpu_bb_w)
 	COMBINE_DATA(&m_cyclwarr_cpub_ram[offset]);
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_palette_r)
-{
-	return m_generic_paletteram_16[offset];
-}
-
 READ16_MEMBER(tatsumi_state::cyclwarr_sprite_r)
 {
 	return m_spriteram[offset];
@@ -218,7 +213,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
 static ADDRESS_MAP_START( apache3_v30_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x08000, 0x08fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("DSW")
@@ -317,7 +312,7 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(cyclwarr_palette_r) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
 	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
@@ -338,7 +333,7 @@ static ADDRESS_MAP_START( cyclwarr_68000b_map, AS_PROGRAM, 16, tatsumi_state )
 
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(cyclwarr_palette_r) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
 	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
@@ -373,7 +368,7 @@ static ADDRESS_MAP_START( bigfight_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(cyclwarr_palette_r) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
@@ -392,7 +387,7 @@ static ADDRESS_MAP_START( bigfight_68000b_map, AS_PROGRAM, 16, tatsumi_state )
 
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(cyclwarr_palette_r) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
