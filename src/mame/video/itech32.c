@@ -301,62 +301,16 @@ WRITE32_MEMBER(itech32_state::itech020_plane_w)
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::timekill_paletteram_w)
-{
-	int r, g, b;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	r = m_generic_paletteram_16[offset & ~1] & 0xff;
-	g = m_generic_paletteram_16[offset & ~1] >> 8;
-	b = m_generic_paletteram_16[offset |  1] >> 8;
-
-	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
-}
-
-
 WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
 {
-	int r, g, b;
-
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))
-		data >>= 8, mem_mask >>= 8;
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	{
+		data >>= 8;
+		mem_mask >>= 8;
+	}
 
-	r = m_generic_paletteram_16[offset & ~1] & 0xff;
-	g = m_generic_paletteram_16[offset & ~1] >> 8;
-	b = m_generic_paletteram_16[offset |  1] & 0xff;
-
-	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
-}
-
-
-WRITE32_MEMBER(itech32_state::drivedge_paletteram_w)
-{
-	int r, g, b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	r = m_generic_paletteram_32[offset] & 0xff;
-	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-	b = (m_generic_paletteram_32[offset] >> 16) & 0xff;
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
-}
-
-
-WRITE32_MEMBER(itech32_state::itech020_paletteram_w)
-{
-	int r, g, b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	r = (m_generic_paletteram_32[offset] >> 16) & 0xff;
-	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-	b = m_generic_paletteram_32[offset] & 0xff;
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	m_palette->write(space, offset, data, mem_mask);
 }
 
 

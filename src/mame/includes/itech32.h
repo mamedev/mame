@@ -34,9 +34,7 @@ public:
 		m_dsp1(*this, "dsp1"),
 		m_dsp2(*this, "dsp2"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram"),
-		m_generic_paletteram_32(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT16> m_main_ram;
 	optional_shared_ptr<UINT16> m_nvram;
@@ -133,10 +131,7 @@ public:
 	DECLARE_WRITE32_MEMBER(itech020_color1_w);
 	DECLARE_WRITE32_MEMBER(itech020_color2_w);
 	DECLARE_WRITE32_MEMBER(itech020_plane_w);
-	DECLARE_WRITE16_MEMBER(timekill_paletteram_w);
 	DECLARE_WRITE16_MEMBER(bloodstm_paletteram_w);
-	DECLARE_WRITE32_MEMBER(drivedge_paletteram_w);
-	DECLARE_WRITE32_MEMBER(itech020_paletteram_w);
 	DECLARE_WRITE16_MEMBER(itech32_video_w);
 	DECLARE_READ16_MEMBER(itech32_video_r);
 	DECLARE_WRITE16_MEMBER(bloodstm_video_w);
@@ -199,6 +194,4 @@ public:
 	optional_device<cpu_device> m_dsp2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;	
 };

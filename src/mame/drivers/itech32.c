@@ -880,7 +880,7 @@ static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x080000, 0x08007f) AM_READWRITE(itech32_video_r, itech32_video_w) AM_SHARE("video")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE(timekill_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
 ADDRESS_MAP_END
 
@@ -898,7 +898,7 @@ static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(bloodstm_video_r, bloodstm_video_w) AM_SHARE("video")
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(bloodstm_plane_w)
 	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
@@ -962,7 +962,7 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 	AM_RANGE(0x08e000, 0x08e003) AM_READ_PORT("8e000") AM_WRITENOP
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_SHARE("drivedge_zctl")
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
-	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITENOP
 	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE(itech020_video_r, itech020_video_w) AM_SHARE("video")
 	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
@@ -1000,7 +1000,7 @@ static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_SHARE("video")
 	AM_RANGE(0x578000, 0x57ffff) AM_READNOP             /* touched by protection */
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
 /* ? */ AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP            /* Unknown Writes */
 	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
@@ -1679,6 +1679,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(GRBX)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1711,10 +1712,12 @@ static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32768)
+	MCFG_PALETTE_FORMAT(XBGR)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
+static MACHINE_CONFIG_DERIVED( drivedge, timekill )
 
 	/* basic machine hardware */
 
@@ -1727,6 +1730,10 @@ static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 	MCFG_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(drivedge_tms2_map)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32768)
+	MCFG_PALETTE_FORMAT(XBGR)
+
 	MCFG_DEVICE_MODIFY("via6522_0")
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech32_state,drivedge_portb_out))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(itech32_state,drivedge_turbo_light))
@@ -1738,7 +1745,7 @@ static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
+static MACHINE_CONFIG_DERIVED( sftm, timekill )
 
 	/* basic machine hardware */
 
@@ -1749,6 +1756,10 @@ static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_020_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(itech32_state, irq1_line_assert, 4*60)
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32768)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	/* via */
 	MCFG_DEVICE_REMOVE("via6522_0")
