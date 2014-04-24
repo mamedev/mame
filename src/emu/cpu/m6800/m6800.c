@@ -1049,11 +1049,15 @@ void m6800_cpu_device::device_start()
 	m_input_capture = 0;
 	m_rdr = 0;
 	m_tdr = 0;
+	m_rmcr = 0;
 	m_ram_ctrl = 0;
 
+	m_pc.d = 0;
 	m_s.d = 0;
 	m_x.d = 0;
 	m_d.d = 0;
+	m_cc = 0;
+	m_wai_state = 0;
 	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
 
 	save_item(NAME(m_ppc.w.l));
