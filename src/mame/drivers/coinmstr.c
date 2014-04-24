@@ -821,7 +821,9 @@ static INPUT_PORTS_START( trailblz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be playable */
-	PORT_START("PIA0.A")
+        PORT_INCLUDE ( trailblz )
+
+	PORT_MODIFY("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_NAME("1 Pound (5 credits)")    // coin x 5
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )  PORT_NAME("50 Pence (2.5 credits)") // coin x 2.5
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )  PORT_NAME("20 Pence (1 credit)")    // coin x 1
@@ -831,7 +833,7 @@ static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be pla
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_D)  PORT_NAME("PIA0.A_0x40")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_F)  PORT_NAME("PIA0.A_0x80")
 
-	PORT_START("PIA1.A")
+	PORT_MODIFY("PIA1.A")
 	PORT_DIPNAME( 0x01, 0x01, "PIA1.A" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -857,7 +859,7 @@ static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be pla
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("PIA2.A")
+	PORT_MODIFY("PIA2.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_CODE(KEYCODE_N)  PORT_NAME("Pass")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_CODE(KEYCODE_Z)  PORT_NAME("Button A")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_CODE(KEYCODE_C)  PORT_NAME("Button C")
@@ -867,7 +869,7 @@ static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be pla
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_9)  PORT_NAME("Refill")             PORT_TOGGLE
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_Q)  PORT_NAME("Remote Credits x5")
 
-	PORT_START("DSW1")
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
