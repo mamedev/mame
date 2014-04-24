@@ -44,6 +44,8 @@ t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t 
 	, c_initial_mode(0)
 {
 	m_is_octal = true;
+	memset(m_reg, 0x00, sizeof(m_reg));
+	memset(&m_psw, 0x00, sizeof(m_psw));
 }
 
 
