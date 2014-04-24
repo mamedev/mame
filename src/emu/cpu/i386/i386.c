@@ -3113,6 +3113,8 @@ void i386_device::i386_common_init(int tlbsize)
 	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
 
+	zero_state();
+
 	save_item(NAME( m_reg.d));
 	save_item(NAME(m_sreg[ES].selector));
 	save_item(NAME(m_sreg[ES].base));
