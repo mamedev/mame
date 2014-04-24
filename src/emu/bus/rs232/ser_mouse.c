@@ -23,6 +23,7 @@ const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
 
 microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
+	, m_dtr(0)
 {
 }
 
