@@ -30,7 +30,6 @@
 #include "debug/debugcpu.h"
 
 // MAMEOS headers
-#include "debugwin.h"
 #include "winmain.h"
 #include "window.h"
 #include "video.h"
@@ -436,9 +435,6 @@ void windows_osd_interface::init_debugger()
 	// get other metrics
 	hscroll_height = GetSystemMetrics(SM_CYHSCROLL);
 	vscroll_width = GetSystemMetrics(SM_CXVSCROLL);
-
-	// ensure we get called on the way out
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugwin_destroy_windows), &machine()));
 }
 
 
@@ -447,7 +443,7 @@ void windows_osd_interface::init_debugger()
 //  debugwin_destroy_windows
 //============================================================
 
-void debugwin_destroy_windows(running_machine &machine)
+void windows_osd_interface::debugger_exit()
 {
 	// loop over windows and free them
 	while (window_list != NULL)

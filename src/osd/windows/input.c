@@ -34,7 +34,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "input.h"
-#include "debugwin.h"
 #include "video.h"
 #include "strconv.h"
 #include "config.h"

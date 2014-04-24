@@ -49,6 +49,7 @@ public:
 	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
+	virtual void debugger_exit();
 
 	// audio overridables
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);

@@ -303,6 +303,7 @@ void osd_interface::exit_subsystems()
 	network_exit();
 	#endif
 	midi_exit();
+	debugger_exit();
 }
 	
 void osd_interface::video_exit()
@@ -330,6 +331,10 @@ void osd_interface::midi_exit()
 	#ifndef DISABLE_MIDI
 	Pm_Terminate();
 	#endif
+}
+
+void osd_interface::debugger_exit()
+{
 }
 
 void osd_interface::osd_exit()

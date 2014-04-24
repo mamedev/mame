@@ -25,7 +25,6 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
-#include "debugwin.h"
 #include "strconv.h"
 #include "config.h"
 

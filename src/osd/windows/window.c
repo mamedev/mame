@@ -31,7 +31,6 @@
 #include "window.h"
 #include "video.h"
 #include "input.h"
-#include "debugwin.h"
 #include "strconv.h"
 #include "config.h"
 #include "winutf8.h"
