@@ -173,6 +173,20 @@ i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *
 	memcpy(m_timing, m_i80286_timing, sizeof(m_i80286_timing));
 	m_amask = 0xffffff;
 	m_fetch_xor = BYTE_XOR_LE(0);
+	memset(m_sregs, 0x00, sizeof(m_sregs));
+	m_sregs[CS] = 0xf000;
+	memset(m_base, 0x00, sizeof(m_base));
+	m_base[CS] = 0xff0000;
+	memset(m_limit, 0x00, sizeof(m_limit));
+	m_limit[CS] = m_limit[SS] = m_limit[DS] = m_limit[ES] = 0xffff;
+	memset(m_rights, 0x00, sizeof(m_rights));
+	m_rights[DS] = m_rights[SS] = m_rights[ES] = 0x93;
+	memset(&m_gdtr, 0x00, sizeof(m_gdtr));
+	memset(&m_idtr, 0x00, sizeof(m_idtr));
+	m_idtr.limit = 0x3ff;
+	memset(&m_ldtr, 0x00, sizeof(m_ldtr));
+	memset(&m_tr, 0x00, sizeof(m_tr));
+	m_msw = 0xfff0;
 }
 
 void i80286_cpu_device::device_reset()
