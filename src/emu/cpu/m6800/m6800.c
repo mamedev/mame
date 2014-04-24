@@ -1158,6 +1158,7 @@ void m6800_cpu_device::device_reset()
 	m_port1_ddr = 0x00;
 	m_port2_ddr = 0x00;
 	m_port3_ddr = 0x00;
+	m_port1_data = 0;
 	m_p3csr = 0x00;
 	m_p3csr_is3_flag_read = 0;
 	m_port2_written = 0;
