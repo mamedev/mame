@@ -338,7 +338,7 @@ Notes:
 */
 
 ROM_START( iqblock )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u7.v5",        0x0000, 0x10000, CRC(811f306e) SHA1(d0aef80f1624002d05721276358f26a3ef69a3f6) )
 
 	ROM_REGION( 0x8000, "user1", 0 )
@@ -398,7 +398,7 @@ Notes:
 */
 
 ROM_START( grndtour )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "grand7.u7",        0x0000, 0x10000, CRC(95cac31e) SHA1(47bbcce6981ea3d38e0aa49ccd3762a4529f3c96) )
 
 	ROM_REGION( 0x8000, "user1", 0 )
