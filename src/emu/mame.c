@@ -150,7 +150,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		machine_config config(*system, options);
 
 		// create the machine structure and driver
-		running_machine machine(config, osd, started_empty);
+		running_machine machine(config, osd);
 
 		// looooong term: remove this
 		global_machine = &machine;
@@ -167,8 +167,13 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		{
 			options.set_system_name(machine.new_driver_name());
 			firstrun = true;
+		} 
+		else 
+		{
+			options.set_system_name("");
 		}
-		if (machine.exit_pending())
+		
+		if (machine.exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))
 			exit_pending = true;
 
 		// machine will go away when we exit scope
