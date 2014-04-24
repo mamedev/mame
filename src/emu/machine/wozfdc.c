@@ -85,6 +85,7 @@ void wozfdc_device::device_reset()
 	cur_lss.address = 0x00;
 	cur_lss.write_start_time = attotime::never;
 	cur_lss.write_position = 0;
+	cur_lss.write_line_active = false;
 	predicted_lss.tm = attotime::never;
 }
 
