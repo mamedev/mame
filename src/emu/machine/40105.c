@@ -75,6 +75,7 @@ void cmos_40105_device::device_reset()
 
 	m_dir = 1;
 	m_dor = 0;
+	m_si = 0;
 
 	m_write_dir(m_dir);
 	m_write_dor(m_dor);
