@@ -154,41 +154,6 @@ void mini_osd_interface::update(bool skip_redraw)
 
 
 //============================================================
-//  update_audio_stream
-//============================================================
-
-void mini_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
-{
-	// if we had actual sound output, we would copy the
-	// interleaved stereo samples to our sound stream
-}
-
-
-//============================================================
-//  set_mastervolume
-//============================================================
-
-void mini_osd_interface::set_mastervolume(int attenuation)
-{
-	// if we had actual sound output, we would adjust the global
-	// volume in response to this function
-}
-
-
-//============================================================
-//  customize_input_type_list
-//============================================================
-
-void mini_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
-{
-	// This function is called on startup, before reading the
-	// configuration from disk. Scan the list, and change the
-	// default control mappings you want. It is quite possible
-	// you won't need to change a thing.
-}
-
-
-//============================================================
 //  keyboard_get_state
 //============================================================
 
