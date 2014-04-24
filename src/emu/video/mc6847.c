@@ -1927,7 +1927,7 @@ const UINT32 s68047_device::s_s68047_hack_palette[16] =
 //-------------------------------------------------
 
 m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c68478p1", __FILE__)
+	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c6847p1", __FILE__)
 {
 }
 
