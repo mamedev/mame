@@ -122,6 +122,7 @@ void ds1302_device::device_reset()
 	m_ce = 0;
 	m_state = STATE_COMMAND;
 	m_bits = 0;
+	m_cmd = 0;
 }
 
 
