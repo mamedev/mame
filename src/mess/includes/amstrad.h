@@ -19,6 +19,7 @@
 #include "bus/cpc/cpc_rom.h"
 #include "bus/cpc/mface2.h"
 #include "bus/cpc/cpc_pds.h"
+#include "bus/cpc/cpc_rs232.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
