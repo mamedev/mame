@@ -2062,6 +2062,8 @@ void wd1770_device::device_reset()
 	m_hld_count = 0;
 	m_sector = 1;
 	m_last_command_data = 0;
+	m_interrupt = 0;
+	m_data_count = 0;
 	wd17xx_command_restore();
 }
 
