@@ -87,10 +87,6 @@ bool windows_osd_interface::video_init()
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->hwnd);
 
-	// possibly create the debug window, but don't show it yet
-	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		machine().osd().init_debugger();
-	
 	return true;
 }
 
