@@ -366,6 +366,10 @@ PREFIXSDL = sdl
 endif
 endif
 
+ifeq ($(OSD),osdmini)
+PREFIXSDL = mini
+endif
+
 # 64-bit builds get a '64' suffix
 ifeq ($(PTR64),1)
 SUFFIX64 = 64
