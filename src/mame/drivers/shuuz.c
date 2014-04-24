@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
 	AM_RANGE(0x105002, 0x105003) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x106000, 0x106001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x107000, 0x107007) AM_NOP
-	AM_RANGE(0x3e0000, 0x3e087f) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("vad:eof")
@@ -234,6 +234,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, "gfxdecode", get_playfield_tile_info)

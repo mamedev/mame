@@ -378,9 +378,7 @@ public:
 	// video helpers
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
-	DECLARE_WRITE16_MEMBER( paletteram_666_w );
 	DECLARE_WRITE16_MEMBER( expanded_paletteram_666_w );
-	DECLARE_WRITE32_MEMBER( paletteram32_666_w );
 
 	// misc helpers
 	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
@@ -433,8 +431,7 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 

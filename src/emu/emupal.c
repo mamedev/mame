@@ -899,6 +899,24 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 }
 
 
+rgb_t raw_to_rgb_converter::BBGGRRII_decoder(UINT32 raw)
+{
+	UINT8 i = raw & 3;
+	UINT8 r = pal4bit(((raw >> 0) & 0x0c) | i);
+	UINT8 g = pal4bit(((raw >> 2) & 0x0c) | i);
+	UINT8 b = pal4bit(((raw >> 4) & 0x0c) | i);
+	return rgb_t(r, g, b);
+}
+
+rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(UINT32 raw)
+{
+	UINT8 i = (raw >> 15) & 1;
+	UINT8 r = pal6bit(((raw >> 9) & 0x3e) | i);
+	UINT8 g = pal6bit(((raw >> 4) & 0x3e) | i);
+	UINT8 b = pal6bit(((raw << 1) & 0x3e) | i);
+	return rgb_t(r, g, b);
+}
+
 rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(UINT32 raw)
 {
 	UINT8 r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));

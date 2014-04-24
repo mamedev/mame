@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xfd0000, 0xfd0001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
@@ -436,6 +436,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig1)
 	MCFG_PALETTE_ADD("palette", 1280)
+	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
 	/* initialize the playfield */
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarig1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)

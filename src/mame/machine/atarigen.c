@@ -975,8 +975,7 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_16(*this, "paletteram")
 {
 }
 
@@ -1402,25 +1401,6 @@ void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen
 
 
 //-------------------------------------------------
-//  paletteram_666_w: 6-6-6 RGB palette RAM handler.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::paletteram_666_w)
-{
-	int newword, r, g, b;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	newword = m_generic_paletteram_16[offset];
-
-	r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
-	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
-	b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
-
-	m_palette->set_pen_color(offset, pal6bit(r), pal6bit(g), pal6bit(b));
-}
-
-
-//-------------------------------------------------
 //  expanded_paletteram_666_w: 6-6-6 RGB expanded
 //  palette RAM handler.
 //-------------------------------------------------
@@ -1443,41 +1423,6 @@ WRITE16_MEMBER(atarigen_state::expanded_paletteram_666_w)
 		m_palette->set_pen_color(palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
-
-
-//-------------------------------------------------
-//  paletteram32_666_w: 6-6-6 RGB palette RAM handler.
-//-------------------------------------------------
-
-WRITE32_MEMBER(atarigen_state::paletteram32_666_w )
-{
-	int newword, r, g, b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	if (ACCESSING_BITS_16_31)
-	{
-		newword = m_generic_paletteram_32[offset] >> 16;
-
-		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
-		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
-		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
-
-		m_palette->set_pen_color(offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		newword = m_generic_paletteram_32[offset] & 0xffff;
-
-		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
-		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
-		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
-
-		m_palette->set_pen_color(offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
-	}
-}
-
 
 
 /***************************************************************************

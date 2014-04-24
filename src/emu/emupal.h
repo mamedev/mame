@@ -144,6 +144,9 @@
 // standard 5-6-5 formats
 #define PALETTE_FORMAT_BBBBBGGGGGGRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 0,5,11>)
 
+// standard 5-5-5-1 formats
+#define PALETTE_FORMAT_IRRRRRGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder)
+
 // standard 8-8-8 formats
 #define PALETTE_FORMAT_XRGB raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,8,0>)
 #define PALETTE_FORMAT_XBGR raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 0,8,16>)
@@ -288,16 +291,9 @@ public:
 		return rgb_t(r, g, b);
 	}
 
-	static rgb_t BBGGRRII_decoder(UINT32 raw)
-	{
-		UINT8 i = (raw >> 0) & 3;
-		UINT8 r = pal4bit(((raw >> 0) & 0x0c) | i);
-		UINT8 g = pal4bit(((raw >> 2) & 0x0c) | i);
-		UINT8 b = pal4bit(((raw >> 4) & 0x0c) | i);
-		return rgb_t(r, g, b);
-	}
-
 	// other standard decoders
+	static rgb_t BBGGRRII_decoder(UINT32 raw);
+	static rgb_t IRRRRRGGGGGBBBBB_decoder(UINT32 raw);
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_decoder(UINT32 raw);  // bits 14/13/12 are LSb
 
