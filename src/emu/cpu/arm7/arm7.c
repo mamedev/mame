@@ -71,7 +71,9 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_archRev(4)  // ARMv4
 	, m_archFlags(eARM_ARCHFLAGS_T)  // has Thumb
 	, m_copro_id(0x41 | (1 << 23) | (7 << 12))  // <-- where did this come from?
+	, m_pc(0)
 {
+	memset(m_r, 0x00, sizeof(m_r));
 }
 
 
@@ -82,7 +84,9 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
 	, m_copro_id(0x41 | (1 << 23) | (7 << 12))  // <-- where did this come from?
+	, m_pc(0)
 {
+	memset(m_r, 0x00, sizeof(m_r));
 }
 
 
