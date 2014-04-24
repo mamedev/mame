@@ -519,11 +519,12 @@ void ins8250_uart_device::device_start()
 	m_out_out2_func.resolve(m_out_out2_cb, *this);
 	set_tra_rate(0);
 	set_rcv_rate(0);
+	memset(&m_regs, 0x00, sizeof(m_regs));
 }
 
 void ins8250_uart_device::device_reset()
 {
-	memset(&m_regs, '\0', sizeof(m_regs));
+	memset(&m_regs, 0x00, sizeof(m_regs));
 	m_regs.ier = 0;
 	m_regs.iir = 1;
 	m_regs.lcr = 0;
