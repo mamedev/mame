@@ -673,6 +673,9 @@ class s68047_device : public mc6847_base_device
 public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	
 	void hack_black_becomes_blue(bool flag);
 
 private:

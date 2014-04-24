@@ -1883,6 +1883,26 @@ s68047_device::s68047_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+
+//-------------------------------------------------
+//  ROM( s68047 )
+//-------------------------------------------------
+
+ROM_START( s68047 )
+	ROM_REGION( 0x200, "chargen", 0 )
+	ROM_LOAD( "s68047", 0x000, 0x200, CRC(f6587f95) SHA1(a4578c6c1cc46b9d1cf9a3b43df74cb7b8c24757) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *s68047_device::device_rom_region() const
+{
+	return ROM_NAME( s68047 );
+}
+
 //
 // In the Bandai Super Vision 8000 there is a video setting
 // bit which causes black to be displayed as blue when css=1.
@@ -1927,7 +1947,7 @@ const UINT32 s68047_device::s_s68047_hack_palette[16] =
 //-------------------------------------------------
 
 m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c6847p1", __FILE__)
+	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P-1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c6847p1", __FILE__)
 {
 }
 
