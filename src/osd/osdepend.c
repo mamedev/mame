@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
+#include "portmidi/portmidi.h"
 
 extern bool g_print_verbose;
 
@@ -244,6 +245,7 @@ void osd_interface::init_subsystems()
 #ifdef USE_NETWORK
 	network_init();
 #endif
+	midi_init();
 }
 
 bool osd_interface::video_init()
@@ -279,6 +281,15 @@ bool osd_interface::network_init()
 	return true;
 }
 
+bool osd_interface::midi_init()
+{
+	#ifndef DISABLE_MIDI
+	Pm_Initialize();
+	#endif
+	return true;
+}
+
+
 void osd_interface::exit_subsystems()
 {
 	video_exit();
@@ -288,6 +299,7 @@ void osd_interface::exit_subsystems()
 	#ifdef USE_NETWORK
 	network_exit();
 	#endif
+	midi_exit();
 }
 	
 void osd_interface::video_exit()
@@ -310,7 +322,15 @@ void osd_interface::network_exit()
 {
 }
 
+void osd_interface::midi_exit()
+{
+	#ifndef DISABLE_MIDI
+	Pm_Terminate();
+	#endif
+}
+
 void osd_interface::osd_exit()
 {
 	exit_subsystems();
 }
+

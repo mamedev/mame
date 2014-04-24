@@ -60,7 +60,6 @@ OSDCOREOBJS = \
 	$(MINIOBJ)/minisync.o \
 	$(MINIOBJ)/minitime.o \
 	$(MINIOBJ)/miniwork.o \
-	$(MINIOBJ)/minimidi.o \
 
 
 

@@ -72,6 +72,7 @@ public:
 	virtual void input_resume();
 	virtual bool output_init();
 	virtual bool network_init();
+	virtual bool midi_init();
 
 	void exit_subsystems();	
 	virtual void video_exit();
@@ -79,6 +80,7 @@ public:
 	virtual void input_exit();
 	virtual void output_exit();
 	virtual void network_exit();
+	virtual void midi_exit();
 
 	virtual void osd_exit();
 private:
