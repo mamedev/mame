@@ -542,6 +542,26 @@ const char *mc6847_friend_device::describe_context(void)
 //**************************************************************************
 
 //-------------------------------------------------
+//  ROM( mc6847 )
+//-------------------------------------------------
+
+ROM_START( mc6847 )
+	ROM_REGION( 0x200, "chargen", 0 )
+	ROM_LOAD( "mc6847", 0x000, 0x200, CRC(9896fba7) SHA1(d0aa6d15278deda15610d290abc7b2f113ced91f) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *mc6847_base_device::device_rom_region() const
+{
+	return ROM_NAME( mc6847 );
+}
+
+
+//-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
@@ -1784,6 +1804,7 @@ const device_type MC6847Y_PAL = &device_creator<mc6847y_pal_device>;
 const device_type MC6847T1_NTSC = &device_creator<mc6847t1_ntsc_device>;
 const device_type MC6847T1_PAL = &device_creator<mc6847t1_pal_device>;
 const device_type S68047 = &device_creator<s68047_device>;
+const device_type M5C6847P1 = &device_creator<m5c6847p1_device>;
 
 
 
@@ -1898,3 +1919,34 @@ const UINT32 s68047_device::s_s68047_hack_palette[16] =
 	rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
 	rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
 };
+
+
+
+//-------------------------------------------------
+//  m5c6847p1_device
+//-------------------------------------------------
+
+m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mc6847_base_device(mconfig, M5C6847P1, "M5C6847P1", tag, owner, clock, ntsc_square_fontdata8x12, 262.5, "m5c68478p1", __FILE__)
+{
+}
+
+
+//-------------------------------------------------
+//  ROM( m5c6847p1 )
+//-------------------------------------------------
+
+ROM_START( m5c6847p1 )
+	ROM_REGION( 0x200, "chargen", 0 )
+	ROM_LOAD( "m5c6847p-1", 0x000, 0x200, CRC(540bafe5) SHA1(1b757eb1fa0b695c233b66aa283fb3d780ab9b8b) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *m5c6847p1_device::device_rom_region() const
+{
+	return ROM_NAME( m5c6847p1 );
+}
