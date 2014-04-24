@@ -200,6 +200,7 @@ void sp0256_device::device_reset()
 	m_mode     = 0;
 	m_page     = 0x1000 << 3;
 	m_silent   = 1;
+	m_sby_line = 0;
 	m_drq_cb(1);
 	SET_SBY(1)
 
