@@ -463,21 +463,21 @@ void debugwin_destroy_windows(running_machine &machine)
 
 
 //============================================================
-//  debugwin_update_during_game
+//  debugger_update
 //============================================================
 
-void debugwin_update_during_game(running_machine &machine)
+void windows_osd_interface::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && machine.phase() == MACHINE_PHASE_RUNNING)
+	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine()) && machine().phase() == MACHINE_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
-		if (debugwin_seq_pressed(machine))
+		if (debugwin_seq_pressed(machine()))
 		{
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_get_visible_cpu(machine)->debug()->halt_on_next_instruction("User-initiated break\n");
+			debug_cpu_get_visible_cpu(machine())->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info != NULL; info = info->next)

@@ -344,10 +344,6 @@ void winwindow_process_events(running_machine &machine, int ingame, bool nodispa
 
 	assert(GetCurrentThreadId() == main_threadid);
 
-	// if we're running, disable some parts of the debugger
-	if (ingame && (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugwin_update_during_game(machine);
-
 	// remember the last time we did this
 	last_event_check = GetTickCount();
 

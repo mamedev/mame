@@ -23,6 +23,5 @@
 //============================================================
 
 void debugwin_destroy_windows(running_machine &machine);
-void debugwin_update_during_game(running_machine &machine);
 
 #endif

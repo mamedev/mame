@@ -366,13 +366,4 @@ typedef float CGFloat;
 
 #endif // __OBJC__
 
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-void debugwin_update_during_game(running_machine &machine);
-
-
 #endif // __SDL_DEBUGOSX__

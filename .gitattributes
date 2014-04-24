@@ -8980,7 +8980,6 @@ src/osd/sdl/build.mak svneol=native#text/plain
 src/osd/sdl/debugosx.h svneol=native#text/plain
 src/osd/sdl/debugosx.m svneol=native#text/plain
 src/osd/sdl/debugqt.c svneol=native#text/plain
-src/osd/sdl/debugqt.h svneol=native#text/plain
 src/osd/sdl/debugqtbreakpointswindow.c svneol=native#text/plain
 src/osd/sdl/debugqtbreakpointswindow.h svneol=native#text/plain
 src/osd/sdl/debugqtdasmwindow.c svneol=native#text/plain

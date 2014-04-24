@@ -130,6 +130,9 @@ void osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	//
 }
 
+void osd_interface::debugger_update()
+{
+}
 
 //-------------------------------------------------
 //  update_audio_stream - update the stereo audio
