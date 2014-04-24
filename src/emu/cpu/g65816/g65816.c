@@ -821,6 +821,7 @@ void g65816_device::device_start()
 	m_set_reg = NULL;
 	m_set_line = NULL;
 	m_execute = NULL;
+	m_debugger_temp = 0;
 
 	m_program = &space(AS_PROGRAM);
 	m_cpu_type = CPU_TYPE_G65816;
