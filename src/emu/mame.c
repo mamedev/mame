@@ -98,6 +98,19 @@ static bool started_empty;
 
 static running_machine *global_machine;
 
+const game_driver *     new_driver_pending = NULL;   // pointer to the next pending driver
+
+//-------------------------------------------------
+//  mame_schedule_new_driver - schedule a new game to
+//  be loaded
+//-------------------------------------------------
+
+void mame_schedule_new_driver(const game_driver &driver)
+{
+	new_driver_pending = &driver;
+}
+
+
 
 /***************************************************************************
     CORE IMPLEMENTATION
@@ -120,6 +133,8 @@ int mame_execute(emu_options &options, osd_interface &osd)
 
 	while (error == MAMERR_NONE && !exit_pending)
 	{
+		new_driver_pending = NULL;
+
 		// if no driver, use the internal empty driver
 		const game_driver *system = options.system();
 		if (system == NULL)
@@ -163,9 +178,9 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		firstrun = false;
 
 		// check the state of the machine
-		if (machine.new_driver_pending())
+		if (new_driver_pending)
 		{
-			options.set_system_name(machine.new_driver_name());
+			options.set_system_name(new_driver_pending->name);
 			firstrun = true;
 		} 
 		else 

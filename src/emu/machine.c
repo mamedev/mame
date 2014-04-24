@@ -125,7 +125,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_paused(false),
 		m_hard_reset_pending(false),
 		m_exit_pending(false),
-		m_new_driver_pending(NULL),
 		m_soft_reset_timer(NULL),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
@@ -482,21 +481,6 @@ void running_machine::schedule_soft_reset()
 
 	// we can't be paused since the timer needs to fire
 	resume();
-
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
-}
-
-
-//-------------------------------------------------
-//  schedule_new_driver - schedule a new game to
-//  be loaded
-//-------------------------------------------------
-
-void running_machine::schedule_new_driver(const game_driver &driver)
-{
-	m_hard_reset_pending = true;
-	m_new_driver_pending = &driver;
 
 	// if we're executing, abort out immediately
 	m_scheduler.eat_all_cycles();

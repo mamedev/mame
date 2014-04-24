@@ -93,7 +93,7 @@ extern const char build_version[];
 /* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 int mame_execute(emu_options &options, osd_interface &osd);
 
-
+void mame_schedule_new_driver(const game_driver &driver);
 /* ----- miscellaneous bits & pieces ----- */
 
 // pop-up a user visible message
