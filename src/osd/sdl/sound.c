@@ -73,7 +73,6 @@ static int          sdl_init(running_machine &machine);
 static void         sdl_kill(running_machine &machine);
 static int          sdl_create_buffers(void);
 static void         sdl_destroy_buffers(void);
-static void         sdl_cleanup_audio(running_machine &machine);
 static void         SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len);
 
 
@@ -81,23 +80,27 @@ static void         SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len)
 //============================================================
 //  osd_start_audio_stream
 //============================================================
-void sdlaudio_init(running_machine &machine)
+bool sdl_osd_interface::sound_init()
 {
 	if (LOG_SOUND)
 		sound_log = fopen(SDLMAME_SOUND_LOG, "w");
 
 	// skip if sound disabled
-	if (machine.sample_rate() != 0)
+	if (machine().sample_rate() != 0)
 	{
-		// attempt to initialize SDL
-		if (sdl_init(machine))
-			return;
+		if (initialized_audio)
+		{
+			sound_exit();
+		}
 
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdl_cleanup_audio), &machine));
+		// attempt to initialize SDL
+		if (sdl_init(machine()))
+			return false;
+
 		// set the startup volume
-		machine.osd().set_mastervolume(attenuation);
+		machine().osd().set_mastervolume(attenuation);
 	}
-	return;
+	return true;
 }
 
 
@@ -106,14 +109,14 @@ void sdlaudio_init(running_machine &machine)
 //  osd_stop_audio_stream
 //============================================================
 
-static void sdl_cleanup_audio(running_machine &machine)
+void sdl_osd_interface::sound_exit()
 {
 	// if nothing to do, don't do it
-	if (machine.sample_rate() == 0)
+	if (machine().sample_rate() == 0)
 		return;
 
 	// kill the buffers and dsound
-	sdl_kill(machine);
+	sdl_kill(machine());
 	sdl_destroy_buffers();
 
 	// print out over/underflow stats
@@ -425,11 +428,6 @@ static int sdl_init(running_machine &machine)
 	int         audio_latency;
 	SDL_AudioSpec   aspec, obtained;
 	char audio_driver[16] = "";
-
-	if (initialized_audio)
-	{
-		sdl_cleanup_audio(machine);
-	}
 
 	osd_printf_verbose("Audio: Start initialization\n");
 #if (SDLMAME_SDL2)

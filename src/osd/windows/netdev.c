@@ -1,12 +1,14 @@
 #include "emu.h"
+#include "winmain.h"
 #include "netdev_pcap.h"
 
-void winnetdev_init(running_machine &machine)
+bool windows_osd_interface::network_init()
 {
 	init_pcap();
+	return true;
 }
 
-void winnetdev_deinit(running_machine &machine)
+void windows_osd_interface::network_exit()
 {
 	deinit_pcap();
 }

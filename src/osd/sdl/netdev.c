@@ -1,8 +1,9 @@
 #include "emu.h"
 #include "netdev_tap.h"
 #include "netdev_pcap.h"
+#include "osdsdl.h"
 
-void sdlnetdev_init(running_machine &machine)
+bool sdl_osd_interface::network_init()
 {
 	#ifdef SDLMAME_NET_TAPTUN
 	init_tap();
@@ -10,9 +11,10 @@ void sdlnetdev_init(running_machine &machine)
 	#ifdef SDLMAME_NET_PCAP
 	init_pcap();
 	#endif
+	return true;
 }
 
-void sdlnetdev_deinit(running_machine &machine)
+void sdl_osd_interface::network_exit()
 {
 	#ifdef SDLMAME_NET_TAPTUN
 	deinit_tap();

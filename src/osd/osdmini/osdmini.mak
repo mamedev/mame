@@ -60,6 +60,7 @@ OSDCOREOBJS = \
 	$(MINIOBJ)/minisync.o \
 	$(MINIOBJ)/minitime.o \
 	$(MINIOBJ)/miniwork.o \
+	$(MINIOBJ)/minimidi.o \
 
 
 
@@ -71,7 +72,11 @@ OSDOBJS = \
 	$(MINIOBJ)/minimain.o
 
 
+$(MINIOBJ)/minimidi.o:    $(SRC)/osd/portmedia/pmmidi.inc
 
+ifeq ($(OS),Windows_NT)
+LIBS += -lwinmm -lwsock32
+endif
 #-------------------------------------------------
 # rules for building the libaries
 #-------------------------------------------------

@@ -67,7 +67,6 @@ static int                  buffer_overflows;
 //  PROTOTYPES
 //============================================================
 
-static void         sound_exit(running_machine &machine);
 static HRESULT      dsound_init(running_machine &machine);
 static void         dsound_kill(void);
 static HRESULT      dsound_create_buffers(void);
@@ -76,21 +75,19 @@ static void         dsound_destroy_buffers(void);
 
 
 //============================================================
-//  winsound_init
+//  sound_init
 //============================================================
 
-void winsound_init(running_machine &machine)
+bool windows_osd_interface::sound_init()
 {
 	// if no sound, don't create anything
-	if (!machine.options().sound())
-		return;
-
-	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sound_exit), &machine));
+	if (!machine().options().sound())
+		return true;
 
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound
-	dsound_init(machine);
+	dsound_init(machine());
+	return true;
 }
 
 
@@ -98,7 +95,7 @@ void winsound_init(running_machine &machine)
 //  sound_exit
 //============================================================
 
-static void sound_exit(running_machine &machine)
+void windows_osd_interface::sound_exit()
 {
 	// kill the buffers and dsound
 	dsound_destroy_buffers();

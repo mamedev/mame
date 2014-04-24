@@ -35,9 +35,6 @@ public:
 
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
-
-private:
-	static void osd_exit(running_machine &machine);
 };
 
 

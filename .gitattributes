@@ -8963,6 +8963,7 @@ src/osd/osdepend.h svneol=native#text/plain
 src/osd/osdmini/minidir.c svneol=native#text/plain
 src/osd/osdmini/minifile.c svneol=native#text/plain
 src/osd/osdmini/minimain.c svneol=native#text/plain
+src/osd/osdmini/minimidi.c svneol=native#text/plain
 src/osd/osdmini/minimisc.c svneol=native#text/plain
 src/osd/osdmini/minisync.c svneol=native#text/plain
 src/osd/osdmini/minitime.c svneol=native#text/plain
@@ -9026,7 +9027,6 @@ src/osd/sdl/man/mess.6 svneol=LF#text/plain eol=lf
 src/osd/sdl/man/romcmp.1 svneol=LF#text/plain eol=lf
 src/osd/sdl/man/testkeys.1 svneol=LF#text/plain eol=lf
 src/osd/sdl/netdev.c svneol=native#text/plain
-src/osd/sdl/netdev.h svneol=native#text/plain
 src/osd/sdl/netdev_pcap.c svneol=native#text/plain
 src/osd/sdl/netdev_pcap.h svneol=native#text/plain
 src/osd/sdl/netdev_pcap_osx.c svneol=native#text/plain
@@ -9117,7 +9117,6 @@ src/osd/windows/mame.ico -text svneol=unset#image/x-icon
 src/osd/windows/mame.man svneol=CRLF#text/plain eol=crlf
 src/osd/windows/mame.rc svneol=CRLF#text/plain eol=crlf
 src/osd/windows/netdev.c svneol=native#text/plain
-src/osd/windows/netdev.h svneol=native#text/plain
 src/osd/windows/netdev_pcap.c svneol=native#text/plain
 src/osd/windows/netdev_pcap.h svneol=native#text/plain
 src/osd/windows/osinline.h svneol=native#text/plain

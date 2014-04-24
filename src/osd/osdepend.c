@@ -76,7 +76,9 @@ void osd_interface::init(running_machine &machine)
 	// extract the verbose printing option
 	if (options.verbose())
 		g_print_verbose = true;
-	
+
+	// ensure we get called on the way out
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_interface::osd_exit), this));
 }
 
 
@@ -220,4 +222,95 @@ bool osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_ar
 void *osd_interface::get_slider_list()
 {
 	return NULL;
+}
+
+void osd_interface::init_subsystems()
+{
+	if (!video_init())
+	{
+		video_exit();
+		osd_printf_error("video_init: Initialization failed!\n\n\n");
+		fflush(stderr);
+		fflush(stdout);
+		exit(-1);	
+	}	
+	sound_init();
+	input_init();
+	// we need pause callbacks
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_interface::input_pause), this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_interface::input_resume), this));
+	
+	output_init();
+#ifdef USE_NETWORK
+	network_init();
+#endif
+}
+
+bool osd_interface::video_init()
+{
+	return true;
+}
+
+bool osd_interface::sound_init()
+{
+	return true;
+}
+
+bool osd_interface::input_init()
+{
+	return true;
+}
+
+void osd_interface::input_pause()
+{
+}
+
+void osd_interface::input_resume()
+{
+}
+
+bool osd_interface::output_init()
+{
+	return true;
+}
+
+bool osd_interface::network_init()
+{
+	return true;
+}
+
+void osd_interface::exit_subsystems()
+{
+	video_exit();
+	sound_exit();
+	input_exit();
+	output_exit();
+	#ifdef USE_NETWORK
+	network_exit();
+	#endif
+}
+	
+void osd_interface::video_exit()
+{
+}
+
+void osd_interface::sound_exit()
+{
+}
+
+void osd_interface::input_exit()
+{
+}
+
+void osd_interface::output_exit()
+{
+}
+
+void osd_interface::network_exit()
+{
+}
+
+void osd_interface::osd_exit()
+{
+	exit_subsystems();
 }
