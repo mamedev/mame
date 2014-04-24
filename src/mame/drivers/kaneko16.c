@@ -2532,7 +2532,7 @@ ROM_START( berlwallt )
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 ROM_END
 
-/* Todo, check if this has the same 'Copy Board' problem as the above set or not, it uses the same character graphics but it definitely comes from an original board.*/
+/* This set definitely comes from an original board but suffers the same 'COPY BOARD' issue in MAME, will be chedked on the PCB shortly */
 
 ROM_START( berlwallk )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
