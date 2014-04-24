@@ -2532,7 +2532,34 @@ ROM_START( berlwallt )
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 ROM_END
 
+/* Todo, check if this has the same 'Copy Board' problem as the above set or not, it uses the same character graphics but it definitely comes from an original board.*/
 
+ROM_START( berlwallk )
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "bw100k.u23", 0x000000, 0x020000, CRC(0ce1d336) SHA1(9dbff4a72f03dd506726c3b305fd0a32e7da4ee1) )
+	ROM_LOAD16_BYTE( "bw101k.u39", 0x000001, 0x020000, CRC(3355be65) SHA1(bc3506236ee2f37b3cba7c4d8fe1b4dad61b06f1) )
+
+	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
+	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
+	ROM_LOAD( "bw300k.u82",  0x100000, 0x020000, CRC(b8de79d7) SHA1(c9a78aa213105f3657349995aca2866bc6d80093) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
+	ROM_LOAD16_BYTE( "bw004.u73",  0x000000, 0x080000, CRC(5300c34d) SHA1(ccb12ea05f89ef68bcfe003faced2ffea24c4bf0) )
+	ROM_LOAD16_BYTE( "bw008.u65",  0x000001, 0x080000, CRC(9aaf2f2f) SHA1(1352856159e19f07e8e30f9c44b21347103ce024) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bw005.u74",  0x100000, 0x080000, CRC(16db6d43) SHA1(0158d0278d085487400ad4384b8cc9618503319e) )
+	ROM_LOAD16_BYTE( "bw009.u66",  0x100001, 0x080000, CRC(1151a0b0) SHA1(584a0da7eb7f06450f95e76faa20d19f053cb74c) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bw006.u75",  0x200000, 0x080000, CRC(73a35d1f) SHA1(af919cf858c5923aea45e0d8d91493e6284cb99e) )
+	ROM_LOAD16_BYTE( "bw00a.u67",  0x200001, 0x080000, CRC(f447dfc2) SHA1(1254eafea92e8e416deedf21cb01990ffc4f896c) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bw007.u76",  0x300000, 0x080000, CRC(97f85c87) SHA1(865e076e098c49c96639f62be793f2de24b4926b) )
+	ROM_LOAD16_BYTE( "bw00b.u68",  0x300001, 0x080000, CRC(b0a48225) SHA1(de256bb6e2a824114274bff0c6c1234934c31c49) ) // FIXED BITS (xxxxxxx0)
+
+	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "bw000k.u46",  0x000000, 0x040000, CRC(52e81a50) SHA1(0adf6b42dee244dba2a4fb237155b04699b0254f) )
+ROM_END
 
 
 /***************************************************************************
@@ -3900,8 +3927,9 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", 0 )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
+GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", 0 )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", 0 )
+GAME( 1991, berlwallk,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", 0 )
 
 
 
