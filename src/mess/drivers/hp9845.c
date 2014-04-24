@@ -1,0 +1,140 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+/*
+
+    HP 9845
+
+    http://www.hp9845.net/
+
+*/
+
+#include "emu.h"
+
+class hp9845_state : public driver_device
+{
+public:
+	hp9845_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag)
+	{ }
+};
+
+static INPUT_PORTS_START( hp9845 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( hp9845a, hp9845_state )
+	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL_11_4MHz)
+	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL_11_4MHz)
+
+	//MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( hp9835a, hp9845_state )
+	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
+	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
+
+	//MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9835a_rom")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( hp9845b, hp9845_state )
+	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
+	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
+
+	//MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+MACHINE_CONFIG_END
+
+ROM_START( hp9845a )
+	ROM_REGION( 0200000, "lpu", 0 )
+	ROM_LOAD( "09845-65544-65547-03-system_lpu.bin", 0000000, 0200000, CRC(47beb87f) SHA1(456caefacafcf19435e1e7e68b1c1e4010841664) )
+
+	ROM_REGION( 0200000, "ppu", 0 )
+	ROM_LOAD( "09845-65540-65543-01-system_ppu.bin", 0000000, 0160000, CRC(bc0a34cc) SHA1(9ff215f4ba32ad85f144845d15f762a71e35588b) )
+ROM_END
+
+#define rom_hp9845s rom_hp9845a
+
+ROM_START( hp9835a )
+	ROM_REGION( 0200000, "lpu", 0 )
+	ROM_LOAD( "1818-2800-03_00-system-lpu.bin", 0000000, 020000, CRC(e0b0977a) SHA1(5afdc6c725abff70b674e46688d8ab38ccf8f3c1) )
+	ROM_LOAD( "1818-2801-03_10-system-lpu.bin", 0020000, 020000, CRC(c51c1e3a) SHA1(798964fa2e7a1fc149ce4400b694630049293119) )
+	ROM_LOAD( "1818-2802-03_20-system-lpu.bin", 0040000, 020000, CRC(bba70a7e) SHA1(2d488594493f8dfcd753e462414cc51c24596a2c) )
+	ROM_LOAD( "1818-2803-03_30-system-lpu.bin", 0060000, 020000, CRC(65e9eba6) SHA1(a11f5d37e8ed14a428335c43e785d635b02d1129) )
+	ROM_LOAD( "1818-2804-03_40-system-lpu.bin", 0100000, 020000, CRC(ef83b695) SHA1(8ca2914609ece2c9c59ebba6ece3fcbc8929aeaf) )
+	ROM_LOAD( "1818-2805-03_50-system-lpu.bin", 0120000, 020000, CRC(401d539f) SHA1(00bda59f71632c4d4fc3268c04262bb81ef0eeba) )
+	ROM_LOAD( "1818-2806-03_60-system-lpu.bin", 0140000, 020000, CRC(fe353db5) SHA1(0fb52d82d3743008cdebebb20c488e34ce2fca4b) )
+	ROM_LOAD( "1818-2807-03_70-system-lpu.bin", 0160000, 020000, CRC(45a3cc5e) SHA1(35c9959331acf7c98ab6a880915b03e3e783a656) )
+
+	ROM_REGION( 0200000, "ppu", 0 )
+	ROM_LOAD( "1818-2808-05_00-system-ppu.bin", 0000000, 020000, CRC(d0c96276) SHA1(cc578d586c4eda81469f29eb7cab7f667e0d5977) )
+	ROM_LOAD( "1818-2809-05_30-system-ppu.bin", 0060000, 020000, CRC(ccdb7171) SHA1(1d24596bc1219983e7cb81f6987af094f2ca7d81) )
+	ROM_LOAD( "1818-2810-05_40-system-ppu.bin", 0100000, 020000, CRC(97487d24) SHA1(823cd16671de8e6ff2c245060c99778acb6ff79c) )
+	ROM_LOAD( "1818-2811-05_50-system-ppu.bin", 0120000, 020000, CRC(18aee6fd) SHA1(388d3b2a063ea2cfdfe9fb9f864fa5f08af817b0) )
+	ROM_LOAD( "1818-2812-05_60-system-ppu.bin", 0140000, 020000, CRC(c0beeeae) SHA1(a5db36a7f7bad84c1013bd3ec4813c355f72427d) )
+	ROM_LOAD( "1818-2813-05_70-system-ppu.bin", 0160000, 020000, CRC(75361bbf) SHA1(40f499c597da5c8c9a55a2a891976d946a54926b) )
+ROM_END
+
+#define rom_hp9835b rom_hp9835a
+
+ROM_START( hp9845b )
+	ROM_REGION( 0200000, "lpu", 0 )
+	ROM_LOAD( "1818-0823-0827-03_00-revb-system_lpu.bin", 0000000, 020000, CRC(f9b222d2) SHA1(a992436750ba2092922b7cd0886d282605d92bff) )
+	ROM_LOAD( "1818-0823-0827-03_10-revb-system_lpu.bin", 0020000, 020000, CRC(bb4a6567) SHA1(a37dd938a181301bbe860f7607569fcf662eb476) )
+	ROM_LOAD( "1818-0824-0828-03_20-reva-system_lpu.bin", 0040000, 020000, CRC(8f15dbb7) SHA1(5f602f596c98ad9eadfd92ebc8dd11e481a082f3) )
+	ROM_LOAD( "1818-0824-0828-03_20-revb-system_lpu.bin", 0040000, 020000, CRC(8c0ef766) SHA1(12c95d0651d6194e222f326f5df396999147e844) )
+	ROM_LOAD( "1818-0824-0828-03_30-reva-system_lpu.bin", 0060000, 020000, CRC(75bd6e8d) SHA1(67cbf169943a011eb60ca43bf0ed32e7596eb722) )
+	ROM_LOAD( "1818-0824-0828-03_30-revb-system_lpu.bin", 0060000, 020000, CRC(e37221b4) SHA1(4dde7fe671a9d1b34d21c7ac0b3ad218a516d120) )
+	ROM_LOAD( "1818-0825-0829-03_40-revb-system_lpu.bin", 0100000, 020000, CRC(9c1c3cfb) SHA1(886a2ce0eaa4af63b16b6a016b8c28c2526b4b98) )
+	ROM_LOAD( "1818-0825-0829-03_50-revb-system_lpu.bin", 0120000, 020000, CRC(1708d445) SHA1(379749287d8892299925fcab7e7d651a55ffb205) )
+	ROM_LOAD( "1818-0826-0830-03_60-revc-system_lpu.bin", 0140000, 020000, CRC(992dd8a8) SHA1(e36a64605075debb282fe02906458e5bc4213cf0) )
+	ROM_LOAD( "1818-0826-0830-03_70-revc-system_lpu.bin", 0160000, 020000, CRC(49d644f6) SHA1(d53f05e52eefe81f59de7e07aa5a64ff69c81c18) )
+
+	ROM_REGION( 0200000, "lpu_fast", 0 )
+	ROM_LOAD( "1818-1506-1502-03_00-reva-system_fast_lpu.bin", 0000000, 020000, CRC(f95f037c) SHA1(008b771b7835cd3b8bebd337438224f59963db17) )
+	ROM_LOAD( "1818-1506-1502-03_10-reva-system_fast_lpu.bin", 0020000, 020000, CRC(a74ed610) SHA1(1b7ff2b8870d6c580a1b7727b3f9bd95fab42bf8) )
+	ROM_LOAD( "1818-1507-1503-03_20-reva-system_fast_lpu.bin", 0040000, 020000, CRC(a54958f5) SHA1(1d30d095edab5005bd6cd18d110de6a98945fbb0) )
+	ROM_LOAD( "1818-1507-1503-03_30-reva-system_fast_lpu.bin", 0060000, 020000, CRC(458f7d1c) SHA1(4cdb626b3fc607af2d5196a82d99329648315ddf) )
+	ROM_LOAD( "1818-1508-1504-03_40-reva-system_fast_lpu.bin", 0100000, 020000, CRC(50c8c81e) SHA1(2dda0c1a3b7e61b2c64b087137680a7df7f592bf) )
+	ROM_LOAD( "1818-1508-1504-03_50-reva-system_fast_lpu.bin", 0120000, 020000, CRC(453a82c6) SHA1(fb17ebc18dee7abc3cca081bd2e27429c2ddb14c) )
+	ROM_LOAD( "1818-1509-1505-03_60-reva-system_fast_lpu.bin", 0140000, 020000, CRC(a77ae15f) SHA1(ef4f8ca5c781dac12a871c2e64928c27cac1b141) )
+	ROM_LOAD( "1818-1509-1505-03_70-reva-system_fast_lpu.bin", 0160000, 020000, CRC(48167f70) SHA1(ed0757ffd294a69c9f1dd3c09a3fe72d6e5ea44d) )
+
+	ROM_REGION( 0200000, "ppu", 0 )
+	ROM_LOAD( "1818-0833-0837-05_40-revc-system_ppu.bin", 0100000, 020000, CRC(a4d1fb83) SHA1(b3cd83fa1408885ab88e212e62dc867e6fec26a7) )
+	ROM_LOAD( "1818-0833-0837-05_40-revd-system_ppu.bin", 0100000, 020000, CRC(6f684017) SHA1(48a24563763d2dd15ac2e025b8f0ff6f672a697e) )
+	ROM_LOAD( "1818-0833-0837-05_50-revc-system_ppu.bin", 0120000, 020000, CRC(1ed3bf1d) SHA1(6dd1daf0cc68fcab84cd3e17fcf8b37de7be18a9) )
+	ROM_LOAD( "1818-0833-0837-05_50-revd-system_ppu.bin", 0120000, 020000, CRC(c7a51e37) SHA1(8de6344064b503dfab7a956eafb21bea40a60389) )
+	ROM_LOAD( "1818-0834-0838-05_60-revc-system_ppu.bin", 0140000, 020000, CRC(ffa22253) SHA1(b4f6747a5a6f7bc4652115bfdbaf73950f7505cf) )
+	ROM_LOAD( "1818-0834-0838-05_60-revd-system_ppu.bin", 0140000, 020000, CRC(273265ad) SHA1(113518ea7d71a815c3a426727a600f864dea1286) )
+	ROM_LOAD( "1818-0834-0838-05_70-revc-system_ppu.bin", 0160000, 020000, CRC(9415d54b) SHA1(596a87bf34f3302aa47ef6d8c0d61c080462d389) )
+	ROM_LOAD( "1818-0834-0838-05_70-revd-system_ppu.bin", 0160000, 020000, CRC(ec6ed330) SHA1(3b5cdfbc5f372ab36fa3386464862f5680392886) )
+	ROM_LOAD( "1818-1899-1898-05_60-reva-system_ppu.bin", 0140000, 020000, CRC(d952d049) SHA1(0939c24b852f0e5073350f6b346980512132cc4c) )
+	ROM_LOAD( "1818-1899-1898-05_70-reva-system_ppu.bin", 0160000, 020000, CRC(6f684017) SHA1(48a24563763d2dd15ac2e025b8f0ff6f672a697e) )
+
+	ROM_REGION( 0200000, "ppu_tops", 0 )
+	ROM_LOAD( "1818-0831-0835-05_00-reva-tops_ppu.bin", 000000, 020000, CRC(8378aa2c) SHA1(91f9e28d17d55e68aae93a9528c06faaab85db89) )
+	ROM_LOAD( "1818-0831-0835-05_10-reva-tops_ppu.bin", 020000, 020000, CRC(14124aa1) SHA1(436457780304fb23736c543adfa2dc5cafb09a33) )
+	ROM_LOAD( "1818-1209-1208-05_00-revb-tops_ppu.bin", 000000, 020000, CRC(6cd52be6) SHA1(5ff074007fca17be3c932a4b82406461f5b0762f) )
+	ROM_LOAD( "1818-1209-1208-05_10-revb-tops_ppu.bin", 020000, 020000, CRC(9ad3a39a) SHA1(511a281a3b5138771a8aa5ed992ffa42e63c420c) )
+	ROM_LOAD( "1818-1592-1591-05_00-revb-tops_ppu.bin", 000000, 020000, CRC(678d67b0) SHA1(907e15be595e35c2cc8da427e31dc63aef958542) )
+	ROM_LOAD( "1818-1592-1591-05_10-revb-tops_ppu.bin", 020000, 020000, CRC(dae4f143) SHA1(a7c7a7919486bc16f365865638545c094d4eab77) )
+
+	ROM_REGION( 0200000, "ppu_kbd_us", 0 )
+	ROM_LOAD( "1818-0832-0836-05_20-revc-keyboard_us.bin", 040000, 020000, CRC(10808d04) SHA1(9dba0dc4fb235e55023998d85fde419de2163036) )
+	ROM_LOAD( "1818-0832-0836-05_30-revc-keyboard_us.bin", 060000, 020000, CRC(25ba36df) SHA1(0bf0af133d5da4dae392799fa88883a82917871a) )
+
+	ROM_REGION( 0200000, "ppu_kbd_de", 0 )
+	ROM_LOAD( "1818-0841-0846-05_20-revc-keyboard_german.bin", 040000, 020000, CRC(eb5cd794) SHA1(4fa00aee614e8fb65000f278c1c9a1862713fd8e) )
+	ROM_LOAD( "1818-0841-0846-05_20-revd-keyboard_german.bin", 060000, 020000, CRC(7dec9c71) SHA1(052ff412065276f374cd6eb7806e56e5c5fe3dff) )
+	ROM_LOAD( "1818-0841-0846-05_30-revc-keyboard_german.bin", 040000, 020000, CRC(bd76661d) SHA1(79ae4de4e550b2e6cafcdb50da56cc9e6c4c25d8) )
+	ROM_LOAD( "1818-0841-0846-05_30-revd-keyboard_german.bin", 060000, 020000, CRC(a0f0701d) SHA1(655fb61d3df7d28d71ce0f12d5fc17f1d7a2ef83) )
+ROM_END
+
+#define rom_hp9845t rom_hp9845b
+#define rom_hp9845c rom_hp9845b
+
+COMP( 1978, hp9845a,   0,       0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845A",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1978, hp9845s,   hp9845a, 0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845S",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1979, hp9835a,   hp9845a, 0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835A",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1979, hp9835b,   hp9845a, 0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835B",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980, hp9845b,   hp9845a, 0,      hp9845b,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845B",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980, hp9845t,   hp9845a, 0,      hp9845b,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845T",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980, hp9845c,   hp9845a, 0,      hp9845b,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845C",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )

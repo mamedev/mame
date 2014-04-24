@@ -1321,7 +1321,6 @@ $(MESSOBJ)/hegener.a:           \
 	$(MESS_DRIVERS)/mmodular.o  \
 	$(MESS_DRIVERS)/stratos.o   \
 
-
 $(MESSOBJ)/hitachi.a:           \
 	$(MESS_DRIVERS)/bmjr.o      \
 	$(MESS_DRIVERS)/bml3.o      \
@@ -1351,7 +1350,8 @@ $(MESSOBJ)/hp.a:                \
 	$(MESS_DRIVERS)/hp48.o      \
 	$(MESS_DRIVERS)/hp16500.o   \
 	$(MESS_DRIVERS)/hp49gp.o    \
-	$(MESS_DRIVERS)/hp9k.o  \
+	$(MESS_DRIVERS)/hp9k.o      \
+	$(MESS_DRIVERS)/hp9845.o    \
 
 $(MESSOBJ)/hec2hrp.a:           \
 	$(MESS_DRIVERS)/hec2hrp.o   \
