@@ -104,6 +104,13 @@ READ16_MEMBER(cybiko_state::serflash_r)
 	return 0;
 }
 
+WRITE16_MEMBER(cybiko_state::serflash_w)
+{
+	m_flash1->cs_w ((data & 0x10) ? 0 : 1);
+	m_flash1->si_w ((data & 0x02) ? 1 : 0);
+	m_flash1->sck_w((data & 0x20) ? 1 : 0);
+}
+
 READ16_MEMBER(cybiko_state::clock_r)
 {
 	if (m_rtc->sda_r())
@@ -114,6 +121,12 @@ READ16_MEMBER(cybiko_state::clock_r)
 	return 0x04;
 }
 
+WRITE16_MEMBER(cybiko_state::clock_w)
+{
+	m_rtc->scl_w((data & 0x02) ? 1 : 0);
+	m_rtc->sda_w((data & 0x01) ? 0 : 1);
+}
+
 READ16_MEMBER(cybiko_state::xtclock_r)
 {
 	if (m_rtc->sda_r())
@@ -122,6 +135,12 @@ READ16_MEMBER(cybiko_state::xtclock_r)
 	}
 
 	return 0;
+}
+
+WRITE16_MEMBER(cybiko_state::xtclock_w)
+{
+	m_rtc->scl_w((data & 0x02) ? 1 : 0);
+	m_rtc->sda_w((data & 0x40) ? 0 : 1);
 }
 
 READ16_MEMBER(cybiko_state::xtpower_r)
@@ -136,16 +155,17 @@ READ16_MEMBER(cybiko_state::xtpower_r)
 //////////////////////
 
 static ADDRESS_MAP_START( cybikov1_io, AS_IO, 16, cybiko_state )
-	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READ(serflash_r)
+	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READWRITE(serflash_r, serflash_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
-	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READ(serflash_r)
+	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READWRITE(serflash_r, serflash_w)
+	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(clock_r, clock_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 16, cybiko_state )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READ(xtpower_r)
-	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READ(xtclock_r)
+	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(xtclock_r, xtclock_w)
 ADDRESS_MAP_END 								 
 
 /////////////////

@@ -59,8 +59,11 @@ public:
 	{ }
 
 	DECLARE_READ16_MEMBER(serflash_r);
+	DECLARE_WRITE16_MEMBER(serflash_w);
 	DECLARE_READ16_MEMBER(clock_r);
+	DECLARE_WRITE16_MEMBER(clock_w);
 	DECLARE_READ16_MEMBER(xtclock_r);
+	DECLARE_WRITE16_MEMBER(xtclock_w);
 	DECLARE_READ16_MEMBER(xtpower_r);
 
 	CYBIKO_RS232 m_rs232;
