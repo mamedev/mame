@@ -277,9 +277,11 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0
 		, ( ( data_width == 7 ) ? ADDRESS_MAP_NAME(data_7bit) : ( ( data_width == 8 ) ? ADDRESS_MAP_NAME(data_8bit) : NULL ) ))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 18, 0)
+	, m_pc(0)
 	, m_features(features)
 	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
+	, m_rtemp(0)
 {
 	m_ds5002fp.mcon = 0;
 	m_ds5002fp.rpctl = 0;
