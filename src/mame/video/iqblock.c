@@ -63,11 +63,6 @@ WRITE8_MEMBER(iqblock_state::iqblock_bgvideoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(iqblock_state::iqblock_bgvideoram_r)
-{
-	return m_bgvideoram[offset];
-}
-
 WRITE8_MEMBER(iqblock_state::iqblock_fgscroll_w)
 {
 	m_fg_tilemap->set_scrolly(offset,data);

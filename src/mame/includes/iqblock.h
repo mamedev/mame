@@ -4,19 +4,17 @@ public:
 	iqblock_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_rambase(*this, "rambase"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram2_8(*this, "paletteram2") { }
+		m_rambase(*this, "rambase"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_rambase;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
-	required_shared_ptr<UINT8> m_generic_paletteram2_8;
+	required_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
 
-	UINT8 *m_bgvideoram;
-	UINT8 *m_fgvideoram;
 	int m_videoenable;
 	int m_video_type;
 	tilemap_t *m_bg_tilemap;
@@ -25,10 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(iqblock_prot_w);
 	DECLARE_WRITE8_MEMBER(grndtour_prot_w);
 	DECLARE_WRITE8_MEMBER(iqblock_irqack_w);
-	DECLARE_READ8_MEMBER(extrarom_r);
 	DECLARE_WRITE8_MEMBER(iqblock_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(iqblock_bgvideoram_w);
-	DECLARE_READ8_MEMBER(iqblock_bgvideoram_r);
 	DECLARE_WRITE8_MEMBER(iqblock_fgscroll_w);
 	DECLARE_WRITE8_MEMBER(port_C_w);
 	DECLARE_DRIVER_INIT(grndtour);
