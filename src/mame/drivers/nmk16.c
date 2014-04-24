@@ -31,6 +31,9 @@ Nouryoku Koujou Iinkai   1995 Tecmo      68000               2xOKIM6295
 driver by Mirko Buffoni, Richard Bush, Nicola Salmoria, Bryan McPhail,
           David Haywood, and R. Belmont.
 
+Afega based their hardware on the NMK hardware, not surprising considering Twin
+Action is simply a hack of USSAF Mustang.
+
 The NMK004 CPU might be a Toshiba TLCS-90 class CPU with internal ROM in the
 0000-1fff range.
 
@@ -42,26 +45,34 @@ games rely on mirror addresses to access the tilemap sequentially.
 
 TODO:
 - NMK004 sound CPU is just (imperfectly) simulated for now.
+
 - There is a handshaking operation happening on boot in most games. It happens on
   the NMK004 communication ports so I have implemented it in NMK004.c. However,
   the same handshaking also happen in tharrier, which doesn't have a NMK004!
   Therefore, it might be another protection device, which sits in the middle
   between CPU and NMK004.
+
+- Sound communication in Mustang might be incorrectly implemented (it does not
+  make correct sounds with our NMK004 simulation)
+
 - Protection is patched in several games.
-- Hacha Mecha Fighter: mcu simulation *might* be wrong/incorrect (see notes).
-- Cocktail mode is supported, but tilemap.c has problems with asymmetrical
-  visible areas.
+
+- Hacha Mecha Fighter: mcu simulation is wrong/incorrect (see notes).
+
 - Music timing in nouryoku is a little off.
 - In Bioship, there's an occasional flicker of one of the sprites composing big
   ships. Increasing CPU speed from 12 to 16 MHz improved it, but it's still not
-  100% fixed. (but the CPU speed has been verified to be 10Mhz??)
-- Input ports in Bio-ship Paladin, Strahl
-- Sound communication in Mustang might be incorrectly implemented
-- Incorrect OKI samples banking in Rapid Hero
+  100% fixed. (the CPU speed has been verified to be 10Mhz??)
+
 - Hacha Mecha Fighter: (BTANB) the bomb graphics are pretty weird when the game is in
   japanese mode,but it's like this on the original game,it's just a japanese write for
   "bomb" word (I presume)
+
 - (PCB owners): Measure pixel clock / vblank duration for all of these games.
+
+- for the Afega games (Guardian Storm especially) the lives display has bad colours,
+  it doesn't matter if this is drawn with the TX layer (some sets) or the sprites (others)
+  so it's probably something else funky with the memory access.
 
 ----
 
@@ -6864,6 +6875,28 @@ ROM_START( grdnstrmk )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( grdnstrmj )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "afega_3.u112", 0x000000, 0x040000, CRC(e51a35fb) SHA1(acb733d0e5c9c54477d0475a64f53d68a84218c6) )
+	ROM_LOAD16_BYTE( "afega_4.u107", 0x000001, 0x040000, CRC(cb10aa54) SHA1(bb0cb837b5651df4ff8f215854353631a39b730c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
+	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* MASK ROM (read as 27C160) */
+
+	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+
+	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
+	ROM_LOAD( "gst-03.u4",  0x00000, 0x10000, CRC(a1347297) SHA1(583f4da991eeedeb523cf4fa3b6900d40e342063) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
+
 
 ROM_START( grdnstrmv ) /* Apples Industries license - Vertical version */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
@@ -7600,6 +7633,7 @@ GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, driver_device, 0,        ROT
 
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, driver_device, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
 GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
+GAME( 1998, grdnstrmj,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrmg, ROT270,             "Afega",                             "Sen Jing - Guardian Storm (Japan)", 0 )
 GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Jeon Sin - Guardian Storm (Korea)", 0 )
 GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Red Fox War Planes II (China, set 1)", 0 )
 GAME( 1998, redfoxwp2a,grdnstrm,grdnstrmk,grdnstrk, nmk16_state,  redfoxwp2a,ROT270,             "Afega",                             "Red Fox War Planes II (China, set 2)", 0 )
