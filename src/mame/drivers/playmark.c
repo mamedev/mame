@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_WRITE(bigtwin_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x780000, 0x7807ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 //  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x780000, 0x7807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2") AM_WRITE(hotmind_coin_eeprom_w)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x10a000, 0x10bfff) AM_RAM
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x280800, 0x280fff) AM_RAM // unused
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
@@ -1061,7 +1061,7 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playmark)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
 
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigtwinb)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
 
@@ -1172,7 +1172,7 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excelsr)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
 
@@ -1211,7 +1211,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hrdtimes)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
@@ -1251,7 +1251,7 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hrdtimes)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)
 

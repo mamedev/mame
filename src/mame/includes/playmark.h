@@ -18,8 +18,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_bgvideoram;
@@ -28,7 +27,6 @@ public:
 	optional_shared_ptr<UINT16> m_videoram3;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_rowscroll;
-//      UINT16 *     m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *m_tx_tilemap;
@@ -74,7 +72,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hrdtimes_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bigtwin_paletteram_w);
 	DECLARE_WRITE16_MEMBER(bigtwin_scroll_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_scroll_w);
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
@@ -113,5 +110,4 @@ public:
 	optional_device<pic16c57_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
