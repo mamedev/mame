@@ -645,6 +645,7 @@ mc68681_channel::mc68681_channel(const machine_config &mconfig, const char *tag,
 	MR1(0),
 	MR2(0),
 	SR(0),
+	rx_enabled(0),
 	rx_fifo_num(0),
 	tx_enabled(0)
 {
