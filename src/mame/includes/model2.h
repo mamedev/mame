@@ -105,6 +105,7 @@ public:
 	void model2_check_irq_state();
 	void model2_check_irqack_state(UINT32 data);
 	UINT8 m_gearsel;
+	UINT8 m_lightgun_mux;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
@@ -139,7 +140,8 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_prg_w);
 	DECLARE_READ32_MEMBER(geo_r);
 	DECLARE_WRITE32_MEMBER(geo_w);
-	DECLARE_READ32_MEMBER(hotd_unk_r);
+	DECLARE_READ32_MEMBER(hotd_lightgun_r);
+	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
 	DECLARE_READ32_MEMBER(sonic_unk_r);
 	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ32_MEMBER(desert_unk_r);
