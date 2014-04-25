@@ -853,6 +853,9 @@ void tms32010_device::device_start()
 	m_opcode.d = 0;
 	m_oldacc.d = 0;
 	m_memaccess = 0;
+	m_PC = 0;
+	m_STR = 0;
+	m_ACC.d = 0;
 
 	state_add( TMS32010_PC,   "PC",   m_PC).formatstr("%04X");
 	state_add( TMS32010_STR,  "STR",  m_STR).formatstr("%04X");
