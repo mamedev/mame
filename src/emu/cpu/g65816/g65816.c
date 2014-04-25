@@ -824,7 +824,6 @@ void g65816_device::device_start()
 	m_debugger_temp = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_cpu_type = CPU_TYPE_G65816;
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
