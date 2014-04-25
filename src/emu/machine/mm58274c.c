@@ -125,6 +125,8 @@ void mm58274c_device::device_reset()
 	m_seconds1 = systime.local_time.second / 10;
 	m_seconds2 = systime.local_time.second % 10;
 	m_tenths = 0;
+	m_status = 0;
+	m_control = 0;
 }
 
 
