@@ -29,6 +29,9 @@
 #define MCFG_AT45DB161_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB161, 0)
 
+#define MCFG_AT45DBXXX_SO_CALLBACK(_cb) \
+	devcb = &at45db041_device::set_so_cb(*device, DEVCB2_##_cb);
+
 
 // ======================> at45db041_device
 
@@ -45,6 +48,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(so_r);
 
 	UINT8 *get_ptr() {  return m_data;  }
+
+	template<class _Object> static devcb2_base &set_so_cb(device_t &device, _Object object) { return downcast<at45db041_device &>(device).write_so.set_callback(object); }
+	devcb2_write_line write_so;
 
 protected:
 	// device-level overrides

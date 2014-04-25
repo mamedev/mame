@@ -45,14 +45,16 @@ const device_type AT45DB161 = &device_creator<at45db161_device>;
 
 at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AT45DB041, "AT45DB041", tag, owner, clock, "at45db041", __FILE__),
-	device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this),
+	write_so(*this)
 {
 }
 
 
 at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this),
+	write_so(*this)
 {
 }
 
@@ -90,6 +92,8 @@ void at45db041_device::device_start()
 	save_item(NAME(m_pin.wp));
 	save_item(NAME(m_pin.reset));
 	save_item(NAME(m_pin.busy));
+
+	write_so.resolve_safe();
 }
 
 
@@ -369,6 +373,7 @@ WRITE_LINE_MEMBER(at45db041_device::sck_w)
 		}
 		// output (part 2)
 		m_pin.so = (m_so_byte >> m_so_bits) & 1;
+		write_so(m_pin.so);
 		m_so_bits++;
 	}
 	// save sck
