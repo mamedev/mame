@@ -36,6 +36,7 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9)
 	, m_flag_handler(*this)
+	, m_halt(0)
 	, m_debugger_temp(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
