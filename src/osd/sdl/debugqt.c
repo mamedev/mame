@@ -35,9 +35,6 @@
 #include "debugqtmemorywindow.h"
 #include "debugqtbreakpointswindow.h"
 
-#include "debugqt.h"
-
-
 //============================================================
 //  "Global" variables to make QT happy
 //============================================================
@@ -323,11 +320,14 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 //  Available for video.*
 //============================================================
 
-void debugwin_update_during_game(running_machine &machine)
+void xxx_osd_interface::debugger_update()
 {
 	qApp->processEvents(QEventLoop::AllEvents, 1);
 }
 
+void xxx_osd_interface::debugger_exit()
+{
+}
 
 
 #else
@@ -340,7 +340,6 @@ void debugwin_update_during_game(running_machine &machine)
 #include "osdepend.h"
 #include "osdsdl.h"
 
-// win32 stubs for linking
 void sdl_osd_interface::init_debugger()
 {
 }
@@ -349,8 +348,11 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
 }
 
-// win32 stubs for linking
-void debugwin_update_during_game(running_machine &machine)
+void sdl_osd_interface::debugger_update()
+{
+}
+
+void sdl_osd_interface::debugger_exit()
 {
 }
 

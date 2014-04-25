@@ -8972,7 +8972,6 @@ src/osd/osdmini/osdmini.h svneol=native#text/plain
 src/osd/osdmini/osdmini.mak svneol=native#text/plain
 src/osd/osdnet.c svneol=native#text/plain
 src/osd/osdnet.h svneol=native#text/plain
-src/osd/portmedia/pmmidi.inc svneol=native#text/plain
 src/osd/sdl/README_SDL20.txt svneol=native#text/plain
 src/osd/sdl/SDL1211_opengl.h svneol=native#text/plain
 src/osd/sdl/SDLMain_tmpl.h svneol=native#text/plain
@@ -8982,7 +8981,6 @@ src/osd/sdl/build.mak svneol=native#text/plain
 src/osd/sdl/debugosx.h svneol=native#text/plain
 src/osd/sdl/debugosx.m svneol=native#text/plain
 src/osd/sdl/debugqt.c svneol=native#text/plain
-src/osd/sdl/debugqt.h svneol=native#text/plain
 src/osd/sdl/debugqtbreakpointswindow.c svneol=native#text/plain
 src/osd/sdl/debugqtbreakpointswindow.h svneol=native#text/plain
 src/osd/sdl/debugqtdasmwindow.c svneol=native#text/plain
@@ -9027,7 +9025,6 @@ src/osd/sdl/man/mess.6 svneol=LF#text/plain eol=lf
 src/osd/sdl/man/romcmp.1 svneol=LF#text/plain eol=lf
 src/osd/sdl/man/testkeys.1 svneol=LF#text/plain eol=lf
 src/osd/sdl/netdev.c svneol=native#text/plain
-src/osd/sdl/netdev.h svneol=native#text/plain
 src/osd/sdl/netdev_pcap.c svneol=native#text/plain
 src/osd/sdl/netdev_pcap.h svneol=native#text/plain
 src/osd/sdl/netdev_pcap_osx.c svneol=native#text/plain
@@ -9046,7 +9043,6 @@ src/osd/sdl/sdlfile.c svneol=native#text/plain
 src/osd/sdl/sdlfile.h svneol=native#text/plain
 src/osd/sdl/sdlinc.h svneol=native#text/plain
 src/osd/sdl/sdlmain.c svneol=native#text/plain
-src/osd/sdl/sdlmidi.c svneol=native#text/plain
 src/osd/sdl/sdlmisc_os2.c svneol=native#text/plain
 src/osd/sdl/sdlmisc_unix.c svneol=native#text/plain
 src/osd/sdl/sdlmisc_win32.c svneol=native#text/plain
@@ -9102,7 +9098,6 @@ src/osd/windows/d3dhlsl.c svneol=native#text/plain
 src/osd/windows/d3dhlsl.h svneol=native#text/plain
 src/osd/windows/d3dintf.h svneol=native#text/plain
 src/osd/windows/debugwin.c svneol=native#text/plain
-src/osd/windows/debugwin.h svneol=native#text/plain
 src/osd/windows/drawd3d.c svneol=native#text/plain
 src/osd/windows/drawd3d.h svneol=native#text/plain
 src/osd/windows/drawdd.c svneol=native#text/plain
@@ -9118,7 +9113,6 @@ src/osd/windows/mame.ico -text svneol=unset#image/x-icon
 src/osd/windows/mame.man svneol=CRLF#text/plain eol=crlf
 src/osd/windows/mame.rc svneol=CRLF#text/plain eol=crlf
 src/osd/windows/netdev.c svneol=native#text/plain
-src/osd/windows/netdev.h svneol=native#text/plain
 src/osd/windows/netdev_pcap.c svneol=native#text/plain
 src/osd/windows/netdev_pcap.h svneol=native#text/plain
 src/osd/windows/osinline.h svneol=native#text/plain
@@ -9141,7 +9135,6 @@ src/osd/windows/winfile.h svneol=native#text/plain
 src/osd/windows/winmain.c svneol=native#text/plain
 src/osd/windows/winmain.h svneol=native#text/plain
 src/osd/windows/winmenu.c svneol=native#text/plain
-src/osd/windows/winmidi.c svneol=native#text/plain
 src/osd/windows/winmisc.c svneol=native#text/plain
 src/osd/windows/winprefix.h svneol=native#text/plain
 src/osd/windows/winptty.c svneol=native#text/plain

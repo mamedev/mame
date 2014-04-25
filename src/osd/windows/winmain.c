@@ -39,9 +39,6 @@
 #include "winutil.h"
 #include "debugger.h"
 #include "winfile.h"
-#ifdef USE_NETWORK
-#include "netdev.h"
-#endif
 
 #define DEBUG_SLOW_LOCKS    0
 
@@ -466,8 +463,6 @@ int main(int argc, char *argv[])
 		FreeConsole();
 	}
 
-	osd_init_midi();
-
 	// parse config and cmdline options
 	DWORD result = 0;
 	{
@@ -476,9 +471,6 @@ int main(int argc, char *argv[])
 		cli_frontend frontend(options, osd);
 		result = frontend.execute(argc, argv);
 	}
-
-	osd_shutdown_midi();
-
 	// free symbols
 	symbols = NULL;
 	return result;
@@ -617,9 +609,6 @@ void windows_osd_interface::init(running_machine &machine)
 	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
 		SetThreadPriority(GetCurrentThread(), options.priority());
 
-	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_exit), &machine));
-
 	// get number of processors
 	stemp = options.numprocessors();
 
@@ -636,13 +625,8 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// initialize the subsystems
-	winvideo_init(machine);
-	winsound_init(machine);
-	wininput_init(machine);
-	winoutput_init(machine);
-#ifdef USE_NETWORK
-	winnetdev_init(machine);
-#endif
+	osd_interface::init_subsystems();
+	
 	// notify listeners of screen configuration
 	astring tempstring;
 	for (win_window_info *info = win_window_list; info != NULL; info = info->next)
@@ -698,7 +682,7 @@ void windows_osd_interface::init(running_machine &machine)
 //  osd_exit
 //============================================================
 
-void windows_osd_interface::osd_exit(running_machine &machine)
+void windows_osd_interface::osd_exit()
 {
 	// no longer have a machine
 	g_current_machine = NULL;
@@ -706,10 +690,8 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 	// cleanup sockets
 	win_cleanup_sockets();
 
-	#ifdef USE_NETWORK
-	winnetdev_deinit(machine);
-	#endif
-
+	osd_interface::exit_subsystems();
+	
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
 	{
@@ -740,7 +722,7 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 		timeEndPeriod(caps.wPeriodMin);
 
 	// one last pass at events
-	winwindow_process_events(machine, 0, 0);
+	winwindow_process_events(machine(), 0, 0);
 }
 
 

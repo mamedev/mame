@@ -34,7 +34,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "input.h"
-#include "debugwin.h"
 #include "video.h"
 #include "strconv.h"
 #include "config.h"
@@ -212,10 +211,6 @@ static const TCHAR *const default_axis_name[] =
 //============================================================
 //  PROTOTYPES
 //============================================================
-
-static void wininput_pause(running_machine &machine);
-static void wininput_resume(running_machine &machine);
-static void wininput_exit(running_machine &machine);
 
 // device list management
 static void device_list_poll_devices(device_info *devlist_head);
@@ -463,31 +458,27 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 
 
 //============================================================
-//  wininput_init
+//  input_init
 //============================================================
 
-void wininput_init(running_machine &machine)
+bool windows_osd_interface::input_init()
 {
-	// we need pause and exit callbacks
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(wininput_pause), &machine));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(wininput_resume), &machine));
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wininput_exit), &machine));
-
 	// allocate a lock for input synchronizations, since messages sometimes come from another thread
 	input_lock = osd_lock_alloc();
 	assert_always(input_lock != NULL, "Failed to allocate input_lock");
 
 	// decode the options
-	lightgun_shared_axis_mode = downcast<windows_options &>(machine.options()).dual_lightgun();
+	lightgun_shared_axis_mode = downcast<windows_options &>(machine().options()).dual_lightgun();
 
 	// initialize RawInput and DirectInput (RawInput first so we can fall back)
-	rawinput_init(machine);
-	dinput_init(machine);
-	win32_init(machine);
+	rawinput_init(machine());
+	dinput_init(machine());
+	win32_init(machine());
 
 	// poll once to get the initial states
 	input_enabled = true;
-	wininput_poll(machine);
+	wininput_poll(machine());
+	return true;
 }
 
 
@@ -495,13 +486,13 @@ void wininput_init(running_machine &machine)
 //  wininput_pause
 //============================================================
 
-static void wininput_pause(running_machine &machine)
+void windows_osd_interface::input_pause()
 {
 	// keep track of the paused state
 	input_paused = true;
 }
 
-static void wininput_resume(running_machine &machine)
+void windows_osd_interface::input_resume()
 {
 	// keep track of the paused state
 	input_paused = false;
@@ -512,7 +503,7 @@ static void wininput_resume(running_machine &machine)
 //  wininput_exit
 //============================================================
 
-static void wininput_exit(running_machine &machine)
+void windows_osd_interface::input_exit()
 {
 	// acquire the lock and turn off input (this ensures everyone is done)
 	osd_lock_acquire(input_lock);

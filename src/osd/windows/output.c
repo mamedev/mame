@@ -13,7 +13,7 @@
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
-
+#include "winmain.h"
 // MAMEOS headers
 #include "output.h"
 
@@ -66,7 +66,6 @@ static UINT                 om_mame_get_id_string;
 //  FUNCTION PROTOTYPES
 //============================================================
 
-static void winoutput_exit(running_machine &machine);
 static int create_window_class(void);
 static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 static LRESULT register_client(HWND hwnd, LPARAM id);
@@ -77,15 +76,12 @@ static void notifier_callback(const char *outname, INT32 value, void *param);
 
 
 //============================================================
-//  winoutput_init
+//  output_init
 //============================================================
 
-void winoutput_init(running_machine &machine)
+bool windows_osd_interface::output_init()
 {
 	int result;
-
-	// ensure we get cleaned up
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(winoutput_exit), &machine));
 
 	// reset globals
 	clientlist = NULL;
@@ -110,7 +106,7 @@ void winoutput_init(running_machine &machine)
 	assert(output_hwnd != NULL);
 
 	// set a pointer to the running machine
-	SetWindowLongPtr(output_hwnd, GWLP_USERDATA, (LONG_PTR)&machine);
+	SetWindowLongPtr(output_hwnd, GWLP_USERDATA, (LONG_PTR)&machine());
 
 	// allocate message ids
 	om_mame_start = RegisterWindowMessage(OM_MAME_START);
@@ -132,14 +128,16 @@ void winoutput_init(running_machine &machine)
 
 	// register a notifier for output changes
 	output_set_notifier(NULL, notifier_callback, NULL);
+	
+	return true;
 }
 
 
 //============================================================
-//  winoutput_exit
+//  output_exit
 //============================================================
 
-static void winoutput_exit(running_machine &machine)
+void windows_osd_interface::output_exit()
 {
 	// free all the clients
 	while (clientlist != NULL)

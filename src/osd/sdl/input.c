@@ -213,10 +213,6 @@ static int sixaxis_mode;
 //  PROTOTYPES
 //============================================================
 
-static void sdlinput_pause(running_machine &machine);
-static void sdlinput_resume(running_machine &machine);
-static void sdlinput_exit(running_machine &machine);
-
 // deivce list management
 static void device_list_reset_devices(device_info *devlist_head);
 static void device_list_free_devices(device_info **devlist_head);
@@ -1389,7 +1385,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 //  sdlinput_init
 //============================================================
 
-void sdlinput_init(running_machine &machine)
+bool sdl_osd_interface::input_init()
 {
 	keyboard_list = NULL;
 	joystick_list = NULL;
@@ -1398,37 +1394,32 @@ void sdlinput_init(running_machine &machine)
 
 	app_has_mouse_focus = 1;
 
-	// we need pause and exit callbacks
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sdlinput_pause), &machine));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(sdlinput_resume), &machine));
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdlinput_exit), &machine));
-
 	// allocate a lock for input synchronizations
 	input_lock = osd_lock_alloc();
 	assert_always(input_lock != NULL, "Failed to allocate input_lock");
 
 	// register the keyboards
-	sdlinput_register_keyboards(machine);
+	sdlinput_register_keyboards(machine());
 
 	// register the mice
-	sdlinput_register_mice(machine);
+	sdlinput_register_mice(machine());
 
 #if (USE_XINPUT)
 	// register the lightguns
-	sdlinput_register_lightguns(machine);
+	sdlinput_register_lightguns(machine());
 #endif
 
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 	{
 		osd_printf_warning("Debug Build: Disabling input grab for -debug\n");
 		mouse_enabled = 0;
 	}
 
 	// get Sixaxis special mode info
-	sixaxis_mode = downcast<sdl_options &>(machine.options()).sixaxis();
+	sixaxis_mode = downcast<sdl_options &>(machine().options()).sixaxis();
 
 	// register the joysticks
-	sdlinput_register_joysticks(machine);
+	sdlinput_register_joysticks(machine());
 
 	// now reset all devices
 	device_list_reset_devices(keyboard_list);
@@ -1437,6 +1428,7 @@ void sdlinput_init(running_machine &machine)
 #if (USE_XINPUT)
 	device_list_reset_devices(lightgun_list);
 #endif
+	return true;
 }
 
 
@@ -1444,13 +1436,13 @@ void sdlinput_init(running_machine &machine)
 //  sdlinput_pause
 //============================================================
 
-static void sdlinput_pause(running_machine &machine)
+void sdl_osd_interface::input_pause()
 {
 	// keep track of the paused state
 	input_paused = true;
 }
 
-static void sdlinput_resume(running_machine &machine)
+void sdl_osd_interface::input_resume()
 {
 	// keep track of the paused state
 	input_paused = false;
@@ -1461,14 +1453,14 @@ static void sdlinput_resume(running_machine &machine)
 //  sdlinput_exit
 //============================================================
 
-static void sdlinput_exit(running_machine &machine)
+void sdl_osd_interface::input_exit()
 {
 	// free the lock
 	osd_lock_free(input_lock);
 
 	// deregister
 
-	sdlinput_deregister_joysticks(machine);
+	sdlinput_deregister_joysticks(machine());
 
 	// free all devices
 	device_list_free_devices(&keyboard_list);

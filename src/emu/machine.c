@@ -110,7 +110,7 @@ static char giant_string_buffer[65536] = { 0 };
 //  running_machine - constructor
 //-------------------------------------------------
 
-running_machine::running_machine(const machine_config &_config, osd_interface &osd, bool exit_to_game_select)
+running_machine::running_machine(const machine_config &_config, osd_interface &osd)
 	: firstcpu(NULL),
 		primary_screen(NULL),
 		debug_flags(0),
@@ -125,8 +125,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_paused(false),
 		m_hard_reset_pending(false),
 		m_exit_pending(false),
-		m_exit_to_game_select(exit_to_game_select),
-		m_new_driver_pending(NULL),
 		m_soft_reset_timer(NULL),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
@@ -447,16 +445,7 @@ int running_machine::run(bool firstrun)
 
 void running_machine::schedule_exit()
 {
-	// if we are in-game but we started with the select game menu, return to that instead
-	if (m_exit_to_game_select && options().system_name()[0] != 0)
-	{
-		options().set_system_name("");
-		ui_menu_select_game::force_game_select(*this, &render().ui_container());
-	}
-
-	// otherwise, exit for real
-	else
-		m_exit_pending = true;
+	m_exit_pending = true;
 
 	// if we're executing, abort out immediately
 	m_scheduler.eat_all_cycles();
@@ -492,21 +481,6 @@ void running_machine::schedule_soft_reset()
 
 	// we can't be paused since the timer needs to fire
 	resume();
-
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
-}
-
-
-//-------------------------------------------------
-//  schedule_new_driver - schedule a new game to
-//  be loaded
-//-------------------------------------------------
-
-void running_machine::schedule_new_driver(const game_driver &driver)
-{
-	m_hard_reset_pending = true;
-	m_new_driver_pending = &driver;
 
 	// if we're executing, abort out immediately
 	m_scheduler.eat_all_cycles();

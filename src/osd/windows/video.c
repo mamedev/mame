@@ -25,7 +25,6 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
-#include "debugwin.h"
 #include "strconv.h"
 #include "config.h"
 
@@ -51,7 +50,6 @@ static win_monitor_info *primary_monitor;
 //  PROTOTYPES
 //============================================================
 
-static void winvideo_exit(running_machine &machine);
 static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(windows_options &options, int index);
@@ -65,43 +63,38 @@ static void get_resolution(const char *defdata, const char *data, win_window_con
 
 
 //============================================================
-//  winvideo_init
+//  video_init
 //============================================================
 
-void winvideo_init(running_machine &machine)
+bool windows_osd_interface::video_init()
 {
 	int index;
 
-	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(winvideo_exit), &machine));
-
 	// extract data from the options
-	extract_video_config(machine);
+	extract_video_config(machine());
 
 	// set up monitors first
 	init_monitors();
 
 	// initialize the window system so we can make windows
-	winwindow_init(machine);
+	winwindow_init(machine());
 
 	// create the windows
-	windows_options &options = downcast<windows_options &>(machine.options());
+	windows_options &options = downcast<windows_options &>(machine().options());
 	for (index = 0; index < video_config.numscreens; index++)
-		winwindow_video_window_create(machine, index, pick_monitor(options, index), &video_config.window[index]);
+		winwindow_video_window_create(machine(), index, pick_monitor(options, index), &video_config.window[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->hwnd);
 
-	// possibly create the debug window, but don't show it yet
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		machine.osd().init_debugger();
+	return true;
 }
 
 
 //============================================================
-//  winvideo_exit
+//  video_exit
 //============================================================
 
-static void winvideo_exit(running_machine &machine)
+void windows_osd_interface::video_exit()
 {
 	// free all of our monitor information
 	while (win_monitor_list != NULL)
@@ -186,6 +179,9 @@ void windows_osd_interface::update(bool skip_redraw)
 	winwindow_process_events(machine(), TRUE, FALSE);
 	wininput_poll(machine());
 	check_osd_inputs(machine());
+	// if we're running, disable some parts of the debugger
+	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+		debugger_update();
 }
 
 

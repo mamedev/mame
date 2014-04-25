@@ -150,7 +150,7 @@ class running_machine
 
 public:
 	// construction/destruction
-	running_machine(const machine_config &config, osd_interface &osd, bool exit_to_game_select = false);
+	running_machine(const machine_config &config, osd_interface &osd);
 	~running_machine();
 
 	// getters
@@ -176,8 +176,6 @@ public:
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
-	bool new_driver_pending() const { return (m_new_driver_pending != NULL); }
-	const char *new_driver_name() const { return m_new_driver_pending->name; }
 	bool ui_active() const { return m_ui_active; }
 	const char *basename() const { return m_basename; }
 	int sample_rate() const { return m_sample_rate; }
@@ -295,8 +293,6 @@ private:
 	bool                    m_paused;               // paused?
 	bool                    m_hard_reset_pending;   // is a hard reset pending?
 	bool                    m_exit_pending;         // is an exit pending?
-	bool                    m_exit_to_game_select;  // when we exit, go we go back to the game select?
-	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
 
 	// watchdog state

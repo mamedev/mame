@@ -49,11 +49,6 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
-
-#if !defined(NO_DEBUGGER)
-#include "debugqt.h"
-#endif
-
 #include "osdsdl.h"
 #include "sdlos.h"
 
@@ -85,7 +80,6 @@ static sdl_monitor_info *sdl_monitor_list;
 //  PROTOTYPES
 //============================================================
 
-static void video_exit(running_machine &machine);
 static void init_monitors(void);
 static sdl_monitor_info *pick_monitor(sdl_options &options, int index);
 
@@ -101,38 +95,35 @@ static void get_resolution(const char *defdata, const char *data, sdl_window_con
 //  sdlvideo_init
 //============================================================
 
-int sdlvideo_init(running_machine &machine)
+bool sdl_osd_interface::video_init()
 {
 	int index;
 
 	// extract data from the options
-	extract_video_config(machine);
-
-	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_exit), &machine));
+	extract_video_config(machine());
 
 	// set up monitors first
 	init_monitors();
 
 	// we need the beam width in a float, contrary to what the core does.
-	video_config.beamwidth = machine.options().beam();
+	video_config.beamwidth = machine().options().beam();
 
 	// initialize the window system so we can make windows
-	if (sdlwindow_init(machine))
-		return 1;
+	if (sdlwindow_init(machine()))
+		return false;
 
 	// create the windows
-	sdl_options &options = downcast<sdl_options &>(machine.options());
+	sdl_options &options = downcast<sdl_options &>(machine().options());
 	for (index = 0; index < video_config.numscreens; index++)
 	{
 		sdl_window_config conf;
 		memset(&conf, 0, sizeof(conf));
-		extract_window_config(machine, index, &conf);
-		if (sdlwindow_video_window_create(machine, index, pick_monitor(options, index), &conf))
-			return 1;
+		extract_window_config(machine(), index, &conf);
+		if (sdlwindow_video_window_create(machine(), index, pick_monitor(options, index), &conf))
+			return false;
 	}
 
-	return 0;
+	return true;
 }
 
 
@@ -140,7 +131,7 @@ int sdlvideo_init(running_machine &machine)
 //  video_exit
 //============================================================
 
-static void video_exit(running_machine &machine)
+void sdl_osd_interface::video_exit()
 {
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
@@ -341,10 +332,8 @@ void sdl_osd_interface::update(bool skip_redraw)
 	sdlinput_poll(machine());
 	check_osd_inputs(machine());
 
-#if !defined(NO_DEBUGGER)
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugwin_update_during_game(machine());
-#endif
+		debugger_update();
 }
 
 

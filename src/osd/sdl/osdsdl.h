@@ -238,6 +238,8 @@ public:
 	// debugger overridables
 	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
+	virtual void debugger_exit();
 
 	// audio overridables
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
@@ -251,8 +253,26 @@ public:
 	virtual void font_close(osd_font font);
 	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
+	virtual bool video_init();
+	virtual bool sound_init();
+	virtual bool input_init();
+	virtual void input_pause();
+	virtual void input_resume();
+	virtual bool output_init();
+	#ifdef USE_NETWORK
+	virtual bool network_init();
+	#endif
+
+	virtual void video_exit();
+	virtual void sound_exit();
+	virtual void input_exit();
+	virtual void output_exit();
+	#ifdef USE_NETWORK
+	virtual void network_exit();
+	#endif
+
 private:
-	static void osd_exit(running_machine &machine);
+	virtual void osd_exit();
 
 	watchdog *m_watchdog;
 

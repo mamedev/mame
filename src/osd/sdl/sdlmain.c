@@ -50,7 +50,6 @@
 #include "output.h"
 #include "osdsdl.h"
 #include "sdlos.h"
-#include "netdev.h"
 
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
@@ -370,8 +369,6 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	osd_init_midi();    // this is a blues riff in B, watch me for the changes and try to keep up...
-
 	{
 		sdl_osd_interface osd;
 		sdl_options options;
@@ -400,8 +397,6 @@ int main(int argc, char *argv[])
 	}
 	#endif
 	#endif
-
-	osd_shutdown_midi();
 
 	exit(res);
 
@@ -444,11 +439,10 @@ sdl_osd_interface::~sdl_osd_interface()
 //  osd_exit
 //============================================================
 
-void sdl_osd_interface::osd_exit(running_machine &machine)
+void sdl_osd_interface::osd_exit()
 {
-	#ifdef SDLMAME_NETWORK
-		sdlnetdev_deinit(machine);
-	#endif
+
+	osd_interface::exit_subsystems();
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
@@ -667,8 +661,6 @@ void sdl_osd_interface::init(running_machine &machine)
 		}
 		osd_sdl_info();
 	}
-	// must be before sdlvideo_init!
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_exit), &machine));
 
 	defines_verbose();
 
@@ -676,26 +668,11 @@ void sdl_osd_interface::init(running_machine &machine)
 		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		{
 			osd_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
-			osd_exit(machine);
+			osd_exit();
 			exit(-1);
 		}
 
-	if (sdlvideo_init(machine))
-	{
-		osd_exit(machine);
-		osd_printf_error("sdlvideo_init: Initialization failed!\n\n\n");
-		fflush(stderr);
-		fflush(stdout);
-		exit(-1);
-	}
-
-	sdlinput_init(machine);
-	sdlaudio_init(machine);
-	sdloutput_init(machine);
-
-#ifdef SDLMAME_NETWORK
-	sdlnetdev_init(machine);
-#endif
+	osd_interface::init_subsystems();
 
 	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);

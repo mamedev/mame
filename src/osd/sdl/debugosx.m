@@ -110,13 +110,20 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 
 
 //============================================================
-//  debugwin_update_during_game
+//  debugger_update
 //============================================================
 
-void debugwin_update_during_game(running_machine &machine)
+void sdl_osd_interface::debugger_update()
 {
 }
 
+//============================================================
+//  debugger_exit
+//============================================================
+
+void sdl_osd_interface::debugger_exit()
+{
+}
 
 //============================================================
 //  debugwin_view_update

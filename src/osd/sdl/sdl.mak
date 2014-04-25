@@ -397,7 +397,6 @@ OSDOBJS = \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
-	$(SDLOBJ)/sdlmidi.o
 
 ifdef NO_USE_MIDI
 DEFS += -DDISABLE_MIDI=1
