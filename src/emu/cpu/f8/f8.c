@@ -82,6 +82,7 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	, m_a(0)
 	, m_w(0)
 	, m_is(0)
+	, m_pc(0)
 {
 	memset(m_r, 0x00, sizeof(m_r));
 }
