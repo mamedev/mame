@@ -31,4 +31,8 @@ void sdl_osd_interface::debugger_update()
 {
 }
 
+void sdl_osd_interface::debugger_exit()
+{
+}
+
 #endif

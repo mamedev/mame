@@ -320,11 +320,14 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 //  Available for video.*
 //============================================================
 
-void sdl_osd_interface::debugger_update()
+void xxx_osd_interface::debugger_update()
 {
 	qApp->processEvents(QEventLoop::AllEvents, 1);
 }
 
+void xxx_osd_interface::debugger_exit()
+{
+}
 
 
 #else
@@ -346,6 +349,10 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 }
 
 void sdl_osd_interface::debugger_update()
+{
+}
+
+void sdl_osd_interface::debugger_exit()
 {
 }
 
