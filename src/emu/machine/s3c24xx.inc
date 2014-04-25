@@ -94,9 +94,9 @@ void S3C24_CLASS_NAME::s3c24xx_reset()
 
 int S3C24_CLASS_NAME::iface_core_pin_r(int pin)
 {
-	if (!m_pin_r.isnull())
+	if (!m_pin_r_cb.isnull())
 	{
-		return (m_pin_r)(pin);
+		return (m_pin_r_cb)(pin);
 	}
 	else
 	{
@@ -354,7 +354,7 @@ UINT32 S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 			vram += 2;
 		}
 	}
-	if (m_iface_lcd.flags & S3C24XX_INTERFACE_LCD_REVERSE)
+	if (m_flags & S3C24XX_INTERFACE_LCD_REVERSE)
 	{
 		return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
 	}
@@ -423,7 +423,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 		UINT32 data = s3c24xx_lcd_dma_read();
 		for (int j = 0; j < 32; j++)
 		{
-			if (m_iface_lcd.flags & S3C24XX_INTERFACE_LCD_REVERSE)
+			if (m_flags & S3C24XX_INTERFACE_LCD_REVERSE)
 			{
 				*scanline++ = s3c24xx_get_color_stn_01( data & 0x01);
 				data = data >> 1;
@@ -2292,25 +2292,25 @@ void S3C24_CLASS_NAME::s3c24xx_iic_reset()
 
 void S3C24_CLASS_NAME::iface_i2c_scl_w( int state)
 {
-	if (!m_scl_w.isnull())
+	if (!m_scl_w_cb.isnull())
 	{
-		(m_scl_w)( state);
+		(m_scl_w_cb)( state);
 	}
 }
 
 void S3C24_CLASS_NAME::iface_i2c_sda_w(int state)
 {
-	if (!m_sda_w.isnull())
+	if (!m_sda_w_cb.isnull())
 	{
-		(m_sda_w)(state);
+		(m_sda_w_cb)(state);
 	}
 }
 
 int S3C24_CLASS_NAME::iface_i2c_sda_r()
 {
-	if (!m_sda_r.isnull())
+	if (!m_sda_r_cb.isnull())
 	{
-		return (m_sda_r)();
+		return (m_sda_r_cb)();
 	}
 	else
 	{
@@ -2528,9 +2528,9 @@ void S3C24_CLASS_NAME::s3c24xx_iis_reset()
 
 void S3C24_CLASS_NAME::iface_i2s_data_w(int ch, UINT16 data)
 {
-	if (!m_i2s_data_w.isnull())
+	if (!m_data_w_cb.isnull())
 	{
-		(m_i2s_data_w)( ch, data, 0);
+		(m_data_w_cb)( ch, data, 0);
 	}
 }
 
@@ -2768,7 +2768,7 @@ void S3C24_CLASS_NAME::s3c24xx_adc_reset()
 
 UINT32 S3C24_CLASS_NAME::iface_adc_data_r(int ch)
 {
-	if (!m_adc_data_r.isnull())
+	if (!m_data_r_cb.isnull())
 	{
 		int offs = ch;
 		#if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
@@ -2777,7 +2777,7 @@ UINT32 S3C24_CLASS_NAME::iface_adc_data_r(int ch)
 			offs += 2;
 		}
 		#endif
-		return (m_adc_data_r)(offs, 0);
+		return (m_data_r_cb)(offs, 0);
 	}
 	else
 	{
@@ -2992,25 +2992,25 @@ void S3C24_CLASS_NAME::s3c24xx_nand_reset()
 
 void S3C24_CLASS_NAME::iface_nand_command_w(UINT8 data)
 {
-	if (!m_command_w.isnull())
+	if (!m_command_w_cb.isnull())
 	{
-		(m_command_w)( 0, data, 0xff);
+		(m_command_w_cb)( 0, data, 0xff);
 	}
 }
 
 void S3C24_CLASS_NAME::iface_nand_address_w(UINT8 data)
 {
-	if (!m_address_w.isnull())
+	if (!m_address_w_cb.isnull())
 	{
-		(m_address_w)( 0, data, 0xff);
+		(m_address_w_cb)( 0, data, 0xff);
 	}
 }
 
 UINT8 S3C24_CLASS_NAME::iface_nand_data_r()
 {
-	if (!m_nand_data_r.isnull())
+	if (!m_nand_data_r_cb.isnull())
 	{
-		return (m_nand_data_r)( 0, 0xff);
+		return (m_nand_data_r_cb)( 0, 0xff);
 	}
 	else
 	{
@@ -3020,9 +3020,9 @@ UINT8 S3C24_CLASS_NAME::iface_nand_data_r()
 
 void S3C24_CLASS_NAME::iface_nand_data_w(UINT8 data)
 {
-	if (!m_nand_data_w.isnull())
+	if (!m_nand_data_w_cb.isnull())
 	{
-		(m_nand_data_w)(0, data, 0xff);
+		(m_nand_data_w_cb)(0, data, 0xff);
 	}
 }
 
@@ -3473,20 +3473,20 @@ void S3C24_CLASS_NAME::s3c24xx_device_reset()
 void S3C24_CLASS_NAME::s3c24xx_device_start()
 {
 	verboselog( machine(), 1, "s3c24xx device start\n");
-	m_pin_r.resolve(m_iface_core.pin_r, *this);
-	m_pin_w.resolve(m_iface_core.pin_w, *this);
+	m_pin_r_cb.resolve();
+	m_pin_w_cb.resolve_safe();
 	m_port_r.resolve(m_iface_gpio.port_r, *this);
 	m_port_w.resolve(m_iface_gpio.port_w, *this);
-	m_scl_w.resolve(m_iface_i2c.scl_w, *this);
-	m_sda_r.resolve(m_iface_i2c.sda_r, *this);
-	m_sda_w.resolve(m_iface_i2c.sda_w, *this);
-	m_adc_data_r.resolve(m_iface_adc.data_r, *this);
-	m_i2s_data_w.resolve(m_iface_i2s.data_w, *this);
+	m_scl_w_cb.resolve();
+	m_sda_r_cb.resolve();
+	m_sda_w_cb.resolve();
+	m_data_r_cb.resolve();
+	m_data_w_cb.resolve();
 	#if !defined(DEVICE_S3C2400)
-	m_command_w.resolve(m_iface_nand.command_w, *this);
-	m_address_w.resolve(m_iface_nand.address_w, *this);
-	m_nand_data_r.resolve(m_iface_nand.data_r, *this);
-	m_nand_data_w.resolve(m_iface_nand.data_w, *this);
+	m_command_w_cb.resolve();
+	m_address_w_cb.resolve();
+	m_nand_data_r_cb.resolve();
+	m_nand_data_w_cb.resolve();
 	#endif
 	for (int i = 0; i < 5; i++)
 	{

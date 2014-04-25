@@ -561,18 +561,8 @@ INPUT_PORTS_END
 
 static const s3c2410_interface bballoon_s3c2410_intf =
 {
-	// CORE (pin read / pin write)
-	{ DEVCB_DRIVER_MEMBER32(ghosteo_state,s3c2410_core_pin_r), DEVCB_NULL },
 	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(ghosteo_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(ghosteo_state,s3c2410_gpio_port_w) },
-	// I2C (scl write / sda read / sda write)
-	{ DEVCB_DRIVER_LINE_MEMBER(ghosteo_state,s3c2410_i2c_scl_w), DEVCB_DRIVER_LINE_MEMBER(ghosteo_state,s3c2410_i2c_sda_r), DEVCB_DRIVER_LINE_MEMBER(ghosteo_state,s3c2410_i2c_sda_w) },
-	// ADC (data read)
-	{ DEVCB_NULL },
-	// I2S (data write)
-	{ DEVCB_NULL },
-	// NAND (command write / address write / data read / data write)
-	{ DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_command_w), DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_address_w), DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_data_r), DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_data_w) }
+	{ DEVCB_DRIVER_MEMBER32(ghosteo_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(ghosteo_state,s3c2410_gpio_port_w) }
 };
 
 
@@ -640,7 +630,17 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 	MCFG_PALETTE_ADD("palette", 256)
 
 
-	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf, "palette")
+	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
+	MCFG_DEVICE_CONFIG(bballoon_s3c2410_intf)
+	MCFG_S3C2410_PALETTE("palette")
+	MCFG_S3C2410_CORE_PIN_R_CB(READ32(ghosteo_state, s3c2410_core_pin_r))
+	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_scl_w))
+	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(ghosteo_state, s3c2410_i2c_sda_r))
+	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_sda_w))
+	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(ghosteo_state, s3c2410_nand_command_w))
+	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(ghosteo_state, s3c2410_nand_address_w))
+	MCFG_S3C2410_NAND_DATA_R_CB(READ8(ghosteo_state, s3c2410_nand_data_r))
+	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(ghosteo_state, s3c2410_nand_data_w))
 
 //  MCFG_NAND_ADD("nand", 0xEC, 0x75)
 //  MCFG_DEVICE_CONFIG(bballoon_nand_intf)

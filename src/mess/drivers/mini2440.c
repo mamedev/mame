@@ -211,18 +211,8 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 
 static S3C2440_INTERFACE( mini2440_s3c2440_intf )
 {
-	// CORE (pin read / pin write)
-	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_core_pin_r), DEVCB_NULL },
 	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_r), DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_w) },
-	// I2C (scl write / sda read / sda write)
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	// ADC (data read)
-	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_adc_data_r) },
-	// I2S (data write)
-	{ DEVCB_DRIVER_MEMBER16(mini2440_state,s3c2440_i2s_data_w) },
-	// NAND (command write / address write / data read / data write)
-	{ DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_command_w), DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_address_w), DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_data_r), DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_data_w) }
+	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_r), DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_w) }
 };
 
 static NAND_INTERFACE( mini2440_nand_intf )
@@ -251,7 +241,16 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_SOUND_ADD("dac2", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_S3C2440_ADD("s3c2440", 12000000, mini2440_s3c2440_intf, "palette")
+	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
+	MCFG_DEVICE_CONFIG(mini2440_s3c2440_intf)
+	MCFG_S3C2440_PALETTE("palette")
+	MCFG_S3C2440_CORE_PIN_R_CB(READ32(mini2440_state, s3c2440_core_pin_r))
+	MCFG_S3C2440_ADC_DATA_R_CB(READ32(mini2440_state, s3c2440_adc_data_r))
+	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(mini2440_state, s3c2440_i2s_data_w))
+	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(mini2440_state, s3c2440_nand_command_w))
+	MCFG_S3C2440_NAND_ADDRESS_W_CB(WRITE8(mini2440_state, s3c2440_nand_address_w))
+	MCFG_S3C2440_NAND_DATA_R_CB(READ8(mini2440_state, s3c2440_nand_data_r))
+	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(mini2440_state, s3c2440_nand_data_w))
 
 	MCFG_NAND_ADD("nand", mini2440_nand_intf)
 	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2440", s3c2440_device, frnb_w))

@@ -277,20 +277,8 @@ DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 
 static S3C2410_INTERFACE( palmz22_s3c2410_intf )
 {
-	// CORE (pin read / pin write)
-	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_core_pin_r), DEVCB_NULL },
 	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_w)},
-	// I2C (scl write / sda read / sda write)
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	// ADC (data read)
-	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_adc_data_r) },
-	// I2S (data write)
-	{ DEVCB_NULL },
-	// NAND (command write / address write / data read / data write)
-	{ DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_command_w), DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_address_w), DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_data_r), DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_data_w) },
-	// LCD (flags)
-	{ 0 }
+	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_w)}
 };
 
 static NAND_INTERFACE( palmz22_nand_intf )
@@ -313,7 +301,15 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-	MCFG_S3C2410_ADD("s3c2410", 12000000, palmz22_s3c2410_intf, "palette")
+	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
+	MCFG_DEVICE_CONFIG(palmz22_s3c2410_intf)
+	MCFG_S3C2410_PALETTE("palette")
+	MCFG_S3C2410_CORE_PIN_R_CB(READ32(palmz22_state, s3c2410_core_pin_r))
+	MCFG_S3C2410_ADC_DATA_R_CB(READ32(palmz22_state, s3c2410_adc_data_r))
+	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(palmz22_state, s3c2410_nand_command_w))
+	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(palmz22_state, s3c2410_nand_address_w))
+	MCFG_S3C2410_NAND_DATA_R_CB(READ8(palmz22_state, s3c2410_nand_data_r))
+	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(palmz22_state, s3c2410_nand_data_w))
 
 	MCFG_NAND_ADD("nand", palmz22_nand_intf)
 	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, frnb_w))

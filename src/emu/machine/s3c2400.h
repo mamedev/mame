@@ -14,13 +14,35 @@
 
 #define S3C2400_TAG "s3c2400"
 
-#define MCFG_S3C2400_ADD(_tag, _clock, _config, _palette_tag) \
-	MCFG_DEVICE_ADD(_tag, S3C2400, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+#define MCFG_S3C2400_PALETTE(_palette_tag) \
 	s3c2400_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #define S3C2400_INTERFACE(name) \
 	const s3c2400_interface(name) =
+
+#define MCFG_S3C2400_CORE_PIN_R_CB(_devcb) \
+	devcb = &s3c2400_device::set_core_pin_r_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_S3C2400_CORE_PIN_W_CB(_devcb) \
+	devcb = &s3c2400_device::set_core_pin_w_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_S3C2400_I2C_SCL_W_CB(_devcb) \
+	devcb = &s3c2400_device::set_i2c_scl_w_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_S3C2400_I2C_SDA_R_CB(_devcb) \
+	devcb = &s3c2400_device::set_i2c_sda_r_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_S3C2400_I2C_SDA_W_CB(_devcb) \
+	devcb = &s3c2400_device::set_i2c_sda_w_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_S3C2400_ADC_DATA_R_CB(_devcb) \
+	devcb = &s3c2400_device::set_adc_data_r_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_S3C2400_I2S_DATA_W_CB(_devcb) \
+	devcb = &s3c2400_device::set_i2s_data_w_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_S3C2400_LCD_FLAGS(_flags) \
+	s3c2400_device::set_lcd_flags(*device, _flags);
 
 enum
 {
@@ -37,48 +59,15 @@ enum
     TYPE DEFINITIONS
 *******************************************************************************/
 
-struct s3c2400_interface_core
-{
-	devcb_read32 pin_r;
-	devcb_write32 pin_w;
-};
-
 struct s3c2400_interface_gpio
 {
 	devcb_read32 port_r;
 	devcb_write32 port_w;
 };
 
-struct s3c2400_interface_i2c
-{
-	devcb_write_line scl_w;
-	devcb_read_line sda_r;
-	devcb_write_line sda_w;
-};
-
-struct s3c2400_interface_adc
-{
-	devcb_read32 data_r;
-};
-
-struct s3c2400_interface_i2s
-{
-	devcb_write16 data_w;
-};
-
-struct s3c2400_interface_lcd
-{
-	int flags;
-};
-
 struct s3c2400_interface
 {
-	s3c2400_interface_core m_iface_core;
 	s3c2400_interface_gpio m_iface_gpio;
-	s3c2400_interface_i2c m_iface_i2c;
-	s3c2400_interface_adc m_iface_adc;
-	s3c2400_interface_i2s m_iface_i2s;
-	s3c2400_interface_lcd m_iface_lcd;
 };
 
 /*******************************************************************************
@@ -378,6 +367,14 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
+	template<class _Object> static devcb2_base &set_core_pin_r_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_pin_r_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_core_pin_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_pin_w_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_i2c_scl_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_scl_w_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_i2c_sda_r_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_sda_r_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_i2c_sda_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_sda_w_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_adc_data_r_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_data_r_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_i2s_data_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_data_w_cb.set_callback(object); }
+	static void set_lcd_flags(device_t &device, int flags) { downcast<s3c2400_device &>(device).m_flags = flags; }
 
 	// device-level overrides
 	virtual void device_config_complete();
@@ -888,20 +885,16 @@ public:
 	s3c24xx_spi_t m_spi[S3C24XX_SPI_COUNT];
 	s3c24xx_mmc_t m_mmc;
 	required_device<device_t> m_cpu;
-	devcb_resolved_read32 m_pin_r;
-	devcb_resolved_write32 m_pin_w;
+	devcb2_read32 m_pin_r_cb;
+	devcb2_write32 m_pin_w_cb;
 	devcb_resolved_read32 m_port_r;
 	devcb_resolved_write32 m_port_w;
-	devcb_resolved_write_line m_scl_w;
-	devcb_resolved_read_line m_sda_r;
-	devcb_resolved_write_line m_sda_w;
-	devcb_resolved_read32 m_adc_data_r;
-	devcb_resolved_write16 m_i2s_data_w;
-	devcb_resolved_write8 m_command_w;
-	devcb_resolved_write8 m_address_w;
-	devcb_resolved_read8  m_nand_data_r;
-	devcb_resolved_write8 m_nand_data_w;
-
+	devcb2_write_line m_scl_w_cb;
+	devcb2_read_line m_sda_r_cb;
+	devcb2_write_line m_sda_w_cb;
+	devcb2_read32 m_data_r_cb;
+	devcb2_write16 m_data_w_cb;
+	int m_flags;
 };
 
 extern const device_type S3C2400;
