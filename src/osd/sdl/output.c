@@ -18,6 +18,7 @@
 
 // MAMEOS headers
 #include "output.h"
+#include "osdsdl.h"
 
 
 
