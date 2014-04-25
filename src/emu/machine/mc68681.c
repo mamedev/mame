@@ -133,6 +133,7 @@ void mc68681_device::device_reset()
 	CTR.d = 0;  /* Counter/Timer Preset Value */
 	m_read_vector = false;
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
+	IPCR = 0;
 
 	write_outport(OPR ^ 0xff);
 }
