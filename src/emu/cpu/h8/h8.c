@@ -197,7 +197,8 @@ void h8_device::execute_run()
 		}
 		while(bcount && icount && icount <= bcount)
 			internal_update(end_cycles - bcount);
-		do_exec_partial();
+		if(inst_substate)
+			do_exec_partial();
 	}
 	end_cycles = 0;
 }
