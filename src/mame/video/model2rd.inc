@@ -49,7 +49,7 @@
 #define MODEL2_TEXTURED
 #define MODEL2_TRANSLUCENT
 #else
-#error "Model 2 renderer: Invalif function selected!"
+#error "Model 2 renderer: Invalid function selected!"
 #endif
 
 #ifndef MODEL2_TEXTURED

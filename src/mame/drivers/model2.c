@@ -365,7 +365,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	//printf("%08x %08x (%08x)\n",m_intreq,m_intena,1<<bit);
 	model2_check_irq_state();
 
-	m_timervals[tnum] = -1;
+	m_timervals[tnum] = 0xfffff;
 	m_timerrun[tnum] = 0;
 }
 
@@ -1473,7 +1473,7 @@ WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
-/* Top Skater reads here */
+/* Top Skater reads here and discards the result */
 READ8_MEMBER(model2_state::tgpid_r)
 {
 	unsigned char ID[]={0,'T','A','H',0,'A','K','O',0,'Z','A','K',0,'M','T','K'};
@@ -1481,13 +1481,13 @@ READ8_MEMBER(model2_state::tgpid_r)
 	return ID[offset];
 }
 
+
+
 /* common map for all Model 2 versions */
 static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE("workram")
-	// "extra" data
-	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("user1", 0x1000000)
 
 	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE(geo_r, geo_w)
 	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
@@ -1520,6 +1520,9 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
+
+	// "extra" data
+	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("user1", 0x1000000)
 
 	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE(mode_w)
 
