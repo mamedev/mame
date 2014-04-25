@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="hp9835a_rom" description="HP 9835A/B Option ROMs">
+	
+	<software name="mass">
+		<description>Mass Storage</description>
+		<year>198?</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="98331A" />
+
+		<part name="rom" interface="hp9835a_rom">
+			<dataarea name="rom" size="0x4000">
+				<rom name="98331a-05_10_revb-9835-mass storage.bin" size="0x2000" crc="338457c9" sha1="152c677dba24021613d735610d37f78986f24d13" offset="0x0000" />
+				<rom name="98331a-05_20_revb-9835-mass storage.bin" size="0x2000" crc="ffdef31f" sha1="6e2ac2b237e1e8eed41a5674ba3bb960665f0f48" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="io">
+		<description>I/O</description>
+		<year>198?</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="98332A" />
+
+		<part name="rom" interface="hp9835a_rom">
+			<dataarea name="rom" size="0x8000">
+				<rom name="98332a-11_10-reva-9835-io.bin" size="0x2000" crc="58eb0fd5" sha1="deeba2fa3febd502053581974017cf8391e8642f" offset="0x0000" />
+				<rom name="98332a-11_20-reva-9835-io.bin" size="0x2000" crc="dfed5265" sha1="90b31ece6a739ab84d0b73451cd3d5f6c3c49293" offset="0x2000" />
+				<rom name="98332a-11_30-reva-9835-io.bin" size="0x2000" crc="cdb4fce3" sha1="c34f527a4c59a0ded7823ee55954e0e4c563ebd8" offset="0x4000" />
+				<rom name="98332a-11_40-reva-9835-io.bin" size="0x2000" crc="5ae82548" sha1="87f5b17fc5254032fbb75c31d295130d72d76ab9" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="asmexec">
+		<description>Assembly Execution</description>
+		<year>198?</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="98338A" />
+
+		<part name="rom" interface="hp9835a_rom">
+			<dataarea name="rom" size="0x2000">
+				<rom name="98338a-13_50-reva-9835-assembly_execution.bin" size="0x2000" crc="af3d703e" sha1="cbc41b824b51eb809c3810f335839ffac8970b3d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="asmdev">
+		<description>Assembly Language Development &amp; Execution</description>
+		<year>198?</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="98339A" />
+
+		<part name="rom" interface="hp9835a_rom">
+			<dataarea name="rom" size="0x4000">
+				<rom name="98339a-13_60-revb-9835-assembly_execution_and_development.bin" size="0x2000" crc="e91a6bd7" sha1="7707b6c6a20713d37c7a6538062fa1d78c29de1e" offset="0x0000" />
+				<rom name="98339a-13_70-revb-9835-assembly_execution_and_development.bin" size="0x2000" crc="129a2fca" sha1="4b8b9e704dca3341aedb27dfcf37ef7f45e7d463" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
