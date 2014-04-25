@@ -926,8 +926,12 @@ void z80dart_channel::control_write(UINT8 data)
 	case 2:
 		// interrupt vector
 		if (m_index == z80dart_device::CHANNEL_B)
-			m_rr[2] = ( m_rr[2] & 0x0e ) | ( m_wr[2] & 0xF1);;
-
+		{
+			if(m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR)
+				m_rr[2] = ( m_rr[2] & 0x0e ) | ( m_wr[2] & 0xF1);
+			else
+				m_rr[2] = m_wr[2];
+		}
 		m_uart->check_interrupts();
 		LOG(("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", m_owner->tag(), 'A' + m_index, data));
 		break;
