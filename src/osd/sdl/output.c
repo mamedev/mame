@@ -17,7 +17,6 @@
 #include "emu.h"
 
 // MAMEOS headers
-#include "output.h"
 #include "osdsdl.h"
 
 
@@ -68,7 +67,7 @@ PID_CAST osd_getpid(void)
 }
 
 //============================================================
-//  sdloutput_init
+//  output_init
 //============================================================
 
 bool sdl_osd_interface::output_init()

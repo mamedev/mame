@@ -47,7 +47,6 @@
 // OSD headers
 #include "video.h"
 #include "input.h"
-#include "output.h"
 #include "osdsdl.h"
 #include "sdlos.h"
 

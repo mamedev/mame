@@ -29,7 +29,6 @@
 #include "winmain.h"
 #include "window.h"
 #include "video.h"
-#include "sound.h"
 #include "input.h"
 #include "output.h"
 #include "config.h"

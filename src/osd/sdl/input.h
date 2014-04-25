@@ -18,7 +18,6 @@
 //  PROTOTYPES
 //============================================================
 
-void sdlinput_init(running_machine &machine);
 void sdlinput_poll(running_machine &machine);
 int  sdlinput_should_hide_mouse(running_machine &machine);
 
