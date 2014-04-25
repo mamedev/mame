@@ -45,6 +45,7 @@ s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, d
 		m_cpu(*this, ":maincpu"),
 		m_pin_r_cb(*this),
 		m_pin_w_cb(*this),
+		m_port_w_cb(*this),
 		m_scl_w_cb(*this),
 		m_sda_r_cb(*this),
 		m_sda_w_cb(*this),

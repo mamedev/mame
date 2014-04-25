@@ -279,7 +279,7 @@ DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 static S3C2410_INTERFACE( hp49gp_s3c2410_intf )
 {
 	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(hp49gp_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(hp49gp_state,s3c2410_gpio_port_w) }
+	{ DEVCB_DRIVER_MEMBER32(hp49gp_state,s3c2410_gpio_port_r) }
 };
 
 static MACHINE_CONFIG_START( hp49gp, hp49gp_state )
@@ -301,6 +301,7 @@ static MACHINE_CONFIG_START( hp49gp, hp49gp_state )
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_DEVICE_CONFIG(hp49gp_s3c2410_intf)
 	MCFG_S3C2410_PALETTE("palette")
+	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(hp49gp_state, s3c2410_gpio_port_w))
 	MCFG_S3C2410_LCD_FLAGS(S3C24XX_INTERFACE_LCD_REVERSE)
 MACHINE_CONFIG_END
 

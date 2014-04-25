@@ -183,7 +183,7 @@ DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
 static S3C2440_INTERFACE( gizmondo_s3c2440_intf )
 {
 	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(gizmondo_state,s3c2440_gpio_port_r), DEVCB_DRIVER_MEMBER32(gizmondo_state,s3c2440_gpio_port_w) }
+	{ DEVCB_DRIVER_MEMBER32(gizmondo_state,s3c2440_gpio_port_r) }
 };
 
 static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
@@ -206,6 +206,7 @@ static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_DEVICE_CONFIG(gizmondo_s3c2440_intf)
 	MCFG_S3C2440_PALETTE("palette")
+	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(gizmondo_state, s3c2440_gpio_port_w))
 
 	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 

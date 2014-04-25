@@ -1766,9 +1766,9 @@ UINT32 S3C24_CLASS_NAME::iface_gpio_port_r(int port, UINT32 mask)
 
 void S3C24_CLASS_NAME::iface_gpio_port_w(int port, UINT32 mask, UINT32 data)
 {
-	if (!m_port_w.isnull())
+	if (!m_port_w_cb.isnull())
 	{
-		(m_port_w)( port, data, mask );
+		(m_port_w_cb)( port, data, mask );
 	}
 }
 
@@ -3476,7 +3476,7 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	m_pin_r_cb.resolve();
 	m_pin_w_cb.resolve_safe();
 	m_port_r.resolve(m_iface_gpio.port_r, *this);
-	m_port_w.resolve(m_iface_gpio.port_w, *this);
+	m_port_w_cb.resolve();
 	m_scl_w_cb.resolve();
 	m_sda_r_cb.resolve();
 	m_sda_w_cb.resolve();

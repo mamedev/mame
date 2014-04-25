@@ -25,6 +25,9 @@
 #define MCFG_S3C2440_CORE_PIN_W_CB(_devcb) \
 	devcb = &s3c2440_device::set_core_pin_w_callback(*device, DEVCB2_##_devcb);
 	
+#define MCFG_S3C2440_GPIO_PORT_W_CB(_devcb) \
+	devcb = &s3c2440_device::set_gpio_port_w_callback(*device, DEVCB2_##_devcb);
+	
 #define MCFG_S3C2440_I2C_SCL_W_CB(_devcb) \
 	devcb = &s3c2440_device::set_i2c_scl_w_callback(*device, DEVCB2_##_devcb);
 
@@ -83,7 +86,6 @@ enum
 struct s3c2440_interface_gpio
 {
 	devcb_read32 port_r;
-	devcb_write32 port_w;
 };
 
 struct s3c2440_interface
@@ -489,6 +491,7 @@ public:
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	template<class _Object> static devcb2_base &set_core_pin_r_callback(device_t &device, _Object object) { return downcast<s3c2440_device &>(device).m_pin_r_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_core_pin_w_callback(device_t &device, _Object object) { return downcast<s3c2440_device &>(device).m_pin_w_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_gpio_port_w_callback(device_t &device, _Object object) { return downcast<s3c2440_device &>(device).m_port_w_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_i2c_scl_w_callback(device_t &device, _Object object) { return downcast<s3c2440_device &>(device).m_scl_w_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_i2c_sda_r_callback(device_t &device, _Object object) { return downcast<s3c2440_device &>(device).m_sda_r_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_i2c_sda_w_callback(device_t &device, _Object object) { return downcast<s3c2440_device &>(device).m_sda_w_cb.set_callback(object); }
@@ -1150,7 +1153,7 @@ public:
 	devcb2_read32 m_pin_r_cb;
 	devcb2_write32 m_pin_w_cb;
 	devcb_resolved_read32 m_port_r;
-	devcb_resolved_write32 m_port_w;
+	devcb2_write32 m_port_w_cb;
 	devcb2_write_line m_scl_w_cb;
 	devcb2_read_line m_sda_r_cb;
 	devcb2_write_line m_sda_w_cb;

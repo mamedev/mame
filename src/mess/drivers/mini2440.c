@@ -212,7 +212,7 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 static S3C2440_INTERFACE( mini2440_s3c2440_intf )
 {
 	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_r), DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_w) }
+	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_r) }
 };
 
 static NAND_INTERFACE( mini2440_nand_intf )
@@ -245,6 +245,7 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_DEVICE_CONFIG(mini2440_s3c2440_intf)
 	MCFG_S3C2440_PALETTE("palette")
 	MCFG_S3C2440_CORE_PIN_R_CB(READ32(mini2440_state, s3c2440_core_pin_r))
+	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(mini2440_state, s3c2440_gpio_port_w))
 	MCFG_S3C2440_ADC_DATA_R_CB(READ32(mini2440_state, s3c2440_adc_data_r))
 	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(mini2440_state, s3c2440_i2s_data_w))
 	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(mini2440_state, s3c2440_nand_command_w))
