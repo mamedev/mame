@@ -75,48 +75,68 @@ static int          sdl_create_buffers(void);
 static void         sdl_destroy_buffers(void);
 static void         SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len);
 
+class sound_sdl : public osd_sound_interface
+{
+public:
+	// construction/destruction
+	sound_sdl(const osd_interface &osd);
+	virtual ~sound_sdl();
+	
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
+};
 
+const osd_sound_type OSD_SOUND_SDL = &osd_sound_creator<sound_sdl>;
 
 //============================================================
-//  osd_start_audio_stream
+//  sound_register
 //============================================================
-bool sdl_osd_interface::sound_init()
+
+void sdl_osd_interface::sound_register()
+{
+	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
+}
+
+//-------------------------------------------------
+//  sound_sdl - constructor
+//-------------------------------------------------
+sound_sdl::sound_sdl(const osd_interface &osd)
+	: osd_sound_interface(osd)
 {
 	if (LOG_SOUND)
 		sound_log = fopen(SDLMAME_SOUND_LOG, "w");
 
 	// skip if sound disabled
-	if (machine().sample_rate() != 0)
+	if (osd.machine().sample_rate() != 0)
 	{
 		if (initialized_audio)
 		{
-			sound_exit();
+			//sound_exit();
 		}
 
 		// attempt to initialize SDL
-		if (sdl_init(machine()))
-			return false;
+		if (sdl_init(osd.machine()))
+			return;
 
 		// set the startup volume
-		machine().osd().set_mastervolume(attenuation);
+		set_mastervolume(attenuation);
 	}
-	return true;
 }
 
 
 
 //============================================================
-//  osd_stop_audio_stream
+//  sound_sdl - destructor
 //============================================================
 
-void sdl_osd_interface::sound_exit()
+sound_sdl::~sound_sdl()
 {
 	// if nothing to do, don't do it
-	if (machine().sample_rate() == 0)
+	if (m_osd.machine().sample_rate() == 0)
 		return;
 
 	// kill the buffers and dsound
-	sdl_kill(machine());
+	sdl_kill(m_osd.machine());
 	sdl_destroy_buffers();
 
 	// print out over/underflow stats
@@ -264,10 +284,10 @@ static void copy_sample_data(running_machine &machine, const INT16 *data, int by
 //  update_audio_stream
 //============================================================
 
-void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+void sound_sdl::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 {
 	// if nothing to do, don't do it
-	if (machine().sample_rate() != 0 && stream_buffer)
+	if (m_osd.machine().sample_rate() != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
 		int play_position, write_position, stream_in;
@@ -275,7 +295,7 @@ void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_thi
 
 		play_position = stream_playpos;
 
-		write_position = stream_playpos + ((machine().sample_rate() / 50) * sizeof(INT16) * 2);
+		write_position = stream_playpos + ((m_osd.machine().sample_rate() / 50) * sizeof(INT16) * 2);
 		orig_write = write_position;
 
 		if (!stream_in_initialized)
@@ -336,7 +356,7 @@ void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_thi
 
 		// now we know where to copy; let's do it
 		stream_buffer_in = stream_in;
-		copy_sample_data(machine(), buffer, bytes_this_frame);
+		copy_sample_data(m_osd.machine(), buffer, bytes_this_frame);
 	}
 }
 
@@ -346,7 +366,7 @@ void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_thi
 //  set_mastervolume
 //============================================================
 
-void sdl_osd_interface::set_mastervolume(int _attenuation)
+void sound_sdl::set_mastervolume(int _attenuation)
 {
 	// clamp the attenuation to 0-32 range
 	if (_attenuation > 0)

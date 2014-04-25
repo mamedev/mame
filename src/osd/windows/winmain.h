@@ -125,6 +125,7 @@
 #define WINOPTION_FULLSCREENGAMMA       "full_screen_gamma"
 
 // sound options
+#define WINOPTION_SOUND                 "sound"
 #define WINOPTION_AUDIO_LATENCY         "audio_latency"
 
 // input options
@@ -257,6 +258,7 @@ public:
 	float full_screen_gamma() const { return float_value(WINOPTION_FULLSCREENGAMMA); }
 
 	// sound options
+	const char *sound() const { return value(WINOPTION_SOUND); }
 	int audio_latency() const { return int_value(WINOPTION_AUDIO_LATENCY); }
 
 	// input options
@@ -301,10 +303,6 @@ public:
 	virtual void debugger_update();
 	virtual void debugger_exit();
 
-	// audio overridables
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
-
 	// video overridables
 	virtual void *get_slider_list();
 
@@ -317,7 +315,7 @@ public:
 	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
 	virtual bool video_init();
-	virtual bool sound_init();
+	virtual void sound_register();
 	virtual bool input_init();
 	virtual void input_pause();
 	virtual void input_resume();
@@ -327,7 +325,6 @@ public:
 	#endif
 
 	virtual void video_exit();
-	virtual void sound_exit();
 	virtual void input_exit();
 	virtual void output_exit();
 	#ifdef USE_NETWORK

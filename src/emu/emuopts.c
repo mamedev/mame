@@ -113,7 +113,6 @@ const options_entry emu_options::s_option_entries[] =
 
 	// sound options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE SOUND OPTIONS" },
-	{ OPTION_SOUND,                                      "1",         OPTION_BOOLEAN,    "enable sound output" },
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     OPTION_INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ OPTION_VOLUME ";vol",                              "0",         OPTION_INTEGER,    "sound volume in decibels (-32 min, 0 max)" },

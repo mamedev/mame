@@ -810,11 +810,11 @@ sound_manager::sound_manager(running_machine &machine)
 		m_rightmix(machine.sample_rate()),
 		m_muted(0),
 		m_attenuation(0),
-		m_nosound_mode(!machine.options().sound()),
 		m_wavfile(NULL),
 		m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
 		m_last_update(attotime::zero)
 {
+	m_nosound_mode = (strcmp(machine.options().sound(),"none")==0) ? true : false;
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = machine.options().wav_write();
 	const char *avifile = machine.options().avi_write();

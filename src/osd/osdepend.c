@@ -21,7 +21,8 @@ extern bool g_print_verbose;
 //-------------------------------------------------
 
 osd_interface::osd_interface()
-	: m_machine(NULL)
+	: m_machine(NULL),
+	  m_sound(NULL)
 {
 }
 
@@ -146,6 +147,7 @@ void osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_fr
 	// It provides an array of stereo samples in L-R order which should be
 	// output at the configured sample_rate.
 	//
+	m_sound->update_audio_stream(buffer,samples_this_frame);
 }
 
 
@@ -162,6 +164,7 @@ void osd_interface::set_mastervolume(int attenuation)
 	//    while (attenuation++ < 0)
 	//       volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
 	//
+	m_sound->set_mastervolume(attenuation);
 }
 
 
@@ -237,7 +240,10 @@ void osd_interface::init_subsystems()
 		fflush(stderr);
 		fflush(stdout);
 		exit(-1);	
-	}	
+	}
+
+	m_sound_options.add("none", OSD_SOUND_NONE, false);	
+	sound_register();
 	sound_init();
 	input_init();
 	// we need pause callbacks
@@ -258,7 +264,18 @@ bool osd_interface::video_init()
 
 bool osd_interface::sound_init()
 {
+	osd_sound_type sound = m_sound_options.find(machine().options().sound());
+	if (sound==NULL) 
+	{
+		osd_printf_warning("sound_init: option %s not found swithing sound off\n",machine().options().sound());
+		sound = m_sound_options.find("none");
+	}
+	m_sound = (*sound)(*this);
 	return true;
+}
+
+void osd_interface::sound_register()
+{
 }
 
 bool osd_interface::input_init()
@@ -312,6 +329,8 @@ void osd_interface::video_exit()
 
 void osd_interface::sound_exit()
 {
+	m_sound_options.reset();
+	global_free(m_sound);
 }
 
 void osd_interface::input_exit()
@@ -342,3 +361,33 @@ void osd_interface::osd_exit()
 	exit_subsystems();
 }
 
+
+
+//-------------------------------------------------
+//  osd_sound_interface - constructor
+//-------------------------------------------------
+
+osd_sound_interface::osd_sound_interface(const osd_interface &osd)
+	: m_osd(osd)
+{
+}
+
+
+//-------------------------------------------------
+//  osd_sound_interface - destructor
+//-------------------------------------------------
+
+osd_sound_interface::~osd_sound_interface()
+{
+}
+
+//-------------------------------------------------
+//  sound_none - constructor
+//-------------------------------------------------
+sound_none::sound_none(const osd_interface &osd)
+	: osd_sound_interface(osd)
+{
+}
+
+
+const osd_sound_type OSD_SOUND_NONE = &osd_sound_creator<sound_none>;

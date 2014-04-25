@@ -288,6 +288,7 @@ endif
 
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
+LIBS += -lSDL.dll
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8

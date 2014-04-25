@@ -27,6 +27,8 @@
 #include "video.h"
 #include "config.h"
 
+#define SDLMAME_SDL2 0
+#include "../sdl/sdlinc.h"
 
 //============================================================
 //  DEBUGGING
@@ -41,60 +43,101 @@
 //  LOCAL VARIABLES
 //============================================================
 
-// DirectSound objects
-static LPDIRECTSOUND        dsound;
-static DSCAPS               dsound_caps;
-
-// sound buffers
-static LPDIRECTSOUNDBUFFER  primary_buffer;
-static LPDIRECTSOUNDBUFFER  stream_buffer;
-static UINT32               stream_buffer_size;
-static UINT32               stream_buffer_in;
-
-// descriptors and formats
-static DSBUFFERDESC         primary_desc;
-static DSBUFFERDESC         stream_desc;
-static WAVEFORMATEX         primary_format;
-static WAVEFORMATEX         stream_format;
-
-// buffer over/underflow counts
-static int                  buffer_underflows;
-static int                  buffer_overflows;
-
 
 //============================================================
 //  PROTOTYPES
 //============================================================
 
-static HRESULT      dsound_init(running_machine &machine);
-static void         dsound_kill(void);
-static HRESULT      dsound_create_buffers(void);
-static void         dsound_destroy_buffers(void);
-
-
-
-//============================================================
-//  sound_init
-//============================================================
-
-bool windows_osd_interface::sound_init()
+class sound_direct_sound : public osd_sound_interface
 {
-	// if no sound, don't create anything
-	if (!machine().options().sound())
-		return true;
+public:
+	// construction/destruction
+	sound_direct_sound(const osd_interface &osd);
+	virtual ~sound_direct_sound();
+	
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
 
-	// attempt to initialize directsound
-	// don't make it fatal if we can't -- we'll just run without sound
-	dsound_init(machine());
-	return true;
+	HRESULT      dsound_init();
+	void         dsound_kill();
+	HRESULT      dsound_create_buffers();
+	void         dsound_destroy_buffers();
+	void 		 copy_sample_data(const INT16 *data, int bytes_to_copy);
+private:	
+	// DirectSound objects
+	LPDIRECTSOUND        dsound;
+	DSCAPS               dsound_caps;
+
+	// sound buffers
+	LPDIRECTSOUNDBUFFER  primary_buffer;
+	LPDIRECTSOUNDBUFFER  stream_buffer;
+	UINT32               stream_buffer_size;
+	UINT32               stream_buffer_in;
+
+	// descriptors and formats
+	DSBUFFERDESC         primary_desc;
+	DSBUFFERDESC         stream_desc;
+	WAVEFORMATEX         primary_format;
+	WAVEFORMATEX         stream_format;
+
+	// buffer over/underflow counts
+	int                  buffer_underflows;
+	int                  buffer_overflows;
+};
+
+const osd_sound_type OSD_SOUND_DIRECT_SOUND = &osd_sound_creator<sound_direct_sound>;
+
+
+class sound_sdl : public osd_sound_interface
+{
+public:
+	// construction/destruction
+	sound_sdl(const osd_interface &osd);
+	virtual ~sound_sdl() { }
+	
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) { }
+	virtual void set_mastervolume(int attenuation) { }
+};
+
+const osd_sound_type OSD_SOUND_SDL = &osd_sound_creator<sound_sdl>;
+
+//-------------------------------------------------
+//  sound_sdl - constructor
+//-------------------------------------------------
+sound_sdl::sound_sdl(const osd_interface &osd)
+	: osd_sound_interface(osd)
+{
+	char audio_driver[16] = "";
+	if ( SDL_InitSubSystem(SDL_INIT_AUDIO) < 0 ) {
+		fprintf(stderr, "WinMain() error: %s", SDL_GetError());
+		return;
+	}
+	SDL_SetModuleHandle(GetModuleHandle(NULL));
+
+	osd_printf_verbose("Audio: Start initialization\n");
+#if (SDLMAME_SDL2)
+	strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
+#else
+	SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
+#endif
+	osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
+	
 }
 
 
-//============================================================
-//  sound_exit
-//============================================================
+//-------------------------------------------------
+//  sound_direct_sound - constructor
+//-------------------------------------------------
+sound_direct_sound::sound_direct_sound(const osd_interface &osd)
+	: osd_sound_interface(osd)
+{
+	// attempt to initialize directsound
+	// don't make it fatal if we can't -- we'll just run without sound
+	dsound_init();
+}
 
-void windows_osd_interface::sound_exit()
+
+sound_direct_sound::~sound_direct_sound()
 {
 	// kill the buffers and dsound
 	dsound_destroy_buffers();
@@ -109,10 +152,20 @@ void windows_osd_interface::sound_exit()
 
 
 //============================================================
+//  sound_register
+//============================================================
+
+void windows_osd_interface::sound_register()
+{
+	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false);
+	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
+}
+
+//============================================================
 //  copy_sample_data
 //============================================================
 
-static void copy_sample_data(const INT16 *data, int bytes_to_copy)
+void sound_direct_sound::copy_sample_data(const INT16 *data, int bytes_to_copy)
 {
 	void *buffer1, *buffer2;
 	DWORD length1, length2;
@@ -156,7 +209,7 @@ static void copy_sample_data(const INT16 *data, int bytes_to_copy)
 //  update_audio_stream
 //============================================================
 
-void windows_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+void sound_direct_sound::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 {
 	int bytes_this_frame = samples_this_frame * stream_format.nBlockAlign;
 	DWORD play_position, write_position;
@@ -212,7 +265,7 @@ void windows_osd_interface::update_audio_stream(const INT16 *buffer, int samples
 //  set_mastervolume
 //============================================================
 
-void windows_osd_interface::set_mastervolume(int attenuation)
+void sound_direct_sound::set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
 	if (attenuation > 0)
@@ -230,7 +283,7 @@ void windows_osd_interface::set_mastervolume(int attenuation)
 //  dsound_init
 //============================================================
 
-static HRESULT dsound_init(running_machine &machine)
+HRESULT sound_direct_sound::dsound_init()
 {
 	HRESULT result;
 
@@ -263,12 +316,12 @@ static HRESULT dsound_init(running_machine &machine)
 	stream_format.wBitsPerSample    = 16;
 	stream_format.wFormatTag        = WAVE_FORMAT_PCM;
 	stream_format.nChannels         = 2;
-	stream_format.nSamplesPerSec    = machine.sample_rate();
+	stream_format.nSamplesPerSec    = m_osd.machine().sample_rate();
 	stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
 	// compute the buffer size based on the output sample rate
-	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * downcast<windows_options &>(machine.options()).audio_latency() / 10;
+	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * downcast<windows_options &>(m_osd.machine().options()).audio_latency() / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;
@@ -301,7 +354,7 @@ error:
 //  dsound_kill
 //============================================================
 
-static void dsound_kill(void)
+void sound_direct_sound::dsound_kill()
 {
 	// release the object
 	if (dsound != NULL)
@@ -314,7 +367,7 @@ static void dsound_kill(void)
 //  dsound_create_buffers
 //============================================================
 
-static HRESULT dsound_create_buffers(void)
+HRESULT sound_direct_sound::dsound_create_buffers()
 {
 	HRESULT result;
 	void *buffer;
@@ -391,7 +444,7 @@ error:
 //  dsound_destroy_buffers
 //============================================================
 
-static void dsound_destroy_buffers(void)
+void sound_direct_sound::dsound_destroy_buffers(void)
 {
 	// stop any playback
 	if (stream_buffer != NULL)
@@ -407,3 +460,4 @@ static void dsound_destroy_buffers(void)
 		IDirectSoundBuffer_Release(primary_buffer);
 	primary_buffer = NULL;
 }
+

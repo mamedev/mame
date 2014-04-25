@@ -195,6 +195,7 @@ const options_entry sdl_options::s_option_entries[] =
 
 	// sound options
 	{ NULL,                                   NULL,  OPTION_HEADER,     "SOUND OPTIONS" },
+	{ SDLOPTION_SOUND,                        "sdl", OPTION_STRING,     "sound output method: none or sdl" },	
 	{ SDLOPTION_AUDIO_LATENCY,                "2",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// keyboard mapping

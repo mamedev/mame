@@ -284,7 +284,7 @@ public:
 	float flicker() const { return float_value(OPTION_FLICKER); }
 
 	// core sound options
-	bool sound() const { return bool_value(OPTION_SOUND); }
+	const char *sound() const { return value(OPTION_SOUND); }
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
 	bool samples() const { return bool_value(OPTION_SAMPLES); }
 	int volume() const { return int_value(OPTION_VOLUME); }

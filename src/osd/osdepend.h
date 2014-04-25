@@ -25,7 +25,12 @@
 // forward references
 class input_type_entry;
 class device_t;
+class osd_interface;
+class osd_sound_interface;
 typedef void *osd_font;
+
+// a device_type is simply a pointer to its alloc function
+typedef osd_sound_interface *(*osd_sound_type)(const osd_interface &osd);
 
 
 // ======================> osd_interface
@@ -52,8 +57,8 @@ public:
 	virtual void debugger_exit();
 
 	// audio overridables
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
+	void update_audio_stream(const INT16 *buffer, int samples_this_frame);
+	void set_mastervolume(int attenuation);
 
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
@@ -68,7 +73,10 @@ public:
 
 	void init_subsystems();	
 	virtual bool video_init();
-	virtual bool sound_init();
+	
+	bool sound_init();
+	virtual void sound_register();
+	
 	virtual bool input_init();
 	virtual void input_pause();
 	virtual void input_resume();
@@ -78,17 +86,56 @@ public:
 
 	void exit_subsystems();	
 	virtual void video_exit();
-	virtual void sound_exit();
+	void sound_exit();
 	virtual void input_exit();
 	virtual void output_exit();
 	virtual void network_exit();
 	virtual void midi_exit();
 
 	virtual void osd_exit();
+
 private:
 	// internal state
-	running_machine *   m_machine;
+	running_machine *   m_machine;	
+
+protected:	
+	osd_sound_interface* m_sound;
+	
+	tagmap_t<osd_sound_type>  m_sound_options;  
 };
 
+class osd_sound_interface
+{
+public:
+	// construction/destruction
+	osd_sound_interface(const osd_interface &osd);
+	virtual ~osd_sound_interface();
+	
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) = 0;
+	virtual void set_mastervolume(int attenuation) = 0;
+protected:	
+	const osd_interface& m_osd;
+};
+
+class sound_none : public osd_sound_interface
+{
+public:
+	// construction/destruction
+	sound_none(const osd_interface &osd);
+	virtual ~sound_none() { }
+	
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) { }
+	virtual void set_mastervolume(int attenuation) { }
+};
+
+// this template function creates a stub which constructs a device
+template<class _DeviceClass>
+osd_sound_interface *osd_sound_creator(const osd_interface &osd)
+{
+	return global_alloc(_DeviceClass(osd));
+}
+
+
+extern const osd_sound_type OSD_SOUND_NONE;
 
 #endif  /* __OSDEPEND_H__ */

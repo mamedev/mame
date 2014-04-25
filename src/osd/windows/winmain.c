@@ -408,6 +408,7 @@ const options_entry windows_options::s_option_entries[] =
 
 	// sound options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS SOUND OPTIONS" },
+	{ WINOPTION_SOUND,                                "dsound",   OPTION_STRING,     "sound output method: none, dsound or sdl" },	
 	{ WINOPTION_AUDIO_LATENCY "(1-5)",                "2",        OPTION_INTEGER,    "set audio latency (increase to reduce glitches)" },
 
 	// input options
