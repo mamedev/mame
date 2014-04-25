@@ -56,7 +56,6 @@ static FILE *output;
 //  FUNCTION PROTOTYPES
 //============================================================
 
-static void sdloutput_exit(running_machine &machine);
 static void notifier_callback(const char *outname, INT32 value, void *param);
 
 //============================================================
