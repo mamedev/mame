@@ -75,6 +75,7 @@ mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, d
 	ip4clk(0),
 	ip5clk(0),
 	ip6clk(0),
+	ACR(0),
 	IP_last_state(0)
 {
 }
