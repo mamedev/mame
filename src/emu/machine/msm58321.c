@@ -202,6 +202,7 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 	m_cs1(0),
 	m_address(0xf)
 {
+	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
 
