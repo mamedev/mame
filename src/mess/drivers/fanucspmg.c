@@ -716,11 +716,6 @@ static MC6845_UPDATE_ROW( fanuc_update_row )
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 	UINT8 *chargen = state->m_chargen->base();
-	static const UINT32 palette[8] =
-	{
-		// black    red       green    yellow     blue      purple  light blue white
-		0x000000, 0xff0000, 0x00ff00, 0xffff00, 0x0000ff, 0xff00ff, 0x99ffff, 0xffffff
-	};
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -733,8 +728,12 @@ static MC6845_UPDATE_ROW( fanuc_update_row )
 				UINT8 chr = state->m_vram[offset + 0x600];
 				UINT8 attr = state->m_vram[offset];
 				UINT8 data = chargen[ chr + (ra * 256) ];
-				UINT32 fg = palette[((attr>>5) & 7)];
+				UINT32 fg = 0;
 				UINT32 bg = 0;
+
+				if (attr & 0x20) fg |= 0xff0000;
+				if (attr & 0x40) fg |= 0x00ff00;
+				if (attr & 0x80) fg |= 0x0000ff;
 
 				*p++ = ( data & 0x01 ) ? fg : bg;
 				*p++ = ( data & 0x02 ) ? fg : bg;
