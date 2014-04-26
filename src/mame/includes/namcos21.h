@@ -37,8 +37,7 @@ public:
 		m_mpSharedRAM1(*this,"mpsharedram1"),
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_master_dsp_code(*this,"master_dsp_code"),
-		m_dsp(*this, "dsp"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_dsp(*this, "dsp") { }
 
 	optional_shared_ptr<UINT16> m_winrun_dspbios;
 	optional_shared_ptr<UINT16> m_winrun_polydata;
@@ -49,7 +48,6 @@ public:
 	optional_shared_ptr<UINT16> m_master_dsp_code;
 
 	optional_device<cpu_device> m_dsp;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	UINT8 *m_videoram;
 	UINT16 *m_winrun_dspcomram;
@@ -121,8 +119,6 @@ public:
 	DECLARE_WRITE16_MEMBER(shareram1_w);
 	DECLARE_READ16_MEMBER(datarom_r);
 	DECLARE_READ16_MEMBER(data2_r);
-	DECLARE_READ16_MEMBER(paletteram16_r);
-	DECLARE_WRITE16_MEMBER(paletteram16_w);
 	DECLARE_WRITE16_MEMBER(NAMCO_C139_SCI_buffer_w);
 	DECLARE_READ16_MEMBER(NAMCO_C139_SCI_buffer_r);
 	DECLARE_WRITE16_MEMBER(NAMCO_C139_SCI_register_w);

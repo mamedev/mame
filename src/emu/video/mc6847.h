@@ -514,6 +514,9 @@ private:
 class mc6847_base_device : public mc6847_friend_device
 {
 public:
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+
 	/* updates the screen -- this will call begin_update(),
 	   followed by update_row() reapeatedly and after all row
 	   updating is complete, end_update() */
@@ -670,10 +673,22 @@ class s68047_device : public mc6847_base_device
 public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	
 	void hack_black_becomes_blue(bool flag);
 
 private:
 	static const UINT32 s_s68047_hack_palette[16];
+};
+
+class m5c6847p1_device : public mc6847_base_device
+{
+public:	
+	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 };
 
 
@@ -684,5 +699,6 @@ extern const device_type MC6847Y_PAL;
 extern const device_type MC6847T1_NTSC;
 extern const device_type MC6847T1_PAL;
 extern const device_type S68047;
+extern const device_type M5C6847P1;
 
 #endif /* __MC6847__ */

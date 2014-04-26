@@ -641,9 +641,13 @@ void i80186_cpu_device::device_reset()
 	m_dma[1].drq_delay = false;
 	m_dma[0].drq_state = false;
 	m_dma[1].drq_state = false;
-	m_timer[0].control = 0;
-	m_timer[1].control = 0;
-	m_timer[2].control = 0;
+	for(int i = 0; i < ARRAY_LENGTH(m_timer); ++i)
+	{
+		m_timer[i].control = 0;
+		m_timer[i].time_timer_active = 0;
+		m_timer[i].maxA = 0;
+		m_timer[i].maxB = 0;
+	}
 }
 
 UINT8 i80186_cpu_device::read_port_byte(UINT16 port)

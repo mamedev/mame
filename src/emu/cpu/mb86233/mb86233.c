@@ -1027,8 +1027,8 @@ void mb86233_cpu_device::execute_run()
 					break;
 
 					case 0x11:
-						GETA().u = GETARAM()[INDIRECT(r1,1)];
-						GETB().u = GETBRAM()[INDIRECT(r2|(2<<6),0)];
+						GETA().u = GETBRAM()[INDIRECT(r1,1)];
+						GETB().u = GETARAM()[INDIRECT(r2|(2<<6),0)];
 					break;
 
 					default:

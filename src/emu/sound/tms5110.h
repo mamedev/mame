@@ -243,38 +243,33 @@ extern const device_type M58817;
 
 /* PROM controlled TMS5110 interface */
 
-struct tmsprom_interface
-{
-	const char *prom_region;        /* prom memory region - sound region is automatically assigned */
-	UINT32 rom_size;                /* individual rom_size */
-	UINT8 pdc_bit;                  /* bit # of pdc line */
-	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	UINT8 ctl1_bit;                 /* bit # of ctl1 line */
-	UINT8 ctl2_bit;                 /* bit # of ctl2 line */
-	UINT8 ctl4_bit;                 /* bit # of ctl4 line */
-	UINT8 ctl8_bit;                 /* bit # of ctl8 line */
-	UINT8 reset_bit;                /* bit # of rom reset */
-	UINT8 stop_bit;                 /* bit # of stop */
-	devcb_write_line pdc_func;      /* tms pdc func */
-	devcb_write8 ctl_func;          /* tms ctl func */
-};
-
 class tmsprom_device : public device_t
 {
 public:
 	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	WRITE_LINE_MEMBER( m0_w );
-	READ_LINE_MEMBER( data_r );
+	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom_region = region; }
+	static void set_rom_size(device_t &device, UINT32 rom_size) { downcast<tmsprom_device &>(device).m_rom_size = rom_size; }
+	static void set_pdc_bit(device_t &device, UINT8 pdc_bit) { downcast<tmsprom_device &>(device).m_pdc_bit = pdc_bit; }
+	static void set_ctl1_bit(device_t &device, UINT8 ctl1_bit) { downcast<tmsprom_device &>(device).m_ctl1_bit = ctl1_bit; }
+	static void set_ctl2_bit(device_t &device, UINT8 ctl2_bit) { downcast<tmsprom_device &>(device).m_ctl2_bit = ctl2_bit; }
+	static void set_ctl4_bit(device_t &device, UINT8 ctl4_bit) { downcast<tmsprom_device &>(device).m_ctl4_bit = ctl4_bit; }
+	static void set_ctl8_bit(device_t &device, UINT8 ctl8_bit) { downcast<tmsprom_device &>(device).m_ctl8_bit = ctl8_bit; }
+	static void set_reset_bit(device_t &device, UINT8 reset_bit) { downcast<tmsprom_device &>(device).m_reset_bit = reset_bit; }
+	static void set_stop_bit(device_t &device, UINT8 stop_bit) { downcast<tmsprom_device &>(device).m_stop_bit = stop_bit; }
+	template<class _Object> static devcb2_base &set_pdc_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_pdc_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_ctl_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_ctl_cb.set_callback(object); }
+	
+	DECLARE_WRITE_LINE_MEMBER( m0_w );
+	DECLARE_READ_LINE_MEMBER( data_r );
 
 	/* offset is rom # */
 	DECLARE_WRITE8_MEMBER( rom_csq_w );
 	DECLARE_WRITE8_MEMBER( bit_w );
-	WRITE_LINE_MEMBER( enable_w );
+	DECLARE_WRITE_LINE_MEMBER( enable_w );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -294,17 +289,57 @@ private:
 
 	int m_prom_cnt;
 
-	devcb_resolved_write_line m_pdc_func;     /* tms pdc func */
-	devcb_resolved_write8 m_ctl_func;         /* tms ctl func */
+	const char *m_prom_region;        /* prom memory region - sound region is automatically assigned */
+	UINT32 m_rom_size;                /* individual rom_size */
+	UINT8 m_pdc_bit;                  /* bit # of pdc line */
+	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
+	UINT8 m_ctl1_bit;                 /* bit # of ctl1 line */
+	UINT8 m_ctl2_bit;                 /* bit # of ctl2 line */
+	UINT8 m_ctl4_bit;                 /* bit # of ctl4 line */
+	UINT8 m_ctl8_bit;                 /* bit # of ctl8 line */
+	UINT8 m_reset_bit;                /* bit # of rom reset */
+	UINT8 m_stop_bit;                 /* bit # of stop */
+	devcb2_write_line m_pdc_cb;      /* tms pdc func */
+	devcb2_write8 m_ctl_cb;          /* tms ctl func */
 
-	int    m_clock;
 	emu_timer *m_romclk_timer;
-	const tmsprom_interface *m_intf;
 	const UINT8 *m_rom;
 	const UINT8 *m_prom;
 };
 
 extern const device_type TMSPROM;
 
+#define MCFG_TMSPROM_REGION(_region) \
+	tmsprom_device::set_region(*device, _region);
+
+#define MCFG_TMSPROM_ROM_SIZE(_size) \
+	tmsprom_device::set_rom_size(*device, _size);
+	
+#define MCFG_TMSPROM_PDC_BIT(_bit) \
+	tmsprom_device::set_pdc_bit(*device, _bit);
+	
+#define MCFG_TMSPROM_CTL1_BIT(_bit) \
+	tmsprom_device::set_ctl1_bit(*device, _bit);
+
+#define MCFG_TMSPROM_CTL2_BIT(_bit) \
+	tmsprom_device::set_ctl2_bit(*device, _bit);
+	
+#define MCFG_TMSPROM_CTL4_BIT(_bit) \
+	tmsprom_device::set_ctl4_bit(*device, _bit);
+	
+#define MCFG_TMSPROM_CTL8_BIT(_bit) \
+	tmsprom_device::set_ctl8_bit(*device, _bit);
+
+#define MCFG_TMSPROM_RESET_BIT(_bit) \
+	tmsprom_device::set_reset_bit(*device, _bit);
+	
+#define MCFG_TMSPROM_STOP_BIT(_bit) \
+	tmsprom_device::set_stop_bit(*device, _bit);
+
+#define MCFG_TMSPROM_PDC_CB(_devcb) \
+	devcb = &tmsprom_device::set_pdc_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_TMSPROM_CTL_CB(_devcb) \
+    devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB2_##_devcb);
 
 #endif /* __TMS5110_H__ */

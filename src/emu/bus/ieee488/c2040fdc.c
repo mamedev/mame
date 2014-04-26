@@ -115,6 +115,7 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	cur_live.next_state = -1;
 	cur_live.write_position = 0;
 	cur_live.write_start_time = attotime::never;
+	cur_live.drv_sel = m_drv_sel;
 }
 
 c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

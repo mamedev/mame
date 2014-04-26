@@ -16,9 +16,10 @@
 
 const device_type S3VIRGE = &device_creator<s3virge_vga_device>;
 const device_type S3VIRGEDX = &device_creator<s3virgedx_vga_device>;
+const device_type S3VIRGEDX1 = &device_creator<s3virgedx_rev1_vga_device>;
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: s3_vga_device(mconfig, S3VIRGE, "S3VIRGE", tag, owner, clock, "s3virge_vga", __FILE__)
+	: s3_vga_device(mconfig, S3VIRGE, "S3 86C325", tag, owner, clock, "virge_vga", __FILE__)
 {
 }
 
@@ -28,7 +29,17 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_typ
 }
 
 s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: s3virge_vga_device(mconfig, S3VIRGEDX, "S3VIRGEDX", tag, owner, clock, "s3virgedx_vga", __FILE__)
+	: s3virge_vga_device(mconfig, S3VIRGEDX, "S3 86C375", tag, owner, clock, "virgedx_vga", __FILE__)
+{
+}
+
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: s3virge_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: s3virgedx_vga_device(mconfig, S3VIRGEDX1, "S3 86C375 (rev 1)", tag, owner, clock, "virgedx_r1", __FILE__)
 {
 }
 
@@ -50,7 +61,7 @@ void s3virge_vga_device::device_start()
 	vga.svga_intf.seq_regcount = 0x1c;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x400000;
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
 	save_item(vga.memory,"Video RAM");
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
@@ -83,6 +94,42 @@ void s3virgedx_vga_device::device_start()
 	s3.id_cr30 = 0xe1;  // CR30
 }
 
+void s3virgedx_rev1_vga_device::device_start()
+{
+	s3virge_vga_device::device_start();
+
+	// set device ID
+	s3.id_high = 0x8a;  // CR2D
+	s3.id_low = 0x01;   // CR2E
+	s3.revision = 0x01; // CR2F
+	s3.id_cr30 = 0xe1;  // CR30
+}
+
+void s3virge_vga_device::device_reset()
+{
+	vga_device::device_reset();
+	// Power-on strapping bits.  Sampled at reset, but can be modified later.
+	// These are just assumed defaults.
+	s3.strapping = 0x000f0912;
+}
+
+void s3virgedx_vga_device::device_reset()
+{
+	vga_device::device_reset();
+	// Power-on strapping bits.  Sampled at reset, but can be modified later.
+	// These are just assumed defaults.
+	s3.strapping = 0x000f0912;
+}
+
+void s3virgedx_rev1_vga_device::device_reset()
+{
+	vga_device::device_reset();
+	// Power-on strapping bits.  Sampled at reset, but can be modified later.
+	// These are based on results from a Diamond Stealth 3D 2000 Pro (Virge/DX based)
+	// bits 8-15 are still unknown, S3ID doesn't show config register 2 (CR37)
+	s3.strapping = 0x0aff0912;
+}
+
 UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 {
 	UINT8 res;
@@ -112,7 +159,7 @@ UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 				res = s3.crt_reg_lock;
 				break;
 			case 0x36:  // Configuration register 1
-				res = 0x12;  // PCI (not really), 1-cycle EDO
+				res = s3.strapping & 0x000000ff;  // PCI (not really), Fast Page Mode DRAM
 				if(vga.svga_intf.vram_size == 0x200000)
 					res |= 0x80;
 				else if(vga.svga_intf.vram_size == 0x400000)
@@ -121,7 +168,7 @@ UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 					res |= 0x80;  // shouldn't get here...
 				break;
 			case 0x37:  // Configuration register 2
-				res = 0x09;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
+				res = (s3.strapping & 0x0000ff00) >> 8;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
 				break;
 			case 0x38:
 				res = s3.reg_lock1;
@@ -188,7 +235,7 @@ UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 				res = s3.ext_misc_ctrl_2;
 				break;
 			case 0x68:  // Configuration register 3
-				res = 0x03;  // no /CAS,/OE stretch time
+				res = (s3.strapping & 0x00ff0000) >> 16;  // no /CAS,/OE stretch time, 32-bit data bus size
 				break;
 			case 0x69:
 				res = vga.crtc.start_addr_latch >> 16;
@@ -197,7 +244,7 @@ UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 				res = svga.bank_r & 0x7f;
 				break;
 			case 0x6f: // Configuration register 4
-				res = 0x18;  // Serial port I/O at port 0xe8, Serial port I/O disabled (MMIO only), no /WE delay
+				res = (s3.strapping & 0xff000000) >> 24;  // LPB(?) mode, Serial port I/O at port 0xe8, Serial port I/O disabled (MMIO only), no WE delay
 				break;
 			default:
 				res = vga.crtc.data[index];
@@ -275,6 +322,20 @@ void s3virge_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				s3.crt_reg_lock = data;
 				svga.bank_w = data & 0xf;
 				svga.bank_r = svga.bank_w;
+				break;
+			case 0x36:
+				if(s3.reg_lock2 == 0xa5)
+				{
+					s3.strapping = (s3.strapping & 0xffffff00) | data;
+					logerror("CR36: Strapping data = %08x\n",s3.strapping);
+				}
+				break;
+			case 0x37:
+				if(s3.reg_lock2 == 0xa5)
+				{
+					s3.strapping = (s3.strapping & 0xffff00ff) | (data << 8);
+					logerror("CR37: Strapping data = %08x\n",s3.strapping);
+				}
 				break;
 			case 0x38:
 				s3.reg_lock1 = data;
@@ -518,6 +579,13 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				s3_define_video_mode();
 				//printf("%02x X\n",data);
 				break;
+			case 0x68:
+				if(s3.reg_lock2 == 0xa5)
+				{
+					s3.strapping = (s3.strapping & 0xff00ffff) | (data << 16);
+					logerror("CR68: Strapping data = %08x\n",s3.strapping);
+				}
+				break;
 			case 0x69:
 				vga.crtc.start_addr_latch &= ~0x1f0000;
 				vga.crtc.start_addr_latch |= ((data & 0x1f) << 16);
@@ -526,6 +594,13 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 			case 0x6a:
 				svga.bank_w = data & 0x3f;
 				svga.bank_r = svga.bank_w;
+				break;
+			case 0x6f:
+				if(s3.reg_lock2 == 0xa5)
+				{
+					s3.strapping = (s3.strapping & 0x00ffffff) | (data << 24);
+					logerror("CR6F: Strapping data = %08x\n",s3.strapping);
+				}
 				break;
 			default:
 				if(LOG_REG) logerror("S3: CR%02X write %02x\n",index,data);

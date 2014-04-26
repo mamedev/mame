@@ -372,6 +372,11 @@ void nec_common_device::device_start()
 	m_EA = 0;
 	m_EO = 0;
 	m_E16 = 0;
+	m_debugger_temp = 0;
+	m_ip = 0;
+
+	memset(m_regs.w, 0x00, sizeof(m_regs.w));
+	memset(m_sregs, 0x00, sizeof(m_sregs));
 
 	save_item(NAME(m_regs.w));
 	save_item(NAME(m_sregs));

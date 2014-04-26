@@ -108,6 +108,7 @@ enum
 	XTAL_11_0592MHz     = 11059200,     /* Lethal Justice, Ruleta RE-900 */
 	XTAL_11_2MHz        = 11200000,     /* New York, New York */
 	XTAL_11_289MHz      = 11289000,     /* Vanguard */
+	XTAL_11_4MHz        = 11400000,     /* HP 9845 */
 	XTAL_11_6688MHz     = 11668800,     /* Gameplan pixel clock */
 	XTAL_11_8MHz        = 11800000,     /* IBM PC Music Feature Card */
 	XTAL_11_9808MHz     = 11980800,     /* Luxor ABC 80 */

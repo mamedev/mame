@@ -160,6 +160,9 @@ void tms7000_device::device_start()
 	m_t1_capture_latch = 0;
 	m_t1_prescaler = 0;
 	m_t1_decrementer = 0;
+	memset(&m_pc, 0x00, sizeof(m_pc));
+	m_sp = 0;
+	m_sr = 0;
 
 	/* Save register state */
 	save_item(NAME(pPC));

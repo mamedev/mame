@@ -75,6 +75,7 @@ mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, d
 	ip4clk(0),
 	ip5clk(0),
 	ip6clk(0),
+	ACR(0),
 	IP_last_state(0)
 {
 }
@@ -132,6 +133,7 @@ void mc68681_device::device_reset()
 	CTR.d = 0;  /* Counter/Timer Preset Value */
 	m_read_vector = false;
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
+	IPCR = 0;
 
 	write_outport(OPR ^ 0xff);
 }
@@ -645,6 +647,7 @@ mc68681_channel::mc68681_channel(const machine_config &mconfig, const char *tag,
 	MR1(0),
 	MR2(0),
 	SR(0),
+	rx_enabled(0),
 	rx_fifo_num(0),
 	tx_enabled(0)
 {

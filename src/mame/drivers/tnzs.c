@@ -863,26 +863,6 @@ static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8, tnzs_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tnzs_state::jpopnics_palette_w)
-{
-	int r, g, b;
-	UINT16 paldata;
-	m_generic_paletteram_8[offset] = data;
-
-	offset = offset >> 1;
-
-	paldata = (m_generic_paletteram_8[offset * 2] << 8) | m_generic_paletteram_8[(offset * 2 + 1)];
-
-	g = (paldata >> 12) & 0x000f;
-	r = (paldata >> 4) & 0x000f;
-	b = (paldata >> 8) & 0x000f;
-	// the other bits seem to be used, and the colours are wrong..
-
-	m_palette->set_pen_color(offset, r << 4, g << 4, b << 4);
-}
-
-
-
 static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( tnzs_ramrom_bank_r, tnzs_ramrom_bank_w )
@@ -893,7 +873,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)
@@ -1926,7 +1906,8 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnzs)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_FORMAT(GGGGBBBBRRRRxxxx) /* wrong, the other 4 bits seem to be used as well */
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

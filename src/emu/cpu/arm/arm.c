@@ -231,6 +231,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, d
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_endian(ENDIANNESS_LITTLE)
 {
+	memset(m_sArmRegister, 0x00, sizeof(m_sArmRegister));
 }
 
 
@@ -239,6 +240,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)
 {
+	memset(m_sArmRegister, 0x00, sizeof(m_sArmRegister));
 }
 
 

@@ -15,30 +15,6 @@ WRITE16_MEMBER(dec0_state::dec0_update_sprites_w)
 	memcpy(m_buffered_spriteram,m_spriteram,0x800);
 }
 
-/******************************************************************************/
-
-void dec0_state::update_24bitcol(int offset)
-{
-	int r,g,b;
-
-	r = (m_generic_paletteram_16[offset] >> 0) & 0xff;
-	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
-	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-
-WRITE16_MEMBER(dec0_state::dec0_paletteram_rg_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	update_24bitcol(offset);
-}
-
-WRITE16_MEMBER(dec0_state::dec0_paletteram_b_w)
-{
-	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
-	update_24bitcol(offset);
-}
 
 /******************************************************************************/
 
@@ -371,15 +347,6 @@ VIDEO_START_MEMBER(dec0_state,dec0)
 {
 	VIDEO_START_CALL_MEMBER(dec0_nodma);
 	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x800/2);
-}
-
-VIDEO_START_MEMBER(dec0_automat_state,automat)
-{
-	VIDEO_START_CALL_MEMBER(dec0_nodma);
-	m_paletteram.resize(0x800);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
-	save_item(NAME(m_paletteram));
 }
 
 /******************************************************************************/

@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CPU_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_MC6847_ADD("vdg", MC6847_NTSC, XTAL_7_15909MHz/3, fc100_mc6847_interface )  // Clock not verified
+	MCFG_MC6847_ADD("vdg", M5C6847P1, XTAL_7_15909MHz/3, fc100_mc6847_interface )  // Clock not verified
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("f4palette")

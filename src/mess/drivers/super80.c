@@ -1,6 +1,6 @@
 // license:MAME
 // copyright-holders:Robbbert
-/*
+/*****************************************************************************
 
 Super80.c written by Robbbert, 2005-2010.
 
@@ -181,6 +181,32 @@ points to the ROMs. When a machine reset occurs, bank 1 is switched in. A timer 
 after 4 bytes are read, bank 0 is selected. The timer is as close as can be to real operation of the
 hardware.
 
+
+Super80 disk WD2793, Z80DMA:
+
+Port(hex)  Role       Comment
+---------  -----      --------
+30         DMA I/O    Z80A DMA Controller Command Register
+38         WDSTCM     WD2793 Command Status
+39         WDTRK      WD2793 Track Register
+3A         WDSEC      WD2793 Sector Register
+3B         WDDATA     WD2793 Data Register
+
+3E         UFDSTAT    FDD and WD2793 Status input
+   Bit0    INTRQ      1 = WD2793 Interrupt Request
+   Bit1    DATARQ     1 = Data Ready to Receive or Send
+   Bit2    MOTOR ON   1 = FDD Motor On
+
+3F         UFDCOM     WD2793 Command Register output
+   Bit0    5/8        1 = 8" Drive Selected
+   Bit1    ENMF*      0 = 1MHz, 1 = 2MHz (for 8" double density)
+   Bit2    DR0SEL     1 = Drive 0 (Drive A) selected
+   Bit3    DR1SEL     1 = Drive 1 (Drive B) selected
+   Bit4    DR2SEL     1 = Drive 2 (Drive C) selected
+   Bit5    DR3SEL     1 = Drive 3 (Drive D) selected
+   Bit6    SIDESEL    0 = Select Disk side 0, 1 = Select Disk side 1
+   Bit7    DDEN*      0 = MFM (Double Density), 1 = FM (Single Density)
+
 ***********************************************************************************************************/
 
 #include "super80.lh"
@@ -256,6 +282,10 @@ static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_device, register_r)
 	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("dma", z80dma_device, read, write)
+	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+	AM_RANGE(0x3e, 0x3e) AM_READ(port3e_r)
+	AM_RANGE(0x3f, 0x3f) AM_WRITE(port3f_w)
 	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
 	AM_RANGE(0xdc, 0xdc) AM_WRITE(super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80r_f0_w)
@@ -634,6 +664,59 @@ static MC6845_INTERFACE( super80v_crtc )
 	NULL
 };
 
+//-------------------------------------------------
+//  Z80DMA_INTERFACE( dma_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( super80_state::busreq_w )
+{
+// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
+	m_dma->bai_w(state); // tell dma that bus has been granted
+}
+
+READ8_MEMBER(super80_state::memory_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(super80_state::memory_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	prog_space.write_byte(offset, data);
+}
+
+READ8_MEMBER(super80_state::io_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(super80_state::io_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	prog_space.write_byte(offset, data);
+}
+
+// busack on cpu connects to bai pin
+static Z80DMA_INTERFACE( dma_intf )
+{
+	//DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), //busreq - connects to busreq on cpu
+	DEVCB_DRIVER_LINE_MEMBER(super80_state, busreq_w), //busreq - connects to busreq on cpu
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //int/pulse - connects to IRQ0 on cpu
+	DEVCB_NULL, //ba0 - not connected
+	DEVCB_DRIVER_MEMBER(super80_state, memory_read_byte),
+	DEVCB_DRIVER_MEMBER(super80_state, memory_write_byte),
+	DEVCB_DRIVER_MEMBER(super80_state, io_read_byte),
+	DEVCB_DRIVER_MEMBER(super80_state, io_write_byte),
+};
+
+static SLOT_INTERFACE_START( super80_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( super80, super80_state )
 	/* basic machine hardware */
@@ -757,6 +840,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80r_io)
+	MCFG_Z80DMA_ADD("dma", MASTER_CLOCK/6, dma_intf)
+	MCFG_WD2793x_ADD("fdc", XTAL_2MHz)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /**************************** ROMS *****************************************************************/

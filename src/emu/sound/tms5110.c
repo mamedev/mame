@@ -1160,7 +1160,7 @@ void tmsprom_device::register_for_save_states()
 void tmsprom_device::update_prom_cnt()
 {
 	UINT8 prev_val = m_prom[m_prom_cnt] | 0x0200;
-	if (m_enable && (prev_val & (1<<m_intf->stop_bit)))
+	if (m_enable && (prev_val & (1<<m_stop_bit)))
 		m_prom_cnt |= 0x10;
 	else
 		m_prom_cnt &= 0x0f;
@@ -1184,13 +1184,13 @@ void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	//if (m_enable && m_prom_cnt < 0x10) printf("ctrl %04x, enable %d cnt %d\n", ctrl, m_enable, m_prom_cnt);
 	m_prom_cnt = ((m_prom_cnt + 1) & 0x0f) | (m_prom_cnt & 0x10);
 
-	if (ctrl & (1 << m_intf->reset_bit))
+	if (ctrl & (1 << m_reset_bit))
 		m_address = 0;
 
-	m_ctl_func(0, BITSWAP8(ctrl,0,0,0,0,m_intf->ctl8_bit,
-			m_intf->ctl4_bit,m_intf->ctl2_bit,m_intf->ctl1_bit));
+	m_ctl_cb((offs_t)0, BITSWAP8(ctrl,0,0,0,0,m_ctl8_bit,
+			m_ctl4_bit,m_ctl2_bit,m_ctl1_bit));
 
-	m_pdc_func((ctrl >> m_intf->pdc_bit) & 0x01);
+	m_pdc_cb((ctrl >> m_pdc_bit) & 0x01);
 }
 
 //-------------------------------------------------
@@ -1199,22 +1199,17 @@ void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void tmsprom_device::device_start()
 {
-	m_intf = (const tmsprom_interface *) static_config();
-	assert_always(m_intf != NULL, "Error creating TMSPROM chip: No configuration");
-
 	/* resolve lines */
-	m_pdc_func.resolve(m_intf->pdc_func, *this);
-	m_ctl_func.resolve(m_intf->ctl_func, *this);
+	m_pdc_cb.resolve_safe();
+	m_ctl_cb.resolve_safe();
 
 	m_rom = *region();
 	assert_always(m_rom != NULL, "Error creating TMSPROM chip: No rom region found");
-	m_prom = machine().root_device().memregion(m_intf->prom_region)->base();
-	assert_always(m_rom != NULL, "Error creating TMSPROM chip: No prom region found");
-
-	m_clock = clock();
+	m_prom = machine().root_device().memregion(m_prom_region)->base();
+	assert_always(m_prom != NULL, "Error creating TMSPROM chip: No prom region found");
 
 	m_romclk_timer = timer_alloc(0);
-	m_romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock));
+	m_romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	m_bit = 0;
 	m_base_address = 0;
@@ -1232,7 +1227,7 @@ WRITE_LINE_MEMBER( tmsprom_device::m0_w )
 	if (m_m0 && !state)
 	{
 		m_address += 1;
-		m_address &= (m_intf->rom_size-1);
+		m_address &= (m_rom_size-1);
 	}
 	m_m0 = state;
 }
@@ -1246,7 +1241,7 @@ READ_LINE_MEMBER( tmsprom_device::data_r )
 WRITE8_MEMBER( tmsprom_device::rom_csq_w )
 {
 	if (!data)
-		m_base_address = offset * m_intf->rom_size;
+		m_base_address = offset * m_rom_size;
 }
 
 WRITE8_MEMBER( tmsprom_device::bit_w )
@@ -1357,16 +1352,17 @@ m58817_device::m58817_device(const machine_config &mconfig, const char *tag, dev
 const device_type TMSPROM = &device_creator<tmsprom_device>;
 
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tmsprom_device::device_config_complete()
+	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__),
+		m_prom_region(""),
+		m_rom_size(0),
+		m_pdc_bit(0),
+		m_ctl1_bit(0),
+		m_ctl2_bit(0),
+		m_ctl4_bit(0),
+		m_ctl8_bit(0),
+		m_reset_bit(0),
+		m_stop_bit(0),
+		m_pdc_cb(*this),
+		m_ctl_cb(*this)
 {
 }

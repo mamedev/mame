@@ -45,14 +45,16 @@ const device_type AT45DB161 = &device_creator<at45db161_device>;
 
 at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AT45DB041, "AT45DB041", tag, owner, clock, "at45db041", __FILE__),
-	device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this),
+	write_so(*this)
 {
 }
 
 
 at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this),
+	write_so(*this)
 {
 }
 
@@ -80,6 +82,14 @@ void at45db041_device::device_start()
 	m_buffer1.resize(page_size());
 	//m_buffer2.resize(page_size());
 
+	// pins
+	m_pin.cs    = 0;
+	m_pin.sck   = 0;
+	m_pin.si    = 0;
+	m_pin.wp    = 0;
+	m_pin.reset = 0;
+	m_pin.busy  = 0;
+
 	// data
 	save_item(NAME(m_data));
 	// pins
@@ -90,6 +100,8 @@ void at45db041_device::device_start()
 	save_item(NAME(m_pin.wp));
 	save_item(NAME(m_pin.reset));
 	save_item(NAME(m_pin.busy));
+
+	write_so.resolve_safe();
 }
 
 
@@ -111,13 +123,7 @@ void at45db041_device::device_reset()
 	m_io.size = 0;
 	m_io.pos  = 0;
 	// pins
-	m_pin.cs    = 0;
-	m_pin.sck   = 0;
-	m_pin.si    = 0;
-	m_pin.so    = 0;
-	m_pin.wp    = 0;
-	m_pin.reset = 0;
-	m_pin.busy  = 0;
+	m_pin.so  = 0;
 	// output
 	m_so_byte = 0;
 	m_so_bits = 0;
@@ -358,6 +364,13 @@ WRITE_LINE_MEMBER(at45db041_device::sck_w)
 			m_so_bits = 0;
 			m_so_byte = read_byte();
 		}
+		// output (part 2)
+		m_pin.so = (m_so_byte >> m_so_bits) & 1;
+		write_so(m_pin.so);
+		m_so_bits++;
+	}
+	else
+	{
 		// input
 		if (m_pin.si) m_si_byte = m_si_byte | (1 << m_si_bits);
 		m_si_bits++;
@@ -367,9 +380,6 @@ WRITE_LINE_MEMBER(at45db041_device::sck_w)
 			write_byte(m_si_byte);
 			m_si_byte = 0;
 		}
-		// output (part 2)
-		m_pin.so = (m_so_byte >> m_so_bits) & 1;
-		m_so_bits++;
 	}
 	// save sck
 	m_pin.sck = state;

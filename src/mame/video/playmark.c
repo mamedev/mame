@@ -304,25 +304,6 @@ WRITE16_MEMBER(playmark_state::hrdtimes_bgvideoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-
-WRITE16_MEMBER(playmark_state::bigtwin_paletteram_w)
-{
-	int r, g, b, val;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	val = m_generic_paletteram_16[offset];
-	r = (val >> 11) & 0x1e;
-	g = (val >>  7) & 0x1e;
-	b = (val >>  3) & 0x1e;
-
-	r |= ((val & 0x08) >> 3);
-	g |= ((val & 0x04) >> 2);
-	b |= ((val & 0x02) >> 1);
-
-	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-}
-
 WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);

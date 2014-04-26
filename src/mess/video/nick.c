@@ -118,6 +118,7 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 		m_LD2(0),
 		m_virq(CLEAR_LINE)
 {
+	memset(&m_LPT, 0x00, sizeof(m_LPT));
 }
 
 

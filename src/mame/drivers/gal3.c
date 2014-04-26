@@ -146,7 +146,7 @@ public:
 	//UINT32 *m_mpSharedRAM1;
 	UINT16 m_namcos21_video_enable;
 	required_shared_ptr<UINT16> m_rso_shared_ram;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 	UINT32 m_led_mst;
 	UINT32 m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);
@@ -175,6 +175,11 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 		namcos2_shared_state::c355_obj_code2tile_delegate() );
 
 }
+
+/* FIXME: this code has simply been copypasted from namcos21.c
+   (which has subsequently been rewritten to use generic MAME
+   palette handling) with a 32-bit CPU it's rather unlikely
+   that the palette RAM is actually laid out this way */
 
 void gal3_state::update_palette(  )
 {

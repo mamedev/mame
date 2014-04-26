@@ -405,17 +405,17 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 WRITE16_MEMBER(gaelco3d_state::gaelco3d_paletteram_w)
 {
 	m_poly->wait("Palette change");
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	m_palette[offset] = ((m_generic_paletteram_16[offset] & 0x7fe0) << 6) | (m_generic_paletteram_16[offset] & 0x1f);
+	COMBINE_DATA(&m_paletteram16[offset]);
+	m_palette[offset] = ((m_paletteram16[offset] & 0x7fe0) << 6) | (m_paletteram16[offset] & 0x1f);
 }
 
 
 WRITE32_MEMBER(gaelco3d_state::gaelco3d_paletteram_020_w)
 {
 	m_poly->wait("Palette change");
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	m_palette[offset*2+0] = ((m_generic_paletteram_32[offset] & 0x7fe00000) >> 10) | ((m_generic_paletteram_32[offset] & 0x1f0000) >> 16);
-	m_palette[offset*2+1] = ((m_generic_paletteram_32[offset] & 0x7fe0) << 6) | (m_generic_paletteram_32[offset] & 0x1f);
+	COMBINE_DATA(&m_paletteram32[offset]);
+	m_palette[offset*2+0] = ((m_paletteram32[offset] & 0x7fe00000) >> 10) | ((m_paletteram32[offset] & 0x1f0000) >> 16);
+	m_palette[offset*2+1] = ((m_paletteram32[offset] & 0x7fe0) << 6) | (m_paletteram32[offset] & 0x1f);
 }
 
 

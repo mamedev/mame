@@ -61,7 +61,8 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(io_map)),
 		m_write_irq(*this),
 		m_write_lh(*this),
-		m_write_rh(*this)
+		m_write_rh(*this),
+		m_irq_status(0)
 {
 }
 

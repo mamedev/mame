@@ -307,23 +307,6 @@ static ADDRESS_MAP_START( ad2083_sound_io_map, AS_IO, 8, scramble_state )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
 ADDRESS_MAP_END
 
-static const tmsprom_interface prom_intf =
-{
-	"5110ctrl",                     /* prom memory region - sound region is automatically assigned */
-	0x1000,                         /* individual rom_size */
-	1,                              /* bit # of pdc line */
-	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	8,                              /* bit # of ctl1 line */
-	2,                              /* bit # of ctl2 line */
-	8,                              /* bit # of ctl4 line */
-	2,                              /* bit # of ctl8 line */
-	6,                              /* bit # of rom reset */
-	7,                              /* bit # of stop */
-	DEVCB_DEVICE_LINE_MEMBER("tms", tms5110_device, pdc_w),        /* tms pdc func */
-	DEVCB_DEVICE_MEMBER("tms", tms5110_device, ctl_w)      /* tms ctl func */
-};
-
-
 MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
@@ -332,7 +315,18 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
-	MCFG_DEVICE_CONFIG(prom_intf)
+	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
+	MCFG_TMSPROM_ROM_SIZE(0x1000)   /* individual rom_size */
+	MCFG_TMSPROM_PDC_BIT(1)         /* bit # of pdc line */
+	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
+	MCFG_TMSPROM_CTL1_BIT(8)        /* bit # of ctl1 line */
+	MCFG_TMSPROM_CTL2_BIT(2)        /* bit # of ctl2 line */
+	MCFG_TMSPROM_CTL4_BIT(8)        /* bit # of ctl4 line */
+	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
+	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
+	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
+	MCFG_TMSPROM_PDC_CB(DEVWRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
+	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)

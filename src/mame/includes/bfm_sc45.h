@@ -603,6 +603,113 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	PORT_DIPSETTING(    0x0e, "14" ) \
 	PORT_DIPSETTING(    0x0f, "15" )
 
+// just use macros for these for now, makes changing them later easier.
+#define PORT_HOLD1( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Hold1")  PORT_CODE(KEYCODE_A)
+
+#define PORT_HOLD2( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_S) 
+
+#define PORT_HOLD3( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON11 )  PORT_NAME("Hold3") PORT_CODE(KEYCODE_D)
+
+#define PORT_HOLD4( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON12 )  PORT_NAME("Hold4") PORT_CODE(KEYCODE_F)
+
+#define PORT_HOLD5( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON13 )  PORT_NAME("Hold5") PORT_CODE(KEYCODE_G)
+
+#define PORT_HOLD6( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON14 )  PORT_NAME("Hold6") PORT_CODE(KEYCODE_H)
+
+#define PORT_HOLD7( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON15 )  PORT_NAME("Hold7") PORT_CODE(KEYCODE_J)
+
+#define PORT_CANCEL( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_2)
+
+#define PORT_STARTBTN( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+
+#define PORT_REFILL( bits ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Refill")
+
+#define PORT_CUSTOMSC4_1( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME(name) PORT_CODE(KEYCODE_Z)
+
+#define PORT_CUSTOMSC4_2( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME(name) PORT_CODE(KEYCODE_X)
+
+#define PORT_CUSTOMSC4_3( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME(name) PORT_CODE(KEYCODE_C)
+
+#define PORT_CUSTOMSC4_4( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME(name) PORT_CODE(KEYCODE_V)
+
+#define PORT_CUSTOMSC4_5( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME(name) PORT_CODE(KEYCODE_B)
+
+#define PORT_CUSTOMSC4_6( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME(name) PORT_CODE(KEYCODE_N)
+
+#define PORT_CUSTOMSC4_7( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME(name) PORT_CODE(KEYCODE_M)
+
+#define PORT_CUSTOMSC4_8( bits, name ) \
+	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME(name) PORT_CODE(KEYCODE_COMMA)
+
+
+
+
+#define SC4_STANDARD_STAKE_KEY \
+	PORT_MODIFY("IN-3") /* the Stake key */ \
+	PORT_DIPNAME( 0x1c, 0x00, "IN 3-2:4 (Stake Key)" ) \
+	PORT_DIPSETTING(    0x00, "0" ) \
+	PORT_DIPSETTING(    0x04, "1" ) \
+	PORT_DIPSETTING(    0x08, "2" ) \
+	PORT_DIPSETTING(    0x0c, "3" ) \
+	PORT_DIPSETTING(    0x10, "4" ) \
+	PORT_DIPSETTING(    0x14, "5" ) \
+	PORT_DIPSETTING(    0x18, "6" ) \
+	PORT_DIPSETTING(    0x1c, "7" )
+
+#define SC4_STANDARD_SYSBUTS \
+	PORT_MODIFY("IN-20") \
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Green Button (Service?)") /* next to the dips on the MB */ \
+	PORT_DIPNAME( 0x0002, 0x0000, "Door Lock" ) /* DORLOK20.1 */ \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0004, 0x0000, "Service Door" ) /* SERDOR20.2 */ \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0008, 0x0000, "Cashbox Door" ) /* CSHDOR20.3 */ \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0010, 0x0000, "Hopper DMP" ) /* HOPDMP20.4 */ \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+
+
+#define SC4_STANDARD_PERCENT_KEY \
+	PORT_MODIFY("IN-6") /* the %age key */ \
+	PORT_DIPNAME( 0x0f, 0x00, "IN 6-0:3 (Percentage Key)" ) \
+	PORT_DIPSETTING(    0x00, "0" ) \
+	PORT_DIPSETTING(    0x01, "1" ) \
+	PORT_DIPSETTING(    0x02, "2" ) \
+	PORT_DIPSETTING(    0x03, "3" ) \
+	PORT_DIPSETTING(    0x04, "4" ) \
+	PORT_DIPSETTING(    0x05, "5" ) \
+	PORT_DIPSETTING(    0x06, "6" ) \
+	PORT_DIPSETTING(    0x07, "7" ) \
+	PORT_DIPSETTING(    0x08, "8" ) \
+	PORT_DIPSETTING(    0x09, "9" ) \
+	PORT_DIPSETTING(    0x0a, "a" ) \
+	PORT_DIPSETTING(    0x0b, "b" ) \
+	PORT_DIPSETTING(    0x0c, "c" ) \
+	PORT_DIPSETTING(    0x0d, "d" ) \
+	PORT_DIPSETTING(    0x0e, "e" ) \
+	PORT_DIPSETTING(    0x0f, "f" )
+
 #define SC4_STANDARD_BLANK_DIPS \
 	PORT_MODIFY("IN-16") \
 	PORT_DIPNAME( 0x0001, 0x0000, "IN 16-0 (DSW1)"  ) /* DIL1 16.0 */ \

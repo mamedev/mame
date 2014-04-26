@@ -61,6 +61,16 @@ READ8_MEMBER(h8_sci_device::brr_r)
 	return brr;
 }
 
+bool h8_sci_device::is_sync_start() const
+{
+	return (ssr & SMR_CA) && ((scr & (SCR_TE|SCR_RE)) == (SCR_TE|SCR_RE));
+}
+
+bool h8_sci_device::has_recv_error() const
+{
+	return ssr & (SSR_ORER|SSR_PER|SSR_FER);
+}
+
 WRITE8_MEMBER(h8_sci_device::scr_w)
 {
 	logerror("%s: scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", tag(), data,
@@ -82,7 +92,7 @@ WRITE8_MEMBER(h8_sci_device::scr_w)
 		clock_stop(CLK_RX);
 	}
 
-	if((delta & SCR_RE) && (scr & SCR_RE) && rx_state == ST_IDLE && !(ssr & (SSR_ORER|SSR_PER|SSR_FER)))
+	if((delta & SCR_RE) && (scr & SCR_RE) && rx_state == ST_IDLE && !has_recv_error() && !is_sync_start())
 		rx_start();
 	if((delta & SCR_TIE) && (scr & SCR_TIE) && (ssr & SSR_TDRE))
 		intc->internal_interrupt(txi_int);
@@ -90,7 +100,7 @@ WRITE8_MEMBER(h8_sci_device::scr_w)
 		intc->internal_interrupt(tei_int);
 	if((delta & SCR_RIE) && (scr & SCR_RIE) && (ssr & SSR_RDRF))
 		intc->internal_interrupt(rxi_int);
-	if((delta & SCR_RIE) && (scr & SCR_RIE) && (ssr & (SSR_ORER|SSR_PER|SSR_FER)))
+	if((delta & SCR_RIE) && (scr & SCR_RIE) && has_recv_error())
 		intc->internal_interrupt(eri_int);
 }
 
@@ -126,7 +136,7 @@ WRITE8_MEMBER(h8_sci_device::ssr_w)
 	if(tx_state == ST_IDLE && !(ssr & SSR_TDRE))
 		tx_start();
 
-	if((scr & SCR_RE) && rx_state == ST_IDLE && !(ssr & (SSR_ORER|SSR_PER|SSR_FER)))
+	if((scr & SCR_RE) && rx_state == ST_IDLE && !has_recv_error() && !is_sync_start())
 		rx_start();
 }
 
@@ -502,6 +512,8 @@ void h8_sci_device::tx_start()
 		tx_bit = 1;
 	}
 	clock_start(CLK_TX);
+	if(rx_state == ST_IDLE && !has_recv_error() && is_sync_start())
+		rx_start();
 }
 
 void h8_sci_device::tx_dropped_edge()
@@ -608,12 +620,12 @@ void h8_sci_device::rx_done()
 		}
 	}
 	if(scr & SCR_RIE) {
-		if(ssr & (SSR_ORER|SSR_PER|SSR_FER))
+		if(has_recv_error())
 			intc->internal_interrupt(eri_int);
 		else
 			intc->internal_interrupt(rxi_int);
 	}
-	if((scr & SCR_RE) && !(ssr & (SSR_ORER|SSR_PER|SSR_FER)))
+	if((scr & SCR_RE) && !has_recv_error() && !is_sync_start())
 		rx_start();
 	else {
 		clock_stop(CLK_RX);

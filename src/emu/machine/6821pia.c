@@ -60,6 +60,8 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 	m_cb2_handler(*this),
 	m_irqa_handler(*this),
 	m_irqb_handler(*this),
+	m_in_ca1(0),
+	m_ctl_a(0),
 	m_irq_a_state(0),
 	m_in_cb1(0),
 	m_ctl_b(0),

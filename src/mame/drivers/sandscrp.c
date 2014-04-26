@@ -1,8 +1,8 @@
 /*
 
-    Sand Scorpion
+    Sand Scorpion    (C) 1992 FACE
 
-(C) 1992 FACE
+driver by   Luca Elia (l.elia@tin.it)
 
 PCB Number: Z03VA-001
 

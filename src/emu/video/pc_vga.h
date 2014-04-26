@@ -556,6 +556,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	struct
 	{
 		UINT8 memory_config;
@@ -573,6 +574,7 @@ protected:
 		UINT8 id_low;
 		UINT8 revision;
 		UINT8 id_cr30;
+		UINT32 strapping;  // power-on strapping bits
 		UINT8 sr10;   // MCLK PLL
 		UINT8 sr11;   // MCLK PLL
 		UINT8 sr12;   // DCLK PLL

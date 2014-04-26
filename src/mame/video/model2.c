@@ -945,8 +945,9 @@ static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangl
 		extra->texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
 		extra->texx = 32 * ((tri->texheader[2] >> 0) & 0x1f);
 		extra->texy = 32 * (((tri->texheader[2] >> 6) & 0x1f) + ( tri->texheader[2] & 0x20 ));
-		extra->texmirrorx = (tri->texheader[0] >> 9) & 1;
-		extra->texmirrory = (tri->texheader[0] >> 8) & 1;
+		/* TODO: Virtua Striker contradicts with this. */
+		extra->texmirrorx = 0;//(tri->texheader[0] >> 9) & 1;
+		extra->texmirrory = 0;//(tri->texheader[0] >> 8) & 1;
 		extra->texsheet = (tri->texheader[2] & 0x1000) ? state->m_textureram1 : state->m_textureram0;
 
 		tri->v[0].pz = 1.0f / (1.0f + tri->v[0].pz);

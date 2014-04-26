@@ -40,6 +40,7 @@ i8251_device::i8251_device(const machine_config &mconfig, const char *tag, devic
 	m_syndet_handler(*this),
 	m_cts(1),
 	m_dsr(1),
+	m_rxd(0),
 	m_rxc(0),
 	m_txc(0)
 {

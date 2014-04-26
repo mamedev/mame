@@ -346,8 +346,6 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 	return r;
 }
 
-// Todo:  Tatsumi self-test fails if OKI doesn't respond (when sound off).
-// Mame really should emulate the OKI status reads even with Mame sound off.
 READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 {
 	int r=m_oki->read(space,0);

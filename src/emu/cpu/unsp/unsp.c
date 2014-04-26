@@ -126,6 +126,7 @@ void unsp_device::device_start()
 	m_sirq = 0;
 	m_sb = 0;
 	m_saved_sb = 0;
+	m_debugger_temp = 0;
 
 	m_program = &space(AS_PROGRAM);
 

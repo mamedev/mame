@@ -94,21 +94,9 @@ static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0xe00000, 0xefffff ) AM_READ( cybikoxt_key_r )
 ADDRESS_MAP_END
 
-READ16_MEMBER(cybiko_state::serflash_r)
-{
-	if (m_flash1->so_r())
-	{
-		return 0x08;
-	}
-
-	return 0;
-}
-
 WRITE16_MEMBER(cybiko_state::serflash_w)
 {
 	m_flash1->cs_w ((data & 0x10) ? 0 : 1);
-	m_flash1->si_w ((data & 0x02) ? 1 : 0);
-	m_flash1->sck_w((data & 0x20) ? 1 : 0);
 }
 
 READ16_MEMBER(cybiko_state::clock_r)
@@ -155,11 +143,11 @@ READ16_MEMBER(cybiko_state::xtpower_r)
 //////////////////////
 
 static ADDRESS_MAP_START( cybikov1_io, AS_IO, 16, cybiko_state )
-	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READWRITE(serflash_r, serflash_w)
+	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_WRITE(serflash_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
-	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READWRITE(serflash_r, serflash_w)
+	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_WRITE(serflash_w)
 	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(clock_r, clock_w)
 ADDRESS_MAP_END
 
@@ -347,6 +335,10 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
 	MCFG_CPU_IO_MAP( cybikov1_io )
 
+	MCFG_DEVICE_MODIFY("maincpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, si_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, sck_w))
+
 	// screen
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -365,6 +357,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	/* rtc */
 	MCFG_PCF8593_ADD("rtc")
 	MCFG_AT45DB041_ADD("flash1")
+	MCFG_AT45DBXXX_SO_CALLBACK(DEVWRITELINE("maincpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	
@@ -380,8 +373,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL_11_0592MHz)
-	MCFG_CPU_PROGRAM_MAP(cybikov2_mem )
-	MCFG_CPU_IO_MAP(cybikov2_io )
+	MCFG_CPU_PROGRAM_MAP(cybikov2_mem)
+	MCFG_CPU_IO_MAP(cybikov2_io)
+
+	MCFG_DEVICE_MODIFY("maincpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, si_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, sck_w))
 
 	// machine
 	MCFG_SST_39VF020_ADD("flash2")

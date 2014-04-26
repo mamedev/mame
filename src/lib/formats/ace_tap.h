@@ -11,6 +11,7 @@
 
 #include "cassimg.h"
 
+#if 0
 struct ace_tape_t
 {
 	UINT8 hdr_type;
@@ -22,6 +23,7 @@ struct ace_tape_t
 	UINT8 hdr_3c4d;
 	UINT16 dat_len;
 };
+#endif
 
 CASSETTE_FORMATLIST_EXTERN(ace_cassette_formats);
 

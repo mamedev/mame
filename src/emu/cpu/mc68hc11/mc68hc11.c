@@ -421,16 +421,7 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_pr));
 	save_item(NAME(m_frc_base));
 
-	state_add( HC11_PC, "PC", m_pc).formatstr("%04X");
-	state_add( HC11_SP, "SP", m_sp).formatstr("%04X");
-	state_add( HC11_A,  "A", m_d.d8.a).formatstr("%02X");
-	state_add( HC11_B,  "B", m_d.d8.b).formatstr("%02X");
-	state_add( HC11_IX, "IX", m_ix).formatstr("%04X");
-	state_add( HC11_IY, "IY", m_iy).formatstr("%04X");
-
-	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
-
+	m_pc = 0;
 	m_d.d16 = 0;
 	m_ix = 0;
 	m_iy = 0;
@@ -443,6 +434,16 @@ void mc68hc11_cpu_device::device_start()
 	m_reg_position = 0;
 	m_tflg1 = 0;
 	m_tmsk1 = 0;
+
+	state_add( HC11_PC, "PC", m_pc).formatstr("%04X");
+	state_add( HC11_SP, "SP", m_sp).formatstr("%04X");
+	state_add( HC11_A,  "A", m_d.d8.a).formatstr("%02X");
+	state_add( HC11_B,  "B", m_d.d8.b).formatstr("%02X");
+	state_add( HC11_IX, "IX", m_ix).formatstr("%04X");
+	state_add( HC11_IY, "IY", m_iy).formatstr("%04X");
+
+	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
 }
