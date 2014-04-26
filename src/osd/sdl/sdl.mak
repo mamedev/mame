@@ -802,8 +802,6 @@ testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-$(SDLOBJ)/sdlmidi.o: $(SRC)/osd/portmedia/pmmidi.inc
-
 #-------------------------------------------------
 # clean up
 #-------------------------------------------------
