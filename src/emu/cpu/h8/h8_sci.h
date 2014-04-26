@@ -165,6 +165,9 @@ protected:
 	void rx_start();
 	void rx_done();
 	void rx_raised_edge();
+
+	bool is_sync_start() const;
+	bool has_recv_error() const;
 };
 
 extern const device_type H8_SCI;

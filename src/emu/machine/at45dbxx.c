@@ -82,6 +82,14 @@ void at45db041_device::device_start()
 	m_buffer1.resize(page_size());
 	//m_buffer2.resize(page_size());
 
+	// pins
+	m_pin.cs    = 0;
+	m_pin.sck   = 0;
+	m_pin.si    = 0;
+	m_pin.wp    = 0;
+	m_pin.reset = 0;
+	m_pin.busy  = 0;
+
 	// data
 	save_item(NAME(m_data));
 	// pins
@@ -115,13 +123,7 @@ void at45db041_device::device_reset()
 	m_io.size = 0;
 	m_io.pos  = 0;
 	// pins
-	m_pin.cs    = 0;
-	m_pin.sck   = 0;
-	m_pin.si    = 0;
-	m_pin.so    = 0;
-	m_pin.wp    = 0;
-	m_pin.reset = 0;
-	m_pin.busy  = 0;
+	m_pin.so  = 0;
 	// output
 	m_so_byte = 0;
 	m_so_bits = 0;
@@ -362,6 +364,13 @@ WRITE_LINE_MEMBER(at45db041_device::sck_w)
 			m_so_bits = 0;
 			m_so_byte = read_byte();
 		}
+		// output (part 2)
+		m_pin.so = (m_so_byte >> m_so_bits) & 1;
+		write_so(m_pin.so);
+		m_so_bits++;
+	}
+	else
+	{
 		// input
 		if (m_pin.si) m_si_byte = m_si_byte | (1 << m_si_bits);
 		m_si_bits++;
@@ -371,10 +380,6 @@ WRITE_LINE_MEMBER(at45db041_device::sck_w)
 			write_byte(m_si_byte);
 			m_si_byte = 0;
 		}
-		// output (part 2)
-		m_pin.so = (m_so_byte >> m_so_bits) & 1;
-		write_so(m_pin.so);
-		m_so_bits++;
 	}
 	// save sck
 	m_pin.sck = state;

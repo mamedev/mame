@@ -54,7 +54,7 @@ def save_full_one(f, t, name, source):
             print >>f, line
             substate = substate + 1
         elif has_eat(line):
-            print >>f, "\ticount = bcount; inst_substate = %d; return;" % substate
+            print >>f, "\tif(icount) icount = bcount; inst_substate = %d; return;" % substate
             substate = substate + 1
         else:
             print >>f, line
@@ -74,7 +74,7 @@ def save_partial_one(f, t, name, source):
             print >>f, line
             substate = substate + 1
         elif has_eat(line):
-            print >>f, "\ticount = bcount; inst_substate = %d; return;" % substate
+            print >>f, "\tif(icount) icount = bcount; inst_substate = %d; return;" % substate
             print >>f, "case %d:;" % substate
             substate = substate + 1
         else:
