@@ -16,9 +16,10 @@
 
 const device_type S3VIRGE = &device_creator<s3virge_vga_device>;
 const device_type S3VIRGEDX = &device_creator<s3virgedx_vga_device>;
+const device_type S3VIRGEDX1 = &device_creator<s3virgedx_rev1_vga_device>;
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: s3_vga_device(mconfig, S3VIRGE, "S3VIRGE", tag, owner, clock, "s3virge_vga", __FILE__)
+	: s3_vga_device(mconfig, S3VIRGE, "S3 86C325", tag, owner, clock, "virge_vga", __FILE__)
 {
 }
 
@@ -28,7 +29,17 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_typ
 }
 
 s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: s3virge_vga_device(mconfig, S3VIRGEDX, "S3VIRGEDX", tag, owner, clock, "s3virgedx_vga", __FILE__)
+	: s3virge_vga_device(mconfig, S3VIRGEDX, "S3 86C375", tag, owner, clock, "virgedx_vga", __FILE__)
+{
+}
+
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: s3virge_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: s3virgedx_vga_device(mconfig, S3VIRGEDX1, "S3 86C375 (rev 1)", tag, owner, clock, "virgedx_r1", __FILE__)
 {
 }
 
@@ -83,6 +94,17 @@ void s3virgedx_vga_device::device_start()
 	s3.id_cr30 = 0xe1;  // CR30
 }
 
+void s3virgedx_rev1_vga_device::device_start()
+{
+	s3virge_vga_device::device_start();
+
+	// set device ID
+	s3.id_high = 0x8a;  // CR2D
+	s3.id_low = 0x01;   // CR2E
+	s3.revision = 0x01; // CR2F
+	s3.id_cr30 = 0xe1;  // CR30
+}
+
 void s3virge_vga_device::device_reset()
 {
 	vga_device::device_reset();
@@ -97,6 +119,15 @@ void s3virgedx_vga_device::device_reset()
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0912;
+}
+
+void s3virgedx_rev1_vga_device::device_reset()
+{
+	vga_device::device_reset();
+	// Power-on strapping bits.  Sampled at reset, but can be modified later.
+	// These are based on results from a Diamond Stealth 3D 2000 Pro (Virge/DX based)
+	// bits 8-15 are still unknown, S3ID doesn't show config register 2 (CR37)
+	s3.strapping = 0x0aff0912;
 }
 
 UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)

@@ -50,6 +50,21 @@ class s3virgedx_vga_device :  public s3virge_vga_device
 public:
 	// construction/destruction
 	s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+};
+
+// ======================> s3virgedx_vga_device
+
+class s3virgedx_rev1_vga_device :  public s3virgedx_vga_device
+{
+public:
+	// construction/destruction
+	s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -60,5 +75,6 @@ protected:
 // device type definition
 extern const device_type S3VIRGE;
 extern const device_type S3VIRGEDX;
+extern const device_type S3VIRGEDX1;
 
 #endif /* S3VIRGE_H_ */
