@@ -152,11 +152,30 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_halfspeed)
 
 READ8_MEMBER( super80_state::port3e_r )
 {
-	return 0xff;
+	return 0xF8 | m_fdc->intrq_r() | (m_fdc->drq_r() << 1) | 2;
 }
 
+// UFDC board can support 4 drives; we support 2
 WRITE8_MEMBER( super80_state::port3f_w )
 {
+	// m_fdc->58(BIT(data, 0));   5/8 pin not emulated in wd_fdc
+	m_fdc->set_unscaled_clock(BIT(data, 1) ? 2e6 : 1e6); // ENMF pin not emulated in wd_fdc
+
+	floppy_image_device *floppy = NULL;
+	if (BIT(data, 2)) floppy = m_floppy0->get_device();
+	if (BIT(data, 3)) floppy = m_floppy1->get_device();
+	//if (BIT(data, 4)) floppy = m_floppy2->get_device();
+	//if (BIT(data, 5)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(!BIT(data, 6));
+	}
+
+	m_fdc->dden_w(BIT(data, 7));
 }
 
 READ8_MEMBER( super80_state::super80_f2_r )
