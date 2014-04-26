@@ -126,9 +126,10 @@ UINT8* prom_load(running_machine& machine, const prom_load_t* prom, const UINT8*
 		break;
 	}
 
-	UINT8* dst = reinterpret_cast<UINT8*>(array);
+	UINT8* base = reinterpret_cast<UINT8*>(array);
 	for (int page = 0; page < pages; page++)
 	{
+		UINT8* dst = base + (prom->type * prom->size * page);
 		for (int segment = 0; segment < segments; segment++, prom++)
 		{
 			for (UINT32 src_addr = 0; src_addr < prom->size; src_addr++)
@@ -148,7 +149,6 @@ UINT8* prom_load(running_machine& machine, const prom_load_t* prom, const UINT8*
 			}
 			src += prom->size;
 		}
-		dst += prom->type * prom->size;
 	}
 
 #if DEBUG_PROM_LOAD
