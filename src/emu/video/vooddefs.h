@@ -3328,25 +3328,6 @@ do                                                                              
 	/* handle alpha mask */                                                     \
 	APPLY_ALPHAMASK(VV, STATS, FBZMODE, c_other.rgb.a);                         \
 																				\
-	/* handle alpha test */                                                     \
-	APPLY_ALPHATEST(VV, STATS, ALPHAMODE, c_other.rgb.a);                       \
-																				\
-	/* compute c_local */                                                       \
-	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)                       \
-	{                                                                           \
-		if (FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0)    /* iterated RGB */      \
-			c_local.u = ITERARGB.u;                                             \
-		else                                            /* color0 RGB */        \
-			c_local.u = (VV)->reg[color0].u;                                    \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		if (!(TEXELARGB.rgb.a & 0x80))                  /* iterated RGB */      \
-			c_local.u = ITERARGB.u;                                             \
-		else                                            /* color0 RGB */        \
-			c_local.u = (VV)->reg[color0].u;                                    \
-	}                                                                           \
-																				\
 	/* compute a_local */                                                       \
 	switch (FBZCP_CCA_LOCALSELECT(FBZCOLORPATH))                                \
 	{                                                                           \
@@ -3376,6 +3357,79 @@ do                                                                              
 		}                                                                       \
 	}                                                                           \
 																				\
+	/* select zero or a_other */                                                \
+	if (FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH) == 0)                                \
+		a = c_other.rgb.a;                                                      \
+	else                                                                        \
+		a = 0;                                                                  \
+																				\
+	/* subtract a_local */                                                      \
+	if (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))                                     \
+		a -= c_local.rgb.a;                                                     \
+																				\
+	/* blend alpha */                                                           \
+	switch (FBZCP_CCA_MSELECT(FBZCOLORPATH))                                    \
+	{                                                                           \
+		default:    /* reserved */                                              \
+		case 0:     /* 0 */                                                     \
+			blenda = 0;                                                         \
+			break;                                                              \
+																				\
+		case 1:     /* a_local */                                               \
+			blenda = c_local.rgb.a;                                             \
+			break;                                                              \
+																				\
+		case 2:     /* a_other */                                               \
+			blenda = c_other.rgb.a;                                             \
+			break;                                                              \
+																				\
+		case 3:     /* a_local */                                               \
+			blenda = c_local.rgb.a;                                             \
+			break;                                                              \
+																				\
+		case 4:     /* texture alpha */                                         \
+			blenda = TEXELARGB.rgb.a;                                           \
+			break;                                                              \
+	}                                                                           \
+																				\
+	/* reverse the alpha blend */                                               \
+	if (!FBZCP_CCA_REVERSE_BLEND(FBZCOLORPATH))                                 \
+		blenda ^= 0xff;                                                         \
+																				\
+	/* do the blend */                                                          \
+	a = (a * (blenda + 1)) >> 8;                                                \
+																				\
+	/* add clocal or alocal to alpha */                                         \
+	if (FBZCP_CCA_ADD_ACLOCAL(FBZCOLORPATH))                                    \
+		a += c_local.rgb.a;                                                     \
+                                                                                \
+	/* clamp */                                                                 \
+	CLAMP(a, 0x00, 0xff);                                                       \
+	                                                                            \
+	/* invert */                                                                \
+	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))                                  \
+		a ^= 0xff;                                                              \
+																				\
+	/* handle alpha test */                                                     \
+	APPLY_ALPHATEST(VV, STATS, ALPHAMODE, a);                                   \
+																				\
+																				\
+	/* compute c_local */                                                       \
+	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)                       \
+	{                                                                           \
+		if (FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0)    /* iterated RGB */      \
+			c_local.u = ITERARGB.u;                                             \
+		else                                            /* color0 RGB */        \
+			c_local.u = (VV)->reg[color0].u;                                    \
+	}                                                                           \
+	else                                                                        \
+	{                                                                           \
+		if (!(TEXELARGB.rgb.a & 0x80))                  /* iterated RGB */      \
+			c_local.u = ITERARGB.u;                                             \
+		else                                            /* color0 RGB */        \
+			c_local.u = (VV)->reg[color0].u;                                    \
+	}                                                                           \
+																				\
 	/* select zero or c_other */                                                \
 	if (FBZCP_CC_ZERO_OTHER(FBZCOLORPATH) == 0)                                 \
 	{                                                                           \
@@ -3386,12 +3440,6 @@ do                                                                              
 	else                                                                        \
 		r = g = b = 0;                                                          \
 																				\
-	/* select zero or a_other */                                                \
-	if (FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH) == 0)                                \
-		a = c_other.rgb.a;                                                      \
-	else                                                                        \
-		a = 0;                                                                  \
-																				\
 	/* subtract c_local */                                                      \
 	if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH))                                      \
 	{                                                                           \
@@ -3399,10 +3447,6 @@ do                                                                              
 		g -= c_local.rgb.g;                                                     \
 		b -= c_local.rgb.b;                                                     \
 	}                                                                           \
-																				\
-	/* subtract a_local */                                                      \
-	if (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))                                     \
-		a -= c_local.rgb.a;                                                     \
 																				\
 	/* blend RGB */                                                             \
 	switch (FBZCP_CC_MSELECT(FBZCOLORPATH))                                     \
@@ -3437,31 +3481,6 @@ do                                                                              
 			break;                                                              \
 	}                                                                           \
 																				\
-	/* blend alpha */                                                           \
-	switch (FBZCP_CCA_MSELECT(FBZCOLORPATH))                                    \
-	{                                                                           \
-		default:    /* reserved */                                              \
-		case 0:     /* 0 */                                                     \
-			blenda = 0;                                                         \
-			break;                                                              \
-																				\
-		case 1:     /* a_local */                                               \
-			blenda = c_local.rgb.a;                                             \
-			break;                                                              \
-																				\
-		case 2:     /* a_other */                                               \
-			blenda = c_other.rgb.a;                                             \
-			break;                                                              \
-																				\
-		case 3:     /* a_local */                                               \
-			blenda = c_local.rgb.a;                                             \
-			break;                                                              \
-																				\
-		case 4:     /* texture alpha */                                         \
-			blenda = TEXELARGB.rgb.a;                                           \
-			break;                                                              \
-	}                                                                           \
-																				\
 	/* reverse the RGB blend */                                                 \
 	if (!FBZCP_CC_REVERSE_BLEND(FBZCOLORPATH))                                  \
 	{                                                                           \
@@ -3470,15 +3489,10 @@ do                                                                              
 		blendb ^= 0xff;                                                         \
 	}                                                                           \
 																				\
-	/* reverse the alpha blend */                                               \
-	if (!FBZCP_CCA_REVERSE_BLEND(FBZCOLORPATH))                                 \
-		blenda ^= 0xff;                                                         \
-																				\
 	/* do the blend */                                                          \
 	r = (r * (blendr + 1)) >> 8;                                                \
 	g = (g * (blendg + 1)) >> 8;                                                \
 	b = (b * (blendb + 1)) >> 8;                                                \
-	a = (a * (blenda + 1)) >> 8;                                                \
 																				\
 	/* add clocal or alocal to RGB */                                           \
 	switch (FBZCP_CC_ADD_ACLOCAL(FBZCOLORPATH))                                 \
@@ -3500,15 +3514,10 @@ do                                                                              
 			break;                                                              \
 	}                                                                           \
 																				\
-	/* add clocal or alocal to alpha */                                         \
-	if (FBZCP_CCA_ADD_ACLOCAL(FBZCOLORPATH))                                    \
-		a += c_local.rgb.a;                                                     \
-																				\
 	/* clamp */                                                                 \
 	CLAMP(r, 0x00, 0xff);                                                       \
 	CLAMP(g, 0x00, 0xff);                                                       \
 	CLAMP(b, 0x00, 0xff);                                                       \
-	CLAMP(a, 0x00, 0xff);                                                       \
 																				\
 	/* invert */                                                                \
 	if (FBZCP_CC_INVERT_OUTPUT(FBZCOLORPATH))                                   \
@@ -3517,8 +3526,6 @@ do                                                                              
 		g ^= 0xff;                                                              \
 		b ^= 0xff;                                                              \
 	}                                                                           \
-	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))                                  \
-		a ^= 0xff;                                                              \
 }                                                                               \
 while (0)
 
