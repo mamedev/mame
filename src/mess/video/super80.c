@@ -1,4 +1,4 @@
-/* Super80.c written by Robbbert, 2005-2010. See the MESS wiki for documentation. */
+/* Super80.c written by Robbbert, 2005-2010. See the driver source for documentation. */
 
 /* Notes on using MAME MC6845 Device (MMD).
     1. Speed of MMD is about 20% slower than pre-MMD coding
@@ -382,7 +382,7 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15]; // get cursor position
 	m_s_options=m_io_config->read();
 	output_set_value("cass_led",BIT(m_shared, 5));
-	m_6845->screen_update(screen, bitmap, cliprect);
+	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -446,12 +446,12 @@ WRITE8_MEMBER( super80_state::super80v_10_w )
 {
 	data &= 0x1f;
 	m_mc6845_ind = data;
-	m_6845->address_w( space, 0, data );
+	m_crtc->address_w( space, 0, data );
 }
 
 WRITE8_MEMBER( super80_state::super80v_11_w )
 {
 	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];  /* save data in register */
-	m_6845->register_w( space, 0, data );
+	m_crtc->register_w( space, 0, data );
 	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12)) mc6845_cursor_configure();       /* adjust cursor shape - remove when mame fixed */
 }

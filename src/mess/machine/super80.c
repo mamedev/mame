@@ -11,7 +11,7 @@ WRITE8_MEMBER( super80_state::pio_port_a_w )
 	m_keylatch = data;
 };
 
-READ8_MEMBER(super80_state::pio_port_b_r)
+READ8_MEMBER( super80_state::pio_port_b_r )
 {
 	UINT8 data = 0xff;
 
@@ -150,6 +150,15 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_halfspeed)
 
 /**************************** I/O PORTS *****************************************************************/
 
+READ8_MEMBER( super80_state::port3e_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( super80_state::port3f_w )
+{
+}
+
 READ8_MEMBER( super80_state::super80_f2_r )
 {
 	UINT8 data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
@@ -198,7 +207,7 @@ void super80_state::machine_reset()
 	membank("boot")->set_entry(1);
 }
 
-void super80_state::driver_init_common(  )
+void super80_state::driver_init_common()
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
