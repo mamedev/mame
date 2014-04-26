@@ -33,6 +33,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	virtual UINT8 s3_crtc_reg_read(UINT8 index);
@@ -53,6 +54,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 };
 
 // device type definition
