@@ -89,8 +89,6 @@ extern win_video_config video_config;
 //  PROTOTYPES
 //============================================================
 
-void winvideo_init(running_machine &machine);
-
 void winvideo_monitor_refresh(win_monitor_info *monitor);
 float winvideo_monitor_get_aspect(win_monitor_info *monitor);
 win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);

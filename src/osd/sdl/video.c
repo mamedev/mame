@@ -92,7 +92,7 @@ static void get_resolution(const char *defdata, const char *data, sdl_window_con
 
 
 //============================================================
-//  sdlvideo_init
+//  video_init
 //============================================================
 
 bool sdl_osd_interface::video_init()

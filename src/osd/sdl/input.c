@@ -1382,7 +1382,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 #endif
 
 //============================================================
-//  sdlinput_init
+//  input_init
 //============================================================
 
 bool sdl_osd_interface::input_init()
