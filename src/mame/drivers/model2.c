@@ -2414,6 +2414,7 @@ WRITE32_MEMBER(model2_state::copro_tgp_buffer_w)
 static ADDRESS_MAP_START( copro_tgp_map, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgp_program")
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_tgp_buffer_r, copro_tgp_buffer_w)
+//	AM_RANGE(0x00800000, 0x009fffff) AM_ROM AM_REGION("user5", 0)
 	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION("tgp", 0)
 ADDRESS_MAP_END
 
@@ -3419,7 +3420,7 @@ ROM_START( skytargt ) /* Sky Target, Model 2A */
 
 	ROM_REGION( 0x800000, "tgp", ROMREGION_ERASE00 ) // TGP data (COPRO sockets)
 
-	ROM_REGION( 0x800000, "user5", 0 ) // Coprocessor Data ROM
+	ROM_REGION( 0x800000, "user7", 0 ) // Coprocessor Data ROM, check me!
 	ROM_LOAD32_WORD( "mpr-18420.28", 0x000000, 0x200000, CRC(92b87817) SHA1(b6949b745d0bedeecd6d0240f8911cb345c16d8d) )
 	ROM_LOAD32_WORD( "mpr-18419.29", 0x000002, 0x200000, CRC(74542d87) SHA1(37230e96dd526fb47fcbde5778e5466d8955a969) )
 
@@ -3441,6 +3442,9 @@ ROM_START( skytargt ) /* Sky Target, Model 2A */
 	ROM_LOAD( "mpr-18423.32",   0x200000, 0x200000, CRC(c356d765) SHA1(ae69c9d4e333579d826178d2863156dc784aedef) )
 	ROM_LOAD( "mpr-18422.36",   0x400000, 0x200000, CRC(b4f3cea6) SHA1(49669be09e10dfae7fddce0fc4e415466cb29566) )
 	ROM_LOAD( "mpr-18421.37",   0x600000, 0x200000, CRC(00522390) SHA1(5dbbf2ba008adad36929fcecb7c2c1e5ffd12618) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
 ROM_END
 
 ROM_START( vcop2 ) /* Virtua Cop 2, Model 2A, Sega Game ID# 833-12266, ROM board ID# 834-12267 */

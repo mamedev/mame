@@ -992,8 +992,6 @@ void mb86233_cpu_device::execute_run()
 		debugger_instruction_hook(this, GETPC());
 
 		opcode = ROPCODE(GETPC());
-		//if(GETPC() != 0x77)
-		//printf("%08x %08x\n",GETPC(),opcode);
 
 		GETFIFOWAIT() = 0;
 
@@ -1010,18 +1008,23 @@ void mb86233_cpu_device::execute_run()
 
 				switch( op )
 				{
+					case 0x01:
+						GETA().u = GETARAM()[INDIRECT(r1,1)];
+						GETB().u = GETEXTERNAL( GETEB(),INDIRECT(r2|(2<<6), 0));
+					break;
+
 					case 0x04: // ?
 						GETA().u = GETARAM()[r1];
 						GETB().u = GETEXTERNAL( GETEB(),r2);
 					break;
 
 					case 0x0C:
-						GETA().u = GETARAM()[r1];
+						GETA().u = GETARAM()[INDIRECT(r1,1)];
 						GETB().u = GETBRAM()[r2];
 					break;
 
-					case 0x0D:
-						GETA().u = GETARAM()[INDIRECT(r1,0)];
+					case 0x0D: // VF2 shadows
+						GETA().u = GETARAM()[INDIRECT(r1,1)];
 						GETB().u = GETBRAM()[INDIRECT(r2|2<<6,0)];
 					break;
 
