@@ -124,7 +124,7 @@ void osd_interface::init_debugger()
 	// is active. This gives any OSD debugger interface a chance to
 	// create all of its structures.
 	//
-	osd_debugger_type debugger = m_debugger_options.find("windows");//machine().options().debugger());
+	osd_debugger_type debugger = m_debugger_options.find("qt");//machine().options().debugger());
 	if (debugger==NULL) 
 	{
 		osd_printf_warning("debugger_init: option %s not found swithing debugger off\n","windows");//machine().options().debugger());

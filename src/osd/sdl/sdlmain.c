@@ -50,7 +50,7 @@
 #include "osdsdl.h"
 #include "sdlos.h"
 #include "modules/sound/sdl_sound.h"
-
+#include "modules/debugger/debugqt.h"
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
 
@@ -576,6 +576,15 @@ static void osd_sdl_info(void)
 void sdl_osd_interface::sound_register()
 {
 	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
+}
+
+//============================================================
+//  debugger_register
+//============================================================
+
+void sdl_osd_interface::debugger_register()
+{
+	m_debugger_options.add("qt", OSD_DEBUGGER_QT, false);
 }
 
 //============================================================

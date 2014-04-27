@@ -83,6 +83,12 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
+OSDSRC = $(SRC)/osd
+OSDOBJ = $(OBJ)/osd
+
+#ifdef USE_QTDEBUG
+OBJDIRS += $(OSDOBJ)/modules/debugger/qt
+#endif
 
 ifndef SDL_LIBVER
 SDL_LIBVER = sdl
@@ -634,25 +640,25 @@ endif # OS2
 #-------------------------------------------------
 
 ifndef NO_USE_QTDEBUG
-$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+$(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
 	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
 
 DEBUGOBJS = \
-	$(SDLOBJ)/debugqt.o \
-	$(SDLOBJ)/debugqtview.o \
-	$(SDLOBJ)/debugqtwindow.o \
-	$(SDLOBJ)/debugqtlogwindow.o \
-	$(SDLOBJ)/debugqtdasmwindow.o \
-	$(SDLOBJ)/debugqtmainwindow.o \
-	$(SDLOBJ)/debugqtmemorywindow.o \
-	$(SDLOBJ)/debugqtbreakpointswindow.o \
-	$(SDLOBJ)/debugqtview.moc.o \
-	$(SDLOBJ)/debugqtwindow.moc.o \
-	$(SDLOBJ)/debugqtlogwindow.moc.o \
-	$(SDLOBJ)/debugqtdasmwindow.moc.o \
-	$(SDLOBJ)/debugqtmainwindow.moc.o \
-	$(SDLOBJ)/debugqtmemorywindow.moc.o \
-	$(SDLOBJ)/debugqtbreakpointswindow.moc.o
+	$(OSDOBJ)/modules/debugger/debugqt.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtview.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o
 endif
 
 ifeq ($(NO_DEBUGGER),1)
