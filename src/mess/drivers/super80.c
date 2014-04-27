@@ -760,7 +760,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(100)) // keyb scan
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_h", super80_state, timer_h, attotime::from_hz(100)) // half-speed
 MACHINE_CONFIG_END
 
@@ -785,7 +785,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80m)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16)
+	MCFG_PALETTE_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -809,7 +809,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80v)
 	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
 
-	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)

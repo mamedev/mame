@@ -99,6 +99,7 @@ public:
 	UINT8 m_flash;
 	UINT16 m_cursor;
 	UINT8 m_mc6845_cursor[16];
+	UINT8 m_palette_index;
 	required_device<palette_device> m_palette;
 private:
 	virtual void machine_reset();
@@ -108,14 +109,12 @@ private:
 	UINT8 m_last_data;
 	UINT8 m_key_pressed;
 	UINT16 m_vidpg;
-	UINT8 m_current_palette;
 	UINT8 m_current_charset;
 	const UINT8 *m_p_chargen;
 	UINT8 m_mc6845_reg[32];
 	UINT8 m_mc6845_ind;
 	UINT8 *m_p_ram;
 	void mc6845_cursor_configure();
-	void palette_set_colors_rgb(const UINT8 *colors);
 	void super80_cassette_motor(UINT8 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;

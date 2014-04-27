@@ -11,60 +11,43 @@
 
 /**************************** PALETTES for super80m and super80v ******************************************/
 
-static const UINT8 super80_rgb_palette[16*3] =
+PALETTE_INIT_MEMBER( super80_state, super80m )
 {
-	0x00, 0x00, 0x00,   /*  0 Black     */
-	0x00, 0x00, 0x00,   /*  1 Black     */
-	0x00, 0x00, 0x7f,   /*  2 Blue      */
-	0x00, 0x00, 0xff,   /*  3 Light Blue    */
-	0x00, 0x7f, 0x00,   /*  4 Green     */
-	0x00, 0xff, 0x00,   /*  5 Bright Green  */
-	0x00, 0x7f, 0x7f,   /*  6 Cyan      */
-	0x00, 0xff, 0xff,   /*  7 Turquoise     */
-	0x7f, 0x00, 0x00,   /*  8 Dark Red      */
-	0xff, 0x00, 0x00,   /*  9 Red       */
-	0x7f, 0x00, 0x7f,   /* 10 Purple        */
-	0xff, 0x00, 0xff,   /* 11 Magenta       */
-	0x7f, 0x7f, 0x00,   /* 12 Lime      */
-	0xff, 0xff, 0x00,   /* 13 Yellow        */
-	0xbf, 0xbf, 0xbf,   /* 14 Off White     */
-	0xff, 0xff, 0xff,   /* 15 White     */
-};
-
-static const UINT8 super80_comp_palette[16*3] =
-{
-	0x00, 0x00, 0x00,   /*  0 Black     */
-	0x80, 0x80, 0x80,   /*  1 Grey      */
-	0x00, 0x00, 0xff,   /*  2 Blue      */
-	0xff, 0xff, 0x80,   /*  3 Light Yellow  */
-	0x00, 0xff, 0x00,   /*  4 Green     */
-	0xff, 0x80, 0xff,   /*  5 Light Magenta */
-	0x00, 0xff, 0xff,   /*  6 Cyan      */
-	0xff, 0x40, 0x40,   /*  7 Light Red     */
-	0xff, 0x00, 0x00,   /*  8 Red       */
-	0x00, 0x80, 0x80,   /*  9 Dark Cyan     */
-	0xff, 0x00, 0xff,   /* 10 Magenta       */
-	0x80, 0xff, 0x80,   /* 11 Light Green   */
-	0xff, 0xff, 0x00,   /* 12 Yellow        */
-	0x00, 0x00, 0x80,   /* 13 Dark Blue     */
-	0xff, 0xff, 0xff,   /* 14 White     */
-	0x00, 0x00, 0x00,   /* 15 Black     */
-};
-
-void super80_state::palette_set_colors_rgb(const UINT8 *colors)
-{
-	UINT8 r, b, g, color_count = 16;
-
-	while (color_count--)
-	{
-		r = *colors++; g = *colors++; b = *colors++;
-		m_palette->set_pen_color(15-color_count, rgb_t(r, g, b));
-	}
-}
-
-PALETTE_INIT_MEMBER(super80_state,super80m)
-{
-	palette_set_colors_rgb(super80_rgb_palette);
+	// RGB
+	//palette_set_colors_rgb(super80_rgb_palette);
+	m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */
+	m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00));   /*  1 Black     */
+	m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x7f));   /*  2 Blue      */
+	m_palette->set_pen_color(3, rgb_t(0x00, 0x00, 0xff));   /*  3 Light Blue    */
+	m_palette->set_pen_color(4, rgb_t(0x00, 0x7f, 0x00));   /*  4 Green     */
+	m_palette->set_pen_color(5, rgb_t(0x00, 0xff, 0x00));   /*  5 Bright Green  */
+	m_palette->set_pen_color(6, rgb_t(0x00, 0x7f, 0x7f));   /*  6 Cyan      */
+	m_palette->set_pen_color(7, rgb_t(0x00, 0xff, 0xff));   /*  7 Turquoise     */
+	m_palette->set_pen_color(8, rgb_t(0x7f, 0x00, 0x00));   /*  8 Dark Red      */
+	m_palette->set_pen_color(9, rgb_t(0xff, 0x00, 0x00));   /*  9 Red       */
+	m_palette->set_pen_color(10, rgb_t(0x7f, 0x00, 0x7f));   /* 10 Purple        */
+	m_palette->set_pen_color(11, rgb_t(0xff, 0x00, 0xff));   /* 11 Magenta       */
+	m_palette->set_pen_color(12, rgb_t(0x7f, 0x7f, 0x00));   /* 12 Lime      */
+	m_palette->set_pen_color(13, rgb_t(0xff, 0xff, 0x00));   /* 13 Yellow        */
+	m_palette->set_pen_color(14, rgb_t(0xbf, 0xbf, 0xbf));   /* 14 Off White     */
+	m_palette->set_pen_color(15, rgb_t(0xff, 0xff, 0xff));   /* 15 White     */
+	// Composite
+	m_palette->set_pen_color(16, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */
+	m_palette->set_pen_color(17, rgb_t(0x80, 0x80, 0x80));   /*  1 Grey      */
+	m_palette->set_pen_color(18, rgb_t(0x00, 0x00, 0xff));   /*  2 Blue      */
+	m_palette->set_pen_color(19, rgb_t(0xff, 0xff, 0x80));   /*  3 Light Yellow  */
+	m_palette->set_pen_color(20, rgb_t(0x00, 0xff, 0x00));   /*  4 Green     */
+	m_palette->set_pen_color(21, rgb_t(0xff, 0x80, 0xff));   /*  5 Light Magenta */
+	m_palette->set_pen_color(22, rgb_t(0x00, 0xff, 0xff));   /*  6 Cyan      */
+	m_palette->set_pen_color(23, rgb_t(0xff, 0x40, 0x40));   /*  7 Light Red     */
+	m_palette->set_pen_color(24, rgb_t(0xff, 0x00, 0x00));   /*  8 Red       */
+	m_palette->set_pen_color(25, rgb_t(0x00, 0x80, 0x80));   /*  9 Dark Cyan     */
+	m_palette->set_pen_color(26, rgb_t(0xff, 0x00, 0xff));   /* 10 Magenta       */
+	m_palette->set_pen_color(27, rgb_t(0x80, 0xff, 0x80));   /* 11 Light Green   */
+	m_palette->set_pen_color(28, rgb_t(0xff, 0xff, 0x00));   /* 12 Yellow        */
+	m_palette->set_pen_color(29, rgb_t(0x00, 0x00, 0x80));   /* 13 Dark Blue     */
+	m_palette->set_pen_color(30, rgb_t(0xff, 0xff, 0xff));   /* 14 White     */
+	m_palette->set_pen_color(31, rgb_t(0x00, 0x00, 0x00));   /* 15 Black     */
 }
 
 
@@ -75,16 +58,7 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 	if (state)
 	{
 		/* if we chose another palette or colour mode, enable it */
-		UINT8 chosen_palette = (m_io_config->read() & 0x60)>>5;                // read colour dipswitches
-
-		if (chosen_palette != m_current_palette)                        // any changes?
-		{
-			m_current_palette = chosen_palette;                 // save new palette
-			if (!m_current_palette)
-				palette_set_colors_rgb(super80_comp_palette);        // composite colour
-			else
-				palette_set_colors_rgb(super80_rgb_palette);     // rgb and b&w
-		}
+		m_palette_index = (m_io_config->read() & 0x60) ? 0 : 16;
 	}
 }
 
@@ -244,8 +218,8 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 				if (!(options & 0x40))
 				{
 					col = m_p_ram[0xfe00 | ma | x]; /* byte of colour to display */
-					fg = col & 0x0f;
-					bg = (col & 0xf0) >> 4;
+					fg = m_palette_index + (col & 0x0f);
+					bg = m_palette_index + (col >> 4);
 				}
 
 				/* get pattern of pixels for that character scanline */
@@ -408,8 +382,8 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		if (~state->m_s_options & 0x40)
 		{
 			col = state->m_p_colorram[mem];                 /* byte of colour to display */
-			fg = col & 0x0f;
-			bg = (col & 0xf0) >> 4;
+			fg = state->m_palette_index + (col & 0x0f);
+			bg = state->m_palette_index + (col >> 4);
 		}
 
 		/* if inverse mode, replace any pcgram chrs with inverse chrs */

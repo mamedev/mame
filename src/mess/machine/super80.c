@@ -227,6 +227,7 @@ void super80_state::machine_reset()
 	m_portf0 = 0xff;
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
+	m_palette_index = 0;
 	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(super80_state::super80_reset),this));
 	membank("boot")->set_entry(1);
 }
