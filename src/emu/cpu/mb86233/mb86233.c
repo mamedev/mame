@@ -908,7 +908,7 @@ UINT32 mb86233_cpu_device::INDIRECT( UINT32 reg, int source )
 	}
 	else if ( mode == 2 )
 	{
-		UINT32  addr = reg & 0x1f;
+		UINT32  addr = reg & 0x3f;
 
 		if ( source )
 		{
@@ -960,6 +960,13 @@ UINT32 mb86233_cpu_device::INDIRECT( UINT32 reg, int source )
 			else
 				GETGPR(3) += ( reg & 0x1f );
 		}
+		if( mode == 7)
+		{
+			if ( source )
+				GETGPR(2)&=0x3f;
+			else
+				GETGPR(3)&=0x3f;
+		}
 
 		return addr;
 	}
@@ -985,6 +992,8 @@ void mb86233_cpu_device::execute_run()
 		debugger_instruction_hook(this, GETPC());
 
 		opcode = ROPCODE(GETPC());
+		//if(GETPC() != 0x77)
+		//printf("%08x %08x\n",GETPC(),opcode);
 
 		GETFIFOWAIT() = 0;
 
