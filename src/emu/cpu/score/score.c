@@ -58,6 +58,10 @@ score7_cpu_device::score7_cpu_device(const machine_config &mconfig, const char *
 		m_pc(0),
 		m_ppc(0)
 {
+	memset(m_gpr, 0x00, sizeof(m_gpr));
+	memset(m_cr, 0x00, sizeof(m_cr));
+	memset(m_sr, 0x00, sizeof(m_sr));
+	memset(m_ce, 0x00, sizeof(m_ce));
 }
 
 //-------------------------------------------------
