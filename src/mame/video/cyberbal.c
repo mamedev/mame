@@ -137,8 +137,9 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 	screen_device_iterator iter(*this);
 	for (i = 0, update_screen = iter.first(); update_screen != NULL; i++, update_screen = iter.next())
 	{
-		tilemap_t *curplayfield = i ? (tilemap_t*)m_playfield2_tilemap : (tilemap_t*)m_playfield_tilemap;
-		tilemap_device *curalpha = i ? (tilemap_device*)m_alpha2_tilemap : (tilemap_device*)m_alpha_tilemap;
+		/* need explicit target() because one is optional_device and other is required_device */
+		tilemap_t *curplayfield = i ? m_playfield2_tilemap.target() : m_playfield_tilemap.target();
+		tilemap_device *curalpha = i ? m_alpha2_tilemap.target() : m_alpha_tilemap.target();
 
 		/* keep in range */
 		int offset = ((scanline - 8) / 8) * 64 + 47;
@@ -212,8 +213,8 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 	curmob->draw_async(cliprect);
 
 	/* draw the playfield */
-	tilemap_t &curplayfield = index ? static_cast<tilemap_t &>(m_playfield2_tilemap) : static_cast<tilemap_t &>(m_playfield_tilemap);
-	curplayfield.draw(screen, bitmap, cliprect, 0, 0);
+	tilemap_t *curplayfield = index ? m_playfield2_tilemap.target() : m_playfield_tilemap.target();
+	curplayfield->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = curmob->bitmap();
@@ -232,8 +233,8 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 		}
 
 	/* add the alpha on top */
-	tilemap_t &curalpha = index ? static_cast<tilemap_t &>(m_alpha2_tilemap) : static_cast<tilemap_t &>(m_alpha_tilemap);
-	curalpha.draw(screen, bitmap, cliprect, 0, 0);
+	tilemap_t *curalpha = index ? m_alpha2_tilemap.target() : m_alpha_tilemap.target();
+	curalpha->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
