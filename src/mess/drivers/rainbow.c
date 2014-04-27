@@ -2,16 +2,16 @@
     DEC Rainbow 100
 
     Driver-in-progress by R. Belmont and Miodrag Milanovic.
-    Portions (2013-2014) by Karl-Ludwig Deisenhofer (VT video, preliminary floppy, keyboard, DIP switches).
+    Portions (2013-2014) by Karl-Ludwig Deisenhofer (VT attributes, preliminary floppy, keyboard, DIP switches).
 
-    STATE AS OF MARCH 2014
+    STATE AS OF APRIL 2014
     ----------------------
     Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
     While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 
     Currently, there are 2 showstoppers:
     (1) IRQ logic for 100-B needs further work (text in RBCONVERT.ZIP has details concerning -A versus -B)
-    (2) Keyboard emulation incomplete (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
+    (2) Keyboard emulation incomplete (inhibits the system from booting with ERROR 50).
 
     - FLOPPY TIMING: 'wd17xx_complete_command' * must * be hard wired to about 13 usecs.
       Line 1063 in 'wd17xx.c' has to be changed (until legacy code here is removed):
@@ -21,24 +21,35 @@
     - NOT WORKING: serial (ERROR 60).
     - NOT WORKING: printer interface (ERROR 40). Like error 60 not mission-critical.
 
-    - NON-CRITICAL: watchdog logic (triggered after 108 ms without interrupts on original machine) still does not work as intended.
+    - NON-CRITICAL: watchdog logic ('MHFU' triggered after 108 ms without interrupts on original machine) does not work.
+                    The timer is reset by TWO sources: the VERT INT L from the DC012, or the MHFU ENB L from the enable flip-flop.
+                    MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds
 
-                    Timer is reset by TWO sources: the VERT INT L from the DC012, or the MHFU ENB L from the enable flip-flop.
-                    The MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds.
-
-                    BIOS assumes a power-up reset if MHFU detection is disabled - and assumes a MHFU reset if MHFU detection is ENABLED.
-
-                    As there is no reset switch, only a limited software reset exists on a real DEC-100 (CTRL-SETUP within SETUP).
+    - FIXME: warm boot triggers ERROR 16 (watchdog). BIOS assumes proper power-up only if MHFU detection is _disabled_
+      Apart from power-cycling, Ctrl-Setup (within SETUP) appears to be the only way to reboot the DEC-100.
 
     - TO BE IMPLEMENTED AS SLOT DEVICES (for now, DIP settings affect 'system_parameter_r' only and are disabled):
-            * Color graphics option (uses NEC upd7220 GDC)
-            * Extended communication option (same as BUNDLE_OPTION ?)
+            * Color graphics option (uses NEC upd7220 GDC). 		REFERENCE: Programmer's Reference: AA-AE36A-TV.
+            Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 × 64 K video RAM. Pallette limited to 4 colors on 100-A.
+
+            * Extended communication option (1 of 4 possible BUNDLE_OPTIONs)	REFERENCE: AA-V172A-TV + Addendum AV-Y890A-TV.
+            See also NEWCOM1.DOC in RBETECDOC.ZIP.   Board connected to the front rightmost expansion slot (1 of the expansion
+            ports used by the hard disk controller). Thus can't be added to a system that includes the DEC RD50/51.
+            => 2 ports, a high-speed RS-422 half-duplex interface (port A) + lower-speed RS-423 full/half-duplex interface
+            with modem control (port B). A DMA mode allowed high-speed transfer of data into and out of the Rainbow's memory.
 
     - OTHER HARDWARE UPGRADES:
-            * Suitable Solutions ClikClok (real time clock)
+            * Suitable Solutions ClikClok (battery backed real time clock)
+                    Plugs into the NVM chip socket on a 100-A and into the Boot ROM on the 100-B (there is a socket
+                    on the ClikClok for the NVM / ROM chip). Came with software for 'all versions of MS-DOS'.
+
+            * 8087	Numerical Data Coprocessor daughterboard.		REFERENCE: EK-PCNDP-IN-PRE
+                    Daughterboard, to be plugged into the expansion port where the memory expansion card usually sits.
+                    If a memory adapter board is present, it has to be plugged into a connector atop the 8087 copro board.
+                    The 8088 is put into the CPU socket on the coprocessor board.
 
             * Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
-              plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Altered BOOT ROM labeled 'TBSS1.3 - 3ED4'.
+              plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Patched 5.0x BOOT ROM labeled 'TBSS1.3 - 3ED4'.
 
             * NEC_V20 (requires modded BOOT ROM because of - at least 2 - hard coded timing loops):
                  100A:         100B/100+:                       100B+ ALTERNATE RECOMMENDATION (fixes RAM size auto-detection problems when V20 is in place.
@@ -184,8 +195,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 // EK-PC100-PS-002 (APPENDIX B.2.2); pc100ps2.pdf
 
 
-// Workaround DOES NOT APPLY to the 190-B ROM. Only enable when compiling the 'rainbow' driver -
-//#define FORCE_RAINBOW_100_LOGO
+// Workaround not valid for 100-A -
+//#define FORCE_RAINBOW_B_LOGO
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -283,10 +294,14 @@ protected:
 private:
 	enum
 	{
-		IRQ_8088_MAILBOX = 0,   // vector 0x27/a7
-		IRQ_8088_VBL,           // vector 0x20/a0
-		IRQ_8088_KBD,           // vector 0x26/a6
-
+        IRQ_8088_MAILBOX = 0,   // vector 0x27/a7	(lowest priority)
+        IRQ_8088_KBD,           // vector 0x26/a6	KEYBOARD (8251A) Interrupt
+//		IRQ_EXT_COMM,			// vector 0x25		[OPTION BOARD] Interrupt from external COMM.BOARD (non DMA)
+//		IRQ_COMM_PRN_7201,		// vector 0x24		COMM./PRINTER (7201) IRQ
+//		IRQ_EXT_DMAC,			// vector 0x23		[OPTION BOARD] : from external COMM.BOARD (DMA Control IRQ)
+//		IRQ_GRF,				// vector 0x22		GRAPHICS IRQ
+//		IRQ_SH_10_BDL,			// vector 0x21		BUNDLE IRQ (hard disc / COMM.BOARD) : Pin 23 of expansion connector J4
+        IRQ_8088_VBL,           // vector 0x20/a0	(highest priority)
 		IRQ_8088_MAX
 	};
 
@@ -368,14 +383,19 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_irq_high));
 	save_item(NAME(m_irq_mask));
 
-#ifdef FORCE_RAINBOW_100_LOGO
+#ifdef FORCE_RAINBOW_B_LOGO
 	UINT8 *rom = memregion("maincpu")->base();
 
-	rom[0xf4174]=0xeb; // jmps  RAINBOW100_LOGO__loc_33D
-	rom[0xf4175]=0x08;
+    if (rom[0xf4174] == 0x75)
+    {   rom[0xf4174] = 0xeb; // jmps  RAINBOW100_LOGO__loc_33D
+        rom[0xf4175] = 0x08;
+    }
 
-	rom[0xf4000 + 0x364a]= 0x0a;
-	rom[0xf4384]=0xeb; // JMPS  =>  BOOT80
+    if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B
+        rom[0xf4384] = 0xeb; // JMPS  =>  BOOT80
+
+    if (rom[0xf4000 + 0x3ffc] == 0x35) // v5.05
+        rom[0xf437b] = 0xeb;
 #endif
 
 }
@@ -411,7 +431,6 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	// 0x02 Communication status / control register (8088)
 	AM_RANGE (0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w)
 
-	// 0x04 Video processor DC011
 	AM_RANGE (0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
 
 	// TODO: unmapped [06] : Communication bit rates (see page 21 of PC 100 SPEC)
@@ -420,7 +439,6 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 
-	// 0x0C Video processor DC012
 	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
 
 	// TODO: unmapped [0e] : PRINTER BIT RATE REGISTER (WO)
@@ -429,22 +447,41 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
 
 	// UNMAPPED:
-	// 0x20 - 0x2f ***** EXTENDED COMM. OPTION (option select 1)- for example:
-	// 0x27     (RESET EXTENDED COMM OPTION) - OUT 27 @ offset 1EA7
-
-	// 0x40  COMMUNICATIONS DATA REGISTER (MPSC)
+    // 0x20 - 0x2f ***** EXTENDED COMM. OPTION (option select 1)
+    //  0x27 (RESET EXTENDED COMM OPTION - - see boot ROM @1EA6)
+    // ===========================================================
+    // 0x40  COMMUNICATIONS DATA REGISTER (MPSC)  
 	// 0x41  PRINTER DATA REGISTER (MPSC)
 	// 0x42  COMMUNICATIONS CONTROL / STATUS REGISTER (MPSC)
 	// 0x43  PRINTER CONTROL / STATUS REGISTER (MPSC)
+    // ===========================================================
+    // 0x50 - 0x57 ***** COLOR GRAPHICS OPTION:
+    //  50h   Graphics option software reset.  Any write to this
+    //        port also resynchronizes the read/modify/write memory
+    //        cycles of the Graphics Option to those of the GDC (*)
+	//                                       * see boot ROM @1EB4/8
+    //  51h   Data written to this port is loaded into the area
+    //        selected by the previous write to port 53h.
 
-	// 0x50 - 0xf  ***** OPTIONAL COLOR GRAPHICS - for example:
-	// 0x50     (RESET_GRAPH. OPTION) - OUT 50 @ offsets F5EB5 + F5EB9
+    //  52h   Data written to this port is loaded into the Write Buffer.
 
+    //  53h   Data written to this port provides address selection
+    //        for indirect addressing (see Indirect Register).
+
+    //  54h   Data written to this port is loaded into the low-order
+    //        byte of the Write Mask.
+
+    //  55h   Data written to this port is loaded into the high-order
+    //        byte of the Write Mask.
+
+    //  56h   Data written to this port is loaded into the GDC's FIFO
+    //        Buffer and flagged as a parameter.
 	// ===========================================================
 	// TODO: hard disc emulation!
 	// ------ Rainbow uses 'WD 1010 AL' (Western Digital 1983)
 	//        Register compatible to WD2010 (present in MESS)
 	// R/W REGISTERS 60 - 68 (?)
+    AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
 	// ===========================================================
 	// HARD DISC SIZES AND LIMITS
 	//   HARDWARE:
@@ -455,7 +492,6 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	//   SOFTWARE:
 	//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3)
 	//   - MS-DOS 3 has a global 1024 cylinder limit (32 MB).
-	AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -490,7 +526,7 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_START("MEMORY PRESENT")
 		PORT_DIPNAME( 0xF0000, 0x20000, "MEMORY PRESENT")
 		PORT_DIPSETTING(    0x10000, "64  K (MINIMUM ON 100-A)" ) // see BOARD_RAM
-		PORT_DIPSETTING(    0x20000, "128 K (MINIMUM ON 100-B)" ) 
+        PORT_DIPSETTING(    0x20000, "128 K (MINIMUM ON 100-B)" )
 		PORT_DIPSETTING(    0x30000, "192 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0x40000, "256 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0x50000, "320 K (MEMORY OPTION)" )
@@ -507,8 +543,11 @@ static INPUT_PORTS_START( rainbow100b_in )
 	// Floppy is always 'on', BUNDLE + GRAPHICS are not implemented yet:
 		PORT_START("FLOPPY CONTROLLER")
 		PORT_DIPNAME( 0x01, 0x01, "FLOPPY CONTROLLER") PORT_TOGGLE
-		PORT_DIPSETTING(    0x01, DEF_STR( On ) ) 
+        PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
+    //	BUNDLE_OPTION: COMM.card or hard disc controller extension (marketed later).
+    //  NOTES: - hard disc and COMM.extension exclude each other.
+    //         - connector J4 has 4 select lines.  Select option 1 = COMM CARD ?
 		PORT_START("BUNDLE OPTION")
 		PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -518,9 +557,9 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-		
+
 	// W13 - W18 are used for factory tests	and affect the boot process -
-	PORT_START("W13") 
+    PORT_START("W13")
 		PORT_DIPNAME( 0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -569,7 +608,7 @@ void rainbow_state::machine_reset()
 {
 	/* configure RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	if (m_inp8->read() < END_OF_RAM) 
+    if (m_inp8->read() < END_OF_RAM)
 	{	program.unmap_readwrite(m_inp8->read(), END_OF_RAM);
 	}
 
@@ -628,10 +667,10 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-// interrupt handling and arbitration.  priorities currently unknown.
+// Interrupt handling and arbitration.  See 3.1.3.8 OF PC-100 spec.
 void rainbow_state::update_8088_irqs()
 {
-	static const int vectors[] = { 0x27, 0x20, 0x26 };
+    static const int vectors[] = { 0x27, 0x26, 0x20 };
 
 	if (m_irq_mask != 0)
 	{
@@ -732,16 +771,17 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 READ8_MEMBER(rainbow_state::system_parameter_r)
 {
 /*  Info about option boards is in bits 0 - 3:
+    SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
     Bundle card (1) | Floppy (2) | Graphics (4) | Memory option (8)
-
     0 1 2 3 4 5 6 7
     B F G M
-   ( 1 means NOT present )
+    ( 1 means NOT present; 4-7 reserved )
 */
-	return	(((m_inp5->read() == 1)		? 0 : 1)  |
+    return	( ((m_inp5->read() == 1)		? 0 : 1)  |
 		 ((m_inp6->read() == 1)		? 0 : 2)  |
 		 ((m_inp7->read() == 1)		? 0 : 4)  |
-		 ((m_inp8->read() > BOARD_RAM)	? 0 : 8)
+              ((m_inp8->read() > BOARD_RAM)	? 0 : 8)  |
+              16 | 32 | 64 | 128 // to be verified.
 		);
 }
 
@@ -1007,7 +1047,9 @@ WRITE_LINE_MEMBER( rainbow_state::clear_video_interrupt )
 	lower_8088_irq(IRQ_8088_VBL);
 }
 
-READ8_MEMBER( rainbow_state::diagnostic_r )
+
+
+READ8_MEMBER( rainbow_state::diagnostic_r ) // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
 //    printf("%02x DIP value ORed to diagnostic\n", ( m_inp1->read() | m_inp2->read() | m_inp3->read()   )  );
 
@@ -1018,7 +1060,7 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 			);
 }
 
-WRITE8_MEMBER( rainbow_state::diagnostic_w )
+WRITE8_MEMBER( rainbow_state::diagnostic_w ) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
 //    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
 	m_SCREEN_BLANK = (data & 2) ? false : true;
@@ -1058,7 +1100,6 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 	// reset device when going from high to low,
 	// restore command when going from low to high :
 	m_fdc->mr_w((data & 1) ? 1 : 0);
-
 	m_diagnostic = data;
 }
 
@@ -1075,7 +1116,6 @@ void rainbow_state::update_kbd_irq()
 		lower_8088_irq(IRQ_8088_KBD);
 	}
 }
-
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
 {
@@ -1225,7 +1265,8 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-// 'Rainbow 100-A' (introduced May 1982) is first-generation hardware with ROM 04.03.11
+// 'Rainbow 100-A' (system module 70-19974-00, PSU H7842-A)
+// - first generation hardware (introduced May '82) with ROM 04.03.11
 // - 64 K base RAM on board (instead of 128 K on 'B' model).  832 K RAM max.
 // - inability to boot from hard disc (mind the inadequate PSU)
 // - cannot control bit 7 of IRQ vector (prevents DOS >= 2.05 from booting on unmodified hardware)
@@ -1234,7 +1275,7 @@ MACHINE_CONFIG_END
 
 // FIXME: 12-19606-02 and 12-19678-04 are just PART NUMBERS from the 100-A field manual.
 // Someone who knows the DEC naming conventions should correct them -
-ROM_START( rainbow100 )
+ROM_START( rainbow100a )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "12-19606-02a.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
 	ROM_LOAD( "12-19606-02b.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
@@ -1244,7 +1285,10 @@ ROM_START( rainbow100 )
 	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
-// ROM definition for 100-B (different revisions built until ~ May 1986; see MP-01491-00)
+// ROM definition for 100-B (system module 70-1994-02, PSU H7842-D)
+// Built until ~ May 1986 (see MP-01491-00)
+// - 32 K ROM (version 5.03)
+// - 128 K base and 896 K max. mem.
 ROM_START( rainbow )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "23-022e5-00.bin",  0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
@@ -1262,11 +1306,9 @@ ROM_END
 // 'Rainbow 190 B' (announced March 1985) is identical to 100-B, with alternate ROM v5.05.
 // According to an article in Wall Street Journal it came with a 10 MB HD and 640 K RAM.
 
-// We have no version history. The BOOT 2.4 README reveals 'recent ROM changes for MASS 11'
-// in January 1985. These were not present in the older version 04.03.11 (for PC-100-A)
-// and also not in version 05.03 (from PC-100B / PC100B+).
+// CHANGES: the 'Boot 2.4' manual mentions 'recent ROM changes for MASS 11' in January 1985.
+// Older ROMs like 04.03.11 (for PC-100-A) or 05.03 (100-B) obviously do not incorporate these.
 
-// A first glance:
 // => jump tables (F4000-F40083 and FC000-FC004D) were not extended.
 // => absolute addresses of some internal routines have changed.
 // => programs that do not rely on specific ROM versions should be compatible.
@@ -1287,6 +1329,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT   COMPAT  MACHINE       INPUT      STATE          INIT COMPANY                         FULLNAME       FLAGS */
-COMP( 1982, rainbow100 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-A", GAME_IS_SKELETON                        )
+COMP( 1982, rainbow100a , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-A", GAME_IS_SKELETON                        )
 COMP( 1983, rainbow   , 0      ,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
 COMP( 1985, rainbow190 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 190-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
