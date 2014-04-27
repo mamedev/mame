@@ -841,46 +841,46 @@ WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_paletteram32[offset]);
 
 	/* 12 bit palette games - there has to be a palette select bit somewhere */
 	if (m_f3_game==SPCINVDX || m_f3_game==RIDINGF || m_f3_game==ARABIANM || m_f3_game==RINGRAGE) {
-		b = 15 * ((m_generic_paletteram_32[offset] >> 4) & 0xf);
-		g = 15 * ((m_generic_paletteram_32[offset] >> 8) & 0xf);
-		r = 15 * ((m_generic_paletteram_32[offset] >> 12) & 0xf);
+		b = 15 * ((m_paletteram32[offset] >> 4) & 0xf);
+		g = 15 * ((m_paletteram32[offset] >> 8) & 0xf);
+		r = 15 * ((m_paletteram32[offset] >> 12) & 0xf);
 	}
 
 	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
 	else if (m_f3_game==CLEOPATR) {
 		if (offset<0x100 || offset>0x1000) {
-			r = ((m_generic_paletteram_32[offset] >>16) & 0x7f)<<1;
-			g = ((m_generic_paletteram_32[offset] >> 8) & 0x7f)<<1;
-			b = ((m_generic_paletteram_32[offset] >> 0) & 0x7f)<<1;
+			r = ((m_paletteram32[offset] >>16) & 0x7f)<<1;
+			g = ((m_paletteram32[offset] >> 8) & 0x7f)<<1;
+			b = ((m_paletteram32[offset] >> 0) & 0x7f)<<1;
 		} else {
-			r = (m_generic_paletteram_32[offset] >>16) & 0xff;
-			g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-			b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
+			r = (m_paletteram32[offset] >>16) & 0xff;
+			g = (m_paletteram32[offset] >> 8) & 0xff;
+			b = (m_paletteram32[offset] >> 0) & 0xff;
 		}
 	}
 
 	/* Another weird couple - perhaps this is alpha blending related? */
 	else if (m_f3_game==TWINQIX || m_f3_game==RECALH) {
 		if (offset>0x1c00) {
-			r = ((m_generic_paletteram_32[offset] >>16) & 0x7f)<<1;
-			g = ((m_generic_paletteram_32[offset] >> 8) & 0x7f)<<1;
-			b = ((m_generic_paletteram_32[offset] >> 0) & 0x7f)<<1;
+			r = ((m_paletteram32[offset] >>16) & 0x7f)<<1;
+			g = ((m_paletteram32[offset] >> 8) & 0x7f)<<1;
+			b = ((m_paletteram32[offset] >> 0) & 0x7f)<<1;
 		} else {
-			r = (m_generic_paletteram_32[offset] >>16) & 0xff;
-			g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-			b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
+			r = (m_paletteram32[offset] >>16) & 0xff;
+			g = (m_paletteram32[offset] >> 8) & 0xff;
+			b = (m_paletteram32[offset] >> 0) & 0xff;
 		}
 	}
 
 	/* All other games - standard 24 bit palette */
 	else {
-		r = (m_generic_paletteram_32[offset] >>16) & 0xff;
-		g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-		b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
+		r = (m_paletteram32[offset] >>16) & 0xff;
+		g = (m_paletteram32[offset] >> 8) & 0xff;
+		b = (m_paletteram32[offset] >> 0) & 0xff;
 	}
 
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));

@@ -140,31 +140,6 @@ Region byte at offset 0x031:
 #include "includes/slapshot.h"
 
 
-/******************************************************
-                COLOR
-******************************************************/
-
-READ16_MEMBER(slapshot_state::color_ram_word_r)
-{
-	return m_color_ram[offset];
-}
-
-WRITE16_MEMBER(slapshot_state::color_ram_word_w)
-{
-	int r,g,b;
-	COMBINE_DATA(&m_color_ram[offset]);
-
-	if ((offset % 2) == 1)  /* assume words written sequentially */
-	{
-		r = (m_color_ram[offset- 1 ] & 0xff);
-		g = (m_color_ram[offset] & 0xff00) >> 8;
-		b = (m_color_ram[offset] & 0xff);
-
-		m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
-	}
-}
-
-
 /***********************************************************
                 INTERRUPTS
 ***********************************************************/
@@ -287,7 +262,7 @@ static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_SHARE("color_ram") /* 8bpg palette */
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -302,7 +277,7 @@ static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_READWRITE(color_ram_word_r, color_ram_word_w) AM_SHARE("color_ram") /* 8bpg palette */
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -531,6 +506,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)

@@ -59,7 +59,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram") { }
+		m_paletteram32(*this, "paletteram") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
@@ -294,7 +294,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	optional_shared_ptr<UINT32> m_paletteram32;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

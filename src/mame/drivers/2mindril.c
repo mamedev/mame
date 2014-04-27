@@ -45,8 +45,7 @@ class _2mindril_state : public taito_f3_state
 public:
 	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taito_f3_state(mconfig, type, tag),
-		m_iodata(*this, "iodata"),
-		m_maincpu(*this, "maincpu") { }
+		m_iodata(*this, "iodata") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_iodata;
@@ -57,7 +56,6 @@ public:
 	UINT16        irq_reg;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ16_MEMBER(drill_io_r);
 	DECLARE_WRITE16_MEMBER(drill_io_w);
 	DECLARE_WRITE16_MEMBER(sensors_w);
