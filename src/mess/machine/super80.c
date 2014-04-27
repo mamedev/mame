@@ -9,7 +9,8 @@
 WRITE8_MEMBER( super80_state::pio_port_a_w )
 {
 	m_keylatch = data;
-};
+	m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff)); // refresh kbd int
+}
 
 READ8_MEMBER( super80_state::pio_port_b_r )
 {
@@ -31,6 +32,8 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 		data &= m_io_x6->read();
 	if (!BIT(m_keylatch, 7))
 		data &= m_io_x7->read();
+
+	m_key_pressed = 3;
 
 	return data;
 };
@@ -66,25 +69,27 @@ void super80_state::super80_cassette_motor( UINT8 data )
 /********************************************* TIMER ************************************************/
 
 
-	/* this timer runs at 200khz and does 2 jobs:
-	1. Scan the keyboard and present the results to the pio
-	2. Emulate the 2 chips in the cassette input circuit
+// If normal keyboard scan has stopped, then do a scan to allow the interrupt key sequence
+TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
+{
+	if (m_key_pressed)
+		m_key_pressed--;
+	else
+	if (!m_key_pressed)
+		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+}
 
-	Reasons why it is necessary:
-	1. The real z80pio is driven by the cpu clock and is capable of independent actions.
-	MAME does not support this at all. If the interrupt key sequence is entered, the
-	computer can be reset out of a hung state by the operator.
-	2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+/* cassette load circuit
+	This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
 	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
 	The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
-	My "read-any-system" cassette circuit was a CA3140 op-amp, the smarts being done in software.
+	The "read-any-system" cassette circuit is a CA3140 op-amp, the smarts being done in software.
 
 	bit 0 = original system (U79 and U1)
 	bit 1 = MDS fast system
 	bit 2 = CA3140 */
-
-TIMER_CALLBACK_MEMBER(super80_state::super80_timer)
+TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
 {
 	UINT8 cass_ws=0;
 
@@ -95,11 +100,9 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_timer)
 	{
 		if (cass_ws) m_cass_data[3] ^= 2;       // the MDS flipflop
 		m_cass_data[0] = cass_ws;
-		m_cass_data[2] = ((m_cass_data[1] < 0x40) ? 1 : 0) | cass_ws | m_cass_data[3];
+		m_cass_data[2] = ((m_cass_data[1] < 0x0d) ? 1 : 0) | cass_ws | m_cass_data[3];
 		m_cass_data[1] = 0;
 	}
-
-	m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
@@ -221,7 +224,9 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 void super80_state::machine_reset()
 {
-	m_shared=0xff;
+	m_shared = 0xff;
+	m_keylatch = 0xff;
+	m_key_pressed = 0;
 	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(super80_state::super80_reset),this));
 	membank("boot")->set_entry(1);
 }
@@ -230,7 +235,6 @@ void super80_state::driver_init_common()
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
-	machine().scheduler().timer_pulse(attotime::from_hz(200000), timer_expired_delegate(FUNC(super80_state::super80_timer),this));   /* timer for keyboard and cassette */
 }
 
 DRIVER_INIT_MEMBER(super80_state,super80)
