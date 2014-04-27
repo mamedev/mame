@@ -3364,6 +3364,9 @@ void cp1610_cpu_device::device_start()
 	m_reset_pending = 0;
 	m_intr_pending = 0;
 	m_intrm_pending = 0;
+	m_flags = 0;
+	memset(m_r, 0x00, sizeof(m_r));
+
 	m_program = &space(AS_PROGRAM);
 
 	save_item(NAME(m_r));

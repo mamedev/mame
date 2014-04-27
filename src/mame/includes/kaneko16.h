@@ -121,29 +121,33 @@ class kaneko16_berlwall_state : public kaneko16_state
 public:
 	kaneko16_berlwall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
-		m_bg15_reg(*this, "bg15_reg"),
 		m_bg15_select(*this, "bg15_select"),
+		m_bg15_scroll(*this, "bg15_scroll"),
+		m_bg15_bright(*this, "bg15_bright"),
 		m_bgpalette(*this, "bgpalette")
 
 	{
 	}
 
-	optional_shared_ptr<UINT16> m_bg15_reg;
 	optional_shared_ptr<UINT16> m_bg15_select;
+	optional_shared_ptr<UINT16> m_bg15_scroll;
+	optional_shared_ptr<UINT16> m_bg15_bright;
 	required_device<palette_device> m_bgpalette;
 
-	bitmap_ind16 m_bg15_bitmap;
+	bitmap_ind16 m_bg15_bitmap[32];
 
 	DECLARE_READ16_MEMBER(kaneko16_bg15_select_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
-	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
+	DECLARE_READ16_MEMBER(kaneko16_bg15_bright_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_bg15_bright_w);
 
 	DECLARE_READ16_MEMBER(berlwall_oki_r);
 	DECLARE_WRITE16_MEMBER(berlwall_oki_w);
 
 	DECLARE_READ16_MEMBER(berlwall_spriteram_r);
 	DECLARE_WRITE16_MEMBER(berlwall_spriteram_w);
+	DECLARE_READ16_MEMBER(berlwall_spriteregs_r);
+	DECLARE_WRITE16_MEMBER(berlwall_spriteregs_w);
 
 	DECLARE_DRIVER_INIT(berlwall);
 	DECLARE_PALETTE_INIT(berlwall);

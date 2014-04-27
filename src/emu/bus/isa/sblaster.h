@@ -225,7 +225,7 @@ protected:
 		virtual void dack16_w(int line, UINT16 data);
 		virtual void drq16_w(int state) { m_isa->drq5_w(state); }
 		virtual void drq_w(int state) { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active);  }
+		virtual void irq_w(int state, int source) { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active != 0);  }
 		virtual void mixer_reset();
 		void mixer_set();
 		virtual void rcv_complete();    // Rx completed receiving byte

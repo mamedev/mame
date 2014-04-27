@@ -724,19 +724,16 @@ static MC6845_UPDATE_ROW( fanuc_update_row )
 		if (state->m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
-			{
+			{   															  
 				UINT8 chr = state->m_vram[offset + 0x600];
 				UINT8 attr = state->m_vram[offset];
 				UINT8 data = chargen[ chr + (ra * 256) ];
-				UINT32 fg = 0xffffff;
+				UINT32 fg = 0;
 				UINT32 bg = 0;
 
-				// colors are black, red, green, yellow, blue, purple, light blue, and white
-				// attr & 0x70 = 0x60 is green, need more software running to know the others
-				if (((attr>>4) & 7) == 6)
-				{
-					fg = 0x008800;
-				}
+				if (attr & 0x20) fg |= 0xff0000;
+				if (attr & 0x40) fg |= 0x00ff00;
+				if (attr & 0x80) fg |= 0x0000ff;
 
 				*p++ = ( data & 0x01 ) ? fg : bg;
 				*p++ = ( data & 0x02 ) ? fg : bg;

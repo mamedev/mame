@@ -908,7 +908,7 @@ UINT32 mb86233_cpu_device::INDIRECT( UINT32 reg, int source )
 	}
 	else if ( mode == 2 )
 	{
-		UINT32  addr = reg & 0x1f;
+		UINT32  addr = reg & 0x3f;
 
 		if ( source )
 		{
@@ -960,6 +960,13 @@ UINT32 mb86233_cpu_device::INDIRECT( UINT32 reg, int source )
 			else
 				GETGPR(3) += ( reg & 0x1f );
 		}
+		if( mode == 7)
+		{
+			if ( source )
+				GETGPR(2)&=0x3f;
+			else
+				GETGPR(3)&=0x3f;
+		}
 
 		return addr;
 	}
@@ -1001,18 +1008,23 @@ void mb86233_cpu_device::execute_run()
 
 				switch( op )
 				{
+					case 0x01:
+						GETA().u = GETARAM()[INDIRECT(r1,1)];
+						GETB().u = GETEXTERNAL( GETEB(),INDIRECT(r2|(2<<6), 0));
+					break;
+
 					case 0x04: // ?
 						GETA().u = GETARAM()[r1];
 						GETB().u = GETEXTERNAL( GETEB(),r2);
 					break;
 
 					case 0x0C:
-						GETA().u = GETARAM()[r1];
+						GETA().u = GETARAM()[INDIRECT(r1,1)];
 						GETB().u = GETBRAM()[r2];
 					break;
 
-					case 0x0D:
-						GETA().u = GETARAM()[INDIRECT(r1,0)];
+					case 0x0D: // VF2 shadows
+						GETA().u = GETARAM()[INDIRECT(r1,1)];
 						GETB().u = GETBRAM()[INDIRECT(r2|2<<6,0)];
 					break;
 
@@ -1151,12 +1163,17 @@ void mb86233_cpu_device::execute_run()
 					{
 						UINT32  offset;
 
-						if ( ( r2 >> 6 ) & 1 )
+						if ( (( r2 >> 6 ) & 7) == 1 )
+						{
 							offset = INDIRECT(r1,1);
+							val = GETEXTERNAL( 0,offset);
+						}
 						else
+						{
 							offset = INDIRECT(r1,0);
+							val = GETEXTERNAL( GETEB(),offset);
+						}
 
-						val = GETEXTERNAL( GETEB(),offset);
 						ALU( alu);
 						SETREGS(r2,val);
 					}

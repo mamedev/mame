@@ -1959,6 +1959,64 @@ static INPUT_PORTS_START( daytona )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( manxtt )
+	PORT_START("1c00000")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c00000_r, NULL)
+
+	PORT_START("1c00004")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN3")
+
+	PORT_START("1c0000c")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("1c00010")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN0")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
+
+	PORT_START("1c00014")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN4")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("1c0001c")
+	PORT_BIT( 0x0000001a, IP_ACTIVE_HIGH, IPT_SPECIAL ) // these must be high
+	PORT_BIT( 0x0000ffe5, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c0001c_r, NULL)
+
+	PORT_START("IN0")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("VR") // VR
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / VR")
+	PORT_BIT(0x0090, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ANA0")  // throttle
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("ANA1")  // brake
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("ANA2")  // bank
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( srallyc )
 	PORT_START("1c00000")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2356,6 +2414,7 @@ WRITE32_MEMBER(model2_state::copro_tgp_buffer_w)
 static ADDRESS_MAP_START( copro_tgp_map, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgp_program")
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_tgp_buffer_r, copro_tgp_buffer_w)
+	AM_RANGE(0x00800000, 0x009fffff) AM_ROM AM_REGION("tgp", 0)
 	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION("tgp", 0)
 ADDRESS_MAP_END
 
@@ -3197,6 +3256,7 @@ ROM_START( manxtt ) /* Manx TT Superbike Twin Revision D, Model 2A - Can be set 
 	ROM_LOAD32_WORD( "mpr-18761.28", 0x000000, 0x200000, CRC(4e39ec05) SHA1(50696cd320f1a6492e0c193713acbce085d959cd) )
 	ROM_LOAD32_WORD( "mpr-18762.29", 0x000002, 0x200000, CRC(4ab165d8) SHA1(7ff42a4c7236fec76f94f2d0c5537e503bcc98e5) )
 
+
 	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-18760.25", 0x000000, 0x200000, CRC(4e3a4a89) SHA1(bba6cd2a15b3f963388a3a87880da86b10f6e0a2) )
 	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
@@ -3257,6 +3317,8 @@ ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	ROM_LOAD32_WORD( "mpr-18761.28", 0x000000, 0x200000, CRC(4e39ec05) SHA1(50696cd320f1a6492e0c193713acbce085d959cd) )
 	ROM_LOAD32_WORD( "mpr-18762.29", 0x000002, 0x200000, CRC(4ab165d8) SHA1(7ff42a4c7236fec76f94f2d0c5537e503bcc98e5) )
 
+	ROM_REGION( 0x800000, "tgpextra", ROMREGION_ERASEFF) // Coprocessor Data ROM
+
 	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-18760.25", 0x000000, 0x200000, CRC(4e3a4a89) SHA1(bba6cd2a15b3f963388a3a87880da86b10f6e0a2) )
 	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
@@ -3314,6 +3376,8 @@ ROM_START( motoraid ) /* Motoraid, Model 2A, Sega game ID# 833-13232 MOTOR RAID 
 	ROM_LOAD32_WORD( "epr-20011.28", 0x000000, 0x100000, CRC(794c026c) SHA1(85abd667491fd019ee18ba256fd580356f4e1fe9) )
 	ROM_LOAD32_WORD( "epr-20012.29", 0x000002, 0x100000, CRC(f53db4e3) SHA1(4474610eed52248e5e36be438eff5d39f076b134) )
 
+	ROM_REGION( 0x800000, "tgpextra", ROMREGION_ERASEFF) // Coprocessor Data ROM
+
 	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20022.25", 0x000000, 0x400000, CRC(9e47b3c2) SHA1(c73279e837f56c0417c07ba3c642af28fe9a24fa) )
 	ROM_LOAD32_WORD( "mpr-20021.24", 0x000002, 0x400000, CRC(3cbf36cb) SHA1(059cea17f9d6f5960d9fd869c36ffb6fcf230c1a) )
@@ -3360,8 +3424,6 @@ ROM_START( skytargt ) /* Sky Target, Model 2A */
 	ROM_COPY( "user1", 0x1000000, 0x1f00000, 0x100000 )
 
 	ROM_REGION( 0x800000, "tgp", ROMREGION_ERASE00 ) // TGP data (COPRO sockets)
-
-	ROM_REGION( 0x800000, "user5", 0 ) // Coprocessor Data ROM
 	ROM_LOAD32_WORD( "mpr-18420.28", 0x000000, 0x200000, CRC(92b87817) SHA1(b6949b745d0bedeecd6d0240f8911cb345c16d8d) )
 	ROM_LOAD32_WORD( "mpr-18419.29", 0x000002, 0x200000, CRC(74542d87) SHA1(37230e96dd526fb47fcbde5778e5466d8955a969) )
 
@@ -3383,6 +3445,9 @@ ROM_START( skytargt ) /* Sky Target, Model 2A */
 	ROM_LOAD( "mpr-18423.32",   0x200000, 0x200000, CRC(c356d765) SHA1(ae69c9d4e333579d826178d2863156dc784aedef) )
 	ROM_LOAD( "mpr-18422.36",   0x400000, 0x200000, CRC(b4f3cea6) SHA1(49669be09e10dfae7fddce0fc4e415466cb29566) )
 	ROM_LOAD( "mpr-18421.37",   0x600000, 0x200000, CRC(00522390) SHA1(5dbbf2ba008adad36929fcecb7c2c1e5ffd12618) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
 ROM_END
 
 ROM_START( vcop2 ) /* Virtua Cop 2, Model 2A, Sega Game ID# 833-12266, ROM board ID# 834-12267 */
@@ -5867,7 +5932,7 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 	m_protstate = m_protpos = 0;
 
 	ROM[0x56578/4] = 0x08000004;
-	ROM[0x5b3e8/4] = 0x08000004;
+	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
 DRIVER_INIT_MEMBER(model2_state,overrev)
@@ -5911,8 +5976,8 @@ GAME( 1994, vcop,            0, model2o, vcop,    driver_device, 0,       ROT0, 
 GAME( 1994, vcopa,           0, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
-GAME( 1995, manxtt,          0, manxttdx,model2, driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, manxttc,         0, model2a, model2,  driver_device, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, manxtt,          0, manxttdx,manxtt,  driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, manxttc,         0, model2a, manxtt,  driver_device, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallyc,         0, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - TWIN (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallycb,  srallyc, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - TWIN (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallyca,  srallyc, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - DX (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

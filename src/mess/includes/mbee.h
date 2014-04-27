@@ -153,10 +153,7 @@ public:
 	UINT8 *m_p_gfxram;
 	UINT8 *m_p_colorram;
 	UINT8 *m_p_attribram;
-	UINT8 m_speed;
-	UINT8 m_flash;
 	UINT8 m_framecnt;
-	UINT16 m_cursor;
 	UINT8 m_08;
 	UINT8 m_1c;
 	void mbee_video_kbd_scan(int param);

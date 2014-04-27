@@ -40,7 +40,6 @@ void kaneko16_state::kaneko16_fill_bitmap(palette_device* palette, _BitmapClass 
 		}
 	}
 
-
 	typename _BitmapClass::pixel_t *dest;
 	(void)dest; // shut up Visual Studio
 	if (sizeof(*dest) == 2)
@@ -112,46 +111,50 @@ PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 {
-	int sx, x,y;
 	UINT8 *RAM  =   memregion("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
-	m_bg15_bitmap.allocate(256 * 32, 256 * 1);
+	for (int screen = 0; screen < 32; screen++)
+		m_bg15_bitmap[screen].allocate(256, 256);
 
 /*
     8aba is used as background color
-    8aba/2 = 455d = 10001 01010 11101 = $11 $0a $1d
+    8aba/2 = 455d = 10001 01010 11101 = $11 $0a $1d (G5R5B5)
 */
 
-	for (sx = 0 ; sx < 32 ; sx++)   // horizontal screens
-		for (x = 0 ; x < 256 ; x++) // horizontal pixels
-		for (y = 0 ; y < 256 ; y++) // vertical pixels
+	for (int screen = 0; screen < 32; screen++)
+	{
+		for (int x = 0 ; x < 256 ; x++)
 		{
-			int addr  = sx * (256 * 256) + x + y * 256;
-			int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
-			int r,g,b;
+			for (int y = 0 ; y < 256 ; y++)
+			{
+				int addr  = screen * (256 * 256) + x + y * 256;
+				int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
+				int r,g,b;
 
-			r = (data & 0x07c0) >>  6;
-			g = (data & 0xf800) >> 11;
-			b = (data & 0x003e) >>  1;
+				r = (data & 0x07c0) >>  6;
+				g = (data & 0xf800) >> 11;
+				b = (data & 0x003e) >>  1;
 
-			/* apply a simple decryption */
-			r ^= 0x09;
+				/* apply a simple decryption */
+				r ^= 0x09;
 
-			if (~g & 0x08) g ^= 0x10;
-			g = (g - 1) & 0x1f;     /* decrease with wraparound */
-
-			b ^= 0x03;
-			if (~b & 0x08) b ^= 0x10;
-			b = (b + 2) & 0x1f;     /* increase with wraparound */
-
-			/* kludge to fix the rollercoaster picture */
-			if ((r & 0x10) && (b & 0x10))
+				if (~g & 0x08) g ^= 0x10;
 				g = (g - 1) & 0x1f;     /* decrease with wraparound */
 
-			m_bg15_bitmap.pix16(y, sx * 256 + x) = ((g << 10) | (r << 5) | b);
+				b ^= 0x03;
+				if (~b & 0x08) b ^= 0x10;
+				b = (b + 2) & 0x1f;     /* increase with wraparound */
+
+				/* kludge to fix the rollercoaster picture */
+				if ((r & 0x10) && (b & 0x10))
+				g = (g - 1) & 0x1f;     /* decrease with wraparound */
+
+				m_bg15_bitmap[screen].pix16(y, x) = ((g << 10) | (r << 5) | b) & 0x7fff;
+			}
 		}
+	}
 
 	VIDEO_START_CALL_MEMBER(kaneko16);
 }
@@ -172,57 +175,70 @@ WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_w)
 	COMBINE_DATA(&m_bg15_select[0]);
 }
 
-/* ? */
-READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_r)
+/* Brightness (00-ff) */
+READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_bright_r)
 {
-	return m_bg15_reg[0];
+	return m_bg15_bright[0];
 }
-WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_w)
+WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_bright_w)
 {
-	COMBINE_DATA(&m_bg15_reg[0]);
-//  printf("kaneko16_bg15_reg_w %04x\n", m_bg15_reg[0]);
+	COMBINE_DATA(&m_bg15_bright[0]);
 	double brt1 = data & 0xff;
 	brt1 = brt1 / 255.0;
 
-	for (int i = 0; i < 0x8000;i++)
+	for (int i = 0; i < 0x8000; i++)
 		m_bgpalette->set_pen_contrast(i, brt1);
 }
 
 
 void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_bg15_bitmap.valid())
+	if (!m_bg15_bitmap[0].valid())
+		return;
+
+	int select	=	m_bg15_select[ 0 ];
+	int scroll	=	m_bg15_scroll[ 0 ];
+
+	int screen	=	select & 0x1f;
+	int flip	=	select & 0x20;
+
+	int scrollx	=	(scroll >> 0) & 0xff;
+	int scrolly	=	(scroll >> 8) & 0xff;
+
+	if (!flip)
 	{
-		int select  =   m_bg15_select[ 0 ];
-//      int reg     =   m_bg15_reg[ 0 ];
-		int flip    =   select & 0x20;
-		int sx;//, sy;
+		scrollx -= 0x80;
+		scrolly -= 0x08;
+	}
+	else
+	{
+		scrollx -= 0xff - 0x80;
+		scrolly -= 0xff - 0x08;
+	}
 
-	//  if (flip)   select ^= 0x1f;
+	const pen_t *pal = m_bgpalette->pens();
+	UINT16* srcbitmap;
+	UINT32* dstbitmap;
 
-		sx      =   (select & 0x1f) * 256;
-	//  sy      =   0;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		if (!flip)	srcbitmap = &m_bg15_bitmap[screen].pix16(        (y - scrolly) & 0xff  );
+		else		srcbitmap = &m_bg15_bitmap[screen].pix16( 255 - ((y - scrolly) & 0xff) );
 
-		const pen_t *pal = m_bgpalette->pens();
-		UINT16* srcbitmap;
-		UINT32* dstbitmap;
+		dstbitmap = &bitmap.pix32(y);
 
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (!flip) srcbitmap = &m_bg15_bitmap.pix16(y);
-			else srcbitmap =  &m_bg15_bitmap.pix16(255-y);
-			dstbitmap = &bitmap.pix32(y);
+			UINT16 pix;
 
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			{
-				UINT16 pix = srcbitmap[x + sx];
-				dstbitmap[x] = pal[pix&0x7fff];
-			}
+			if (!flip)	pix = srcbitmap[        (x - scrollx) & 0xff  ];
+			else		pix = srcbitmap[ 255 - ((x - scrollx) & 0xff) ];
+
+			dstbitmap[x] = pal[pix];
 		}
-
-//      flag = 0;
 	}
 }
+
 UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill

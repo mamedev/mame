@@ -185,7 +185,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		} 
 		else 
 		{
-			options.set_system_name("");
+			if (machine.exit_pending()) options.set_system_name("");
 		}
 		
 		if (machine.exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))
