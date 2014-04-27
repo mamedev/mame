@@ -254,6 +254,8 @@ void tms9995_device::device_start()
 
 	m_idle_state = false;
 
+	m_source_value = 0;
+
 	// add the states for the debugger
 	for (int i=0; i < 20; i++)
 	{
