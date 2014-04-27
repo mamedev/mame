@@ -41,6 +41,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, d
 					m_write_vsyn(*this),
 					m_reset(0)
 {
+	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
 tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -49,6 +50,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 					m_write_vsyn(*this),
 					m_reset(0)
 {
+	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
 crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
