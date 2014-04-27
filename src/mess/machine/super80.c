@@ -111,10 +111,10 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_reset)
 	membank("boot")->set_entry(0);
 }
 
-TIMER_CALLBACK_MEMBER(super80_state::super80_halfspeed)
+TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 {
 	UINT8 go_fast = 0;
-	if ( (!BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
+	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
@@ -201,7 +201,7 @@ WRITE8_MEMBER( super80_state::super80_dc_w )
 WRITE8_MEMBER( super80_state::super80_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
-	m_shared = data;
+	m_portf0 = data;
 	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
 	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
@@ -212,7 +212,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 WRITE8_MEMBER( super80_state::super80r_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
-	m_shared = data | 0x14;
+	m_portf0 = data | 0x14;
 	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
 	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
@@ -224,29 +224,19 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 void super80_state::machine_reset()
 {
-	m_shared = 0xff;
+	m_portf0 = 0xff;
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
 	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(super80_state::super80_reset),this));
 	membank("boot")->set_entry(1);
 }
 
-void super80_state::driver_init_common()
+DRIVER_INIT_MEMBER( super80_state,super80 )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
-DRIVER_INIT_MEMBER(super80_state,super80)
-{
-	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(super80_state::super80_halfspeed),this)); /* timer for 1MHz slowdown */
-	driver_init_common();
-}
-
-DRIVER_INIT_MEMBER(super80_state,super80v)
-{
-	driver_init_common();
-}
 
 /*-------------------------------------------------
     QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
@@ -255,7 +245,6 @@ DRIVER_INIT_MEMBER(super80_state,super80v)
 QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 {
 	UINT16 exec_addr, start_addr, end_addr;
-	int autorun;
 
 	/* load the binary into memory */
 	if (z80bin_load_file(&image, file_type, &exec_addr, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
@@ -263,13 +252,9 @@ QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 
 	/* is this file executable? */
 	if (exec_addr != 0xffff)
-	{
-		/* check to see if autorun is on (I hate how this works) */
-		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
-
-		if (autorun)
+		/* check to see if autorun is on */
+		if BIT(m_io_config->read_safe(0xFF), 0)
 			m_maincpu->set_pc(exec_addr);
-	}
 
 	return IMAGE_INIT_PASS;
 }

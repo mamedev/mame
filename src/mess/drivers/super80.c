@@ -76,10 +76,10 @@ The user has to adjust some bytes in memory in order to select a different baud 
 
   BDF8  BDF9    Baud
   ---------------------
-  F8    4   300
-  BA    3   400
-  7C    2   600
-  3E    1   1200
+  F8    04       300
+  BA    03       400
+  7C    02       600
+  3E    01      1200
 
 The enhanced Monitor roms (those not supplied by Dick Smith) have extra commands to change the rates
 without the tedium of manually modifying memory.
@@ -100,7 +100,7 @@ a bit and reading the next, until a full byte has been constructed. Lastly, the 
 checked that it is at a high level.
 
 This means that we cannot attempt to convert frequency to voltage ourselves, since the OS only
-"looks" once a bit. The solution is to use a mame timer running at a high enough rate (200 kHz)
+"looks" once a bit. The solution is to use a mame timer running at a high enough rate (40 kHz)
 to read the wave state. While the wave state stays constant, a counter is incremented. When the
 state changes, the output is set according to how far the counter has progressed. The counter is
 then reset ready for the next wave state. The code for this is in the TIMER_CALLBACK.
@@ -761,6 +761,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(100)) // keyb scan
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_h", super80_state, timer_h, attotime::from_hz(100)) // half-speed
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80d, super80 )
@@ -967,10 +968,10 @@ ROM_START( super80v )
 	ROM_REGION( 0x1000, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT      COMPANY       FULLNAME */
-COMP( 1981, super80,  0,       0, super80,  super80, super80_state,  super80,  "Dick Smith Electronics","Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0, super80d, super80d, super80_state, super80,  "Dick Smith Electronics","Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0, super80e, super80d, super80_state, super80,  "Dick Smith Electronics","Super-80 (El Graphix 4)" , GAME_UNOFFICIAL)
-COMP( 1981, super80m, super80, 0, super80m, super80m, super80_state, super80,  "Dick Smith Electronics","Super-80 (with colour)" , GAME_UNOFFICIAL)
-COMP( 1981, super80r, super80, 0, super80r, super80r, super80_state, super80v, "Dick Smith Electronics","Super-80 (with VDUEB)" , GAME_UNOFFICIAL)
-COMP( 1981, super80v, super80, 0, super80v, super80v, super80_state, super80v, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , GAME_UNOFFICIAL)
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT      COMPANY       FULLNAME */
+COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state,  super80, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
+COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
+COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , GAME_UNOFFICIAL)
+COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with colour)" , GAME_UNOFFICIAL)
+COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , GAME_UNOFFICIAL)
+COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , GAME_UNOFFICIAL)

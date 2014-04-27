@@ -93,9 +93,9 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
 
-	output_set_value("cass_led",BIT(m_shared, 5));
+	output_set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -133,9 +133,9 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
 
-	output_set_value("cass_led",BIT(m_shared, 5));
+	output_set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -173,9 +173,9 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
 
-	output_set_value("cass_led",BIT(m_shared, 5));
+	output_set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -217,9 +217,9 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 	/* get selected character generator */
 	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
 
-	output_set_value("cass_led",BIT(m_shared, 5));
+	output_set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_shared, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	if (screen_on)
@@ -295,7 +295,7 @@ static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x
 
 READ8_MEMBER( super80_state::super80v_low_r )
 {
-	if (m_shared & 4)
+	if BIT(m_portf0, 2)
 		return m_p_videoram[offset];
 	else
 		return m_p_colorram[offset];
@@ -303,7 +303,7 @@ READ8_MEMBER( super80_state::super80v_low_r )
 
 WRITE8_MEMBER( super80_state::super80v_low_w )
 {
-	if (m_shared & 4)
+	if BIT(m_portf0, 2)
 		m_p_videoram[offset] = data;
 	else
 		m_p_colorram[offset] = data;
@@ -311,10 +311,10 @@ WRITE8_MEMBER( super80_state::super80v_low_w )
 
 READ8_MEMBER( super80_state::super80v_high_r )
 {
-	if (~m_shared & 4)
+	if (!BIT(m_portf0, 2))
 		return m_p_colorram[0x800 | offset];
 	else
-	if (m_shared & 0x10)
+	if BIT(m_portf0, 4)
 		return m_p_pcgram[0x800 | offset];
 	else
 		return m_p_pcgram[offset];
@@ -322,13 +322,13 @@ READ8_MEMBER( super80_state::super80v_high_r )
 
 WRITE8_MEMBER( super80_state::super80v_high_w )
 {
-	if (~m_shared & 4)
+	if (!BIT(m_portf0, 2))
 		m_p_colorram[0x800 | offset] = data;
 	else
 	{
 		m_p_videoram[0x800 | offset] = data;
 
-		if (m_shared & 0x10)
+		if BIT(m_portf0, 4)
 			m_p_pcgram[0x800 | offset] = data;
 	}
 }
@@ -381,7 +381,7 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 	m_speed = m_mc6845_reg[10]&0x20, m_flash = m_mc6845_reg[10]&0x40; // cursor modes
 	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15]; // get cursor position
 	m_s_options=m_io_config->read();
-	output_set_value("cass_led",BIT(m_shared, 5));
+	output_set_value("cass_led",BIT(m_portf0, 5));
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
@@ -413,7 +413,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		}
 
 		/* if inverse mode, replace any pcgram chrs with inverse chrs */
-		if ((~state->m_shared & 0x10) && (chr & 0x80))          // is it a high chr in inverse mode
+		if ((!BIT(state->m_portf0, 4)) && (chr & 0x80))          // is it a high chr in inverse mode
 		{
 			inv ^= 0xff;                        // invert the chr
 			chr &= 0x7f;                        // and drop bit 7

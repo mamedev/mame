@@ -14,7 +14,7 @@
 #include "machine/wd_fdc.h"
 
 
-/* Bits in shared variable:
+/* Bits in m_portf0 variable:
     d5 cassette LED
     d4 super80v rom or pcg bankswitch (1=pcg ram, 0=char gen rom)
     d2 super80v video or colour bankswitch (1=video ram, 0=colour ram)
@@ -75,7 +75,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_DRIVER_INIT(super80);
-	DECLARE_DRIVER_INIT(super80v);
 	DECLARE_VIDEO_START(super80);
 	DECLARE_VIDEO_START(super80v);
 	DECLARE_PALETTE_INIT(super80m);
@@ -86,13 +85,12 @@ public:
 	UINT32 screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_super80m(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(super80_timer);
 	TIMER_CALLBACK_MEMBER(super80_reset);
-	TIMER_CALLBACK_MEMBER(super80_halfspeed);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	UINT8 m_s_options;
-	UINT8 m_shared;
+	UINT8 m_portf0;
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_colorram;
 	UINT8 *m_p_pcgram;
@@ -119,7 +117,6 @@ private:
 	void mc6845_cursor_configure();
 	void palette_set_colors_rgb(const UINT8 *colors);
 	void super80_cassette_motor(UINT8 data);
-	void driver_init_common();
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
