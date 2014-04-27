@@ -351,9 +351,6 @@ VIDEO_START_MEMBER(super80_state,super80v)
 
 UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_framecnt++;
-	m_speed = m_mc6845_reg[10]&0x20, m_flash = m_mc6845_reg[10]&0x40; // cursor modes
-	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15]; // get cursor position
 	m_s_options=m_io_config->read();
 	output_set_value("cass_led",BIT(m_portf0, 5));
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -393,12 +390,9 @@ MC6845_UPDATE_ROW( super80v_update_row )
 			chr &= 0x7f;                        // and drop bit 7
 		}
 
-		/* process cursor - remove when mame fixed */
-		if ((((!state->m_flash) && (!state->m_speed)) ||
-			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||
-			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&
-			(mem == state->m_cursor))
-				inv ^= state->m_mc6845_cursor[ra];
+		/* process cursor */
+		if (x == cursor_x)
+			inv ^= state->m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_p_pcgram[(chr<<4) | ra] ^ inv;

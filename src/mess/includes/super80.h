@@ -94,10 +94,6 @@ public:
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_colorram;
 	UINT8 *m_p_pcgram;
-	UINT8 m_framecnt;
-	UINT8 m_speed;
-	UINT8 m_flash;
-	UINT16 m_cursor;
 	UINT8 m_mc6845_cursor[16];
 	UINT8 m_palette_index;
 	required_device<palette_device> m_palette;
