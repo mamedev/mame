@@ -9108,7 +9108,6 @@ src/osd/windows/d3dcomm.h svneol=native#text/plain
 src/osd/windows/d3dhlsl.c svneol=native#text/plain
 src/osd/windows/d3dhlsl.h svneol=native#text/plain
 src/osd/windows/d3dintf.h svneol=native#text/plain
-src/osd/windows/debugwin.c svneol=native#text/plain
 src/osd/windows/drawd3d.c svneol=native#text/plain
 src/osd/windows/drawd3d.h svneol=native#text/plain
 src/osd/windows/drawdd.c svneol=native#text/plain
