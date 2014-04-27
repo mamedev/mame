@@ -445,5 +445,8 @@ pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, d
 	, m_out_int_func(*this)
 	, m_sp_en_func(*this)
 	, m_read_slave_ack_func(*this)
+	, m_irr(0)
+	, m_irq_lines(0)
+	, m_level_trig_mode(0)
 {
 }
