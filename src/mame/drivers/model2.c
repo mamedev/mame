@@ -1989,17 +1989,19 @@ static INPUT_PORTS_START( manxtt )
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("VR") // VR
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / VR")
-	PORT_BIT(0x0090, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shift up in Manx TT, Punch in Motoraid
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // shift down in Manx TT, Kick in Motoraid
+	PORT_BIT(0xffcf, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5990,7 +5992,7 @@ GAME( 1995, skytargt,        0, model2a, skytargt,driver_device, 0,       ROT0, 
 GAME( 1996, doaa,          doa, model2a, model2,  model2_state,  doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zeroguna,  zerogun, model2a, model2,  model2_state,  zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunaj, zerogun, model2a, model2,  model2_state,  zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, motoraid,        0, model2a, model2,  driver_device, 0,       ROT0, "Sega",   "Motor Raid - Twin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, motoraid,        0, model2a, manxtt,  driver_device, 0,       ROT0, "Sega",   "Motor Raid - Twin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcop,        0, model2a, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2, dynamcop, model2a, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,  pltkids, model2a, model2,  model2_state,  pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
