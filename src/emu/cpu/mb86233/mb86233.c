@@ -1160,12 +1160,17 @@ void mb86233_cpu_device::execute_run()
 					{
 						UINT32  offset;
 
-						if ( ( r2 >> 6 ) & 1 )
+						if ( (( r2 >> 6 ) & 7) == 1 )
+						{
 							offset = INDIRECT(r1,1);
+							val = GETEXTERNAL( 0,offset);
+						}
 						else
+						{
 							offset = INDIRECT(r1,0);
+							val = GETEXTERNAL( GETEB(),offset);
+						}
 
-						val = GETEXTERNAL( GETEB(),offset);
 						ALU( alu);
 						SETREGS(r2,val);
 					}
