@@ -3647,6 +3647,7 @@ void powervr2_device::device_start()
 	spg_load = 0;
 	spg_vblank = 0;
 	spg_width = 0;
+	spg_control = 0;
 	vo_control = 0;
 	vo_startx = 0;
 	vo_starty = 0;
@@ -3665,6 +3666,7 @@ void powervr2_device::device_start()
 	ta_yuv_tex_cnt = 0;
 	memset(fog_table, 0, sizeof(fog_table));
 	memset(palette, 0, sizeof(palette));
+	memset(&m_pvr_dma, 0x00, sizeof(m_pvr_dma));
 
 	sb_pdstap = 0;
 	sb_pdstar = 0;
