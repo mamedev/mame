@@ -137,8 +137,8 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 	screen_device_iterator iter(*this);
 	for (i = 0, update_screen = iter.first(); update_screen != NULL; i++, update_screen = iter.next())
 	{
-		tilemap_t *curplayfield = i ? m_playfield2_tilemap : m_playfield_tilemap;
-		tilemap_device *curalpha = i ? m_alpha2_tilemap : m_alpha_tilemap;
+		tilemap_t *curplayfield = i ? (tilemap_t*)m_playfield2_tilemap : (tilemap_t*)m_playfield_tilemap;
+		tilemap_device *curalpha = i ? (tilemap_device*)m_alpha2_tilemap : (tilemap_device*)m_alpha_tilemap;
 
 		/* keep in range */
 		int offset = ((scanline - 8) / 8) * 64 + 47;
