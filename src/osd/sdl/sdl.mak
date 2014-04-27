@@ -368,6 +368,9 @@ endif
 SDLSRC = $(SRC)/osd/$(OSD)
 SDLOBJ = $(OBJ)/osd/$(OSD)
 
+OSDSRC = $(SRC)/osd
+OSDOBJ = $(OBJ)/osd
+
 OBJDIRS += $(SDLOBJ)
 
 #-------------------------------------------------
@@ -391,7 +394,7 @@ OSDOBJS = \
 	$(SDLMAIN) \
 	$(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
-	$(SDLOBJ)/sound.o  \
+	$(OSDOBJ)/modules/sound/sdl_sound.o  \
 	$(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \

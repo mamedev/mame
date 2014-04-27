@@ -10,14 +10,14 @@
 //============================================================
 
 // standard sdl header
-#include "sdlinc.h"
+#include "../../sdl/sdlinc.h"
 
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
 
-#include "osdepend.h"
-#include "osdsdl.h"
+#include "sdl_sound.h"
+#include "../../sdl/osdsdl.h"
 
 //============================================================
 //  DEBUGGING
@@ -75,27 +75,7 @@ static int          sdl_create_buffers(void);
 static void         sdl_destroy_buffers(void);
 static void         SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len);
 
-class sound_sdl : public osd_sound_interface
-{
-public:
-	// construction/destruction
-	sound_sdl(const osd_interface &osd);
-	virtual ~sound_sdl();
-	
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
-};
-
 const osd_sound_type OSD_SOUND_SDL = &osd_sound_creator<sound_sdl>;
-
-//============================================================
-//  sound_register
-//============================================================
-
-void sdl_osd_interface::sound_register()
-{
-	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
-}
 
 //-------------------------------------------------
 //  sound_sdl - constructor
@@ -449,6 +429,11 @@ static int sdl_init(running_machine &machine)
 	SDL_AudioSpec   aspec, obtained;
 	char audio_driver[16] = "";
 
+	if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
+		exit(-1);
+	}
+
 	osd_printf_verbose("Audio: Start initialization\n");
 #if (SDLMAME_SDL2)
 	strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
@@ -529,6 +514,7 @@ static void sdl_kill(running_machine &machine)
 
 		SDL_CloseAudio();
 	}
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
 

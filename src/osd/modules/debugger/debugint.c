@@ -10,10 +10,10 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "debugint.h"
 #include "ui/ui.h"
 #include "rendfont.h"
 #include "uiinput.h"
-#include "osdepend.h"
 
 #include "debug/debugvw.h"
 #include "debug/dvdisasm.h"
@@ -26,6 +26,8 @@
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+const osd_debugger_type OSD_DEBUGGER_INTERNAL = &osd_debugger_creator<debugger_internal>;
 
 #define BORDER_YTHICKNESS 1
 #define BORDER_XTHICKNESS 1
@@ -839,7 +841,7 @@ static void dview_update(debug_view &dw, void *osdprivate)
 #endif
 }
 
-static void debugint_exit(running_machine &machine)
+void debugger_internal::debugger_exit()
 {
 	for (DView *ndv = list; ndv != NULL; )
 	{
@@ -849,17 +851,17 @@ static void debugint_exit(running_machine &machine)
 	}
 	if (debug_font != NULL)
 	{
-		machine.render().font_free(debug_font);
+		m_osd.machine().render().font_free(debug_font);
 		debug_font = NULL;
 	}
 
 }
 
-void debugint_init(running_machine &machine)
+void debugger_internal::init_debugger()
 {
 	unicode_char ch;
 	int chw;
-	debug_font = machine.render().font_alloc("ui.bdf"); //ui_get_font(machine);
+	debug_font = m_osd.machine().render().font_alloc("ui.bdf"); //ui_get_font(machine);
 	debug_font_width = 0;
 	debug_font_height = 15;
 
@@ -868,7 +870,7 @@ void debugint_init(running_machine &machine)
 	list = NULL;
 	focus_view = NULL;
 
-	debug_font_aspect = machine.render().ui_aspect();
+	debug_font_aspect = m_osd.machine().render().ui_aspect();
 
 	for (ch=0;ch<=127;ch++)
 	{
@@ -879,7 +881,6 @@ void debugint_init(running_machine &machine)
 	debug_font_width++;
 	/* FIXME: above does not really work */
 	debug_font_width = 10;
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugint_exit), &machine));
 }
 
 #if 0
@@ -1405,7 +1406,7 @@ static void update_views(void)
 }
 
 
-void debugint_wait_for_debugger(device_t &device, bool firststop)
+void debugger_internal::wait_for_debugger(device_t &device, bool firststop)
 {
 	if (firststop && list == NULL)
 	{
@@ -1438,10 +1439,18 @@ void debugint_wait_for_debugger(device_t &device, bool firststop)
 
 }
 
-void debugint_update_during_game(running_machine &machine)
+void debugger_internal::debugger_update()
 {
-	if (!debug_cpu_is_stopped(machine) && machine.phase() == MACHINE_PHASE_RUNNING)
+	if (!debug_cpu_is_stopped(m_osd.machine()) && m_osd.machine().phase() == MACHINE_PHASE_RUNNING)
 	{
 		update_views();
 	}
+}
+
+//-------------------------------------------------
+//  debugger_internal - constructor
+//-------------------------------------------------
+debugger_internal::debugger_internal(const osd_interface &osd)
+	: osd_debugger_interface(osd)
+{
 }

@@ -76,12 +76,18 @@
 WINSRC = $(SRC)/osd/$(OSD)
 WINOBJ = $(OBJ)/osd/$(OSD)
 
+OSDSRC = $(SRC)/osd
+OSDOBJ = $(OBJ)/osd
+
 OBJDIRS += $(WINOBJ)
-ifdef USE_QTDEBUG
-OBJDIRS += $(WINOBJ)/../sdl
-endif
 
+#ifdef USE_QTDEBUG
+OBJDIRS += $(OSDOBJ)/modules/debugger/qt
+#endif
 
+DEFS += -DSDLMAME_SDL2=0
+DEFS += -DUSE_XINPUT=0
+DEFS += -DUSE_OPENGL=0
 
 #-------------------------------------------------
 # configure the resource compiler
@@ -333,7 +339,8 @@ OSDOBJS = \
 	$(WINOBJ)/drawnone.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
-	$(WINOBJ)/sound.o \
+	$(OSDOBJ)/modules/sound/direct_sound.o \
+	$(OSDOBJ)/modules/sound/sdl_sound.o  \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmenu.o \
@@ -352,11 +359,11 @@ CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 $(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.inc
 $(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.inc
 
-ifndef USE_QTDEBUG
+#ifndef USE_QTDEBUG
 # add debug-specific files
 OSDOBJS += \
-	$(WINOBJ)/debugwin.o
-endif
+	$(OSDOBJ)/modules/debugger/debugwin.o
+#endif
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
@@ -364,36 +371,34 @@ RESFILE = $(WINOBJ)/mame.res
 #-------------------------------------------------
 # QT Debug library
 #-------------------------------------------------
-ifdef USE_QTDEBUG
+#ifdef USE_QTDEBUG
 QT_INSTALL_HEADERS := $(shell qmake -query QT_INSTALL_HEADERS)
 QT_LIBS := -L$(shell qmake -query QT_INSTALL_LIBS)
 LIBS += $(QT_LIBS) -lqtmain -lQtGui4 -lQtCore4
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
-SDLOBJ := $(WINOBJ)/../sdl
-SDLSRC := $(WINSRC)/../sdl
 CFLAGS += -DUSE_QTDEBUG
 
 MOC = @moc
-$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+$(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
 	$(MOC) $(INCPATH) $(DEFS) $< -o $@
 
 OSDOBJS += \
-	$(SDLOBJ)/debugqt.o \
-	$(SDLOBJ)/debugqtview.o \
-	$(SDLOBJ)/debugqtwindow.o \
-	$(SDLOBJ)/debugqtlogwindow.o \
-	$(SDLOBJ)/debugqtdasmwindow.o \
-	$(SDLOBJ)/debugqtmainwindow.o \
-	$(SDLOBJ)/debugqtmemorywindow.o \
-	$(SDLOBJ)/debugqtbreakpointswindow.o \
-	$(SDLOBJ)/debugqtview.moc.o \
-	$(SDLOBJ)/debugqtwindow.moc.o \
-	$(SDLOBJ)/debugqtlogwindow.moc.o \
-	$(SDLOBJ)/debugqtdasmwindow.moc.o \
-	$(SDLOBJ)/debugqtmainwindow.moc.o \
-	$(SDLOBJ)/debugqtmemorywindow.moc.o \
-	$(SDLOBJ)/debugqtbreakpointswindow.moc.o
-endif
+	$(OSDOBJ)/modules/debugger/debugqt.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtview.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o
+#endif
 
 #-------------------------------------------------
 # rules for building the libaries

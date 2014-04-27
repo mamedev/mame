@@ -49,6 +49,7 @@
 #include "input.h"
 #include "osdsdl.h"
 #include "sdlos.h"
+#include "modules/sound/sdl_sound.h"
 
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
@@ -442,13 +443,13 @@ sdl_osd_interface::~sdl_osd_interface()
 void sdl_osd_interface::osd_exit()
 {
 
-	osd_interface::exit_subsystems();
+	osd_interface::osd_exit();
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 		/* FixMe: Bug in SDL2.0, Quitting joystick will cause SIGSEGV */
 #if SDLMAME_SDL2
-		SDL_QuitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
+		SDL_QuitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
 #else
 		SDL_Quit();
 #endif
@@ -568,6 +569,14 @@ static void osd_sdl_info(void)
 #endif
 }
 
+//============================================================
+//  sound_register
+//============================================================
+
+void sdl_osd_interface::sound_register()
+{
+	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
+}
 
 //============================================================
 //  init
@@ -652,9 +661,9 @@ void sdl_osd_interface::init(running_machine &machine)
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 #if (SDLMAME_SDL2)
-		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		if (SDL_InitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #else
-		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #endif
 			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 			exit(-1);

@@ -22,13 +22,9 @@
 #include "emuopts.h"
 
 // MAMEOS headers
+#include "direct_sound.h"
 #include "winmain.h"
 #include "window.h"
-#include "video.h"
-#include "config.h"
-
-#define SDLMAME_SDL2 0
-#include "../sdl/sdlinc.h"
 
 //============================================================
 //  DEBUGGING
@@ -48,82 +44,7 @@
 //  PROTOTYPES
 //============================================================
 
-class sound_direct_sound : public osd_sound_interface
-{
-public:
-	// construction/destruction
-	sound_direct_sound(const osd_interface &osd);
-	virtual ~sound_direct_sound();
-	
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
-
-	HRESULT      dsound_init();
-	void         dsound_kill();
-	HRESULT      dsound_create_buffers();
-	void         dsound_destroy_buffers();
-	void 		 copy_sample_data(const INT16 *data, int bytes_to_copy);
-private:	
-	// DirectSound objects
-	LPDIRECTSOUND        dsound;
-	DSCAPS               dsound_caps;
-
-	// sound buffers
-	LPDIRECTSOUNDBUFFER  primary_buffer;
-	LPDIRECTSOUNDBUFFER  stream_buffer;
-	UINT32               stream_buffer_size;
-	UINT32               stream_buffer_in;
-
-	// descriptors and formats
-	DSBUFFERDESC         primary_desc;
-	DSBUFFERDESC         stream_desc;
-	WAVEFORMATEX         primary_format;
-	WAVEFORMATEX         stream_format;
-
-	// buffer over/underflow counts
-	int                  buffer_underflows;
-	int                  buffer_overflows;
-};
-
 const osd_sound_type OSD_SOUND_DIRECT_SOUND = &osd_sound_creator<sound_direct_sound>;
-
-
-class sound_sdl : public osd_sound_interface
-{
-public:
-	// construction/destruction
-	sound_sdl(const osd_interface &osd);
-	virtual ~sound_sdl() { }
-	
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) { }
-	virtual void set_mastervolume(int attenuation) { }
-};
-
-const osd_sound_type OSD_SOUND_SDL = &osd_sound_creator<sound_sdl>;
-
-//-------------------------------------------------
-//  sound_sdl - constructor
-//-------------------------------------------------
-sound_sdl::sound_sdl(const osd_interface &osd)
-	: osd_sound_interface(osd)
-{
-	char audio_driver[16] = "";
-	if ( SDL_InitSubSystem(SDL_INIT_AUDIO) < 0 ) {
-		fprintf(stderr, "WinMain() error: %s", SDL_GetError());
-		return;
-	}
-	SDL_SetModuleHandle(GetModuleHandle(NULL));
-
-	osd_printf_verbose("Audio: Start initialization\n");
-#if (SDLMAME_SDL2)
-	strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
-#else
-	SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
-#endif
-	osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
-	
-}
-
 
 //-------------------------------------------------
 //  sound_direct_sound - constructor
@@ -150,16 +71,6 @@ sound_direct_sound::~sound_direct_sound()
 	LOG(("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows));
 }
 
-
-//============================================================
-//  sound_register
-//============================================================
-
-void windows_osd_interface::sound_register()
-{
-	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false);
-	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
-}
 
 //============================================================
 //  copy_sample_data

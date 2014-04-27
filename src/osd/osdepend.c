@@ -13,6 +13,9 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "portmidi/portmidi.h"
+#include "modules/sound/none.h"
+#include "modules/debugger/none.h"
+#include "modules/debugger/debugint.h"
 
 extern bool g_print_verbose;
 
@@ -22,7 +25,8 @@ extern bool g_print_verbose;
 
 osd_interface::osd_interface()
 	: m_machine(NULL),
-	  m_sound(NULL)
+	  m_sound(NULL),
+	  m_debugger(NULL)
 {
 }
 
@@ -78,6 +82,13 @@ void osd_interface::init(running_machine &machine)
 	// extract the verbose printing option
 	if (options.verbose())
 		g_print_verbose = true;
+		
+	m_sound_options.add("none", OSD_SOUND_NONE, false);	
+	sound_register();
+	
+	m_debugger_options.add("none", OSD_DEBUGGER_NONE, false);	
+	m_debugger_options.add("internal", OSD_DEBUGGER_INTERNAL, false);	
+	debugger_register();
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_interface::osd_exit), this));
@@ -113,6 +124,15 @@ void osd_interface::init_debugger()
 	// is active. This gives any OSD debugger interface a chance to
 	// create all of its structures.
 	//
+	osd_debugger_type debugger = m_debugger_options.find("windows");//machine().options().debugger());
+	if (debugger==NULL) 
+	{
+		osd_printf_warning("debugger_init: option %s not found swithing debugger off\n","windows");//machine().options().debugger());
+		debugger = m_debugger_options.find("none");
+	}
+	m_debugger = (*debugger)(*this);
+	
+	m_debugger->init_debugger();
 }
 
 
@@ -129,10 +149,22 @@ void osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	// called repeatedly until a command is issued that resumes
 	// execution.
 	//
+	m_debugger->wait_for_debugger(device, firststop);
 }
 
 void osd_interface::debugger_update()
 {
+	if (m_debugger) m_debugger->debugger_update();
+}
+
+void osd_interface::debugger_exit()
+{
+	if (m_debugger)
+	{
+		m_debugger->debugger_exit();
+		global_free(m_debugger);
+		m_debugger = NULL;
+	}
 }
 
 //-------------------------------------------------
@@ -242,8 +274,6 @@ void osd_interface::init_subsystems()
 		exit(-1);	
 	}
 
-	m_sound_options.add("none", OSD_SOUND_NONE, false);	
-	sound_register();
 	sound_init();
 	input_init();
 	// we need pause callbacks
@@ -275,6 +305,10 @@ bool osd_interface::sound_init()
 }
 
 void osd_interface::sound_register()
+{
+}
+
+void osd_interface::debugger_register()
 {
 }
 
@@ -329,7 +363,6 @@ void osd_interface::video_exit()
 
 void osd_interface::sound_exit()
 {
-	m_sound_options.reset();
 	global_free(m_sound);
 }
 
@@ -352,15 +385,12 @@ void osd_interface::midi_exit()
 	#endif
 }
 
-void osd_interface::debugger_exit()
-{
-}
-
 void osd_interface::osd_exit()
 {
 	exit_subsystems();
+	m_debugger_options.reset();
+	m_sound_options.reset();
 }
-
 
 
 //-------------------------------------------------
@@ -372,7 +402,6 @@ osd_sound_interface::osd_sound_interface(const osd_interface &osd)
 {
 }
 
-
 //-------------------------------------------------
 //  osd_sound_interface - destructor
 //-------------------------------------------------
@@ -382,12 +411,19 @@ osd_sound_interface::~osd_sound_interface()
 }
 
 //-------------------------------------------------
-//  sound_none - constructor
+//  osd_debugger_interface - constructor
 //-------------------------------------------------
-sound_none::sound_none(const osd_interface &osd)
-	: osd_sound_interface(osd)
+
+osd_debugger_interface::osd_debugger_interface(const osd_interface &osd)
+	: m_osd(osd)
 {
 }
 
+//-------------------------------------------------
+//  osd_debugger_interface - destructor
+//-------------------------------------------------
 
-const osd_sound_type OSD_SOUND_NONE = &osd_sound_creator<sound_none>;
+osd_debugger_interface::~osd_debugger_interface()
+{
+}
+

@@ -297,12 +297,6 @@ public:
 	virtual void init(running_machine &machine);
 	virtual void update(bool skip_redraw);
 
-	// debugger overridables
-	virtual void init_debugger();
-	virtual void wait_for_debugger(device_t &device, bool firststop);
-	virtual void debugger_update();
-	virtual void debugger_exit();
-
 	// video overridables
 	virtual void *get_slider_list();
 
@@ -314,8 +308,10 @@ public:
 	virtual void font_close(osd_font font);
 	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
-	virtual bool video_init();
 	virtual void sound_register();
+	virtual void debugger_register();
+	
+	virtual bool video_init();	
 	virtual bool input_init();
 	virtual void input_pause();
 	virtual void input_resume();

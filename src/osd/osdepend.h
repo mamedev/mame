@@ -27,10 +27,15 @@ class input_type_entry;
 class device_t;
 class osd_interface;
 class osd_sound_interface;
+class osd_debugger_interface;
+
 typedef void *osd_font;
 
-// a device_type is simply a pointer to its alloc function
+// a osd_sound_type is simply a pointer to its alloc function
 typedef osd_sound_interface *(*osd_sound_type)(const osd_interface &osd);
+
+// a osd_sound_type is simply a pointer to its alloc function
+typedef osd_debugger_interface *(*osd_debugger_type)(const osd_interface &osd);
 
 
 // ======================> osd_interface
@@ -51,10 +56,11 @@ public:
 	virtual void update(bool skip_redraw);
 
 	// debugger overridables
-	virtual void init_debugger();
-	virtual void wait_for_debugger(device_t &device, bool firststop);
-	virtual void debugger_update();
-	virtual void debugger_exit();
+	void init_debugger();
+	void wait_for_debugger(device_t &device, bool firststop);
+	void debugger_update();
+	void debugger_exit();
+	virtual void debugger_register();
 
 	// audio overridables
 	void update_audio_stream(const INT16 *buffer, int samples_this_frame);
@@ -100,8 +106,10 @@ private:
 
 protected:	
 	osd_sound_interface* m_sound;
+	osd_debugger_interface* m_debugger;
 	
 	tagmap_t<osd_sound_type>  m_sound_options;  
+	tagmap_t<osd_debugger_type>  m_debugger_options;  
 };
 
 class osd_sound_interface
@@ -117,25 +125,34 @@ protected:
 	const osd_interface& m_osd;
 };
 
-class sound_none : public osd_sound_interface
-{
-public:
-	// construction/destruction
-	sound_none(const osd_interface &osd);
-	virtual ~sound_none() { }
-	
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) { }
-	virtual void set_mastervolume(int attenuation) { }
-};
-
-// this template function creates a stub which constructs a device
+// this template function creates a stub which constructs a sound subsystem
 template<class _DeviceClass>
 osd_sound_interface *osd_sound_creator(const osd_interface &osd)
 {
 	return global_alloc(_DeviceClass(osd));
 }
 
+class osd_debugger_interface
+{
+public:
+	// construction/destruction
+	osd_debugger_interface(const osd_interface &osd);
+	virtual ~osd_debugger_interface();
+	
+	virtual void init_debugger() = 0;
+	virtual void wait_for_debugger(device_t &device, bool firststop) = 0;
+	virtual void debugger_update() = 0;
+	virtual void debugger_exit() = 0;
 
-extern const osd_sound_type OSD_SOUND_NONE;
+protected:	
+	const osd_interface& m_osd;
+};
+
+// this template function creates a stub which constructs a debugger
+template<class _DeviceClass>
+osd_debugger_interface *osd_debugger_creator(const osd_interface &osd)
+{
+	return global_alloc(_DeviceClass(osd));
+}
 
 #endif  /* __OSDEPEND_H__ */
