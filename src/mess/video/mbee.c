@@ -396,8 +396,6 @@ VIDEO_START_MEMBER(mbee_state,mbeeppc)
 UINT32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
-	m_speed = m_sy6545_reg[10]&0x20, m_flash = m_sy6545_reg[10]&0x40;           // cursor modes
-	m_cursor = (m_sy6545_reg[14]<<8) | m_sy6545_reg[15];                    // get cursor position
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
@@ -432,11 +430,8 @@ MC6845_UPDATE_ROW( mbee_update_row )
 		state->mbee_video_kbd_scan(x+ma);
 
 		/* process cursor */
-		if ((((!state->m_flash) && (!state->m_speed)) ||                    // (5,6)=(0,0) = cursor on always
-			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||     // (5,6)=(1,1) = cycle per 32 frames
-			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&      // (5,6)=(0,1) = cycle per 16 frames
-			(mem == state->m_cursor))                   // displaying at cursor position?
-				inv ^= state->m_sy6545_cursor[ra];          // cursor scan row
+		if (x == cursor_x)
+			inv ^= state->m_sy6545_cursor[ra];          // cursor scan row
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_p_gfxram[(chr<<4) | ra] ^ inv;
@@ -473,11 +468,8 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 		state->mbee_video_kbd_scan(x+ma);
 
 		/* process cursor */
-		if ((((!state->m_flash) && (!state->m_speed)) ||                    // (5,6)=(0,0) = cursor on always
-			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||     // (5,6)=(1,1) = cycle per 32 frames
-			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&      // (5,6)=(0,1) = cycle per 16 frames
-			(mem == state->m_cursor))                   // displaying at cursor position?
-				inv ^= state->m_sy6545_cursor[ra];          // cursor scan row
+		if (x == cursor_x)
+			inv ^= state->m_sy6545_cursor[ra];          // cursor scan row
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_p_gfxram[(chr<<4) | ra] ^ inv;
@@ -530,11 +522,8 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 		state->mbee_video_kbd_scan(x+ma);
 
 		/* process cursor */
-		if ((((!state->m_flash) && (!state->m_speed)) ||                    // (5,6)=(0,0) = cursor on always
-			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||     // (5,6)=(1,1) = cycle per 32 frames
-			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&      // (5,6)=(0,1) = cycle per 16 frames
-			(mem == state->m_cursor))                   // displaying at cursor position?
-				inv ^= state->m_sy6545_cursor[ra];          // cursor scan row
+		if (x == cursor_x)
+			inv ^= state->m_sy6545_cursor[ra];          // cursor scan row
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_p_gfxram[(chr<<4) | ra] ^ inv;
