@@ -229,6 +229,9 @@ void kbdc8042_device::device_start()
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 	memset(&m_keyboard, 0x00, sizeof(m_keyboard));
 	memset(&m_mouse, 0x00, sizeof(m_mouse));
+	m_sending = 0;
+	m_last_write_to_control = 0;
+	m_status_read_mode = 0;
 }
 
 /*-------------------------------------------------
