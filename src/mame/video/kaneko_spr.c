@@ -136,7 +136,8 @@ Offset:         Format:                     Value:
                     f--- ---- ---- ----     Multisprite: Use Latched Code + 1
                     -e-- ---- ---- ----     Multisprite: Use Latched Color (And Flip?)
                     --d- ---- ---- ----     Multisprite: Use Latched X,Y As Offsets
-                    ---c ba-- ---- ----
+                    ---c b--- ---- ----     Index Of XY Offset
+                    ---- -a-- ---- ----
                     ---- --9- ---- ----     High Priority (vs FG Tiles Of High Priority)
                     ---- ---8 ---- ----     High Priority (vs BG Tiles Of High Priority)
                     ---- ---- 7654 32--     Color
@@ -148,7 +149,8 @@ Offset:         Format:                     Value:
                     f--- ---- ---- ----     Multisprite: Use Latched Code + 1
                     -e-- ---- ---- ----     Multisprite: Use Latched Color (And Flip?)
                     --d- ---- ---- ----     Multisprite: Use Latched X,Y As Offsets
-                    ---c ba-- ---- ----
+                    ---c b--- ---- ----     Index Of XY Offset
+                    ---- -a-- ---- ----
                     ---- --9- ---- ----     X Flip
                     ---- ---8 ---- ----     Y Flip
                     ---- ---- 7--- ----     High Priority (vs FG Tiles Of High Priority)

@@ -14,7 +14,7 @@ OTHER  :  93C46 EEPROM [Optional]
 
 CUSTOM :  VU-001 046A                  (48pin PQFP)
           VU-002 052 151021            (160pin PQFP)    <- Sprites
-          VU-003                                        <- High Colour Background
+          VU-003 048 XJ009 (x3)        (40pin)          <- High Colour Background
           VIEW2-CHIP 23160-509 9047EAI (144pin PQFP)    <- Tilemaps
           MUX2-CHIP                    (64pin PQFP)
           HELP1-CHIP                   (64pin PQFP)
@@ -25,7 +25,7 @@ CUSTOM :  VU-001 046A                  (48pin PQFP)
 ----------------------------------------------------------------------------------------
 Year + Game                    PCB         Notes
 ----------------------------------------------------------------------------------------
-91  The Berlin Wall
+91  The Berlin Wall            BW-002      3 x VU-003 (encrypted high colour background)
     Magical Crystals           Z00FC-02
 92  Bakuretsu Breaker          ZOOFC-02
     Blaze On                   Z02AT-002   2 VU-002 Sprites Chips (Atlus PCB ID: ATL-67140)
@@ -272,16 +272,31 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_w)
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
+READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_r)
+{
+	if (offset & 0x4)
+		return 0;
+	offset = BITSWAP8(offset, 7, 6, 5, 2, 4, 3, 1, 0);
+	return m_kaneko_spr->kaneko16_sprites_regs_r(space, offset, mem_mask);
+}
+
+WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_w)
+{
+	if (offset & 0x4)
+		return;
+	offset = BITSWAP8(offset, 7, 6, 5, 2, 4, 3, 1, 0);
+	m_kaneko_spr->kaneko16_sprites_regs_w(space, offset, data, mem_mask);
+}
+
 static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x30e000, 0x30ffff) AM_READWRITE(berlwall_spriteram_r, berlwall_spriteram_w) AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-//  AM_RANGE(0x480000, 0x480001) AM_RAM     // ?
-	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_reg_r, kaneko16_bg15_reg_w) AM_SHARE("bg15_reg")    // High Color Background
-	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_SHARE("bg15_select")
-	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	/* writes to 0x600020 - 0x60003f too, mirror, or is it only hooked up on bytes or similar? */
+	AM_RANGE(0x30e000, 0x30ffff) AM_READWRITE(berlwall_spriteram_r, berlwall_spriteram_w) AM_SHARE("spriteram")       // Sprites (scrambled RAM)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                // Palette
+	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg15_scroll")                                                       // High Color Background
+	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_bright_r, kaneko16_bg15_bright_w) AM_SHARE("bg15_bright") // ""
+	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_SHARE("bg15_select") // ""
+	AM_RANGE(0x600000, 0x60003f) AM_READWRITE(berlwall_spriteregs_r, berlwall_spriteregs_w)                           // Sprite Regs (scrambled RAM)
 	AM_RANGE(0x680000, 0x680001) AM_READ_PORT("P1")
 	AM_RANGE(0x680002, 0x680003) AM_READ_PORT("P2")
 	AM_RANGE(0x680004, 0x680005) AM_READ_PORT("SYSTEM")
@@ -814,7 +829,7 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                            The Berlin Wall (set 1)
+                            The Berlin Wall
 ***************************************************************************/
 
 static INPUT_PORTS_START( berlwall )
@@ -897,7 +912,7 @@ static INPUT_PORTS_START( berlwall )
 	PORT_DIPSETTING(    0x30, "England" )
 	PORT_DIPSETTING(    0x20, "Italy" )
 	PORT_DIPSETTING(    0x10, "Germany" )
-	PORT_DIPSETTING(    0x00, "Freeze Screen" ) // Not documented
+	PORT_DIPSETTING(    0x00, "Freeze Screen" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -906,12 +921,12 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                            The Berlin Wall (set 2)
+                            The Berlin Wall (bootleg ?)
 ***************************************************************************/
 
 //  Same as berlwall, but for a different lives setting
 
-static INPUT_PORTS_START( berlwalt )
+static INPUT_PORTS_START( berlwallt )
 	PORT_INCLUDE(berlwall)
 
 	PORT_MODIFY("DSW2")
@@ -923,6 +938,22 @@ static INPUT_PORTS_START( berlwalt )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+                            The Berlin Wall (Korea)
+***************************************************************************/
+
+//  Same as berlwallt, but no country setting
+
+static INPUT_PORTS_START( berlwallk )
+	PORT_INCLUDE(berlwallt)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x30, 0x30, "Pause Mode" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "Off (1)" )
+	PORT_DIPSETTING(    0x20, "Off (2)" )
+	PORT_DIPSETTING(    0x10, "Off (3)" )
+	PORT_DIPSETTING(    0x00, "Freeze Screen" )
+INPUT_PORTS_END
 
 
 /***************************************************************************
@@ -1684,11 +1715,11 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
-	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
+	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240+16);
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
-//  kaneko16_sprite_device::set_altspacing(*device, 1);
+	kaneko16_sprite_device::set_offsets(*device, 0, -1 << 6);
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
@@ -2405,6 +2436,7 @@ ROM_END
                                 The Berlin Wall
 
 The Berlin Wall, Kaneko 1991, BW-002
+(berlwallt set)
 
 ----
 
@@ -2429,19 +2461,18 @@ BW-001                      42101
                            SWA
 
 
-PALs : BW-U47, BW-U48 (backgrounds encryption)
+GAL16V8A-25LP : BW-U47 & BW-U48 (backgrounds encryption), BW-U54
 
 ***************************************************************************/
 
 ROM_START( berlwall )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "u23_01.u23", 0x000000, 0x020000, CRC(76b526ce) SHA1(95ba7cccbe88fd695c28b6a7c25a1afd130c1aa6) )
-	ROM_LOAD16_BYTE( "u39_01.u39", 0x000001, 0x020000, CRC(78fa7ef2) SHA1(8392de6e307dcd2bf5bcbeb37d578d33246acfcf) )
+	ROM_LOAD16_BYTE( "bw100e_u23-01.u23", 0x000000, 0x020000, CRC(76b526ce) SHA1(95ba7cccbe88fd695c28b6a7c25a1afd130c1aa6) )
+	ROM_LOAD16_BYTE( "bw101e_u39-01.u39", 0x000001, 0x020000, CRC(78fa7ef2) SHA1(8392de6e307dcd2bf5bcbeb37d578d33246acfcf) )
 
-	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
-	ROM_LOAD( "bw300.u82",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
@@ -2458,11 +2489,16 @@ ROM_START( berlwall )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
+
+	ROM_REGION( 0x600, "plds", 0 )     /* 3 x GAL16V8A-25LP */
+	ROM_LOAD( "bw_u47.u47", 0x000, 0x0117, NO_DUMP)
+	ROM_LOAD( "bw_u48.u48", 0x200, 0x0117, NO_DUMP)
+	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
 
 
 /*
-berlwalt original bug ?
+berlwallt original bug ?
 
 info from SebV:
 
@@ -2495,13 +2531,13 @@ game is started, and is incremented by 1 once a level is finished)
 01CF72: movem.l (A7)+, D0/A0-A2
 01CF76:
 
-berlwall levels: 1-1,2,3(anim),...
-berlwalt levels: 1-1(anim)2-1/2/3/4/5(anim)3-1/2/3/4/5(anim)4-1(*)
+berlwall  levels: 1-1,2,3(anim),...
+berlwallt levels: 1-1(anim)2-1/2/3/4/5(anim)3-1/2/3/4/5(anim)4-1(*)
 
-note: berlwall may be genuine while berlwalt may be bootleg! because
-stage 1-1 of berlwalt is stage 1-3 of berlwall, and berlwall has
-explanation ingame. + the flyer from TAFA shows main character as
-berlwall and not berlwalt!
+note: berlwall may be genuine while berlwallt may be bootleg! because
+stage 1-1 of berlwallt is stage 1-3 of berlwall, and berlwall has
+explanation ingame.
+(TAFA flyers exist for both berlwall and berlwallt player graphics)
 --------------------------------------------------------------------------------
 */
 
@@ -2513,7 +2549,7 @@ ROM_START( berlwallt )
 	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
-	ROM_LOAD( "bw300.u82",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) )
+	ROM_LOAD( "bw300.u82",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) ) // Masked players, Japanese text
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
@@ -2530,9 +2566,14 @@ ROM_START( berlwallt )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
+
+	ROM_REGION( 0x600, "plds", 0 )     /* 3 x GAL16V8A-25LP */
+	ROM_LOAD( "bw_u47.u47", 0x000, 0x0117, NO_DUMP)
+	ROM_LOAD( "bw_u48.u48", 0x200, 0x0117, NO_DUMP)
+	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
 
-/* This set definitely comes from an original board but suffers the same 'COPY BOARD' issue in MAME, will be chedked on the PCB shortly */
+/* This set definitely comes from an original board but suffers the same 'COPY BOARD' issue in MAME, will be checked on the PCB shortly */
 
 ROM_START( berlwallk )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
@@ -2542,7 +2583,7 @@ ROM_START( berlwallk )
 	ROM_REGION( 0x120000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "bw001.u84",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002.u83",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
-	ROM_LOAD( "bw300k.u82",  0x100000, 0x020000, CRC(b8de79d7) SHA1(c9a78aa213105f3657349995aca2866bc6d80093) )
+	ROM_LOAD( "bw300k.u82", 0x100000, 0x020000, CRC(b8de79d7) SHA1(c9a78aa213105f3657349995aca2866bc6d80093) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "bw003.u77",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
@@ -2559,6 +2600,11 @@ ROM_START( berlwallk )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bw000k.u46",  0x000000, 0x040000, CRC(52e81a50) SHA1(0adf6b42dee244dba2a4fb237155b04699b0254f) )
+
+	ROM_REGION( 0x600, "plds", 0 )     /* 3 x GAL16V8A-25LP */
+	ROM_LOAD( "bw_u47.u47", 0x000, 0x0117, NO_DUMP)
+	ROM_LOAD( "bw_u48.u48", 0x200, 0x0117, NO_DUMP)
+	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
 
 
@@ -3928,8 +3974,8 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 ***************************************************************************/
 
 GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", 0 )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", 0 )
-GAME( 1991, berlwallk,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", 0 )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", 0 )
+GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", 0 )
 
 
 
