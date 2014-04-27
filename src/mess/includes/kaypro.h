@@ -73,10 +73,7 @@ public:
 	UINT8 m_mc6845_cursor[16];
 	UINT8 m_mc6845_reg[32];
 	UINT8 m_mc6845_ind;
-	UINT8 m_speed;
-	UINT8 m_flash;
 	UINT8 m_framecnt;
-	UINT16 m_cursor;
 	UINT8 *m_p_videoram;
 	kay_kbd_t *m_kbd;
 	int m_centronics_busy;

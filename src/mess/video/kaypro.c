@@ -114,9 +114,6 @@ UINT32 kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bi
 UINT32 kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
-	m_speed = m_mc6845_reg[10]&0x20;
-	m_flash = m_mc6845_reg[10]&0x40;                // cursor modes
-	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15];                    // get cursor position
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
@@ -177,12 +174,9 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		if ( (BIT(attr, 2)) & (BIT(state->m_framecnt, 3)) )
 			fg = bg;
 
-		/* process cursor - remove when mame fixed */
-		if ((((!state->m_flash) && (!state->m_speed)) ||
-			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||
-			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&
-			(mem == state->m_cursor))
-				inv ^= state->m_mc6845_cursor[ra];
+		/* process cursor */
+		if (x == cursor_x)
+			inv ^= state->m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
 		if ( (ra == 15) & (BIT(attr, 3)) )  /* underline */
