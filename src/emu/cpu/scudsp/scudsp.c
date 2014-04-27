@@ -909,6 +909,28 @@ void scudsp_cpu_device::execute_run()
 
 void scudsp_cpu_device::device_start()
 {
+	m_pc = 0;
+	m_flags = 0;
+	m_delay = 0;
+	m_top = 0;
+	m_lop = 0;
+	memset(&m_rx, 0x00, sizeof(m_rx));
+	m_mul = 0;
+	memset(&m_ry, 0x00, sizeof(m_ry));
+	m_alu = 0;
+	memset(&m_ph, 0x00, sizeof(m_ph));
+	memset(&m_pl, 0x00, sizeof(m_pl));
+	memset(&m_ach, 0x00, sizeof(m_ach));
+	memset(&m_acl, 0x00, sizeof(m_acl));
+	m_ra0 = 0;
+	m_wa0 = 0;
+	m_ra = 0;
+	m_ct0 = 0;
+	m_ct1 = 0;
+	m_ct2 = 0;
+	m_ct3 = 0;
+	memset(&m_dma, 0x00, sizeof(m_dma));
+
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
