@@ -60,6 +60,9 @@ const device_type MSM6585 = &device_creator<msm6585_device>;
 msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock, "msm5205", __FILE__),
 						device_sound_interface(mconfig, *this),
+						m_prescaler(0),
+						m_bitwidth(0),
+						m_select(0),
 						m_vclk_cb(*this)
 {
 }
@@ -67,6 +70,8 @@ msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, d
 msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sound_interface(mconfig, *this),
+						m_prescaler(0),
+						m_bitwidth(0),
 						m_select(0),
 						m_vclk_cb(*this)
 {
