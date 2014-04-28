@@ -220,6 +220,13 @@ const device_type SPC700 = &device_creator<spc700_device>;
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_a(0)
+	, m_x(0)
+	, m_y(0)
+	, m_s(0)
+	, m_pc(0)
+	, m_ppc(0)
+	, m_debugger_temp(0)
 {
 }
 
