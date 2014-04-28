@@ -2342,9 +2342,9 @@ updateirq:
     ppc4xx_spu_r - serial port read handler
 -------------------------------------------------*/
 
-static READ8_HANDLER( ppc4xx_spu_r )
+READ8_MEMBER( ppc4xx_device::ppc4xx_spu_r )
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(&space.device())->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(this)->token();
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -2369,9 +2369,9 @@ static READ8_HANDLER( ppc4xx_spu_r )
     ppc4xx_spu_w - serial port write handler
 -------------------------------------------------*/
 
-static WRITE8_HANDLER( ppc4xx_spu_w )
+WRITE8_MEMBER( ppc4xx_device::ppc4xx_spu_w )
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(&space.device())->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(this)->token();
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)
@@ -2435,8 +2435,8 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
     the 4XX
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32, legacy_cpu_device )
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8_LEGACY(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
+static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32, ppc4xx_device )
+	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
 ADDRESS_MAP_END
 
 

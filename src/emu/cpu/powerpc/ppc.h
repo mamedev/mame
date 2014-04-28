@@ -189,10 +189,44 @@ void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_writ
 void ppc4xx_set_dcr_read_handler(device_t *device, read32_delegate dcr_read_func);
 void ppc4xx_set_dcr_write_handler(device_t *device, write32_delegate dcr_write_func);
 
-DECLARE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
-DECLARE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
+class ppc4xx_device : public legacy_cpu_device
+{
+public:
+	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info);
+	DECLARE_READ8_MEMBER( ppc4xx_spu_r );
+	DECLARE_WRITE8_MEMBER( ppc4xx_spu_w );
+};
 
-DECLARE_LEGACY_CPU_DEVICE(PPC405GP, ppc405gp);
+CPU_GET_INFO( ppc403ga );
+
+class ppc403ga_device : public ppc4xx_device
+{
+public:
+	ppc403ga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type PPC403GA;
+
+CPU_GET_INFO( ppc403gcx );
+
+class ppc403gcx_device : public ppc4xx_device
+{
+public:
+	ppc403gcx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type PPC403GCX;
+
+
+CPU_GET_INFO( ppc405gp );
+
+class ppc405gp_device : public ppc4xx_device
+{
+public:
+	ppc405gp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type PPC405GP;
 
 DECLARE_LEGACY_CPU_DEVICE(PPC601, ppc601);
 DECLARE_LEGACY_CPU_DEVICE(PPC602, ppc602);
