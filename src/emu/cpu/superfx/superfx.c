@@ -593,6 +593,12 @@ void superfx_device::device_start()
 	m_irq = 0;
 	m_cache_access_speed = 0;
 	m_memory_access_speed = 0;
+	m_debugger_temp = 0;
+	m_romcl = 0;
+	m_romdr = 0;
+	m_ramcl = 0;
+	m_ramar = 0;
+	m_ramdr = 0;
 
 	superfx_regs_reset();
 	superfx_memory_reset();
