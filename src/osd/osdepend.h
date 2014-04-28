@@ -16,11 +16,90 @@
 #include "emucore.h"
 #include "osdcore.h"
 #include "unicode.h"
+#include "options.h"
 
+//============================================================
+//  Defines
+//============================================================
 
-//**************************************************************************
+#define OSDOPTION_OSLOG                 "oslog"
+#define OSDOPTION_WATCHDOG              "watchdog"
+
+#define OSDOPTION_MULTITHREADING        "multithreading"
+#define OSDOPTION_NUMPROCESSORS         "numprocessors"
+#define OSDOPTION_BENCH                 "bench"
+
+#define OSDOPTION_VIDEO                 "video"
+#define OSDOPTION_NUMSCREENS            "numscreens"
+#define OSDOPTION_WINDOW                "window"
+#define OSDOPTION_MAXIMIZE              "maximize"
+#define OSDOPTION_KEEPASPECT            "keepaspect"
+#define OSDOPTION_UNEVENSTRETCH         "unevenstretch"
+#define OSDOPTION_WAITVSYNC             "waitvsync"
+#define OSDOPTION_SYNCREFRESH           "syncrefresh"
+
+#define OSDOPTION_SCREEN                "screen"
+#define OSDOPTION_ASPECT                "aspect"
+#define OSDOPTION_RESOLUTION            "resolution"
+#define OSDOPTION_VIEW                  "view"
+
+#define OSDOPTION_SWITCHRES             "switchres"
+
+#define OSDOPTION_SOUND			        "sound"
+#define OSDOPTION_AUDIO_LATENCY         "audio_latency"
+
+#define OSDOPTVAL_AUTO                  "auto"
+
+//============================================================
 //  TYPE DEFINITIONS
-//**************************************************************************
+//============================================================
+
+class osd_options : public core_options
+{
+public:
+	// construction/destruction
+	osd_options();
+
+	// debugging options
+	bool oslog() const { return bool_value(OSDOPTION_OSLOG); }
+	int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
+
+	// performance options
+	bool multithreading() const { return bool_value(OSDOPTION_MULTITHREADING); }
+	const char *numprocessors() const { return value(OSDOPTION_NUMPROCESSORS); }
+	int bench() const { return int_value(OSDOPTION_BENCH); }
+
+	// video options
+	const char *video() const { return value(OSDOPTION_VIDEO); }
+	int numscreens() const { return int_value(OSDOPTION_NUMSCREENS); }
+	bool window() const { return bool_value(OSDOPTION_WINDOW); }
+	bool maximize() const { return bool_value(OSDOPTION_MAXIMIZE); }
+	bool keep_aspect() const { return bool_value(OSDOPTION_KEEPASPECT); }
+	bool uneven_stretch() const { return bool_value(OSDOPTION_UNEVENSTRETCH); }
+	bool wait_vsync() const { return bool_value(OSDOPTION_WAITVSYNC); }
+	bool sync_refresh() const { return bool_value(OSDOPTION_SYNCREFRESH); }
+
+	// per-window options
+	const char *screen() const { return value(OSDOPTION_SCREEN); }
+	const char *aspect() const { return value(OSDOPTION_ASPECT); }
+	const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
+	const char *view() const { return value(OSDOPTION_VIEW); }
+	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SCREEN, index)); }
+	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_ASPECT, index)); }
+	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_RESOLUTION, index)); }
+	const char *view(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_VIEW, index)); }
+
+	// full screen options
+	bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
+
+	// sound options
+	const char *sound() const { return value(OSDOPTION_SOUND); }
+	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
+
+private:
+	static const options_entry s_option_entries[];
+};
+
 
 // forward references
 class input_type_entry;

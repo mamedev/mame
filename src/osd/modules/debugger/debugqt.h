@@ -21,7 +21,7 @@ class debugger_qt : public osd_debugger_interface
 public:
 	// construction/destruction
 	debugger_qt(const osd_interface &osd);
-	virtual ~debugger_qt() { }
+	virtual ~debugger_qt();
 	
 	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);

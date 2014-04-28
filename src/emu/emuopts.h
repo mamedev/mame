@@ -188,7 +188,7 @@ enum
 struct game_driver;
 
 
-class emu_options : public core_options
+class emu_options : public osd_options
 {
 	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
 

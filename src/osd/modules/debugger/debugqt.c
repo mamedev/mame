@@ -38,13 +38,17 @@ int qtArgc = 0;
 char** qtArgv = NULL;
 
 bool oneShot = true;
-MainWindow* mainQtWindow = NULL;
+static MainWindow* mainQtWindow = NULL;
 
 //-------------------------------------------------
 //  debugger_qt - constructor
 //-------------------------------------------------
 debugger_qt::debugger_qt(const osd_interface &osd)
 	: osd_debugger_interface(osd)
+{
+}
+
+debugger_qt::~debugger_qt()
 {
 }
 
