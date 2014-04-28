@@ -537,7 +537,7 @@ windows_osd_interface::~windows_osd_interface()
 
 void windows_osd_interface::sound_register()
 {
-	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false); // making Direct Sound audio default one
+	m_sound_options.add("auto", OSD_SOUND_DIRECT_SOUND, false); // making Direct Sound audio default one
 	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false);
 	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
 }
