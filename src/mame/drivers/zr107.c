@@ -174,7 +174,8 @@ Check gticlub.c for details on the bottom board.
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "video/k001604.h"
-#include "video/gticlub.h"
+#include "video/k001005.h"
+#include "video/k001006.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/konami_helper.h"
 
@@ -202,7 +203,11 @@ public:
 		m_analog2(*this, "ANALOG2"),
 		m_analog3(*this, "ANALOG3"),
 		m_palette(*this, "palette"),
+		m_k001005(*this, "k001005"),
+		m_k001006_1(*this, "k001006_1"),
+		m_k001006_2(*this, "k001006_2"),
 		m_generic_paletteram_32(*this, "paletteram") { }
+
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -213,6 +218,9 @@ public:
 	optional_shared_ptr<UINT32> m_workram;
 	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
 	required_device<palette_device> m_palette;
+	optional_device<k001005_device> m_k001005;
+	optional_device<k001006_device> m_k001006_1;
+	optional_device<k001006_device> m_k001006_2;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	UINT32 *m_sharc_dataram;
@@ -255,8 +263,6 @@ protected:
 
 VIDEO_START_MEMBER(zr107_state,jetwave)
 {
-	K001005_init(machine());
-	K001006_init(machine(),m_palette);
 }
 
 
@@ -266,7 +272,7 @@ UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &b
 
 	m_k001604->draw_back_layer(bitmap, cliprect);
 
-	K001005_draw(bitmap, cliprect);
+	m_k001005->draw(bitmap, cliprect);
 
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
@@ -305,9 +311,6 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 	m_k056832->set_layer_offs(5, -29, -27);
 	m_k056832->set_layer_offs(6, -29, -27);
 	m_k056832->set_layer_offs(7, -29, -27);
-
-	K001006_init(machine(),m_palette);
-	K001005_init(machine());
 }
 
 UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -315,7 +318,7 @@ UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bit
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-	K001005_draw(bitmap, cliprect);
+	m_k001005->draw(bitmap, cliprect);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
@@ -466,7 +469,7 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x740a0000, 0x740a3fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)        /* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_WRITE_LEGACY(cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE_LEGACY(K001006_0_r, K001006_0_w)
+	AM_RANGE(0x78040000, 0x7804000f) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)               /* LANC registers */
@@ -492,8 +495,8 @@ static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_device, char_r, char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)      /* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_MIRROR(0x80000000) AM_WRITE_LEGACY(cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(K001006_0_r, K001006_0_w)
-	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(K001006_1_r, K001006_1_w)
+	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
+	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001006_2", k001006_device, read, write)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)             /* LANC registers */
@@ -550,7 +553,7 @@ WRITE32_MEMBER(zr107_state::dsp_dataram_w)
 static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, zr107_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(K001005_r, K001005_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_DEVREADWRITE("k001005", k001005_device, read, write)
 	AM_RANGE(0x700000, 0x7000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
@@ -796,6 +799,13 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("k001005", K001005, 0)
+	MCFG_K001005_TEXEL_CHIP("k001006_1")
+
+	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
+	MCFG_K001006_GFX_REGION("gfx1")
+	MCFG_K001006_TEX_LAYOUT(0)
+
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
 
@@ -859,6 +869,19 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("k001005", K001005, 0)
+	MCFG_K001005_TEXEL_CHIP("k001006_1")
+
+	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
+	MCFG_K001006_GFX_REGION("gfx1")
+	MCFG_K001006_TEX_LAYOUT(0)
+
+	// The second K001006 chip connects to the second K001005 chip.
+	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
+	MCFG_DEVICE_ADD("k001006_2", K001006, 0)
+	MCFG_K001006_GFX_REGION("gfx1")
+	MCFG_K001006_TEX_LAYOUT(0)
+
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
 
@@ -885,8 +908,6 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 	m_sharc_dataram = auto_alloc_array(machine(), UINT32, 0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
-
-	K001005_preprocess_texture_data(memregion("gfx1")->base(), memregion("gfx1")->bytes(), 0);
 }
 
 DRIVER_INIT_MEMBER(zr107_state,zr107)

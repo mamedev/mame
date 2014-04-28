@@ -230,7 +230,8 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
-#include "video/gticlub.h"
+#include "video/k001005.h"
+#include "video/k001006.h"
 #include "video/k001604.h"
 
 
@@ -254,8 +255,11 @@ public:
 		m_analog3(*this, "AN3"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
+		m_k001005(*this, "k001005"),
+		m_k001006_1(*this, "k001006_1"),
+		m_k001006_2(*this, "k001006_2"),
 		m_generic_paletteram_32(*this, "paletteram")  { }
-
+		
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -269,6 +273,9 @@ public:
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
+	optional_device<k001005_device> m_k001005;
+	optional_device<k001006_device> m_k001006_1;
+	optional_device<k001006_device> m_k001006_2;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
@@ -485,8 +492,8 @@ static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(gticlub_k001604_char_r, gticlub_k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE_LEGACY(K001006_0_r, K001006_0_w)
-	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE_LEGACY(K001006_1_r, K001006_1_w)
+	AM_RANGE(0x78040000, 0x7804000f) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
+	AM_RANGE(0x78080000, 0x7808000f) AM_DEVREADWRITE("k001006_2", k001006_device, read, write)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)
@@ -533,7 +540,7 @@ WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
 static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(K001005_r, K001005_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_DEVREADWRITE("k001005", k001005_device, read, write)
 	AM_RANGE(0x700000, 0x7000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
@@ -796,9 +803,6 @@ VIDEO_START_MEMBER(gticlub_state,gticlub)
 	debug_tex_page = 0;
 	debug_tex_palette = 0;
 	*/
-
-	K001006_init(machine(),m_palette);
-	K001005_init(machine());
 }
 
 UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -807,7 +811,7 @@ UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 
 
 	k001604->draw_back_layer(bitmap, cliprect);
 
-	K001005_draw(bitmap, cliprect);
+	m_k001005->draw(bitmap, cliprect);
 
 	k001604->draw_front_layer(screen, bitmap, cliprect);
 
@@ -950,6 +954,19 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_K001604_ROZ_OFFSET(0)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k001005", K001005, 0)
+	MCFG_K001005_TEXEL_CHIP("k001006_1")
+
+	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
+	MCFG_K001006_GFX_REGION("gfx1")
+	MCFG_K001006_TEX_LAYOUT(1)
+
+	// The second K001006 chip connects to the second K001005 chip.
+	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
+	MCFG_DEVICE_ADD("k001006_2", K001006, 0)
+	MCFG_K001006_GFX_REGION("gfx1")
+	MCFG_K001006_TEX_LAYOUT(1)
 
 	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
@@ -1376,8 +1393,6 @@ DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_GTICLUB);
 
 	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
-
-	K001005_preprocess_texture_data(memregion("gfx1")->base(), memregion("gfx1")->bytes(), 1);
 }
 
 void gticlub_state::init_hangplt_common()

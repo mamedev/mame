@@ -1,11 +1,8 @@
-/* This is currently unused, video/gticlub.c has it's own implementation, why? */
-
-
 #include "emu.h"
 #include "k001006.h"
 
 /*****************************************************************************/
-/* Konami K001006 Custom 3D Texel Renderer chip (KS10081) */
+/* Konami K001006 Texel Unit (KS10081) */
 
 /***************************************************************************/
 /*                                                                         */
@@ -16,12 +13,13 @@
 const device_type K001006 = &device_creator<k001006_device>;
 
 k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K001006, "K001006 3D Texel Renderer", tag, owner, clock, "k001006", __FILE__),
+	: device_t(mconfig, K001006, "K001006 Texel Unit", tag, owner, clock, "k001006", __FILE__),
 	m_pal_ram(NULL),
 	m_unknown_ram(NULL),
 	m_addr(0),
 	m_device_sel(0),
-	m_palette(NULL)
+	m_palette(NULL),
+	m_tex_layout(0)
 {
 }
 
@@ -33,16 +31,7 @@ k001006_device::k001006_device(const machine_config &mconfig, const char *tag, d
 
 void k001006_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const k001006_interface *intf = reinterpret_cast<const k001006_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k001006_interface *>(this) = *intf;
 
-	// or initialize to defaults if none provided
-	else
-	{
-		m_gfx_region = "";
-	}
 }
 
 //-------------------------------------------------
@@ -54,6 +43,11 @@ void k001006_device::device_start()
 	m_pal_ram = auto_alloc_array_clear(machine(), UINT16, 0x800);
 	m_unknown_ram = auto_alloc_array_clear(machine(), UINT16, 0x1000);
 	m_palette = auto_alloc_array_clear(machine(), UINT32, 0x800);
+
+	m_gfxrom = machine().root_device().memregion(m_gfx_region)->base();
+	m_texrom = auto_alloc_array(machine(), UINT8, 0x800000);
+	
+	preprocess_texture_data(m_texrom, m_gfxrom, 0x800000, m_tex_layout);
 
 	save_pointer(NAME(m_pal_ram), 0x800*sizeof(UINT16));
 	save_pointer(NAME(m_unknown_ram), 0x1000*sizeof(UINT16));
@@ -158,7 +152,67 @@ WRITE32_MEMBER( k001006_device::write )
 	}
 }
 
-UINT32 k001006_device::get_palette( int index )
+UINT32 k001006_device::fetch_texel(int page, int pal_index, int u, int v)
 {
-	return m_palette[index];
+	UINT8 *tex = m_texrom + page;
+	int texel = tex[((v & 0x1ff) * 512) + (u & 0x1ff)];
+	return m_palette[pal_index + texel];
+}
+
+
+void k001006_device::preprocess_texture_data(UINT8 *dst, UINT8 *src, int length, int layout)
+{
+	static const int decode_x_gti[8] = {  0, 16, 2, 18, 4, 20, 6, 22 };
+	static const int decode_y_gti[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 104, 65, 73, 97, 105 };
+
+	static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
+	static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
+
+	int index;
+	int i, x, y;
+	UINT8 temp[0x40000];
+
+	const int *decode_x;
+	const int *decode_y;
+
+	if (layout == 1)
+	{
+		decode_x = decode_x_gti;
+		decode_y = decode_y_gti;
+	}
+	else
+	{
+		decode_x = decode_x_zr107;
+		decode_y = decode_y_zr107;
+	}
+
+	for (index=0; index < length; index += 0x40000)
+	{
+		int offset = index;
+
+		memset(temp, 0, 0x40000);
+
+		for (i=0; i < 0x800; i++)
+		{
+			int tx = ((i & 0x400) >> 5) | ((i & 0x100) >> 4) | ((i & 0x40) >> 3) | ((i & 0x10) >> 2) | ((i & 0x4) >> 1) | (i & 0x1);
+			int ty = ((i & 0x200) >> 5) | ((i & 0x80) >> 4) | ((i & 0x20) >> 3) | ((i & 0x8) >> 2) | ((i & 0x2) >> 1);
+
+			tx <<= 3;
+			ty <<= 4;
+
+			for (y=0; y < 16; y++)
+			{
+				for (x=0; x < 8; x++)
+				{
+					UINT8 pixel = src[offset + decode_y[y] + decode_x[x]];
+
+					temp[((ty+y) * 512) + (tx+x)] = pixel;
+				}
+			}
+
+			offset += 128;
+		}
+
+		memcpy(&dst[index], temp, 0x40000);
+	}
 }
