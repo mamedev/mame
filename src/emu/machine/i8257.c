@@ -33,7 +33,7 @@ enum
 	REGISTER_ADDRESS = 0,
 	REGISTER_WORD_COUNT,
 	REGISTER_STATUS = 8,
-	REGISTER_COMMAND = REGISTER_STATUS
+	REGISTER_MODE = REGISTER_STATUS
 };
 
 
@@ -496,7 +496,7 @@ READ8_MEMBER( i8257n_device::read )
 
 		m_msb = !m_msb;
 	}
-	else if(offset == 8)
+	else if(offset == REGISTER_STATUS)
 	{
 		data = m_status;
 
@@ -541,8 +541,10 @@ WRITE8_MEMBER( i8257n_device::write )
 				m_channel[channel].m_count = ((data & 0x3f) << 8) | (m_channel[channel].m_count & 0xff);
 				m_channel[channel].m_mode = (data >> 6);
 				if(MODE_AUTOLOAD && (channel == 2))
+				{
 					m_channel[3].m_count = ((data & 0x3f) << 8) | (m_channel[3].m_count & 0xff);
 					m_channel[3].m_mode = (data >> 6);
+				}
 			}
 			else
 			{
@@ -555,7 +557,7 @@ WRITE8_MEMBER( i8257n_device::write )
 
 		m_msb = !m_msb;
 	}
-	else if(offset == 8)
+	else if(offset == REGISTER_MODE)
 	{
 		m_transfer_mode = data;
 
