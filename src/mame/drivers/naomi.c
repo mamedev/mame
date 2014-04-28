@@ -8206,7 +8206,8 @@ ROM_START( initdv3e )
 	ROM_LOAD( "317-0384-com.pic", 0x000000, 0x004300, CRC(081ccd51) SHA1(598b3bd9e8b16f5954d15738c1ca55703609b690) )
 ROM_END
 
-ROM_START( vf4tuned ) // this GD-ROM contain two copies of the same game file
+// gds-0036x GD-ROMs have two copies of identical game file, and two boot files BHX1.BIN and BHX1.1GB, so can be two PICs too
+ROM_START( vf4tuned )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 

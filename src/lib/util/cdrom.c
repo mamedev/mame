@@ -477,7 +477,7 @@ UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool
 	}
 
 	if (file->cdtoc.tracks[tracknum].subsize == 0)
-		return 1;
+		return 0;
 
 	// read the data
 	chd_error err = read_partial_sector(file, buffer, lbasector, chdsector, tracknum, file->cdtoc.tracks[tracknum].datasize, file->cdtoc.tracks[tracknum].subsize);
