@@ -198,28 +198,6 @@ WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 	m_sq1panel->rx_w(state);
 }
 
-static const es5506_interface es5506_config =
-{
-	"waverom",  /* Bank 0 */
-	"waverom2", /* Bank 1 */
-	"waverom3", /* Bank 0 */
-	"waverom4", /* Bank 1 */
-	1,          /* channels */
-	DEVCB_DRIVER_LINE_MEMBER(esqkt_state,esq5506_otto_irq), /* irq */
-	DEVCB_DRIVER_MEMBER16(esqkt_state, esq5506_read_adc)
-};
-
-static const es5506_interface es5506_2_config =
-{
-	"waverom",  /* Bank 0 */
-	"waverom2", /* Bank 1 */
-	"waverom3", /* Bank 0 */
-	"waverom4", /* Bank 1 */
-	1,          /* channels */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
@@ -245,11 +223,21 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)
-	MCFG_SOUND_CONFIG(es5506_config)
+	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
+	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
+	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
+	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
+	MCFG_ES5506_CHANNELS(1)          /* channels */
+	MCFG_ES5506_IRQ_CB(WRITELINE(esqkt_state, esq5506_otto_irq)) /* irq */
+	MCFG_ES5506_READ_PORT_CB(READ16(esqkt_state, esq5506_read_adc))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL_16MHz)
-	MCFG_SOUND_CONFIG(es5506_2_config)
+	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
+	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
+	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
+	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
+	MCFG_ES5506_CHANNELS(1)          /* channels */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END

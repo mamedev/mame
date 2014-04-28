@@ -1639,24 +1639,6 @@ static INPUT_PORTS_START( aama )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const es5506_interface es5506_config =
-{
-	"ensoniq.0",
-	"ensoniq.1",
-	"ensoniq.2",
-	"ensoniq.3",
-	1               /* channels */
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -1692,7 +1674,11 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(es5506_config)
+	MCFG_ES5506_REGION0("ensoniq.0")
+	MCFG_ES5506_REGION1("ensoniq.1")
+	MCFG_ES5506_REGION2("ensoniq.2")
+	MCFG_ES5506_REGION3("ensoniq.3")
+	MCFG_ES5506_CHANNELS(1)               /* channels */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	/* via */

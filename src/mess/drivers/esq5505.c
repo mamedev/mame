@@ -607,15 +607,6 @@ static const hd63450_interface dmac_interface =
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
 };
 
-static const es5505_interface es5505_config =
-{
-	"waverom",  /* Bank 0 */
-	"waverom2", /* Bank 1 */
-	4,          /* channels */
-	DEVCB_DRIVER_LINE_MEMBER(esq5505_state, esq5505_otis_irq), /* irq */
-	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_r) /* ADC */
-};
-
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
@@ -647,7 +638,11 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("otis", ES5505, XTAL_10MHz)
-	MCFG_SOUND_CONFIG(es5505_config)
+	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
+	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
+	MCFG_ES5505_CHANNELS(4)          /* channels */
+	MCFG_ES5505_IRQ_CB(WRITELINE(esq5505_state, esq5505_otis_irq)) /* irq */
+	MCFG_ES5505_READ_PORT_CB(READ16(esq5505_state, analog_r)) /* ADC */
 	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
@@ -718,7 +713,11 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("otis", ES5505, XTAL_30_4761MHz / 2)
-	MCFG_SOUND_CONFIG(es5505_config)
+	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
+	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
+	MCFG_ES5505_CHANNELS(4)          /* channels */
+	MCFG_ES5505_IRQ_CB(WRITELINE(esq5505_state, esq5505_otis_irq)) /* irq */
+	MCFG_ES5505_READ_PORT_CB(READ16(esq5505_state, analog_r)) /* ADC */
 	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)

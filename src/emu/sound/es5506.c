@@ -148,7 +148,14 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 		#if MAKE_WAVS
 		m_wavraw(NULL),
 		#endif
-		m_eslog(NULL)
+		m_eslog(NULL),
+		m_region0(NULL),
+		m_region1(NULL),
+		m_region2(NULL),
+		m_region3(NULL),
+		m_channels(0),
+		m_irq_cb(*this),
+		m_read_port_cb(*this)		
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -161,36 +168,6 @@ const device_type ES5506 = &device_creator<es5506_device>;
 es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: es550x_device(mconfig, ES5506, "ES5506", tag, owner, clock, "es5506", __FILE__)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void es550x_device::device_config_complete()
-{
-}
-
-void es5506_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const es5506_interface *intf = reinterpret_cast<const es5506_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<es5506_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_region0 = "";
-		m_region1 = "";
-		m_region2 = "";
-		m_region3 = "";
-		m_channels = 0;
-		memset(&m_irq_callback, 0, sizeof(m_irq_callback));
-		memset(&m_read_port, 0, sizeof(m_read_port));
-	}
 }
 
 //-------------------------------------------------
@@ -225,8 +202,8 @@ void es5506_device::device_start()
 
 	/* initialize the rest of the structure */
 	m_master_clock = clock();
-	m_irq_callback_func.resolve(m_irq_callback, *this);
-	m_port_read_func.resolve(m_read_port, *this);
+	m_irq_cb.resolve();
+	m_read_port_cb.resolve();
 	m_irqv = 0x80;
 	m_channels = channels;
 
@@ -339,30 +316,6 @@ es5505_device::es5505_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void es5505_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const es5505_interface *intf = reinterpret_cast<const es5505_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<es5505_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_es5505_region0 = "";
-		m_es5505_region1 = "";
-		m_es5505_channels = 0;
-		memset(&m_es5505_irq_callback, 0, sizeof(m_es5505_irq_callback));
-		memset(&m_es5505_read_port, 0, sizeof(m_es5505_read_port));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -373,8 +326,8 @@ void es5505_device::device_start()
 	int channels = 1;  /* 1 channel by default, for backward compatibility */
 
 	/* only override the number of channels if the value is in the valid range 1 .. 4 */
-	if (1 <= m_es5505_channels && m_es5505_channels <= 4)
-		channels = m_es5505_channels;
+	if (1 <= m_channels && m_channels <= 4)
+		channels = m_channels;
 
 	/* debugging */
 	if (LOG_COMMANDS && !m_eslog)
@@ -384,15 +337,15 @@ void es5505_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32), this);
 
 	/* initialize the regions */
-	m_region_base[0] = m_es5505_region0 ? (UINT16 *)machine().root_device().memregion(m_es5505_region0)->base() : NULL;
-	m_region_base[1] = m_es5505_region1 ? (UINT16 *)machine().root_device().memregion(m_es5505_region1)->base() : NULL;
+	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : NULL;
+	m_region_base[1] = m_region1 ? (UINT16 *)machine().root_device().memregion(m_region1)->base() : NULL;
 
 	/* initialize the rest of the structure */
 	m_master_clock = clock();
-	m_irq_callback_func.resolve(m_es5505_irq_callback, *this);
-	m_port_read_func.resolve(m_es5505_read_port, *this);
+	m_irq_cb.resolve();
+	m_read_port_cb.resolve();
 	m_irqv = 0x80;
-	m_es5505_channels = channels;
+	m_channels = channels;
 
 	/* compute the tables */
 	compute_tables();
@@ -467,8 +420,8 @@ void es5505_device::device_start()
 void es550x_device::update_irq_state()
 {
 	/* ES5505/6 irq line has been set high - inform the host */
-	if (!m_irq_callback_func.isnull())
-		m_irq_callback_func(1); /* IRQB set high */
+	if (!m_irq_cb.isnull())
+		m_irq_cb(1); /* IRQB set high */
 }
 
 void es550x_device::update_internal_irq_state()
@@ -484,8 +437,8 @@ void es550x_device::update_internal_irq_state()
 
 	m_irqv=0x80;
 
-	if (!m_irq_callback_func.isnull())
-		m_irq_callback_func(0); /* IRQB set low */
+	if (!m_irq_cb.isnull())
+		m_irq_cb(0); /* IRQB set low */
 }
 
 /**********************************************************************************************
@@ -1095,7 +1048,7 @@ void es5505_device::generate_samples(INT32 **outputs, int offset, int samples)
 		return;
 
 	/* clear out the accumulators */
-	for (int i = 0; i < m_es5505_channels << 1; i++)
+	for (int i = 0; i < m_channels << 1; i++)
 	{
 		memset(outputs[i] + offset, 0, sizeof(INT32) * samples);
 	}
@@ -1111,7 +1064,7 @@ void es5505_device::generate_samples(INT32 **outputs, int offset, int samples)
 			voice->control |= CONTROL_STOP0;
 
 		int voice_channel = (voice->control & CONTROL_CAMASK) >> 10;
-		int channel = voice_channel % m_es5505_channels;
+		int channel = voice_channel % m_channels;
 		int l = channel << 1;
 		int r = l + 1;
 		INT32 *left = outputs[l] + offset;
@@ -1512,8 +1465,8 @@ inline UINT32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x68/8:    /* PAR */
-			if (!m_port_read_func.isnull())
-				result = m_port_read_func(0);
+			if (!m_read_port_cb.isnull())
+				result = m_read_port_cb(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
@@ -1588,8 +1541,8 @@ inline UINT32 es5506_device::reg_read_high(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x68/8:    /* PAR */
-			if (!m_port_read_func.isnull())
-				result = m_port_read_func(0);
+			if (!m_read_port_cb.isnull())
+				result = m_read_port_cb(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
@@ -1610,8 +1563,8 @@ inline UINT32 es5506_device::reg_read_test(es550x_voice *voice, offs_t offset)
 	switch (offset)
 	{
 		case 0x68/8:    /* PAR */
-			if (!m_port_read_func.isnull())
-				result = m_port_read_func(0);
+			if (!m_read_port_cb.isnull())
+				result = m_read_port_cb(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
@@ -2171,8 +2124,8 @@ inline UINT16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x09:  /* PAR */
-			if (!m_port_read_func.isnull())
-				result = m_port_read_func(0);
+			if (!m_read_port_cb.isnull())
+				result = m_read_port_cb(0);
 			break;
 
 		case 0x0f:  /* PAGE */
