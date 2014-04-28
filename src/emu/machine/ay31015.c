@@ -125,10 +125,30 @@ ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, 
 
 ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock, "ay31015", __FILE__),
+				m_control_reg(0),
+				m_status_reg(0),
+				m_second_stop_bit(0),
+				m_total_pulses(0),
+				m_internal_sample(0),
+				m_rx_data(0),
+				m_rx_buffer(0),
+				m_rx_bit_count(0),
+				m_rx_parity(0),
+				m_rx_pulses(0),
+				m_rx_clock(0),
+				m_rx_timer(NULL),
+				m_tx_data(0),
+				m_tx_buffer(0),
+				m_tx_parity(0),
+				m_tx_pulses(0),
+				m_tx_clock(0),
+				m_tx_timer(NULL),
 				m_read_si_cb(*this),
 				m_write_so_cb(*this),
 				m_status_changed_cb(*this)
 {
+	for (int i = 0; i < 41; i++)
+		m_pins[i] = 0;
 }
 
 ay51013_device::ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
