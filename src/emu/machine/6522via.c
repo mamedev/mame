@@ -149,11 +149,14 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_in_a(0xff),
 		m_in_ca1(0),
 		m_in_ca2(0),
+		m_out_ca2(0),
 		m_in_b(0),
 		m_in_cb1(0),
 		m_in_cb2(0),
 		m_pcr(0),
-		m_acr(0)
+		m_acr(0),
+		m_ier(0),
+		m_ifr(0)
 {
 }
 
