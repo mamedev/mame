@@ -61,6 +61,10 @@ void nextkbd_device::device_reset()
 	memset(fifo, 0, sizeof(fifo));
 	modifiers_state = 0;
 	nmi_active = false;
+	prev_mousex = 0;
+	prev_mousey = 0;
+	prev_mousebtn = 0;
+	km_address = 0;
 	poll_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
 }
 
