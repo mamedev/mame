@@ -536,7 +536,6 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(video_ctrl_w);
 
-	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(vbl_r);
 
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
@@ -575,11 +574,6 @@ WRITE8_MEMBER(fanucspmg_state::shared_w)
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(fanucspmg_state::test_r)
-{
-	return 0x00;    // 0x80 to start weird not-sure-what process which may be FDC related
-}
-
 READ8_MEMBER(fanucspmg_state::vbl_r)
 {
 	return m_vbl_stat;
@@ -587,10 +581,21 @@ READ8_MEMBER(fanucspmg_state::vbl_r)
 
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
+	AM_RANGE(0x80000, 0x81fff) AM_RAM
 
 	AM_RANGE(0x88000, 0x88001) AM_READ8(vbl_r, 0xffff)
 
-	AM_RANGE(0xf0004, 0xf0005) AM_READ8(test_r, 0xffff)
+	AM_RANGE(0xf0004, 0xf0007) AM_DEVICE8(FDC_TAG, upd765a_device, map, 0x00ff)
+	AM_RANGE(0xf0008, 0xf000f) AM_DEVREADWRITE8(PIT0_TAG, pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0xf0010, 0xf0011) AM_DEVREADWRITE8(USART0_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf0012, 0xf0013) AM_DEVREADWRITE8(USART0_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xf0014, 0xf0015) AM_DEVREADWRITE8(USART1_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf0016, 0xf0017) AM_DEVREADWRITE8(USART1_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xf0018, 0xf0019) AM_DEVREADWRITE8(USART2_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf001a, 0xf001b) AM_DEVREADWRITE8(USART2_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xf001c, 0xf001d) AM_DEVREADWRITE8(USART3_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf001e, 0xf001f) AM_DEVREADWRITE8(USART3_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xf0048, 0xf004f) AM_DEVREADWRITE8(PIT1_TAG, pit8253_device, read, write, 0x00ff)
 
 	AM_RANGE(0xf8000, 0xf9fff) AM_READWRITE8(shared_r, shared_w, 0xffff)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
