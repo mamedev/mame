@@ -666,14 +666,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static Z80CTC_INTERFACE( einstein_ctc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_serial_transmit_clock),
-	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_serial_receive_clock),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
-};
-
 static Z80PIO_INTERFACE( einstein_pio_intf )
 {
 	DEVCB_NULL,
@@ -747,7 +739,11 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
 
-	MCFG_Z80CTC_ADD(IC_I058, XTAL_X002 / 2, einstein_ctc_intf)
+	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(einstein_state, einstein_serial_transmit_clock))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(einstein_state, einstein_serial_receive_clock))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(IC_I058, z80ctc_device, trg3))
+
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", einstein_state, einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
 

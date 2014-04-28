@@ -905,14 +905,6 @@ static Z80SIO_INTERFACE( sio_interface )
 	DEVCB_NULL
 };
 
-static const z80ctc_interface ctc_interface =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,  // zc0_cb
-	DEVCB_NULL,  // zc1_cb
-	DEVCB_NULL   // zc2_cb
-};
-
 static const am9517a_interface dma_interface =
 {
 	DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
@@ -1018,7 +1010,9 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_Z80PIO_ADD("pio",XTAL_8MHz / 26, pio_interface)
 	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, sio_interface)
-	MCFG_Z80CTC_ADD("ctc",XTAL_8MHz / 4, ctc_interface)
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_AM9517A_ADD("dma",XTAL_8MHz / 4, dma_interface)
 

@@ -98,14 +98,6 @@ Z80PIO_INTERFACE( kc85_pio_intf )
 	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_brdy_cb)         /* portB ready active callback */
 };
 
-Z80CTC_INTERFACE( kc85_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, ctc_zc0_callback),
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, ctc_zc1_callback),
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, video_toggle_blink_state)
-};
-
 static const cassette_interface kc_cassette_interface =
 {
 	kc_cassette_formats,
@@ -124,7 +116,12 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_Z80PIO_ADD( "z80pio", KC85_3_CLOCK, kc85_pio_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", KC85_3_CLOCK, kc85_ctc_intf )
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_3_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(kc_state, ctc_zc0_callback))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(kc_state, ctc_zc1_callback))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(kc_state, video_toggle_blink_state))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -193,7 +190,12 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_Z80PIO_ADD( "z80pio", KC85_4_CLOCK, kc85_pio_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", KC85_4_CLOCK, kc85_ctc_intf )
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_4_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(kc_state, ctc_zc0_callback))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(kc_state, ctc_zc1_callback))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(kc_state, video_toggle_blink_state))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -88,17 +88,6 @@ WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 	}
 }
 
-// timer 0 irq does digit display, and timer 3 irq does scan of the
-// monitor keyboard.
-// No idea how the CTC is connected, so guessed.
-Z80CTC_INTERFACE( llc1_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3),
-	DEVCB_NULL
-};
-
 Z80PIO_INTERFACE( llc1_z80pio1_intf )
 {
 	DEVCB_NULL, /* callback when change interrupt status */
@@ -134,15 +123,6 @@ MACHINE_RESET_MEMBER(llc_state,llc1)
 MACHINE_START_MEMBER(llc_state,llc1)
 {
 }
-
-Z80CTC_INTERFACE( llc2_ctc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /* Driver initialization */
 DRIVER_INIT_MEMBER(llc_state,llc2)

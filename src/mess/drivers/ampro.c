@@ -155,14 +155,6 @@ WRITE_LINE_MEMBER( ampro_state::ctc_z0_w )
 	m_dart->txca_w(state);
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DRIVER_LINE_MEMBER(ampro_state, ctc_z0_w),         /* ZC/TO0 callback - Z80DART Ch A, SIO Ch A */
-	DEVCB_DEVICE_LINE_MEMBER("z80dart", z80dart_device, rxtxcb_w),         /* ZC/TO1 callback - SIO Ch B */
-	DEVCB_NULL         /* ZC/TO2 callback */
-};
-
 static SLOT_INTERFACE_START( ampro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -195,7 +187,11 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
 	/* Devices */
-	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_16MHz / 4, ctc_intf )
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(ampro_state, ctc_z0_w))	// Z80DART Ch A, SIO Ch A
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))	// SIO Ch B
+
 	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, dart_intf )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))

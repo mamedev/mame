@@ -69,10 +69,6 @@ WRITE8_MEMBER( onyx_state::kbd_put )
 }
 
 #if 0
-WRITE_LINE_MEMBER( onyx_state::p8k_daisy_interrupt )
-{
-	m_maincpu->set_input_line(0, state);
-}
 
 /* Z80 DMA */
 
@@ -117,32 +113,6 @@ static Z80DMA_INTERFACE( p8k_dma_intf )
 	DEVCB_DRIVER_MEMBER(onyx_state, memory_write_byte),
 	DEVCB_DRIVER_MEMBER(onyx_state, io_read_byte),
 	DEVCB_DRIVER_MEMBER(onyx_state, io_write_byte)
-};
-
-/* Z80 CTC 0 */
-// to implement: callbacks!
-// manual states the callbacks should go to
-// Baud Gen 3, FDC, System-Kanal
-
-static Z80CTC_INTERFACE( p8k_ctc_0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
-
-/* Z80 CTC 1 */
-// to implement: callbacks!
-// manual states the callbacks should go to
-// Baud Gen 0, Baud Gen 1, Baud Gen 2,
-
-static Z80CTC_INTERFACE( p8k_ctc_1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL,         /* ZC/TO2 callback */
 };
 
 /* Z80 PIO 0 */
@@ -271,30 +241,6 @@ ADDRESS_MAP_END
 
 
 #if 0
-WRITE_LINE_MEMBER( onyx_state::p8k_16_daisy_interrupt )
-{
-	// this must be studied a little bit more :-)
-}
-
-/* Z80 CTC 0 */
-
-static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt), /* interrupt handler */
-	DEVCB_NULL,             /* ZC/TO0 callback */
-	DEVCB_NULL,             /* ZC/TO1 callback */
-	DEVCB_NULL              /* ZC/TO2 callback */
-};
-
-/* Z80 CTC 1 */
-
-static Z80CTC_INTERFACE( p8k_16_ctc_1_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt), /* interrupt handler */
-	DEVCB_NULL,             /* ZC/TO0 callback */
-	DEVCB_NULL,             /* ZC/TO1 callback */
-	DEVCB_NULL              /* ZC/TO2 callback */
-};
 
 /* Z80 PIO 0 */
 
@@ -406,8 +352,8 @@ static MACHINE_CONFIG_START( c8002, onyx_state )
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	/* peripheral hardware */
-	//MCFG_Z80CTC_ADD("z80ctc_0", XTAL_4MHz, p8k_16_ctc_0_intf)
-	//MCFG_Z80CTC_ADD("z80ctc_1", XTAL_4MHz, p8k_16_ctc_1_intf)
+	//MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
+	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
 	//MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
 	//MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
 	//MCFG_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )

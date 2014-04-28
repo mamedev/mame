@@ -89,19 +89,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
-//-------------------------------------------------
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), // interrupt handler
-	DEVCB_NULL, // ZC/TO0 callback
-	DEVCB_NULL, // ZC/TO1 callback
-	DEVCB_NULL  // ZC/TO2 callback
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
 //-------------------------------------------------
 
@@ -111,7 +98,8 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
 	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
 	MCFG_CPU_IO_MAP(wangpc_wdc_io)
 
-	MCFG_Z80CTC_ADD(MK3882_TAG, 2000000, ctc_intf)
+	MCFG_DEVICE_ADD(MK3882_TAG, Z80CTC, 2000000)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
 MACHINE_CONFIG_END

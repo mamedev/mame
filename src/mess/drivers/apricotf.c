@@ -249,7 +249,7 @@ static Z80SIO_INTERFACE( sio_intf )
 
 
 //-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
+//  Z80CTC
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( f1_state::ctc_int_w )
@@ -269,15 +269,6 @@ WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
 {
 	m_sio->txca_w(state);
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_int_w),      // interrupt handler
-	DEVCB_NULL,     // ZC/TO0 callback
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z1_w),   // ZC/TO1 callback
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z2_w),   // ZC/TO2 callback
-};
-
 
 //-------------------------------------------------
 //  floppy
@@ -319,7 +310,11 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(f1_state, ctc_int_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80dart_device, ctsa_w))

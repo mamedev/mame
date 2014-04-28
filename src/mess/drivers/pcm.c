@@ -231,22 +231,6 @@ static const z80_daisy_config pcm_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80CTC_INTERFACE( ctc_u_intf ) // all pins go to expansion socket
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
-
-static Z80CTC_INTERFACE( ctc_s_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* ZC/TO0 callback - SIO channel A clock */
-	DEVCB_NULL,         /* ZC/TO1 callback - SIO channel B clock */
-	DEVCB_DRIVER_LINE_MEMBER(pcm_state, pcm_82_w) /* ZC/TO2 callback - speaker */
-};
-
 static Z80PIO_INTERFACE( pio_u_intf ) // all pins go to expansion socket
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
@@ -344,8 +328,15 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
 	MCFG_Z80SIO0_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
-	MCFG_Z80CTC_ADD( "z80ctc_u", XTAL_10MHz /4, ctc_u_intf )
-	MCFG_Z80CTC_ADD( "z80ctc_s", XTAL_10MHz /4, ctc_s_intf )
+
+	MCFG_DEVICE_ADD("z80ctc_u", Z80CTC, XTAL_10MHz /4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80ctc_s", Z80CTC, XTAL_10MHz /4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	// ZC0 : SIO channel A clock
+	// ZC1 : SIO channel B clock
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(pcm_state, pcm_82_w))	// speaker
 MACHINE_CONFIG_END
 
 /* ROM definition */

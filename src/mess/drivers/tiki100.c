@@ -593,14 +593,6 @@ WRITE_LINE_MEMBER( tiki100_state::ctc_z2_w )
 	m_ctc->trg3(state);
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z0_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
-	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z2_w),
-};
-
 /* FD1797 Interface */
 
 FLOPPY_FORMATS_MEMBER( tiki100_state::floppy_formats )
@@ -719,8 +711,15 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, dart_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/4, pio_intf)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, ctc_z2_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
+
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_8MHz/8) // FD1767PL-02 or FD1797-PL
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)

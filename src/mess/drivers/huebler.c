@@ -251,14 +251,6 @@ WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 	/* cassette transmit/receive clock */
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z0_w),    /* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w),    /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z2_w) /* ZC/TO2 callback */
-};
-
 /* Z80-PIO Interface */
 
 static Z80PIO_INTERFACE( pio1_intf )
@@ -407,7 +399,12 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_10MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(amu880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(amu880_state, ctc_z2_w))
+
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, XTAL_10MHz/4, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_10MHz/4, pio2_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856

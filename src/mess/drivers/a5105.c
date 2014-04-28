@@ -552,14 +552,6 @@ static SLOT_INTERFACE_START( a5105_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static Z80CTC_INTERFACE( a5105_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),             /* interrupt callback */
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        /* ZC/TO0 callback */
-	DEVCB_NULL,                                     /* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     /* ZC/TO2 callback */
-};
-
 static Z80PIO_INTERFACE( a5105_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),             /* callback when change interrupt status */
@@ -609,7 +601,11 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_15MHz / 4, a5105_ctc_intf )
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_15MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_15MHz / 4, a5105_pio_intf )
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

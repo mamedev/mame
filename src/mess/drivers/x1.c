@@ -2252,20 +2252,6 @@ static GFXDECODE_START( x1 )
 //  GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
-/*************************************
- *
- *  CTC
- *
- *************************************/
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),        // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),       // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),       // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg2),       // ZC/TO2 callback
-};
-
 static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
@@ -2556,7 +2542,11 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_CPU_CONFIG(x1_daisy)
 
-	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4, ctc_intf )
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 

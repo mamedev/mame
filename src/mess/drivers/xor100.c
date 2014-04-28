@@ -425,14 +425,6 @@ WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
 {
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z0_w),           /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z1_w),           /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z2_w)        /* ZC/TO2 callback */
-};
-
 /* WD1795-02 Interface */
 
 static SLOT_INTERFACE_START( xor100_floppies )
@@ -543,7 +535,12 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_I8255_OUT_PORTB_CB(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_I8255_IN_PORTC_CB(READ8(xor100_state, i8255_pc_r))
 
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(xor100_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(xor100_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(xor100_state, ctc_z2_w))
+
 	MCFG_FD1795x_ADD(WD1795_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)

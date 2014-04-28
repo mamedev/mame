@@ -219,14 +219,6 @@ READ8_MEMBER( pasopia_state::rombank_r )
 	return (m_ram_bank) ? 4 : 0;
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback, beep interface
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
-};
-
 READ8_MEMBER( pasopia_state::mux_r )
 {
 	return m_mux_data;
@@ -359,7 +351,12 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(pasopia_state, rombank_r))
 
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_4MHz, ctc_intf )
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
 MACHINE_CONFIG_END
 

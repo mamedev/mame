@@ -665,7 +665,7 @@ static Z80SIO_INTERFACE( sio_intf )
 
 
 //-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
+//  Z80CTC
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
@@ -679,15 +679,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 	m_ctc->trg2(1);
 	m_ctc->trg2(0);
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxca_w),  // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, txca_w),  // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w) // ZC/TO2 callback
-};
-
 
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
@@ -806,8 +797,14 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
+
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
@@ -871,8 +868,14 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
+
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)

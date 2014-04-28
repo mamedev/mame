@@ -469,27 +469,6 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 }
 
 
-// other inputs of ctca:
-// trg0 = KBDSTB; trg1 = index pulse from fdc; trg2 = synca output from sio
-
-
-
-static Z80CTC_INTERFACE( ctca_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback - KBDCLK */
-	DEVCB_NULL,     /* ZC/TO1 callback - not connected */
-	DEVCB_NULL      /* ZC/TO2 callback - not connected */
-};
-
-static Z80CTC_INTERFACE( ctcb_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback - SIO channel B clock */
-	DEVCB_NULL,     /* ZC/TO1 callback - SIO channel A clock */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTCB_TAG, z80ctc_device, trg3) /* ZC/TO2 callback */
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config bigbord2_daisy_chain[] =
@@ -640,8 +619,17 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	/* devices */
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, MAIN_CLOCK, dma_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, MAIN_CLOCK, sio_intf)
-	MCFG_Z80CTC_ADD(Z80CTCA_TAG, MAIN_CLOCK, ctca_intf)
-	MCFG_Z80CTC_ADD(Z80CTCB_TAG, MAIN_CLOCK / 6, ctcb_intf)
+
+	MCFG_DEVICE_ADD(Z80CTCA_TAG, Z80CTC, MAIN_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	// other inputs of ctca:
+	// trg0 = KBDSTB; trg1 = index pulse from fdc; trg2 = synca output from sio
+
+	MCFG_DEVICE_ADD(Z80CTCB_TAG, Z80CTC, MAIN_CLOCK / 6)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	// ZC0 = SIO channel B clock, ZC1 = SIO channel A clock
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTCB_TAG, z80ctc_device, trg3))
+
 	MCFG_MB8877x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)

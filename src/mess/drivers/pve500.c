@@ -62,14 +62,6 @@ private:
 };
 
 
-static Z80CTC_INTERFACE( external_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL, /* ZC/TO0 callback */
-	DEVCB_NULL, /* ZC/TO1 callback */
-	DEVCB_NULL  /* ZC/TO2 callback */
-};
-
 static const z80sio_interface external_sio_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
@@ -312,7 +304,10 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_CONFIG(maincpu_daisy_chain)
-	MCFG_Z80CTC_ADD("external_ctc", XTAL_12MHz / 2, external_ctc_intf)
+
+	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL_12MHz / 2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80SIO_ADD("external_sio", XTAL_12MHz / 2, external_sio_intf)
 
 	MCFG_CPU_ADD("subcpu", TLCS_Z80, XTAL_12MHz / 2) /* TMPZ84C015BF-6 (TOSHIBA TLCS-Z80) */

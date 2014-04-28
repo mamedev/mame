@@ -537,14 +537,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(0);
 }
 
-static Z80CTC_INTERFACE( z80ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
-	DEVCB_NULL,        // ZC/TO1 callback
-	DEVCB_NULL     // ZC/TO2 callback
-};
-
 static MACHINE_CONFIG_START( dg680, dg680_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
@@ -575,7 +567,10 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_8MHz / 4, z80ctc_intf )
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_8MHz / 4, z80pio_intf )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))

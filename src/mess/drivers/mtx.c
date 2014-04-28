@@ -207,7 +207,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    Z80CTC_INTERFACE( ctc_intf )
+    Z80CTC
 -------------------------------------------------*/
 
 TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
@@ -234,14 +234,6 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
 		m_z80dart->rxtxcb_w(state);
 	}
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mtx_state,ctc_trg1_w),
-	DEVCB_DRIVER_LINE_MEMBER(mtx_state,ctc_trg2_w)
-};
 
 /*-------------------------------------------------
     Z80DART_INTERFACE( dart_intf )
@@ -355,7 +347,11 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_4MHz, ctc_intf )
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(mtx_state, ctc_trg1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(mtx_state, ctc_trg2_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL_4MHz/13))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")

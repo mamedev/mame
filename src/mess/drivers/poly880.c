@@ -140,14 +140,6 @@ WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
 {
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z0_w),  /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z1_w),  /* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg3)    /* ZC/TO2 callback */
-};
-
 /* Z80-PIO Interface */
 
 WRITE8_MEMBER( poly880_state::pio1_pa_w )
@@ -290,7 +282,12 @@ static MACHINE_CONFIG_START( poly880, poly880_state )
 	MCFG_DEFAULT_LAYOUT( layout_poly880 )
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_7_3728MHz/16, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_7_3728MHz/16)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(poly880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(poly880_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, XTAL_7_3728MHz/16, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_7_3728MHz/16, pio2_intf)
 

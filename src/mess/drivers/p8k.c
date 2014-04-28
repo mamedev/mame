@@ -276,32 +276,6 @@ static Z80DMA_INTERFACE( p8k_dma_intf )
 	DEVCB_DRIVER_MEMBER(p8k_state, io_write_byte)
 };
 
-/* Z80 CTC 0 */
-// to implement: callbacks!
-// manual states the callbacks should go to
-// Baud Gen 3, FDC, System-Kanal
-
-static Z80CTC_INTERFACE( p8k_ctc_0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
-
-/* Z80 CTC 1 */
-// to implement: callbacks!
-// manual states the callbacks should go to
-// Baud Gen 0, Baud Gen 1, Baud Gen 2,
-
-static Z80CTC_INTERFACE( p8k_ctc_1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL,         /* ZC/TO2 callback */
-};
-
 /* Z80 PIO 0 */
 
 static Z80PIO_INTERFACE( p8k_pio_0_intf )
@@ -635,26 +609,6 @@ WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
 	// this must be studied a little bit more :-)
 }
 
-/* Z80 CTC 0 */
-
-static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_16_daisy_interrupt), /* interrupt handler */
-	DEVCB_NULL,             /* ZC/TO0 callback */
-	DEVCB_NULL,             /* ZC/TO1 callback */
-	DEVCB_NULL              /* ZC/TO2 callback */
-};
-
-/* Z80 CTC 1 */
-
-static Z80CTC_INTERFACE( p8k_16_ctc_1_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_16_daisy_interrupt), /* interrupt handler */
-	DEVCB_NULL,             /* ZC/TO0 callback */
-	DEVCB_NULL,             /* ZC/TO1 callback */
-	DEVCB_NULL              /* ZC/TO2 callback */
-};
-
 /* Z80 PIO 0 */
 
 static const z80pio_interface p8k_16_pio_0_intf =
@@ -781,8 +735,19 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 
 	/* peripheral hardware */
 	MCFG_Z80DMA_ADD("z80dma", XTAL_4MHz, p8k_dma_intf)
-	MCFG_Z80CTC_ADD("z80ctc_0", 1229000, p8k_ctc_0_intf)    /* 1.22MHz clock */
-	MCFG_Z80CTC_ADD("z80ctc_1", 1229000, p8k_ctc_1_intf)    /* 1.22MHz clock */
+
+	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, 1229000)    /* 1.22MHz clock */
+	// to implement: callbacks!
+	// manual states the callbacks should go to
+	// Baud Gen 3, FDC, System-Kanal
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, 1229000)    /* 1.22MHz clock */
+	// to implement: callbacks!
+	// manual states the callbacks should go to
+	// Baud Gen 0, Baud Gen 1, Baud Gen 2,
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_sio_0_intf)   /* 9.6kBaud default */
 	MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_sio_1_intf)   /* 9.6kBaud default */
 	MCFG_Z80PIO_ADD("z80pio_0", 1229000, p8k_pio_0_intf)
@@ -814,8 +779,12 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k_16)
 
 	/* peripheral hardware */
-	MCFG_Z80CTC_ADD("z80ctc_0", XTAL_4MHz, p8k_16_ctc_0_intf)
-	MCFG_Z80CTC_ADD("z80ctc_1", XTAL_4MHz, p8k_16_ctc_1_intf)
+	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+
+	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+
 	MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
 	MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
 	MCFG_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )

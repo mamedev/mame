@@ -193,14 +193,6 @@ static Z80DART_INTERFACE( dart1_intf )
 	DEVCB_NULL
 };
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback - */
-	DEVCB_NULL,     /* ZC/TO1 callback - */
-	DEVCB_NULL      /* ZC/TO2 callback - */
-};
-
 static SLOT_INTERFACE_START( ts802_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -261,7 +253,10 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	MCFG_Z80DMA_ADD("z80dma", XTAL_16MHz / 4, dma_intf)
 	MCFG_Z80DART_ADD("z80dart1", XTAL_16MHz / 4, dart0_intf )
 	MCFG_Z80DART_ADD("z80dart2", XTAL_16MHz / 4, dart1_intf )
-	MCFG_Z80CTC_ADD("z80ctc", XTAL_16MHz / 4, ctc_intf)
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_FD1793x_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

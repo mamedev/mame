@@ -277,14 +277,6 @@ WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
 	m_sio->txca_w(state);
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rxtxcb_w),         /* ZC/TO0 callback - SIO Ch B */
-	DEVCB_DRIVER_LINE_MEMBER(altos5_state, ctc_z1_w),         /* ZC/TO1 callback - Z80DART Ch A, SIO Ch A */
-	DEVCB_DEVICE_LINE_MEMBER("z80dart", z80dart_device, rxtxcb_w),         /* ZC/TO2 callback - Z80DART Ch B */
-};
-
 // system functions
 static Z80PIO_INTERFACE( pio0_intf )
 {
@@ -482,9 +474,14 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80DMA_ADD( "z80dma",   XTAL_8MHz / 2, dma_intf)
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_8MHz / 2, pio0_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_8MHz / 2, pio1_intf )
-	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_8MHz / 2, ctc_intf )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80sio", z80dart_device, rxtxcb_w))	// SIO Ch B
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(altos5_state, ctc_z1_w))		// Z80DART Ch A, SIO Ch A
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))		// Z80DART Ch B
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rxb_w))

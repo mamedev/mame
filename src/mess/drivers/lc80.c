@@ -133,14 +133,6 @@ WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
 {
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z0_w),         /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z1_w),         /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z2_w)          /* ZC/TO2 callback */
-};
-
 /* Z80-PIO Interface */
 
 void lc80_state::update_display()
@@ -375,7 +367,12 @@ static MACHINE_CONFIG_START( lc80, lc80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, 900000, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(lc80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(lc80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(lc80_state, ctc_z2_w))
+
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 900000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 900000, pio2_intf)
 
@@ -401,7 +398,12 @@ static MACHINE_CONFIG_START( lc80_2, lc80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, 900000, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(lc80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(lc80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(lc80_state, ctc_z2_w))
+
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 900000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 900000, pio2_intf)
 

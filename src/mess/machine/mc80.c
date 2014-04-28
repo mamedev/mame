@@ -36,15 +36,6 @@ WRITE_LINE_MEMBER(mc80_state::ctc_z2_w)
 	downcast<z80ctc_device *>(machine().device("z80ctc"))->trg1(state);
 }
 
-Z80CTC_INTERFACE( mc8020_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_LINE_MEMBER(mc80_state, ctc_z0_w),
-	DEVCB_DRIVER_LINE_MEMBER(mc80_state, ctc_z1_w),
-	DEVCB_DRIVER_LINE_MEMBER(mc80_state,ctc_z2_w)
-};
-
-
 READ8_MEMBER( mc80_state::mc80_port_b_r )
 {
 	return 0;
@@ -171,22 +162,6 @@ Z80PIO_INTERFACE( mc8030_asp_z80pio_intf )
 	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_b_r),
 	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_b_w),
 	DEVCB_NULL
-};
-
-Z80CTC_INTERFACE( mc8030_zve_z80ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // for user
-	DEVCB_NULL, // for user
-	DEVCB_NULL  // for user
-};
-
-Z80CTC_INTERFACE( mc8030_asp_z80ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // to SIO CLK CH A
-	DEVCB_NULL, // to SIO CLK CH B
-	DEVCB_NULL  // KMBG (??)
 };
 
 // SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)

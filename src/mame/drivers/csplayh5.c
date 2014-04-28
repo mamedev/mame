@@ -594,15 +594,6 @@ static GFXDECODE_START( csplayh5 )
 GFXDECODE_END
 #endif
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),   /* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	DEVCB_NULL,                 /* ZC/TO1 callback */
-	DEVCB_NULL                  /* ZC/TO2 callback */
-};
-
-
 void csplayh5_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -658,7 +649,9 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
 	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
 
-	MCFG_Z80CTC_ADD("ctc", 8000000, ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 8000000)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

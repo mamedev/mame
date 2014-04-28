@@ -151,14 +151,6 @@ WRITE_LINE_MEMBER( czk80_state::ctc_z2_w )
 {
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(czk80_state, ctc_z0_w),    /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(czk80_state, ctc_z1_w),    /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(czk80_state, ctc_z2_w)     /* ZC/TO2 callback */
-};
-
 static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
@@ -242,7 +234,13 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(czk80_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_Z80CTC_ADD( "z80ctc",  XTAL_16MHz / 4, ctc_intf)
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(czk80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
+
 	MCFG_Z80DART_ADD("z80dart", XTAL_16MHz / 4, dart_intf)
 	MCFG_Z80PIO_ADD( "z80pio",  XTAL_16MHz / 4, pio_intf)
 MACHINE_CONFIG_END

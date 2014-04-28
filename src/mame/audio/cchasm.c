@@ -116,14 +116,6 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
 	}
 }
 
-Z80CTC_INTERFACE( cchasm_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,                 /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,ctc_timer_1_w),   /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,ctc_timer_2_w)    /* ZC/TO2 callback */
-};
-
 void cchasm_state::sound_start()
 {
 	m_coin_flag = 0;

@@ -263,14 +263,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const z80ctc_interface rt1715_ctc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static Z80SIO_INTERFACE( rt1715_sio_intf )
 {
 	0, 0, 0, 0,
@@ -352,7 +344,9 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
-	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)
+
+	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
+
 	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
 
 	/* floppy */

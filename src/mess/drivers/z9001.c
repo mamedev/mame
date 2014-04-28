@@ -101,14 +101,6 @@ static const z80_daisy_config z9001_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DRIVER_LINE_MEMBER(z9001_state, cass_w),          /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3) /* ZC/TO2 callback */
-};
-
 static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
@@ -263,7 +255,12 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_9_8304MHz / 4, pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_9_8304MHz / 4, pio2_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_9_8304MHz / 4, ctc_intf )
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_9_8304MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(z9001_state, cass_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END
 

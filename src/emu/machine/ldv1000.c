@@ -77,15 +77,6 @@ static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8, pioneer_ldv1000_device )
 ADDRESS_MAP_END
 
 
-static Z80CTC_INTERFACE( ctcintf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ctc_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ldvctc" },
@@ -99,7 +90,8 @@ static MACHINE_CONFIG_FRAGMENT( ldv1000 )
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
 	MCFG_CPU_IO_MAP(ldv1000_portmap)
 
-	MCFG_Z80CTC_ADD("ldvctc", XTAL_5MHz/2, ctcintf)
+	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL_5MHz/2)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
 
 	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))

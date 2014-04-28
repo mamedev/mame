@@ -290,16 +290,8 @@ INPUT_PORTS_END
 
 
 /*********************************************
-*   CTC & Daisy Chain Interrupts Interface   *
+*   Daisy Chain Interrupts Interface   *
 *********************************************/
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
 
 static const z80_daisy_config daisy_chain[] =
 {
@@ -331,7 +323,8 @@ static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, jankenmn_lamps1_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, jankenmn_lamps2_w))
 
-	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK, ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* NO VIDEO */
 

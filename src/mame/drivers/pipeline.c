@@ -315,14 +315,6 @@ static GFXDECODE_START( pipeline )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x3, 0x100, 32 ) // 3bpp tiles
 GFXDECODE_END
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),      // interrupt handler
-	DEVCB_NULL,                 // ZC/TO0 callback
-	DEVCB_NULL,                 // ZC/TO1 callback
-	DEVCB_NULL                  // ZC/TO2 callback
-};
-
 static const z80_daisy_config daisy_chain_sound[] =
 {
 	{ "ctc" },
@@ -370,7 +362,8 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_CPU_ADD("mcu", M68705, 7372800/2)
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 
-	MCFG_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audiocpu" */, ctc_intf )
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 7372800/2 /* same as "audiocpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))

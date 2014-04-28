@@ -425,14 +425,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( xerox820_state::ctc_tick )
 	m_ctc->trg0(0);
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg1),  /* ZC/TO0 callback */
-	DEVCB_NULL, /* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg3)   /* ZC/TO2 callback */
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config xerox820_daisy_chain[] =
@@ -665,8 +657,13 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_20MHz/8, gppio_intf)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_20MHz/8)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_20MHz/8))
+
 	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
@@ -727,8 +724,13 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_16MHz/4, xerox820ii_kbpio_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_16MHz/4, gppio_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_RD_TAG, XTAL_20MHz/8, rdpio_intf)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_16MHz/4))
+
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))

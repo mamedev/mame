@@ -151,14 +151,6 @@ WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
 {
 }
 
-static Z80CTC_INTERFACE( babbage_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z0_w),  /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z1_w),  /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z2_w)   /* ZC/TO2 callback */
-};
-
 /* Z80-PIO Interface */
 
 // The 8 LEDs
@@ -273,7 +265,12 @@ static MACHINE_CONFIG_START( babbage, babbage_state )
 	MCFG_DEFAULT_LAYOUT(layout_babbage)
 
 	/* Devices */
-	MCFG_Z80CTC_ADD( "z80ctc", MAIN_CLOCK, babbage_ctc_intf)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, MAIN_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(babbage_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(babbage_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(babbage_state, ctc_z2_w))
+
 	MCFG_Z80PIO_ADD( "z80pio_1", MAIN_CLOCK, babbage_z80pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio_2", MAIN_CLOCK, babbage_z80pio2_intf )
 

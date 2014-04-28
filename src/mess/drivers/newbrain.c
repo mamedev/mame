@@ -1175,14 +1175,6 @@ WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z2_w )
 	m_ctc->trg1(state);
 }
 
-static Z80CTC_INTERFACE( newbrain_ctc_intf )
-{
-	DEVCB_NULL,             /* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER(MC6850_TAG, acia6850_device, write_rxc), /* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE_MEMBER(MC6850_TAG, acia6850_device, write_txc), /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z2_w)  /* ZC/TO2 callback */
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_state::ctc_c2_tick)
 {
 	m_ctc->trg2(1);
@@ -1380,7 +1372,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	MCFG_CPU_IO_MAP(newbrain_fdc_io_map)
 
 	// devices
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/8)
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxc))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_txc))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(newbrain_eim_state, ctc_z2_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_state, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
 	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
 

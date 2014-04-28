@@ -1287,7 +1287,9 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
-	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
@@ -1407,7 +1409,9 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
-	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
 	//MCFG_WATCHDOG_VBLANK_INIT(16)
 	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)

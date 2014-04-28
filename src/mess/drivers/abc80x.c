@@ -627,7 +627,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
+//  Z80CTC
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
@@ -660,15 +660,6 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     // interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z0_w),   // ZC/TO0 callback
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z1_w),   // ZC/TO1 callback
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z2_w),   // ZC/TO2 callback
-};
-
 
 //-------------------------------------------------
 //  Z80SIO_INTERFACE( sio_intf )
@@ -1141,7 +1132,12 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(abc800_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
+
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
@@ -1196,7 +1192,12 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(abc800_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
+
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
@@ -1251,7 +1252,12 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(abc800_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
+
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
@@ -1300,7 +1306,13 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	// peripheral hardware
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(abc800_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
+
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 

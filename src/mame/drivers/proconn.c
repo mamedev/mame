@@ -321,14 +321,6 @@ static Z80PIO_INTERFACE( pio_interface_5 )
 };
 
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,                 // ZC/TO0 callback
-	DEVCB_NULL,                 // ZC/TO1 callback
-	DEVCB_NULL                  // ZC/TO2 callback
-};
-
 WRITE16_MEMBER(proconn_state::serial_transmit)
 {
 //Don't like the look of this, should be a clock somewhere
@@ -410,7 +402,10 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_Z80PIO_ADD( "z80pio_3", 4000000, pio_interface_3 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_4", 4000000, pio_interface_4 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_5", 4000000, pio_interface_5 ) /* ?? Mhz */
-	MCFG_Z80CTC_ADD( "z80ctc",   4000000, ctc_intf ) /* ?? Mhz */
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80SIO_ADD( "z80sio",   4000000, sio_intf ) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

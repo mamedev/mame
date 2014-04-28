@@ -120,14 +120,6 @@ WRITE_LINE_MEMBER( nanos_state::ctc_z2_w )
 {
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z0_w),    /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z1_w),    /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z2_w)     /* ZC/TO2 callback */
-};
-
 /* Z80-PIO Interface */
 
 static Z80PIO_INTERFACE( pio1_intf )
@@ -575,8 +567,18 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* devices */
-	MCFG_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
-	MCFG_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
+	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(nanos_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(nanos_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(nanos_state, ctc_z2_w))
+
+	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(nanos_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(nanos_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(nanos_state, ctc_z2_w))
+
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, pio1_intf)
 	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_4MHz, pio2_intf)
 	MCFG_Z80SIO0_ADD( "z80sio_0", XTAL_4MHz, sio1_intf)

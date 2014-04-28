@@ -219,7 +219,15 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc1_z80pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_3MHz, llc1_z80pio2_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
+	// timer 0 irq does digit display, and timer 3 irq does scan of the
+	// monitor keyboard.
+	// No idea how the CTC is connected, so guessed.
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(llc_state, kbd_put))
 MACHINE_CONFIG_END
@@ -252,7 +260,9 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc2_z80pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_3MHz, llc2_z80pio2_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc2_ctc_intf )
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
+
 	MCFG_K7659_KEYBOARD_ADD()
 
 	/* internal ram */
