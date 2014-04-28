@@ -229,6 +229,7 @@ public:
 	emu_timer* m_vblank_irq;
 	emu_timer* m_fdc_tc;
 	emu_timer* m_adpcm_timer;
+	emu_timer* m_bus_error_timer;
 	UINT16* m_spriteram;
 	tilemap_t* m_bg0_8;
 	tilemap_t* m_bg1_8;

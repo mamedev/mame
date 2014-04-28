@@ -449,6 +449,9 @@ The arrows denote direction of data flow.
         ':maincpu' (FC1A9): unmapped program memory write to F004E = 0096 & 00FF
         ':maincpu' (FC1AE): unmapped program memory write to F004C = 0010 & 00FF
 
+        To boot a floppy put "bp fc5fa,1,{ip=c682;g}" and "bp fc6d7,1,{ip=c755;g}"
+        into the debugger.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -456,7 +459,7 @@ The arrows denote direction of data flow.
 #include "cpu/i8085/i8085.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "machine/upd765.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -513,7 +516,7 @@ public:
 	required_device<pit8253_device> m_pit1;
 	required_device<pic8259_device> m_pic0;
 	required_device<pic8259_device> m_pic1;
-	required_device<i8257_device> m_dmac;
+	required_device<i8257n_device> m_dmac;
 	required_device<mc6845_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<UINT8> m_shared;
@@ -535,10 +538,14 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_row_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(video_ctrl_w);
-
-	DECLARE_READ8_MEMBER(vbl_r);
+	DECLARE_READ8_MEMBER(fdcdma_r);
+	DECLARE_WRITE8_MEMBER(fdcdma_w);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE8_MEMBER(dma_page_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	DECLARE_WRITE_LINE_MEMBER(tc_w);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 
 	DECLARE_DRIVER_INIT(fanucspmg);
 
@@ -551,6 +558,7 @@ private:
 	UINT8 m_vbl_ctrl;
 	UINT8 m_keyboard_row;
 	UINT8 m_vbl_stat;
+	UINT8 m_dma_page;
 };
 
 DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
@@ -574,17 +582,55 @@ WRITE8_MEMBER(fanucspmg_state::shared_w)
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(fanucspmg_state::vbl_r)
+READ8_MEMBER(fanucspmg_state::get_slave_ack)
 {
-	return m_vbl_stat;
+	if(offset == 7)
+		return m_pic1->acknowledge();
+
+	return 0x00;
+}
+
+WRITE_LINE_MEMBER(fanucspmg_state::tc_w)
+{
+	m_fdc->tc_w(state);
+}
+
+WRITE_LINE_MEMBER(fanucspmg_state::hrq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dmac->hlda_w(state);
+}
+
+READ8_MEMBER(fanucspmg_state::fdcdma_r)
+{
+	return m_fdc->dma_r();
+}
+
+WRITE8_MEMBER(fanucspmg_state::fdcdma_w)
+{
+	m_fdc->dma_w(data);
+}
+
+WRITE8_MEMBER(fanucspmg_state::dma_page_w)
+{
+	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
+	// verify
+	floppy0->mon_w(!(data & 2));
+	floppy1->mon_w(!(data & 2));
+
+	m_dma_page = (data >> 2) & 0xf;
 }
 
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
 	AM_RANGE(0x80000, 0x81fff) AM_RAM
 
-	AM_RANGE(0x88000, 0x88001) AM_READ8(vbl_r, 0xffff)
+//	AM_RANGE(0x80000, 0x83fff) AM_READWRITE8(shared2_r, shared2_w, 0xffff) // Comms with HDD controller ?
+//	AM_RANGE(0x88000, 0x88001) AM_READ(busy_r)
+//	AM_RANGE(0x8c000, 0x8c001) AM_WRITE(signal_w)
 
+	AM_RANGE(0xf0000, 0xf0003) AM_DEVREADWRITE8(PIC0_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0xf0004, 0xf0007) AM_DEVICE8(FDC_TAG, upd765a_device, map, 0x00ff)
 	AM_RANGE(0xf0008, 0xf000f) AM_DEVREADWRITE8(PIT0_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf0010, 0xf0011) AM_DEVREADWRITE8(USART0_TAG, i8251_device, data_r, data_w, 0x00ff)
@@ -595,7 +641,10 @@ static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0xf001a, 0xf001b) AM_DEVREADWRITE8(USART2_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xf001c, 0xf001d) AM_DEVREADWRITE8(USART3_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xf001e, 0xf001f) AM_DEVREADWRITE8(USART3_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xf0020, 0xf0029) AM_DEVREADWRITE8(DMAC_TAG, i8257n_device, read, write, 0xffff)
+	AM_RANGE(0xf0046, 0xf0047) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0xf0048, 0xf004f) AM_DEVREADWRITE8(PIT1_TAG, pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0xf2000, 0xf2003) AM_DEVREADWRITE8(PIC1_TAG, pic8259_device, read, write, 0x00ff)
 
 	AM_RANGE(0xf8000, 0xf9fff) AM_READWRITE8(shared_r, shared_w, 0xffff)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
@@ -701,18 +750,19 @@ void fanucspmg_state::machine_reset()
 	m_vbl_ctrl = 0;
 	m_vram_bank = 0;
 	m_video_ctrl = 0;
+	m_dma_page = 0;
 }
 
 READ8_MEMBER(fanucspmg_state::memory_read_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	return prog_space.read_byte(offset | (m_dma_page << 16));
 }
 
 WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	return prog_space.write_byte(offset | (m_dma_page << 16), data);
 }
 
 static MC6845_UPDATE_ROW( fanuc_update_row )
@@ -792,6 +842,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_CPU_IO_MAP(maincpu_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
 
 	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL_16MHz/2/2)
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
@@ -810,14 +861,20 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
 	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL_15MHz / 5)
-	MCFG_I8257_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(fanucspmg_state, memory_write_byte))
+	MCFG_DEVICE_ADD(DMAC_TAG, I8257N, XTAL_15MHz / 5)
+	MCFG_I8257N_OUT_HRQ_CB(WRITELINE(fanucspmg_state, hrq_w))
+	MCFG_I8257N_OUT_TC_CB(WRITELINE(fanucspmg_state, tc_w))
+	MCFG_I8257N_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
+	MCFG_I8257N_OUT_MEMW_CB(WRITE8(fanucspmg_state, memory_write_byte))
+	MCFG_I8257N_IN_IOR_0_CB(READ8(fanucspmg_state, fdcdma_r))
+	MCFG_I8257N_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
 
-	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, NULL)
-	MCFG_PIC8259_ADD(PIC1_TAG, INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, READ8(fanucspmg_state, get_slave_ack))
+	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NULL)
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(DMAC_TAG, i8257n_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 
