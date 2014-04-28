@@ -417,10 +417,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 // legacy space reads/writes
 #define AM_READWRITE_LEGACY(_rhandler, _whandler) \
 	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler);
-#define AM_READWRITE8_LEGACY(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask);
-#define AM_READWRITE32_LEGACY(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask);
 
 // legacy device reads
 #define AM_DEVREAD_LEGACY(_tag, _handler) \
