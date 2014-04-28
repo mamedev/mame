@@ -537,6 +537,7 @@ windows_osd_interface::~windows_osd_interface()
 
 void windows_osd_interface::sound_register()
 {
+	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false); // making Direct Sound audio default one
 	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false);
 	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
 }
@@ -548,8 +549,9 @@ void windows_osd_interface::sound_register()
 
 void windows_osd_interface::debugger_register()
 {
-	m_debugger_options.add("windows", OSD_DEBUGGER_WINDOWS, false);
-	m_debugger_options.add("qt", OSD_DEBUGGER_QT, false);
+	m_debugger_options.add("auto", OSD_DEBUGGER_WINDOWS, false); // making windows debugger default one
+	m_debugger_options.add("windows", OSD_DEBUGGER_WINDOWS, false);	
+	m_debugger_options.add("qt", OSD_DEBUGGER_QT, false);	
 }
 
 //============================================================

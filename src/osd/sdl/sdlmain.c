@@ -520,6 +520,7 @@ static void osd_sdl_info(void)
 
 void sdl_osd_interface::sound_register()
 {
+	m_sound_options.add("auto", OSD_SOUND_SDL, false); // making SDL audio default one
 	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
 }
 
@@ -529,6 +530,7 @@ void sdl_osd_interface::sound_register()
 
 void sdl_osd_interface::debugger_register()
 {
+	m_debugger_options.add("auto", OSD_DEBUGGER_QT, false); // making QT debugger default one
 	m_debugger_options.add("qt", OSD_DEBUGGER_QT, false);
 }
 

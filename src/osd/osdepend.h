@@ -22,6 +22,10 @@
 //  Defines
 //============================================================
 
+#define OSDOPTION_LOG                   "log"
+#define OSDOPTION_VERBOSE               "verbose"
+#define OSDOPTION_DEBUG                 "debug"
+#define OSDOPTION_DEBUGGER			    "debugger"
 #define OSDOPTION_OSLOG                 "oslog"
 #define OSDOPTION_WATCHDOG              "watchdog"
 
@@ -61,6 +65,10 @@ public:
 	osd_options();
 
 	// debugging options
+	bool verbose() const { return bool_value(OSDOPTION_VERBOSE); }
+	bool log() const { return bool_value(OSDOPTION_LOG); }
+	bool debug() const { return bool_value(OSDOPTION_DEBUG); }	
+	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }	
 	bool oslog() const { return bool_value(OSDOPTION_OSLOG); }
 	int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
 

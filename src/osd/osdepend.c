@@ -23,6 +23,10 @@ const options_entry osd_options::s_option_entries[] =
 {
 	// debugging options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD DEBUGGING OPTIONS" },
+	{ OSDOPTION_LOG,                          "0",        OPTION_BOOLEAN,    "generate an error.log file" },
+	{ OSDOPTION_VERBOSE ";v",                 "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
+	{ OSDOPTION_DEBUG ";d",                   "0",        OPTION_BOOLEAN,    "enable/disable debugger" },
+	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,      OPTION_STRING,    "debugger used" },
 	{ OSDOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",        OPTION_INTEGER,    "force the program to terminate if no updates within specified number of seconds" },
 
@@ -198,10 +202,10 @@ void osd_interface::init_debugger()
 	// is active. This gives any OSD debugger interface a chance to
 	// create all of its structures.
 	//
-	osd_debugger_type debugger = m_debugger_options.find("qt");//machine().options().debugger());
+	osd_debugger_type debugger = m_debugger_options.find(machine().options().debugger());
 	if (debugger==NULL) 
 	{
-		osd_printf_warning("debugger_init: option %s not found swithing debugger off\n","windows");//machine().options().debugger());
+		osd_printf_warning("debugger_init: option %s not found swithing debugger off\n",machine().options().debugger());
 		debugger = m_debugger_options.find("none");
 	}
 	m_debugger = (*debugger)(*this);

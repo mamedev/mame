@@ -153,11 +153,7 @@ enum
 #define OPTION_MOUSE_DEVICE         "mouse_device"
 
 // core debugging options
-#define OPTION_LOG                  "log"
-#define OPTION_VERBOSE              "verbose"
 #define OPTION_UPDATEINPAUSE        "update_in_pause"
-#define OPTION_DEBUG                "debug"
-#define OPTION_DEBUG_INTERNAL       "debug_internal"
 #define OPTION_DEBUGSCRIPT          "debugscript"
 
 // core misc options
@@ -316,10 +312,6 @@ public:
 	int coin_impulse() const { return int_value(OPTION_COIN_IMPULSE); }
 
 	// core debugging options
-	bool verbose() const { return bool_value(OPTION_VERBOSE); }
-	bool log() const { return bool_value(OPTION_LOG); }
-	bool debug() const { return bool_value(OPTION_DEBUG); }
-	bool debug_internal() const { return bool_value(OPTION_DEBUG_INTERNAL); }
 	const char *debug_script() const { return value(OPTION_DEBUGSCRIPT); }
 	bool update_in_pause() const { return bool_value(OPTION_UPDATEINPAUSE); }
 
