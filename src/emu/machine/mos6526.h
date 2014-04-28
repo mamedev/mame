@@ -117,8 +117,8 @@ public:
 	static void static_set_tod_clock(device_t &device, int clock) { downcast<mos6526_device &>(device).m_tod_clock = clock; }
 
 	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(object); }
 	template<class _Object> static devcb2_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pa.set_callback(object); }
 	template<class _Object> static devcb2_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pa.set_callback(object); }
 	template<class _Object> static devcb2_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pb.set_callback(object); }
