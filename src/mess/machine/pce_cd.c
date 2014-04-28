@@ -201,6 +201,14 @@ void pce_cd_device::device_reset()
 	m_regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
 	//m_regs[0x03] = (m_regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
 	m_msm_idle = 1;
+
+	m_scsi_RST = 0;
+	m_scsi_last_RST = 0;
+	m_scsi_SEL = 0;
+	m_scsi_BSY = 0;
+	m_selected = 0;
+	m_scsi_ATN = 0;
+	m_end_mark = 0;
 }
 
 
