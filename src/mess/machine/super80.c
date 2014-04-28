@@ -16,22 +16,11 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0))
-		data &= m_io_x0->read();
-	if (!BIT(m_keylatch, 1))
-		data &= m_io_x1->read();
-	if (!BIT(m_keylatch, 2))
-		data &= m_io_x2->read();
-	if (!BIT(m_keylatch, 3))
-		data &= m_io_x3->read();
-	if (!BIT(m_keylatch, 4))
-		data &= m_io_x4->read();
-	if (!BIT(m_keylatch, 5))
-		data &= m_io_x5->read();
-	if (!BIT(m_keylatch, 6))
-		data &= m_io_x6->read();
-	if (!BIT(m_keylatch, 7))
-		data &= m_io_x7->read();
+	for (int i = 0; i < 8; i++)
+	{
+		if (!BIT(m_keylatch, i))
+			data &= m_io_keyboard[i]->read();
+	}
 
 	m_key_pressed = 3;
 
