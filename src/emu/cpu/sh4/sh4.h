@@ -147,19 +147,61 @@ struct sh4_ddt_dma
 
 typedef void (*sh4_ftcsr_callback)(UINT32);
 
-DECLARE_LEGACY_CPU_DEVICE(SH3LE, sh3);
-DECLARE_LEGACY_CPU_DEVICE(SH3BE, sh3be);
-DECLARE_LEGACY_CPU_DEVICE(SH4LE, sh4);
-DECLARE_LEGACY_CPU_DEVICE(SH4BE, sh4be);
+CPU_GET_INFO( sh3 );
 
-DECLARE_WRITE32_HANDLER( sh4_internal_w );
-DECLARE_READ32_HANDLER( sh4_internal_r );
+class sh3_device : public legacy_cpu_device
+{
+public:
+	sh3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	sh3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info);
 
-DECLARE_WRITE32_HANDLER( sh3_internal_w );
-DECLARE_READ32_HANDLER( sh3_internal_r );
+	DECLARE_WRITE32_MEMBER( sh3_internal_w );
+	DECLARE_READ32_MEMBER( sh3_internal_r );
 
-DECLARE_WRITE32_HANDLER( sh3_internal_high_w );
-DECLARE_READ32_HANDLER( sh3_internal_high_r );
+	DECLARE_WRITE32_MEMBER( sh3_internal_high_w );
+	DECLARE_READ32_MEMBER( sh3_internal_high_r );
+	
+};
+
+extern const device_type SH3LE;
+
+CPU_GET_INFO( sh3be );
+
+class sh3be_device : public sh3_device
+{
+public:
+	sh3be_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type SH3BE;
+
+CPU_GET_INFO( sh4 );
+
+class sh4_device : public legacy_cpu_device
+{
+public:
+	sh4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	sh4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info);
+	
+	DECLARE_WRITE32_MEMBER( sh4_internal_w );
+	DECLARE_READ32_MEMBER( sh4_internal_r );	
+	
+	DECLARE_READ64_MEMBER( sh4_tlb_r );
+	DECLARE_WRITE64_MEMBER( sh4_tlb_w );
+};
+
+extern const device_type SH4LE;
+
+CPU_GET_INFO( sh4be );
+
+class sh4be_device : public sh4_device
+{
+public:
+	sh4be_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type SH4BE;
+
 
 
 void sh4_set_frt_input(device_t *device, int state);
