@@ -5,6 +5,7 @@
 Super80.c written by Robbbert, 2005-2010.
 
 2010-12-19: Added V3.7 bios freshly dumped today.
+2014-04-28: Added disk system and did cleanups
 
 See the MESS sysinfo and wiki for usage
 documentation. Below for the most technical bits:
@@ -206,6 +207,12 @@ Port(hex)  Role       Comment
    Bit5    DR3SEL     1 = Drive 3 (Drive D) selected
    Bit6    SIDESEL    0 = Select Disk side 0, 1 = Select Disk side 1
    Bit7    DDEN*      0 = MFM (Double Density), 1 = FM (Single Density)
+
+ToDo:
+- Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
+       of the horrible inline editor they use)
+- Get disk system to work (no disk images available) only connected to super80r atm
+
 
 ***********************************************************************************************************/
 
