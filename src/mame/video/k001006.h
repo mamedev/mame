@@ -39,10 +39,10 @@ private:
 
 	const char * m_gfx_region;
 	UINT8 *      m_gfxrom;
-	int m_tex_width;
-	int m_tex_height;
-	int m_tex_mirror_x;
-	int m_tex_mirror_y;
+	//int m_tex_width;
+	//int m_tex_height;
+	//int m_tex_mirror_x;
+	//int m_tex_mirror_y;
 	int m_tex_layout;
 };
 
