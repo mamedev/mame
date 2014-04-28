@@ -11,7 +11,7 @@
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -48,7 +48,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
-	required_device<i8257_device> m_dma;
+	required_device<i8257n_device> m_dma;
 	required_device<upd3301_device> m_crtc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
@@ -66,9 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_WRITE8_MEMBER( dma_mem_w );
-	DECLARE_READ8_MEMBER( dma_io_r );
-	DECLARE_WRITE8_MEMBER( dma_io_w );
+	DECLARE_READ8_MEMBER( dma_mem_r );
 
 	/* video state */
 	int m_width80;

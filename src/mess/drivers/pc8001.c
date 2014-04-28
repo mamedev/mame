@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(port30_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READWRITE(port40_r, port40_w)
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
-	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE(I8257_TAG, i8257_device, i8257_r, i8257_w)
+	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE(I8257_TAG, i8257n_device, read, write)
 //  AM_RANGE(0x70, 0x7f) unused
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
@@ -407,31 +407,15 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
-	m_dma->i8257_hlda_w(state);
+	m_dma->hlda_w(state);
 }
 
-WRITE8_MEMBER( pc8001_state::dma_mem_w )
-{
-	//if (channel == 2)
-	{
-		m_crtc->dack_w(space, offset, data);
-	}
-}
-
-READ8_MEMBER( pc8001_state::dma_io_r )
+READ8_MEMBER( pc8001_state::dma_mem_r )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	return program.read_byte(offset);
 }
-
-WRITE8_MEMBER( pc8001_state::dma_io_w )
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.write_byte(offset, data);
-}
-
 
 /* Machine Initialization */
 
@@ -444,7 +428,7 @@ void pc8001_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* initialize DMA */
-	m_dma->i8257_ready_w(1);
+	m_dma->ready_w(1);
 
 	/* setup memory banking */
 	UINT8 *ram = m_ram->pointer();
@@ -524,24 +508,17 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, 4000000)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(pc8001_state, hrq_w))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(pc8001_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_IN_IOR_1_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_IN_IOR_2_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_IN_IOR_3_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(pc8001_state, dma_io_w))
-	MCFG_I8257_OUT_IOW_1_CB(WRITE8(pc8001_state, dma_io_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(pc8001_state, dma_io_w))
-	MCFG_I8257_OUT_IOW_3_CB(WRITE8(pc8001_state, dma_io_w))
+	MCFG_DEVICE_ADD(I8257_TAG, I8257N, 4000000)
+	MCFG_I8257N_OUT_HRQ_CB(WRITELINE(pc8001_state, hrq_w))
+	MCFG_I8257N_IN_MEMR_CB(READ8(pc8001_state, dma_mem_r))
+	MCFG_I8257N_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, 14318180)
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
-	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, i8257_drq2_w))
+	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257n_device, dreq2_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc8001_state, write_centronics_ack))
@@ -580,24 +557,17 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, 4000000)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(pc8001_state, hrq_w))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(pc8001_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_IN_IOR_1_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_IN_IOR_2_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_IN_IOR_3_CB(READ8(pc8001_state, dma_io_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(pc8001_state, dma_io_w))
-	MCFG_I8257_OUT_IOW_1_CB(WRITE8(pc8001_state, dma_io_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(pc8001_state, dma_io_w))
-	MCFG_I8257_OUT_IOW_3_CB(WRITE8(pc8001_state, dma_io_w))
+	MCFG_DEVICE_ADD(I8257_TAG, I8257N, 4000000)
+	MCFG_I8257N_OUT_HRQ_CB(WRITELINE(pc8001_state, hrq_w))
+	MCFG_I8257N_IN_MEMR_CB(READ8(pc8001_state, dma_mem_r))
+	MCFG_I8257N_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, 14318180)
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
-	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, i8257_drq2_w))
+	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257n_device, dreq2_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 
