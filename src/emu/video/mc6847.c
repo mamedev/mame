@@ -565,8 +565,9 @@ const rom_entry *mc6847_base_device::device_rom_region() const
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source)
+mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source) :
+	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source),
+	m_char_rom(*this, "chargen")
 {
 	m_palette = s_palette;
 

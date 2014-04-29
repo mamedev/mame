@@ -554,6 +554,8 @@ protected:
 	}
 
 private:
+	required_memory_region m_char_rom;
+	
 	struct video_scanline
 	{
 		UINT8 m_sample_count;
