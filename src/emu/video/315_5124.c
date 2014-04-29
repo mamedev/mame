@@ -617,14 +617,7 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 			break;
 
 		case 0x03:
-			{
-				UINT16 address = m_addr & m_cram_mask;
-				if (data != m_CRAM->u8(address))
-				{
-					m_CRAM->u8(address) = data;
-					m_cram_dirty = 1;
-				}
-			}
+			cram_write(data);
 			break;
 	}
 
@@ -1691,7 +1684,40 @@ void sega315_5378_device::update_palette()
 	{
 		for (i = 0; i < 32; i++)
 		{
-			m_current_palette[i] = ((m_CRAM->u8(i * 2 + 1) << 8) | m_CRAM->u8(i * 2)) & 0x0fff;
+			m_current_palette[i] = m_CRAM->u16(i) & 0x0fff;
+		}
+	}
+}
+
+
+void sega315_5124_device::cram_write(UINT8 data)
+{
+	UINT16 address = m_addr & m_cram_mask;
+	if (data != m_CRAM->u8(address))
+	{
+		m_CRAM->u8(address) = data;
+		m_cram_dirty = 1;
+	}
+}
+
+
+void sega315_5378_device::cram_write(UINT8 data)
+{
+	if (m_sega315_5124_compatibility_mode)
+	{
+		sega315_5124_device::cram_write(data);
+	}
+	else
+	{
+		if (m_addr & 1)
+		{
+			UINT16 address = (m_addr & m_cram_mask) >> 1;
+			UINT16 dataw = (data << 8) | m_buffer;
+			if (dataw != m_CRAM->u16(address))
+			{
+				m_CRAM->u16(address) = dataw;
+				m_cram_dirty = 1;
+			}
 		}
 	}
 }

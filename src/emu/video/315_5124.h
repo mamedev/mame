@@ -89,6 +89,7 @@ public:
 protected:
 	void set_display_settings();
 	virtual void update_palette();
+	virtual void cram_write(UINT8 data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();
 	void process_line_timer();
@@ -193,6 +194,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void update_palette();
+	virtual void cram_write(UINT8 data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();
 };
