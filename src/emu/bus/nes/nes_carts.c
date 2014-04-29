@@ -332,6 +332,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("pjoy84",           NES_PJOY84)
 	SLOT_INTERFACE_INTERNAL("nocash_nochr",     NES_NOCHR)
 	SLOT_INTERFACE_INTERNAL("nes_action53",     NES_ACTION53)
+	SLOT_INTERFACE_INTERNAL("nes_2a03pur",      NES_2A03PURITANS)
 // other unsupported...
 	SLOT_INTERFACE_INTERNAL("ninjaryu",         NES_NROM)    // mapper 111 - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_dance",        NES_NROM)    // UNSUPPORTED
@@ -350,7 +351,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ffe3",             NES_FFE3)
 	SLOT_INTERFACE_INTERNAL("ffe4",             NES_FFE4)
 	SLOT_INTERFACE_INTERNAL("ffe8",             NES_FFE8)
-SLOT_INTERFACE_INTERNAL("test",             NES_NROM)
+	SLOT_INTERFACE_INTERNAL("test",             NES_NROM)
 //
 	SLOT_INTERFACE_INTERNAL("unknown",          NES_NROM)  //  a few pirate dumps uses the wrong mapper...
 SLOT_INTERFACE_END

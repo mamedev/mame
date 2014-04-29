@@ -751,6 +751,7 @@ ifneq ($(filter NES,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/nes
 BUSOBJS += $(BUSOBJ)/nes/nes_slot.o
 BUSOBJS += $(BUSOBJ)/nes/nes_carts.o
+BUSOBJS += $(BUSOBJ)/nes/2a03pur.o
 BUSOBJS += $(BUSOBJ)/nes/act53.o
 BUSOBJS += $(BUSOBJ)/nes/aladdin.o
 BUSOBJS += $(BUSOBJ)/nes/ave.o

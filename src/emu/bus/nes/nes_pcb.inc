@@ -302,6 +302,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_cfight",       UNL_CITYFIGHT },
 	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "nes_action53",     BTL_ACTION53 },
+	{ "nes_2a03pur",      BTL_2A03_PURITANS },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },

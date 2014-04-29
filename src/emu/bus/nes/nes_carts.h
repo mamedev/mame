@@ -31,6 +31,7 @@
 #include "sunsoft_dcs.h"
 #include "taito.h"
 // unlicensed/bootleg/pirate PCBs
+#include "2a03pur.h"
 #include "act53.h"
 #include "aladdin.h"
 #include "ave.h"
