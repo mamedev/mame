@@ -399,8 +399,8 @@ UINT8 riot6532_device::portb_out_get()
 riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RIOT6532, "6532 RIOT", tag, owner, clock, "riot6532", __FILE__)
 	, m_irq(CLEAR_LINE)
-	, m_pa7prev(0)
 	, m_pa7dir(0)
+	, m_pa7prev(0)
 {
 	memset(m_port, 0x00, sizeof(m_port));
 }
