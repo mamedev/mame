@@ -305,7 +305,7 @@ struct PPC_REGS {
 
 	UINT64 tb;          /* 56-bit timebase register */
 
-	device_irq_acknowledge_callback irq_callback;
+	device_irq_acknowledge_delegate irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 

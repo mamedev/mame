@@ -528,7 +528,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( amigacd_tpi6525_irq );
 	
 	DECLARE_WRITE_LINE_MEMBER(amiga_m68k_reset);
-
+	
+	IRQ_CALLBACK_MEMBER(amiga_ar1_irqack);
+	
 	int m_centronics_busy;
 	int m_centronics_perror;
 	int m_centronics_select;

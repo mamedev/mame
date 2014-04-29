@@ -385,7 +385,7 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 
 
 			vector = 0x600;
-			sh4->irq_callback(sh4->device, INPUT_LINE_NMI);
+			sh4->irq_callback(*sh4->device, INPUT_LINE_NMI);
 			LOG(("SH-4 '%s' nmi exception after [%s]\n", sh4->device->tag(), message));
 		} else {
 	//      if ((sh4->m[ICR] & 0x4000) && (sh4->nmi_line_state == ASSERT_LINE))
@@ -397,9 +397,9 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 			sh4->m[INTEVT] = exception_codes[exception];
 			vector = 0x600;
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				sh4->irq_callback(*sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				sh4->irq_callback(sh4->device, SH4_IRL3+1);
+				sh4->irq_callback(*sh4->device, SH4_IRL3+1);
 			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
 		}
 	}
@@ -424,9 +424,9 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 			vector = 0x600;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				sh4->irq_callback(*sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				sh4->irq_callback(sh4->device, SH4_IRL3+1);
+				sh4->irq_callback(*sh4->device, SH4_IRL3+1);
 
 			if (sh3_intevt2_exception_codes[exception]==-1)
 				fatalerror("sh3_intevt2_exception_codes unpopulated for exception %02x\n", exception);

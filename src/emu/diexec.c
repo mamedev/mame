@@ -48,7 +48,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 		m_timed_interrupt_period(attotime::zero),
 		m_is_octal(false),
 		m_nextexec(NULL),
-		m_driver_irq_legacy(0),
 		m_timedint_timer(NULL),
 		m_profiler(PROFILER_IDLE),
 		m_icountptr(NULL),
@@ -137,7 +136,6 @@ void device_execute_interface::static_set_irq_acknowledge_callback(device_t &dev
 	if (!device.interface(exec))
 		throw emu_fatalerror("MCFG_DEVICE_IRQ_ACKNOWLEDGE called on device '%s' with no execute interface", device.tag());
 	exec->m_driver_irq = callback;
-	exec->m_driver_irq_legacy = NULL;
 }
 
 
@@ -217,29 +215,6 @@ void device_execute_interface::abort_timeslice()
 		m_cycles_running -= delta;
 		*m_icountptr -= delta;
 	}
-}
-
-
-//-------------------------------------------------
-//  set_irq_acknowledge_callback - install a driver-specific
-//  callback for IRQ acknowledge
-//-------------------------------------------------
-
-void device_execute_interface::set_irq_acknowledge_callback(device_irq_acknowledge_callback callback)
-{
-	m_driver_irq_legacy = callback;
-}
-
-
-//-------------------------------------------------
-//  set_irq_acknowledge_callback - install a driver-specific
-//  callback for IRQ acknowledge
-//-------------------------------------------------
-
-void device_execute_interface::set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback)
-{
-	m_driver_irq = callback;
-	m_driver_irq_legacy = NULL;
 }
 
 
@@ -626,26 +601,24 @@ void device_execute_interface::interface_clock_changed()
 
 
 //-------------------------------------------------
-//  static_standard_irq_callback - IRQ acknowledge
+//  standard_irq_callback_member - IRQ acknowledge
 //  callback; handles HOLD_LINE case and signals
 //  to the debugger
 //-------------------------------------------------
 
-IRQ_CALLBACK( device_execute_interface::static_standard_irq_callback )
+IRQ_CALLBACK_MEMBER( device_execute_interface::standard_irq_callback_member )
 {
-	return device->execute().standard_irq_callback(irqline);
+	return device.execute().standard_irq_callback(irqline);
 }
 
 int device_execute_interface::standard_irq_callback(int irqline)
 {
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = m_input[irqline].default_irq_callback();
-	LOG(("static_standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector));
+	LOG(("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector));
 
 	// if there's a driver callback, run it to get the vector
-	if (m_driver_irq_legacy != NULL)
-		vector = (*m_driver_irq_legacy)(&device(), irqline);
-	else if (!m_driver_irq.isnull())
+	if (!m_driver_irq.isnull())
 		vector = m_driver_irq(device(),irqline);
 
 	// notify the debugger

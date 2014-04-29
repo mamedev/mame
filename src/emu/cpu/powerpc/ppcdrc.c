@@ -542,7 +542,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback)
 {
 	powerpc_state *ppc;
 	drcbe_info beinfo;

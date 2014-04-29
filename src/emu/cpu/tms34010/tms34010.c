@@ -61,7 +61,7 @@ struct tms34010_state
 	UINT8               hblank_stable;
 	UINT8               external_host_access;
 	UINT8               executing;
-	device_irq_acknowledge_callback irq_callback;
+	device_irq_acknowledge_delegate irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -605,7 +605,7 @@ static void check_interrupt(tms34010_state *tms)
 
 		/* call the callback for externals */
 		if (irqline >= 0)
-			(void)(*tms->irq_callback)(tms->device, irqline);
+			(void)(tms->irq_callback)(*tms->device, irqline);
 	}
 }
 
@@ -672,7 +672,7 @@ static CPU_RESET( tms34010 )
 	tms34010_state *tms = get_safe_token(device);
 	const tms34010_config *config = tms->config;
 	screen_device *screen = tms->screen;
-	device_irq_acknowledge_callback save_irqcallback = tms->irq_callback;
+	device_irq_acknowledge_delegate save_irqcallback = tms->irq_callback;
 	emu_timer *save_scantimer = tms->scantimer;
 
 	memset(tms, 0, sizeof(*tms));

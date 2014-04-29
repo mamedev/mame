@@ -2846,7 +2846,7 @@ static CPU_RESET( common_sh4_reset )
 	int savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
-	device_irq_acknowledge_callback save_irqcallback;
+	device_irq_acknowledge_delegate save_irqcallback;
 
 	tsaved[0] = sh4->dma_timer[0];
 	tsaved[1] = sh4->dma_timer[1];

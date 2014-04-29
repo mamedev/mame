@@ -73,7 +73,7 @@ static int check_kickstart_12_13( running_machine &machine, const char *cart_nam
 
 ***************************************************************************/
 
-static IRQ_CALLBACK(amiga_ar1_irqack)
+IRQ_CALLBACK_MEMBER(amiga_state::amiga_ar1_irqack)
 {
 	if ( irqline == 7 && amigacrt.ar1_spurious )
 	{
@@ -167,7 +167,7 @@ static void amiga_ar1_init( running_machine &machine )
 	amigacrt.ar1_spurious = 0;
 
 	/* Install IRQ ACK callback */
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(amiga_ar1_irqack);
+	device_execute_interface::static_set_irq_acknowledge_callback(*machine.device<cpu_device>("maincpu"), device_irq_acknowledge_delegate(FUNC(amiga_state::amiga_ar1_irqack), state));
 }
 
 /***************************************************************************
