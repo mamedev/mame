@@ -169,6 +169,7 @@ inline void i8257n_device::dma_read()
 		m_temp = m_in_memr_cb(offset);
 		break;
 	}
+
 }
 
 
@@ -250,9 +251,18 @@ i8257n_device::i8257n_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, I8257N, "I8257N", tag, owner, clock, "i8257n", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
+		m_tc(false),
+		m_msb(0),
+		m_hreq(CLEAR_LINE),
 		m_hack(0),
 		m_ready(1),
+		m_state(0),
+		m_current_channel(0),
+		m_last_channel(0),
 		m_transfer_mode(0),
+		m_status(0),
+		m_request(0),
+		m_temp(0),
 		m_out_hrq_cb(*this),
 		m_out_tc_cb(*this),
 		m_in_memr_cb(*this),
@@ -285,12 +295,12 @@ void i8257n_device::device_start()
 	// resolve callbacks
 	m_out_hrq_cb.resolve_safe();
 	m_out_tc_cb.resolve_safe();
-	m_in_memr_cb.resolve();
+	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
-	m_in_ior_0_cb.resolve();
-	m_in_ior_1_cb.resolve();
-	m_in_ior_2_cb.resolve();
-	m_in_ior_3_cb.resolve();
+	m_in_ior_0_cb.resolve_safe(0);
+	m_in_ior_1_cb.resolve_safe(0);
+	m_in_ior_2_cb.resolve_safe(0);
+	m_in_ior_3_cb.resolve_safe(0);
 	m_out_iow_0_cb.resolve_safe();
 	m_out_iow_1_cb.resolve_safe();
 	m_out_iow_2_cb.resolve_safe();
