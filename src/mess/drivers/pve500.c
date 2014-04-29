@@ -24,7 +24,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "pve500.lh"
 
 #define IO_EXPANDER_PORTA 0
@@ -62,16 +62,6 @@ private:
 };
 
 
-static const z80sio_interface external_sio_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
-  DEVCB_NULL, /* DTR changed handler */
-	DEVCB_NULL, /* RTS changed handler */
-	DEVCB_NULL, /* BREAK changed handler */
-	DEVCB_NULL, /* transmit handler */
-	DEVCB_NULL  /* receive handler */
-};
-
 static const z80_daisy_config maincpu_daisy_chain[] =
 {
 	{ "external_ctc" },
@@ -81,7 +71,7 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 
 
 static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("external_sio", z80sio_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0B) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -308,7 +298,8 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL_12MHz / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO_ADD("external_sio", XTAL_12MHz / 2, external_sio_intf)
+	MCFG_Z80SIO0_ADD("external_sio", XTAL_12MHz / 2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_CPU_ADD("subcpu", TLCS_Z80, XTAL_12MHz / 2) /* TMPZ84C015BF-6 (TOSHIBA TLCS-Z80) */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
