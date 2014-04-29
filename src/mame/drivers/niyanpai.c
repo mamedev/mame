@@ -944,7 +944,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 8000000 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
