@@ -407,7 +407,6 @@ void i8244_device::render_scanline(int vpos)
 
 	UINT8   collision_map[160];
 
-
 	if ( vpos == m_start_vpos )
 	{
 		m_control_status &= ~0x08;
@@ -449,9 +448,13 @@ void i8244_device::render_scanline(int vpos)
 							for ( int k = 0; k < width + 2; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
-								collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
-								m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
-								m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
+
+								if ( px < 160 )
+								{
+									collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
+								}
 							}
 						}
 					}
@@ -471,19 +474,22 @@ void i8244_device::render_scanline(int vpos)
 							{
 								int px = x_grid_offset + i * width + k;
 
-								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ px ] & m_vdc.s.collision )
+								if ( px < 160 )
 								{
-									m_collision_status |= COLLISION_VERTICAL_GRID;
+									/* Check if we collide with an already drawn source object */
+									if ( collision_map[ px ] & m_vdc.s.collision )
+									{
+										m_collision_status |= COLLISION_VERTICAL_GRID;
+									}
+									/* Check if an already drawn object would collide with us */
+									if ( COLLISION_VERTICAL_GRID & m_vdc.s.collision && collision_map[ px ] )
+									{
+										m_collision_status |= collision_map[ px ];
+									}
+									collision_map[ px ] |= COLLISION_VERTICAL_GRID;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
 								}
-								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_VERTICAL_GRID & m_vdc.s.collision && collision_map[ px ] )
-								{
-									m_collision_status |= collision_map[ px ];
-								}
-								collision_map[ px ] |= COLLISION_VERTICAL_GRID;
-								m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
-								m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
 							}
 						}
 					}
@@ -636,17 +642,20 @@ void i8244_device::render_scanline(int vpos)
 								}
 								if ( x >= -1 && x < 159 )
 								{
-									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & m_vdc.s.collision )
+									if ( x >= 0 )
 									{
-										m_collision_status |= ( 1 << i );
+										/* Check if we collide with an already drawn source object */
+										if ( collision_map[ x ] & m_vdc.s.collision )
+										{
+											m_collision_status |= ( 1 << i );
+										}
+										/* Check if an already drawn object would collide with us */
+										if ( ( 1 << i ) & m_vdc.s.collision && collision_map[ x ] )
+										{
+											m_collision_status |= collision_map[ x ];
+										}
+										collision_map[ x ] |= ( 1 << i );
 									}
-									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & m_vdc.s.collision && collision_map[ x ] )
-									{
-										m_collision_status |= collision_map[ x ];
-									}
-									collision_map[ x ] |= ( 1 << i );
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + x_shift + 2 * x + 2 ) = color;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + x_shift + 2 * x + 3 ) = color;
 								}
