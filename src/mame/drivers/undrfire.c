@@ -740,6 +740,7 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbombers)
 	MCFG_PALETTE_ADD("palette", 16384)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)

@@ -567,6 +567,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
