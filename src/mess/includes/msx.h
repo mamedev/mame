@@ -11,7 +11,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"
-#include "machine/wd17xx.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
@@ -30,6 +29,8 @@
 //#include "osdepend.h"
 #include "hashfile.h"
 #include "includes/msx_slot.h"
+#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 
 #define MSX_MAX_CARTS   (2)
 
@@ -53,7 +54,10 @@ public:
 		m_k051649(*this, "k051649"),
 		m_dac(*this, "dac"),
 		m_rtc(*this, TC8521_TAG),
-		m_wd179x(*this, "wd179x"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_floppy(NULL),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -153,7 +157,12 @@ public:
 	optional_device<k051649_device> m_k051649;
 	required_device<dac_device> m_dac;
 	optional_device<rp5c01_device> m_rtc;
-	optional_device<fd1793_device> m_wd179x;
+	optional_device<wd_fdc_analog_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
 	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
@@ -210,9 +219,5 @@ protected:
 	required_ioport m_io_key5;
 };
 
-
-/*----------- defined in machine/msx.c -----------*/
-
-extern const wd17xx_interface msx_wd17xx_interface;
 
 #endif /* __MSX_H__ */
