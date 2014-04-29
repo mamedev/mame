@@ -554,7 +554,7 @@ protected:
 	}
 
 private:
-	required_memory_region m_char_rom;
+	optional_memory_region m_char_rom;
 	
 	struct video_scanline
 	{
