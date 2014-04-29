@@ -101,28 +101,6 @@ static const z80_daisy_config z9001_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* read port A */
-	DEVCB_DRIVER_MEMBER(z9001_state, port88_w),         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,         /* read port B - user expansion */
-	DEVCB_NULL,         /* write port B - user expansion */
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-static Z80PIO_INTERFACE( pio2_intf ) // keyboard PIO
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* read port A */
-	DEVCB_NULL,         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,         /* read port B */
-	DEVCB_NULL,         /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
-
 //Bits0,1 not connected; 2,3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.
 WRITE8_MEMBER( z9001_state::port88_w )
 {
@@ -253,8 +231,13 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(z9001_state, kbd_put))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
-	MCFG_Z80PIO_ADD( "z80pio1", XTAL_9_8304MHz / 4, pio1_intf )
-	MCFG_Z80PIO_ADD( "z80pio2", XTAL_9_8304MHz / 4, pio2_intf )
+
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz / 4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(z9001_state, port88_w))
+
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_9_8304MHz / 4)	 // keyboard PIO
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_9_8304MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

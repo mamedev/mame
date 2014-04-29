@@ -174,17 +174,6 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL
 };
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // IRQ
-	DEVCB_NULL, // port A read
-	DEVCB_NULL, // port A write
-	DEVCB_NULL,
-	DEVCB_NULL, // port B read
-	DEVCB_NULL, // port B write
-	DEVCB_NULL
-};
-
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
 {
@@ -242,7 +231,9 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
 
 	MCFG_Z80DART_ADD("z80dart", XTAL_16MHz / 4, dart_intf)
-	MCFG_Z80PIO_ADD( "z80pio",  XTAL_16MHz / 4, pio_intf)
+
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_16MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 

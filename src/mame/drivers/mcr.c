@@ -1956,8 +1956,12 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
-	MCFG_Z80PIO_ADD("ipu_pio1", 7372800/2, nflfoot_pio_intf)
+	MCFG_DEVICE_ADD("ipu_pio0", Z80PIO, 7372800/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
 MACHINE_CONFIG_END
 

@@ -806,17 +806,6 @@ WRITE8_MEMBER( fidelz80_state::vsc_pio_portb_w )
 	m_speech->rst_w(BIT(data, 6));
 }
 
-static Z80PIO_INTERFACE( vsc_z80pio_intf )
-{
-	DEVCB_NULL,                                             /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_porta_r),   /* port A read callback */
-	DEVCB_NULL,                                             /* port A write callback */
-	DEVCB_NULL,                                             /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_r),   /* port B read callback */
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_w),   /* port B write callback */
-	DEVCB_NULL                                              /* portB ready active callback */
-};
-
 /******************************************************************************
     I8041 MCU, for VBRC/7002 and bridgec3/7014
 ******************************************************************************/
@@ -1321,7 +1310,10 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vsc_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vsc_portb_w))
 
-	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, vsc_z80pio_intf)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(fidelz80_state, vsc_pio_porta_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", fidelz80_state, nmi_timer, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(600))

@@ -115,45 +115,6 @@ static Z80DMA_INTERFACE( p8k_dma_intf )
 	DEVCB_DRIVER_MEMBER(onyx_state, io_write_byte)
 };
 
-/* Z80 PIO 0 */
-
-static Z80PIO_INTERFACE( p8k_pio_0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 1 */
-
-static Z80PIO_INTERFACE( p8k_pio_1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 2 */
-
-static Z80PIO_INTERFACE( p8k_pio_2_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_INPUT_PORT("DSW"),    /* port a read */
-	DEVCB_NULL, /* port a write */
-	DEVCB_NULL, /* ready a */
-	DEVCB_NULL, /* port b read */
-	DEVCB_NULL, /* port b write */
-	DEVCB_NULL  /* ready b */
-};
-
 /* Z80 SIO 0 */
 
 WRITE16_MEMBER( onyx_state::pk8_sio_0_serial_transmit )
@@ -242,45 +203,6 @@ ADDRESS_MAP_END
 
 #if 0
 
-/* Z80 PIO 0 */
-
-static const z80pio_interface p8k_16_pio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 1 */
-
-static const z80pio_interface p8k_16_pio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 2 */
-
-static const z80pio_interface p8k_16_pio_2_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Z80 SIO 0 */
 
 WRITE16_MEMBER( onyx_state::pk8_16_sio_0_serial_transmit )
@@ -356,9 +278,9 @@ static MACHINE_CONFIG_START( c8002, onyx_state )
 	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
 	//MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
 	//MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
-	//MCFG_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )
-	//MCFG_Z80PIO_ADD("z80pio_1", XTAL_4MHz, p8k_16_pio_1_intf )
-	//MCFG_Z80PIO_ADD("z80pio_2", XTAL_4MHz, p8k_16_pio_2_intf )
+	//MCFG_DEVICE_ADD("z80pio_0", Z80CTC, XTAL_4MHz)
+	//MCFG_DEVICE_ADD("z80pio_1", Z80CTC, XTAL_4MHz)
+	//MCFG_DEVICE_ADD("z80pio_2", Z80CTC, XTAL_4MHz)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)

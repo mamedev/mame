@@ -92,18 +92,6 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
 };
 
 
-Z80PIO_INTERFACE( nflfoot_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("ipu", INPUT_LINE_IRQ0),  /* interrupt handler */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 WRITE_LINE_MEMBER(mcr_state::ipu_ctc_interrupt)
 {
 	m_ipu->set_input_line(0, state);

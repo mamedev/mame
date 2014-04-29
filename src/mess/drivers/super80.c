@@ -732,7 +732,10 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CPU_IO_MAP(super80_io)
 	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(super80_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(super80_state,pio_port_b_r))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(48.8)
@@ -807,7 +810,10 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CPU_IO_MAP(super80v_io)
 	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(super80_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(super80_state,pio_port_b_r))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

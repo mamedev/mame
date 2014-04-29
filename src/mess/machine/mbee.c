@@ -80,20 +80,9 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 	return data;
 };
 
-const z80pio_interface mbee_z80pio_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mbee_state, pio_port_a_w),
-	DEVCB_DRIVER_LINE_MEMBER(mbee_state, pio_ardy),
-	DEVCB_DRIVER_MEMBER(mbee_state, pio_port_b_r),
-	DEVCB_DRIVER_MEMBER(mbee_state, pio_port_b_w),
-	DEVCB_NULL
-};
-
 /*************************************************************************************
 
-    Floppy DIsk
+    Floppy Disk
 
     The callback is quite simple, no interrupts are used.
     If either IRQ or DRQ activate, they set bit 7 of inport 0x48.

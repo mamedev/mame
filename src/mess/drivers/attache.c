@@ -871,17 +871,6 @@ static const ay8910_interface ay8912_interface =
 	DEVCB_NULL                  /* portB write */
 };
 
-static const z80pio_interface pio_interface =
-{
-	DEVCB_NULL,//DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portA_r),
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portA_w),
-	DEVCB_NULL,  // out_ardy_cb
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portB_r),
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portB_w),
-	DEVCB_NULL   // out_brdy_cb
-};
-
 static Z80SIO_INTERFACE( sio_interface )
 {
 	0, 0, 0, 0,
@@ -1008,7 +997,12 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_MSM5832_ADD("rtc",XTAL_32_768kHz)
 
-	MCFG_Z80PIO_ADD("pio",XTAL_8MHz / 26, pio_interface)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz/26)
+	MCFG_Z80PIO_IN_PA_CB(READ8(attache_state, pio_portA_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(attache_state, pio_portA_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
+
 	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, sio_interface)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)

@@ -666,17 +666,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static Z80PIO_INTERFACE( einstein_pio_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),
-	DEVCB_NULL
-};
-
 static const ay8910_interface einstein_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -737,7 +726,9 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	driver. So we update at 50Hz and hope this is good enough. */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, einstein_keyboard_timer_callback, attotime::from_hz(50))
 
-	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
+	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(einstein_state, einstein_serial_transmit_clock))

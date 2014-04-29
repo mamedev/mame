@@ -561,7 +561,9 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_CPU_PROGRAM_MAP(senjyo_sound_map)
 	MCFG_CPU_IO_MAP(senjyo_sound_io_map)
 
-	MCFG_Z80PIO_ADD( "z80pio", 2000000, senjyo_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, 2000000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(senjyo_state, pio_pa_r))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 2000000 /* same as "sub" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))

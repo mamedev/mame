@@ -286,28 +286,6 @@ static Z80SIO_INTERFACE( rt1715_sio_intf )
 	DEVCB_NULL
 };
 
-static const z80pio_interface rt1715_pio_data_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const z80pio_interface rt1715_pio_control_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* priority unknown */
 static const z80_daisy_config rt1715_daisy_chain[] =
 {
@@ -350,8 +328,8 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
 
 	/* floppy */
-	MCFG_Z80PIO_ADD("a71", XTAL_10MHz/4 /* ? */, rt1715_pio_data_intf)
-	MCFG_Z80PIO_ADD("a72", XTAL_10MHz/4 /* ? */, rt1715_pio_control_intf)
+	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a72", Z80PIO, XTAL_10MHz/4 /* ? */)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

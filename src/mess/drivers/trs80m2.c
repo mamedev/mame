@@ -540,7 +540,7 @@ static Z80DMA_INTERFACE( dma_intf )
 
 
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  Z80PIO
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( trs80m2_state::write_centronics_busy )
@@ -623,18 +623,6 @@ WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
 {
 	m_centronics->write_strobe(!state);
 }
-
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),             // interrupt callback
-	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_r),               // port A read callback
-	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_w),               // port A write callback
-	DEVCB_NULL,                                                 // port A ready callback
-	DEVCB_NULL,                                                 // port B read callback
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // port B write callback
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, strobe_w)           // port B ready callback
-};
-
 
 //-------------------------------------------------
 //  Z80SIO_INTERFACE( sio_intf )
@@ -806,7 +794,14 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(trs80m2_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(trs80m2_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
+
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
@@ -877,7 +872,14 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(trs80m2_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(trs80m2_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
+
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
 

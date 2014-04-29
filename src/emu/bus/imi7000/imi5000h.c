@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER( imi5000h_device::ctc_z2_w )
 }
 
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio0_intf )
+//  Z80PIO 1
 //-------------------------------------------------
 
 READ8_MEMBER( imi5000h_device::pio0_pa_r )
@@ -205,20 +205,8 @@ WRITE8_MEMBER( imi5000h_device::pio0_pb_w )
 	*/
 }
 
-static Z80PIO_INTERFACE( pio0_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pa_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_0_TAG, z80pio_device, strobe_a),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pb_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_0_TAG, z80pio_device, strobe_b)
-};
-
-
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio2_intf )
+//  Z80PIO 2
 //-------------------------------------------------
 
 READ8_MEMBER( imi5000h_device::pio2_pa_r )
@@ -270,20 +258,8 @@ WRITE8_MEMBER( imi5000h_device::pio2_pb_w )
 	// command bus
 }
 
-static Z80PIO_INTERFACE( pio2_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pa_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_2_TAG, z80pio_device, strobe_a),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pb_w),
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio3_intf )
+//  Z80PIO 3
 //-------------------------------------------------
 
 READ8_MEMBER( imi5000h_device::pio3_pa_r )
@@ -362,18 +338,6 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 	*/
 }
 
-static Z80PIO_INTERFACE( pio3_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pa_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_3_TAG, z80pio_device, strobe_a),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pb_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_3_TAG, z80pio_device, strobe_b)
-};
-
-
 //-------------------------------------------------
 //  MACHINE_DRIVER( imi5000h )
 //-------------------------------------------------
@@ -390,9 +354,30 @@ static MACHINE_CONFIG_FRAGMENT( imi5000h )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(imi5000h_device, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(imi5000h_device, ctc_z2_w))
 
-	MCFG_Z80PIO_ADD(Z80PIO_0_TAG, XTAL_8MHz/2, pio0_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_2_TAG, XTAL_8MHz/2, pio2_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_3_TAG, XTAL_8MHz/2, pio3_intf)
+	MCFG_DEVICE_ADD(Z80PIO_0_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(imi5000h_device, pio0_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(imi5000h_device, pio0_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE(Z80PIO_0_TAG, z80pio_device, strobe_a))
+	MCFG_Z80PIO_IN_PB_CB(READ8(imi5000h_device, pio0_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(imi5000h_device, pio0_pb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE(Z80PIO_0_TAG, z80pio_device, strobe_b))
+
+	MCFG_DEVICE_ADD(Z80PIO_2_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(imi5000h_device, pio2_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(imi5000h_device, pio2_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE(Z80PIO_2_TAG, z80pio_device, strobe_a))
+	MCFG_Z80PIO_IN_PB_CB(READ8(imi5000h_device, pio2_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(imi5000h_device, pio2_pb_w))
+
+	MCFG_DEVICE_ADD(Z80PIO_3_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_IN_PA_CB(READ8(imi5000h_device, pio3_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(imi5000h_device, pio3_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE(Z80PIO_3_TAG, z80pio_device, strobe_a))
+	MCFG_Z80PIO_IN_PB_CB(READ8(imi5000h_device, pio3_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(imi5000h_device, pio3_pb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE(Z80PIO_3_TAG, z80pio_device, strobe_b))
 
 	//MCFG_HARDDISK_ADD("harddisk1")
 MACHINE_CONFIG_END

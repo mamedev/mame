@@ -114,9 +114,6 @@ INPUT_PORTS_EXTERN( kay_kbd );
 
 /*----------- defined in machine/kaypro.c -----------*/
 
-extern const z80pio_interface kayproii_pio_g_intf;
-extern const z80pio_interface kayproii_pio_s_intf;
-extern const z80pio_interface kaypro4_pio_s_intf;
 extern const z80sio_interface kaypro_sio_intf;
 
 /*----------- defined in video/kaypro.c -----------*/

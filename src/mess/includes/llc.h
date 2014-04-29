@@ -59,11 +59,4 @@ public:
 	optional_device<ram_device> m_ram;
 };
 
-
-/*----------- defined in machine/llc.c -----------*/
-extern const z80pio_interface llc1_z80pio1_intf;
-extern const z80pio_interface llc1_z80pio2_intf;
-extern const z80pio_interface llc2_z80pio1_intf;
-extern const z80pio_interface llc2_z80pio2_intf;
-
 #endif

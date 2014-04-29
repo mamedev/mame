@@ -80,39 +80,6 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 	m_floppy->ss_w(BIT(data, 2));
 }
 
-const z80pio_interface kayproii_pio_g_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-const z80pio_interface kayproii_pio_s_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),    /* read printer status */
-	DEVCB_DRIVER_MEMBER(kaypro_state, kayproii_pio_system_w),   /* activate various internal devices */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-const z80pio_interface kaypro4_pio_s_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),    /* read printer status */
-	DEVCB_DRIVER_MEMBER(kaypro_state, kaypro4_pio_system_w),    /* activate various internal devices */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback */
-};
-
 /***********************************************************
 
     KAYPRO2X SYSTEM PORT
@@ -164,7 +131,6 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 	m_system_port = data;
 }
-
 
 
 /***********************************************************************

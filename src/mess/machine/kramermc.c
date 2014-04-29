@@ -29,17 +29,6 @@ WRITE8_MEMBER(kramermc_state::kramermc_port_a_w)
 	m_key_row = ((data >> 1) & 0x07);
 }
 
-Z80PIO_INTERFACE( kramermc_z80pio_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(kramermc_state,kramermc_port_a_r),
-	DEVCB_DRIVER_MEMBER(kramermc_state,kramermc_port_a_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(kramermc_state,kramermc_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Driver initialization */
 DRIVER_INIT_MEMBER(kramermc_state,kramermc)
 {

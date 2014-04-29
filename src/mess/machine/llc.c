@@ -88,28 +88,6 @@ WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 	}
 }
 
-Z80PIO_INTERFACE( llc1_z80pio1_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_a_r),
-	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_b_w),
-	DEVCB_NULL
-};
-
-Z80PIO_INTERFACE( llc1_z80pio2_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(llc_state, llc1_port2_a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(llc_state, llc1_port2_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 DRIVER_INIT_MEMBER(llc_state,llc1)
 {
 }
@@ -194,29 +172,7 @@ WRITE8_MEMBER(llc_state::llc2_port1_b_w)
 	m_rv = BIT(data, 5);
 }
 
-Z80PIO_INTERFACE( llc2_z80pio1_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_b_r),
-	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_b_w),
-	DEVCB_NULL
-};
-
 READ8_MEMBER(llc_state::llc2_port2_a_r)
 {
 	return 0; // bit 2 low or hangs on ^Z^X^C sequence
 }
-
-Z80PIO_INTERFACE( llc2_z80pio2_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(llc_state, llc2_port2_a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};

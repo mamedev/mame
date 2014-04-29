@@ -552,17 +552,6 @@ static SLOT_INTERFACE_START( a5105_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static Z80PIO_INTERFACE( a5105_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),             /* callback when change interrupt status */
-	DEVCB_NULL,                                     /* port A read callback */
-	DEVCB_NULL,                                     /* port A write callback */
-	DEVCB_NULL,                                     /* portA ready active callback */
-	DEVCB_NULL,                                     /* port B read callback */
-	DEVCB_NULL,                                     /* port B write callback */
-	DEVCB_NULL                                      /* portB ready active callback */
-};
-
 static const z80_daisy_config a5105_daisy_chain[] =
 {
 	{ "z80ctc" },
@@ -606,7 +595,8 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_15MHz / 4, a5105_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_15MHz / 4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 

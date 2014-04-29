@@ -27,18 +27,6 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 	return data;
 };
 
-Z80PIO_INTERFACE( super80_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(super80_state, pio_port_a_w),
-	DEVCB_NULL,         /* portA ready active callback (not used in super80) */
-	DEVCB_DRIVER_MEMBER(super80_state,pio_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback (not used in super80) */
-};
-
-
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
 void super80_state::super80_cassette_motor( UINT8 data )

@@ -99,4 +99,3 @@ public:
 
 /*----------- defined in audio/senjyo.c -----------*/
 extern const z80_daisy_config senjyo_daisy_chain[];
-extern const z80pio_interface senjyo_pio_intf;

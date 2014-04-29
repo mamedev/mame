@@ -422,23 +422,6 @@ static Z80DMA_INTERFACE( dma_intf )
 	DEVCB_DRIVER_MEMBER(super6_state, io_write_byte),
 };
 
-
-//-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
-//-------------------------------------------------
-
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  COM8116_INTERFACE( brg_intf )
 //-------------------------------------------------
@@ -552,7 +535,10 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(XTAL_24MHz/16))
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_24MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
 	MCFG_WD2793x_ADD(WD2793_TAG, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(super6_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(super6_state, fdc_drq_w))

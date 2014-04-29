@@ -69,9 +69,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
-	DECLARE_READ8_MEMBER(z1013_port_b_r);
-	DECLARE_WRITE8_MEMBER(z1013_port_b_w);
-	DECLARE_READ8_MEMBER(z1013k7659_port_b_r);
+	DECLARE_READ8_MEMBER(port_b_r);
+	DECLARE_WRITE8_MEMBER(port_b_w);
+	DECLARE_READ8_MEMBER(k7659_port_b_r);
 	required_shared_ptr<UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_keyboard_line;
@@ -270,7 +270,7 @@ WRITE8_MEMBER( z1013_state::z1013_keyboard_w )
 	m_keyboard_line = data;
 }
 
-READ8_MEMBER( z1013_state::z1013_port_b_r )
+READ8_MEMBER( z1013_state::port_b_r )
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
@@ -287,38 +287,16 @@ READ8_MEMBER( z1013_state::z1013_port_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( z1013_state::z1013_port_b_w )
+WRITE8_MEMBER( z1013_state::port_b_w )
 {
 	m_keyboard_part = BIT(data, 4); // for z1013a2 only
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
-const z80pio_interface z1013_z80pio_intf =
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(z1013_state, z1013_port_b_r),
-	DEVCB_DRIVER_MEMBER(z1013_state, z1013_port_b_w),
-	DEVCB_NULL
-};
-
-READ8_MEMBER( z1013_state::z1013k7659_port_b_r )
+READ8_MEMBER( z1013_state::k7659_port_b_r )
 {
 	return 0xff;
 }
-
-const z80pio_interface z1013k7659_z80pio_intf =
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(z1013_state, z1013k7659_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 {
@@ -400,7 +378,6 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_CPU_PROGRAM_MAP(z1013_mem)
 	MCFG_CPU_IO_MAP(z1013_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -418,15 +395,19 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* Devices */
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_1MHz, z1013_z80pio_intf )
+	/* devices */
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_1MHz)
+	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(z1013_state, port_b_w))
+
 	MCFG_CASSETTE_ADD( "cassette", z1013_cassette_interface )
 	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80", 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( z1013k76, z1013 )
 	MCFG_DEVICE_REMOVE("z80pio")
-	MCFG_Z80PIO_ADD("z80pio", XTAL_1MHz, z1013k7659_z80pio_intf)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_1MHz)
+	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, k7659_port_b_r))
 MACHINE_CONFIG_END
 
 /* ROM definition */

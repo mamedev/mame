@@ -240,28 +240,6 @@ WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
 	m_led_sel = (data & 0xff) | (m_led_sel & 0x300);
 }
 
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   // callback when change interrupt status
-	DEVCB_NULL,                                         // port A read callback
-	DEVCB_DRIVER_MEMBER(chessmst_state, pio1_port_a_w), // port A write callback
-	DEVCB_NULL,                                         // portA ready active callback
-	DEVCB_NULL,                                         // port B read callback
-	DEVCB_DRIVER_MEMBER(chessmst_state, pio1_port_b_w), // port B write callback
-	DEVCB_NULL                                          // portB ready active callback
-};
-
-static Z80PIO_INTERFACE( pio2_intf )
-{
-	DEVCB_NULL,                                         // callback when change interrupt status
-	DEVCB_DRIVER_MEMBER(chessmst_state, pio2_port_a_r), // port A read callback
-	DEVCB_NULL,                                         // port A write callback
-	DEVCB_NULL,                                         // portA ready active callback
-	DEVCB_NULL,                                         // port B read callback
-	DEVCB_DRIVER_MEMBER(chessmst_state, pio2_port_b_w), // port B write callback
-	DEVCB_NULL                                          // portB ready active callback
-};
-
 static MACHINE_CONFIG_START( chessmst, chessmst_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -276,9 +254,15 @@ static MACHINE_CONFIG_START( chessmst, chessmst_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	/* Devices */
-	MCFG_Z80PIO_ADD("z80pio1", XTAL_4MHz, pio1_intf)
-	MCFG_Z80PIO_ADD("z80pio2", XTAL_4MHz, pio2_intf)
+	/* devices */
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
+
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

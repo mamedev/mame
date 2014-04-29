@@ -133,7 +133,6 @@ public:
 
 extern const z80_daisy_config mcr_daisy_chain[];
 extern const z80_daisy_config mcr_ipu_daisy_chain[];
-extern const z80pio_interface nflfoot_pio_intf;
 extern const z80sio_interface nflfoot_sio_intf;
 extern UINT8 mcr_cocktail_flip;
 

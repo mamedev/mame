@@ -229,8 +229,15 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // WD1943, SMC8116
 
-	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
-	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
+	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 2500000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+
+	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(kaypro_state, pio_system_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kaypro_state, kayproii_pio_system_w))
+
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )  /* start at 300 baud */
 
 	MCFG_FD1793x_ADD("fdc", XTAL_20MHz / 20)
@@ -246,7 +253,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
 	MCFG_DEVICE_REMOVE("z80pio_s")
-	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kaypro4_pio_s_intf )
+	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(kaypro_state, pio_system_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kaypro_state, kaypro4_pio_system_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kaypro2x, kaypro_state )

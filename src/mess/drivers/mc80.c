@@ -178,8 +178,12 @@ static MACHINE_CONFIG_START( mc8020, mc80_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	/* Devices */
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_2_4576MHz, mc8020_z80pio_intf )
+	/* devices */
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_2_4576MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(mc80_state, mc80_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc80_state, mc80_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mc80_state, mc80_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc80_state, mc80_port_b_w))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_2_4576MHz / 100)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -213,13 +217,23 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
-	MCFG_Z80PIO_ADD( "zve_pio", XTAL_2_4576MHz, mc8030_zve_z80pio_intf )
+	MCFG_DEVICE_ADD("zve_pio", Z80PIO, XTAL_2_4576MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(mc80_state, zve_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc80_state, zve_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mc80_state, zve_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc80_state, zve_port_b_w))
 
 	MCFG_DEVICE_ADD("zve_ctc", Z80CTC, XTAL_2_4576MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// ZC0, ZC1, ZC2 for user
 
-	MCFG_Z80PIO_ADD( "asp_pio", XTAL_2_4576MHz, mc8030_asp_z80pio_intf )
+	MCFG_DEVICE_ADD("asp_pio", Z80PIO, XTAL_2_4576MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(mc80_state, asp_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc80_state, asp_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mc80_state, asp_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc80_state, asp_port_b_w))
 
 	MCFG_DEVICE_ADD("asp_ctc", Z80CTC, XTAL_2_4576MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

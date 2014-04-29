@@ -120,30 +120,6 @@ WRITE_LINE_MEMBER( nanos_state::ctc_z2_w )
 {
 }
 
-/* Z80-PIO Interface */
-
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
-	DEVCB_NULL,                     /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_NULL,                     /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
-};
-
-static Z80PIO_INTERFACE( pio2_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
-	DEVCB_NULL,                     /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_NULL,                     /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
-};
-
 /* Z80-SIO Interface */
 
 WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
@@ -510,17 +486,6 @@ void nanos_state::machine_reset()
 	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(false);
 }
 
-static Z80PIO_INTERFACE( nanos_z80pio_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_b_r),
-	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_b_w),
-	DEVCB_NULL
-};
-
 FLOPPY_FORMATS_MEMBER( nanos_state::floppy_formats )
 	FLOPPY_NANOS_FORMAT
 FLOPPY_FORMATS_END
@@ -579,11 +544,20 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(nanos_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(nanos_state, ctc_z2_w))
 
-	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, pio1_intf)
-	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_4MHz, pio2_intf)
+	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80SIO0_ADD( "z80sio_0", XTAL_4MHz, sio1_intf)
 	MCFG_Z80SIO0_ADD( "z80sio_1", XTAL_4MHz, sio2_intf)
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
+
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(nanos_state, nanos_port_a_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(nanos_state, nanos_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(nanos_state, nanos_port_b_w))
+
 	/* UPD765 */
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", nanos_floppies, "525hd", nanos_state::floppy_formats)

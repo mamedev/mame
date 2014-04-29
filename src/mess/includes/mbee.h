@@ -224,10 +224,6 @@ public:
 };
 
 
-/*----------- defined in machine/mbee.c -----------*/
-
-extern const z80pio_interface mbee_z80pio_intf;
-
 /*----------- defined in video/mbee.c -----------*/
 
 MC6845_UPDATE_ROW( mbee_update_row );

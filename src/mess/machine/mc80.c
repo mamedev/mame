@@ -54,17 +54,6 @@ WRITE8_MEMBER( mc80_state::mc80_port_b_w )
 {
 }
 
-Z80PIO_INTERFACE( mc8020_z80pio_intf )
-{
-	DEVCB_NULL, /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(mc80_state, mc80_port_a_r),
-	DEVCB_DRIVER_MEMBER(mc80_state, mc80_port_a_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc80_state, mc80_port_b_r),
-	DEVCB_DRIVER_MEMBER(mc80_state, mc80_port_b_w),
-	DEVCB_NULL
-};
-
 /*****************************************************************************/
 /*                            Implementation for MC80.3x                     */
 /*****************************************************************************/
@@ -124,17 +113,6 @@ WRITE8_MEMBER( mc80_state::zve_port_b_w )
 {
 }
 
-Z80PIO_INTERFACE( mc8030_zve_z80pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(mc80_state, zve_port_a_r),
-	DEVCB_DRIVER_MEMBER(mc80_state, zve_port_a_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc80_state, zve_port_b_r),
-	DEVCB_DRIVER_MEMBER(mc80_state, zve_port_b_w),
-	DEVCB_NULL
-};
-
 READ8_MEMBER( mc80_state::asp_port_a_r )
 {
 	return 0xff;
@@ -152,17 +130,6 @@ WRITE8_MEMBER( mc80_state::asp_port_a_w )
 WRITE8_MEMBER( mc80_state::asp_port_b_w )
 {
 }
-
-Z80PIO_INTERFACE( mc8030_asp_z80pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_a_r),
-	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_a_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_b_r),
-	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_b_w),
-	DEVCB_NULL
-};
 
 // SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 Z80SIO_INTERFACE( mc8030_asp_z80sio_intf )

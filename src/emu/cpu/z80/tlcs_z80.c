@@ -18,17 +18,6 @@
 //  m_tlcsz80->set_internal_pio_interface (pio_intf);
 //  m_tlcsz80->set_internal_sio_interface (sio_intf);
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(DEVICE_SELF_OWNER, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const z80sio_interface sio_intf =
 {
 	DEVCB_CPU_INPUT_LINE(DEVICE_SELF_OWNER, INPUT_LINE_IRQ0), /* interrupt handler */
@@ -69,7 +58,9 @@ static MACHINE_CONFIG_FRAGMENT( tlcs_z80 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
 	MCFG_Z80SIO_ADD(TLCSZ80_INTERNAL_SIO_TAG, TLCS_Z80_CLOCK, sio_intf)
-	MCFG_Z80PIO_ADD(TLCSZ80_INTERNAL_PIO_TAG, TLCS_Z80_CLOCK, pio_intf)
+
+	MCFG_DEVICE_ADD(TLCSZ80_INTERNAL_PIO_TAG, Z80PIO, TLCS_Z80_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 tlcs_z80_device::tlcs_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

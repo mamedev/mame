@@ -277,18 +277,6 @@ WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
 	m_sio->txca_w(state);
 }
 
-// system functions
-static Z80PIO_INTERFACE( pio0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DRIVER_MEMBER(altos5_state, port08_r),         /* read port A */
-	DEVCB_DRIVER_MEMBER(altos5_state, port08_w),         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(altos5_state, port09_r),         /* read port B */
-	DEVCB_DRIVER_MEMBER(altos5_state, port09_w),         /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
-
 /*
 d0: L = a HD is present
 d1: L = a 2nd hard drive is present
@@ -348,18 +336,6 @@ WRITE8_MEMBER( altos5_state::port09_w )
 	m_port09 = data;
 	setup_banks(2);
 }
-
-// parallel port
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* read port A */
-	DEVCB_NULL,         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,         /* read port B */
-	DEVCB_NULL,         /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
 
 // serial printer and console#3
 static Z80DART_INTERFACE( dart_intf )
@@ -472,8 +448,17 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 
 	/* Devices */
 	MCFG_Z80DMA_ADD( "z80dma",   XTAL_8MHz / 2, dma_intf)
-	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_8MHz / 2, pio0_intf )
-	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_8MHz / 2, pio1_intf )
+
+	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL_8MHz / 2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(altos5_state, port08_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(altos5_state, port08_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(altos5_state, port09_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(altos5_state, port09_w))
+
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_8MHz / 2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 

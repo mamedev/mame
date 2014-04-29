@@ -778,17 +778,6 @@ WRITE8_MEMBER( pasopia7_state::mux_w )
 	m_mux_data = data;
 }
 
-static Z80PIO_INTERFACE( z80pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
-	DEVCB_DRIVER_MEMBER(pasopia7_state, mux_r),
-	DEVCB_DRIVER_MEMBER(pasopia7_state, mux_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pasopia7_state, keyb_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const z80_daisy_config p7_daisy[] =
 {
 	{ "z80ctc" },
@@ -967,7 +956,11 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))	// beep interface
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(pasopia7_state, mux_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pasopia7_state, unk_r))

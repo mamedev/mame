@@ -253,17 +253,6 @@ WRITE8_MEMBER( pasopia_state::mux_w )
 	m_mux_data = data;
 }
 
-static Z80PIO_INTERFACE( z80pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
-	DEVCB_DRIVER_MEMBER(pasopia_state, mux_r),  // in port A
-	DEVCB_DRIVER_MEMBER(pasopia_state, mux_w),  // out port A
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pasopia_state, keyb_r), // in port B
-	DEVCB_NULL,                 // out port B
-	DEVCB_NULL
-};
-
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,                  /* show border area */
@@ -357,7 +346,11 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(pasopia_state, mux_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia_state, mux_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia_state, keyb_r))
 MACHINE_CONFIG_END
 
 /* ROM definition */

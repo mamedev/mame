@@ -231,28 +231,6 @@ static const z80_daisy_config pcm_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80PIO_INTERFACE( pio_u_intf ) // all pins go to expansion socket
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* read port A */
-	DEVCB_NULL,         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,         /* read port B */
-	DEVCB_NULL,         /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-static Z80PIO_INTERFACE( pio_s_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),           /* read port A */
-	DEVCB_NULL,         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_r),           /* read port B */
-	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_w),           /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
-
 static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
@@ -325,8 +303,16 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	/* Devices */
 	MCFG_K7659_KEYBOARD_ADD()
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
-	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
+
+	MCFG_DEVICE_ADD("z80pio_u", Z80PIO, XTAL_10MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, XTAL_10MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
+	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
+
 	MCFG_Z80SIO0_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
 
 	MCFG_DEVICE_ADD("z80ctc_u", Z80CTC, XTAL_10MHz /4)

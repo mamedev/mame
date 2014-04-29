@@ -165,17 +165,6 @@ WRITE8_MEMBER( babbage_state::pio1_b_w )
 	}
 }
 
-static Z80PIO_INTERFACE( babbage_z80pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* int callback */
-	DEVCB_NULL, /* port a read */
-	DEVCB_NULL, /* port a write */
-	DEVCB_NULL, /* ready a */
-	DEVCB_NULL, /* port b read */
-	DEVCB_DRIVER_MEMBER(babbage_state, pio1_b_w),   /* port b write */
-	DEVCB_NULL  /* ready b */
-};
-
 READ8_MEMBER( babbage_state::pio2_a_r )
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE); // release interrupt
@@ -195,17 +184,6 @@ WRITE8_MEMBER( babbage_state::pio2_b_w )
 	else
 		output_set_digit_value(data, m_segment);
 }
-
-static Z80PIO_INTERFACE( babbage_z80pio2_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* int callback */
-	DEVCB_DRIVER_MEMBER(babbage_state, pio2_a_r),   /* port a read */
-	DEVCB_NULL, /* port a write */
-	DEVCB_NULL, /* ready a */
-	DEVCB_NULL, /* port b read */
-	DEVCB_DRIVER_MEMBER(babbage_state, pio2_b_w),   /* port b write */
-	DEVCB_NULL  /* ready b */
-};
 
 static const z80_daisy_config babbage_daisy_chain[] =
 {// need to check the order
@@ -271,8 +249,14 @@ static MACHINE_CONFIG_START( babbage, babbage_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(babbage_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(babbage_state, ctc_z2_w))
 
-	MCFG_Z80PIO_ADD( "z80pio_1", MAIN_CLOCK, babbage_z80pio1_intf )
-	MCFG_Z80PIO_ADD( "z80pio_2", MAIN_CLOCK, babbage_z80pio2_intf )
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MAIN_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(babbage_state, pio1_b_w))
+
+	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, MAIN_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(babbage_state, pio2_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(babbage_state, pio2_b_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", babbage_state, keyboard_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END

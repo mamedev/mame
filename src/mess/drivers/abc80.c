@@ -271,7 +271,7 @@ static const sn76477_interface csg_intf =
 
 
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  Z80PIO
 //-------------------------------------------------
 
 READ8_MEMBER( abc80_state::pio_pa_r )
@@ -387,20 +387,8 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 	}
 };
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(abc80_state, pio_pa_r),     /* port A read callback */
-	DEVCB_NULL,                                     /* port A write callback */
-	DEVCB_NULL,                                     /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_r),     /* port B read callback */
-	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_w),     /* port B write callback */
-	DEVCB_NULL                                      /* portB ready active callback */
-};
-
-
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  Z80 Daisy Chain
 //-------------------------------------------------
 
 static const z80_daisy_config abc80_daisy_chain[] =
@@ -553,8 +541,14 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_11_9808MHz/2/2, pio_intf)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_11_9808MHz/2/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(abc80_state, pio_pa_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc80_state, pio_pb_w))
+
 	MCFG_CASSETTE_ADD("cassette", abc80_cassette_interface)
+
 	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
 	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(abc80_state, keydown_w))
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "slow")

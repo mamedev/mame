@@ -35,10 +35,6 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-
-/*----------- defined in machine/ac1.c -----------*/
-extern const z80pio_interface ac1_z80pio_intf;
-
 /*----------- defined in video/ac1.c -----------*/
 extern const gfx_layout ac1_charlayout;
 

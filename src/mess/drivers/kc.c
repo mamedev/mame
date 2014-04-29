@@ -87,17 +87,6 @@ extern SLOT_INTERFACE_START(kc85_exp)
 SLOT_INTERFACE_END
 
 
-Z80PIO_INTERFACE( kc85_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),                     /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_r),             /* port A read callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_w),             /* port A write callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_ardy_cb),        /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_r),             /* port B read callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_w),             /* port B write callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_brdy_cb)         /* portB ready active callback */
-};
-
 static const cassette_interface kc_cassette_interface =
 {
 	kc_cassette_formats,
@@ -115,7 +104,14 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CPU_CONFIG(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_Z80PIO_ADD( "z80pio", KC85_3_CLOCK, kc85_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, KC85_3_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(kc_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kc_state, pio_porta_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(kc_state, pio_ardy_cb))
+	MCFG_Z80PIO_IN_PB_CB(READ8(kc_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(kc_state, pio_portb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(kc_state, pio_brdy_cb))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_3_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
@@ -189,7 +185,14 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_CPU_CONFIG(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_Z80PIO_ADD( "z80pio", KC85_4_CLOCK, kc85_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, KC85_4_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(kc_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kc_state, pio_porta_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(kc_state, pio_ardy_cb))
+	MCFG_Z80PIO_IN_PB_CB(READ8(kc_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(kc_state, pio_portb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(kc_state, pio_brdy_cb))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_4_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))

@@ -276,45 +276,6 @@ static Z80DMA_INTERFACE( p8k_dma_intf )
 	DEVCB_DRIVER_MEMBER(p8k_state, io_write_byte)
 };
 
-/* Z80 PIO 0 */
-
-static Z80PIO_INTERFACE( p8k_pio_0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 1 */
-
-static Z80PIO_INTERFACE( p8k_pio_1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 2 */
-
-static Z80PIO_INTERFACE( p8k_pio_2_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_INPUT_PORT("DSW"),    /* port a read */
-	DEVCB_NULL, /* port a write */
-	DEVCB_NULL, /* ready a */
-	DEVCB_NULL, /* port b read */
-	DEVCB_NULL, /* port b write */
-	DEVCB_NULL  /* ready b */
-};
-
 /* Z80 SIO 0 */
 
 WRITE16_MEMBER( p8k_state::pk8_sio_0_serial_transmit )
@@ -609,45 +570,6 @@ WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
 	// this must be studied a little bit more :-)
 }
 
-/* Z80 PIO 0 */
-
-static const z80pio_interface p8k_16_pio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 1 */
-
-static const z80pio_interface p8k_16_pio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 2 */
-
-static const z80pio_interface p8k_16_pio_2_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Z80 SIO 0 */
 
 WRITE16_MEMBER( p8k_state::pk8_16_sio_0_serial_transmit )
@@ -750,9 +672,17 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 
 	MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_sio_0_intf)   /* 9.6kBaud default */
 	MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_sio_1_intf)   /* 9.6kBaud default */
-	MCFG_Z80PIO_ADD("z80pio_0", 1229000, p8k_pio_0_intf)
-	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
-	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
+
+	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, 1229000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 1229000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, 1229000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(IOPORT("DSW"))
+
 	MCFG_I8272A_ADD("i8272", true)
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("z80dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
@@ -787,9 +717,15 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 
 	MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
 	MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
-	MCFG_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )
-	MCFG_Z80PIO_ADD("z80pio_1", XTAL_4MHz, p8k_16_pio_1_intf )
-	MCFG_Z80PIO_ADD("z80pio_2", XTAL_4MHz, p8k_16_pio_2_intf )
+
+	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+
+	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

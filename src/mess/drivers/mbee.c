@@ -739,7 +739,12 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
 
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_12MHz / 6, mbee_z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_12MHz / 6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mbee_state, pio_port_a_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mbee_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mbee_state, pio_port_b_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -783,7 +788,12 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
 
-	MCFG_Z80PIO_ADD( "z80pio", 3375000, mbee_z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mbee_state, pio_port_a_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mbee_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mbee_state, pio_port_b_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

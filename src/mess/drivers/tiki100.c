@@ -558,17 +558,6 @@ WRITE8_MEMBER( tiki100_state::pio_pb_w )
 	m_cassette->output(BIT(data, 6) ? -1 : 1);
 }
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_r),
-	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_w),
-	DEVCB_NULL
-};
-
 /* Z80-CTC Interface */
 
 TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
@@ -710,7 +699,13 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, dart_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/4, pio_intf)
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PB_CB(READ8(tiki100_state, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(tiki100_state, pio_pb_w))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

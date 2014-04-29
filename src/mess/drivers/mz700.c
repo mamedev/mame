@@ -406,7 +406,11 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_DEVICE_MODIFY("pit8253")
 	MCFG_PIT8253_CLK0(XTAL_17_73447MHz/16)
 
-	MCFG_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_17_73447MHz/5)
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(mz_state, mz800_z80pio_irq))
+	MCFG_Z80PIO_IN_PA_CB(READ8(mz_state, mz800_z80pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz_state, mz800_z80pio_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 

@@ -217,8 +217,14 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
-	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc1_z80pio1_intf )
-	MCFG_Z80PIO_ADD( "z80pio2", XTAL_3MHz, llc1_z80pio2_intf )
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port1_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(llc_state, llc1_port1_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc1_port1_b_w))
+
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_3MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port2_a_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc1_port2_b_r))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
 	// timer 0 irq does digit display, and timer 3 irq does scan of the
@@ -258,8 +264,13 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc2_z80pio1_intf )
-	MCFG_Z80PIO_ADD( "z80pio2", XTAL_3MHz, llc2_z80pio2_intf )
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
+	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
+	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc2_port1_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc2_port1_b_w))
+
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_3MHz)
+	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc2_port2_a_r))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
 

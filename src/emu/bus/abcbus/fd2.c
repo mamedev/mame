@@ -105,22 +105,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
-//-------------------------------------------------
-
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  z80_daisy_config daisy_chain
 //-------------------------------------------------
 
@@ -150,7 +134,8 @@ static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
 	MCFG_CPU_IO_MAP(abc_fd2_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz, pio_intf)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_4MHz)
+
 	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_4MHz/2)
 
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", abc_fd2_floppies, "525sssd", floppy_image_device::default_floppy_formats)
