@@ -1257,6 +1257,7 @@ void v810_device::device_start()
 	m_irq_line = 0;
 	m_irq_state = 0;
 	m_nmi_line = 0;
+	memset(m_reg, 0x00, sizeof(m_reg));
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_line));
