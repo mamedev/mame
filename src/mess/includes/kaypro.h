@@ -90,8 +90,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
-	required_device<z80dart_device> m_sio;
-	optional_device<z80dart_device> m_sio2x;
+	required_device<z80sio0_device> m_sio;
+	optional_device<z80sio0_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
