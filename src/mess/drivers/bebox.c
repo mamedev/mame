@@ -165,9 +165,19 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbdc", kbdc8042_device, write_out2))
 
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, bebox_dma8237_1_config )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(bebox_state, bebox_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(bebox_state, bebox_dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(bebox_state, bebox_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(bebox_state, bebox_dma_write_byte))
+	MCFG_I8237_IN_IOR_2_CB(READ8(bebox_state, bebox_dma8237_fdc_dack_r))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(bebox_state, bebox_dma8237_fdc_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(bebox_state, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(bebox_state, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(bebox_state, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(bebox_state, pc_dack3_w))
 
-	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, bebox_dma8237_2_config )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
 
 	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
 

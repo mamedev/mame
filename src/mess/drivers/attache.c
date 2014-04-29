@@ -871,17 +871,6 @@ static const ay8910_interface ay8912_interface =
 	DEVCB_NULL                  /* portB write */
 };
 
-static const am9517a_interface dma_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
-	DEVCB_DRIVER_LINE_MEMBER(attache_state,eop_w),  // out_eop_cb
-	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_r),  // in_memr_cb
-	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_w),  // out_memw_cb
-	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // in_ior_cb[4]
-	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // out_iow_cb[4]
-	{DEVCB_NULL,/*DEVCB_DRIVER_LINE_MEMBER(attache_state,fdc_dack_w),*/ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}   // out_dack_cb[4]
-};
-
 // IRQ daisy chain = CTC -> SIO -> Expansion
 static const z80_daisy_config attache_daisy_chain[] =
 {
@@ -985,7 +974,14 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_AM9517A_ADD("dma",XTAL_8MHz / 4, dma_interface)
+	MCFG_DEVICE_ADD("dma", AM9517A, XTAL_8MHz / 4)
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(attache_state, hreq_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(attache_state, eop_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(attache_state, dma_mem_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(attache_state, dma_mem_w))
+	MCFG_AM9517A_IN_IOR_0_CB(READ8(attache_state, fdc_dma_r))
+	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(attache_state, fdc_dma_w))
+	// MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(attache_state, fdc_dack_w))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))

@@ -345,18 +345,6 @@ WRITE_LINE_MEMBER( mm1_state::dack3_w )
 	update_tc();
 }
 
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_hrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_eop_w),
-	DEVCB_DRIVER_MEMBER(mm1_state, read),
-	DEVCB_DRIVER_MEMBER(mm1_state, write),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_r) },
-	{ DEVCB_DEVICE_MEMBER(I8275_TAG, i8275x_device, dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
-};
-
-
 WRITE_LINE_MEMBER( mm1_state::itxc_w )
 {
 	if (!m_intc)
@@ -479,7 +467,17 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_I8212_IRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
 	MCFG_I8212_DI_CALLBACK(DEVREAD8(KB_TAG, mm1_keyboard_t, read))
 
-	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, dmac_intf)
+	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, XTAL_6_144MHz/2)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(mm1_state, dma_hrq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(mm1_state, dma_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(mm1_state, read))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(mm1_state, write))
+	MCFG_I8237_IN_IOR_2_CB(READ8(mm1_state, mpsc_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(DEVREAD8(UPD765_TAG, upd765_family_device, mdma_r))
+	MCFG_I8237_OUT_IOW_0_CB(DEVWRITE8(I8275_TAG, i8275x_device, dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(mm1_state, mpsc_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8(UPD765_TAG, upd765_family_device, mdma_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(mm1_state, dack3_w))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_6_144MHz/2/2)

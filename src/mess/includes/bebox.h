@@ -119,8 +119,6 @@ protected:
 
 /*----------- defined in machine/bebox.c -----------*/
 
-extern const am9517a_interface bebox_dma8237_1_config;
-extern const am9517a_interface bebox_dma8237_2_config;
 extern const ins8250_interface bebox_uart_inteface_0;
 extern const ins8250_interface bebox_uart_inteface_1;
 extern const ins8250_interface bebox_uart_inteface_2;

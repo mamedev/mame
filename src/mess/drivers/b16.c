@@ -283,17 +283,6 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-static I8237_INTERFACE( b16_dma8237_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b16_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(b16_state, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
 
 static MACHINE_CONFIG_START( b16, b16_state )
 	/* basic machine hardware */
@@ -312,7 +301,9 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_I8237_ADD("8237dma", XTAL_14_31818MHz/2, b16_dma8237_interface)
+	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL_14_31818MHz/2)
+	MCFG_I8237_IN_MEMR_CB(READ8(b16_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(b16_state, memory_write_byte))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", b16)
 	MCFG_PALETTE_ADD("palette", 8)

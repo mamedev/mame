@@ -101,31 +101,6 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 	{ NULL }
 };
 
-
-//-------------------------------------------------
-//  I8237_INTERFACE( dmac_intf )
-//-------------------------------------------------
-
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL, },
-	{ DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL, },
-	{ DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL }
-};
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_rtc )
 //-------------------------------------------------
@@ -136,7 +111,7 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_rtc )
 	MCFG_CPU_PROGRAM_MAP(wangpc_rtc_mem)
 	MCFG_CPU_IO_MAP(wangpc_rtc_io)
 
-	MCFG_I8237_ADD(AM9517A_TAG, 2000000, dmac_intf)
+	MCFG_DEVICE_ADD(AM9517A_TAG, AM9517A, 2000000)
 
 	MCFG_DEVICE_ADD(Z80CTC_0_TAG, Z80CTC, 2000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

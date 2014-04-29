@@ -395,17 +395,6 @@ WRITE8_MEMBER(qx10_state::memory_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-static I8237_INTERFACE( qx10_dma8237_1_interface )
-{
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state,dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
-	DEVCB_DRIVER_MEMBER(qx10_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(qx10_state, memory_write_byte),
-	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_MEMBER("upd7220", upd7220_device, dack_r)*/ DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_MEMBER("upd7220", upd7220_device, dack_w)*/ DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
 /*
     8237 DMA (Slave)
     Channel 1: Option slots #1
@@ -413,16 +402,6 @@ static I8237_INTERFACE( qx10_dma8237_1_interface )
     Channel 3: Option slots #3
     Channel 4: Option slots #4
 */
-static I8237_INTERFACE( qx10_dma8237_2_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
 
 /*
     MC146818
@@ -806,8 +785,18 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(qx10_state, keyboard_irq))
 
-	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
-	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
+	MCFG_DEVICE_ADD("8237dma_1", AM9517A, MAIN_CLK/4)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(qx10_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(qx10_state, tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(qx10_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(qx10_state, memory_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(qx10_state, fdc_dma_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(qx10_state, gdc_dack_r))
+	//MCFG_I8237_IN_IOR_2_CB(DEVREAD8("upd7220", upd7220_device, dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(qx10_state, fdc_dma_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(qx10_state, gdc_dack_w))
+	//MCFG_I8237_OUT_IOW_2_CB(DEVWRITE8("upd7220", upd7220_device, dack_w))
+	MCFG_DEVICE_ADD("8237dma_2", AM9517A, MAIN_CLK/4)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 

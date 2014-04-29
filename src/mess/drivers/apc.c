@@ -896,16 +896,6 @@ CH1: FDC
 CH2: ("reserved for future graphics expansion")
 CH3: AUX
 */
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_tc_w),
-	DEVCB_DRIVER_MEMBER(apc_state, apc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(apc_state, apc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,fdc_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,fdc_w), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack3_w) }
-};
 
 static const floppy_format_type apc_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
@@ -944,7 +934,17 @@ static MACHINE_CONFIG_START( apc, apc_state )
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(apc_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: check ir7_w
-	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
+	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apc_state, apc_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(apc_state, apc_tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(apc_state, apc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(apc_state, apc_dma_write_byte))
+	MCFG_I8237_IN_IOR_1_CB(READ8(apc_state, fdc_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(apc_state, fdc_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(apc_state, apc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(apc_state, apc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apc_state, apc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apc_state, apc_dack3_w))
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)

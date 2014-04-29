@@ -154,32 +154,6 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack1_w ) { pc_select_dma_channel(1, st
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
 
-I8237_INTERFACE( pc_dma8237_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_hrq_changed),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_out_eop),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_read_byte),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_write_byte),
-
-	{ DEVCB_NULL,
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_r) },
-
-
-	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_0_dack_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_w) },
-
-	// DACK's
-	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack0_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack1_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack2_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack3_w) }
-};
-
-
 /*************************************************************
  *
  * pic8259 configuration
@@ -432,8 +406,23 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
 
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, pc_dma8237_config )
-
+	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(ibm5160_mb_device, pc_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(ibm5160_mb_device, pc_dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(ibm5160_mb_device, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(ibm5160_mb_device, pc_dma_write_byte))
+	MCFG_I8237_IN_IOR_1_CB(READ8(ibm5160_mb_device, pc_dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(ibm5160_mb_device, pc_dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(ibm5160_mb_device, pc_dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(ibm5160_mb_device, pc_dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(ibm5160_mb_device, pc_dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(ibm5160_mb_device, pc_dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ibm5160_mb_device, pc_dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(ibm5160_mb_device, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(ibm5160_mb_device, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(ibm5160_mb_device, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ibm5160_mb_device, pc_dack3_w))
+	
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NULL )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)

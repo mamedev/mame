@@ -3136,35 +3136,11 @@ WRITE8_MEMBER(pc9801_state::fdc_2dd_w)
 	m_fdc_2dd->dma_w(data);
 }
 
-
-/* TODO: check channels 0 - 1 */
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_tc_w),
-	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_r), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2dd_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_w), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2dd_w) },
-	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
-};
-
-
 /*
 ch1 cs-4231a
 ch2 FDC
 ch3 SCSI
 */
-static I8237_INTERFACE( pc9801rs_dmac_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_tc_w),
-	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_r), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_w), DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
-};
 
 /****************************************
 *
@@ -3588,7 +3564,19 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
 
-	MCFG_I8237_ADD("i8237", 5000000, dmac_intf) // unknown clock
+	MCFG_DEVICE_ADD("i8237", AM9517A, 5000000) // unknown clock, TODO: check channels 0 - 1
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc9801_state, pc9801_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc9801_state, pc9801_tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(pc9801_state, pc9801_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pc9801_state, pc9801_dma_write_byte))
+	MCFG_I8237_IN_IOR_2_CB(READ8(pc9801_state, fdc_2hd_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(pc9801_state, fdc_2dd_r))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pc9801_state, fdc_2hd_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(pc9801_state, fdc_2dd_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pc9801_state, pc9801_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc9801_state, pc9801_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc9801_state, pc9801_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc9801_state, pc9801_dack3_w))
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
 
@@ -3689,7 +3677,17 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
 
-	MCFG_I8237_ADD("i8237", MAIN_CLOCK_X1*8, pc9801rs_dmac_intf) // unknown clock
+	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK_X1*8) // unknown clock
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc9801_state, pc9801_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc9801_state, pc9801_tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(pc9801_state, pc9801_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pc9801_state, pc9801_dma_write_byte))
+	MCFG_I8237_IN_IOR_2_CB(READ8(pc9801_state, fdc_2hd_r))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pc9801_state, fdc_2hd_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pc9801_state, pc9801_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc9801_state, pc9801_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc9801_state, pc9801_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc9801_state, pc9801_dack3_w))
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
 
@@ -3767,7 +3765,7 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_80286_A20(pc9801_state, pc9801_286_a20)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
-//  MCFG_I8237_REPLACE("i8237", 10000000, pc9801rs_dmac_intf) // unknown clock
+//  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
@@ -3797,7 +3795,17 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_PIT8253_CLK2(MAIN_CLOCK_X2) /* RS-232c */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
 
-	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
+	MCFG_DEVICE_ADD("i8237", AM9517A, 16000000) // unknown clock
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc9801_state, pc9801_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc9801_state, pc9801_tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(pc9801_state, pc9801_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pc9801_state, pc9801_dma_write_byte))
+	MCFG_I8237_IN_IOR_2_CB(READ8(pc9801_state, fdc_2hd_r))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pc9801_state, fdc_2hd_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pc9801_state, pc9801_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc9801_state, pc9801_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc9801_state, pc9801_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc9801_state, pc9801_dack3_w))
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
 

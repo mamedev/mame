@@ -10,29 +10,6 @@
 #include "bus/pc_kbd/keyboards.h"
 
 
-I8237_INTERFACE( at_dma8237_1_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER("dma8237_2",am9517a_device,dreq0_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_dma8237_out_eop),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_read_byte),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_write_byte),
-	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_0_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_1_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_2_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_3_dack_r) },
-	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_0_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_1_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_2_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_3_dack_w) },
-	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack0_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack1_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack2_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack3_w) }
-};
-
-
-I8237_INTERFACE( at_dma8237_2_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_read_word),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_write_word),
-	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_5_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_6_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_7_dack_r) },
-	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_5_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_6_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma8237_7_dack_w) },
-	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack4_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack5_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack6_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack7_w) }
-};
-
 static SLOT_INTERFACE_START(pc_isa_onboard)
 	SLOT_INTERFACE("comat", ISA8_COM_AT)
 	SLOT_INTERFACE("lpt", ISA8_LPT)
@@ -48,8 +25,38 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(southbridge_device, at_pit8254_out2_changed))
 
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
-	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(southbridge_device, at_dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(southbridge_device, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(southbridge_device, pc_dma_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(southbridge_device, pc_dma8237_0_dack_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(southbridge_device, pc_dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(southbridge_device, pc_dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(southbridge_device, pc_dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(southbridge_device, pc_dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(southbridge_device, pc_dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(southbridge_device, pc_dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(southbridge_device, pc_dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(southbridge_device, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(southbridge_device, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(southbridge_device, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(southbridge_device, pc_dack3_w))
+
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(southbridge_device, pc_dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(southbridge_device, pc_dma_read_word))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(southbridge_device, pc_dma_write_word))
+	MCFG_I8237_IN_IOR_1_CB(READ8(southbridge_device, pc_dma8237_5_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(southbridge_device, pc_dma8237_6_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(southbridge_device, pc_dma8237_7_dack_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(southbridge_device, pc_dma8237_5_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(southbridge_device, pc_dma8237_6_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(southbridge_device, pc_dma8237_7_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(southbridge_device, pc_dack4_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(southbridge_device, pc_dack5_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(southbridge_device, pc_dack6_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(southbridge_device, pc_dack7_w))
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(":maincpu", 0), VCC, READ8(southbridge_device, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )

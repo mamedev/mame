@@ -312,18 +312,6 @@ WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 	space.write_byte(offset, data);
 }
 
-static I8237_INTERFACE( paso1600_dma8237_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(paso1600_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(paso1600_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-
 static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
@@ -347,7 +335,9 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NULL )
-	MCFG_I8237_ADD("8237dma", 16000000/4, paso1600_dma8237_interface)
+	MCFG_DEVICE_ADD("8237dma", AM9517A, 16000000/4)
+	MCFG_I8237_IN_MEMR_CB(READ8(paso1600_state, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(paso1600_state, pc_dma_write_byte))
 MACHINE_CONFIG_END
 
 ROM_START( paso1600 )

@@ -422,22 +422,6 @@ INPUT_PORTS_END
 */
 
 //-------------------------------------------------
-//  I8237_INTERFACE( dmac_intf )
-//-------------------------------------------------
-
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_w), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-
-//-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
@@ -554,7 +538,10 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
-	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
+	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 250000)
+	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
+	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_t, data_r))
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_t, data_w))
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 
 	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
