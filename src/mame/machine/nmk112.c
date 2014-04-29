@@ -20,6 +20,8 @@ const device_type NMK112 = &device_creator<nmk112_device>;
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NMK112, "NMK112", tag, owner, clock, "nmk112", __FILE__),
 		m_page_mask(0xff),
+		m_tag0(NULL),
+		m_tag1(NULL),
 		m_rom0(NULL),
 		m_rom1(NULL),
 		m_size0(0),
@@ -98,14 +100,6 @@ WRITE8_MEMBER( nmk112_device::okibank_w )
 {
 	if (m_current_bank[offset] != data)
 		do_bankswitch(offset, data);
-}
-
-WRITE16_MEMBER( nmk112_device::okibank_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		okibank_w(space, offset, data & 0xff);
-	}
 }
 
 void nmk112_device::postload_bankswitch()

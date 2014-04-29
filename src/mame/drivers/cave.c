@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_SHARE("paletteram.0")      // Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)                 // M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)                 //
-	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)                             //
+	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)                       //
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                                                        // Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                                        // Inputs + EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(cave_eeprom_msb_w)                                    // EEPROM

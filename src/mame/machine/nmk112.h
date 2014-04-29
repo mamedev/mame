@@ -23,7 +23,6 @@ public:
 	static void set_page_mask(device_t &device, UINT8 mask) { downcast<nmk112_device &>(device).m_page_mask = ~mask; }
 	
 	DECLARE_WRITE8_MEMBER( okibank_w );
-	DECLARE_WRITE16_MEMBER( okibank_lsb_w );
 
 protected:
 	// device-level overrides
