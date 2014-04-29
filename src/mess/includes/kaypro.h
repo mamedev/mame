@@ -2,7 +2,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/com8116.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/snapquik.h"
@@ -90,8 +90,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
-	required_device<z80sio_device> m_sio;
-	optional_device<z80sio_device> m_sio2x;
+	required_device<z80dart_device> m_sio;
+	optional_device<z80dart_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -111,10 +111,6 @@ void kay_kbd_d_w( running_machine &machine, UINT8 data );
 
 INPUT_PORTS_EXTERN( kay_kbd );
 
-
-/*----------- defined in machine/kaypro.c -----------*/
-
-extern const z80sio_interface kaypro_sio_intf;
 
 /*----------- defined in video/kaypro.c -----------*/
 
