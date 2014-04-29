@@ -359,17 +359,6 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
 	prog_space.write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dk3_dma )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(dkong_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(dkong_state, memory_write_byte),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /*************************************
  *
  *  VBLANK and IRQ generation
@@ -1702,11 +1691,14 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(dkong3_map)
 	MCFG_CPU_IO_MAP(dkong3_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, vblank_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong3)
+	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
-	MCFG_Z80DMA_ADD("z80dma", CLOCK_1H, dk3_dma)
+	MCFG_DEVICE_ADD("z80dma", Z80DMA, CLOCK_1H)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(dkong_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(dkong_state, memory_write_byte))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

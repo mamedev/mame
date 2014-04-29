@@ -672,7 +672,7 @@ static MC6845_INTERFACE( super80v_crtc )
 };
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( super80_state::busreq_w )
@@ -706,19 +706,6 @@ WRITE8_MEMBER(super80_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
 }
-
-// busack on cpu connects to bai pin
-static Z80DMA_INTERFACE( dma_intf )
-{
-	//DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), //busreq - connects to busreq on cpu
-	DEVCB_DRIVER_LINE_MEMBER(super80_state, busreq_w), //busreq - connects to busreq on cpu
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //int/pulse - connects to IRQ0 on cpu
-	DEVCB_NULL, //ba0 - not connected
-	DEVCB_DRIVER_MEMBER(super80_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(super80_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(super80_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(super80_state, io_write_byte),
-};
 
 static SLOT_INTERFACE_START( super80_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -858,7 +845,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80r_io)
-	MCFG_Z80DMA_ADD("dma", MASTER_CLOCK/6, dma_intf)
+
+	MCFG_DEVICE_ADD("dma", Z80DMA, MASTER_CLOCK/6)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(super80_state, busreq_w))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//ba0 - not connected
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(super80_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(super80_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(super80_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(super80_state, io_write_byte))
+
 	MCFG_WD2793x_ADD("fdc", XTAL_2MHz)
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

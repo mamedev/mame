@@ -69,52 +69,6 @@ WRITE8_MEMBER( onyx_state::kbd_put )
 }
 
 #if 0
-
-/* Z80 DMA */
-
-WRITE_LINE_MEMBER( onyx_state::p8k_dma_irq_w )
-{
-	i8272a_device *i8272 = machine().device<i8272a_device>("i8272");
-	i8272->tc_w(state);
-
-	p8k_daisy_interrupt(state);
-}
-
-READ8_MEMBER(onyx_state::memory_read_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
-}
-
-WRITE8_MEMBER(onyx_state::memory_write_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
-}
-
-READ8_MEMBER(onyx_state::io_read_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.read_byte(offset);
-}
-
-WRITE8_MEMBER(onyx_state::io_write_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
-}
-
-static Z80DMA_INTERFACE( p8k_dma_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_dma_irq_w),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(onyx_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(onyx_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(onyx_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(onyx_state, io_write_byte)
-};
-
 /* Z80 SIO 0 */
 
 WRITE16_MEMBER( onyx_state::pk8_sio_0_serial_transmit )

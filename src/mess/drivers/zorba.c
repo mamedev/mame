@@ -173,7 +173,7 @@ DRIVER_INIT_MEMBER( zorba_state, zorba )
 }
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( zorba_state::busreq_w )
@@ -216,18 +216,6 @@ WRITE8_MEMBER(zorba_state::io_write_byte)
 	}
 }
 
-// busack on cpu connects to bai pin
-static Z80DMA_INTERFACE( dma_intf )
-{
-	//DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), //busreq - connects to busreq on cpu
-	DEVCB_DRIVER_LINE_MEMBER(zorba_state, busreq_w), //busreq - connects to busreq on cpu
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //int/pulse - connects to IRQ0 on cpu
-	DEVCB_NULL, //ba0 - not connected
-	DEVCB_DRIVER_MEMBER(zorba_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(zorba_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(zorba_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(zorba_state, io_write_byte),
-};
 
 static SLOT_INTERFACE_START( zorba_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -365,8 +353,16 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* Devices */
-	MCFG_Z80DMA_ADD("dma", XTAL_24MHz/6, dma_intf)
+	/* devices */
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_24MHz/6)
+	// busack on cpu connects to bai pin
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(zorba_state, busreq_w))	 //connects to busreq on cpu
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))	// connects to IRQ0 on cpu
+	//ba0 - not connected
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(zorba_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(zorba_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(zorba_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(zorba_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("uart0", I8251, 0)
 	// COM port

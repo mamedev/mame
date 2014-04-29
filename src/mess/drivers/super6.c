@@ -384,7 +384,7 @@ static Z80DART_INTERFACE( dart_intf )
 
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 READ8_MEMBER(super6_state::memory_read_byte)
@@ -410,17 +410,6 @@ WRITE8_MEMBER(super6_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
 }
-
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(super6_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(super6_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(super6_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(super6_state, io_write_byte),
-};
 
 //-------------------------------------------------
 //  COM8116_INTERFACE( brg_intf )
@@ -534,7 +523,13 @@ static MACHINE_CONFIG_START( super6, super6_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(XTAL_24MHz/16))
 
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_24MHz/6)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(super6_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(super6_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(super6_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(super6_state, io_write_byte))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_24MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

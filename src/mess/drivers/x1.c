@@ -1909,17 +1909,6 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( x1_dma )
-{
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(x1_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(x1_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(x1_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(x1_state, io_write_byte)
-};
-
 /*************************************
  *
  *  Inputs
@@ -2544,9 +2533,9 @@ static MACHINE_CONFIG_START( x1, x1_state )
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
@@ -2614,7 +2603,14 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
 	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , sio_intf )
-	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
+
+	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("x1_cpu", INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(x1_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(x1_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(x1_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(x1_state, io_write_byte))
 
 	MCFG_DEVICE_REMOVE("fdc")
 	MCFG_MB8877_ADD("fdc",x1turbo_mb8877a_interface)

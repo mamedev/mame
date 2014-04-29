@@ -512,7 +512,7 @@ WRITE8_MEMBER( trs80m2_state::kbd_w )
 }
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 READ8_MEMBER(trs80m2_state::io_read_byte)
@@ -526,18 +526,6 @@ WRITE8_MEMBER(trs80m2_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
 }
-
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(trs80m2_state, read),
-	DEVCB_DRIVER_MEMBER(trs80m2_state, write),
-	DEVCB_DRIVER_MEMBER(trs80m2_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(trs80m2_state, io_write_byte),
-};
-
 
 //-------------------------------------------------
 //  Z80PIO
@@ -793,7 +781,13 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_8MHz/2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(trs80m2_state, read))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(trs80m2_state, write))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(trs80m2_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(trs80m2_state, io_write_byte))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -871,7 +865,13 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_8MHz/2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(trs80m2_state, read))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(trs80m2_state, write))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(trs80m2_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(trs80m2_state, io_write_byte))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

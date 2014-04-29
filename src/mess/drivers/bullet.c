@@ -773,7 +773,7 @@ static Z80DART_INTERFACE( dart_intf )
 
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 void bullet_state::update_dma_rdy()
@@ -842,20 +842,8 @@ WRITE8_MEMBER(bullet_state::io_write_byte)
 	m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bullet_state, dma_mreq_r),
-	DEVCB_DRIVER_MEMBER(bullet_state, dma_mreq_w),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_write_byte)
-};
-
-
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( bulletf_dma_intf )
+//  Z80DMA for bulletf (not used currently)
 //-------------------------------------------------
 
 void bulletf_state::update_dma_rdy()
@@ -883,20 +871,6 @@ WRITE8_MEMBER( bulletf_state::dma_mreq_w )
 {
 	m_ram->pointer()[(DMB6 << 16) | offset] = data;
 }
-
-#if 0
-static Z80DMA_INTERFACE( bulletf_dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bulletf_state, dma_mreq_r),
-	DEVCB_DRIVER_MEMBER(bulletf_state, dma_mreq_w),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_write_byte)
-};
-#endif
-
 
 //-------------------------------------------------
 //  Z80PIO
@@ -1168,7 +1142,14 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
 
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_16MHz/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(bullet_state, dma_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bullet_state, dma_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(bullet_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bullet_state, io_write_byte))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_16MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -1232,7 +1213,14 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
 
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_16MHz/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(bullet_state, dma_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bullet_state, dma_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(bullet_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bullet_state, io_write_byte))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_16MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

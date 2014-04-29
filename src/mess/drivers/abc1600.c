@@ -510,7 +510,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma0_intf )
+//  Z80DMA 0
 //-------------------------------------------------
 
 void abc1600_state::update_drdy0()
@@ -534,20 +534,8 @@ WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state && m_dmadis);
 }
 
-static Z80DMA_INTERFACE( dma0_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_1_TAG, z80dma_device, bai_w),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_r),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_w),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_r),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_w)
-};
-
-
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma1_intf )
+//  Z80DMA 1
 //-------------------------------------------------
 
 void abc1600_state::update_drdy1()
@@ -564,20 +552,8 @@ void abc1600_state::update_drdy1()
 	}
 }
 
-static Z80DMA_INTERFACE( dma1_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, bai_w),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_r),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_w),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_r),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_w)
-};
-
-
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma2_intf )
+//  Z80DMA 2
 //-------------------------------------------------
 
 void abc1600_state::update_drdy2()
@@ -585,18 +561,6 @@ void abc1600_state::update_drdy2()
 	// Winchester
 	m_dma2->rdy_w(1);
 }
-
-static Z80DMA_INTERFACE( dma2_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_r),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_w),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_r),
-	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_w)
-};
-
 
 //-------------------------------------------------
 //  Z80DART_INTERFACE( dart_intf )
@@ -916,12 +880,35 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 
 	// devices
 	MCFG_ABC1600_MAC_ADD(MC68008P8_TAG, mac_mem)
-	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, XTAL_64MHz/16, dma0_intf)
-	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, XTAL_64MHz/16, dma1_intf)
-	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
+
+	MCFG_DEVICE_ADD(Z8410AB1_0_TAG, Z80DMA, XTAL_64MHz/16)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(abc1600_state, dbrq_w))
+	MCFG_Z80DMA_OUT_BAO_CB(DEVWRITELINE(Z8410AB1_1_TAG, z80dma_device, bai_w))
+	MCFG_Z80DMA_IN_MREQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_r))
+	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_w))
+
+	MCFG_DEVICE_ADD(Z8410AB1_1_TAG, Z80DMA, XTAL_64MHz/16)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(abc1600_state, dbrq_w))
+	MCFG_Z80DMA_OUT_BAO_CB(DEVWRITELINE(Z8410AB1_2_TAG, z80dma_device, bai_w))
+	MCFG_Z80DMA_IN_MREQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_r))
+	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_w))
+
+	MCFG_DEVICE_ADD(Z8410AB1_2_TAG, Z80DMA, XTAL_64MHz/16)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(abc1600_state, dbrq_w))
+	MCFG_Z80DMA_IN_MREQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_r))
+	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_w))
+
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
+
 	MCFG_DEVICE_ADD(Z8530B1_TAG, SCC8530, XTAL_64MHz/16)
 	MCFG_Z8530_INTRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))
+
 	MCFG_DEVICE_ADD(Z8536B1_TAG, Z8536, XTAL_64MHz/16)
 	MCFG_Z8536_IRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_2))
 	MCFG_Z8536_PA_IN_CALLBACK(READ8(abc1600_state, cio_pa_r))

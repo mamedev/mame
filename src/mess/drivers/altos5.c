@@ -245,17 +245,6 @@ WRITE_LINE_MEMBER( altos5_state::busreq_w )
 	setup_banks(state); // adjust banking for dma or cpu
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(altos5_state, busreq_w),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // BAO, not used
-	DEVCB_DRIVER_MEMBER(altos5_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(altos5_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(altos5_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(altos5_state, io_write_byte)
-};
-
 // baud rate generator and RTC. All inputs are 2MHz.
 TIMER_DEVICE_CALLBACK_MEMBER(altos5_state::ctc_tick)
 {
@@ -446,8 +435,15 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_CPU_IO_MAP(altos5_io)
 	MCFG_CPU_CONFIG(daisy_chain_intf)
 
-	/* Devices */
-	MCFG_Z80DMA_ADD( "z80dma",   XTAL_8MHz / 2, dma_intf)
+	/* devices */
+	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_8MHz / 2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(altos5_state, busreq_w))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	// BAO, not used
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(altos5_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(altos5_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(altos5_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(altos5_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

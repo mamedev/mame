@@ -135,18 +135,6 @@ WRITE8_MEMBER( ts802_state::io_write_byte )
 	m_io->write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), // BUSRQ?
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ts802_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(ts802_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(ts802_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(ts802_state, io_write_byte),
-
-};
-
 static Z80DART_INTERFACE( dart0_intf )
 {
 	0, 0, 0, 0,
@@ -250,7 +238,15 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	/* Devices */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ts802_state, kbd_put))
-	MCFG_Z80DMA_ADD("z80dma", XTAL_16MHz / 4, dma_intf)
+
+	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_16MHz / 4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(ts802_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(ts802_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(ts802_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(ts802_state, io_write_byte))
+
 	MCFG_Z80DART_ADD("z80dart1", XTAL_16MHz / 4, dart0_intf )
 	MCFG_Z80DART_ADD("z80dart2", XTAL_16MHz / 4, dart1_intf )
 

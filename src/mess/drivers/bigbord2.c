@@ -240,18 +240,6 @@ WRITE8_MEMBER(bigbord2_state::io_write_byte)
 	m_io->write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT), // actually BUSRQ
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bigbord2_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(bigbord2_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(bigbord2_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(bigbord2_state, io_write_byte),
-
-};
-
 
 /* Read/Write Handlers */
 
@@ -617,7 +605,14 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bigbord2_state, ctc_tick, attotime::from_hz(MAIN_CLOCK))
 
 	/* devices */
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, MAIN_CLOCK, dma_intf)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, MAIN_CLOCK)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(bigbord2_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bigbord2_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(bigbord2_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bigbord2_state, io_write_byte))
+
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, MAIN_CLOCK, sio_intf)
 
 	MCFG_DEVICE_ADD(Z80CTCA_TAG, Z80CTC, MAIN_CLOCK)

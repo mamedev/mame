@@ -265,17 +265,6 @@ WRITE8_MEMBER(p8k_state::io_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( p8k_dma_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_dma_irq_w),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(p8k_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(p8k_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(p8k_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(p8k_state, io_write_byte)
-};
-
 /* Z80 SIO 0 */
 
 WRITE16_MEMBER( p8k_state::pk8_sio_0_serial_transmit )
@@ -656,7 +645,13 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
 
 	/* peripheral hardware */
-	MCFG_Z80DMA_ADD("z80dma", XTAL_4MHz, p8k_dma_intf)
+	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_4MHz)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(p8k_state, p8k_dma_irq_w))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(p8k_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(p8k_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(p8k_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(p8k_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, 1229000)    /* 1.22MHz clock */
 	// to implement: callbacks!

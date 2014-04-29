@@ -40,13 +40,26 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_Z80DMA_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, Z80DMA, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_Z80DMA_OUT_BUSREQ_CB(_devcb) \
+	devcb = &z80dma_device::set_out_busreq_callback(*device, DEVCB2_##_devcb);
 
-#define Z80DMA_INTERFACE(_name) \
-	const z80dma_interface (_name) =
+#define MCFG_Z80DMA_OUT_INT_CB(_devcb) \
+	devcb = &z80dma_device::set_out_int_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_Z80DMA_OUT_BAO_CB(_devcb) \
+	devcb = &z80dma_device::set_out_bao_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DMA_IN_MREQ_CB(_devcb) \
+	devcb = &z80dma_device::set_in_mreq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DMA_OUT_MREQ_CB(_devcb) \
+	devcb = &z80dma_device::set_out_mreq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DMA_IN_IORQ_CB(_devcb) \
+	devcb = &z80dma_device::set_in_iorq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DMA_OUT_IORQ_CB(_devcb) \
+	devcb = &z80dma_device::set_out_iorq_callback(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
@@ -54,35 +67,23 @@
 //**************************************************************************
 
 
-// ======================> z80dma_interface
-
-struct z80dma_interface
-{
-	devcb_write_line    m_out_busreq_cb;
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_bao_cb;
-
-	// memory accessors
-	devcb_read8         m_in_mreq_cb;
-	devcb_write8        m_out_mreq_cb;
-
-	// I/O accessors
-	devcb_read8         m_in_iorq_cb;
-	devcb_write8        m_out_iorq_cb;
-};
-
-
-
 // ======================> z80dma_device
 
 class z80dma_device :   public device_t,
-						public device_z80daisy_interface,
-						public z80dma_interface
+						public device_z80daisy_interface
 {
 public:
 	// construction/destruction
 	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_out_busreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_busreq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_bao_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_bao_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_mreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_in_mreq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_mreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_mreq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_iorq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_in_iorq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_iorq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_iorq_cb.set_callback(object); }
+	
 	UINT8 read();
 	void write(UINT8 data);
 	DECLARE_READ8_MEMBER( read ) { return read(); }
@@ -94,7 +95,6 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -121,13 +121,13 @@ private:
 	void rdy_write_callback(int state);
 
 	// internal state
-	devcb_resolved_write_line   m_out_busreq_func;
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_bao_func;
-	devcb_resolved_read8        m_in_mreq_func;
-	devcb_resolved_write8       m_out_mreq_func;
-	devcb_resolved_read8        m_in_iorq_func;
-	devcb_resolved_write8       m_out_iorq_func;
+	devcb2_write_line   m_out_busreq_cb;
+	devcb2_write_line   m_out_int_cb;
+	devcb2_write_line   m_out_bao_cb;
+	devcb2_read8        m_in_mreq_cb;
+	devcb2_write8       m_out_mreq_cb;
+	devcb2_read8        m_in_iorq_cb;
+	devcb2_write8       m_out_iorq_cb;
 
 	emu_timer *m_timer;
 
