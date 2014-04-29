@@ -181,14 +181,6 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-static MOS6530_INTERFACE( mk2_mos6530_interface )
-{
-	DEVCB_DRIVER_MEMBER(mk2_state, mk2_read_a),
-	DEVCB_DRIVER_MEMBER(mk2_state, mk2_write_a),
-	DEVCB_DRIVER_MEMBER(mk2_state, mk2_read_b),
-	DEVCB_DRIVER_MEMBER(mk2_state, mk2_write_b)
-};
-
 
 static MACHINE_CONFIG_START( mk2, mk2_state )
 	/* basic machine hardware */
@@ -196,11 +188,14 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 	MCFG_CPU_PROGRAM_MAP(mk2_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk2)
 
-	MCFG_MOS6530_ADD( "miot", 1000000, mk2_mos6530_interface )
+	MCFG_DEVICE_ADD("miot", MOS6530, 1000000)
+	MCFG_MOS6530_IN_PA_CB(READ8(mk2_state, mk2_read_a))
+	MCFG_MOS6530_OUT_PA_CB(WRITE8(mk2_state, mk2_write_a))
+	MCFG_MOS6530_IN_PB_CB(READ8(mk2_state, mk2_read_b))
+	MCFG_MOS6530_OUT_PB_CB(WRITE8(mk2_state, mk2_write_b))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

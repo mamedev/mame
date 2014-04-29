@@ -39,31 +39,12 @@ enum
 const device_type MOS6530 = &device_creator<mos6530_device>;
 
 mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6530, "MOS6530", tag, owner, clock, "mos6530", __FILE__)
+	: device_t(mconfig, MOS6530, "MOS6530", tag, owner, clock, "mos6530", __FILE__),
+		m_in_pa_cb(*this),
+		m_out_pa_cb(*this),
+		m_in_pb_cb(*this),
+		m_out_pb_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos6530_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mos6530_interface *intf = reinterpret_cast<const mos6530_interface *>(static_config());
-	if (intf != NULL)
-			*static_cast<mos6530_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -76,21 +57,21 @@ void mos6530_device::device_start()
 	m_clock = clock();
 
 	/* resolve callbacks */
-	m_port[0].in_port_func.resolve(m_in_pa_cb, *this);
-	m_port[1].in_port_func.resolve(m_in_pb_cb, *this);
-	m_port[0].out_port_func.resolve(m_out_pa_cb, *this);
-	m_port[1].out_port_func.resolve(m_out_pb_cb, *this);
+	m_in_pa_cb.resolve_safe(0);
+	m_out_pa_cb.resolve_safe();
+	m_in_pb_cb.resolve_safe(0);
+	m_out_pb_cb.resolve_safe();
 
 	/* allocate timers */
 	m_timer = timer_alloc(TIMER_END_CALLBACK);
 
 	/* register for save states */
-	save_item(NAME(m_port[0].in));
-	save_item(NAME(m_port[0].out));
-	save_item(NAME(m_port[0].ddr));
-	save_item(NAME(m_port[1].in));
-	save_item(NAME(m_port[1].out));
-	save_item(NAME(m_port[1].ddr));
+	save_item(NAME(m_port[0].m_in));
+	save_item(NAME(m_port[0].m_out));
+	save_item(NAME(m_port[0].m_ddr));
+	save_item(NAME(m_port[1].m_in));
+	save_item(NAME(m_port[1].m_out));
+	save_item(NAME(m_port[1].m_ddr));
 
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_irqenable));
@@ -106,10 +87,10 @@ void mos6530_device::device_start()
 void mos6530_device::device_reset()
 {
 	/* reset I/O states */
-	m_port[0].out = 0;
-	m_port[0].ddr = 0;
-	m_port[1].out = 0;
-	m_port[1].ddr = 0;
+	m_port[0].m_out = 0;
+	m_port[0].m_ddr = 0;
+	m_port[1].m_out = 0;
+	m_port[1].m_ddr = 0;
 
 	/* reset IRQ states */
 	m_irqenable = 0;
@@ -135,15 +116,12 @@ void mos6530_device::device_reset()
 
 void mos6530_device::update_irqstate()
 {
-	UINT8 out = m_port[1].out;
+	UINT8 out = m_port[1].m_out;
 
-	if ( m_irqenable )
-		out = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
+	if (m_irqenable)
+		out = ((m_irqstate & TIMER_FLAG) ? 0x00 : 0x80) | (out & 0x7F);
 
-	if (!m_port[1].out_port_func.isnull())
-		m_port[1].out_port_func(0, out);
-	else
-		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", tag());
+	m_out_pb_cb((offs_t)0, out);
 }
 
 
@@ -246,28 +224,28 @@ WRITE8_MEMBER( mos6530_device::write )
 	else
 	{
 		/* A1 selects the port */
-		mos6530_port *port = &m_port[(offset >> 1) & 1];
+		mos6530_port *port = &m_port[BIT(offset, 1)];
 
 		/* if A0 == 1, we are writing to the port's DDR */
 		if (offset & 1)
-			port->ddr = data;
+			port->m_ddr = data;
 
 		/* if A0 == 0, we are writing to the port's output */
 		else
 		{
-			UINT8 olddata = port->out;
-			port->out = data;
+			UINT8 olddata = port->m_out;
+			port->m_out = data;
 
-			if ( ( offset & 2 ) && m_irqenable )
+			if ((offset & 2) && m_irqenable)
 			{
-				olddata = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( olddata & 0x7F );
-				data = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( data & 0x7F );
+				olddata = ((m_irqstate & TIMER_FLAG) ? 0x00 : 0x80) | (olddata & 0x7F);
+				data = ((m_irqstate & TIMER_FLAG) ? 0x00 : 0x80) | (data & 0x7F);
 			}
 
-			if (!port->out_port_func.isnull())
-				port->out_port_func(0, data);
+			if (!BIT(offset, 1))
+				m_out_pa_cb((offs_t)0, data);
 			else
-				logerror("%s 6530MIOT chip %s: Port %c is being written to but has no handler. %02X\n", machine().describe_context(), tag(), 'A' + (offset & 1), data);
+				m_out_pb_cb((offs_t)0, data);
 		}
 	}
 }
@@ -308,30 +286,28 @@ READ8_MEMBER( mos6530_device::read )
 	else
 	{
 		/* A1 selects the port */
-		mos6530_port *port = &m_port[(offset >> 1) & 1];
+		mos6530_port *port = &m_port[BIT(offset, 1)];
 
 		/* if A0 == 1, we are reading the port's DDR */
 		if (offset & 1)
-			val = port->ddr;
+			val = port->m_ddr;
 
 		/* if A0 == 0, we are reading the port as an input */
 		else
 		{
-			UINT8   out = port->out;
+			UINT8 out = port->m_out;
 
-			if ( ( offset & 2 ) && m_irqenable )
-				out = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
+			if ((offset & 2) && m_irqenable)
+				out = ((m_irqstate & TIMER_FLAG) ? 0x00 : 0x80) | (out & 0x7F);
 
 			/* call the input callback if it exists */
-			if (!port->in_port_func.isnull())
-			{
-				port->in = port->in_port_func(0);
-			}
+			if (!BIT(offset, 1))
+				port->m_in = m_in_pa_cb(0);
 			else
-				logerror("%s 6530MIOT chip %s: Port %c is being read but has no handler.\n", machine().describe_context(), tag(), 'A' + (offset & 1));
+				port->m_in = m_in_pb_cb(0);
 
 			/* apply the DDR to the result */
-			val = (out & port->ddr) | (port->in & ~port->ddr);
+			val = (out & port->m_ddr) | (port->m_in & ~port->m_ddr);
 		}
 	}
 	return val;
@@ -345,7 +321,7 @@ READ8_MEMBER( mos6530_device::read )
 
 void mos6530_device::porta_in_set(UINT8 data, UINT8 mask)
 {
-	m_port[0].in = (m_port[0].in & ~mask) | (data & mask);
+	m_port[0].m_in = (m_port[0].m_in & ~mask) | (data & mask);
 }
 
 
@@ -356,7 +332,7 @@ void mos6530_device::porta_in_set(UINT8 data, UINT8 mask)
 
 void mos6530_device::portb_in_set(UINT8 data, UINT8 mask)
 {
-	m_port[1].in = (m_port[1].in & ~mask) | (data & mask);
+	m_port[1].m_in = (m_port[1].m_in & ~mask) | (data & mask);
 }
 
 
@@ -367,7 +343,7 @@ void mos6530_device::portb_in_set(UINT8 data, UINT8 mask)
 
 UINT8 mos6530_device::porta_in_get()
 {
-	return m_port[0].in;
+	return m_port[0].m_in;
 }
 
 
@@ -378,7 +354,7 @@ UINT8 mos6530_device::porta_in_get()
 
 UINT8 mos6530_device::portb_in_get()
 {
-	return m_port[1].in;
+	return m_port[1].m_in;
 }
 
 
@@ -389,7 +365,7 @@ UINT8 mos6530_device::portb_in_get()
 
 UINT8 mos6530_device::porta_out_get()
 {
-	return m_port[0].out;
+	return m_port[0].m_out;
 }
 
 
@@ -400,5 +376,5 @@ UINT8 mos6530_device::porta_out_get()
 
 UINT8 mos6530_device::portb_out_get()
 {
-	return m_port[1].out;
+	return m_port[1].m_out;
 }
