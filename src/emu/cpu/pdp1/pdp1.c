@@ -554,6 +554,7 @@ void pdp1_device::device_start()
 	m_sbs_level = 0;
 	m_sbs_restore = 0;
 	m_no_sequence_break = 0;
+	m_debugger_temp = 0;
 
 	m_program = &space(AS_PROGRAM);
 
