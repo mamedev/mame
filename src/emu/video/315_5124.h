@@ -99,7 +99,7 @@ protected:
 	void draw_scanline_mode2( int *line_buffer, int line );
 	void draw_scanline_mode0( int *line_buffer, int line );
 	void select_sprites( int line );
-	void check_pending_flags( int hpos );
+	void check_pending_flags();
 
 	// device-level overrides
 	virtual void device_start();
@@ -129,6 +129,7 @@ protected:
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
+	attotime         m_line_end_time;
 	UINT8            m_line_counter;
 	UINT8            m_hcounter;
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */

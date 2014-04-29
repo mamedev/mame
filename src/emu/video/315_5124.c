@@ -70,12 +70,10 @@ PAL frame timing
 #define SPROVR_HPOS           23
 #define SPRCOL_BASEHPOS       59
 #define X_SCROLL_HPOS         21
+#define DISPLAY_DISABLED_HPOS 17 /* fixes 'fantdizzy' (SMS PAL game) flicker */
+#define DISPLAY_CB_HPOS       0
 
-/* Display callback delay that fixes a flicker issue at top of screen when
-   playing 'fantdizzy' (SMS PAL game), due to time when display is disabled. */
-#define DISPLAY_CB_HPOS       6
-
-#define DRAW_TIME_GG        86      /* 1 + 2 + 14 + 8 + 96/2 */
+#define DRAW_TIME_GG        86      /* 1 + 2 + 14 + 8 + 122/2 */
 #define DRAW_TIME_SMS       25      /* 1 + 2 + 14 + 8 */
 
 #define PRIORITY_BIT          0x1000
@@ -368,9 +366,6 @@ void sega315_5124_device::process_line_timer()
 
 	m_display_disabled = !(m_reg[0x01] & 0x40);
 
-	/* Activate flags that were pending until the end of previous line. */
-	check_pending_flags(m_screen->width());
-
 	/* Check if we're on the last line of a frame */
 	if (vpos == vpos_limit - 1)
 	{
@@ -546,8 +541,21 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 }
 
 
-void sega315_5124_device::check_pending_flags( int hpos )
+void sega315_5124_device::check_pending_flags()
 {
+	const attotime current_time = machine().time();
+	int hpos;
+
+	if (current_time < m_line_end_time)
+	{
+		hpos = m_screen->hpos();
+	}
+	else
+	{
+		hpos = m_screen->width();
+		m_line_end_time = current_time + m_screen->time_until_pos(m_screen->vpos(), hpos);
+	}
+
 	if ((m_pending_status & STATUS_HINT) && hpos >= HINT_HPOS)
 	{
 		m_pending_status &= ~STATUS_HINT;
@@ -576,7 +584,7 @@ READ8_MEMBER( sega315_5124_device::register_read )
 {
 	UINT8 temp;
 
-	check_pending_flags(m_screen->hpos());
+	check_pending_flags();
 	temp = m_status;
 
 	if ( !space.debugger_access() )
@@ -631,7 +639,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 	int reg_num;
 	int hpos = m_screen->hpos();
 
-	check_pending_flags(hpos);
+	check_pending_flags();
 
 	if (m_pending_reg_write == 0)
 	{
@@ -664,6 +672,9 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 
 			if (reg_num == 0 || reg_num == 1)
 				set_display_settings();
+
+			if (reg_num == 1 && hpos <= DISPLAY_DISABLED_HPOS)
+				m_display_disabled = !(m_reg[0x01] & 0x40);
 
 			if (reg_num == 8 && hpos <= X_SCROLL_HPOS)
 				m_reg8copy = m_reg[0x08];
@@ -1815,6 +1826,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_tmpbitmap));
 	save_item(NAME(m_y1_bitmap));
 	save_item(NAME(m_draw_time));
+	save_item(NAME(m_line_end_time));
 	save_item(NAME(m_sprite_base));
 	save_item(NAME(m_selected_sprite));
 	save_item(NAME(m_sprite_count));
@@ -1853,6 +1865,7 @@ void sega315_5124_device::device_reset()
 	m_line_counter = 0;
 	m_hcounter = 0;
 	m_draw_time = DRAW_TIME_SMS;
+	m_line_end_time = machine().time() + m_screen->time_until_pos(m_screen->vpos(), m_screen->width());
 
 	for (i = 0; i < 0x20; i++)
 		m_current_palette[i] = 0;
