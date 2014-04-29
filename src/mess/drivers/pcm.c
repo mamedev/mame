@@ -231,30 +231,6 @@ static const z80_daisy_config pcm_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 
 /* F4 Character Displayer */
 static const gfx_layout pcm_charlayout =
@@ -302,7 +278,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 
 	/* Devices */
 	MCFG_K7659_KEYBOARD_ADD()
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
 
 	MCFG_DEVICE_ADD("z80pio_u", Z80PIO, XTAL_10MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -313,7 +289,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
 
-	MCFG_Z80SIO0_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
+	MCFG_Z80SIO0_ADD("z80sio", 4800, 0, 0, 0, 0) // clocks come from the system ctc
 
 	MCFG_DEVICE_ADD("z80ctc_u", Z80CTC, XTAL_10MHz /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

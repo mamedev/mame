@@ -410,43 +410,6 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
 GFXDECODE_END
 
-#if 0
-static const z80sio_interface sio_intf =
-{
-	DEVCB_NULL,                 /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_NULL,                 /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-
-static Z80DART_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-#endif
-
-
 static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },

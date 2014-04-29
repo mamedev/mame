@@ -563,7 +563,7 @@ void abc1600_state::update_drdy2()
 }
 
 //-------------------------------------------------
-//  Z80DART_INTERFACE( dart_intf )
+//  Z80DART
 //-------------------------------------------------
 
 READ8_MEMBER( abc1600_state::dart_r )
@@ -575,30 +575,6 @@ WRITE8_MEMBER( abc1600_state::dart_w )
 {
 	m_dart->ba_cd_w(space, A2_A1 ^ 0x03, data);
 }
-
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_5), // shared with SCC
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  SCC8530_INTERFACE( sc_intf )
@@ -904,7 +880,12 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_IN_IORQ_CB(DEVREAD8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_r))
 	MCFG_Z80DMA_OUT_IORQ_CB(DEVWRITE8(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_w))
 
-	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
+	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))	 // shared with SCC
 
 	MCFG_DEVICE_ADD(Z8530B1_TAG, SCC8530, XTAL_64MHz/16)
 	MCFG_Z8530_INTRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))

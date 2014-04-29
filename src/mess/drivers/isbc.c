@@ -187,29 +187,6 @@ WRITE8_MEMBER( isbc_state::ppi_c_w )
 		m_pic_1->ir7_w(0);
 }
 
-static I8274_INTERFACE(isbc286_uart8274_interface)
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER("rs232a", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232a", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232a", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER("rs232b", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232b", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232b", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DRIVER_LINE_MEMBER(isbc_state, isbc_uart8274_irq),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 {
 	m_uart8274->m1_r(); // always set
@@ -315,7 +292,14 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc286_uart8274_interface)
+	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxa_w))

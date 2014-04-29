@@ -130,27 +130,3 @@ WRITE8_MEMBER( mc80_state::asp_port_a_w )
 WRITE8_MEMBER( mc80_state::asp_port_b_w )
 {
 }
-
-// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
-Z80SIO_INTERFACE( mc8030_asp_z80sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};

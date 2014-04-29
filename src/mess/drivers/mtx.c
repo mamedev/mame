@@ -236,36 +236,6 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
 }
 
 /*-------------------------------------------------
-    Z80DART_INTERFACE( dart_intf )
--------------------------------------------------*/
-
-static Z80DART_INTERFACE( dart_intf )
-{
-	0,
-	0,
-	0,
-	0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/*-------------------------------------------------
     z80_daisy_config mtx_daisy_chain
 -------------------------------------------------*/
 
@@ -396,7 +366,8 @@ static MACHINE_CONFIG_DERIVED( rs128, mtx512 )
 	MCFG_CPU_CONFIG(rs128_daisy_chain)
 
 	/* devices */
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_4MHz, dart_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG,  XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

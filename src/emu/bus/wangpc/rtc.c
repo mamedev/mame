@@ -127,34 +127,6 @@ static I8237_INTERFACE( dmac_intf )
 };
 
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_rtc )
 //-------------------------------------------------
 
@@ -172,7 +144,8 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_rtc )
 	MCFG_DEVICE_ADD(Z80CTC_1_TAG, Z80CTC, 2000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, 2000000, sio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, 2000000, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 

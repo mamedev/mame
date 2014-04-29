@@ -95,6 +95,25 @@ z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, 
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
 		m_chanB(*this, CHANB_TAG),
+		m_rxca(0),
+		m_txca(0),
+		m_rxcb(0),
+		m_txcb(0),
+		m_out_txda_cb(*this),
+		m_out_dtra_cb(*this),
+		m_out_rtsa_cb(*this),
+		m_out_wrdya_cb(*this),
+		m_out_synca_cb(*this),
+		m_out_txdb_cb(*this),
+		m_out_dtrb_cb(*this),
+		m_out_rtsb_cb(*this),
+		m_out_wrdyb_cb(*this),
+		m_out_syncb_cb(*this),
+		m_out_int_cb(*this),
+		m_out_rxdrqa_cb(*this),
+		m_out_txdrqa_cb(*this),
+		m_out_rxdrqb_cb(*this),
+		m_out_txdrqb_cb(*this),
 		m_variant(variant)
 {
 	for (int i = 0; i < 8; i++)
@@ -106,6 +125,25 @@ z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, d
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
 		m_chanB(*this, CHANB_TAG),
+		m_rxca(0),
+		m_txca(0),
+		m_rxcb(0),
+		m_txcb(0),
+		m_out_txda_cb(*this),
+		m_out_dtra_cb(*this),
+		m_out_rtsa_cb(*this),
+		m_out_wrdya_cb(*this),
+		m_out_synca_cb(*this),
+		m_out_txdb_cb(*this),
+		m_out_dtrb_cb(*this),
+		m_out_rtsb_cb(*this),
+		m_out_wrdyb_cb(*this),
+		m_out_syncb_cb(*this),
+		m_out_int_cb(*this),
+		m_out_rxdrqa_cb(*this),
+		m_out_txdrqa_cb(*this),
+		m_out_rxdrqb_cb(*this),
+		m_out_txdrqb_cb(*this),
 		m_variant(TYPE_DART)
 {
 	for (int i = 0; i < 8; i++)
@@ -149,74 +187,35 @@ upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z80dart_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const z80dart_interface *intf = reinterpret_cast<const z80dart_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<z80dart_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_rxca = m_txca = m_rxcb = m_txcb = 0;
-
-		memset(&m_out_txda_cb, 0, sizeof(m_out_txda_cb));
-		memset(&m_out_dtra_cb, 0, sizeof(m_out_dtra_cb));
-		memset(&m_out_rtsa_cb, 0, sizeof(m_out_rtsa_cb));
-		memset(&m_out_wrdya_cb, 0, sizeof(m_out_wrdya_cb));
-		memset(&m_out_synca_cb, 0, sizeof(m_out_synca_cb));
-		memset(&m_out_txdb_cb, 0, sizeof(m_out_txdb_cb));
-		memset(&m_out_dtrb_cb, 0, sizeof(m_out_dtrb_cb));
-		memset(&m_out_rtsb_cb, 0, sizeof(m_out_rtsb_cb));
-		memset(&m_out_wrdyb_cb, 0, sizeof(m_out_wrdyb_cb));
-		memset(&m_out_syncb_cb, 0, sizeof(m_out_syncb_cb));
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_rxdrqa_cb, 0, sizeof(m_out_rxdrqa_cb));
-		memset(&m_out_txdrqa_cb, 0, sizeof(m_out_txdrqa_cb));
-		memset(&m_out_rxdrqb_cb, 0, sizeof(m_out_rxdrqb_cb));
-		memset(&m_out_txdrqb_cb, 0, sizeof(m_out_txdrqb_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void z80dart_device::device_start()
 {
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_txda_cb.resolve_safe();
+	m_out_dtra_cb.resolve_safe();
+	m_out_rtsa_cb.resolve_safe();
+	m_out_wrdya_cb.resolve_safe();
+	m_out_synca_cb.resolve_safe();
+	m_out_txdb_cb.resolve_safe();
+	m_out_dtrb_cb.resolve_safe();
+	m_out_rtsb_cb.resolve_safe();
+	m_out_wrdyb_cb.resolve_safe();
+	m_out_syncb_cb.resolve_safe();
+	m_out_int_cb.resolve_safe();
+	m_out_rxdrqa_cb.resolve_safe();
+	m_out_txdrqa_cb.resolve_safe();
+	m_out_rxdrqb_cb.resolve_safe();
+	m_out_txdrqb_cb.resolve_safe();
 
 	// configure channel A
 	m_chanA->m_rxc = m_rxca;
 	m_chanA->m_txc = m_txca;
 
-	m_chanA->m_out_txd_cb = m_out_txda_cb;
-	m_chanA->m_out_dtr_cb = m_out_dtra_cb;
-	m_chanA->m_out_rts_cb = m_out_rtsa_cb;
-	m_chanA->m_out_wrdy_cb = m_out_wrdya_cb;
-	m_chanA->m_out_sync_cb = m_out_synca_cb;
-	m_chanA->m_out_rxdrq_cb = m_out_rxdrqa_cb;
-	m_chanA->m_out_txdrq_cb = m_out_txdrqa_cb;
-
 	// configure channel B
 	m_chanB->m_rxc = m_rxcb;
 	m_chanB->m_txc = m_txcb;
-
-	m_chanB->m_out_txd_cb = m_out_txdb_cb;
-	m_chanB->m_out_dtr_cb = m_out_dtrb_cb;
-	m_chanB->m_out_rts_cb = m_out_rtsb_cb;
-	m_chanB->m_out_wrdy_cb = m_out_wrdyb_cb;
-	m_chanB->m_out_sync_cb = m_out_syncb_cb;
-	m_chanB->m_out_rxdrq_cb = m_out_rxdrqb_cb;
-	m_chanB->m_out_txdrq_cb = m_out_txdrqb_cb;
 
 	// state saving
 	save_item(NAME(m_int_state));
@@ -333,7 +332,7 @@ void z80dart_device::z80daisy_irq_reti()
 void z80dart_device::check_interrupts()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
-	m_out_int_func(state);
+	m_out_int_cb(state);
 }
 
 
@@ -546,15 +545,6 @@ void z80dart_channel::device_start()
 	m_uart = downcast<z80dart_device *>(owner());
 	m_index = m_uart->get_channel_index(this);
 
-	// resolve callbacks
-	m_out_txd_func.resolve(m_out_txd_cb, *m_uart);
-	m_out_dtr_func.resolve(m_out_dtr_cb, *m_uart);
-	m_out_rts_func.resolve(m_out_rts_cb, *m_uart);
-	m_out_wrdy_func.resolve(m_out_wrdy_cb, *m_uart);
-	m_out_sync_func.resolve(m_out_sync_cb, *m_uart);
-	m_out_rxdrq_func.resolve(m_out_rxdrq_cb, *m_uart);
-	m_out_txdrq_func.resolve(m_out_txdrq_cb, *m_uart);
-
 	// state saving
 	save_item(NAME(m_rr));
 	save_item(NAME(m_wr));
@@ -620,17 +610,26 @@ void z80dart_channel::tra_callback()
 	if (!(m_wr[5] & WR5_TX_ENABLE))
 	{
 		// transmit mark
-		m_out_txd_func(1);
+		if (m_index == z80dart_device::CHANNEL_A)
+			m_uart->m_out_txda_cb(1);
+		else
+			m_uart->m_out_txdb_cb(1);
 	}
 	else if (m_wr[5] & WR5_SEND_BREAK)
 	{
 		// transmit break
-		m_out_txd_func(0);
+		if (m_index == z80dart_device::CHANNEL_A)
+			m_uart->m_out_txda_cb(0);
+		else
+			m_uart->m_out_txdb_cb(0);
 	}
 	else if (!is_transmit_register_empty())
 	{
 		// transmit data
-		m_out_txd_func(transmit_register_get_data_bit());
+		if (m_index == z80dart_device::CHANNEL_A)
+			m_uart->m_out_txda_cb(transmit_register_get_data_bit());
+		else
+			m_uart->m_out_txdb_cb(transmit_register_get_data_bit());
 	}
 }
 
@@ -656,12 +655,18 @@ void z80dart_channel::tra_complete()
 	else if (m_wr[5] & WR5_SEND_BREAK)
 	{
 		// transmit break
-		m_out_txd_func(0);
+		if (m_index == z80dart_device::CHANNEL_A)
+			m_uart->m_out_txda_cb(0);
+		else
+			m_uart->m_out_txdb_cb(0);
 	}
 	else
 	{
 		// transmit mark
-		m_out_txd_func(1);
+		if (m_index == z80dart_device::CHANNEL_A)
+			m_uart->m_out_txda_cb(1);
+		else
+			m_uart->m_out_txdb_cb(1);
 	}
 
 	// if transmit buffer is empty
@@ -1321,7 +1326,10 @@ void z80dart_channel::set_dtr(int state)
 {
 	m_dtr = state;
 
-	m_out_dtr_func(m_dtr);
+	if (m_index == z80dart_device::CHANNEL_A)
+		m_uart->m_out_dtra_cb(m_dtr);
+	else
+		m_uart->m_out_dtrb_cb(m_dtr);
 }
 
 
@@ -1331,7 +1339,10 @@ void z80dart_channel::set_dtr(int state)
 
 void z80dart_channel::set_rts(int state)
 {
-	m_out_rts_func(state);
+	if (m_index == z80dart_device::CHANNEL_A)
+		m_uart->m_out_rtsa_cb(state);
+	else
+		m_uart->m_out_rtsb_cb(state);
 }
 
 

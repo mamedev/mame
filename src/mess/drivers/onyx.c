@@ -29,7 +29,7 @@ and be connected to a RS422 network.
 //#include "cpu/z80/z80daisy.h"
 //#include "machine/z80ctc.h"
 //#include "machine/z80pio.h"
-//#include "machine/z80sio.h"
+//#include "machine/z80dart.h"
 //#include "machine/z80dma.h"
 #include "machine/terminal.h"
 
@@ -68,56 +68,6 @@ WRITE8_MEMBER( onyx_state::kbd_put )
 	m_term_data = data;
 }
 
-#if 0
-/* Z80 SIO 0 */
-
-WRITE16_MEMBER( onyx_state::pk8_sio_0_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_sio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_daisy_interrupt),            /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_sio_0_serial_transmit),   /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 SIO 1 */
-
-WRITE16_MEMBER( onyx_state::pk8_sio_1_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_sio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_daisy_interrupt),            /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_sio_1_serial_transmit),   /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 Daisy Chain */
-
-static const z80_daisy_config p8k_daisy_chain[] =
-{
-	{ "z80dma" },   /* FDC related */
-	{ "z80pio_2" },
-	{ "z80ctc_0" },
-	{ "z80sio_0" },
-	{ "z80sio_1" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80ctc_1" },
-	{ NULL }
-};
-#endif
 
 /* Input ports */
 static INPUT_PORTS_START( c8002 )
@@ -155,58 +105,6 @@ static ADDRESS_MAP_START(subio, AS_IO, 8, onyx_state)
 ADDRESS_MAP_END
 
 
-#if 0
-
-/* Z80 SIO 0 */
-
-WRITE16_MEMBER( onyx_state::pk8_16_sio_0_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_16_sio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),         /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_16_sio_0_serial_transmit),    /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 SIO 1 */
-
-WRITE16_MEMBER( onyx_state::pk8_16_sio_1_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_16_sio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),         /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_16_sio_1_serial_transmit),    /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 Daisy Chain */
-
-static const z80_daisy_config p8k_16_daisy_chain[] =
-{
-	{ "z80ctc_0" },
-	{ "z80ctc_1" },
-	{ "z80sio_0" },
-	{ "z80sio_1" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80pio_2" },
-	{ NULL }
-};
-#endif
-
-
 /***************************************************************************
 
     Machine Drivers
@@ -230,8 +128,8 @@ static MACHINE_CONFIG_START( c8002, onyx_state )
 	/* peripheral hardware */
 	//MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
-	//MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
-	//MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
+	//MCFG_Z80SIO0_ADD("z80sio_0", 9600, 0, 0, 0, 0)
+	//MCFG_Z80SIO0_ADD("z80sio_1", 9600, 0, 0, 0, 0)
 	//MCFG_DEVICE_ADD("z80pio_0", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80pio_1", Z80CTC, XTAL_4MHz)
 	//MCFG_DEVICE_ADD("z80pio_2", Z80CTC, XTAL_4MHz)

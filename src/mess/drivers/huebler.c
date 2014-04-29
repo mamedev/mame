@@ -263,29 +263,6 @@ WRITE_LINE_MEMBER(amu880_state::cassette_w)
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state, cassette_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config amu880_daisy_chain[] =
@@ -387,7 +364,9 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL_10MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, 0, 0, 0, 0) // U856
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(amu880_state, cassette_w))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CASSETTE_ADD("cassette", amu880_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))

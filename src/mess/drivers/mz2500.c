@@ -2068,30 +2068,6 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
 }
 
-static Z80SIO_INTERFACE( mz2500_sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
@@ -2112,7 +2088,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2500_state, mz2500_pio1_porta_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
 
-	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
+	MCFG_Z80SIO0_ADD("z80sio", 6000000, 0, 0, 0, 0)
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))

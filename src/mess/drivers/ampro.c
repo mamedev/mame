@@ -117,29 +117,6 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ NULL }
 };
 
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY
-	DEVCB_NULL, // SYNC
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // Baud rate generator. All inputs are 2MHz.
 TIMER_DEVICE_CALLBACK_MEMBER( ampro_state::ctc_tick )
 {
@@ -192,7 +169,12 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(ampro_state, ctc_z0_w))	// Z80DART Ch A, SIO Ch A
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))	// SIO Ch B
 
-	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, dart_intf )
+	MCFG_Z80DART_ADD("z80dart", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
 

@@ -54,68 +54,12 @@ const device_type WANGPC_MCC = &device_creator<wangpc_mcc_device>;
 
 
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  Z80DART_INTERFACE( dart_intf )
-//-------------------------------------------------
-
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_mcc )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( wangpc_mcc )
-	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 4000000, sio_intf)
-	MCFG_Z80DART_ADD(Z80DART_TAG, 4000000, dart_intf)
+	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 4000000, 0, 0, 0, 0)
+	MCFG_Z80DART_ADD(Z80DART_TAG, 4000000, 0, 0, 0, 0)
 MACHINE_CONFIG_END
 
 

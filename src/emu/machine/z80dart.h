@@ -152,91 +152,95 @@
 #include "cpu/z80/z80daisy.h"
 
 
-
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_Z80DART_ADD(_tag, _clock, _config) \
+#define MCFG_Z80DART_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80DART, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_Z80SIO0_ADD(_tag, _clock, _config) \
+#define MCFG_Z80SIO0_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80SIO0, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_Z80SIO1_ADD(_tag, _clock, _config) \
+#define MCFG_Z80SIO1_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80SIO1, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_Z80SIO2_ADD(_tag, _clock, _config) \
+#define MCFG_Z80SIO2_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80SIO2, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_Z80SIO3_ADD(_tag, _clock, _config) \
+#define MCFG_Z80SIO3_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80SIO3, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_Z80SIO4_ADD(_tag, _clock, _config) \
+#define MCFG_Z80SIO4_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80SIO4, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_I8274_ADD(_tag, _clock, _config) \
+#define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, I8274, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_UPD7201_ADD(_tag, _clock, _config) \
+#define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, UPD7201, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb)
 
-#define MCFG_Z80DART_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
 
-#define Z80DART_INTERFACE(_name) \
-	const z80dart_interface (_name) =
+#define MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb) \
+	z80dart_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
 
-#define Z80SIO_INTERFACE(_name) \
-	const z80dart_interface (_name) =
+#define MCFG_Z80DART_OUT_TXDA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_txda_callback(*device, DEVCB2_##_devcb);
 
-#define UPD7201_INTERFACE(_name) \
-	const z80dart_interface (_name) =
+#define MCFG_Z80DART_OUT_DTRA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_dtra_callback(*device, DEVCB2_##_devcb);
 
-#define I8274_INTERFACE(_name) \
-	const z80dart_interface (_name) =
+#define MCFG_Z80DART_OUT_RTSA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_rtsa_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_WRDYA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_wrdya_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_SYNCA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_synca_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_TXDB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_txdb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_DTRB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_dtrb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_RTSB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_rtsb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_WRDYB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_wrdyb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_SYNCB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_syncb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_INT_CB(_devcb) \
+	devcb = &z80dart_device::set_out_int_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_RXDRQA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_rxdrqa_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_TXDRQA_CB(_devcb) \
+	devcb = &z80dart_device::set_out_txdrqa_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_RXDRQB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_rxdrqb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_Z80DART_OUT_TXDRQB_CB(_devcb) \
+	devcb = &z80dart_device::set_out_txdrqb_callback(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> z80dart_interface
-
-struct z80dart_interface
-{
-	int m_rxca;
-	int m_txca;
-	int m_rxcb;
-	int m_txcb;
-
-	devcb_write_line    m_out_txda_cb;
-	devcb_write_line    m_out_dtra_cb;
-	devcb_write_line    m_out_rtsa_cb;
-	devcb_write_line    m_out_wrdya_cb;
-	devcb_write_line    m_out_synca_cb;
-
-	devcb_write_line    m_out_txdb_cb;
-	devcb_write_line    m_out_dtrb_cb;
-	devcb_write_line    m_out_rtsb_cb;
-	devcb_write_line    m_out_wrdyb_cb;
-	devcb_write_line    m_out_syncb_cb;
-
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_rxdrqa_cb;
-	devcb_write_line    m_out_txdrqa_cb;
-	devcb_write_line    m_out_rxdrqb_cb;
-	devcb_write_line    m_out_txdrqb_cb;
-};
-
 
 // ======================> z80dart_channel
 
@@ -276,14 +280,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
-
-	devcb_write_line   m_out_txd_cb;
-	devcb_write_line   m_out_dtr_cb;
-	devcb_write_line   m_out_rts_cb;
-	devcb_write_line   m_out_wrdy_cb;
-	devcb_write_line   m_out_sync_cb;
-	devcb_write_line   m_out_rxdrq_cb;
-	devcb_write_line   m_out_txdrq_cb;
 
 	int m_rxc;
 	int m_txc;
@@ -434,14 +430,6 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 
-	devcb_resolved_write_line   m_out_txd_func;
-	devcb_resolved_write_line   m_out_dtr_func;
-	devcb_resolved_write_line   m_out_rts_func;
-	devcb_resolved_write_line   m_out_wrdy_func;
-	devcb_resolved_write_line   m_out_sync_func;
-	devcb_resolved_write_line   m_out_rxdrq_func;
-	devcb_resolved_write_line   m_out_txdrq_func;
-
 	// receiver state
 	UINT8 m_rx_data_fifo[3];    // receive data FIFO
 	UINT8 m_rx_error_fifo[3];   // receive error FIFO
@@ -476,8 +464,7 @@ protected:
 // ======================> z80dart_device
 
 class z80dart_device :  public device_t,
-						public device_z80daisy_interface,
-						public z80dart_interface
+						public device_z80daisy_interface
 {
 	friend class z80dart_channel;
 
@@ -486,6 +473,31 @@ public:
 	z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txda_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_dtra_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_rtsa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rtsa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_wrdya_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_wrdya_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_synca_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_synca_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_txdb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dtrb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_dtrb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_rtsb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rtsb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_wrdyb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_wrdyb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_syncb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_rxdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rxdrqa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqa_cb.set_callback(object); }	
+	template<class _Object> static devcb2_base &set_out_rxdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_rxdrqb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<z80dart_device &>(device).m_out_txdrqb_cb.set_callback(object); }	
+	
+	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
+	{
+		z80dart_device &dev = downcast<z80dart_device &>(device);
+		dev.m_rxca = rxa;
+		dev.m_txca = txa;
+		dev.m_rxcb = rxb;
+		dev.m_txcb = txb;
+	}
+	
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
@@ -512,7 +524,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -550,8 +561,30 @@ protected:
 	required_device<z80dart_channel> m_chanB;
 
 	// internal state
-	devcb_resolved_write_line       m_out_int_func;
-	int                             m_int_state[8];     // interrupt state
+	int m_rxca;
+	int m_txca;
+	int m_rxcb;
+	int m_txcb;
+	
+	devcb2_write_line    m_out_txda_cb;
+	devcb2_write_line    m_out_dtra_cb;
+	devcb2_write_line    m_out_rtsa_cb;
+	devcb2_write_line    m_out_wrdya_cb;
+	devcb2_write_line    m_out_synca_cb;
+	
+	devcb2_write_line    m_out_txdb_cb;
+	devcb2_write_line    m_out_dtrb_cb;
+	devcb2_write_line    m_out_rtsb_cb;
+	devcb2_write_line    m_out_wrdyb_cb;
+	devcb2_write_line    m_out_syncb_cb;
+	
+	devcb2_write_line    m_out_int_cb;
+	devcb2_write_line    m_out_rxdrqa_cb;
+	devcb2_write_line    m_out_txdrqa_cb;
+	devcb2_write_line    m_out_rxdrqb_cb;
+	devcb2_write_line    m_out_txdrqb_cb;
+
+	int m_int_state[8];     // interrupt state
 
 	int m_variant;
 };
@@ -639,7 +672,6 @@ extern const device_type Z80SIO3;
 extern const device_type Z80SIO4;
 extern const device_type I8274;
 extern const device_type UPD7201;
-
 
 
 #endif

@@ -241,7 +241,8 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	// ZC1: to SIO CLK CH B
 	// ZC2: KMBG (??)
 
-	MCFG_Z80SIO0_ADD( "asp_sio", 4800, mc8030_asp_z80sio_intf )
+	MCFG_Z80SIO0_ADD("asp_sio", 4800, 0, 0, 0, 0 )
+	// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 MACHINE_CONFIG_END
 
 /* ROM definition */

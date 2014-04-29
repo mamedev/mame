@@ -438,34 +438,6 @@ static I8237_INTERFACE( dmac_intf )
 
 
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
@@ -591,7 +563,9 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
 
-	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, sio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))

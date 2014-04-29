@@ -871,29 +871,6 @@ static const ay8910_interface ay8912_interface =
 	DEVCB_NULL                  /* portB write */
 };
 
-static Z80SIO_INTERFACE( sio_interface )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const am9517a_interface dma_interface =
 {
 	DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
@@ -1003,7 +980,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
 
-	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, sio_interface)
+	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, 0, 0, 0, 0)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

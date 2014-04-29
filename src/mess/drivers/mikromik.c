@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 }
 
 //-------------------------------------------------
-//  UPD7201_INTERFACE( mpsc_intf )
+//  UPD7201
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mm1_state::drq2_w )
@@ -398,30 +398,6 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 		m_dmac->dreq1_w(ASSERT_LINE);
 	}
 }
-
-static UPD7201_INTERFACE( mpsc_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),    // receive DRQ
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),    // transmit DRQ
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 READ_LINE_MEMBER( mm1_state::dsra_r )
 {
@@ -519,7 +495,13 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
 
-	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
+	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(mm1_state, drq2_w))
+	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(mm1_state, drq1_w))
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)

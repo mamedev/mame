@@ -263,29 +263,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static Z80SIO_INTERFACE( rt1715_sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* priority unknown */
 static const z80_daisy_config rt1715_daisy_chain[] =
 {
@@ -325,7 +302,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 
 	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
 
-	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
+	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, 0, 0, 0, 0)
 
 	/* floppy */
 	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)

@@ -438,35 +438,6 @@ READ8_MEMBER(qx10_state::mc146818_r)
 	return m_rtc->read(space, !offset);
 }
 
-/*
-    UPD7201
-    Channel A: Keyboard
-    Channel B: RS232
-*/
-
-static UPD7201_INTERFACE(qx10_upd7201_interface)
-{
-	0, 0, 0, 0, // channel b clock set by pit2 channel 2
-
-	DEVCB_DEVICE_LINE_MEMBER("kbd", rs232_port_device, write_txd),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state, keyboard_irq),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
 {
 	m_scc->m1_r(); // always set
@@ -825,7 +796,16 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 
 	MCFG_PIC8259_ADD("pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(qx10_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
-	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
+
+	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, 0, 0, 0, 0)	// channel b clock set by pit2 channel 2
+	// Channel A: Keyboard
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("kbd", rs232_port_device, write_txd))
+	// Channel B: RS232
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(qx10_state, keyboard_irq))
+
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 

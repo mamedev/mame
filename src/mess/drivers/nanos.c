@@ -127,52 +127,6 @@ WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-static Z80SIO_INTERFACE( sio1_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static Z80SIO_INTERFACE( sio2_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config nanos_daisy_chain[] =
@@ -550,8 +504,11 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD( "z80sio_0", XTAL_4MHz, sio1_intf)
-	MCFG_Z80SIO0_ADD( "z80sio_1", XTAL_4MHz, sio2_intf)
+	MCFG_Z80SIO0_ADD("z80sio_0", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
+
+	MCFG_Z80SIO0_ADD("z80sio_1", XTAL_4MHz, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_IN_PA_CB(READ8(nanos_state, nanos_port_a_r))

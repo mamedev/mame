@@ -214,7 +214,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
+//  Z80SIO
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( f1_state::sio_int_w )
@@ -223,30 +223,6 @@ WRITE_LINE_MEMBER( f1_state::sio_int_w )
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int || m_sio_int);
 }
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, sio_int_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  Z80CTC
@@ -309,7 +285,9 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
-	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
+
+	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(f1_state, sio_int_w))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
 	MCFG_Z80CTC_INTR_CB(WRITELINE(f1_state, ctc_int_w))

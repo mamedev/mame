@@ -52,13 +52,4 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-
-/*----------- defined in machine/mc80.c -----------*/
-
-/*****************************************************************************/
-/*                            Implementation for MC80.3x                     */
-/*****************************************************************************/
-
-extern const z80dart_interface mc8030_asp_z80sio_intf;
-
-#endif /* MC80_H_ */
+#endif

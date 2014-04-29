@@ -613,34 +613,6 @@ WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
 }
 
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  Z80CTC
 //-------------------------------------------------
 
@@ -796,7 +768,8 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
@@ -880,7 +853,9 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
 	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")

@@ -194,33 +194,6 @@ WRITE_LINE_MEMBER( apricot_state::timer_out2 )
 	}
 }
 
-static Z80SIO_INTERFACE( apricot_z80sio_intf )
-{
-	0, 0,
-	XTAL_4MHz / 16, XTAL_4MHz / 16,
-
-	// channel a
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER("ic71", i8089_device, drq2_w),
-	DEVCB_NULL,
-
-	// channel b
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, data_selector_dtr_w),
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, data_selector_rts_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER("ic31", pic8259_device, ir5_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //**************************************************************************
 //  FLOPPY
 //**************************************************************************
@@ -403,7 +376,14 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_PIT8253_CLK2(XTAL_4MHz / 2)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(apricot_state, timer_out2))
 
-	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, apricot_z80sio_intf)
+	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, 0, 0, XTAL_4MHz / 16, XTAL_4MHz / 16)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_WRDYA_CB(DEVWRITELINE("ic71", i8089_device, drq2_w))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(apricot_state, data_selector_dtr_w))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(apricot_state, data_selector_rts_w))
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("ic31", pic8259_device, ir5_w))
 
 	// rs232 port
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)

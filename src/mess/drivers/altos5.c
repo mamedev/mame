@@ -326,58 +326,6 @@ WRITE8_MEMBER( altos5_state::port09_w )
 	setup_banks(2);
 }
 
-// serial printer and console#3
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	// console#3
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// printer
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// consoles#1 and 2
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	// console#2
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY    connects to (altos5_state, fdc_intrq_w),
-	DEVCB_NULL, // SYNC
-
-	// console#1
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // unused DRQ pins
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( altos5_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -455,8 +403,19 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_8MHz / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
-	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
+	MCFG_Z80DART_ADD("z80dart", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	// Channel A - console #3
+	// Channel B - printer
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_Z80SIO0_ADD("z80sio", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	// Channel A - console #2
+	// WRDY connects to (altos5_state, fdc_intrq_w)
+	// Channel B - console #1
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

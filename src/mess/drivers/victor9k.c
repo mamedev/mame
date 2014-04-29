@@ -349,34 +349,6 @@ WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
 */
 
 //-------------------------------------------------
-//  UPD7201_INTERFACE( mpsc_intf )
-//-------------------------------------------------
-
-static UPD7201_INTERFACE( mpsc_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir1_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MC6852_INTERFACE( ssda_intf )
 //-------------------------------------------------
 
@@ -962,7 +934,15 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_PIT8253_CLK2(100000)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir2_w))
 
-	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)
+	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
+
 	MCFG_DEVICE_ADD(MC6852_TAG, MC6852, XTAL_30MHz/30)
 	MCFG_MC6852_TX_DATA_CALLBACK(DEVWRITELINE(HC55516_TAG, hc55516_device, digit_w))
 	MCFG_MC6852_IRQ_CALLBACK(WRITELINE(victor9k_state, ssda_irq_w))

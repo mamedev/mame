@@ -421,30 +421,6 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
 }
 
 
-static Z80SIO_INTERFACE( osbexec_sio_config )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,  //DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 #if 0
 static const wd17xx_interface osbexec_wd17xx_interface =
 {
@@ -606,7 +582,6 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_CPU_IO_MAP( osbexec_io)
 	MCFG_CPU_CONFIG( osbexec_daisy_config )
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
@@ -619,7 +594,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-//  MCFG_PIT8253_ADD( "pit", osbexec_pit_config )
+//  MCFG_PIT8253_ADD("pit", osbexec_pit_config)
 
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(osbexec_state, osbexec_pia0_a_r))
@@ -635,7 +610,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osbexec_state, osbexec_pia1_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(osbexec_state, osbexec_pia1_irq))
 
-	MCFG_Z80SIO2_ADD( "sio", MAIN_CLOCK/6, osbexec_sio_config )
+	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
 
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
