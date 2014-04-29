@@ -21014,8 +21014,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19910830"/>
 		<info name="alt_title" value="プロ野球スーパーリーグ'91"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" size="524288">
 				<rom name="pro yakyuu super league '91 (jpn).bin" size="524288" crc="a948ab7e" sha1="9d446471b8fe37b08dc7c4a99de22de9d56a1d16" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+			<dataarea name="sram" size="8192"> <!-- based on game formatting, 8-bit only, not specified in header -->
 			</dataarea>
 		</part>
 	</software>
