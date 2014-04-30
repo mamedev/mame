@@ -106,6 +106,24 @@ void n8x300_cpu_device::device_start()
 	save_item(NAME(m_left_IV));
 	save_item(NAME(m_right_IV));
 
+	// reset registers here, since they are unchanged when /RESET goes low.
+	m_R1 = 0;
+	m_R2 = 0;
+	m_R3 = 0;
+	m_R4 = 0;
+	m_R5 = 0;
+	m_R6 = 0;
+	m_R11 = 0;
+	m_IVL = 0;
+	m_IVR = 0;
+	m_AUX = 0;
+
+	m_PC = 0;
+	m_AR = 0;
+	m_IR = 0;
+	m_OVF = 0;
+	m_genPC = 0;
+
 	// Register state for debugger
 	state_add( _8X300_PC, "PC", m_PC).mask(0x1fff).formatstr("%04X");
 	state_add( _8X300_AR,  "AR",  m_AR).mask(0x1fff).formatstr("%04X");
@@ -124,18 +142,6 @@ void n8x300_cpu_device::device_start()
 	state_add(STATE_GENPC, "curpc", m_genPC).noshow();
 
 	m_icountptr = &m_icount;
-
-	// reset registers here, since they are unchanged when /RESET goes low.
-	m_R1 = 0;
-	m_R2 = 0;
-	m_R3 = 0;
-	m_R4 = 0;
-	m_R5 = 0;
-	m_R6 = 0;
-	m_R11 = 0;
-	m_IVL = 0;
-	m_IVR = 0;
-	m_AUX = 0;
 }
 
 void n8x300_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
