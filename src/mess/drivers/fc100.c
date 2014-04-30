@@ -64,8 +64,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port33_w);
 	DECLARE_WRITE8_MEMBER(port43_w);
+	DECLARE_WRITE8_MEMBER(port60_w);
+	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
+	DECLARE_DRIVER_INIT(fc100);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -93,6 +96,7 @@ private:
 	bool m_cass_state;
 	bool m_cassold;
 	UINT8 m_key_pressed;
+	bool m_banksw_unlocked;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -107,7 +111,8 @@ private:
 static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x6000, 0x7fff ) AM_ROM AM_REGION("cart", 0)
+	AM_RANGE( 0x6000, 0x77ff ) AM_ROM AM_REGION("cart", 0)
+	AM_RANGE( 0x7800, 0x7fff ) AM_READ_BANK("bankr") AM_WRITE_BANK("bankw") // Banked RAM/ROM
 	AM_RANGE( 0x8000, 0xBFFF ) AM_RAM // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -126,9 +131,8 @@ static ADDRESS_MAP_START( fc100_io, AS_IO, 8, fc100_state )
 	AM_RANGE(0x42, 0x42) AM_WRITENOP // bit 0 could be printer select
 	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
 	AM_RANGE(0x44, 0x44) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	// AM_RANGE(0x60, 0x61)   banking, details unknown
-	AM_RANGE(0x70, 0x70) AM_WRITENOP //  banking, details unknown
-	// AM_RANGE(0x71, 0x71)   banking, details unknown
+	AM_RANGE(0x60, 0x61) AM_WRITE(port60_w)
+	AM_RANGE(0x70, 0x71) AM_WRITE(port70_w)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0xb8, 0xb8) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
@@ -511,6 +515,29 @@ void fc100_state::machine_reset()
 	m_cass_state = 0;
 	m_cassold = 0;
 	m_key_pressed = 0;
+	membank("bankr")->set_entry(0);
+	membank("bankw")->set_entry(0);
+}
+
+WRITE8_MEMBER( fc100_state::port60_w )
+{
+	if (m_banksw_unlocked)
+		membank("bankr")->set_entry(offset);
+}
+
+WRITE8_MEMBER( fc100_state::port70_w )
+{
+	m_banksw_unlocked = (bool)offset;
+}
+
+DRIVER_INIT_MEMBER( fc100_state, fc100 )
+{
+	UINT8 *ram = memregion("ram")->base();
+	UINT8 *cgen = memregion("chargen")->base()+0x800;
+
+	membank("bankr")->configure_entry(0, &cgen[0]);
+	membank("bankw")->configure_entry(0, &ram[0]);
+	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
 static MACHINE_CONFIG_START( fc100, fc100_state )
@@ -557,6 +584,8 @@ ROM_START( fc100 )
 	ROM_LOAD( "08-02.u49",     0x2000, 0x2000, CRC(e14fc7e9) SHA1(9c5821e65c1efe698e25668d24c36929ea4c3ad7) )
 	ROM_LOAD( "06-03.u50",     0x4000, 0x2000, CRC(d783c84e) SHA1(6d1bf53995e08724d5ecc24198cdda4442eb2eb9) )
 
+	ROM_REGION( 0x800, "ram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "cg-04-01.u53",  0x0000, 0x1000, CRC(2de75b7f) SHA1(464369d98cbae92ffa322ebaa4404cf5b26825f1) )
 
@@ -567,4 +596,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS          INIT    COMPANY    FULLNAME  FLAGS */
-CONS( 1982, fc100,  0,      0,       fc100,   fc100,  driver_device,   0,   "Goldstar", "FC-100", GAME_NOT_WORKING )
+CONS( 1982, fc100,  0,      0,       fc100,   fc100,  fc100_state, fc100,   "Goldstar", "FC-100", GAME_NOT_WORKING )
