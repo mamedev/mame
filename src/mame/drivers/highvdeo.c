@@ -112,8 +112,7 @@ public:
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_okim6376(*this, "oki"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
 	UINT16 m_vblank_bit;
@@ -127,7 +126,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tv_vcf_bankselect_w);
 	DECLARE_WRITE16_MEMBER(write1_w);
 	DECLARE_READ16_MEMBER(tv_ncf_read1_r);
-	DECLARE_WRITE16_MEMBER(tv_tcf_paletteram_w);
 	DECLARE_WRITE16_MEMBER(tv_tcf_bankselect_w);
 	DECLARE_READ16_MEMBER(newmcard_status_r);
 	DECLARE_READ16_MEMBER(newmcard_vblank_r);
@@ -157,7 +155,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 
@@ -258,16 +255,16 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_paletteram_w)
 			switch(m_pal.offs_internal)
 			{
 				case 0:
-					m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					m_pal.r = pal6bit(data);
 					m_pal.offs_internal++;
 					break;
 				case 1:
-					m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					m_pal.g = pal6bit(data);
 					m_pal.offs_internal++;
 					break;
 				case 2:
-					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
+					m_pal.b = pal6bit(data);
+					m_palette->set_pen_color(m_pal.offs, m_pal.r, m_pal.g, m_pal.b);
 					m_pal.offs_internal = 0;
 					m_pal.offs++;
 					break;
@@ -437,21 +434,6 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
 	coin_counter_w(machine(), 1, ~data & 0x10); // Notes (all)
 }
 
-
-WRITE16_MEMBER(highvdeo_state::tv_tcf_paletteram_w)
-{
-	int r, g, b, color;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	color = m_generic_paletteram_16[offset];
-	r = (color >> 8) & 0xf8;
-	g = (color >> 3) & 0xf8;
-	b = (color << 3) & 0xf8;
-
-	m_palette->set_pen_color(offset, r, g, b);
-}
-
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 {
 	UINT32 bankaddress;
@@ -467,7 +449,7 @@ static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE(tv_tcf_paletteram_w ) AM_SHARE("paletteram")
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -1209,6 +1191,9 @@ static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGGBBBBB)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( newmcard, tv_tcf )

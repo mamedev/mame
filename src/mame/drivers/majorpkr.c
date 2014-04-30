@@ -466,8 +466,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram") { }
 
 	int m_mux_data;
 	int m_palette_bank;
@@ -503,7 +502,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;	
 };
 
 
