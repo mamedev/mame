@@ -16,32 +16,38 @@
 #define MC6854_FIFO_SIZE 3
 /* hardcoded size of the 6854 FIFO (this is a hardware limit) */
 
-
-/* ---------- configuration ------------ */
-
-struct mc6854_interface
-{
-	devcb_write_line  m_out_irq_cb; /* interrupt request */
-
-	/* low-level, bit-based interface */
-	devcb_write_line  m_out_txd_cb; /* transmit bit */
-
-	/* high-level, frame-based interface */
-	void ( * m_out_frame ) ( device_t *device, UINT8* data, int length );
-
-	/* control lines */
-	devcb_write_line  m_out_rts_cb; /* 1 = transmitting, 0 = idle */
-	devcb_write_line  m_out_dtr_cb; /* 1 = data transmit ready, 0 = busy */
-};
+typedef device_delegate<void (UINT8 *data, int length)> mc6854_out_frame_delegate;
+#define MC6854_OUT_FRAME_CB(name)  void name(UINT8 * data, int length)
 
 
-class mc6854_device : public device_t,
-								public mc6854_interface
+#define MCFG_MC6854_OUT_IRQ_CB(_devcb) \
+	devcb = &mc6854_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_MC6854_OUT_TXD_CB(_devcb) \
+	devcb = &mc6854_device::set_out_txd_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_MC6854_OUT_FRAME_CB(_class, _method) \
+	mc6854_device::set_out_frame_callback(*device, mc6854_out_frame_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_MC6854_OUT_RTS_CB(_devcb) \
+	devcb = &mc6854_device::set_out_rts_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_MC6854_OUT_DTR_CB(_devcb) \
+	devcb = &mc6854_device::set_out_dtr_callback(*device, DEVCB2_##_devcb);
+
+
+class mc6854_device : public device_t
 {
 public:
 	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mc6854_device() {}
 
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_txd_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_txd_cb.set_callback(object); }
+	static void set_out_frame_callback(device_t &device, mc6854_out_frame_delegate callback) { downcast<mc6854_device &>(device).m_out_frame_cb = callback; }
+	template<class _Object> static devcb2_base &set_out_rts_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_rts_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_dtr_cb.set_callback(object); }
+	
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -62,16 +68,22 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
 	// internal state
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_txd_func;
-	devcb_resolved_write_line   m_out_rts_func;
-	devcb_resolved_write_line   m_out_dtr_func;
+	devcb2_write_line  m_out_irq_cb; /* interrupt request */
+	
+	/* low-level, bit-based interface */
+	devcb2_write_line  m_out_txd_cb; /* transmit bit */
+	 
+	 /* high-level, frame-based interface */
+	mc6854_out_frame_delegate	m_out_frame_cb;
+	
+	/* control lines */
+	devcb2_write_line  m_out_rts_cb; /* 1 = transmitting, 0 = idle */
+	devcb2_write_line  m_out_dtr_cb; /* 1 = data transmit ready, 0 = busy */
 
 	/* registers */
 	UINT8 m_cr1, m_cr2, m_cr3, m_cr4; /* control registers */
@@ -143,14 +155,5 @@ extern const device_type MC6854;
    if the frame is accepted and 0 is returned, the CPU may abort it). Ony
    full frames are accepted.
 */
-
-
-#define MCFG_MC6854_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MC6854, 0)          \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MC6854_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
-
 
 #endif

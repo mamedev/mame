@@ -717,7 +717,9 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_DEVICE_CONFIG(thomson_floppy_interface_3)
 
 /* network */
-	MCFG_MC6854_ADD( "mc6854", to7_network_iface )
+	MCFG_DEVICE_ADD( "mc6854", MC6854, 0 )
+	MCFG_MC6854_OUT_FRAME_CB(thomson_state, to7_network_got_frame)
+
 
 /* pia */
 	MCFG_DEVICE_ADD(THOM_PIA_SYS, PIA6821, 0)

@@ -623,15 +623,6 @@ static const floppy_interface bbc_floppy_interface =
 	NULL
 };
 
-static const mc6854_interface adlc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_w),
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 {
 	m_adlc->rxc_w(state);
@@ -999,7 +990,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* econet */
-	MCFG_MC6854_ADD("mc6854", adlc_intf)
+	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
+	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
