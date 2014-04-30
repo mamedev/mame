@@ -13,7 +13,6 @@
 
     TODO:
 
-	- character attributes
     - double spaced rows
 
 */
@@ -69,6 +68,14 @@ const int DMA_BURST_SPACING[] = { 0, 7, 15, 23, 31, 39, 47, 55 };
 	DMA_BURST_SPACING[(m_param[REG_DMA] >> 2) & 0x07]
 
 
+const int i8275_device::character_attribute[3][16] =
+{
+	{ 2, 2, 4, 4, 2, 4, 4, 4, 2, 4, 4, 0, 2, 0, 0, 0 },
+	{ 8, 0xc, 8, 0xc, 1, 0xc, 8, 1, 1, 4, 1, 0, 2, 0, 0, 0 },
+	{ 4, 4, 2, 2, 4, 4, 4, 2, 2, 4, 4, 0, 2, 0, 0, 0 }
+};
+
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -108,6 +115,7 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_lten(0),
 	m_scanline(0),
 	m_du(false),
+	m_end_of_screen(false),
 	m_cursor_blink(0),
 	m_char_blink(0)
 {
@@ -220,6 +228,8 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_lten = 0;
 
 			m_du = false;
+			m_dma_stop = false;
+			m_end_of_screen = false;
 
 			m_cursor_blink++;
 			m_cursor_blink &= 0x1f;
@@ -243,7 +253,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_buffer_idx = 0;
 			m_fifo_idx = 0;
 
-			if ((!m_du && (m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW)) || (m_scanline == m_vrtc_drq_scanline))
+			if ((!m_dma_stop && !m_du && (m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW)) || (m_scanline == m_vrtc_drq_scanline))
 			{
 				// start DMA burst
 				m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
@@ -253,6 +263,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if (m_scanline < m_vrtc_scanline)
 		{
 			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
+			bool end_of_row = false;
 
 			for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
 			{
@@ -289,7 +300,48 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					}
 					else
 					{
-						// character attribute code
+						if ((data & 0xf0) == 0xf0)
+						{
+							// special control character
+							switch (data)
+							{
+							case SCC_END_OF_ROW:
+							case SCC_END_OF_ROW_DMA:
+								end_of_row = true;
+								break;
+
+							case SCC_END_OF_SCREEN:
+							case SCC_END_OF_SCREEN_DMA:
+								m_end_of_screen = true;
+								break;
+							}
+						}
+						else
+						{
+							// character attribute code
+							m_hlgt = (data & CA_H) ? 1 : 0;
+							m_vsp = (data & CA_B) ? 1 : 0;
+
+							UINT8 ca = 0;
+							int cccc = (data >> 2) & 0x0f;
+
+							if (line_counter < UNDERLINE)
+							{
+								ca = character_attribute[0][cccc];
+							}
+							else if (line_counter == UNDERLINE)
+							{
+								ca = character_attribute[1][cccc];
+							}
+							else
+							{
+								ca = character_attribute[2][cccc];
+							}
+
+							m_lten = (ca & CA_LTEN) ? 1 : 0;
+							m_vsp = (ca & CA_VSP) ? 1 : 0;
+							m_lineattr = ca >> 2;
+						}
 					}
 				}
 
@@ -315,6 +367,11 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					{
 						lten = vis;
 					}
+				}
+
+				if (end_of_row || m_end_of_screen)
+				{
+					vsp = 1;
 				}
 
 				if (!m_display_cb.isnull())
@@ -489,18 +546,33 @@ WRITE8_MEMBER( i8275_device::dack_w )
 			m_fifo_next = true;
 		}
 
-		if (m_buffer_idx == CHARACTERS_PER_ROW)
+		switch (data)
 		{
+		case SCC_END_OF_ROW_DMA:
 			// stop DMA
+			// TODO should read one more character if DMA burst not completed
+			break;
+
+		case SCC_END_OF_SCREEN_DMA:
+			m_dma_stop = true;
+			// TODO should read one more character if DMA burst not completed
+			break;
+
+		default:
+			if (m_buffer_idx == CHARACTERS_PER_ROW)
+			{
+				// stop DMA
+			}
+			else if (!(m_buffer_idx % DMA_BURST_COUNT))
+			{
+				m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
+			}
+			else
+			{
+				m_drq_on_timer->adjust(attotime::zero);	
+			}
 		}
-		else if (!(m_buffer_idx % DMA_BURST_COUNT))
-		{
-			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
-		}
-		else
-		{
-			m_drq_on_timer->adjust(attotime::zero);	
-		}
+
 	}
 }
 

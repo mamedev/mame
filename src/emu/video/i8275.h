@@ -154,19 +154,33 @@ protected:
 
 	enum
 	{
-		CA_H = 0x01,
-		CA_B = 0x02,
-		CA_CCCC = 0x3c
+		CA_H =    0x01,
+		CA_B =    0x02,
+		CA_CCCC = 0x3c,
+		CA_LTEN = 0x01,
+		CA_VSP =  0x02,
+		CA_LA0 =  0x04,
+		CA_LA1 =  0x08
 	};
 
 	enum
 	{
-		FAC_H = 0x01,
-		FAC_B = 0x02,
-		FAC_GG = 0x0c,
-		FAC_R = 0x10,
-		FAC_U = 0x20
+		SCC_END_OF_ROW =        0xf0,
+		SCC_END_OF_ROW_DMA =    0xf1,
+		SCC_END_OF_SCREEN =     0xf2,
+		SCC_END_OF_SCREEN_DMA = 0xf3
 	};
+
+	enum
+	{
+		FAC_H =  0x01,
+		FAC_B =  0x02,
+		FAC_GG = 0x0c,
+		FAC_R =  0x10,
+		FAC_U =  0x20
+	};
+
+	static const int character_attribute[3][16];
 
 	devcb2_write_line   m_write_irq;
 	devcb2_write_line   m_write_drq;
@@ -203,6 +217,8 @@ protected:
 	int m_vrtc_scanline;
 	int m_vrtc_drq_scanline;
 	bool m_du;
+	bool m_dma_stop;
+	bool m_end_of_screen;
 
 	int m_cursor_blink;
 	int m_char_blink;
