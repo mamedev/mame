@@ -317,6 +317,84 @@ int find_lamp_strings(running_machine &machine)
 	return 0;
 }
 
+
+int find_reel_strings(running_machine &machine)
+{
+	if (strcmp(machine.system().name, "sc4dnd"))
+		return 0;
+	
+	// these are for sc4dnd ONLY, need to work out how the code calculates them
+	
+	// this list is 4 * 16 symbols for the regular reels, 12 symbols for the number spin, and 2 groups of 16 depending on jackpot/stake keys used for the prize reel
+	// code that points at these is likely to be complex because it's conditional on the game code / mode..
+	int reelsizes[] = { 16, 16, 16, 16, 12, 16, 16 };
+	int total_reel_symbols = 0;
+
+	for (int i = 0; i < 7; i++)
+	{
+		total_reel_symbols += reelsizes[i];
+	}
+
+	int startblock = 0x8d74c;
+	int endblock =   startblock + 4 * (total_reel_symbols);
+
+
+	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *rom8 = machine.root_device().memregion( "maincpu" )->base();
+
+
+
+	printf("------------ REELS -----------------\n");
+
+	if (endblock > startblock)
+	{
+		int which_reel = 0;
+		int current_symbols = 0;
+
+
+
+		for (int j = startblock / 2; j < endblock / 2; j+=2)
+		{
+			if (current_symbols == 0)
+			{
+				printf("REEL %d\n", which_reel+1);
+			}
+			
+			UINT32 stringaddr = (rom[j + 0] << 16) | rom[j + 1];
+
+			printf("addr %08x  ", stringaddr);
+				
+			for (int k = stringaddr; k < stringaddr + 10; k++)
+			{
+				UINT8 chr = rom8[k^1];
+
+				if ((chr == 0xff) || (chr == 0x00))
+				{
+					k = stringaddr + 10;
+				}
+				else
+				{
+					printf("%c", chr);
+				}
+							
+			}
+		
+			printf("\n");
+
+			current_symbols++;
+			if (current_symbols == reelsizes[which_reel])
+			{
+				current_symbols = 0;
+				which_reel++;
+			}
+
+
+		}
+	}
+
+	return 0;
+}
+
 /* default reels */
 static const stepper_interface* default_reel_configs[6] =
 {
@@ -375,7 +453,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 	// debug helpers to find strings used for inputs and where the buttons map
 	find_input_strings(machine());
 	find_lamp_strings(machine());
-
+	find_reel_strings(machine());
 }
 
 DRIVER_INIT_MEMBER(sc4_state,sc4mbus)
