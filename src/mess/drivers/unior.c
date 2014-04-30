@@ -389,7 +389,7 @@ void unior_state::video_start()
 
 static MACHINE_CONFIG_START( unior, unior_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9) // unknown clock
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
 	MCFG_CPU_IO_MAP(unior_io)
 
@@ -412,8 +412,8 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_20MHz / 9) // unknown frequency, looks like vertical or horizontal sync pulses
-	MCFG_PIT8253_CLK1(XTAL_16MHz / 9) // unknown frequency
+	MCFG_PIT8253_CLK0(XTAL_20MHz / 12)
+	MCFG_PIT8253_CLK1(XTAL_20MHz / 9)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(unior_state, write_uart_clock))
 	MCFG_PIT8253_CLK2(XTAL_16MHz / 9 / 64) // unknown frequency
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
@@ -432,12 +432,12 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
 
-	MCFG_DEVICE_ADD("dma", I8257N, XTAL_20MHz / 9) // unknown clock
+	MCFG_DEVICE_ADD("dma", I8257N, XTAL_20MHz / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275x_device, dack_w))
 
-	MCFG_DEVICE_ADD("crtc", I8275x, XTAL_20MHz / 9 / 4) // unknown clock
+	MCFG_DEVICE_ADD("crtc", I8275x, XTAL_20MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257n_device, dreq2_w))

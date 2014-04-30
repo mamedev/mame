@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
-	MCFG_DEVICE_ADD("i8275", I8275x, XTAL_16MHz / 9 / 4) // 1 dma transfer per char clock
+	MCFG_DEVICE_ADD("i8275", I8275x, XTAL_16MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(radio86_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257n_device, dreq2_w))
