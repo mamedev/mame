@@ -109,7 +109,8 @@ mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, dev
 	m_write_bkdet(*this),
 	m_write_xsync(*this),
 	m_rxc(0),
-	m_txc(0)
+	m_txc(0),
+	m_sr(0)
 {
 }
 
