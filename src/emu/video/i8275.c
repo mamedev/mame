@@ -115,6 +115,7 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_lten(0),
 	m_scanline(0),
 	m_du(false),
+	m_dma_stop(false),
 	m_end_of_screen(false),
 	m_cursor_blink(0),
 	m_char_blink(0)
@@ -206,7 +207,35 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 0\n", tag(), y, x);
 			m_write_vrtc(0);
 		}
-		else if (m_scanline == m_irq_scanline)
+		
+		if (m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW))
+		{
+			if (lc == 0)
+			{
+				if (m_buffer_idx < CHARACTERS_PER_ROW)
+				{
+					m_status |= ST_DU;
+					m_du = true;
+					
+					//if (LOG) logerror("I8275 '%s' y %u x %u DMA Underrun\n", tag(), y, x);
+					
+					m_write_drq(0);
+				}
+
+				if (!m_du && !m_dma_stop)
+				{
+					// swap line buffers
+					m_buffer_dma = !m_buffer_dma;
+					m_buffer_idx = 0;
+					m_fifo_idx = 0;
+
+					// start DMA burst
+					m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
+				}
+			}
+		}
+		
+		if (m_scanline == m_irq_scanline)
 		{
 			if (m_status & ST_IE)
 			{
@@ -215,7 +244,8 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				m_write_irq(ASSERT_LINE);
 			}
 		}
-		else if (m_scanline == m_vrtc_scanline)
+		
+		if (m_scanline == m_vrtc_scanline)
 		{
 			//if (LOG) logerror("I8275 '%s' y %u x %u VRTC 1\n", tag(), y, x);
 			m_write_vrtc(1);
@@ -237,27 +267,16 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_char_blink++;
 			m_char_blink &= 0x3f;
 		}
-
-		if (lc == 0)
+		
+		if (m_scanline == m_vrtc_drq_scanline)
 		{
-			if ((m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW) && (m_buffer_idx < CHARACTERS_PER_ROW) && !m_du)
-			{
-				m_status |= ST_DU;
-				m_du = true;
-				//if (LOG) logerror("I8275 '%s' y %u x %u DMA Underrun\n", tag(), y, x);
-				m_write_drq(0);
-			}
-
 			// swap line buffers
 			m_buffer_dma = !m_buffer_dma;
 			m_buffer_idx = 0;
 			m_fifo_idx = 0;
 
-			if ((!m_dma_stop && !m_du && (m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW)) || (m_scanline == m_vrtc_drq_scanline))
-			{
-				// start DMA burst
-				m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
-			}
+			// start DMA burst
+			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
 		}
 
 		if (m_scanline < m_vrtc_scanline)
@@ -519,9 +538,7 @@ WRITE8_MEMBER( i8275_device::write )
 
 WRITE8_MEMBER( i8275_device::dack_w )
 {
-	//int y = m_screen->vpos();
-	//int x = m_screen->hpos();
-	//if (LOG) logerror("I8275 '%s' y %u x %u DACK %04x:%02x %u\n", tag(), y, x, offset, data, m_buffer_idx);
+	//if (LOG) logerror("I8275 '%s' y %u x %u DACK %04x:%02x %u\n", tag(), m_screen->vpos(), m_screen->hpos(), offset, data, m_buffer_idx);
 
 	m_write_drq(0);
 
@@ -642,4 +659,6 @@ void i8275_device::recompute_parameters()
 	if (LOG) logerror("irq_y %u vrtc_y %u drq_y %u\n", m_irq_scanline, m_vrtc_scanline, m_vrtc_drq_scanline);
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+
+	if (DOUBLE_SPACED_ROWS) fatalerror("Double spaced rows not supported!");
 }
