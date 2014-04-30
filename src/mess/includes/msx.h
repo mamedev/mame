@@ -39,6 +39,9 @@
 #define MCFG_MSX_LAYOUT(_layout) \
 	msx_state::set_layout(*owner, msx_slot_layout_##_layout);
 
+#define MCFG_MSX_RAMIO_SET_BITS(_ramio_set_bits) \
+	msx_state::set_ramio_set_bits(*owner, _ramio_set_bits);
+
 class msx_state : public driver_device
 {
 public:
@@ -84,6 +87,7 @@ public:
 
 	// static configuration helpers
 	static void set_layout(device_t &device, const msx_slot_layout *layout) { downcast<msx_state &>(device).m_layout = layout; }
+	static void set_ramio_set_bits(device_t &device, UINT8 ramio_set_bits) { downcast<msx_state &>(device).m_ramio_set_bits = ramio_set_bits; }
 
 	DECLARE_WRITE8_MEMBER(msx_page0_w);
 	DECLARE_WRITE8_MEMBER(msx_page0_1_w);

@@ -870,9 +870,6 @@ void msx_state::msx_memory_init()
 		case MSX_LAYOUT_KANJI_ENTRY:
 			m_kanji_mem = m_region_maincpu->base() + layout->option;
 			break;
-		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
-			m_ramio_set_bits = (UINT8)layout->option;
-			break;
 		}
 	}
 }
