@@ -37,8 +37,7 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	static STREAM_UPDATE( static_stream_generate );
-	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	void *          m_chip;
 
@@ -57,7 +56,7 @@ class ym2610b_device : public ym2610_device
 public:
 	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type YM2610B;

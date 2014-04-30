@@ -241,12 +241,7 @@ void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, UINT8 data 
 #define DSS_INPUT_STREAM__GAIN      DISCRETE_INPUT(1)
 #define DSS_INPUT_STREAM__OFFSET    DISCRETE_INPUT(2)
 
-STREAM_UPDATE( discrete_dss_input_stream_node::static_stream_generate )
-{
-	reinterpret_cast<discrete_dss_input_stream_node *>(param)->stream_generate(inputs, outputs, samples);
-}
-
-void discrete_dss_input_stream_node::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void discrete_dss_input_stream_node::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *ptr = outputs[0];
 	int samplenum = samples;
@@ -322,7 +317,7 @@ void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)
 		discrete_sound_device *snd_device = downcast<discrete_sound_device *>(m_device);
 		//assert(DSS_INPUT_STREAM__STREAM < snd_device->m_input_stream_list.count());
 
-		m_buffer_stream = m_device->machine().sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), this, static_stream_generate);
+		m_buffer_stream = m_device->machine().sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), stream_update_delegate(FUNC(discrete_dss_input_stream_node::stream_generate),this));
 
 		snd_device->get_stream()->set_input(m_stream_in_number, m_buffer_stream);
 	}

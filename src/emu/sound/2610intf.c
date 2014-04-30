@@ -111,12 +111,7 @@ void ym2610_device::_ym2610_update_request()
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
-STREAM_UPDATE( ym2610_device::static_stream_generate )
-{
-	reinterpret_cast<ym2610_device *>(param)->stream_generate(inputs, outputs, samples);
-}
-
-void ym2610_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2610_device::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	ym2610_update_one(m_chip, outputs, samples);
 }
@@ -125,7 +120,7 @@ void ym2610_device::stream_generate(stream_sample_t **inputs, stream_sample_t **
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2610b_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2610b_device::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	ym2610b_update_one(m_chip, outputs, samples);
 }
@@ -157,7 +152,7 @@ void ym2610_device::device_start()
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate, this, &ym2610_device::static_stream_generate);
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2610_device::stream_generate),this));
 	/* setup adpcm buffers */
 	pcmbufa  = *region();
 	pcmsizea = region()->bytes();

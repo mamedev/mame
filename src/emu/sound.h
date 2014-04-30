@@ -29,10 +29,7 @@ const int STREAM_SYNC       = -1;       // special rate value indicating a one-s
 //  MACROS
 //**************************************************************************
 
-// legacy
-#define STREAM_UPDATE(name) void name(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-
-
+typedef delegate<void (sound_stream &, stream_sample_t **inputs, stream_sample_t **outputs, int samples)> stream_update_delegate;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -98,7 +95,7 @@ class sound_stream
 	static const UINT32 FRAC_MASK               = FRAC_ONE - 1;
 
 	// construction/destruction
-	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, void *param = NULL, stream_update_func callback = &sound_stream::device_stream_update_stub);
+	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
 
 public:
 	// getters
@@ -133,7 +130,6 @@ private:
 	void apply_sample_rate_changes();
 
 	// internal helpers
-	static STREAM_UPDATE( device_stream_update_stub );
 	void recompute_sample_rate_data();
 	void allocate_resample_buffers();
 	void allocate_output_buffers();
@@ -174,8 +170,7 @@ private:
 	INT32               m_output_base_sampindex;      // sample at base of buffer, relative to the current emulated second
 
 	// callback information
-	stream_update_func  m_callback;                   // callback function
-	void *              m_param;                      // callback function parameter
+	stream_update_delegate  m_callback;                   // callback function
 };
 
 
@@ -209,7 +204,7 @@ public:
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
 
 	// stream creation
-	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, void *param = NULL, sound_stream::stream_update_func callback = NULL);
+	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback = stream_update_delegate());
 
 	// global controls
 	void set_attenuation(int attenuation);

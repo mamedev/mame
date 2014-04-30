@@ -41,8 +41,7 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	static STREAM_UPDATE( static_stream_generate );
-	void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
 	sound_stream *  m_stream;
