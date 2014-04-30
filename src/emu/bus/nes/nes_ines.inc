@@ -59,8 +59,8 @@ static const nes_mmc mmc_list[] =
 	{ 27, UNL_WORLDHERO },  // 27 World Hero board - Unsupported
 	{ 28, BTL_ACTION53 },   // 28 - Multi-discrete PCB designed by Tepples for Action 53
 	// 29 Unused
-	{ 30, BTL_2A03_PURITANS },   // 30 - PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
-	// 31 Unused
+	// 30 UNROM 512 + Flash, currently unsupported
+	{ 31, BTL_2A03_PURITANS },   // 31 - PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
 	{ 32, IREM_G101 },
 	{ 33, TAITO_TC0190FMC },
 	{ 34, STD_BXROM },
