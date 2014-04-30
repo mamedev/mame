@@ -14,8 +14,7 @@ void ym2608_update_request(void *param);
 #define MCFG_YM2608_AY8910_INTF(_ay8910_config) \
 	ym2608_device::set_ay8910_config(*device, _ay8910_config);
 
-class ym2608_device : public device_t,
-									public device_sound_interface
+class ym2608_device : public ay8910_device
 {
 public:
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -27,7 +26,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	void *_psg();
 	void _IRQHandler(int irq);
 	void _timer_handler(int c,int count,int clock);
 	void _ym2608_update_request();
@@ -43,15 +41,13 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
+	static STREAM_UPDATE( static_stream_generate );
+	void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
 	void *          m_chip;
-	void *          m_psg;
 	devcb2_write_line m_irq_handler;
 	const ay8910_interface *m_ay8910_config;
 };

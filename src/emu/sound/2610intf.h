@@ -11,8 +11,7 @@ void ym2610_update_request(void *param);
 #define MCFG_YM2610_IRQ_HANDLER(_devcb) \
 	devcb = &ym2610_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-class ym2610_device : public device_t,
-									public device_sound_interface
+class ym2610_device : public ay8910_device
 {
 public:
 	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -24,7 +23,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	void *_psg();
 	void _IRQHandler(int irq);
 	void _timer_handler(int c,int count,int clock);
 	void _ym2610_update_request();
@@ -39,8 +37,8 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	static STREAM_UPDATE( static_stream_generate );
+	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	void *          m_chip;
 
@@ -59,8 +57,7 @@ class ym2610b_device : public ym2610_device
 public:
 	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type YM2610B;

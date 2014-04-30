@@ -4,25 +4,25 @@
 static void psg_set_clock(void *param, int clock)
 {
 	ym2203_device *ym2203 = (ym2203_device *) param;
-	ay8910_set_clock_ym(ym2203->_psg(), clock);
+	ym2203->ay_set_clock(clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
 	ym2203_device *ym2203 = (ym2203_device *) param;
-	ay8910_write_ym(ym2203->_psg(), address, data);
+	ym2203->ay8910_write_ym(address, data);
 }
 
 static int psg_read(void *param)
 {
 	ym2203_device *ym2203 = (ym2203_device *) param;
-	return ay8910_read_ym(ym2203->_psg());
+	return ym2203->ay8910_read_ym();
 }
 
 static void psg_reset(void *param)
 {
 	ym2203_device *ym2203 = (ym2203_device *) param;
-	ay8910_reset_ym(ym2203->_psg());
+	ym2203->ay8910_reset_ym();
 }
 
 static const ssg_callbacks psgintf =
@@ -32,11 +32,6 @@ static const ssg_callbacks psgintf =
 	psg_read,
 	psg_reset
 };
-
-void *ym2203_device::_psg()
-{
-	return m_psg;
-}
 
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
@@ -99,13 +94,16 @@ void ym2203_device::_ym2203_update_request()
 	m_stream->update();
 }
 
-
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2203_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+STREAM_UPDATE( ym2203_device::static_stream_generate )
+{
+	reinterpret_cast<ym2203_device *>(param)->stream_generate(inputs, outputs, samples);
+}
+
+void ym2203_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	ym2203_update_one(m_chip, outputs[0], samples);
 }
@@ -123,27 +121,18 @@ void ym2203_device::device_post_load()
 
 void ym2203_device::device_start()
 {
-	static const ay8910_interface default_ay8910_config =
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	};
-
+	ay8910_device::device_start();
+	
 	int rate = clock()/72; /* ??? */
 
-	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
-
 	m_irq_handler.resolve();
-	m_psg = ay8910_start_ym(this, ay8910_config);
-	assert_always(m_psg != NULL, "Error creating YM2203/AY8910 chip");
 
 	/* Timer Handler set */
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
+	m_stream = machine().sound().stream_alloc(*this,0,1,rate, this, &ym2203_device::static_stream_generate);
 
 	/* Initialize FM emurator */
 	m_chip = ym2203_init(this,this,clock(),rate,timer_handler,IRQHandler,&psgintf);
@@ -157,7 +146,6 @@ void ym2203_device::device_start()
 void ym2203_device::device_stop()
 {
 	ym2203_shutdown(m_chip);
-	ay8910_stop_ym(m_psg);
 }
 
 //-------------------------------------------------
@@ -203,10 +191,9 @@ WRITE8_MEMBER( ym2203_device::write_port_w )
 const device_type YM2203 = &device_creator<ym2203_device>;
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YM2203, "YM2203", tag, owner, clock, "ym2203", __FILE__),
-		device_sound_interface(mconfig, *this),
+	: ay8910_device(mconfig, YM2203, "YM2203", tag, owner, clock, "ym2203", __FILE__),
 		m_irq_handler(*this),
-		m_ay8910_config(NULL)
+		m_ay8910_config(NULL)		
 {
 }
 
@@ -218,4 +205,15 @@ ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, dev
 
 void ym2203_device::device_config_complete()
 {
+	static const ay8910_interface default_ay8910_config =
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+	};
+
+	if (m_ay8910_config != NULL) 
+		device_t::static_set_static_config(*this, m_ay8910_config);
+	else
+		device_t::static_set_static_config(*this, &(default_ay8910_config));
 }

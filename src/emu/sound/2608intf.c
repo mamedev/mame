@@ -17,25 +17,25 @@
 static void psg_set_clock(void *param, int clock)
 {
 	ym2608_device *ym2608 = (ym2608_device *) param;
-	ay8910_set_clock_ym(ym2608->_psg(), clock);
+	ym2608->ay_set_clock(clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
 	ym2608_device *ym2608 = (ym2608_device *) param;
-	ay8910_write_ym(ym2608->_psg(), address, data);
+	ym2608->ay8910_write_ym(address, data);
 }
 
 static int psg_read(void *param)
 {
 	ym2608_device *ym2608 = (ym2608_device *) param;
-	return ay8910_read_ym(ym2608->_psg());
+	return ym2608->ay8910_read_ym();
 }
 
 static void psg_reset(void *param)
 {
 	ym2608_device *ym2608 = (ym2608_device *) param;
-	ay8910_reset_ym(ym2608->_psg());
+	ym2608->ay8910_reset_ym();
 }
 
 static const ssg_callbacks psgintf =
@@ -45,11 +45,6 @@ static const ssg_callbacks psgintf =
 	psg_read,
 	psg_reset
 };
-
-void *ym2608_device::_psg()
-{
-	return m_psg;
-}
 
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
@@ -116,17 +111,20 @@ void ym2608_device::_ym2608_update_request()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2608_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+STREAM_UPDATE( ym2608_device::static_stream_generate )
+{
+	reinterpret_cast<ym2608_device *>(param)->stream_generate(inputs, outputs, samples);
+}
+
+void ym2608_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	ym2608_update_one(m_chip, outputs, samples);
 }
-
 
 void ym2608_device::device_post_load()
 {
 	ym2608_postload(m_chip);
 }
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -134,30 +132,22 @@ void ym2608_device::device_post_load()
 
 void ym2608_device::device_start()
 {
-	static const ay8910_interface default_ay8910_config =
-	{
-		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	};
-
+	ay8910_device::device_start();
+	
 	int rate = clock()/72;
 	void *pcmbufa;
 	int  pcmsizea;
 
-	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
 
 	m_irq_handler.resolve();
 	/* FIXME: Force to use single output */
-	m_psg = ay8910_start_ym(this, ay8910_config);
-	assert_always(m_psg != NULL, "Error creating YM2608/AY8910 chip");
 
 	/* Timer Handler set */
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate, this, &ym2608_device::static_stream_generate);
 	/* setup adpcm buffers */
 	pcmbufa  = *region();
 	pcmsizea = region()->bytes();
@@ -176,7 +166,6 @@ void ym2608_device::device_start()
 void ym2608_device::device_stop()
 {
 	ym2608_shutdown(m_chip);
-	ay8910_stop_ym(m_psg);
 }
 
 //-------------------------------------------------
@@ -202,8 +191,7 @@ WRITE8_MEMBER( ym2608_device::write )
 const device_type YM2608 = &device_creator<ym2608_device>;
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YM2608, "YM2608", tag, owner, clock, "ym2608", __FILE__),
-		device_sound_interface(mconfig, *this),
+	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, "ym2608", __FILE__),
 		m_irq_handler(*this),
 		m_ay8910_config(NULL)
 {
@@ -217,6 +205,16 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 
 void ym2608_device::device_config_complete()
 {
+	static const ay8910_interface default_ay8910_config =
+	{
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+	};
+	if (m_ay8910_config != NULL) 
+		device_t::static_set_static_config(*this, m_ay8910_config);
+	else
+		device_t::static_set_static_config(*this, &(default_ay8910_config));
 }
 
 ROM_START( ym2608 )
