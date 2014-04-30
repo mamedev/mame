@@ -1763,19 +1763,6 @@ WRITE16_MEMBER(pc88va_state::fdc_dma_w)
 	m_fdc->dma_w(data);
 }
 
-
-/* ch2 is FDC, ch0/3 are "user". ch1 is unused */
-static const upd71071_intf pc88va_dma_config =
-{
-	"maincpu",
-	8000000,
-	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_hlda_w),
-	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_tc_w),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER16(pc88va_state, fdc_dma_r), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER16(pc88va_state, fdc_dma_w), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
 FLOPPY_FORMATS_MEMBER( pc88va_state::floppy_formats )
 	FLOPPY_XDF_FORMAT
 FLOPPY_FORMATS_END
@@ -1834,7 +1821,13 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL )
 
-	MCFG_UPD71071_ADD("dmac", pc88va_dma_config)
+	MCFG_DEVICE_ADD("dmac", UPD71071, 0) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
+	MCFG_UPD71071_CPU("maincpu")
+	MCFG_UPD71071_CLOCK(8000000)
+	MCFG_UPD71071_OUT_HREQ_CB(WRITELINE(pc88va_state, pc88va_hlda_w))
+	MCFG_UPD71071_OUT_EOP_CB(WRITELINE(pc88va_state, pc88va_tc_w))
+	MCFG_UPD71071_DMA_READ_2_CB(READ16(pc88va_state, fdc_dma_r))
+	MCFG_UPD71071_DMA_WRITE_2_CB(WRITE16(pc88va_state, fdc_dma_w))
 
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_irq))
