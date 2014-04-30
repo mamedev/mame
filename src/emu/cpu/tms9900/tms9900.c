@@ -220,6 +220,7 @@ void tms99xx_device::device_start()
 
 	m_state_any = 0;
 	PC = 0;
+	m_hold_state = false;
 
 	// add the states for the debugger
 	for (int i=0; i < 20; i++)
