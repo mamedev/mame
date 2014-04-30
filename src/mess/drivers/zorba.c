@@ -16,12 +16,12 @@ and might be swappable. Need a schematic.
 ToDo:
 - Add interrupt vector hardware and masking feature
 - Connect devices to the above hardware
+- Fix the display
 - Fix the unholy mess surrounding the dma and crtc
 - Connect up the PIT
 - Replace the ascii keyboard with the real one, if possible
 - Probably lots of other things
 
-Note: because the 8275 isn't working, a generic video handler is being used at this time.
 
 *************************************************************************************************************/
 
@@ -44,29 +44,25 @@ class zorba_state : public driver_device
 {
 public:
 	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_beep(*this, "beeper"),
-		m_dma(*this, "dma"),
-		m_u0(*this, "uart0"),
-		m_u1(*this, "uart1"),
-		m_u2(*this, "uart2"),
-		m_pia0(*this, "pia0"),
-		m_pia1(*this, "pia1"),
-		m_crtc(*this, "crtc"),
-		m_fdc (*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
-		m_palette(*this, "palette")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_beep(*this, "beeper")
+		, m_dma(*this, "dma")
+		, m_u0(*this, "uart0")
+		, m_u1(*this, "uart1")
+		, m_u2(*this, "uart2")
+		, m_pia0(*this, "pia0")
+		, m_pia1(*this, "pia1")
+		, m_crtc(*this, "crtc")
+		, m_fdc (*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+	{}
 
 public:
 	const UINT8 *m_p_chargen;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(zorba);
-	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(zorba);
 	DECLARE_MACHINE_RESET(zorba);
 	DECLARE_READ8_MEMBER(ram_r);
@@ -83,6 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	I8275_DRAW_CHARACTER_MEMBER( zorba_update_chr );
+	required_device<palette_device> m_palette;
 
 private:
 	UINT8 m_term_data;
@@ -98,14 +95,11 @@ private:
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-public:
-	required_device<palette_device> m_palette;
 };
 
 static ADDRESS_MAP_START( zorba_mem, AS_PROGRAM, 8, zorba_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE( 0x4000, 0xf6ff ) AM_RAM
-	AM_RANGE( 0xf700, 0xffff ) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0x4000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zorba_kbdmem, AS_PROGRAM, 8, zorba_state )
@@ -193,7 +187,7 @@ READ8_MEMBER(zorba_state::memory_read_byte)
 WRITE8_MEMBER(zorba_state::memory_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 READ8_MEMBER(zorba_state::io_read_byte)
@@ -212,7 +206,7 @@ WRITE8_MEMBER(zorba_state::io_write_byte)
 	}
 	else
 	{
-		return prog_space.write_byte(offset, data);
+		prog_space.write_byte(offset, data);
 	}
 }
 
@@ -252,6 +246,9 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+
+	if (gpa) charcode+=0x80; // attribute 0x84 on title screen
+
 	UINT8 gfx = m_p_chargen[(linecount & 15) + (charcode << 4)];
 
 	if (vsp)
@@ -267,46 +264,31 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
 }
 
+
+/* F4 Character Displayer */
+static const gfx_layout u5_charlayout =
+{
+	8, 11,                   /* 8 x 11 characters */
+	256,                  /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
+	8*16                    /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( zorba )
+	GFXDECODE_ENTRY( "chargen", 0x0000, u5_charlayout, 0, 1 )
+GFXDECODE_END
+
 MACHINE_RESET_MEMBER( zorba_state, zorba )
 {
 	m_beep->set_frequency(800);
 	m_p_chargen = memregion("chargen")->base();
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
-}
-
-UINT32 zorba_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-
-	for (y = 0; y < 25; y++)
-	{
-		for (ra = 0; ra < 11; ra++)
-		{
-			UINT16 *p = &bitmap.pix16(sy++);
-
-			for (x = 0; x < 80; x++)
-			{
-				gfx = 0;
-				chr = m_p_videoram[x+ma];
-
-				if (chr) gfx = m_p_chargen[(chr<<4) | ra ];
-
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-		ma+=80;
-	}
-	return 0;
 }
 
 READ8_MEMBER( zorba_state::keyboard_r )
@@ -337,14 +319,9 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	//MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update) // not working
-	MCFG_SCREEN_UPDATE_DRIVER(zorba_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 276)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
-	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update) // not working
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
 
