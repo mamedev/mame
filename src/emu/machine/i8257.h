@@ -45,57 +45,61 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_I8257N_ADD(_tag, _clock, _config) \
+#define MCFG_I8257_ADD(_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, I8257N, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_I8257N_OUT_HRQ_CB(_devcb) \
+#define MCFG_I8257_OUT_HRQ_CB(_devcb) \
 	devcb = &i8257n_device::set_out_hrq_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_TC_CB(_devcb) \
+#define MCFG_I8257_OUT_TC_CB(_devcb) \
 	devcb = &i8257n_device::set_out_tc_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_IN_MEMR_CB(_devcb) \
+#define MCFG_I8257_IN_MEMR_CB(_devcb) \
 	devcb = &i8257n_device::set_in_memr_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_MEMW_CB(_devcb) \
+#define MCFG_I8257_OUT_MEMW_CB(_devcb) \
 	devcb = &i8257n_device::set_out_memw_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_IN_IOR_0_CB(_devcb) \
+#define MCFG_I8257_IN_IOR_0_CB(_devcb) \
 	devcb = &i8257n_device::set_in_ior_0_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_IN_IOR_1_CB(_devcb) \
+#define MCFG_I8257_IN_IOR_1_CB(_devcb) \
 	devcb = &i8257n_device::set_in_ior_1_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_IN_IOR_2_CB(_devcb) \
+#define MCFG_I8257_IN_IOR_2_CB(_devcb) \
 	devcb = &i8257n_device::set_in_ior_2_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_IN_IOR_3_CB(_devcb) \
+#define MCFG_I8257_IN_IOR_3_CB(_devcb) \
 	devcb = &i8257n_device::set_in_ior_3_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_IOW_0_CB(_devcb) \
+#define MCFG_I8257_OUT_IOW_0_CB(_devcb) \
 	devcb = &i8257n_device::set_out_iow_0_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_IOW_1_CB(_devcb) \
+#define MCFG_I8257_OUT_IOW_1_CB(_devcb) \
 	devcb = &i8257n_device::set_out_iow_1_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_IOW_2_CB(_devcb) \
+#define MCFG_I8257_OUT_IOW_2_CB(_devcb) \
 	devcb = &i8257n_device::set_out_iow_2_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_IOW_3_CB(_devcb) \
+#define MCFG_I8257_OUT_IOW_3_CB(_devcb) \
 	devcb = &i8257n_device::set_out_iow_3_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_DACK_0_CB(_devcb) \
+#define MCFG_I8257_OUT_DACK_0_CB(_devcb) \
 	devcb = &i8257n_device::set_out_dack_0_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_DACK_1_CB(_devcb) \
+#define MCFG_I8257_OUT_DACK_1_CB(_devcb) \
 	devcb = &i8257n_device::set_out_dack_1_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_DACK_2_CB(_devcb) \
+#define MCFG_I8257_OUT_DACK_2_CB(_devcb) \
 	devcb = &i8257n_device::set_out_dack_2_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257N_OUT_DACK_3_CB(_devcb) \
+#define MCFG_I8257_OUT_DACK_3_CB(_devcb) \
 	devcb = &i8257n_device::set_out_dack_3_callback(*device, DEVCB2_##_devcb);
+
+// HACK: the radio86 and alikes require this, is it a bug in the soviet clone or is there something else happening?
+#define MCFG_I8257_REVERSE_RW_MODE(_flag) \
+		i8257n_device::static_set_reverse_rw_mode(*device, _flag);
 
 // ======================> i8257n_device
 
@@ -138,6 +142,7 @@ public:
 	template<class _Object> static devcb2_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<i8257n_device &>(device).m_out_dack_2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<i8257n_device &>(device).m_out_dack_3_cb.set_callback(object); }
 
+	static void static_set_reverse_rw_mode(device_t &device, bool flag) { downcast<i8257n_device &>(device).m_reverse_rw = flag; }
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -153,10 +158,11 @@ private:
 	inline void set_dack();
 	inline void dma_read();
 	inline void dma_write();
-	inline void end_of_process();
+	inline void advance();
 	inline void set_tc(int state);
 	bool next_channel();
 
+	bool m_reverse_rw;
 	bool m_tc;
 	int m_msb;
 	int m_hreq;

@@ -1628,7 +1628,6 @@ $(MESSOBJ)/psion.a:             \
 $(MESSOBJ)/radio.a:             \
 	$(MESS_DRIVERS)/radio86.o   \
 	$(MESS_MACHINE)/radio86.o   \
-	$(MESS_VIDEO)/radio86.o     \
 	$(MESS_DRIVERS)/apogee.o    \
 	$(MESS_DRIVERS)/partner.o   \
 	$(MESS_MACHINE)/partner.o   \

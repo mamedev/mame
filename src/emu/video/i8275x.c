@@ -266,6 +266,12 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		if (m_scanline < m_vrtc_scanline)
 		{
+
+			if (OFFSET_LINE_COUNTER)
+			{
+				lc = (lc - 1) & 0x0f;
+			}
+
 			for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
 			{
 				int m_lineattr = 0;
@@ -327,11 +333,6 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					{
 						lten = vis;
 					}
-				}
-
-				if (OFFSET_LINE_COUNTER)
-				{
-					lc = (lc - 1) & 0x0f;
 				}
 
 				if (!m_display_cb.isnull())

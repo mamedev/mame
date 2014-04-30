@@ -10,8 +10,6 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/8257dma.h"
-#include "video/i8275.h"
 #include "includes/radio86.h"
 
 
@@ -99,7 +97,7 @@ WRITE_LINE_MEMBER(radio86_state::hrq_w)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
-	m_dma8257->i8257_hlda_w(state);
+	m_dma8257->hlda_w(state);
 }
 
 READ8_MEMBER(radio86_state::memory_read_byte)
@@ -186,42 +184,41 @@ WRITE8_MEMBER(radio86_state::mikrosha_8255_font_page_w)
 	m_mikrosha_font_page = (data  > 7) & 1;
 }
 
-const i8275_interface radio86_i8275_interface = {
-	6,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	radio86_display_pixels
+I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
+{
+	int i;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	const UINT8 *charmap = m_charmap;
+	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if(linecount == 8)
+		return;
+	if (vsp) {
+		pixels = 0;
+	}
+	if (lten) {
+		pixels = 0xff;
+	}
+	if (rvv) {
+		pixels ^= 0xff;
+	}
+	for(i=0;i<6;i++) {
+		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
+	}
+}
+
+static const rgb_t radio86_palette[3] = {
+	rgb_t(0x00, 0x00, 0x00), // black
+	rgb_t(0xa0, 0xa0, 0xa0), // white
+	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
-const i8275_interface mikrosha_i8275_interface = {
-	6,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	mikrosha_display_pixels
-};
+PALETTE_INIT_MEMBER(radio86_state,radio86)
+{
+	palette.set_pen_colors(0, radio86_palette, ARRAY_LENGTH(radio86_palette));
+}
 
-const i8275_interface apogee_i8275_interface = {
-	6,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	apogee_display_pixels
-};
+void radio86_state::video_start()
+{
+	m_charmap = memregion("gfx1")->base();
+}
 
-const i8275_interface partner_i8275_interface = {
-	6,
-	1,
-	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	partner_display_pixels
-};

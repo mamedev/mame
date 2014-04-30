@@ -41,8 +41,8 @@ ToDo:
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
-#include "machine/8257dma.h"
-#include "video/i8275.h"
+#include "machine/i8257.h"
+#include "video/i8275x.h"
 #include "sound/speaker.h"
 
 
@@ -69,9 +69,11 @@ public:
 	DECLARE_READ8_MEMBER(ppi1_c_r);
 	DECLARE_WRITE8_MEMBER(ppi1_a_w);
 	DECLARE_WRITE8_MEMBER(ppi1_c_w);
-	DECLARE_WRITE8_MEMBER(cpu_status_callback);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_PALETTE_INIT(unior);
 	DECLARE_READ8_MEMBER(dma_r);
+	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+
 	UINT8 *m_p_vram;
 	UINT8 *m_p_chargen;
 private:
@@ -81,7 +83,7 @@ private:
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
-	required_device<i8257_device> m_dma;
+	required_device<i8257n_device> m_dma;
 	required_device<i8251_device> m_uart;
 public:
 	required_device<palette_device> m_palette;
@@ -96,11 +98,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, i8257_r, i8257_w) // dma data
+	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257n_device, read, write) // dma data
 	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi0", i8255_device, read, write) // cassette player control
 	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0x50, 0x50) AM_WRITE(scroll_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275_device, read, write)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275x_device, read, write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("pit", pit8253_device, read, write )
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
@@ -256,11 +258,14 @@ WRITE8_MEMBER( unior_state::scroll_w )
 		memcpy(m_p_vram, m_p_vram+80, 24*80);
 }
 
-static I8275_DISPLAY_PIXELS(display_pixels)
+I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
-	unior_state *state = device->machine().driver_data<unior_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 gfx = state->m_p_chargen[(linecount & 7) | (charcode << 3)];
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
+
+	if(linecount == 8)
+		return;
+
 	if (vsp)
 		gfx = 0;
 
@@ -273,17 +278,6 @@ static I8275_DISPLAY_PIXELS(display_pixels)
 	for(UINT8 i=0;i<6;i++)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
-
-static const i8275_interface crtc_intf =
-{
-	6,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("dma", i8257_device, i8257_drq2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	display_pixels
-};
 
 static const rgb_t unior_palette[3] =
 {
@@ -369,9 +363,10 @@ READ8_MEMBER(unior_state::dma_r)
 		return m_p_vram[offset & 0x7ff];
 }
 
-WRITE8_MEMBER( unior_state::cpu_status_callback )
+WRITE_LINE_MEMBER( unior_state::hrq_w )
 {
-	m_dma->i8257_hlda_w(BIT(data, 3));
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dma->hlda_w(state);
 }
 
 
@@ -397,15 +392,13 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
 	MCFG_CPU_IO_MAP(unior_io)
-	MCFG_I8085A_STATUS(WRITE8(unior_state, cpu_status_callback))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
@@ -439,12 +432,16 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL_20MHz / 9) // unknown clock
-	MCFG_I8257_OUT_HRQ_CB(INPUTLINE("maincpu", I8085_HALT))
-	MCFG_I8257_OUT_MEMW_CB(DEVWRITE8("crtc", i8275_device, dack_w))
-	MCFG_I8257_IN_IOR_2_CB(READ8(unior_state, dma_r))
+	MCFG_DEVICE_ADD("dma", I8257N, XTAL_20MHz / 9) // unknown clock
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
+	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275x_device, dack_w))
 
-	MCFG_I8275_ADD("crtc", crtc_intf)
+	MCFG_DEVICE_ADD("crtc", I8275x, XTAL_20MHz / 9 / 4) // unknown clock
+	MCFG_I8275_CHARACTER_WIDTH(6)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257n_device, dreq2_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 /* ROM definition */
