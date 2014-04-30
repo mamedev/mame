@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xea00, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr_paletteram9_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM     /* schematics show a 2716 @ 2B here, but nobody used it */
 ADDRESS_MAP_END
@@ -520,7 +520,7 @@ static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr3_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr_paletteram9_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM //AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM AM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("DSW1")
