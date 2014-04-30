@@ -17,7 +17,7 @@ ToDo:
 - Add interrupt vector hardware and masking feature
 - Connect devices to the above hardware
 - Fix the display
-- Fix the unholy mess surrounding the dma and crtc
+- Fix floppy-disk
 - Connect up the PIT
 - Replace the ascii keyboard with the real one, if possible
 - Probably lots of other things
@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update) // not working
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
