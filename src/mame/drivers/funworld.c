@@ -6124,27 +6124,13 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, rcdino4)
-/*****************************************************
-
-  Dino4 hardware with CPU+PLCC daughterboard
-
-  Program ROM data & address lines are swapped.
-  GFX ROMs address lines are swapped and data encrypted.
-
-  Color PROM seems straight.
-
-******************************************************/
+static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT8 *src)
 {
-	UINT8 *rom = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
 	int start = 0x0000;
 
-	UINT8 *gfxrom = memregion("gfx1")->base();
-	int sizeg = memregion("gfx1")->bytes();
 	int startg = 0;
 
-	int i, a, j;
+	int i, a;
 
 	/*****************************
 	*   Program ROM decryption   *
@@ -6170,139 +6156,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 			rom[a] = buffer[i];
 		}
 
-		j = 0;
-
-		for (i = 0x8101; i < 0x8173;)
-		{
-			rom[i] ^= 0xb8;
-
-			switch (j)
-			{
-				case 0:
-				case 2:
-				case 4:
-				case 5:
-				{
-					i += 2;
-					break;
-				}
-
-				case 1:
-				case 3:
-				case 6:
-				{
-					i += 3;
-					break;
-				}
-
-				default: /* case 7 */
-				{
-					i += 2;
-					j = 0;
-				}
-			}
-
-			++j;
-		}
-
-		/* I could not find any obvious pattern to these */
-
-		rom[0x8174] ^= 0xb8;
-		rom[0x8176] ^= 0xb8;
-		rom[0x8177] ^= 0xb8;
-		rom[0x8179] ^= 0xb8;
-		rom[0x817b] ^= 0xb8;
-		rom[0x817d] ^= 0xb8;
-		rom[0x8180] ^= 0xb8;
-		rom[0x8183] ^= 0xb8;
-		rom[0x8185] ^= 0xb8;
-		rom[0x8187] ^= 0xb8;
-		rom[0x818a] ^= 0xb8;
-		rom[0x818c] ^= 0xb8;
-		rom[0x818f] ^= 0xb8;
-		rom[0x8192] ^= 0xb8;
-		rom[0x8195] ^= 0xb8;
-		rom[0x8198] ^= 0xb8;
-		rom[0x819b] ^= 0xb8;
-		rom[0x819d] ^= 0xb8;
-		rom[0x81a0] ^= 0xb8;
-		rom[0x81b2] ^= 0xb8;
-		rom[0x81b3] ^= 0xb8;
-		rom[0x81b4] ^= 0xb8;
-		rom[0x81b5] ^= 0xb8;
-		rom[0x81b7] ^= 0xb8;
-		rom[0x81b9] ^= 0xb8;
-		rom[0x81bb] ^= 0xb8;
-		rom[0x81bd] ^= 0xb8;
-		rom[0x81bf] ^= 0xb8;
-		rom[0x81c1] ^= 0xb8;
-		rom[0x81c3] ^= 0xb8;
-		rom[0x81c5] ^= 0xb8;
-		rom[0x81c7] ^= 0xb8;
-		rom[0x81c9] ^= 0xb8;
-		rom[0x81cb] ^= 0xb8;
-		rom[0x81cd] ^= 0xb8;
-		rom[0x81ce] ^= 0xb8;
-		rom[0x81d0] ^= 0xb8;
-		rom[0x81d2] ^= 0xb8;
-		rom[0x81d3] ^= 0xb8;
-		rom[0x81d5] ^= 0xb8;
-		rom[0x81d6] ^= 0xb8;
-		rom[0x81d8] ^= 0xb8;
-		rom[0x81db] ^= 0xb8;
-		rom[0x81dd] ^= 0xb8;
-		rom[0x81df] ^= 0xb8;
-		rom[0x81e0] ^= 0xb8;
-		rom[0x81e2] ^= 0xb8;
-		rom[0x81e5] ^= 0xb8;
-		rom[0x81e7] ^= 0xb8;
-		rom[0x81ea] ^= 0xb8;
-		rom[0x81ec] ^= 0xb8;
-		rom[0x81ef] ^= 0xb8;
-		rom[0x81f1] ^= 0xb8;
-		rom[0x81f4] ^= 0xb8;
-		rom[0x81f6] ^= 0xb8;
-		rom[0x81f9] ^= 0xb8;
-		rom[0x81fb] ^= 0xb8;
-		rom[0x81fe] ^= 0xb8;
-
-		rom[0x8201] ^= 0x32;
-		rom[0x8204] ^= 0x32;
-		rom[0x8207] ^= 0x32;
-		rom[0x8209] ^= 0x32;
-		rom[0x820a] ^= 0x32;
-		rom[0x820d] ^= 0x32;
-		rom[0x820e] ^= 0x32;
-		rom[0x8210] ^= 0x32;
-		rom[0x8212] ^= 0x32;
-		rom[0x8213] ^= 0x32;
-		rom[0x8214] ^= 0x32;
-		rom[0x8215] ^= 0x32;
-		rom[0x8216] ^= 0x32;
-		rom[0x8217] ^= 0x32;
-		rom[0x8219] ^= 0x32;
-		rom[0x821b] ^= 0x32;
-		rom[0x821d] ^= 0x32;
-		rom[0x821f] ^= 0x32;
-		rom[0x8221] ^= 0x32;
-		rom[0x8223] ^= 0x32;
-		rom[0x8225] ^= 0x32;
-		rom[0x8226] ^= 0x32;
-		rom[0x8227] ^= 0x32;
-		rom[0x822a] ^= 0x32;
-		rom[0x822c] ^= 0x32;
-		rom[0x822d] ^= 0x32;
-		rom[0x8230] ^= 0x32;
-		rom[0x8232] ^= 0x32;
-		rom[0x8254] ^= 0x32;
-		rom[0x8255] ^= 0x32;
-		rom[0x8256] ^= 0x32;
-		rom[0x8259] ^= 0x32;
-		rom[0x825a] ^= 0x32;
-		rom[0x825c] ^= 0x32;
-
 	}
-
 
 	/******************************
 	*   Graphics ROM decryption   *
@@ -6324,7 +6178,6 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 	/* d4-d5 data lines swap, plus a XOR with 0x81, implemented in two steps for an easy view */
 
 	int x;
-	UINT8 *src = memregion( "gfx1" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -6332,6 +6185,168 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 		src[x] = src[x] ^ 0x81;
 	}
 
+}
+
+DRIVER_INIT_MEMBER(funworld_state, rcdino4)
+/*****************************************************
+
+  Dino4 hardware with CPU+PLCC daughterboard
+
+  Program ROM data & address lines are swapped.
+  GFX ROMs address lines are swapped and data encrypted.
+
+  Color PROM seems straight.
+
+******************************************************/
+{
+	int i, j;
+	UINT8 *rom = memregion("maincpu")->base();
+
+	decrypt_rcdino4(rom, memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
+
+	j = 0;
+
+	for (i = 0x8101; i < 0x8173;)
+	{
+		rom[i] ^= 0xb8;
+
+		switch (j)
+		{
+			case 0:
+			case 2:
+			case 4:
+			case 5:
+			{
+				i += 2;
+				break;
+			}
+
+			case 1:
+			case 3:
+			case 6:
+			{
+				i += 3;
+				break;
+			}
+
+			default: /* case 7 */
+			{
+				i += 2;
+				j = 0;
+			}
+		}
+
+		++j;
+	}
+
+	/* I could not find any obvious pattern to these */
+
+	rom[0x8174] ^= 0xb8;
+	rom[0x8176] ^= 0xb8;
+	rom[0x8177] ^= 0xb8;
+	rom[0x8179] ^= 0xb8;
+	rom[0x817b] ^= 0xb8;
+	rom[0x817d] ^= 0xb8;
+	rom[0x8180] ^= 0xb8;
+	rom[0x8183] ^= 0xb8;
+	rom[0x8185] ^= 0xb8;
+	rom[0x8187] ^= 0xb8;
+	rom[0x818a] ^= 0xb8;
+	rom[0x818c] ^= 0xb8;
+	rom[0x818f] ^= 0xb8;
+	rom[0x8192] ^= 0xb8;
+	rom[0x8195] ^= 0xb8;
+	rom[0x8198] ^= 0xb8;
+	rom[0x819b] ^= 0xb8;
+	rom[0x819d] ^= 0xb8;
+	rom[0x81a0] ^= 0xb8;
+	rom[0x81b2] ^= 0xb8;
+	rom[0x81b3] ^= 0xb8;
+	rom[0x81b4] ^= 0xb8;
+	rom[0x81b5] ^= 0xb8;
+	rom[0x81b7] ^= 0xb8;
+	rom[0x81b9] ^= 0xb8;
+	rom[0x81bb] ^= 0xb8;
+	rom[0x81bd] ^= 0xb8;
+	rom[0x81bf] ^= 0xb8;
+	rom[0x81c1] ^= 0xb8;
+	rom[0x81c3] ^= 0xb8;
+	rom[0x81c5] ^= 0xb8;
+	rom[0x81c7] ^= 0xb8;
+	rom[0x81c9] ^= 0xb8;
+	rom[0x81cb] ^= 0xb8;
+	rom[0x81cd] ^= 0xb8;
+	rom[0x81ce] ^= 0xb8;
+	rom[0x81d0] ^= 0xb8;
+	rom[0x81d2] ^= 0xb8;
+	rom[0x81d3] ^= 0xb8;
+	rom[0x81d5] ^= 0xb8;
+	rom[0x81d6] ^= 0xb8;
+	rom[0x81d8] ^= 0xb8;
+	rom[0x81db] ^= 0xb8;
+	rom[0x81dd] ^= 0xb8;
+	rom[0x81df] ^= 0xb8;
+	rom[0x81e0] ^= 0xb8;
+	rom[0x81e2] ^= 0xb8;
+	rom[0x81e5] ^= 0xb8;
+	rom[0x81e7] ^= 0xb8;
+	rom[0x81ea] ^= 0xb8;
+	rom[0x81ec] ^= 0xb8;
+	rom[0x81ef] ^= 0xb8;
+	rom[0x81f1] ^= 0xb8;
+	rom[0x81f4] ^= 0xb8;
+	rom[0x81f6] ^= 0xb8;
+	rom[0x81f9] ^= 0xb8;
+	rom[0x81fb] ^= 0xb8;
+	rom[0x81fe] ^= 0xb8;
+
+	rom[0x8201] ^= 0x32;
+	rom[0x8204] ^= 0x32;
+	rom[0x8207] ^= 0x32;
+	rom[0x8209] ^= 0x32;
+	rom[0x820a] ^= 0x32;
+	rom[0x820d] ^= 0x32;
+	rom[0x820e] ^= 0x32;
+	rom[0x8210] ^= 0x32;
+	rom[0x8212] ^= 0x32;
+	rom[0x8213] ^= 0x32;
+	rom[0x8214] ^= 0x32;
+	rom[0x8215] ^= 0x32;
+	rom[0x8216] ^= 0x32;
+	rom[0x8217] ^= 0x32;
+	rom[0x8219] ^= 0x32;
+	rom[0x821b] ^= 0x32;
+	rom[0x821d] ^= 0x32;
+	rom[0x821f] ^= 0x32;
+	rom[0x8221] ^= 0x32;
+	rom[0x8223] ^= 0x32;
+	rom[0x8225] ^= 0x32;
+	rom[0x8226] ^= 0x32;
+	rom[0x8227] ^= 0x32;
+	rom[0x822a] ^= 0x32;
+	rom[0x822c] ^= 0x32;
+	rom[0x822d] ^= 0x32;
+	rom[0x8230] ^= 0x32;
+	rom[0x8232] ^= 0x32;
+	rom[0x8254] ^= 0x32;
+	rom[0x8255] ^= 0x32;
+	rom[0x8256] ^= 0x32;
+	rom[0x8259] ^= 0x32;
+	rom[0x825a] ^= 0x32;
+	rom[0x825c] ^= 0x32;
+
+}
+
+DRIVER_INIT_MEMBER(funworld_state, rcdinch)
+/*****************************************************
+
+  Dino4 hardware with CPU+PLCC daughterboard
+
+  Less encryption than rc4dino
+
+******************************************************/
+{
+	decrypt_rcdino4(memregion("maincpu")->base(), memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
 }
 
 /**********************************************
@@ -6431,7 +6446,7 @@ GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, tabblue, 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
 GAME(  1998, rcdino4,   0,        cuoreuno, cuoreuno,  funworld_state, rcdino4,  ROT0, "<unknown>",       "unknown encrypted Royal Card (Dino4 HW)",         GAME_NOT_WORKING )
-GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdino4,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
+GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdinch,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
 
 // MCU based games...
 GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, mongolnw, ROT0, "<unknown>",       "Mongolfier New (Italian)",                        GAME_UNEMULATED_PROTECTION )
