@@ -13,6 +13,7 @@
 
     TODO:
 
+	- character attributes
     - double spaced rows
 
 */
@@ -132,7 +133,6 @@ void i8275x_device::device_start()
 	// allocate timers
 	m_hrtc_on_timer = timer_alloc(TIMER_HRTC_ON);
 	m_drq_on_timer = timer_alloc(TIMER_DRQ_ON);
-	m_drq_off_timer = timer_alloc(TIMER_DRQ_OFF);
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	// state saving
@@ -185,28 +185,6 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	case TIMER_DRQ_ON:
 		//if (LOG) logerror("I8275 '%s' y %u x %u DRQ 1\n", tag(), y, x);
 		m_write_drq(1);
-		m_drq_off_timer->adjust(clocks_to_attotime(DMA_BURST_COUNT));
-		break;
-
-	case TIMER_DRQ_OFF:
-		if (m_buffer_idx == 0)
-		{
-			m_status |= ST_DU;
-			m_du = true;
-			//if (LOG) logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
-			m_write_drq(0);
-		}
-		else if (m_buffer_idx == CHARACTERS_PER_ROW)
-		{
-			//if (LOG) logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
-			m_write_drq(0);
-		}
-		else if (DMA_BURST_SPACE > 0)
-		{
-			//if (LOG) logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
-			m_write_drq(0);
-			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
-		}
 		break;
 
 	case TIMER_SCANLINE:
@@ -252,12 +230,20 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		if (lc == 0)
 		{
+			if ((m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW) && (m_buffer_idx < CHARACTERS_PER_ROW) && !m_du)
+			{
+				m_status |= ST_DU;
+				m_du = true;
+				//if (LOG) logerror("I8275 '%s' y %u x %u DMA Underrun\n", tag(), y, x);
+				m_write_drq(0);
+			}
+
 			// swap line buffers
 			m_buffer_dma = !m_buffer_dma;
 			m_buffer_idx = 0;
 			m_fifo_idx = 0;
 
-			if (!m_du && ((m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW) || (m_scanline == m_vrtc_drq_scanline)))
+			if ((!m_du && (m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW)) || (m_scanline == m_vrtc_drq_scanline))
 			{
 				// start DMA burst
 				m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
@@ -266,11 +252,7 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		if (m_scanline < m_vrtc_scanline)
 		{
-
-			if (OFFSET_LINE_COUNTER)
-			{
-				lc = (lc - 1) & 0x0f;
-			}
+			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
 
 			for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
 			{
@@ -339,7 +321,7 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				m_display_cb(m_bitmap,
 					sx * m_hpixels_per_column, // x position on screen of starting point
 					m_scanline, // y position on screen
-					lc, // current line of char
+					line_counter, // current line of char
 					(data & 0x7f),  // char code to be displayed
 					m_lineattr,  // line attribute code
 					lten | m_lten,  // light enable signal
@@ -411,6 +393,7 @@ WRITE8_MEMBER( i8275x_device::write )
 			m_status &= ~ST_IE;
 			if (LOG) logerror("I8275 '%s' IRQ 0\n", tag());
 			m_write_irq(CLEAR_LINE);
+			m_write_drq(0);
 
 			m_param_idx = REG_SCN1;
 			m_param_end = REG_SCN4;
@@ -479,7 +462,11 @@ WRITE8_MEMBER( i8275x_device::write )
 
 WRITE8_MEMBER( i8275x_device::dack_w )
 {
-	//if (LOG) logerror("DACK write %02x %u\n", data, m_buffer_idx);
+	//int y = m_screen->vpos();
+	//int x = m_screen->hpos();
+	//if (LOG) logerror("I8275 '%s' y %u x %u DACK %04x:%02x %u\n", tag(), y, x, offset, data, m_buffer_idx);
+
+	m_write_drq(0);
 
 	if (m_fifo_next)
 	{
@@ -504,7 +491,15 @@ WRITE8_MEMBER( i8275x_device::dack_w )
 
 		if (m_buffer_idx == CHARACTERS_PER_ROW)
 		{
-			m_drq_off_timer->adjust(attotime::zero);
+			// stop DMA
+		}
+		else if (!(m_buffer_idx % DMA_BURST_COUNT))
+		{
+			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
+		}
+		else
+		{
+			m_drq_on_timer->adjust(attotime::zero);	
 		}
 	}
 }
@@ -571,6 +566,8 @@ void i8275x_device::recompute_parameters()
 	m_irq_scanline = (CHARACTER_ROWS_PER_FRAME - 1) * SCANLINES_PER_ROW;
 	m_vrtc_scanline = CHARACTER_ROWS_PER_FRAME * SCANLINES_PER_ROW;
 	m_vrtc_drq_scanline = vert_pix_total - SCANLINES_PER_ROW;
+
+	if (LOG) logerror("irq_y %u vrtc_y %u drq_y %u\n", m_irq_scanline, m_vrtc_scanline, m_vrtc_drq_scanline);
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
 }

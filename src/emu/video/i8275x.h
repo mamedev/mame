@@ -68,7 +68,6 @@
 
 
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -114,7 +113,6 @@ protected:
 	{
 		TIMER_HRTC_ON,
 		TIMER_DRQ_ON,
-		TIMER_DRQ_OFF,
 		TIMER_SCANLINE
 	};
 
@@ -212,7 +210,6 @@ protected:
 	// timers
 	emu_timer *m_hrtc_on_timer;
 	emu_timer *m_drq_on_timer;
-	emu_timer *m_drq_off_timer;
 	emu_timer *m_scanline_timer;
 };
 
