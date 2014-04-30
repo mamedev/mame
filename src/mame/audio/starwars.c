@@ -55,18 +55,6 @@ WRITE_LINE_MEMBER(starwars_state::snd_interrupt)
 }
 
 
-const riot6532_interface starwars_riot6532_intf =
-{
-	DEVCB_DRIVER_MEMBER(starwars_state,r6532_porta_r),
-	DEVCB_DEVICE_MEMBER("tms", tms5220_device, status_r),
-	DEVCB_DRIVER_MEMBER(starwars_state,r6532_porta_w),
-	DEVCB_DEVICE_MEMBER("tms", tms5220_device, data_w),
-	DEVCB_DRIVER_LINE_MEMBER(starwars_state,snd_interrupt)
-};
-
-
-
-
 /*************************************
  *
  *  Sound CPU to/from main CPU

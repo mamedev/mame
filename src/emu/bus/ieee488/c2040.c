@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  riot6532_interface riot0_intf uc1
+//  riot6532 uc1
 //-------------------------------------------------
 
 READ8_MEMBER( c2040_device::dio_r )
@@ -196,18 +196,9 @@ WRITE8_MEMBER( c2040_device::dio_w )
 	m_bus->dio_w(this, data);
 }
 
-static const riot6532_interface riot0_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, dio_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, dio_w),
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
-//  riot6532_interface riot1_intf ue1
+//  riot6532 ue1
 //-------------------------------------------------
 
 READ8_MEMBER( c2040_device::riot1_pa_r )
@@ -334,15 +325,6 @@ WRITE8_MEMBER( c2040_device::riot1_pb_w )
 	output_set_led_value(LED_ERR, BIT(data, 5));
 }
 
-static const riot6532_interface riot1_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pb_w),
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
-};
-
 
 WRITE8_MEMBER( c2040_device::via_pb_w )
 {
@@ -467,8 +449,16 @@ static MACHINE_CONFIG_FRAGMENT( c2040 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
 
-	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
-	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
+	MCFG_DEVICE_ADD(M6532_0_TAG, RIOT6532, XTAL_16MHz/16)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c2040_device, dio_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c2040_device, dio_w))
+
+	MCFG_DEVICE_ADD(M6532_1_TAG, RIOT6532, XTAL_16MHz/16)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c2040_device, riot1_pa_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(c2040_device, riot1_pa_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(c2040_device, riot1_pb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c2040_device, riot1_pb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 
 	// controller
 	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_16MHz/16)
@@ -513,8 +503,16 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
 
-	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
-	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
+	MCFG_DEVICE_ADD(M6532_0_TAG, RIOT6532, XTAL_16MHz/16)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c2040_device, dio_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c2040_device, dio_w))
+
+	MCFG_DEVICE_ADD(M6532_1_TAG, RIOT6532, XTAL_16MHz/16)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c2040_device, riot1_pa_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(c2040_device, riot1_pa_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(c2040_device, riot1_pb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c2040_device, riot1_pb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 
 	// controller
 	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_16MHz/16)

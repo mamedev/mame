@@ -1313,16 +1313,6 @@ READ8_MEMBER(a2600_state::riot_input_port_8_r)
 	return ioport("SWB")->read();
 }
 
-static const riot6532_interface r6532_interface =
-{
-	DEVCB_DRIVER_MEMBER(a2600_state,switch_A_r),
-	DEVCB_DRIVER_MEMBER(a2600_state,riot_input_port_8_r),
-	DEVCB_DRIVER_MEMBER(a2600_state,switch_A_w),
-	DEVCB_DRIVER_MEMBER(a2600_state,switch_B_w),
-	DEVCB_DRIVER_LINE_MEMBER(a2600_state, irq_callback)
-};
-
-
 void a2600_state::install_banks(int count, unsigned init)
 {
 	int i;
@@ -1953,7 +1943,12 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
+	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
@@ -1992,7 +1987,12 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
+	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)

@@ -699,16 +699,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const riot6532_interface riot_intf =
-{
-	DEVCB_DRIVER_MEMBER(firefox_state,riot_porta_r),
-	DEVCB_DEVICE_MEMBER("tms", tms5220_device, status_r),
-	DEVCB_DRIVER_MEMBER(firefox_state,riot_porta_w),
-	DEVCB_DEVICE_MEMBER("tms", tms5220_device, data_w),
-	DEVCB_DRIVER_LINE_MEMBER(firefox_state,riot_irq)
-};
-
-
 static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	/* basic machine hardware */
@@ -728,7 +718,6 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firefox)
 	MCFG_PALETTE_ADD("palette", 512)
 
-
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(64*8, 525, firefox_state, screen_update_firefox)
 	MCFG_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
@@ -738,7 +727,13 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram_1c")
 	MCFG_X2212_ADD_AUTOSAVE("nvram_1d")
-	MCFG_RIOT6532_ADD("riot", MASTER_XTAL/8, riot_intf)
+
+	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_XTAL/8)
+	MCFG_RIOT6532_IN_PA_CB(READ8(firefox_state, riot_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(firefox_state, riot_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("tms", tms5220_device, status_r))
+	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("tms", tms5220_device, data_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(firefox_state, riot_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

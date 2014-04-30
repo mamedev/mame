@@ -125,8 +125,6 @@ protected:
 
 /*----------- defined in machine/a7800.c -----------*/
 
-extern const riot6532_interface a7800_r6532_interface;
-
 void a7800_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 #endif /* A7800_H_ */

@@ -122,20 +122,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  riot6532_interface riot_intf
-//-------------------------------------------------
-
-static const riot6532_interface riot_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( interpod )
 //-------------------------------------------------
 
@@ -144,7 +130,7 @@ static MACHINE_CONFIG_FRAGMENT( interpod )
 	MCFG_CPU_PROGRAM_MAP(interpod_mem)
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
-	MCFG_RIOT6532_ADD(R6532_TAG, 1000000, riot_intf)
+	MCFG_DEVICE_ADD(R6532_TAG, RIOT6532, 1000000)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 
 	MCFG_CBM_IEEE488_ADD(NULL)

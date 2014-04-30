@@ -5,7 +5,7 @@
 
 
 //-------------------------------------------------
-//  i8275_interface crtc_intf
+//  i8275 crtc display pixels
 //-------------------------------------------------
 
 I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )

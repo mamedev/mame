@@ -380,27 +380,6 @@ void tomcat_state::machine_start()
 	m_dsp_BIO = 0;
 }
 
-static const riot6532_interface tomcat_riot6532_intf =
-{
-	DEVCB_NULL,
-/*
-    PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
-    PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
-    PA2 = /READY    INPUT   (TMS-5220 READY FLAG)
-    PA3 = FSEL  OUTPUT  Select TMS5220 clock;
-                0 = 325 KHz (8 KHz sampling)
-                1 = 398 KHz (10 KHz sampling)
-    PA4 = /CC1  OUTPUT  Coin Counter 1
-    PA5 = /CC2  OUTPUT  Coin Counter 2
-    PA6 = /MUSRES   OUTPUT  (Reset the Yamaha)
-    PA7 = MAINFLAG  INPUT
-*/
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL, //  PB0 - PB7   OUTPUT  Speech Data
-	DEVCB_NULL  // connected to IRQ line of 6502
-};
-
 static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
@@ -415,10 +394,23 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP( sound_map)
 
-	MCFG_RIOT6532_ADD("riot", XTAL_14_31818MHz / 8, tomcat_riot6532_intf)
+	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL_14_31818MHz / 8)
+	/*
+	 PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
+	 PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
+	 PA2 = /READY    INPUT   (TMS-5220 READY FLAG)
+	 PA3 = FSEL  OUTPUT  Select TMS5220 clock;
+	 0 = 325 KHz (8 KHz sampling)
+	 1 = 398 KHz (10 KHz sampling)
+	 PA4 = /CC1  OUTPUT  Coin Counter 1
+	 PA5 = /CC2  OUTPUT  Coin Counter 2
+	 PA6 = /MUSRES   OUTPUT  (Reset the Yamaha)
+	 PA7 = MAINFLAG  INPUT
+	 */
+	// OUTB PB0 - PB7   OUTPUT  Speech Data
+	// IRQ CB connected to IRQ line of 6502
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
-
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  riot6532_interface riot0_intf
+//  riot6532 0
 //-------------------------------------------------
 
 READ8_MEMBER( c8280_device::dio_r )
@@ -159,18 +159,8 @@ WRITE8_MEMBER( c8280_device::dio_w )
 	m_bus->dio_w(this, data);
 }
 
-static const riot6532_interface riot0_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, dio_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, dio_w),
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
-//  riot6532_interface riot1_intf
+//  riot6532 1
 //-------------------------------------------------
 
 READ8_MEMBER( c8280_device::riot1_pa_r )
@@ -298,16 +288,6 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 }
 
 
-static const riot6532_interface riot1_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pb_w),
-	DEVCB_CPU_INPUT_LINE(M6502_DOS_TAG, INPUT_LINE_IRQ0)
-};
-
-
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
@@ -325,8 +305,16 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
 
-	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/8, riot0_intf)
-	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/8, riot1_intf)
+	MCFG_DEVICE_ADD(M6532_0_TAG, RIOT6532, XTAL_12MHz/8)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c8280_device, dio_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c8280_device, dio_w))
+
+	MCFG_DEVICE_ADD(M6532_1_TAG, RIOT6532, XTAL_12MHz/8)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c8280_device, riot1_pa_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(c8280_device, riot1_pa_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(c8280_device, riot1_pb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c8280_device, riot1_pb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_DOS_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)

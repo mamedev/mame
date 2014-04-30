@@ -141,7 +141,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  riot6532_interface riot0_intf
+//  riot6532 0
 //-------------------------------------------------
 
 READ8_MEMBER( base_d9060_device::dio_r )
@@ -186,18 +186,8 @@ WRITE8_MEMBER( base_d9060_device::dio_w )
 }
 
 
-static const riot6532_interface riot0_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, dio_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, dio_w),
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
-//  riot6532_interface riot1_intf
+//  riot6532 1
 //-------------------------------------------------
 
 READ8_MEMBER( base_d9060_device::riot1_pa_r )
@@ -324,15 +314,6 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
 	output_set_led_value(LED_ERROR, !BIT(data, 5));
 }
 
-static const riot6532_interface riot1_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pb_w),
-	DEVCB_CPU_INPUT_LINE(M6502_DOS_TAG, INPUT_LINE_IRQ0)
-};
-
 
 WRITE8_MEMBER( base_d9060_device::via_pb_w )
 {
@@ -394,8 +375,16 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_main_mem)
 
-	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_4MHz/4, riot0_intf)
-	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_4MHz/4, riot1_intf)
+	MCFG_DEVICE_ADD(M6532_0_TAG, RIOT6532, XTAL_4MHz/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(base_d9060_device, dio_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(base_d9060_device, dio_w))
+
+	MCFG_DEVICE_ADD(M6532_1_TAG, RIOT6532, XTAL_4MHz/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(base_d9060_device, riot1_pa_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(base_d9060_device, riot1_pa_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(base_d9060_device, riot1_pb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(base_d9060_device, riot1_pb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_DOS_TAG, INPUT_LINE_IRQ0))
 
 	// controller
 	MCFG_CPU_ADD(M6502_HDC_TAG, M6502, XTAL_4MHz/4)
