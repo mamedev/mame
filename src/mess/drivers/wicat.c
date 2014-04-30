@@ -8,6 +8,14 @@ Wicat - various systems.
 
 ****************************************************************************/
 
+/*
+
+	TODO:
+
+	- video DMA is done line by line and needs to be in perfect sync
+
+*/
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
@@ -740,7 +748,7 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	{
 		int color = (romdata >> (7-i)) & 0x01;
 
-		if(linecount > 9)
+		if(vsp || linecount > 9)
 			color = 0;
 
 		bitmap.pix32(y, x + i) = pen[color];
