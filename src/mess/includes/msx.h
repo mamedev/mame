@@ -73,6 +73,7 @@ public:
 		m_bank10(*this, "bank10"),
 		m_bank11(*this, "bank11"),
 		m_region_maincpu(*this, "maincpu"),
+		m_region_kanji(*this, "kanji"),
 		m_io_joy0(*this, "JOY0"),
 		m_io_joy1(*this, "JOY1"),
 		m_io_dsw(*this, "DSW"),
@@ -127,8 +128,6 @@ public:
 	int m_rtc_latch;
 	/* disk */
 	UINT8 m_dsk_stat;
-	/* kanji */
-	UINT8 *m_kanji_mem;
 	int m_kanji_latch;
 	/* memory */
 	const msx_slot_layout *m_layout;
@@ -210,6 +209,7 @@ public:
 
 protected:
 	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_kanji;
 	required_ioport m_io_joy0;
 	required_ioport m_io_joy1;
 	required_ioport m_io_dsw;

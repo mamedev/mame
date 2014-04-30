@@ -10,7 +10,6 @@
 
 enum {
 	MSX_LAYOUT_SLOT_ENTRY,
-	MSX_LAYOUT_KANJI_ENTRY,
 	MSX_LAYOUT_LAST
 };
 
@@ -33,18 +32,6 @@ static const msx_slot_layout msx_slot_layout_##msx[] = {
 		extend,                     \
 		size,                       \
 		option                      \
-	},
-
-#define MSX_LAYOUT_KANJI(offset) \
-	{                               \
-		MSX_LAYOUT_KANJI_ENTRY,     \
-		SLOT_EMPTY,                 \
-		0,                          \
-		0,                          \
-		0,                          \
-		0,                          \
-		0,                          \
-		offset                      \
 	},
 
 #define MSX_LAYOUT_END \

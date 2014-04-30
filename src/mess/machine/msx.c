@@ -867,9 +867,6 @@ void msx_state::msx_memory_init()
 				page++;
 			}
 			break;
-		case MSX_LAYOUT_KANJI_ENTRY:
-			m_kanji_mem = m_region_maincpu->base() + layout->option;
-			break;
 		}
 	}
 }
@@ -1097,10 +1094,10 @@ READ8_MEMBER( msx_state::msx_kanji_r )
 {
 	UINT8 result = 0xff;
 
-	if (offset && m_kanji_mem)
+	if (offset && m_region_kanji)
 	{
 		int latch = m_kanji_latch;
-		result = m_kanji_mem[latch++];
+		result = m_region_kanji->u8(latch++);
 
 		m_kanji_latch &= ~0x1f;
 		m_kanji_latch |= latch & 0x1f;
