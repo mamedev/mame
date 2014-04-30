@@ -33,7 +33,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/z80dma.h"
 #include "machine/pit8253.h"
-#include "video/i8275x.h"
+#include "video/i8275.h"
 #include "sound/beep.h"
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
@@ -91,7 +91,7 @@ private:
 	required_device<i8251_device> m_u2;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
-	required_device<i8275x_device> m_crtc;
+	required_device<i8275_device> m_crtc;
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(rom_r,rom_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("crtc", i8275x_device, read, write)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("crtc", i8275_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
 	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_PIT8253_CLK1(XTAL_24MHz / 3) /* Timer 1: ? */
 	MCFG_PIT8253_CLK2(XTAL_24MHz / 3) /* Timer 2: ? */
 
-	MCFG_DEVICE_ADD("crtc", I8275x, XTAL_14_31818MHz/7)
+	MCFG_DEVICE_ADD("crtc", I8275, XTAL_14_31818MHz/7)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))

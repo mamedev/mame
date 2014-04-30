@@ -42,7 +42,7 @@ ToDo:
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8257.h"
-#include "video/i8275x.h"
+#include "video/i8275.h"
 #include "sound/speaker.h"
 
 
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi0", i8255_device, read, write) // cassette player control
 	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0x50, 0x50) AM_WRITE(scroll_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275x_device, read, write)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275_device, read, write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("pit", pit8253_device, read, write )
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275x_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
@@ -435,9 +435,9 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_DEVICE_ADD("dma", I8257N, XTAL_20MHz / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275x_device, dack_w))
+	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
 
-	MCFG_DEVICE_ADD("crtc", I8275x, XTAL_20MHz / 12)
+	MCFG_DEVICE_ADD("crtc", I8275, XTAL_20MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257n_device, dreq2_w))

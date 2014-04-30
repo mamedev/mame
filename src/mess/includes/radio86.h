@@ -9,7 +9,7 @@
 
 #include "machine/i8255.h"
 #include "machine/i8257.h"
-#include "video/i8275x.h"
+#include "video/i8275.h"
 #include "imagedev/cassette.h"
 
 

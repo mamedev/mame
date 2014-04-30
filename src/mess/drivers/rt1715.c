@@ -41,6 +41,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(rt1715);
+	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -133,7 +134,7 @@ WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
     VIDEO EMULATION
 ***************************************************************************/
 
-static I8275_DISPLAY_PIXELS( rt1715_display_pixels )
+I8275_DRAW_CHARACTER_MEMBER( rt1715_state::crtc_display_pixels )
 {
 }
 
@@ -155,17 +156,6 @@ static GFXDECODE_START( rt1715 )
 	GFXDECODE_ENTRY("gfx", 0x0000, rt1715_charlayout, 0, 1)
 	GFXDECODE_ENTRY("gfx", 0x0800, rt1715_charlayout, 0, 1)
 GFXDECODE_END
-
-static const i8275_interface rt1715_i8275_intf =
-{
-	8,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	rt1715_display_pixels
-};
 
 
 /***************************************************************************
@@ -298,7 +288,9 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
 
-	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
+	MCFG_DEVICE_ADD("a26", I8275, XTAL_2_4576MHz)
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
 
 	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
 

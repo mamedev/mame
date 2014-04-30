@@ -30,7 +30,7 @@ static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK("bank8")
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK("bank9")
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK("bank10")
-	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275x_device, read, write)  // video
+	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_device, read, write)  // video
 	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
 	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257n_device, write)    // DMA
@@ -183,14 +183,14 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 
-	MCFG_DEVICE_ADD("i8275", I8275x, XTAL_16MHz / 12)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(partner_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257n_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275x_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
 	MCFG_I8257_IN_IOR_0_CB(DEVREAD8("wd1793", fd1793_t, data_r))
 	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8("wd1793", fd1793_t, data_w))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275x_device, dack_w))
+	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
 	MCFG_CASSETTE_ADD( "cassette", partner_cassette_interface )

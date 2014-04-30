@@ -16,7 +16,7 @@ Wicat - various systems.
 #include "machine/mm58274c.h"
 #include "machine/mc2661.h"
 #include "machine/im6402.h"
-#include "video/i8275x.h"
+#include "video/i8275.h"
 #include "machine/am9517a.h"
 #include "machine/x2212.h"
 #include "machine/wd_fdc.h"
@@ -101,7 +101,7 @@ public:
 	required_device<mc2661_device> m_uart5;
 	required_device<mc2661_device> m_uart6;
 	required_device<cpu_device> m_videocpu;
-	required_device<i8275x_device> m_videoctrl;
+	required_device<i8275_device> m_videoctrl;
 	required_device<am9517a_device> m_videodma;
 	required_device<mc2661_device> m_videouart0;
 	required_device<mc2661_device> m_videouart1;
@@ -848,7 +848,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(wicat_state, dma_nmi_cb))
 	MCFG_AM9517A_IN_MEMR_CB(READ8(wicat_state, vram_r))
 	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(wicat_state, vram_w))
-	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("video", i8275x_device, dack_w))
+	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("video", i8275_device, dack_w))
 	MCFG_IM6402_ADD("videouart", 0, 0)
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wicat_state, kb_data_ready))
 
@@ -870,11 +870,11 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_SCREEN_SIZE(720,300)
 	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("video",i8275_device,screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_DEVICE_ADD("video", I8275x, XTAL_19_6608MHz/8)
+	MCFG_DEVICE_ADD("video", I8275, XTAL_19_6608MHz/8)
 	MCFG_I8275_CHARACTER_WIDTH(9)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("videodma",am9517a_device, dreq0_w))

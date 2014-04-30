@@ -44,7 +44,7 @@ static ADDRESS_MAP_START(apogee_mem, AS_PROGRAM, 8, apogee_state )
 	AM_RANGE( 0xec00, 0xec03 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x00fc)
 	AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
 	//AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
-	AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275x_device, read, write) AM_MIRROR(0x00fe) // video
+	AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
 	AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE("dma8257", i8257n_device, write)    // DMA
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -241,14 +241,14 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 
 	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 
-	MCFG_DEVICE_ADD("i8275", I8275x, XTAL_16MHz / 12)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257n_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275x_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275x_device, dack_w))
+	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
 	MCFG_CASSETTE_ADD( "cassette", apogee_cassette_interface )

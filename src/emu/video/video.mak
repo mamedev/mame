@@ -292,12 +292,10 @@ endif
 #-------------------------------------------------
 #
 #@src/emu/video/i8275.h,VIDEOS += I8275
-#@src/emu/video/i8275x.h,VIDEOS += I8275
 #-------------------------------------------------
 
 ifneq ($(filter I8275,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/i8275.o         \
-			$(VIDEOOBJ)/i8275x.o
+VIDEOOBJS+= $(VIDEOOBJ)/i8275.o
 endif
 
 #-------------------------------------------------
