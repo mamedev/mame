@@ -339,6 +339,8 @@ void sgb_lcd_device::device_start()
 	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_sgb_tile_data), 0x2000);
 
+	memset(m_sgb_tile_map, 0, sizeof(m_sgb_tile_map));
+
 	/* Some default colours for non-SGB games */
 	m_sgb_pal[0] = 32767;
 	m_sgb_pal[1] = 21140;
