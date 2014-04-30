@@ -62,7 +62,6 @@ public:
 
 public:
 	const UINT8 *m_p_chargen;
-	DECLARE_PALETTE_INIT(zorba);
 	DECLARE_DRIVER_INIT(zorba);
 	DECLARE_MACHINE_RESET(zorba);
 	DECLARE_READ8_MEMBER(ram_r);
@@ -235,21 +234,12 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
 }
 
-PALETTE_INIT_MEMBER( zorba_state, zorba )
-{
-	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
-}
-
 I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	if (gpa) charcode+=0x80; // attribute 0x84 on title screen
-
-	UINT8 gfx = m_p_chargen[(linecount & 15) + (charcode << 4)];
+	UINT8 gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
 	if (vsp)
 		gfx = 0;
@@ -322,8 +312,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
