@@ -57,7 +57,7 @@ void sega005_sound_device::device_start()
 	segag80r_state *state = machine().driver_data<segag80r_state>();
 
 	/* create the stream */
-	m_sega005_stream = machine().sound().stream_alloc(*this, 0, 1, SEGA005_COUNTER_FREQ, this);
+	m_sega005_stream = machine().sound().stream_alloc(*this, 0, 1, SEGA005_COUNTER_FREQ);
 
 	/* create a timer for the 555 */
 	m_sega005_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega005_sound_device::sega005_auto_timer), this));

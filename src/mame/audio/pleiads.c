@@ -668,7 +668,7 @@ void pleiads_sound_device::common_start()
 		m_poly18[i] = bits;
 	}
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 
 	save_item(NAME(m_sound_latch_a));
 	save_item(NAME(m_sound_latch_b));

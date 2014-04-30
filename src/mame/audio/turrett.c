@@ -42,7 +42,7 @@ void turrett_device::device_start()
 	m_direct = &space().direct();
 
 	// Create the sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
 
 	// Create the volume table
 	for (int i = 0; i < 0x4f; ++i)

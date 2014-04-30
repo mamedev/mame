@@ -630,7 +630,7 @@ void s14001a_device::device_start()
 
 	m_SpeechRom = *region();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
 }
 
 //-------------------------------------------------

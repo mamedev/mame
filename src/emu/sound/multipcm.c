@@ -439,7 +439,7 @@ void multipcm_device::device_start()
 
 	m_Rate=(float) clock() / MULTIPCM_CLOCKDIV;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_Rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_Rate);
 
 	//Volume+pan table
 	for(i=0;i<0x800;++i)

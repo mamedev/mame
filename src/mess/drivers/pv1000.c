@@ -65,7 +65,7 @@ void pv1000_sound_device::device_config_complete()
 
 void pv1000_sound_device::device_start()
 {
-	m_sh_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 1024, this);
+	m_sh_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 1024);
 
 	save_item(NAME(m_voice[0].count));
 	save_item(NAME(m_voice[0].period));

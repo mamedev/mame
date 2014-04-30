@@ -118,7 +118,7 @@ void x1_010_device::device_start()
 	LOG_SOUND(("masterclock = %d rate = %d\n", clock(), m_rate ));
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
 
 	save_item(NAME(m_rate));
 	save_item(NAME(m_sound_enable));

@@ -43,7 +43,7 @@ void socrates_snd_device::device_start()
 	m_DAC_output = 0x00; /* output */
 	m_state[0] = m_state[1] = m_state[2] = 0;
 	m_accum[0] = m_accum[1] = m_accum[2] = 0xFF;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
 }
 
 

@@ -77,7 +77,7 @@ void sp0250_device::device_start()
 		machine().scheduler().timer_pulse(attotime::from_hz(clock()) * CLOCK_DIVIDER, timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
 
 	save_item(NAME(m_amp));
 	save_item(NAME(m_pitch));

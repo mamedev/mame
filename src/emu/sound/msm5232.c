@@ -31,7 +31,7 @@ void msm5232_device::device_start()
 
 	init(clock(), rate);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
 
 	/* register with the save state system */
 	machine().save().register_postload(save_prepost_delegate(FUNC(msm5232_device::postload), this));

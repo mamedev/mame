@@ -262,7 +262,7 @@ void c6280_device::device_start()
 	int rate = clock() / 16;
 
 	/* Create stereo stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
 
 	/* Loudest volume level for table */
 	double level = 65535.0 / 6.0 / 32.0;

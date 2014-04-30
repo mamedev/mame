@@ -46,7 +46,7 @@ void flower_sound_device::device_start()
 	flower_sound_channel *voice;
 
 	m_effect_timer = timer_alloc(TIMER_CLOCK_EFFECT);
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, MIXER_SAMPLERATE, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, MIXER_SAMPLERATE);
 	m_mixer_buffer = auto_alloc_array(machine(), short, MIXER_SAMPLERATE);
 	make_mixer_table(8, MIXER_DEFGAIN);
 

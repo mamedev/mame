@@ -70,7 +70,7 @@ void asc_device::static_set_type(device_t &device, int type)
 void asc_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
 
 	memset(m_regs, 0, sizeof(m_regs));
 

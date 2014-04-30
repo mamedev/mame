@@ -117,7 +117,7 @@ void speaker_sound_device::device_start()
 	int i;
 	double x;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 
 	m_level = 0;
 	for (i = 0; i < FILTER_LENGTH; i++)

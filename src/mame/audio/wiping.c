@@ -51,7 +51,7 @@ void wiping_sound_device::device_start()
 	sound_channel *voice;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer = auto_alloc_array_clear(machine(), short, 2 * samplerate);

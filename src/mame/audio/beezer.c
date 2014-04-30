@@ -112,7 +112,7 @@ void beezer_sound_device::device_start()
 	m_sh6840_clocks_per_sample = (int)(((double)SH6840_CLOCK / (double)sample_rate) * (double)(1 << 24));
 
 	/* allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_sh6840_volume));

@@ -216,7 +216,7 @@ void vlm5030_device::device_start()
 	m_rom = region()->base();
 	m_address_mask = (region()->bytes() - 1) & 0xffff;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440);
 
 	/* don't restore "UINT8 *m_rom" when use vlm5030_set_rom() */
 

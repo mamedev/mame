@@ -157,7 +157,7 @@ void nesapu_device::device_start()
 	/* Initialize individual chips */
 	(m_APU.dpcm).memory = &machine().device(m_cpu_tag)->memory().space(AS_PROGRAM);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
 
 	/* register for save */
 	for (int i = 0; i < 2; i++)

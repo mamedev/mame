@@ -192,7 +192,7 @@ void es5506_device::device_start()
 		m_eslog = fopen("es.log", "w");
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
 	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : NULL;
@@ -334,7 +334,7 @@ void es5505_device::device_start()
 		m_eslog = fopen("es.log", "w");
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
 	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : NULL;

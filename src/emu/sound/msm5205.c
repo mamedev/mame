@@ -96,7 +96,7 @@ void msm5205_device::device_start()
 	compute_tables();
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::vclk_callback), this));
 
 	/* register for save states */

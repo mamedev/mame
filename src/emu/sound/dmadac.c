@@ -53,7 +53,7 @@ void dmadac_sound_device::device_start()
 	m_volume = 0x100;
 
 	/* allocate a stream channel */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, DEFAULT_SAMPLE_RATE, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, DEFAULT_SAMPLE_RATE);
 
 	/* register with the save state system */
 	save_item(NAME(m_bufin));

@@ -542,7 +542,7 @@ void seibu_adpcm_device::device_config_complete()
 void seibu_adpcm_device::device_start()
 {
 	m_playing = 0;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
 	m_base = machine().root_device().memregion(m_rom_region)->base();
 	m_adpcm.reset();
 }

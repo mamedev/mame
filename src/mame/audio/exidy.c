@@ -197,7 +197,7 @@ void exidy_sound_device::common_sh_start()
 	m_sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	sh6840_register_state_globals();

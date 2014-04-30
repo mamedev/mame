@@ -181,7 +181,7 @@ void k007232_device::device_start()
 	for (int i = 0; i < 0x10; i++)
 		m_wreg[i] = 0;
 
-	m_stream = machine().sound().stream_alloc(*this, 0 , 2, clock()/128, this);
+	m_stream = machine().sound().stream_alloc(*this, 0 , 2, clock()/128);
 
 	KDAC_A_make_fncode();
 

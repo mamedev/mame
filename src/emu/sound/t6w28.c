@@ -294,7 +294,7 @@ void t6w28_device::device_start()
 	int i;
 
 	m_sample_rate = clock() / 16;
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, m_sample_rate, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, m_sample_rate);
 
 	for (i = 0;i < 8;i++) m_volume[i] = 0;
 

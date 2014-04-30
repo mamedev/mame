@@ -175,7 +175,7 @@ void snes_sound_device::device_config_complete()
 
 void snes_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT8, SNES_SPCRAM_SIZE);
 

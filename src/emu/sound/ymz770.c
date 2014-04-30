@@ -48,7 +48,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, dev
 void ymz770_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 16000, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 16000);
 	m_rom_base = *region();
 	m_rom_limit = region()->bytes() * 8;
 

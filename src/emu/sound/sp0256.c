@@ -112,7 +112,7 @@ void sp0256_device::device_start()
 	m_drq_cb(1);
 	m_sby_cb(1);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
 
 	/* -------------------------------------------------------------------- */
 	/*  Configure our internal variables.                                   */
