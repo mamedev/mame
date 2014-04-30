@@ -128,6 +128,8 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 		m_Mod_RM.RM.w[i] = (WREGS)( i & 7 );
 		m_Mod_RM.RM.b[i] = (BREGS)reg_name[i & 7];
 	}
+
+	memset(&m_regs, 0x00, sizeof(m_regs));
 }
 
 
