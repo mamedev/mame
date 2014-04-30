@@ -112,14 +112,14 @@ void upd71071_device::device_start()
 {
 	m_out_hreq_cb.resolve_safe();
 	m_out_eop_cb.resolve_safe();
-	m_dma_read_0_cb.resolve;
-	m_dma_read_1_cb.resolve;
-	m_dma_read_2_cb.resolve;
-	m_dma_read_3_cb.resolve;
-	m_dma_write_0_cb.resolve;
-	m_dma_write_1_cb.resolve;
-	m_dma_write_2_cb.resolve;
-	m_dma_write_3_cb.resolve;
+	m_dma_read_0_cb.resolve_safe(0);
+	m_dma_read_1_cb.resolve_safe(0);
+	m_dma_read_2_cb.resolve_safe(0);
+	m_dma_read_3_cb.resolve_safe(0);
+	m_dma_write_0_cb.resolve_safe();
+	m_dma_write_1_cb.resolve_safe();
+	m_dma_write_2_cb.resolve_safe();
+	m_dma_write_3_cb.resolve_safe();
 	m_out_dack_0_cb.resolve_safe();
 	m_out_dack_1_cb.resolve_safe();
 	m_out_dack_2_cb.resolve_safe();
