@@ -84,7 +84,7 @@ public:
 
 protected:
 	required_device<cassette_image_device> m_cassette;
-	optional_device<i8257n_device> m_dma8257;
+	optional_device<i8257_device> m_dma8257;
 	required_device<i8255_device> m_ppi8255_1;
 	optional_device<i8255_device> m_ppi8255_2;
 	required_memory_region m_region_maincpu;

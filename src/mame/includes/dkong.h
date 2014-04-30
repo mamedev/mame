@@ -4,6 +4,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "machine/latch8.h"
 #include "machine/z80dma.h"
+#include "machine/i8257.h"
 
 
 /*
@@ -109,7 +110,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_z80dma(*this, "z80dma")
+		m_z80dma(*this, "z80dma"),
+		m_dma8257(*this, "dma8257")
 	{ }
 
 	/* devices */
@@ -189,6 +191,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
+	optional_device<i8257_device> m_dma8257;
 
 	/* radarscp_scanline */
 	int m_counter;
@@ -260,6 +263,7 @@ public:
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
+	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 
 	void braze_decrypt_rom(UINT8 *dest);
 	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);

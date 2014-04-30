@@ -83,7 +83,7 @@ private:
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
-	required_device<i8257n_device> m_dma;
+	required_device<i8257_device> m_dma;
 	required_device<i8251_device> m_uart;
 public:
 	required_device<palette_device> m_palette;
@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257n_device, read, write) // dma data
+	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, read, write) // dma data
 	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi0", i8255_device, read, write) // cassette player control
 	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0x50, 0x50) AM_WRITE(scroll_w)
@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
 
-	MCFG_DEVICE_ADD("dma", I8257N, XTAL_20MHz / 9)
+	MCFG_DEVICE_ADD("dma", I8257, XTAL_20MHz / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
@@ -440,7 +440,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL_20MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257n_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 

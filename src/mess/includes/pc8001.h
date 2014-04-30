@@ -48,7 +48,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
-	required_device<i8257n_device> m_dma;
+	required_device<i8257_device> m_dma;
 	required_device<upd3301_device> m_crtc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;

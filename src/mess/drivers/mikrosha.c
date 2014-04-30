@@ -37,7 +37,7 @@ static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
 	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
 	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x07fc) // Timer
 	AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257n_device, write)    // DMA
+	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257n_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
@@ -237,7 +237,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("dma8257", I8257N, XTAL_16MHz / 9)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_16MHz / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))

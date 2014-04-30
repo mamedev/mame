@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )
 	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_device, read, write)  // video
 	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
-	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257n_device, write)    // DMA
+	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
 	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK("bank11")
 	AM_RANGE( 0xde00, 0xdeff ) AM_WRITE(partner_win_memory_page_w)
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK("bank12")
@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(partner_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257n_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("dma8257", I8257N, XTAL_16MHz / 9)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_16MHz / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(partner_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","partner_cass")
 
 	MCFG_FD1793x_ADD("wd1793", XTAL_16MHz / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257n_device, dreq0_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", partner_floppies, "525qd", partner_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", partner_floppies, "525qd", partner_state::floppy_formats)
 

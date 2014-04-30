@@ -516,7 +516,7 @@ public:
 	required_device<pit8253_device> m_pit1;
 	required_device<pic8259_device> m_pic0;
 	required_device<pic8259_device> m_pic1;
-	required_device<i8257n_device> m_dmac;
+	required_device<i8257_device> m_dmac;
 	required_device<mc6845_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<UINT8> m_shared;
@@ -641,7 +641,7 @@ static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0xf001a, 0xf001b) AM_DEVREADWRITE8(USART2_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xf001c, 0xf001d) AM_DEVREADWRITE8(USART3_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xf001e, 0xf001f) AM_DEVREADWRITE8(USART3_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0020, 0xf0029) AM_DEVREADWRITE8(DMAC_TAG, i8257n_device, read, write, 0xffff)
+	AM_RANGE(0xf0020, 0xf0029) AM_DEVREADWRITE8(DMAC_TAG, i8257_device, read, write, 0xffff)
 	AM_RANGE(0xf0046, 0xf0047) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0xf0048, 0xf004f) AM_DEVREADWRITE8(PIT1_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf2000, 0xf2003) AM_DEVREADWRITE8(PIC1_TAG, pic8259_device, read, write, 0x00ff)
@@ -861,7 +861,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
 	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257N, XTAL_15MHz / 5)
+	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL_15MHz / 5)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(fanucspmg_state, hrq_w))
 	MCFG_I8257_OUT_TC_CB(WRITELINE(fanucspmg_state, tc_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(DMAC_TAG, i8257n_device, dreq0_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(DMAC_TAG, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 

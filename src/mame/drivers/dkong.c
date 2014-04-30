@@ -326,7 +326,6 @@ this is a legitimate Nintendo Kit.
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
-#include "machine/8257dma.h"
 #include "machine/eepromser.h"
 
 /*************************************
@@ -538,9 +537,10 @@ WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
 
 WRITE8_MEMBER(dkong_state::p8257_drq_w)
 {
-	i8257_device *device = machine().device<i8257_device>("dma8257");
-	device->i8257_drq0_w(data & 0x01);
-	device->i8257_drq1_w(data & 0x01);
+	m_dma8257->dreq0_w(data & 0x01);
+	m_dma8257->dreq1_w(data & 0x01);
+	machine().scheduler().abort_timeslice(); // transfer occurs immediately
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
 }
 
 READ8_MEMBER(dkong_state::dkong_in2_r)
@@ -739,7 +739,7 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("sprite_ram") /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_device, i8257_r, i8257_w)   /* P8257 control registers */
+	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)   /* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")    /* IN0, sound CPU intf */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)/* IN1 */
 
@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("sprite_ram") /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_device, i8257_r, i8257_w)   /* P8257 control registers */
+	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)   /* P8257 control registers */
 
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls174.3d")    /* IN0, sound interface */
 
@@ -834,7 +834,7 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")        /* 0x7400 */
 	AM_RANGE(0x1C00, 0x1f7f) AM_RAM                                               /* 0x6000 */
-	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE("dma8257", i8257_device, i8257_r, i8257_w)   /* P8257 control registers */
+	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)   /* P8257 control registers */
 	/* 0x6800 not remapped */
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
@@ -1614,6 +1614,17 @@ INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+WRITE_LINE_MEMBER(dkong_state::busreq_w )
+{
+// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
+	if(m_z80dma)
+		m_z80dma->bai_w(state); // tell dma that bus has been granted
+	else if(m_dma8257)
+		m_dma8257->hlda_w(state);
+}
+
 static MACHINE_CONFIG_START( dkong_base, dkong_state )
 
 	/* basic machine hardware */
@@ -1625,11 +1636,12 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
 
 	MCFG_DEVICE_ADD("dma8257", I8257, CLOCK_1H)
-	MCFG_I8257_OUT_HRQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(dkong_state, busreq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(dkong_state, memory_write_byte))
 	MCFG_I8257_IN_IOR_1_CB(READ8(dkong_state, p8257_ctl_r))
 	MCFG_I8257_OUT_IOW_0_CB(WRITE8(dkong_state, p8257_ctl_w))
+	MCFG_I8257_REVERSE_RW_MODE(1) // why?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
