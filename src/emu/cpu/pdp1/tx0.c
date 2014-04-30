@@ -121,6 +121,12 @@ void tx0_device::device_start()
 	m_stop_cyc0 = 0;
 	m_stop_cyc1 = 0;
 	m_cycle = 0;
+	m_pc = 0;
+	m_ir = 0;
+	m_run = 0;
+	m_rim = 0;
+	m_ioh = 0;
+	m_ios = 0;
 
 	// Resolve callbacks
 	m_cpy_handler.resolve();
