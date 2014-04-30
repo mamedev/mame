@@ -220,8 +220,10 @@ int find_input_strings(running_machine &machine)
 
 		if (found==true)
 		{
+
 			startblock = (rom[i + 5] << 16) | rom[i + 6];
 			endblock = (rom[i + 10] << 16) | rom[i + 11];
+			printf("------------ INPUTS -----------------\n");
 			printf("input strings found at %08x (start of ponter block %08x end of pointer block %08x\n", i*2, startblock, endblock);
 			foundat = i;
 
@@ -262,6 +264,57 @@ int find_input_strings(running_machine &machine)
 	}
 
 	return foundat;
+}
+
+int find_lamp_strings(running_machine &machine)
+{
+	if (strcmp(machine.system().name, "sc4dnd"))
+		return 0;
+	
+	// these are for sc4dnd ONLY, need to work out how the code calculates them
+	int startblock = 0x1cac0;
+	int endblock =   0x1cf9a;
+
+
+	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *rom8 = machine.root_device().memregion( "maincpu" )->base();
+
+	printf("------------ LAMPS -----------------\n");
+
+	if (endblock > startblock)
+	{
+		for (int j = startblock / 2; j < endblock / 2; j+=3)
+		{
+			UINT16 portpos = rom[j + 0];
+			int row = portpos & 0xf;
+			int col = (portpos >> 4 ) & 0xf;
+
+			UINT32 stringaddr = (rom[j + 1] << 16) | rom[j + 2];
+
+			printf("(row %02d, col %02d, unused %02x) addr %08x  ", row,col, (portpos&0xff00)>>8, stringaddr);
+				
+			for (int k = stringaddr; k < stringaddr + 10; k++)
+			{
+				UINT8 chr = rom8[k^1];
+
+				if ((chr == 0xff) || (chr == 0x00))
+				{
+					k = stringaddr + 10;
+				}
+				else
+				{
+					printf("%c", chr);
+				}
+							
+			}
+
+
+			printf("\n");
+
+		}
+	}
+
+	return 0;
 }
 
 /* default reels */
@@ -321,7 +374,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 
 	// debug helpers to find strings used for inputs and where the buttons map
 	find_input_strings(machine());
-
+	find_lamp_strings(machine());
 
 }
 
