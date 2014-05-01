@@ -961,7 +961,7 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	if (m_has_valid_parameters)
 	{
-		assert(m_update_row_cb.isnull() != NULL);
+		assert(!m_update_row_cb.isnull());
 
 		/* call the set up function if any */
 		if (!m_begin_update_cb.isnull())
