@@ -222,6 +222,7 @@ protected:
 
 	int m_cursor_blink;
 	int m_char_blink;
+	UINT8 m_stored_attr;
 
 	// timers
 	emu_timer *m_hrtc_on_timer;

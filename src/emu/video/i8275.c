@@ -118,7 +118,8 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_dma_stop(false),
 	m_end_of_screen(false),
 	m_cursor_blink(0),
-	m_char_blink(0)
+	m_char_blink(0),
+	m_stored_attr(0)
 {
 }
 
@@ -266,6 +267,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 			m_char_blink++;
 			m_char_blink &= 0x3f;
+			m_stored_attr = 0;
 		}
 		
 		if (m_scanline == m_vrtc_drq_scanline)
@@ -283,6 +285,11 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		{
 			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
 			bool end_of_row = false;
+			m_hlgt = (m_stored_attr & FAC_H) ? 1 : 0;
+			m_vsp = (m_stored_attr & FAC_B) ? 1 : 0;
+			m_gpa = (m_stored_attr & FAC_GG) >> 2;
+			m_rvv = (m_stored_attr & FAC_R) ? 1 : 0;
+			m_lten = (m_stored_attr & FAC_U) ? 1 : 0;
 
 			for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
 			{
@@ -302,6 +309,8 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 						m_gpa = (data & FAC_GG) >> 2;
 						m_rvv = (data & FAC_R) ? 1 : 0;
 						m_lten = (data & FAC_U) ? 1 : 0;
+						if ((SCANLINES_PER_ROW - lc)==1)
+							m_stored_attr = data;
 
 						if (!VISIBLE_FIELD_ATTRIBUTE)
 						{
@@ -334,6 +343,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 								m_end_of_screen = true;
 								break;
 							}
+							vsp = 1;
 						}
 						else
 						{

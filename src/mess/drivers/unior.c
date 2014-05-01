@@ -264,7 +264,7 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	UINT8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
 	if(linecount == 8)
-		return;
+		gfx = 0;
 
 	if (vsp)
 		gfx = 0;
