@@ -121,6 +121,7 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_char_blink(0),
 	m_stored_attr(0)
 {
+	memset(m_param, 0x00, sizeof(m_param));
 }
 
 
