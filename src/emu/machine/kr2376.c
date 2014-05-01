@@ -90,6 +90,7 @@ void kr2376_device::device_start()
 	m_strobe_old = 0;
 	m_parity = 0;
 	m_data = 0;
+	memset(m_pins, 0x00, sizeof(m_pins));
 	change_output_lines();
 
 	/* create the timers */
@@ -97,6 +98,7 @@ void kr2376_device::device_start()
 	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	/* register for state saving */
+	save_item(NAME(m_pins));
 	save_item(NAME(m_ring11));
 	save_item(NAME(m_ring8));
 	save_item(NAME(m_modifiers));
