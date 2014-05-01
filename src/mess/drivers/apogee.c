@@ -184,7 +184,7 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 	const UINT8 *charmap = m_charmap + (gpa & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
-		return;
+		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}

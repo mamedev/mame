@@ -161,7 +161,7 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 	const UINT8 *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
-		return;
+		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}

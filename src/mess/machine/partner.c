@@ -337,7 +337,7 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	const UINT8 *charmap = m_charmap + 0x400 * (gpa * 2 + hlgt);
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
-		return;
+		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}
