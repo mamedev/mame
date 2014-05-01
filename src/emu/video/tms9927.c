@@ -39,6 +39,8 @@ tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, d
 				: device_t(mconfig, TMS9927, "TMS9927 VTC", tag, owner, clock, "tms9927", __FILE__),
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
+					m_hpixels_per_column(0),
+					m_selfload_region(NULL),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -48,6 +50,8 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
+					m_hpixels_per_column(0),
+					m_selfload_region(NULL),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -68,22 +72,6 @@ crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tms9927_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tms9927_interface *intf = reinterpret_cast<const tms9927_interface *>(static_config());
-
-	assert(intf != NULL);
-
-	*static_cast<tms9927_interface *>(this) = *intf;
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

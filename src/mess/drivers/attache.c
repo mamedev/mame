@@ -880,12 +880,6 @@ static const z80_daisy_config attache_daisy_chain[] =
 	{ NULL }
 };
 
-static const tms9927_interface crtc_interface =
-{
-	8,  // guessing for now
-	NULL
-};
-
 static SLOT_INTERFACE_START( attache_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -989,7 +983,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_TMS9927_ADD("crtc", 12324000, crtc_interface)
+	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
