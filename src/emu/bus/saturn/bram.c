@@ -58,10 +58,11 @@ saturn_bram32mb_device::saturn_bram32mb_device(const machine_config &mconfig, co
 
 void saturn_bram_device::device_start()
 {
-	// TODO: only allocate the real amount of RAM
-	m_ext_bram = auto_alloc_array_clear(machine(), UINT8, 0x400000);
-	m_ext_bram_size = 0x400000;
-	save_pointer(NAME(m_ext_bram), 0x400000);
+	if (m_ext_bram == NULL)
+	{
+		m_ext_bram.resize(m_size);
+		save_item(NAME(m_ext_bram));
+	}
 }
 
 void saturn_bram_device::device_reset()
@@ -72,7 +73,7 @@ void saturn_bram_device::nvram_default()
 {
 	static const UINT8 init[16] =
 	{ 'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't' };
-	memset(m_ext_bram, 0, m_ext_bram_size);
+	memset(m_ext_bram, 0, m_ext_bram.bytes());
 
 	for (int i = 0; i < 32; i++)
 	{

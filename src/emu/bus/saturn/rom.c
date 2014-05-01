@@ -49,5 +49,5 @@ void saturn_rom_device::device_reset()
 
 READ32_MEMBER(saturn_rom_device::read_rom)
 {
-	return m_rom[offset & (m_rom_size - 1)];
+	return m_rom[offset & (m_rom.count() - 1)];
 }
