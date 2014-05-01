@@ -841,11 +841,6 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const struct macpds_interface macpds_intf =
-{
-	0
-};
-
 static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
 	SLOT_INTERFACE("48gc", NUBUS_48GC)      /* Apple 4*8 Graphics Card */
@@ -1001,7 +996,7 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 
 	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 
-	MCFG_MACPDS_BUS_ADD("sepds", "maincpu", macpds_intf)
+	MCFG_MACPDS_BUS_ADD("sepds", "maincpu")
 	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, NULL)
 MACHINE_CONFIG_END
 
