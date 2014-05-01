@@ -60,6 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(main_to_sub_r);
 	DECLARE_WRITE8_MEMBER(sub_to_main_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
+	MC6845_UPDATE_ROW(fp1100_update_row);
 	UINT8 *m_wram;
 	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_mem_bank;
@@ -84,6 +85,10 @@ public:
 };
 
 void fp1100_state::video_start()
+{
+}
+
+MC6845_UPDATE_ROW( fp1100_state::fp1100_update_row )
 {
 }
 
@@ -347,6 +352,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/2)   /* hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(fp1100_state, fp1100_update_row)
 MACHINE_CONFIG_END
 
 /* ROM definition */
