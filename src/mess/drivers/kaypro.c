@@ -148,21 +148,6 @@ static const z80_daisy_config kaypro2x_daisy_chain[] =
 
 
 
-static MC6845_INTERFACE( kaypro2x_crtc )
-{
-	false,
-	0,0,0,0,        /* visarea adjustment */
-	7,              /* number of dots per character */
-	NULL,
-	kaypro2x_update_row,        /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 //static WRITE_LINE_DEVICE_HANDLER( rx_tx_w )
 //{
 //  downcast<z80sio_device *>(device)->rx_clock_in();
@@ -289,7 +274,11 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000) /* comes out of ULA - needs to be measured */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(7)
+	MCFG_MC6845_UPDATE_ROW_CB(kaypro_state, kaypro2x_update_row)
+
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")

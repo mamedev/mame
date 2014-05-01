@@ -20,6 +20,12 @@ TODO:
   (but there isn't any title screen in the game?)
 - Fix I/O in the 1986 bootleg version;
 
+MC6845 interface:
+  screen size:  384x272    registers 00 & 04. (value-1)
+  visible area: 256x224    registers 01 & 06.
+
+  the clocks are a guess, but is the only logical combination I found to get a reasonable vertical of ~53Hz.
+
 ============================================================================================
 
 file   : readme.txt
@@ -852,32 +858,6 @@ static GFXDECODE_START( cowrace )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0x000, 0x80 )
 GFXDECODE_END
 
-/**********************************************************************************************************
-*
-* MC6845 interface
-*
-* screen size:  384x272    registers 00 & 04. (value-1)
-* visible area: 256x224    registers 01 & 06.
-*
-* the clocks are a guess, but is the only logical combination I found to get a reasonable vertical of ~53Hz.
-*
-***********************************************************************************************************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 /*************************************
  *
  *  Sound HW Config
@@ -1006,7 +986,9 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32, mc6845_intf)  /* 53.333 Hz. guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32)  /* 53.333 Hz. guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

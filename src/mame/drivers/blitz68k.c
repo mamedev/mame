@@ -1647,10 +1647,6 @@ INPUT_PORTS_END
 
 // R6845AP used for video sync signals only
 
-static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
-{
-}
-
 WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq1)
 {
 	m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1666,51 +1662,6 @@ WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 	m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-static MC6845_INTERFACE( mc6845_intf_irq1 )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq1),   /* VSYNC callback */
-	crtc_addr               /* update address callback */
-};
-
-static MC6845_INTERFACE( mc6845_intf_irq3 )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq3),   /* VSYNC callback */
-	crtc_addr               /* update address callback */
-};
-
-static MC6845_INTERFACE( mc6845_intf_irq5 )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq5),   /* VSYNC callback */
-	crtc_addr               /* update address callback */
-};
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, blitz68k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
@@ -1802,7 +1753,10 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq1)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq1))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -1834,7 +1788,10 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -1864,7 +1821,10 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq5)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq5))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -1893,7 +1853,10 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -1924,7 +1887,10 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -1953,7 +1919,10 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq1)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_22_1184MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq1))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -1987,7 +1956,10 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")

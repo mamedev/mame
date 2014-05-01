@@ -126,6 +126,8 @@ public:
 	DECLARE_DRIVER_INIT(dtrvwz5);
 	virtual void machine_start();
 	DECLARE_MACHINE_START(casino5);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
@@ -237,46 +239,38 @@ WRITE8_MEMBER(merit_state::palette_w)
 }
 
 
-static MC6845_BEGIN_UPDATE( begin_update )
+MC6845_BEGIN_UPDATE( merit_state::crtc_begin_update )
 {
-	merit_state *state = device->machine().driver_data<merit_state>();
-	int i;
 	int dim, bit0, bit1, bit2;
 
-	for (i=0; i < NUM_PENS; i++)
+	for (int i=0; i < NUM_PENS; i++)
 	{
 		dim = BIT(i,3) ? 255 : 127;
 		bit0 = BIT(i,0);
 		bit1 = BIT(i,1);
 		bit2 = BIT(i,2);
-		state->m_pens[i] = rgb_t(dim*bit0, dim*bit1, dim*bit2);
+		m_pens[i] = rgb_t(dim*bit0, dim*bit1, dim*bit2);
 	}
-
-	return state->m_pens;
 }
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 {
-	merit_state *state = device->machine().driver_data<merit_state>();
-	UINT8 cx;
-
-	pen_t *pens = (pen_t *)param;
 	UINT8 *gfx[2];
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = state->memregion("gfx1")->base();
-	gfx[1] = state->memregion("gfx2")->base();
-	rlen = state->memregion("gfx2")->bytes();
+	gfx[0] = memregion("gfx1")->base();
+	gfx[1] = memregion("gfx2")->base();
+	rlen = memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
-	for (cx = 0; cx < x_count; cx++)
+	for (UINT8 cx = 0; cx < x_count; cx++)
 	{
 		int i;
-		int attr = state->m_ram_attr[ma & 0x7ff];
+		int attr = m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
-		int addr = ((state->m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (state->m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
 		UINT8   *data;
 
@@ -296,8 +290,8 @@ static MC6845_UPDATE_ROW( update_row )
 			else
 				col |= 0x03;
 
-			col = state->m_ram_palette[col & 0x3ff];
-			bitmap.pix32(y, x) = pens[col ? col & (NUM_PENS-1) : (state->m_lscnblk ? 8 : 0)];
+			col = m_ram_palette[col & 0x3ff];
+			bitmap.pix32(y, x) = m_pens[col ? col & (NUM_PENS-1) : (m_lscnblk ? 8 : 0)];
 
 			x++;
 		}
@@ -316,21 +310,6 @@ WRITE_LINE_MEMBER(merit_state::vsync_changed)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                      /* show border area */
-	0,0,0,0,                    /* visarea adjustment */
-	8,                          /* number of pixels per video memory address */
-	begin_update,               /* before pixel update callback */
-	update_row,                 /* row update callback */
-	NULL,                       /* after pixel update callback */
-	DEVCB_NULL,                 /* callback for display state changes */
-	DEVCB_NULL,                 /* callback for cursor state changes */
-	DEVCB_DRIVER_LINE_MEMBER(merit_state,hsync_changed),    /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(merit_state,vsync_changed),    /* VSYNC callback */
-	NULL                        /* update address callback */
-};
 
 WRITE8_MEMBER(merit_state::led1_w)
 {
@@ -1181,13 +1160,17 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_w))
 
 	/* video hardware */
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
-
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(merit_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(merit_state, crtc_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(merit_state, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(merit_state, vsync_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

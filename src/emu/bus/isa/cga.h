@@ -27,6 +27,18 @@ public:
 	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( cga_text_inten_update_row );
+	MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row );
+	MC6845_UPDATE_ROW( cga_text_inten_alt_update_row );
+	MC6845_UPDATE_ROW( cga_text_blink_update_row );
+	MC6845_UPDATE_ROW( cga_text_blink_update_row_si );
+	MC6845_UPDATE_ROW( cga_text_blink_alt_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
+
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
@@ -55,7 +67,7 @@ public:
 	UINT8   m_color_select;  /* wo 0x3d9 */
 	UINT8   m_status;        /* ro 0x3da */
 
-	mc6845_update_row_func  m_update_row;
+	int     m_update_row_type;
 	UINT8   m_palette_lut_2bpp[4];
 	offs_t  m_chr_gen_offset[4];
 	UINT8   m_font_selection_mask;
@@ -117,6 +129,9 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 	virtual const rom_entry *device_rom_region() const;
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row );
 
 protected:
 	// device-level overrides

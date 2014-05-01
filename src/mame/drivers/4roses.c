@@ -358,28 +358,6 @@ static const ay8910_interface ay8910_intf =
 };
 
 
-#if 0
-/************************
-*    CRTC Interface    *
-************************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-#endif
-
-
 /**************************
 *     Machine Drivers     *
 **************************/
@@ -408,7 +386,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
 	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
 
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
+//  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

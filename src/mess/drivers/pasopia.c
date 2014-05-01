@@ -58,6 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	UINT8 m_hblank;
 	UINT16 m_vram_addr;
@@ -85,11 +86,10 @@ void pasopia_state::video_start()
 {
 }
 
-MC6845_UPDATE_ROW( pasopia_update_row )
+MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
-	pasopia_state *state = device->machine().driver_data<pasopia_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 *m_p_chargen = state->memregion("chargen")->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *m_p_chargen = memregion("chargen")->base();
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -99,7 +99,7 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 		UINT8 inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0xfff;
-		chr = state->m_p_vram[mem];
+		chr = m_p_vram[mem];
 
 		/* get pattern of pixels for that character scanline */
 		gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
@@ -253,21 +253,6 @@ WRITE8_MEMBER( pasopia_state::mux_w )
 	m_mux_data = data;
 }
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                  /* show border area */
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of pixels per video memory address */
-	NULL,                   /* before pixel update callback */
-	pasopia_update_row,     /* row update callback */
-	NULL,                   /* after pixel update callback */
-	DEVCB_NULL,             /* callback for display state changes */
-	DEVCB_NULL,             /* callback for cursor state changes */
-	DEVCB_NULL,             /* HSYNC callback */
-	DEVCB_NULL,             /* VSYNC callback */
-	NULL                    /* update address callback */
-};
-
 static const gfx_layout p7_chars_8x8 =
 {
 	8,8,
@@ -313,7 +298,6 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_CPU_IO_MAP(pasopia_io)
 	MCFG_CPU_CONFIG(pasopia_daisy)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -325,7 +309,10 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_4MHz/4, mc6845_intf)   /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_4MHz/4)   /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(pasopia_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia_state, vram_addr_lo_w))

@@ -119,6 +119,8 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( tvc64);
 
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	tvcexp_slot_device * m_expansions[4];
 	UINT8       m_video_mode;
 	UINT8       m_keyline;

@@ -146,22 +146,6 @@ WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
  *
  *************************************/
 
-static MC6845_INTERFACE( hd6845_intf )
-{
-	false,                              /* show border area */
-	0,0,0,0,                            /* visarea adjustment */
-	8,                                  /* number of pixels per video memory address */
-	NULL,                               /* before pixel update callback */
-	NULL,                               /* row update callback */
-	NULL,                               /* after pixel update callback */
-	DEVCB_NULL,                         /* callback for display state changes */
-	DEVCB_NULL,                         /* callback for cursor state changes */
-	DEVCB_NULL,                         /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4dealem_state, dealem_vsync_changed),   /* VSYNC callback */
-	NULL                                /* update address callback */
-};
-
-
 static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4dealem_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
@@ -236,7 +220,10 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf) /* HD68B45 */
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8) /* HD68B45 */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mpu4dealem_state, dealem_vsync_changed))
 MACHINE_CONFIG_END
 
 

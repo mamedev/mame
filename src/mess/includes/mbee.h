@@ -159,6 +159,12 @@ public:
 	void mbee_video_kbd_scan(int param);
 	UINT8 m_sy6545_cursor[16];
 
+	MC6845_UPDATE_ROW(mbee_update_row);
+	MC6845_UPDATE_ROW(mbeeic_update_row);
+	MC6845_UPDATE_ROW(mbeeppc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(mbee_update_addr);
+	MC6845_ON_UPDATE_ADDR_CHANGED(mbee256_update_addr);
+
 private:
 	size_t m_size;
 	UINT8 m_clock_pulse;
@@ -222,15 +228,5 @@ public:
 	void machine_reset_common_disk();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/mbee.c -----------*/
-
-MC6845_UPDATE_ROW( mbee_update_row );
-MC6845_UPDATE_ROW( mbeeic_update_row );
-MC6845_UPDATE_ROW( mbeeppc_update_row );
-MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
-MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
-
 
 #endif /* MBEE_H_ */

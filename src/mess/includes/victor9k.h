@@ -162,6 +162,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
+	MC6845_UPDATE_ROW( crtc_update_row );
 
 	void ready0_cb(floppy_image_device *, int device);
 	int load0_cb(floppy_image_device *device);

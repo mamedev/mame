@@ -677,7 +677,9 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_28MHz/8, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_28MHz/8) /* 3.5MHz measured on CLKin */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(2)
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 

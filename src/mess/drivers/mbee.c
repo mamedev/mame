@@ -660,67 +660,6 @@ static SLOT_INTERFACE_START( mbee_floppies )
 SLOT_INTERFACE_END
 
 
-static MC6845_INTERFACE( mbee_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	mbee_update_row,        /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	mbee_update_addr        /* handler to process transparent mode */
-};
-
-
-static MC6845_INTERFACE( mbeeic_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	mbeeic_update_row,      /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	mbee_update_addr        /* handler to process transparent mode */
-};
-
-static MC6845_INTERFACE( mbeeppc_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	mbeeppc_update_row,     /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	mbee_update_addr        /* handler to process transparent mode */
-};
-
-static MC6845_INTERFACE( mbee256_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	mbeeppc_update_row,     /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	mbee256_update_addr     /* handler to process transparent mode */
-};
-
 static const cassette_interface mbee_cassette_interface =
 {
 	mbee_cassette_formats,
@@ -766,7 +705,12 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8, mbee_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbee_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee_update_addr)
+
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
@@ -817,7 +761,12 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeic_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeic_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee_update_addr)
+
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
@@ -854,8 +803,13 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeppc)
+
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeppc_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee_update_addr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
@@ -890,8 +844,13 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MCFG_CPU_IO_MAP(mbee256_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256 )
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbee256_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee256_update_addr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
@@ -900,8 +859,13 @@ static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
 	MCFG_CPU_IO_MAP(mbeett_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett )
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbee256_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee256_update_addr)
 MACHINE_CONFIG_END
 
 /* Unused roms:

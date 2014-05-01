@@ -688,7 +688,12 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
+
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbca)
 
 	MCFG_DEFAULT_LAYOUT(layout_bbc)
@@ -909,7 +914,12 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
+
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcm)
 
 	/* sound hardware */

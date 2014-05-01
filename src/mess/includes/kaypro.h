@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kaypro_interrupt);
 	DECLARE_READ8_MEMBER(kaypro_sio_r);
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
+	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
 	const UINT8 *m_p_chargen;
 	UINT8 m_mc6845_cursor[16];
@@ -110,8 +111,3 @@ UINT8 kay_kbd_d_r( running_machine &machine );
 void kay_kbd_d_w( running_machine &machine, UINT8 data );
 
 INPUT_PORTS_EXTERN( kay_kbd );
-
-
-/*----------- defined in video/kaypro.c -----------*/
-
-MC6845_UPDATE_ROW( kaypro2x_update_row );

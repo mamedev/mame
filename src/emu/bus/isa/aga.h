@@ -56,12 +56,24 @@ public:
 	DECLARE_WRITE8_MEMBER( pc_aga_videoram_w );
 	DECLARE_READ8_MEMBER( pc_aga_videoram_r );
 
+	MC6845_UPDATE_ROW( aga_update_row );
+	MC6845_UPDATE_ROW( mda_text_inten_update_row ); 
+	MC6845_UPDATE_ROW( mda_text_blink_update_row );
+	MC6845_UPDATE_ROW( cga_text_inten_update_row );
+	MC6845_UPDATE_ROW( cga_text_inten_alt_update_row );
+	MC6845_UPDATE_ROW( cga_text_blink_update_row );
+	MC6845_UPDATE_ROW( cga_text_blink_alt_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row );
+	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
+
 	required_device<palette_device> m_palette;
 	required_device<mc6845_device> m_mc6845;
 
 	required_ioport m_cga_config;
 
-	mc6845_update_row_func  m_update_row;
+	int     m_update_row_type;
 	AGA_MODE    m_mode;
 	UINT8   m_mda_mode_control;
 	UINT8   m_mda_status;

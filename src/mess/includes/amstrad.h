@@ -319,13 +319,6 @@ protected:
 
 /*----------- defined in machine/amstrad.c -----------*/
 
-extern const mc6845_interface amstrad_mc6845_intf;
-extern const mc6845_interface amstrad_plus_mc6845_intf;
-
-
-
-
-
 
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 SLOT_INTERFACE_EXTERN(cpcplus_exp_cards);

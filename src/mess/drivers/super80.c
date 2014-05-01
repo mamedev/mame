@@ -656,21 +656,6 @@ static const cassette_interface super80_cassette_interface =
 };
 
 
-static MC6845_INTERFACE( super80v_crtc )
-{
-	false,
-	0,0,0,0,                /* visarea adjustment */
-	SUPER80V_DOTS,          /* number of dots per character */
-	NULL,
-	super80v_update_row,        /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 //-------------------------------------------------
 //  Z80DMA
 //-------------------------------------------------
@@ -812,7 +797,10 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(SUPER80V_DOTS)
+	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )

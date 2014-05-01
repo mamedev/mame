@@ -324,17 +324,16 @@ INPUT_PORTS_END
 
 /* Video */
 
-static MC6845_UPDATE_ROW( bw12_update_row )
+MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 {
-	bw12_state *state = device->machine().driver_data<bw12_state>();
-	const pen_t *pen = state->m_palette->pens();
+	const pen_t *pen = m_palette->pens();
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = state->m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
+		UINT8 code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
 		UINT16 addr = code << 4 | (ra & 0x0f);
-		UINT8 data = state->m_char_rom->base()[addr & BW12_CHARROM_MASK];
+		UINT8 data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
 
 		if (column == cursor_x)
 		{
@@ -353,21 +352,6 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 	}
 }
 
-
-static MC6845_INTERFACE( bw12_mc6845_interface )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	bw12_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
 
 /* PIA6821 Interface */
 
@@ -564,7 +548,10 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bw12)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/8, bw12_mc6845_interface)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

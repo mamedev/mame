@@ -380,18 +380,17 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-static MC6845_UPDATE_ROW( trs80m2_update_row )
+MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 {
-	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
-	const pen_t *pen = state->m_palette->pens();
+	const pen_t *pen = m_palette->pens();
 
 	int x = 0;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
+		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = state->m_char_rom->base()[address];
+		UINT8 data = m_char_rom->base()[address];
 
 		int dcursor = (column == cursor_x);
 		int drevid = BIT(code, 7);
@@ -426,21 +425,6 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 		}
 	}
 }
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	trs80m2_update_row,
-	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, de_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, vsync_w),
-	NULL
-};
 
 void trs80m2_state::video_start()
 {
@@ -734,7 +718,12 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(trs80m2_state, de_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
@@ -819,7 +808,12 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(trs80m2_state, de_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)

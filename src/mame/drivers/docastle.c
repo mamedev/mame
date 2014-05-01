@@ -551,35 +551,6 @@ static GFXDECODE_START( docastle )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  6845 CRTC interface
- *
- *************************************/
-
-/*
-The games program the CRTC for a width of 32 characters (256 pixels).
-However, the DE output from the CRTC is first ANDed with the NAND of
-MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
-blanks the first 8 pixels and last 8 pixels of each line.
-*/
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	false,      /* show border area */
-	8,-8,0,0,   /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_DRIVER_LINE_MEMBER(docastle_state, docastle_tint), /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
 /* Machine Drivers */
 
 void docastle_state::machine_reset()
@@ -625,7 +596,17 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, crtc_intf)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16)
+	/*
+	The games program the CRTC for a width of 32 characters (256 pixels).
+	However, the DE output from the CRTC is first ANDed with the NAND of
+	MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
+	blanks the first 8 pixels and last 8 pixels of each line.
+	*/
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_VISAREA_ADJUST(8,-8,0,0)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(docastle_state, docastle_tint))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc

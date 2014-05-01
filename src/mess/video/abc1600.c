@@ -127,7 +127,7 @@ const rom_entry *abc1600_mover_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
 inline UINT16 abc1600_mover_device::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
@@ -161,57 +161,31 @@ inline UINT16 abc1600_mover_device::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 	return (cr << 10) | ((ra & 0x0f) << 6) | ((cc << 1) & 0x3c);
 }
 
-void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 {
 	int x = 0;
 	const pen_t *pen = m_palette->pens();
-
+	
 	for (int column = 0; column < x_count; column += 2)
 	{
 		UINT16 dma = get_crtca(ma, ra, column);
-
+		
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
 		for (int cas = 0; cas < 4; cas++)
 		{
 			UINT16 data = read_videoram(dma + cas);
-
+			
 			for (int bit = 0; bit < 16; bit++)
 			{
 				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
-
+				
 				bitmap.pix32(vbp + y, hbp + x++) = pen[color];
-
+				
 				data <<= 1;
 			}
 		}
 	}
 }
-
-static MC6845_UPDATE_ROW( abc1600_update_row )
-{
-	abc1600_mover_device *mover = downcast<abc1600_mover_device *>(device->owner());
-	mover->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
-}
-
-static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
-{
-}
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	32,
-	NULL,
-	abc1600_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	crtc_update
-};
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( abc1600_mover )
@@ -229,7 +203,10 @@ static MACHINE_CONFIG_FRAGMENT( abc1600_mover )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL_64MHz/32, crtc_intf)
+	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL_64MHz/32)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(32)
+	MCFG_MC6845_UPDATE_ROW_CB(abc1600_mover_device, crtc_update_row)
 MACHINE_CONFIG_END
 
 

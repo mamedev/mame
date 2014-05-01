@@ -41,6 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	const UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
@@ -96,10 +97,9 @@ WRITE8_MEMBER( mx2178_state::kbd_put )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 {
-	mx2178_state *state = device->machine().driver_data<mx2178_state>();
-	const rgb_t *pens = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -107,10 +107,10 @@ static MC6845_UPDATE_ROW( update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (ma + x) & 0x7ff;
-		chr = state->m_p_videoram[mem];
+		chr = m_p_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
+		gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = pens[BIT(gfx, 7)];
@@ -123,21 +123,6 @@ static MC6845_UPDATE_ROW( update_row )
 		*p++ = pens[BIT(gfx, 0)];
 	}
 }
-
-static MC6845_INTERFACE( crtc_interface )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
 
 /* F4 Character Displayer */
 static const gfx_layout mx2178_charlayout =
@@ -185,7 +170,10 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18869600 / 8, crtc_interface) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18869600 / 8) // clk unknown
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 

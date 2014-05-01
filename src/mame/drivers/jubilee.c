@@ -650,25 +650,6 @@ static GFXDECODE_START( jubileep )      /* 4 different graphics banks */
 GFXDECODE_END
 
 
-/***********************
-*    CRTC Interface    *
-************************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,        /* show border area */
-	0, 0, 0, 0,   /* visarea adjustment */
-	8,            /* number of pixels per video memory address */
-	NULL,         /* before pixel update callback */
-	NULL,         /* row update callback */
-	NULL,         /* after pixel update callback */
-	DEVCB_NULL,   /* callback for display state changes */
-	DEVCB_NULL,   /* callback for cursor state changes */
-	DEVCB_NULL,   /* HSYNC callback */
-	DEVCB_NULL,   /* VSYNC callback */
-	NULL          /* update address callback */
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -693,8 +674,9 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jubileep)
 	MCFG_PALETTE_ADD("palette",8)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
-
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
 

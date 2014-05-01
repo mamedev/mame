@@ -256,7 +256,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  MC6845_INTERFACE( hd46505s_intf )
+//  MC6845
 //-------------------------------------------------
 
 #define CODE_NON_DISPLAY    0x1000
@@ -264,11 +264,10 @@ INPUT_PORTS_END
 #define CODE_LOW_INTENSITY  0x4000
 #define CODE_REVERSE_VIDEO  0x8000
 
-static MC6845_UPDATE_ROW( victor9k_update_row )
+MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 {
-	victor9k_state *state = device->machine().driver_data<victor9k_state>();
-	address_space &program = state->m_maincpu->space(AS_PROGRAM);
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	if (BIT(ma, 13))
 	{
@@ -280,7 +279,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 		for (int sx = 0; sx < x_count; sx++)
 		{
-			UINT16 code = (state->m_video_ram[video_ram_addr + 1] << 8) | state->m_video_ram[video_ram_addr];
+			UINT16 code = (m_video_ram[video_ram_addr + 1] << 8) | m_video_ram[video_ram_addr];
 			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
 			UINT16 data = program.read_word(char_ram_addr);
 
@@ -305,20 +304,6 @@ WRITE_LINE_MEMBER(victor9k_state::vert_w)
 	m_pic->ir7_w(state);
 }
 
-static MC6845_INTERFACE( hd46505s_intf )
-{
-	true,
-	0,0,0,0,
-	10,
-	NULL,
-	victor9k_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, vert_w),
-	NULL
-};
 
 
 WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
@@ -906,7 +891,11 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, 1000000, hd46505s_intf) // HD6845 == HD46505S
+	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, 1000000) // HD6845 == HD46505S
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(10)
+	MCFG_MC6845_UPDATE_ROW_CB(victor9k_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(victor9k_state, vert_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

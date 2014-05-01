@@ -223,57 +223,47 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
-void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( grip_device::crtc_update_row )
 {
-	int column, bit;
-
-	for (column = 0; column < x_count; column++)
+	for (int column = 0; column < x_count; column++)
 	{
 		UINT16 address = (m_page << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
 		UINT8 data = m_video_ram[address];
-
-		for (bit = 0; bit < 8; bit++)
+		
+		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = (m_flash ? 0 : BIT(data, bit)) && de;
-
+			
 			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(color);
 		}
 	}
 }
-
-static MC6845_UPDATE_ROW( grip_update_row )
-{
-	grip_device *grip = downcast<grip_device *>(device->owner());
-
-	grip->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,de,hbp,vbp,param);
-}
 /*
-static MC6845_UPDATE_ROW( grip5_update_row )
+MC6845_UPDATE_ROW( grip_device::grip5_update_row )
 {
-    grip5_state *state = device->machine().driver_data<grip5_state>();
-    const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+    const rgb_t *palette = m_palette->palette()->entry_list_raw();
     int column, bit;
 
     for (column = 0; column < x_count; column++)
     {
-        UINT16 address = (state->m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
-        UINT8 data = state->m_video_ram[address];
+        UINT16 address = (m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+        UINT8 data = m_video_ram[address];
 
         for (bit = 0; bit < 8; bit++)
         {
             int x = (column * 8) + bit;
-            int color = state->m_flash ? 0 : BIT(data, bit);
+            int color = m_flash ? 0 : BIT(data, bit);
 
             bitmap.pix32(y, x) = palette[color];
         }
     }
 }
 
-static MC6845_ON_UPDATE_ADDR_CHANGED( grip5_update_addr_changed )
+MC6845_ON_UPDATE_ADDR_CHANGED( grip_device::grip5_addr_changed )
 {
 }
 */
@@ -285,38 +275,6 @@ static const speaker_interface speaker_intf =
 	4,
 	speaker_levels
 };
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	grip_update_row,
-	NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i1_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-/*
-
-static MC6845_INTERFACE( grip5_crtc_intf )
-{
-    false,
-    0,0,0,0,
-    8,
-    NULL,
-    grip5_update_row,
-    NULL,
-    DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i1_w),
-    DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i2_w),
-    DEVCB_NULL,
-    DEVCB_NULL,
-    grip5_update_addr_changed
-};
-*/
 
 
 //-------------------------------------------------
@@ -527,8 +485,14 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/4, crtc_intf)
-//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL_16MHz/4, grip5_crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/4)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(grip_device, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, i1_w))
+	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, i1_w))
+
+//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL_16MHz/4)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(grip_device, ppi_pa_r))

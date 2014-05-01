@@ -271,21 +271,6 @@ static GFXDECODE_START( paso1600 )
 GFXDECODE_END
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 void paso1600_state::machine_start()
 {
 }
@@ -333,8 +318,12 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 //  MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NULL )
+
 	MCFG_DEVICE_ADD("8237dma", AM9517A, 16000000/4)
 	MCFG_I8237_IN_MEMR_CB(READ8(paso1600_state, pc_dma_read_byte))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(paso1600_state, pc_dma_write_byte))

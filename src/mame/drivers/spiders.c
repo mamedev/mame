@@ -321,32 +321,22 @@ WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
 }
 
 
-static MC6845_BEGIN_UPDATE( begin_update )
+MC6845_BEGIN_UPDATE( spiders_state::crtc_begin_update )
 {
-	spiders_state *state = device->machine().driver_data<spiders_state>();
 	/* create the pens */
-	offs_t i;
-
-	for (i = 0; i < NUM_PENS; i++)
+	for (offs_t i = 0; i < NUM_PENS; i++)
 	{
-		state->m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
-
-	return state->m_pens;
 }
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 {
-	spiders_state *state = device->machine().driver_data<spiders_state>();
-	UINT8 cx;
-
-	pen_t *pens = (pen_t *)param;
 	UINT8 x = 0;
 
-	for (cx = 0; cx < x_count; cx++)
+	for (UINT8 cx = 0; cx < x_count; cx++)
 	{
-		int i;
 		UINT8 data1, data2, data3;
 
 		/* the memory is hooked up to the MA, RA lines this way */
@@ -354,18 +344,18 @@ static MC6845_UPDATE_ROW( update_row )
 						((ra << 5) & 0x00e0) |
 						((ma << 0) & 0x001f);
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			offs = offs ^ 0x3fff;
 
-		data1 = state->m_ram[0x0000 | offs];
-		data2 = state->m_ram[0x4000 | offs];
-		data3 = state->m_ram[0x8000 | offs];
+		data1 = m_ram[0x0000 | offs];
+		data2 = m_ram[0x4000 | offs];
+		data3 = m_ram[0x8000 | offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			UINT8 color;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				color = ((data3 & 0x80) >> 5) |
 						((data2 & 0x80) >> 6) |
@@ -386,7 +376,7 @@ static MC6845_UPDATE_ROW( update_row )
 				data3 = data3 >> 1;
 			}
 
-			bitmap.pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = m_pens[color];
 
 			x = x + 1;
 		}
@@ -400,23 +390,6 @@ WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
 {
 	machine().device<ttl74123_device>("ic60")->a_w(generic_space(), 0, state);
 }
-
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                  /* show border area */
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of pixels per video memory address */
-	begin_update,           /* before pixel update callback */
-	update_row,             /* row update callback */
-	NULL,                   /* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,display_enable_changed), /* callback for display state changes */
-	DEVCB_NULL,             /* callback for cursor state changes */
-	DEVCB_NULL,             /* HSYNC callback */
-	DEVCB_NULL,             /* VSYNC callback */
-	NULL                    /* update address callback */
-};
-
 
 
 /*************************************
@@ -603,7 +576,12 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(spiders_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(spiders_state, display_enable_changed))
 
 	/* 74LS123 */
 

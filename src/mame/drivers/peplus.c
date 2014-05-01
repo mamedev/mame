@@ -279,6 +279,7 @@ public:
 	DECLARE_DRIVER_INIT(peplussb);
 	DECLARE_DRIVER_INIT(peplussbw);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -300,26 +301,6 @@ static const UINT16 id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a
 #define CPU_CLOCK           ((MASTER_CLOCK)/2)      /* divided by 2 - 7474 */
 #define MC6845_CLOCK        ((MASTER_CLOCK)/8/3)
 #define SOUND_CLOCK         ((MASTER_CLOCK)/12)
-
-
-/* prototypes */
-
-static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                  /* show border area */
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of pixels per video memory address */
-	NULL,                   /* before pixel update callback */
-	NULL,                   /* row update callback */
-	NULL,                   /* after pixel update callback */
-	DEVCB_NULL,             /* callback for display state changes */
-	DEVCB_NULL,             /* callback for cursor state changes */
-	DEVCB_NULL,             /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(peplus_state,crtc_vsync),  /* VSYNC callback */
-	crtc_addr               /* update address callback */
-};
 
 
 /**************
@@ -377,11 +358,11 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 
 /* ROCKWELL 6545 - Transparent Memory Addressing */
 
-static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
+MC6845_ON_UPDATE_ADDR_CHANGED(peplus_state::crtc_addr)
 {
-	peplus_state *state = device->machine().driver_data<peplus_state>();
-	state->m_vid_address = address;
+	m_vid_address = address;
 }
+
 
 WRITE8_MEMBER(peplus_state::peplus_crtc_mode_w)
 {
@@ -1350,9 +1331,13 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_PALETTE_ADD("palette", 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
-	MCFG_X2404P_ADD("i2cmem")
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(peplus_state, crtc_vsync))
 
+	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

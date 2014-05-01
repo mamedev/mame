@@ -184,6 +184,7 @@ public:
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	MC6845_UPDATE_ROW( abc800m_update_row );
 };
 
 
@@ -248,6 +249,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
 	int m_lrs;                  // low RAM select
@@ -310,6 +312,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc806 );
+	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state
 	int m_keydtr;               // keyboard DTR

@@ -132,6 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 	DECLARE_DRIVER_INIT(applix);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT8 m_video_latch;
 	UINT8 m_pa;
 	virtual void machine_reset();
@@ -771,28 +772,27 @@ void applix_state::video_start()
 {
 }
 
-static MC6845_UPDATE_ROW( applix_update_row )
+MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 {
 // The display is bitmapped. 2 modes are supported here, 320x200x16 and 640x200x4.
 // Need to display a border colour.
 // There is a monochrome mode, but no info found as yet.
-	applix_state *state = device->machine().driver_data<applix_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 i;
 	UINT16 chr,x;
-	UINT32 mem, vidbase = (state->m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
+	UINT32 mem, vidbase = (m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
 		mem = vidbase + ma + x + (ra<<12);
-		chr = state->m_base[mem];
+		chr = m_base[mem];
 
-		if (BIT(state->m_pa, 3))
+		if (BIT(m_pa, 3))
 		// 640 x 200 x 4of16 mode
 		{
 			for (i = 0; i < 8; i++)
 			{
-				*p++ = palette[state->m_palette_latch[chr>>14]];
+				*p++ = palette[m_palette_latch[chr>>14]];
 				chr <<= 2;
 			}
 		}
@@ -808,21 +808,6 @@ static MC6845_UPDATE_ROW( applix_update_row )
 		}
 	}
 }
-
-static MC6845_INTERFACE( applix_crtc )
-{
-	false, // should show a border
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	applix_update_row,      /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(applix_state, vsync_w),
-	NULL
-};
 
 WRITE_LINE_MEMBER( applix_state::vsync_w )
 {
@@ -886,7 +871,12 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000, applix_crtc) // 6545
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000) // 6545
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(applix_state, vsync_w))
+
 	MCFG_DEVICE_ADD("via6522", VIA6522, 0)
 	MCFG_VIA6522_READPB_HANDLER(READ8(applix_state, applix_pb_r))
 	// in CB1 kbd clk

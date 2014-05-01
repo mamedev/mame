@@ -394,7 +394,9 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4) /* 3.5MHz measured on CLKin */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(2)
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
 

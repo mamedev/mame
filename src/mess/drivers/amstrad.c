@@ -875,7 +875,12 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_16MHz / 16, amstrad_mc6845_intf )
+	MCFG_MC6845_ADD("mc6845", MC6845, NULL, XTAL_16MHz / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_vsync_changed))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -961,7 +966,12 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
+	MCFG_MC6845_ADD("mc6845", MC6845, NULL, XTAL_40MHz / 40)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_plus_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_vsync_changed))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -1031,7 +1041,12 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
+	MCFG_MC6845_ADD("mc6845", MC6845, NULL, XTAL_40MHz / 40)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_plus_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_vsync_changed))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 

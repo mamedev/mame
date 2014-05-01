@@ -102,22 +102,22 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(othello);
+	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
-	othello_state *state = device->machine().driver_data<othello_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;
 
-	const UINT8 *gfx = state->memregion("gfx")->base();
+	const UINT8 *gfx = memregion("gfx")->base();
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
-		data_address = ((state->m_videoram[ma + cx] + state->m_tile_bank) << 4) | ra;
+		data_address = ((m_videoram[ma + cx] + m_tile_bank) << 4) | ra;
 		tmp = gfx[data_address] | (gfx[data_address + 0x2000] << 8) | (gfx[data_address + 0x4000] << 16);
 
 		for(x = 0; x < TILE_WIDTH; ++x)
@@ -372,22 +372,6 @@ static INPUT_PORTS_START( othello )
 
 INPUT_PORTS_END
 
-static MC6845_INTERFACE( h46505_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	TILE_WIDTH, /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	update_row, /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
 void othello_state::machine_start()
 {
 	m_mc6845 = machine().device<mc6845_device>("crtc");
@@ -440,7 +424,10 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(othello_state, othello)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */, h46505_intf)   /* H46505 @ CPU clock */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */)   /* H46505 @ CPU clock */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(TILE_WIDTH)
+	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

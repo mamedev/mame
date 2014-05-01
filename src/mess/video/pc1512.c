@@ -360,7 +360,7 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845 
 //-------------------------------------------------
 
 int pc1512_state::get_display_mode(UINT8 mode)
@@ -394,7 +394,7 @@ offs_t pc1512_state::get_char_rom_offset()
 	return ((m_lk->read() >> 5) & 0x03) << 11;
 }
 
-void pc1512_state::draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 {
 	offs_t char_rom_offset = get_char_rom_offset();
 	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
@@ -463,7 +463,7 @@ int pc1512_state::get_color(UINT8 data)
 	return color;
 };
 
-void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
 {
 	if (y > 199) return;
 
@@ -483,7 +483,7 @@ void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &clipre
 	}
 }
 
-void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( pc1512_state::draw_graphics_2 )
 {
 	if (y > 199) return;
 
@@ -506,41 +506,24 @@ void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &clipre
 	}
 }
 
-static MC6845_UPDATE_ROW( pc1512_update_row )
+MC6845_UPDATE_ROW( pc1512_state::crtc_update_row )
 {
-	pc1512_state *state = device->machine().driver_data<pc1512_state>();
-
-	switch (state->get_display_mode(state->m_vdu_mode))
+	switch (get_display_mode(m_vdu_mode))
 	{
 	case ALPHA_40:
 	case ALPHA_80:
-		state->draw_alpha(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
+		draw_alpha(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 		break;
 
 	case GRAPHICS_1:
-		state->draw_graphics_1(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
+		draw_graphics_1(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 		break;
 
 	case GRAPHICS_2:
-		state->draw_graphics_2(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
+		draw_graphics_2(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 		break;
 	}
 }
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	pc1512_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
 
 
 void pc1512_state::video_start()
@@ -616,5 +599,8 @@ MACHINE_CONFIG_FRAGMENT( pc1512_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, SCREEN_TAG, XTAL_28_63636MHz/32, crtc_intf)
+	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, SCREEN_TAG, XTAL_28_63636MHz/32)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(pc1512_state, crtc_update_row)
 MACHINE_CONFIG_END

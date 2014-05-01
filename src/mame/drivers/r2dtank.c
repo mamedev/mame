@@ -79,6 +79,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
 	virtual void machine_start();
 	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 };
@@ -276,32 +278,22 @@ WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
 }
 
 
-static MC6845_BEGIN_UPDATE( begin_update )
+MC6845_BEGIN_UPDATE( r2dtank_state::crtc_begin_update )
 {
-	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
 	/* create the pens */
-	offs_t i;
-
-	for (i = 0; i < NUM_PENS; i++)
+	for (offs_t i = 0; i < NUM_PENS; i++)
 	{
-		state->m_pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		m_pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
-
-	return state->m_pens;
 }
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 {
-	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
-	UINT8 cx;
-
-	pen_t *pens = (pen_t *)param;
 	UINT8 x = 0;
 
-	for (cx = 0; cx < x_count; cx++)
+	for (UINT8 cx = 0; cx < x_count; cx++)
 	{
-		int i;
 		UINT8 data, fore_color;
 
 		/* the memory is hooked up to the MA, RA lines this way */
@@ -309,17 +301,17 @@ static MC6845_UPDATE_ROW( update_row )
 						((ra << 5) & 0x00e0) |
 						((ma << 0) & 0x001f);
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			offs = offs ^ 0x1fff;
 
-		data = state->m_videoram[offs];
-		fore_color = (state->m_colorram[offs] >> 5) & 0x07;
+		data = m_videoram[offs];
+		fore_color = (m_colorram[offs] >> 5) & 0x07;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			UINT8 bit, color;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				bit = data & 0x01;
 				data = data >> 1;
@@ -331,7 +323,7 @@ static MC6845_UPDATE_ROW( update_row )
 			}
 
 			color = bit ? fore_color : 0;
-			bitmap.pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = m_pens[color];
 
 			x = x + 1;
 		}
@@ -345,23 +337,6 @@ WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 {
 	machine().device<ttl74123_device>("74123")->a_w(generic_space(), 0, state);
 }
-
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                  /* show border area */
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of pixels per video memory address */
-	begin_update,           /* before pixel update callback */
-	update_row,             /* row update callback */
-	NULL,                   /* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,display_enable_changed), /* callback for display state changes */
-	DEVCB_NULL,             /* callback for cursor state changes */
-	DEVCB_NULL,             /* HSYNC callback */
-	DEVCB_NULL,             /* VSYNC callback */
-	NULL                    /* update address callback */
-};
-
 
 
 /*************************************
@@ -503,7 +478,12 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(r2dtank_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(r2dtank_state, display_enable_changed))
 
 	/* 74LS123 */
 

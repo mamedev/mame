@@ -98,6 +98,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bsmt_data_hi_w);
 	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
 	DECLARE_READ8_MEMBER(special_r);
+
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
 
@@ -140,50 +143,36 @@ void tapatune_state::machine_reset()
  *
  *************************************/
 
-const rgb_t* get_pens(tapatune_state *state)
+MC6845_BEGIN_UPDATE( tapatune_state::crtc_begin_update )
 {
+	// Create the pens
 	for (UINT32 i = 0; i < 0x100; i++)
 	{
-		int r = state->m_paletteram[3 * i + 0];
-		int g = state->m_paletteram[3 * i + 1];
-		int b = state->m_paletteram[3 * i + 2];
-
+		int r = m_paletteram[3 * i + 0];
+		int g = m_paletteram[3 * i + 1];
+		int b = m_paletteram[3 * i + 2];
+		
 		r = pal6bit(r);
 		g = pal6bit(g);
 		b = pal6bit(b);
-
-		state->m_pens[i] = rgb_t(r, g, b);
+		
+		m_pens[i] = rgb_t(r, g, b);
 	}
-
-	return state->m_pens;
 }
 
 
-static MC6845_BEGIN_UPDATE( begin_update )
+MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 {
-	tapatune_state *state = device->machine().driver_data<tapatune_state>();
-
-	// Create the pens
-	get_pens(state);
-
-	return state->m_pens;
-}
-
-
-static MC6845_UPDATE_ROW( update_row )
-{
-	tapatune_state *state = device->machine().driver_data<tapatune_state>();
 	UINT32 *dest = &bitmap.pix32(y);
-	rgb_t *pens = (rgb_t *)param;
 	offs_t offs = (ma*2 + ra*0x40)*4;
 
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
 
 	for (UINT32 x = 0; x < x_count*4; x++)
 	{
 		UINT8 pix = videoram[BYTE_XOR_BE(offs + x)];
-		dest[2*x] = pens[((pix >> 4) & 0x0f)];
-		dest[2*x + 1] = pens[(pix & 0x0f)];
+		dest[2*x] = m_pens[((pix >> 4) & 0x0f)];
+		dest[2*x + 1] = m_pens[(pix & 0x0f)];
 	}
 }
 
@@ -507,28 +496,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  6845 interface
- *
- *************************************/
-
-static MC6845_INTERFACE( h46505_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	5,          /* number of pixels per video memory address */
-	begin_update,/* before pixel update callback */
-	update_row, /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(tapatune_state,crtc_vsync),    /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -546,7 +513,14 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_24MHz / 16, h46505_intf)
+	
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_24MHz / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(5)
+	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tapatune_state, crtc_vsync))
+
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */

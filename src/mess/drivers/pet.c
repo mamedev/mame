@@ -1071,22 +1071,19 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 
 //-------------------------------------------------
-//  MC6845_INTERFACE( crtc_intf )
+//  MC6845 PET80
 //-------------------------------------------------
 
-static MC6845_BEGIN_UPDATE( pet_begin_update )
+MC6845_BEGIN_UPDATE( pet_state::pet_begin_update )
 {
 	bitmap.fill(rgb_t::black);
-
-	return 0;
 }
 
-static MC6845_UPDATE_ROW( pet80_update_row )
+MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 {
-	pet80_state *state = device->machine().driver_data<pet80_state>();
 	int x = 0;
-	int char_rom_mask = state->m_char_rom->bytes() - 1;
-	const pen_t *pen = state->m_palette->pens();
+	int char_rom_mask = m_char_rom->bytes() - 1;
+	const pen_t *pen = m_palette->pens();
 	hbp = 80;
 
 	for (int column = 0; column < x_count; column++)
@@ -1099,10 +1096,10 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 
 		// even character
 
-		lsd = state->m_video_ram[((ma + column) << 1) & 0x7ff];
+		lsd = m_video_ram[((ma + column) << 1) & 0x7ff];
 
-		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = m_char_rom->base()[char_addr & char_rom_mask];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1112,10 +1109,10 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 
 		// odd character
 
-		lsd = state->m_video_ram[(((ma + column) << 1) + 1) & 0x7ff];
+		lsd = m_video_ram[(((ma + column) << 1) + 1) & 0x7ff];
 
-		char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = m_char_rom->base()[char_addr & char_rom_mask];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1125,32 +1122,16 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 	}
 }
 
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	2*8,
-	pet_begin_update,
-	pet80_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(M6520_1_TAG, pia6821_device, cb1_w),
-	NULL
-};
-
 
 //-------------------------------------------------
-//  MC6845_INTERFACE( pet40_crtc_intf )
+//  MC6845 PET40
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( pet40_update_row )
+MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 {
-	pet_state *state = device->machine().driver_data<pet_state>();
 	int x = 0;
-	int char_rom_mask = state->m_char_rom->bytes() - 1;
-	const pen_t *pen = state->m_palette->pens();
+	int char_rom_mask = m_char_rom->bytes() - 1;
+	const pen_t *pen = m_palette->pens();
 	hbp = 41;
 
 	for (int column = 0; column < x_count; column++)
@@ -1161,10 +1142,10 @@ static MC6845_UPDATE_ROW( pet40_update_row )
 		int invert = BIT(ma, 12);
 		int chr_option = BIT(ma, 13);
 
-		lsd = state->m_video_ram[(ma + column) & 0x3ff];
+		lsd = m_video_ram[(ma + column) & 0x3ff];
 
-		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = m_char_rom->base()[char_addr & char_rom_mask];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1174,32 +1155,16 @@ static MC6845_UPDATE_ROW( pet40_update_row )
 	}
 }
 
-static MC6845_INTERFACE( pet40_crtc_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	pet_begin_update,
-	pet40_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(M6520_1_TAG, pia6821_device, cb1_w),
-	NULL
-};
-
 
 //-------------------------------------------------
-//  MC6845_INTERFACE( cbm8296_crtc_intf )
+//  MC6845 CBM8296
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( cbm8296_update_row )
+MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 {
-	pet80_state *state = device->machine().driver_data<pet80_state>();
 	int x = 0;
-	int char_rom_mask = state->m_char_rom->bytes() - 1;
-	const pen_t *pen = state->m_palette->pens();
+	int char_rom_mask = m_char_rom->bytes() - 1;
+	const pen_t *pen = m_palette->pens();
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1213,10 +1178,10 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 
 		// even character
 
-		lsd = state->m_ram->pointer()[drma];
+		lsd = m_ram->pointer()[drma];
 
-		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = m_char_rom->base()[char_addr & char_rom_mask];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1226,10 +1191,10 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 
 		// odd character
 
-		lsd = state->m_ram->pointer()[drma | 0x100];
+		lsd = m_ram->pointer()[drma | 0x100];
 
-		char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = m_char_rom->base()[char_addr & char_rom_mask];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1238,21 +1203,6 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 		}
 	}
 }
-
-static MC6845_INTERFACE( cbm8296_crtc_intf )
-{
-	true,
-	0,0,0,0,
-	2*8,
-	NULL,
-	cbm8296_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(M6520_1_TAG, pia6821_device, cb1_w),
-	NULL
-};
 
 
 //-------------------------------------------------
@@ -1738,7 +1688,13 @@ static MACHINE_CONFIG_DERIVED( pet4032f, pet4000 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 250 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_DEVICE_REMOVE("sync_timer")
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, pet40_crtc_intf)
+
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(pet_state, pet_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(pet_state, pet40_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE(M6520_1_TAG, pia6821_device, cb1_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1804,7 +1760,13 @@ static MACHINE_CONFIG_DERIVED( cbm4032f, cbm4000 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 250 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_DEVICE_REMOVE("sync_timer")
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, pet40_crtc_intf)
+	
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(pet_state, pet_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(pet_state, pet40_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE(M6520_1_TAG, pia6821_device, cb1_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1880,7 +1842,13 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, crtc_intf)
+
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(2*8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(pet_state, pet_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(pet80_state, pet80_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE(M6520_1_TAG, pia6821_device, cb1_w))
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
@@ -2006,8 +1974,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( cbm8296, pet80, cbm8296_state )
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
 
-	MCFG_DEVICE_MODIFY(MC6845_TAG)
-	MCFG_DEVICE_CONFIG(cbm8296_crtc_intf)
+	MCFG_DEVICE_REMOVE(MC6845_TAG)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(2*8)
+	MCFG_MC6845_UPDATE_ROW_CB(pet80_state, cbm8296_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE(M6520_1_TAG, pia6821_device, cb1_w))
 
 	MCFG_DEVICE_MODIFY("ieee8")
 	MCFG_SLOT_DEFAULT_OPTION("c8250")

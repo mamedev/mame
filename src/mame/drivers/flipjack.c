@@ -423,22 +423,6 @@ static const ay8910_interface ay8910_config_2 =
 	DEVCB_NULL                              /* Port B write */
 };
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
 
 static const gfx_layout tilelayout =
 {
@@ -493,7 +477,9 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(flipjack_state, screen_update_flipjack)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flipjack)
 

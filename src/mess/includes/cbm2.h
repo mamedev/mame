@@ -214,6 +214,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
 
+	MC6845_UPDATE_ROW( crtc_update_row );
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
 	// memory state
 	int m_dramon;

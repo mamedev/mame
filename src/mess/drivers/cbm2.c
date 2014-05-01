@@ -1102,21 +1102,20 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( crtc_update_row )
+MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 {
-	cbm2_state *state = device->machine().driver_data<cbm2_state>();
-	const pen_t *pen = state->m_palette->pens();
+	const pen_t *pen = m_palette->pens();
 
 	int x = 0;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
-		offs_t char_rom_addr = (ma & 0x1000) | (state->m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = state->m_charom->base()[char_rom_addr & 0xfff];
+		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
+		offs_t char_rom_addr = (ma & 0x1000) | (m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
+		UINT8 data = m_charom->base()[char_rom_addr & 0xfff];
 
 		for (int bit = 0; bit < 9; bit++)
 		{
@@ -1126,26 +1125,10 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 
 			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
 
-			if (bit < 8 || !state->m_graphics) data <<= 1;
+			if (bit < 8 || !m_graphics) data <<= 1;
 		}
 	}
 }
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	9,
-	NULL,
-	crtc_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 
 //-------------------------------------------------
 //  vic2_interface vic_intf
@@ -2254,7 +2237,10 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL_18MHz/9, crtc_intf)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL_18MHz/9)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(9)
+	MCFG_MC6845_UPDATE_ROW_CB(cbm2_state, crtc_update_row)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

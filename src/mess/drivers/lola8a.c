@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 
 	DECLARE_READ8_MEMBER(keyboard_r);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
 	UINT8 m_portb;
@@ -196,11 +197,10 @@ PALETTE_INIT_MEMBER(lola8a_state, lola8a)
 	}
 }
 
-static MC6845_UPDATE_ROW( lola8a_update_row )
+MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 {
-	lola8a_state *state = device->machine().driver_data<lola8a_state>();
-	address_space &program = state->m_maincpu->space(AS_PROGRAM);
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	for (int sx = 0; sx < x_count; sx++)
 	{
@@ -257,21 +257,6 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MC6845_INTERFACE( hd46505sp_intf )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	lola8a_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(lola8a_state, crtc_vsync),
-	NULL
-};
-
 static const ay8910_interface psg_intf =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -302,7 +287,13 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, hd6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL_8MHz / 8, hd46505sp_intf) // HD6845 == HD46505S
+
+	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL_8MHz / 8) // HD6845 == HD46505S
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(lola8a_state, crtc_vsync))
+
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(lola8a_state, lola8a)
 

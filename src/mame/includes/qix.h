@@ -136,6 +136,8 @@ public:
 	DECLARE_WRITE8_MEMBER(slither_coinctl_w);
 	DECLARE_WRITE_LINE_MEMBER(qix_pia_dint);
 	DECLARE_WRITE_LINE_MEMBER(qix_pia_sint);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	void set_pen(int offs);
 	int kram3_permut1(int idx, int value);
 	int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table);

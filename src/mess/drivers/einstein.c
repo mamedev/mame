@@ -99,17 +99,16 @@ READ8_MEMBER(einstein_state::einstein_80col_ram_r)
    bit 12       jumper M004, this could be used to select two different character
                 sets.
 */
-static MC6845_UPDATE_ROW( einstein_6845_update_row )
+MC6845_UPDATE_ROW( einstein_state::crtc_update_row )
 {
-	einstein_state *einstein = device->machine().driver_data<einstein_state>();
-	const rgb_t *palette = einstein->m_palette->palette()->entry_list_raw();
-	UINT8 *data = einstein->m_region_gfx1->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *data = m_region_gfx1->base();
 	UINT8 char_code, data_byte;
 	int i, x;
 
 	for (i = 0, x = 0; i < x_count; i++, x += 8)
 	{
-		char_code = einstein->m_crtc_ram[(ma + i) & 0x07ff];
+		char_code = m_crtc_ram[(ma + i) & 0x07ff];
 		data_byte = data[(char_code << 3) + (ra & 0x07) + ((ra & 0x08) << 8)];
 
 		bitmap.pix32(y, x + 0) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 7)];
@@ -676,21 +675,6 @@ static const ay8910_interface einstein_ay_interface =
 	DEVCB_NULL
 };
 
-static MC6845_INTERFACE( einstein_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	einstein_6845_update_row,
-	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_6845_de_changed),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout einstei2_charlayout =
 {
@@ -720,7 +704,6 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_CPU_PROGRAM_MAP(einstein_mem)
 	MCFG_CPU_IO_MAP(einstein_io)
 	MCFG_CPU_CONFIG(einstein_daisy_chain)
-
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
@@ -807,7 +790,11 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4, einstein_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(einstein_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(einstein_state, einstein_6845_de_changed))
 MACHINE_CONFIG_END
 
 

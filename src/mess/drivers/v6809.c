@@ -90,6 +90,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_MACHINE_RESET(v6809);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
@@ -168,10 +170,9 @@ static GFXDECODE_START( v6809 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 1 )
 GFXDECODE_END
 
-MC6845_UPDATE_ROW( v6809_update_row )
+MC6845_UPDATE_ROW( v6809_state::crtc_update_row )
 {
-	v6809_state *state = device->machine().driver_data<v6809_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -179,8 +180,8 @@ MC6845_UPDATE_ROW( v6809_update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (ma + x) & 0x7ff;
-		chr = state->m_p_videoram[mem];
-		gfx = state->m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
+		chr = m_p_videoram[mem];
+		gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];
@@ -194,27 +195,11 @@ MC6845_UPDATE_ROW( v6809_update_row )
 	}
 }
 
-MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
+MC6845_ON_UPDATE_ADDR_CHANGED( v6809_state::crtc_update_addr )
 {
 /* not sure what goes in here - parameters passed are device, address, strobe */
-	v6809_state *state = device->machine().driver_data<v6809_state>();
-	state->m_video_address = address & 0x7ff;
+	m_video_address = address & 0x7ff;
 }
-
-static MC6845_INTERFACE( v6809_crtc )
-{
-	false,
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of dots per character */
-	NULL,
-	v6809_update_row,       /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	v6809_update_addr       /* handler to process transparent mode */
-};
 
 WRITE8_MEMBER( v6809_state::videoram_w )
 {
@@ -341,8 +326,13 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	/* Devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8, v6809_crtc)
+	/* devices */
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(v6809_state, crtc_update_addr)
+
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(v6809_state, kbd_put))
 

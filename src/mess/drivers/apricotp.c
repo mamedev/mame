@@ -50,31 +50,6 @@ enum
 //  VIDEO
 //**************************************************************************
 
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_UPDATE_ROW( fp_update_row )
-{
-}
-
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	fp_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
-
 void fp_state::video_start()
 {
 	// allocate memory
@@ -529,7 +504,10 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000, crtc_intf)
+
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -51,29 +51,29 @@ const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
 
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
-void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 {
 	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x80;
-
+	
 	if (OPTION_80_COL)
 	{
 		for (int column = 0; column < x_count; column++)
 		{
 			offs_t addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
 			UINT16 data = m_video_ram[addr & 0x7fff];
-
+			
 			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 				int color = (BIT(data, 15) << 1) | BIT(data, 7);
-
+				
 				if (column == cursor_x) color = 0x03;
-
+				
 				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
-
+				
 				data <<= 1;
 			}
 		}
@@ -82,33 +82,26 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 	{
 		//offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 40) * 0x480) + (((ra & 0x0f) << 7));
 		offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + (y * 0x80);
-
+		
 		for (int column = 0; column < x_count; column++)
 		{
 			UINT32 data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
-
+			
 			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 				int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
-
+				
 				if (column == cursor_x) color = 0x03;
-
+				
 				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
-
+				
 				data <<= 1;
 			}
-
+			
 			addr += 2;
 		}
 	}
-}
-
-static MC6845_UPDATE_ROW( wangpc_lvc_update_row )
-{
-	wangpc_lvc_device *lvc = downcast<wangpc_lvc_device *>(device->owner());
-
-	lvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }
 
 WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
@@ -118,22 +111,6 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 		set_irq(ASSERT_LINE);
 	}
 }
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	wangpc_lvc_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_lvc_device, vsync_w),
-	NULL
-};
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
@@ -147,7 +124,11 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL_14_31818MHz/16, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL_14_31818MHz/16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(wangpc_lvc_device, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_lvc_device, vsync_w))
 MACHINE_CONFIG_END
 
 

@@ -135,6 +135,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT8 *m_p_chargen;                 /* character ROM */
 	UINT8 *m_p_videoram;                    /* Video RAM */
 	UINT8 *m_p_attribram;                   /* Attribute RAM */
@@ -511,10 +512,9 @@ static GFXDECODE_START( bigbord2 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bigbord2_charlayout, 0, 1 )
 GFXDECODE_END
 
-MC6845_UPDATE_ROW( bigbord2_update_row )
+MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 {
-	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -523,11 +523,11 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 	{
 		inv=0;
 		mem = (ma + x) & 0x7ff;
-		if (BIT(state->m_p_attribram[mem], 7)) inv^=0xff;
-		chr = state->m_p_videoram[mem];
+		if (BIT(m_p_attribram[mem], 7)) inv^=0xff;
+		chr = m_p_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
+		gfx = m_p_chargen[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT( gfx, 7 )];
@@ -540,22 +540,6 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 		*p++ = palette[BIT( gfx, 0 )];
 	}
 }
-
-static MC6845_INTERFACE( bigbord2_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	bigbord2_update_row,        /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, frame), // vsync
-	NULL
-};
-
 
 /* Machine Drivers */
 
@@ -603,7 +587,13 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_MB8877x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_MC6845_ADD("crtc", MC6845, SCREEN_TAG, XTAL_16MHz / 8, bigbord2_crtc)
+
+	MCFG_MC6845_ADD("crtc", MC6845, SCREEN_TAG, XTAL_16MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bigbord2_state, frame))
+
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(bigbord2_state, bigbord2_kbd_put))
 

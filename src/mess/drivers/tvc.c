@@ -510,29 +510,28 @@ void tvc_state::machine_reset()
 	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
 }
 
-static MC6845_UPDATE_ROW( tvc_update_row )
+MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 {
-	tvc_state *state = device->machine().driver_data<tvc_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
-	UINT8 *vram = state->memregion("vram")->base() + ((state->m_vram_bank & 0x30)<<10);
+	UINT8 *vram = memregion("vram")->base() + ((m_vram_bank & 0x30)<<10);
 	UINT16 offset = ((ma*4 + ra*0x40) & 0x3fff);
 	int i;
 
-	switch(state->m_video_mode) {
+	switch(m_video_mode) {
 		case 0 :
 				//  2 colors mode
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT8 data = vram[offset + i];
-					*p++ = palette[state->m_col[BIT(data,7)]];
-					*p++ = palette[state->m_col[BIT(data,6)]];
-					*p++ = palette[state->m_col[BIT(data,5)]];
-					*p++ = palette[state->m_col[BIT(data,4)]];
-					*p++ = palette[state->m_col[BIT(data,3)]];
-					*p++ = palette[state->m_col[BIT(data,2)]];
-					*p++ = palette[state->m_col[BIT(data,1)]];
-					*p++ = palette[state->m_col[BIT(data,0)]];
+					*p++ = palette[m_col[BIT(data,7)]];
+					*p++ = palette[m_col[BIT(data,6)]];
+					*p++ = palette[m_col[BIT(data,5)]];
+					*p++ = palette[m_col[BIT(data,4)]];
+					*p++ = palette[m_col[BIT(data,3)]];
+					*p++ = palette[m_col[BIT(data,2)]];
+					*p++ = palette[m_col[BIT(data,1)]];
+					*p++ = palette[m_col[BIT(data,0)]];
 				}
 				break;
 		case 1 :
@@ -541,14 +540,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT8 data = vram[offset + i];
-					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
-					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
-					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
-					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
-					*p++ = palette[state->m_col[BIT(data,1)*2 + BIT(data,5)]];
-					*p++ = palette[state->m_col[BIT(data,1)*2 + BIT(data,5)]];
-					*p++ = palette[state->m_col[BIT(data,0)*2 + BIT(data,4)]];
-					*p++ = palette[state->m_col[BIT(data,0)*2 + BIT(data,4)]];
+					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
+					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
+					*p++ = palette[m_col[BIT(data,2)*2 + BIT(data,6)]];
+					*p++ = palette[m_col[BIT(data,2)*2 + BIT(data,6)]];
+					*p++ = palette[m_col[BIT(data,1)*2 + BIT(data,5)]];
+					*p++ = palette[m_col[BIT(data,1)*2 + BIT(data,5)]];
+					*p++ = palette[m_col[BIT(data,0)*2 + BIT(data,4)]];
+					*p++ = palette[m_col[BIT(data,0)*2 + BIT(data,4)]];
 				}
 				break;
 		default:
@@ -633,21 +632,6 @@ QUICKLOAD_LOAD_MEMBER( tvc_state,tvc64)
 }
 
 
-static MC6845_INTERFACE( tvc_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8 /*?*/,
-	NULL,
-	tvc_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tvc_state, tvc_int_ff_set),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 static const cassette_interface tvc_cassette_interface =
 {
 	tvc64_cassette_formats,
@@ -679,7 +663,11 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(tvc_state, tvc)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2, tvc_crtc6845_interface) // clk taken from schematics
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2) // clk taken from schematics
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
+	MCFG_MC6845_UPDATE_ROW_CB(tvc_state, crtc_update_row)
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(tvc_state, tvc_int_ff_set))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

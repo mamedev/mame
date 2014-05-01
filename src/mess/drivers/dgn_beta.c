@@ -327,7 +327,6 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(DGNBETA_FRAMES_PER_SECOND)
@@ -375,7 +374,11 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_interface)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_12_288MHz / 16, dgnbeta_crtc6845_interface)    //XTAL is guessed
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_12_288MHz / 16)    //XTAL is guessed
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
+	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(dgn_beta_state, dgnbeta_vsync_changed))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -547,6 +547,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	DECLARE_DRIVER_INIT(fanucspmg);
 
 	UINT8 m_vram[24576];
@@ -765,23 +767,22 @@ WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
 	return prog_space.write_byte(offset | (m_dma_page << 16), data);
 }
 
-static MC6845_UPDATE_ROW( fanuc_update_row )
+MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 {
-	fanucspmg_state *state = downcast<fanucspmg_state *>(device->owner());
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
-	UINT8 *chargen = state->m_chargen->base();
+	UINT8 *chargen = m_chargen->base();
 
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ma + i );
 
-		if (state->m_video_ctrl & 0x02)
+		if (m_video_ctrl & 0x02)
 		{
 			if (offset <= 0x5ff)
 			{   															  
-				UINT8 chr = state->m_vram[offset + 0x600];
-				UINT8 attr = state->m_vram[offset];
+				UINT8 chr = m_vram[offset + 0x600];
+				UINT8 attr = m_vram[offset];
 				UINT8 data = chargen[ chr + (ra * 256) ];
 				UINT32 fg = 0;
 				UINT32 bg = 0;
@@ -813,21 +814,6 @@ static MC6845_UPDATE_ROW( fanuc_update_row )
 		}
 	}
 }
-
-static MC6845_INTERFACE( mc6845_fanuc_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	8,                  /* number of pixels per video memory address */
-	NULL,               /* begin_update */
-	fanuc_update_row,   /* update_row */
-	NULL,               /* end_update */
-	DEVCB_NULL,         /* on_de_changed */
-	DEVCB_NULL,         /* on_cur_changed */
-	DEVCB_NULL,         /* on hsync changed */
-	DEVCB_DRIVER_LINE_MEMBER(fanucspmg_state, vsync_w), /* on vsync changed */
-	NULL
-};
 
 static SLOT_INTERFACE_START( fanuc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -882,7 +868,11 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz, 640, 0, 512, 390, 0, 384 )
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2, mc6845_fanuc_intf)
+	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

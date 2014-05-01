@@ -87,10 +87,6 @@ void fp1100_state::video_start()
 {
 }
 
-static MC6845_UPDATE_ROW( fp1100_update_row )
-{
-}
-
 READ8_MEMBER( fp1100_state::fp1100_mem_r )
 {
 	if(m_mem_bank == 0 && offset <= 0x8fff)
@@ -318,21 +314,6 @@ GFXDECODE_END
 
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	fp1100_update_row,      /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 {
 	if(irq_mask & 0x10)
@@ -362,8 +343,10 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp1100)
 
-	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/2, mc6845_intf)   /* hand tuned to get ~60 fps */
+	/* devices */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/2)   /* hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -575,22 +575,6 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                      /* show border area */
-	0,0,0,0,                    /* visarea adjustment */
-	16,                         /* number of pixels per video memory address */
-	NULL,                       /* before pixel update callback */
-	NULL,                       /* row update callback */
-	NULL,                       /* after pixel update callback */
-	DEVCB_NULL,                 /* callback for display state changes */
-	DEVCB_NULL,                 /* callback for cursor state changes */
-	DEVCB_DRIVER_LINE_MEMBER(vcombat_state,sound_update),   /* HSYNC callback */
-	DEVCB_NULL,                 /* VSYNC callback */
-	NULL                        /* update address callback */
-};
-
-
 static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -621,7 +605,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	/* Disabled for now as it can't handle multiple screens */
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16, mc6845_intf)
+//  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -657,7 +641,10 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 4 / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 4 / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(vcombat_state, sound_update))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)

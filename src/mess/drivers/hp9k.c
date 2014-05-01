@@ -389,21 +389,6 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 
-static MC6845_INTERFACE( hp9k_mc6845_intf )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	NULL,       /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
@@ -422,7 +407,9 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, "screen", XTAL_16MHz / 16, hp9k_mc6845_intf )
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_16MHz / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
 /* ROM definition */

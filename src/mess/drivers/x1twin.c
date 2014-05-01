@@ -79,21 +79,6 @@ static const wd17xx_interface x1_mb8877a_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,          /* show border area*/
-	0,0,0,0,        /* visarea adjustment */
-	8,              /* number of pixels per video memory address */
-	NULL,           /* before pixel update callback */
-	NULL,           /* row update callback */
-	NULL,           /* after pixel update callback */
-	DEVCB_NULL,     /* callback for display state changes */
-	DEVCB_NULL,     /* callback for cursor state changes */
-	DEVCB_NULL,     /* HSYNC callback */
-	DEVCB_NULL,     /* VSYNC callback */
-	NULL            /* update address callback */
-};
-
 /*************************************
  *
  *  Inputs
@@ -508,7 +493,10 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, HUC6260_WPF, 70, 70 + 512 + 32, HUC6260_LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider
+	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
 

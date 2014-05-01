@@ -112,6 +112,8 @@ public:
 	DECLARE_READ8_MEMBER(bml3_f000_r); DECLARE_WRITE8_MEMBER(bml3_f000_w);
 	DECLARE_READ8_MEMBER(bml3_fff0_r); DECLARE_WRITE8_MEMBER(bml3_fff0_w);
 
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_hres_reg;
@@ -589,10 +591,9 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0xffe00000,IP_ACTIVE_HIGH,IPT_UNKNOWN)
 INPUT_PORTS_END
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 {
-	bml3_state *state = device->machine().driver_data<bml3_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
 	// 0: blue
 	// 1: red
@@ -604,9 +605,9 @@ static MC6845_UPDATE_ROW( update_row )
 	bool reverse=0,graphic=0,lowres=0;
 	UINT16 mem=0;
 
-	interlace = (state->m_crtc_vreg[8] & 3) ? 1 : 0;
-	lowres = BIT(state->m_hres_reg, 6);
-	bgcolor = state->m_hres_reg & 7;
+	interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
+	lowres = BIT(m_hres_reg, 6);
+	bgcolor = m_hres_reg & 7;
 
 	if (interlace)
 	{
@@ -624,11 +625,11 @@ static MC6845_UPDATE_ROW( update_row )
 		else
 			mem = (ma + x + ra * x_count/40 * 0x400 -0x400) & 0x3fff;
 
-		color = state->m_p_videoram[mem|0x4000] & 7;
-		reverse = BIT(state->m_p_videoram[mem|0x4000], 3) ^ (x == cursor_x);
-		graphic = BIT(state->m_p_videoram[mem|0x4000], 4);
+		color = m_p_videoram[mem|0x4000] & 7;
+		reverse = BIT(m_p_videoram[mem|0x4000], 3) ^ (x == cursor_x);
+		graphic = BIT(m_p_videoram[mem|0x4000], 4);
 
-		rawbits = state->m_p_videoram[mem];
+		rawbits = m_p_videoram[mem];
 
 		if (graphic)
 		{
@@ -653,12 +654,12 @@ static MC6845_UPDATE_ROW( update_row )
 			int tile_bank = BIT(rawbits, 7);
 			if (interlace)
 			{
-				dots[0] = state->m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)];
-				dots[1] = state->m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)|tile_bank];
+				dots[0] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)];
+				dots[1] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)|tile_bank];
 			}
 			else
 			{
-				dots[0] = dots[1] = state->m_p_chargen[(tile<<4)|(ra<<1)|tile_bank];
+				dots[0] = dots[1] = m_p_chargen[(tile<<4)|(ra<<1)|tile_bank];
 			}
 		}
 
@@ -679,20 +680,6 @@ static MC6845_UPDATE_ROW( update_row )
 	}
 }
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	update_row,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
 
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
@@ -1000,7 +987,11 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bml3_state, crtc_update_row)
+
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))

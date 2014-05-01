@@ -389,21 +389,6 @@ static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
 MACHINE_CONFIG_END
 
 
-static MC6845_INTERFACE( svi806_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8 /*?*/,
-	NULL,
-	svi806_crtc6845_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout svi328_charlayout =
 {
@@ -460,7 +445,10 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svi328)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8, svi806_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)	/* ? */
+	MCFG_MC6845_UPDATE_ROW_CB(svi318_state, crtc_update_row)
 
 	MCFG_VIDEO_START_OVERRIDE(svi318_state, svi328_806 )
 

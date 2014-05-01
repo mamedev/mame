@@ -12,19 +12,6 @@
 #include "cpu/m6809/m6809.h"
 
 
-
-/*************************************
- *
- *  Static function prototypes
- *
- *************************************/
-
-static MC6845_BEGIN_UPDATE( begin_update );
-static MC6845_UPDATE_ROW( update_row );
-
-
-
-
 /*************************************
  *
  *  Start
@@ -272,35 +259,27 @@ void qix_state::set_pen(int offs)
  *
  *************************************/
 
-static MC6845_BEGIN_UPDATE( begin_update )
+MC6845_BEGIN_UPDATE( qix_state::crtc_begin_update )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
-
 #if 0
 	// note the confusing bit order!
 	popmessage("self test leds: %d%d %d%d%d%d",BIT(leds,7),BIT(leds,5),BIT(leds,6),BIT(leds,4),BIT(leds,2),BIT(leds,3));
 #endif
-
-	return &(state->m_pens)[state->m_palette_bank << 8];
 }
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( qix_state::crtc_update_row )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
 	UINT32 *dest = &bitmap.pix32(y);
-	UINT16 x;
-
-	pen_t *pens = (pen_t *)param;
+	pen_t *pens = &m_pens[m_palette_bank << 8];
 
 	/* the memory is hooked up to the MA, RA lines this way */
 	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);
-	offs_t offs_xor = state->m_flip ? 0xffff : 0;
+	offs_t offs_xor = m_flip ? 0xffff : 0;
 
-	for (x = 0; x < x_count * 8; x++)
-		dest[x] = pens[state->m_videoram[(offs + x) ^ offs_xor]];
+	for (UINT16 x = 0; x < x_count * 8; x++)
+		dest[x] = pens[m_videoram[(offs + x) ^ offs_xor]];
 }
-
 
 
 /*************************************
@@ -387,29 +366,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                              /* show border area */
-	0,0,0,0,                            /* visarea adjustment */
-	8,                                  /* number of pixels per video memory address */
-	begin_update,                       /* before pixel update callback */
-	update_row,                         /* row update callback */
-	NULL,                               /* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,display_enable_changed), /* callback for display state changes */
-	DEVCB_NULL,                         /* callback for cursor state changes */
-	DEVCB_NULL,                         /* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_vsync_changed),      /* VSYNC callback */
-	NULL                                /* update address callback */
-};
-
-
 MACHINE_CONFIG_FRAGMENT( qix_video )
 	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
-	MCFG_MC6845_ADD("vid_u18", MC6845, "screen", QIX_CHARACTER_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("vid_u18", MC6845, "screen", QIX_CHARACTER_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(qix_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(qix_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(qix_state, display_enable_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(qix_state, qix_vsync_changed))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */

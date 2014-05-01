@@ -560,21 +560,6 @@ static GFXDECODE_START( multi8 )
 GFXDECODE_END
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 PALETTE_INIT_MEMBER(multi8_state, multi8)
 {
 	UINT8 i;
@@ -676,9 +661,12 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	/* Devices */
+	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/2)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(multi8_state, porta_r))

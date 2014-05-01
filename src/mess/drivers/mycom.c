@@ -93,6 +93,7 @@ public:
 	DECLARE_DRIVER_INIT(mycom);
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_0a;
@@ -130,22 +131,21 @@ void mycom_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static MC6845_UPDATE_ROW( mycom_update_row )
+MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx=0,z;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
-	if (state->m_0a & 0x40)
+	if (m_0a & 0x40)
 	{
 		for (x = 0; x < x_count; x++)                   // lores pixels
 		{
 			UINT8 dbit=1;
 			if (x == cursor_x) dbit=0;
 			mem = (ma + x) & 0x7ff;
-			chr = state->m_p_videoram[mem];
+			chr = m_p_videoram[mem];
 			z = ra / 3;
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
@@ -169,8 +169,8 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 				gfx = inv;  // some blank spacing lines
 			else
 			{
-				chr = state->m_p_videoram[mem];
-				gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
+				chr = m_p_videoram[mem];
+				gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 			}
 
 			/* Display a scanline of a character */
@@ -338,21 +338,6 @@ static const gfx_layout mycom_charlayout =
 static GFXDECODE_START( mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	8,                  /* number of pixels per video memory address */
-	NULL,               /* before pixel update callback */
-	mycom_update_row,   /* row update callback */
-	NULL,               /* after pixel update callback */
-	DEVCB_NULL,         /* callback for display state changes */
-	DEVCB_NULL,         /* callback for cursor state changes */
-	DEVCB_NULL,         /* HSYNC callback */
-	DEVCB_NULL,         /* VSYNC callback */
-	NULL                /* update address callback */
-};
 
 WRITE8_MEMBER( mycom_state::mycom_04_w )
 {
@@ -549,7 +534,10 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

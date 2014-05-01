@@ -92,6 +92,7 @@ public:
 	DECLARE_MACHINE_RESET(cpu09);
 	DECLARE_MACHINE_RESET(ivg09);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	const UINT8 *m_p_chargen;
 	optional_shared_ptr<UINT8> m_p_videoram;
@@ -206,10 +207,9 @@ WRITE8_MEMBER( tavernie_state::ds_w )
 }
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( tavernie_state::crtc_update_row )
 {
-	tavernie_state *state = device->machine().driver_data<tavernie_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx=0;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -223,8 +223,8 @@ static MC6845_UPDATE_ROW( update_row )
 			gfx = inv;  // some blank spacing lines
 		else
 		{
-			chr = state->m_p_videoram[mem];
-			gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
+			chr = m_p_videoram[mem];
+			gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 		}
 
 		/* Display a scanline of a character */
@@ -238,21 +238,6 @@ static MC6845_UPDATE_ROW( update_row )
 		*p++ = palette[BIT(gfx, 0)];
 	}
 }
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	8,                  /* number of pixels per video memory address */
-	NULL,               /* before pixel update callback */
-	update_row,         /* row update callback */
-	NULL,               /* after pixel update callback */
-	DEVCB_NULL,         /* callback for display state changes */
-	DEVCB_NULL,         /* callback for cursor state changes */
-	DEVCB_NULL,         /* HSYNC callback */
-	DEVCB_NULL,         /* VSYNC callback */
-	NULL                /* update address callback */
-};
 
 
 READ8_MEMBER( tavernie_state::pa_r )
@@ -381,7 +366,11 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	/* Devices */
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tavernie_state, kbd_put))
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // unknown clock
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(tavernie_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("pia_ivg", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(tavernie_state, pb_ivg_r))

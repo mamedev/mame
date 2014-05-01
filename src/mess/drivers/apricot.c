@@ -92,6 +92,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( data_selector_dtr_w ) { m_data_selector_dtr = state; };
 	DECLARE_WRITE_LINE_MEMBER( data_selector_rts_w ) { m_data_selector_rts = state; };
 
+	MC6845_UPDATE_ROW( crtc_update_row );
+
 	virtual void machine_start();
 
 	int m_data_selector_dtr;
@@ -224,19 +226,18 @@ UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-static MC6845_UPDATE_ROW( apricot_update_row )
+MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 {
-	apricot_state *state = device->machine().driver_data<apricot_state>();
-	UINT8 *ram = state->m_ram->pointer();
-	const pen_t *pen = state->m_palette->pens();
+	UINT8 *ram = m_ram->pointer();
+	const pen_t *pen = m_palette->pens();
 	int i, x;
 
-	if (state->m_video_mode)
+	if (m_video_mode)
 	{
 		// text mode
 		for (i = 0; i < x_count; i++)
 		{
-			UINT16 code = state->m_screen_buffer[(ma + i) & 0x7ff];
+			UINT16 code = m_screen_buffer[(ma + i) & 0x7ff];
 			UINT16 offset = ((code & 0x7ff) << 5) | (ra << 1);
 			UINT16 data = ram[offset + 1] << 8 | ram[offset];
 			int fill = 0;
@@ -259,22 +260,6 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 		fatalerror("Graphics mode not implemented!\n");
 	}
 }
-
-static MC6845_INTERFACE( apricot_mc6845_intf )
-{
-	false,
-	0,0,0,0,
-	10,
-	NULL,
-	apricot_update_row,
-	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_mc6845_de),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 
 //**************************************************************************
 //  MACHINE EMULATION
@@ -346,7 +331,11 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
+	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(10)
+	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(apricot_state, apricot_mc6845_de))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

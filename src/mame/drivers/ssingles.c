@@ -175,6 +175,8 @@ public:
 	DECLARE_DRIVER_INIT(ssingles);
 	virtual void video_start();
 	INTERRUPT_GEN_MEMBER(atamanot_irq);
+	MC6845_UPDATE_ROW(ssingles_update_row);
+	MC6845_UPDATE_ROW(atamanot_update_row);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -191,112 +193,77 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 	0x00,0x00,0x00, 0xff,0x00,0xff, 0x80,0x00,0x80, 0x40,0x00,0x40
 };
 
-static MC6845_UPDATE_ROW( ssingles_update_row )
+MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 {
-	ssingles_state *state = device->machine().driver_data<ssingles_state>();
-	int cx,x;
 	UINT32 tile_address;
-	UINT16 cell,palette;
-	UINT8 b0,b1;
-	const UINT8 *gfx = state->memregion("gfx1")->base();
+	UINT16 cell, palette;
+	UINT8 b0, b1;
+	const UINT8 *gfx = memregion("gfx1")->base();
 
-	for(cx=0;cx<x_count;++cx)
+	for (int cx = 0; cx < x_count; ++cx)
 	{
-		int address=((ma>>1)+(cx>>1))&0xff;
+		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell=state->m_videoram[address]+(state->m_colorram[address]<<8);
+		cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address=((cell&0x3ff)<<4)+ra;
-		palette=(cell>>10)&0x1c;
+		tile_address = ((cell & 0x3ff) << 4) + ra;
+		palette = (cell >> 10) & 0x1c;
 
-		if(cx&1)
+		if (cx & 1)
 		{
-			b0=gfx[tile_address+0x0000]; /*  9.bin */
-			b1=gfx[tile_address+0x8000]; /* 11.bin */
+			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
+			b1 = gfx[tile_address + 0x8000]; /* 11.bin */
 		}
 		else
 		{
-			b0=gfx[tile_address+0x4000]; /* 10.bin */
-			b1=gfx[tile_address+0xc000]; /* 12.bin */
+			b0 = gfx[tile_address + 0x4000]; /* 10.bin */
+			b1 = gfx[tile_address + 0xc000]; /* 12.bin */
 		}
 
-		for(x=7;x>=0;--x)
+		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
-			b0>>=1;
-			b1>>=1;
+			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			b0 >>= 1;
+			b1 >>= 1;
 		}
 	}
 }
 
-static MC6845_UPDATE_ROW( atamanot_update_row )
+MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 {
-	ssingles_state *state = device->machine().driver_data<ssingles_state>();
-	int cx,x;
 	UINT32 tile_address;
-	UINT16 cell,palette;
-	UINT8 b0,b1;
-	const UINT8 *gfx = state->memregion("gfx1")->base();
+	UINT16 cell, palette;
+	UINT8 b0, b1;
+	const UINT8 *gfx = memregion("gfx1")->base();
 
-	for(cx=0;cx<x_count;++cx)
+	for (int cx = 0; cx < x_count; ++cx)
 	{
-		int address=((ma>>1)+(cx>>1))&0xff;
+		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell=state->m_videoram[address]+(state->m_colorram[address]<<8);
+		cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address=((cell&0x1ff)<<4)+ra;
-		palette=(cell>>10)&0x1c;
+		tile_address = ((cell & 0x1ff) << 4) + ra;
+		palette = (cell >> 10) & 0x1c;
 
-		if(cx&1)
+		if (cx & 1)
 		{
-			b0=gfx[tile_address+0x0000]; /*  9.bin */
-			b1=gfx[tile_address+0x4000]; /* 11.bin */
+			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
+			b1 = gfx[tile_address + 0x4000]; /* 11.bin */
 		}
 		else
 		{
-			b0=gfx[tile_address+0x2000]; /* 10.bin */
-			b1=gfx[tile_address+0x6000]; /* 12.bin */
+			b0 = gfx[tile_address + 0x2000]; /* 10.bin */
+			b1 = gfx[tile_address + 0x6000]; /* 12.bin */
 		}
 
-		for(x=7;x>=0;--x)
+		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
-			b0>>=1;
-			b1>>=1;
+			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			b0 >>= 1;
+			b1 >>= 1;
 		}
 	}
 }
-
-
-static MC6845_INTERFACE( ssingles_mc6845_intf )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,                       /* before pixel update callback */
-	ssingles_update_row,        /* row update callback */
-	NULL,                       /* after pixel update callback */
-	DEVCB_NULL,                 /* callback for display state changes */
-	DEVCB_NULL,                 /* callback for cursor state changes */
-	DEVCB_NULL,                 /* HSYNC callback */
-	DEVCB_NULL,                 /* VSYNC callback */
-	NULL                        /* update address callback */
-};
-
-static MC6845_INTERFACE( atamanot_mc6845_intf )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,                       /* before pixel update callback */
-	atamanot_update_row,        /* row update callback */
-	NULL,                       /* after pixel update callback */
-	DEVCB_NULL,                 /* callback for display state changes */
-	DEVCB_NULL,                 /* callback for cursor state changes */
-	DEVCB_NULL,                 /* HSYNC callback */
-	DEVCB_NULL,                 /* VSYNC callback */
-	NULL                        /* update address callback */
-};
 
 
 WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
@@ -579,8 +546,10 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssingles)
 
-
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, ssingles_mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, ssingles_update_row)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -606,7 +575,10 @@ static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
 
 	MCFG_DEVICE_REMOVE("crtc")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, atamanot_mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atamanot)
 MACHINE_CONFIG_END

@@ -126,25 +126,6 @@ MACHINE_RESET_MEMBER( a6809_state, a6809)
 	m_via->write_pb7(0);
 }
 
-static MC6845_UPDATE_ROW( a6809_update_row )
-{
-}
-
-static MC6845_INTERFACE( a6809_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	12,
-	NULL,
-	a6809_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 READ8_MEMBER( a6809_state::videoram_r )
 {
 	offset += m_start_address;
@@ -266,7 +247,9 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(a6809_state, cass_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2, a6809_crtc6845_interface)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(12)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
 	MCFG_SAA5050_D_CALLBACK(READ8(a6809_state, videoram_r))

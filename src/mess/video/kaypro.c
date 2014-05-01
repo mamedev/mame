@@ -131,10 +131,9 @@ UINT32 kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 
     Not sure how the attributes interact, for example does an underline blink? */
 
 
-MC6845_UPDATE_ROW( kaypro2x_update_row )
+MC6845_UPDATE_ROW( kaypro_state::kaypro2x_update_row )
 {
-	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32 *p = &bitmap.pix32(y);
 	UINT16 x;
 	UINT8 gfx,fg,bg;
@@ -144,8 +143,8 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		UINT16 mem = (ma + x) & 0x7ff;
-		UINT8 chr = state->m_p_videoram[mem];
-		UINT8 attr = state->m_p_videoram[mem | 0x800];
+		UINT8 chr = m_p_videoram[mem];
+		UINT8 attr = m_p_videoram[mem | 0x800];
 
 		if ((attr & 3) == 3)
 		{
@@ -171,18 +170,18 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		}
 
 		/* Take care of flashing characters */
-		if ( (BIT(attr, 2)) & (BIT(state->m_framecnt, 3)) )
+		if ( (BIT(attr, 2)) & (BIT(m_framecnt, 3)) )
 			fg = bg;
 
 		/* process cursor */
 		if (x == cursor_x)
-			inv ^= state->m_mc6845_cursor[ra];
+			inv ^= m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
 		if ( (ra == 15) & (BIT(attr, 3)) )  /* underline */
 			gfx = 0xff;
 		else
-			gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
+			gfx = m_p_chargen[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT( gfx, 7 ) ? fg : bg];

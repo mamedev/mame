@@ -119,6 +119,8 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(svi318_cart);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	required_device<z80_device> m_maincpu;
 protected:
 	required_device<cassette_image_device> m_cassette;
@@ -155,8 +157,5 @@ protected:
 
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
-
-MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
-
 
 #endif /* SVI318_H_ */

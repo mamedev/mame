@@ -77,6 +77,7 @@ public:
 	DECLARE_PALETTE_INIT(alphatro);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_flashcnt;
@@ -154,12 +155,11 @@ void alphatro_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static MC6845_UPDATE_ROW( alphatro_update_row )
+MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 {
-	alphatro_state *state = device->machine().driver_data<alphatro_state>();
-	const rgb_t *pens = state->m_palette->palette()->entry_list_raw();
-	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
-	if (y==0) state->m_flashcnt++;
+	const rgb_t *pens = m_palette->palette()->entry_list_raw();
+	bool palette = BIT(ioport("CONFIG")->read(), 5);
+	if (y==0) m_flashcnt++;
 	bool inv;
 	UINT8 chr,gfx,attr,bg,fg;
 	UINT16 mem,x;
@@ -169,8 +169,8 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	{
 		inv = (x == cursor_x);
 		mem = (ma + x) & 0x7ff;
-		chr = state->m_p_videoram[mem];
-		attr = state->m_p_videoram[mem | 0x800];
+		chr = m_p_videoram[mem];
+		attr = m_p_videoram[mem | 0x800];
 		fg = (palette) ? 8 : attr & 7; // amber or RGB
 		bg = (palette) ? 0 : (attr & 0x38) >> 3;
 
@@ -180,13 +180,13 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 			chr &= 0x7f;
 		}
 
-		if (BIT(attr, 6) & BIT(state->m_flashcnt, 4)) // flashing
+		if (BIT(attr, 6) & BIT(m_flashcnt, 4)) // flashing
 		{
 			inv ^= 1;
 		}
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra];
+		gfx = m_p_chargen[(chr<<4) | ra];
 
 		if (inv)
 		{
@@ -414,21 +414,6 @@ PALETTE_INIT_MEMBER(alphatro_state, alphatro)
 }
 
 
-static MC6845_INTERFACE( alphatro_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	alphatro_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_c)
 {
 	m_cass_data[3]++;
@@ -494,7 +479,10 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk unknown
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))

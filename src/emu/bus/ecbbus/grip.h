@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 
-	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
+	MC6845_UPDATE_ROW( crtc_update_row );
 
 protected:
 	// device-level overrides
