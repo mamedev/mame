@@ -334,6 +334,8 @@ Sony HBK-30 (interface only, meant for 30W) - WD2793
 National FS-FD35 - MB8877A
 Panasonic FS-FD1 - TC8566AF
 Panasonic FS-FD1A - TC8566AF
+Spectravideo SVI-707 - MB8877A - 1 5.25" SSDD drive (320KB) - There seem to be 2 ROMs on the PCB, apparently one is for MSX and one is for CP/M operation?
+                     - See https://plus.google.com/photos/115644813183575095400/albums/5223347091895442113?banner=pwa
 
 */
 
@@ -1131,6 +1133,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( msx_fd1793 )
 	MCFG_FD1793x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(msx_state, msx_wd179x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(msx_state, msx_wd179x_drq_w))
 MACHINE_CONFIG_END
@@ -1154,6 +1157,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( msx_tc8566af )
 	// TODO: Implement TC8566AF, the fragment below is to keep the core happy
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(msx_state, msx_wd179x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(msx_state, msx_wd179x_drq_w))
 MACHINE_CONFIG_END
@@ -1161,6 +1165,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( msx_microsol )
 	// TODO: Implement MICROSOL, the fragment below is to keep the core happy
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(msx_state, msx_wd179x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(msx_state, msx_wd179x_drq_w))
 MACHINE_CONFIG_END
@@ -2637,23 +2642,23 @@ MACHINE_CONFIG_END
 ROM_START (svi728)
 	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("728bios.rom", 0x0000, 0x8000, CRC(1ce9246c) SHA1(ea6a82cf8c6e65eb30b98755c8577cde8d9186c0))
-	ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
+//	ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
 ROM_END
 
 MSX_LAYOUT_INIT (svi728)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 1, 1, DISK_ROM2, 0x4000, 0x8000)
-	MSX_LAYOUT_SLOT (3, 1, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+//	MSX_LAYOUT_SLOT (3, 0, 1, 1, DISK_ROM2, 0x4000, 0x8000)
+//	MSX_LAYOUT_SLOT (3, 1, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
 static MACHINE_CONFIG_DERIVED( svi728, msx_pal )
 	MCFG_MSX_LAYOUT(svi728)
 	// AY8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	MCFG_FRAGMENT_ADD( msx1_2_cartslots )
+	// 1 Cartridge slots, 1 Expansion slot (eg for SVI-707)
+	MCFG_FRAGMENT_ADD( msx1_1_cartslot )
 MACHINE_CONFIG_END
 
 /* MSX - Spectravideo SVI-738 */
@@ -3057,7 +3062,9 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( y503iir, msx_pal )
 	MCFG_MSX_LAYOUT(y503iir)
 	// YM2149 (in S-3527 MSX Engine)
-	// FDC: None, 0 drives
+	// FDC: wd2793/mb8877?, 1 3.5" DSDD drive
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	// 2 Cartridge slots
 	MCFG_FRAGMENT_ADD( msx1_2_cartslots )
 	// S-3527 MSX Engine
@@ -3086,7 +3093,9 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( y503iir2, msx_pal )
 	MCFG_MSX_LAYOUT(y503iir2)
 	// AY8910/YM2149?
-	// FDC: None, 0 drives
+	// FDC: wd2793/mb8877?, 1 3.5" DSDD drive?
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	// 2 Cartridge slots?
 	MCFG_FRAGMENT_ADD( msx1_2_cartslots )
 MACHINE_CONFIG_END
@@ -5033,7 +5042,9 @@ static MACHINE_CONFIG_DERIVED( tpc310, msx2_pal )
 	MCFG_MSX_LAYOUT(tpc310)
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	// YM2149 (in S-1985 MSX Engine)
-	// FDC: None, 0 drives
+	// FDC: mb8877a?, 1 3.5" DSDD drive
+	MCFG_FRAGMENT_ADD( msx_mb8877a )
+	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	// 1 Cartridge slot (slot 2)
 	MCFG_FRAGMENT_ADD( msx2_1_cartslot )
 	// S-1985 MSX Engine
@@ -5240,6 +5251,8 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( msx2pgen, msx2p )
 	MCFG_MSX_LAYOUT(msx2p)
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
+	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_2_cartslots )
 MACHINE_CONFIG_END
 
@@ -5357,7 +5370,7 @@ MSX_LAYOUT_INIT (expertdx)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 2, 1, 1, ROM, 0x4000, 0x20000)
-	MSX_LAYOUT_SLOT (1, 3, 1, 1, DISK_ROM, 0x4000, 0xc000)
+	//MSX_LAYOUT_SLOT (1, 3, 1, 1, DISK_ROM, 0x4000, 0xc000)  /* TC8566AF Disk controller  /* TC8566AF Disk controller*/*/
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM_MM, 0x10000, 0x0000)   /* 64KB Mapper RAM?? */
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	/* Kanji? */
@@ -5366,7 +5379,9 @@ MSX_LAYOUT_END
 static MACHINE_CONFIG_DERIVED( expertdx, msx2p )
 	MCFG_MSX_LAYOUT(expertdx)
 	// AY8910/YM2149?
-	// FDC: wd2793?, 0 drives
+	// FDC: tc8566af, 1 3.5" DSDD drive?
+	MCFG_FRAGMENT_ADD( msx_tc8566af )
+	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	// 2 Cartridge slots?
 	MCFG_FRAGMENT_ADD( msx2_2_cartslots )
 MACHINE_CONFIG_END
