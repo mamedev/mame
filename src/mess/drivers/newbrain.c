@@ -954,29 +954,20 @@ WRITE_LINE_MEMBER( newbrain_eim_state::adc_eoc_w )
 	m_anint = state;
 }
 
-static ADC0808_ANALOG_READ( newbrain_adc_vref_pos_r )
+ADC0808_ANALOG_READ_CB( newbrain_eim_state::adc_vref_pos_r )
 {
 	return 5.0;
 }
 
-static ADC0808_ANALOG_READ( newbrain_adc_vref_neg_r )
+ADC0808_ANALOG_READ_CB( newbrain_eim_state::adc_vref_neg_r )
 {
 	return 0.0;
 }
 
-static ADC0808_ANALOG_READ( newbrain_adc_input_r )
+ADC0808_ANALOG_READ_CB( newbrain_eim_state::adc_input_r )
 {
 	return 0.0;
 }
-
-static ADC0808_INTERFACE( adc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, adc_eoc_w),
-	newbrain_adc_vref_pos_r,
-	newbrain_adc_vref_neg_r,
-	{ newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r,
-		newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r }
-};
 
 /* Memory Maps */
 
@@ -1378,7 +1369,18 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(newbrain_eim_state, ctc_z2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_state, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
-	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
+	MCFG_DEVICE_ADD(ADC0809_TAG, ADC0808, 500000)
+	MCFG_ADC0808_OUT_EOC_CB(WRITELINE(newbrain_eim_state, adc_eoc_w))
+	MCFG_ADC0808_IN_VREF_POS_CB(newbrain_eim_state, adc_vref_pos_r)
+	MCFG_ADC0808_IN_VREF_NEG_CB(newbrain_eim_state, adc_vref_neg_r)
+	MCFG_ADC0808_IN_IN_0_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_1_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_2_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_3_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_4_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_5_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_6_CB(newbrain_eim_state, adc_input_r)
+	MCFG_ADC0808_IN_IN_7_CB(newbrain_eim_state, adc_input_r)
 
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(newbrain_eim_state, acia_tx))
