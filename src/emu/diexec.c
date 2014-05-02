@@ -319,14 +319,13 @@ void device_execute_interface::trigger(int trigid)
 attotime device_execute_interface::local_time() const
 {
 	// if we're active, add in the time from the current slice
-	attotime result = m_localtime;
 	if (executing())
 	{
 		assert(m_cycles_running >= *m_icountptr);
 		int cycles = m_cycles_running - *m_icountptr;
-		result += cycles_to_attotime(cycles);
+		return m_localtime + cycles_to_attotime(cycles);
 	}
-	return result;
+	return m_localtime;
 }
 
 
