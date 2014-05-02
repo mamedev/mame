@@ -58,11 +58,8 @@ saturn_bram32mb_device::saturn_bram32mb_device(const machine_config &mconfig, co
 
 void saturn_bram_device::device_start()
 {
-	if (m_ext_bram == NULL)
-	{
-		m_ext_bram.resize(m_size);
-		save_item(NAME(m_ext_bram));
-	}
+	m_ext_bram.resize(m_size);
+	save_item(NAME(m_ext_bram));
 }
 
 void saturn_bram_device::device_reset()

@@ -43,17 +43,10 @@ saturn_dram32mb_device::saturn_dram32mb_device(const machine_config &mconfig, co
 
 void saturn_dram_device::device_start()
 {
-	if (m_ext_dram0 == NULL)
-	{
-		m_ext_dram0.resize((m_size/2)/sizeof(UINT32));
-		save_item(NAME(m_ext_dram0));
-	}
-
-	if (m_ext_dram1 == NULL)
-	{
-		m_ext_dram1.resize((m_size/2)/sizeof(UINT32));
-		save_item(NAME(m_ext_dram1));
-	}
+	m_ext_dram0.resize((m_size/2)/sizeof(UINT32));
+	m_ext_dram1.resize((m_size/2)/sizeof(UINT32));
+	save_item(NAME(m_ext_dram0));
+	save_item(NAME(m_ext_dram1));
 }
 
 void saturn_dram_device::device_reset()
