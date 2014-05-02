@@ -52,7 +52,6 @@ public:
 	UINT8 m_cocktail;
 	UINT8 m_blaster_bank;
 	UINT8 m_vram_bank;
-	UINT16 m_joust2_current_sound_data;
 	UINT8 m_port_select;
 	rgb_t *m_palette_lookup;
 	UINT8 m_blitterram[8];
@@ -171,7 +170,7 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	optional_shared_ptr<UINT8> m_generic_paletteram_8;
 };
 
 
@@ -183,6 +182,8 @@ public:
 		m_cvsd_sound(*this, "cvsd") { }
 
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
+	UINT16 m_joust2_current_sound_data;
+
 	DECLARE_DRIVER_INIT(joust2);
 	DECLARE_MACHINE_START(joust2);
 	DECLARE_MACHINE_RESET(joust2);
