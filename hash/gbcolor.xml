@@ -24031,7 +24031,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="hpotter2">
+	<software name="hpottr2c">
 		<description>Xiao Shi Mi Shi (Chi)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
@@ -24046,7 +24046,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="hpotter4">
+	<software name="hpotter4" cloneof="hpottr2c">
 		<description>Harry Xiao Zi IV (Chi)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
@@ -24774,8 +24774,20 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
+	<software name="hpotter2">
+		<description>Harry Potter 2 (Asia)</description>
+		<year>2002?</year>
+		<publisher>V.Fame?</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="harry potter ii (unlicensed, english).bin" size="1048576" crc="2ff706c0" sha1="e3f21a748d517527218409e35418b23ced8717da" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This is a title hack of an undumped 'Harry Potter 3: 神奇の光輪' -->
-	<software name="hpotter3">
+	<software name="hpotter3c" cloneof="hpotter2">
 		<description>Harry Potter 3 2003 (Chi)</description>
 		<year>2003?</year>
 		<publisher>V.Fame?</publisher>
