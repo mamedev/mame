@@ -351,17 +351,10 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 }
 
 
-static const struct CassetteOptions vg5k_cassette_options =
-{
-	1,      /* channels */
-	16,     /* bits per sample */
-	44100   /* sample frequency */
-};
-
 static const cassette_interface vg5k_cassette_interface =
 {
 	vg5k_cassette_formats,
-	&vg5k_cassette_options,
+	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
 	"vg5k_cass",
 	NULL

@@ -357,16 +357,10 @@ PALETTE_INIT_MEMBER(zx_state,ts1000)
 
 /* Machine Drivers */
 
-static const struct CassetteOptions zx81_cassette_options = {
-	1,      /* channels */
-	16,     /* bits per sample */
-	44100   /* sample frequency */
-};
-
 static const cassette_interface zx80_cassette_interface =
 {
 	zx80_o_format,
-	&zx81_cassette_options,
+	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
 	NULL
 };
@@ -374,7 +368,7 @@ static const cassette_interface zx80_cassette_interface =
 static const cassette_interface zx81_cassette_interface =
 {
 	zx81_p_format,
-	&zx81_cassette_options,
+	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL

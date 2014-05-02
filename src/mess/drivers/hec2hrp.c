@@ -380,16 +380,10 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 }
 
 /* Cassette definition */
-static const struct CassetteOptions hector_cassette_options = {
-	1,      /* channels */
-	16,     /* bits per sample */
-	44100   /* sample frequency */
-};
-
 static const cassette_interface hector_cassette_interface =
 {
 	hector_cassette_formats,
-	&hector_cassette_options,
+	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL

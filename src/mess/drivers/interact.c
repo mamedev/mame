@@ -98,16 +98,10 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 ADDRESS_MAP_END
 
 /* Cassette definition */
-static const struct CassetteOptions interact_cassette_options = {
-	1,      /* channels */
-	16,     /* bits per sample */
-	44100   /* sample frequency */
-};
-
 static const cassette_interface interact_cassette_interface =
 {
 	hector_cassette_formats,
-	&interact_cassette_options,
+	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
 	"interact_cass",
 	NULL
