@@ -46,15 +46,9 @@ const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3] =
 
 static const floppy_interface nimbus_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_3_5",
-	NULL
+	"floppy_3_5"
 };
 
 /* Null port handlers for now, I believe that the IO ports are used for */

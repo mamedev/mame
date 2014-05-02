@@ -1208,7 +1208,6 @@ const cassette_interface coco_state::coco_cassette_interface =
 	coco_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
 	NULL
 };
 

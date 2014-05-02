@@ -410,7 +410,6 @@ static const cassette_interface cassette_intf =
 	sordm5_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
 	NULL
 };
 

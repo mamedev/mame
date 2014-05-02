@@ -27,8 +27,7 @@ static const cassette_interface apple1_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	"apple1_cass",
-	NULL
+	"apple1_cass"
 };
 
 MACHINE_CONFIG_FRAGMENT( cassette )

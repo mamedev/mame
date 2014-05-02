@@ -553,7 +553,6 @@ static const cassette_interface sol20_cassette_interface =
 	sol20_cassette_formats,//cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 

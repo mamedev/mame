@@ -347,8 +347,7 @@ static const cassette_interface special_cassette_interface =
 	rks_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"special_cass",
-	NULL
+	"special_cass"
 };
 
 FLOPPY_FORMATS_MEMBER( special_state::specimx_floppy_formats )

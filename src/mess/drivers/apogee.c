@@ -147,8 +147,7 @@ static const cassette_interface apogee_cassette_interface =
 	rka_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"apogee_cass",
-	NULL
+	"apogee_cass"
 };
 
 static const INT16 speaker_levels[] = {-32767, -10922, 10922, 32767};

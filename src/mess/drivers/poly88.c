@@ -144,7 +144,6 @@ static const cassette_interface poly88_cassette_interface =
 	cassette_default_formats,
 	&poly88_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 

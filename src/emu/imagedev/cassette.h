@@ -45,7 +45,6 @@ struct cassette_interface
 	const struct CassetteOptions    *m_create_opts;
 	cassette_state                  m_default_state;
 	const char *                    m_interface;
-	device_image_display_info_func  m_device_displayinfo;
 };
 
 // ======================> cassette_image_device
@@ -64,7 +63,6 @@ public:
 	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();
-	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const { return IO_CASSETTE; }

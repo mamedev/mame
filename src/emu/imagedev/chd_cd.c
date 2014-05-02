@@ -26,13 +26,15 @@ const device_type CDROM = &device_creator<cdrom_image_device>;
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDROM, "CD-ROM Image", tag, owner, clock, "cdrom_image", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_interface(NULL)
 {
 }
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name,  tag, owner, clock, shortname, source),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_interface(NULL)
 {
 }
 //-------------------------------------------------
@@ -51,18 +53,6 @@ cdrom_image_device::~cdrom_image_device()
 
 void cdrom_image_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const cdrom_interface *intf = reinterpret_cast<const cdrom_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdrom_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interface, 0, sizeof(m_interface));
-		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
-	}
-
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
 	m_formatlist.append(*global_alloc(image_device_format("chdcd", "CD-ROM drive", m_extension_list, cd_option_spec)));

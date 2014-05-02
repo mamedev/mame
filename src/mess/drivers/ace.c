@@ -539,7 +539,6 @@ static const cassette_interface ace_cassette_interface =
 	ace_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	NULL,
 	NULL
 };
 

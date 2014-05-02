@@ -356,8 +356,7 @@ static const cassette_interface vg5k_cassette_interface =
 	vg5k_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
-	"vg5k_cass",
-	NULL
+	"vg5k_cass"
 };
 
 

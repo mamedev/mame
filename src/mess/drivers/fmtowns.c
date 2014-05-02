@@ -2671,12 +2671,6 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
-struct cdrom_interface towns_cdrom =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT( towns_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I386, 16000000)
@@ -2734,7 +2728,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
 
-	MCFG_CDROM_ADD("cdrom",towns_cdrom)
+	MCFG_CDROM_ADD("cdrom")
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)

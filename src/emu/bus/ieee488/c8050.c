@@ -684,15 +684,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface c8050_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(c8050),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 
@@ -702,15 +696,9 @@ static const floppy_interface c8050_floppy_interface =
 
 static const floppy_interface c8250_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
 	LEGACY_FLOPPY_OPTIONS_NAME(c8250),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 

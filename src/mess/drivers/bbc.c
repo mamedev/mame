@@ -583,8 +583,7 @@ static const cassette_interface bbc_cassette_interface =
 	bbc_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	"bbc_cass",
-	NULL
+	"bbc_cass"
 };
 
 
@@ -612,15 +611,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface bbc_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(bbc),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)

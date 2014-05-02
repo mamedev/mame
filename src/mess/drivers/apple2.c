@@ -944,7 +944,6 @@ static const cassette_interface apple2_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	NULL,
 	NULL
 };
 

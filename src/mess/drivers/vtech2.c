@@ -406,20 +406,13 @@ static const cassette_interface laser_cassette_interface =
 	vtech2_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
 	NULL
 };
 
 static const floppy_interface vtech2_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
 	NULL
 };
 

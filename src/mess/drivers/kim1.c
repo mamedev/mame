@@ -318,7 +318,6 @@ static const cassette_interface kim1_cassette_interface =
 	kim1_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	NULL,
 	NULL
 };
 

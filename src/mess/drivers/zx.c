@@ -370,7 +370,6 @@ static const cassette_interface zx81_cassette_interface =
 	zx81_p_format,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 

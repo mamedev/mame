@@ -139,8 +139,7 @@ static const cassette_interface partner_cassette_interface =
 	rkp_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"partner_cass",
-	NULL
+	"partner_cass"
 };
 
 FLOPPY_FORMATS_MEMBER( partner_state::floppy_formats )

@@ -1462,8 +1462,7 @@ static const cassette_interface x07_cassette_interface =
 	x07_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"x07_cass",
-	NULL
+	"x07_cass"
 };
 
 static MACHINE_CONFIG_START( x07, x07_state )

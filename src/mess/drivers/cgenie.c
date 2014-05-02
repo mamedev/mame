@@ -487,7 +487,6 @@ static const cassette_interface cgenie_cassette_interface =
 	cgenie_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	NULL,
 	NULL
 };
 
@@ -503,14 +502,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface cgenie_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(cgenie),
-	NULL,
 	NULL
 };
 

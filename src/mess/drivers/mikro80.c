@@ -144,7 +144,6 @@ static const cassette_interface mikro80_cassette_interface =
 	rk8_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
 	NULL
 };
 

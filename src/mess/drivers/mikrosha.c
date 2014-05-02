@@ -145,8 +145,7 @@ static const cassette_interface mikrosha_cassette_interface =
 	rkm_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"mikrosha_cass",
-	NULL
+	"mikrosha_cass"
 };
 
 

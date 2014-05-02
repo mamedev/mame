@@ -538,7 +538,6 @@ static const cassette_interface pmd85_cassette_interface =
 	pmd85_cassette_formats,
 	&pmd85_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 

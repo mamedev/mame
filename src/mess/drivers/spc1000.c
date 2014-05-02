@@ -302,7 +302,6 @@ static const cassette_interface spc1000_cassette_interface =
 	spc1000_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
 	NULL
 };
 

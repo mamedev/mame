@@ -637,8 +637,7 @@ static const cassette_interface tvc_cassette_interface =
 	tvc64_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED),
-	"tvc_cass",
-	NULL
+	"tvc_cass"
 };
 
 extern SLOT_INTERFACE_START(tvc_exp)

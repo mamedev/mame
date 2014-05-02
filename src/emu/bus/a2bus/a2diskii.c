@@ -41,15 +41,9 @@ const applefdc_interface fdc_interface =
 
 static const floppy_interface floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 MACHINE_CONFIG_FRAGMENT( diskii )

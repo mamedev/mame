@@ -180,8 +180,7 @@ static const cassette_interface ut88_cassette_interface =
 	rku_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"ut88_cass",
-	NULL
+	"ut88_cass"
 };
 
 /* Machine driver */

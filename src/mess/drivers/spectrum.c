@@ -653,8 +653,7 @@ static const cassette_interface spectrum_cassette_interface =
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"spectrum_cass",
-	NULL
+	"spectrum_cass"
 };
 
 DEVICE_IMAGE_LOAD_MEMBER( spectrum_state,spectrum_cart )

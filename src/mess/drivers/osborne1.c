@@ -201,15 +201,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface osborne1_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(osborne1),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 /* F4 Character Displayer */

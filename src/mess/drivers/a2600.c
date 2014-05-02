@@ -1900,8 +1900,7 @@ static const cassette_interface a2600_cassette_interface =
 	a26_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"a2600_cass",
-	NULL
+	"a2600_cass"
 };
 
 static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)

@@ -661,15 +661,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface z100_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(z100),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 void z100_state::machine_start()

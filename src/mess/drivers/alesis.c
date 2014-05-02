@@ -248,8 +248,7 @@ static const cassette_interface hr16_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	"hr16_cass",
-	NULL
+	"hr16_cass"
 };
 
 static MACHINE_CONFIG_START( hr16, alesis_state )

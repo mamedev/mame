@@ -32,15 +32,9 @@ const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 
 static const floppy_interface mbc55x_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD_35,
 	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static ADDRESS_MAP_START(mbc55x_mem, AS_PROGRAM, 8, mbc55x_state)

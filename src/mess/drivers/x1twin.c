@@ -417,8 +417,7 @@ static const cassette_interface x1_cassette_interface =
 	x1_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"x1_cass",
-	NULL
+	"x1_cass"
 };
 
 static LEGACY_FLOPPY_OPTIONS_START( x1 )
@@ -432,15 +431,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface x1_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(x1),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 

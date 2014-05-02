@@ -521,8 +521,7 @@ static const cassette_interface samcoupe_cassette_interface =
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"samcoupe_cass",
-	NULL
+	"samcoupe_cass"
 };
 
 FLOPPY_FORMATS_MEMBER( samcoupe_state::floppy_formats )

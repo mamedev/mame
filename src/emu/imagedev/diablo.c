@@ -37,7 +37,8 @@ diablo_image_device::diablo_image_device(const machine_config &mconfig, const ch
 		m_chd(NULL),
 		m_hard_disk_handle(NULL),
 		m_device_image_load(device_image_load_delegate()),
-		m_device_image_unload(device_image_func_delegate())
+		m_device_image_unload(device_image_func_delegate()),
+		m_interface(NULL)
 {
 }
 
@@ -57,18 +58,6 @@ diablo_image_device::~diablo_image_device()
 
 void diablo_image_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const diablo_interface *intf = reinterpret_cast<const diablo_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<diablo_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interface, 0, sizeof(m_interface));
-		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
-	}
-
 	m_formatlist.append(*global_alloc(image_device_format("chd", "CHD Hard drive", "chd,dsk", dsk_option_spec)));
 
 	// set brief and instance name

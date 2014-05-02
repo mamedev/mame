@@ -697,14 +697,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface osi_floppy_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state,osi470_index_callback),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(osi),
-	NULL,
 	NULL
 };
 
@@ -838,6 +832,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(sb2m600_state, osi470_index_callback))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

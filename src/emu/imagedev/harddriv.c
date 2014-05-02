@@ -42,7 +42,8 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, cons
 		m_chd(NULL),
 		m_hard_disk_handle(NULL),
 		m_device_image_load(device_image_load_delegate()),
-		m_device_image_unload(device_image_func_delegate())
+		m_device_image_unload(device_image_func_delegate()),
+		m_interface(NULL)
 {
 }
 
@@ -62,18 +63,6 @@ harddisk_image_device::~harddisk_image_device()
 
 void harddisk_image_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const harddisk_interface *intf = reinterpret_cast<const harddisk_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<harddisk_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interface, 0, sizeof(m_interface));
-		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
-	}
-
 	m_formatlist.append(*global_alloc(image_device_format("chd", "CHD Hard drive", "chd,hd", hd_option_spec)));
 
 	// set brief and instance name

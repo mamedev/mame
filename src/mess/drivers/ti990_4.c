@@ -264,14 +264,8 @@ ADDRESS_MAP_END
 
 static const floppy_interface ti990_4_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_8_DSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(fd800),
-	NULL,
 	NULL
 };
 

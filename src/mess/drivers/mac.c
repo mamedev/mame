@@ -879,15 +879,9 @@ SLOT_INTERFACE_END
 
 static const floppy_interface mac_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5",
-	NULL
+	"floppy_3_5"
 };
 
 static MACHINE_CONFIG_START( mac512ke, mac_state )

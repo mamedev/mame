@@ -2248,8 +2248,7 @@ static const cassette_interface pc88_cassette_interface =
 	cassette_default_formats,   // we need T88 format support!
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	"pc8801_cass",
-	NULL
+	"pc8801_cass"
 };
 #endif
 
@@ -2597,7 +2596,6 @@ static const cassette_interface pc8801_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
 	NULL
 };
 

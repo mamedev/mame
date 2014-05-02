@@ -550,20 +550,13 @@ static const cassette_interface trs80l2_cassette_interface =
 	trs80l2_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
 	NULL
 };
 
 static const floppy_interface trs80_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(trs80),
-	NULL,
 	NULL
 };
 

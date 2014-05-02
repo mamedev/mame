@@ -103,8 +103,7 @@ static const cassette_interface interact_cassette_interface =
 	hector_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
-	"interact_cass",
-	NULL
+	"interact_cass"
 };
 
 /* Discrete Sound */

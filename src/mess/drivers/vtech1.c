@@ -459,14 +459,8 @@ WRITE8_MEMBER(vtech1_state::vtech1_fdc_w)
 
 static const floppy_interface vtech1_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(vtech1_only),
-	NULL,
 	NULL
 };
 
@@ -898,7 +892,6 @@ static const cassette_interface laser_cassette_interface =
 	vtech1_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
 	NULL
 };
 

@@ -612,7 +612,6 @@ static const cassette_interface cassette_intf =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
 	NULL
 };
 

@@ -88,8 +88,7 @@ static const cassette_interface adam_cassette_interface =
 	coleco_adam_cassette_formats,
 	&adam_cassette_options,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	"adam_cass",
-	NULL
+	"adam_cass"
 };
 
 

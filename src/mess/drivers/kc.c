@@ -92,8 +92,7 @@ static const cassette_interface kc_cassette_interface =
 	kc_cassette_formats,
 	NULL,
 	CASSETTE_PLAY,
-	"kc_cass",
-	NULL
+	"kc_cass"
 };
 
 static MACHINE_CONFIG_START( kc85_3, kc_state )

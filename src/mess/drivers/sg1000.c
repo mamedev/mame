@@ -548,8 +548,7 @@ const cassette_interface sc3000_cassette_interface =
 	sc3000_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"sc3000_cass",
-	NULL
+	"sc3000_cass"
 };
 
 /*-------------------------------------------------

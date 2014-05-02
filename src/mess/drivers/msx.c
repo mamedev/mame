@@ -1067,8 +1067,7 @@ static const cassette_interface msx_cassette_interface =
 	fmsx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	"msx_cass",
-	NULL
+	"msx_cass"
 };
 
 

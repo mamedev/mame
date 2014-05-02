@@ -31,14 +31,8 @@ ADDRESS_MAP_END
 
 static const floppy_interface apple3_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	NULL,
 	NULL
 };
 

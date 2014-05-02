@@ -78,8 +78,7 @@ static const cassette_interface orion_cassette_interface =
 	rko_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"orion_cass",
-	NULL
+	"orion_cass"
 };
 
 FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )

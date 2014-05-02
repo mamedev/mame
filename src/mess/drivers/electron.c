@@ -175,7 +175,6 @@ static const cassette_interface electron_cassette_interface =
 	uef_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
 	NULL
 };
 

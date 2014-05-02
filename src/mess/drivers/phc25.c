@@ -358,7 +358,6 @@ static const cassette_interface phc25_cassette_interface =
 	phc25_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 

@@ -229,17 +229,12 @@ void pce_cd_device::late_setup()
 	m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 }
 
-struct cdrom_interface pce_cdrom =
-{
-	"pce_cdrom",
-	NULL
-};
-
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
 static MACHINE_CONFIG_FRAGMENT( pce_cd )
 	MCFG_NVRAM_ADD_0FILL("bram")
 
-	MCFG_CDROM_ADD("cdrom", pce_cdrom)
+	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_INTERFACE("pce_cdrom")
 
 	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(pce_cd_device, msm5205_int)) /* interrupt function */

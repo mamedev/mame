@@ -283,7 +283,6 @@ static const cassette_interface pegasus_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED),
-	NULL,
 	NULL
 };
 

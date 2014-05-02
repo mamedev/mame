@@ -381,7 +381,6 @@ const cassette_interface cbm_cassette_interface =
 	cbm_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 #endif

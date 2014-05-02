@@ -186,8 +186,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( status_r );
 
-	static struct harddisk_interface hd_intf;
-
 protected:
 	// device-level overrides
 	virtual void device_start();

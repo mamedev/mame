@@ -322,8 +322,7 @@ static const cassette_interface mz700_cassette_interface =
 	mz700_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"mz_cass",
-	NULL
+	"mz_cass"
 };
 
 

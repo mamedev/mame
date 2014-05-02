@@ -12,8 +12,6 @@ public:
 
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	static struct harddisk_interface hd_intf;
-
 protected:
 	virtual void device_start();
 	virtual void device_reset();

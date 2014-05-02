@@ -1364,7 +1364,6 @@ static const cassette_interface px4_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED),
-	NULL,
 	NULL
 };
 

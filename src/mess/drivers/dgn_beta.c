@@ -288,14 +288,8 @@ PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
 
 static const floppy_interface dgnbeta_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(coco),
-	NULL,
 	NULL
 };
 

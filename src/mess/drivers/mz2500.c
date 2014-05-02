@@ -1220,15 +1220,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface mz2500_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_3_5",
-	NULL
+	"floppy_3_5"
 };
 
 static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )

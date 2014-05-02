@@ -391,21 +391,14 @@ static const cassette_interface sorcerer_cassette_interface =
 	sorcerer_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"sorcerer_cass",
-	NULL
+	"sorcerer_cass"
 };
 
 static const floppy_interface sorcerer_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_8_SSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(sorcerer),
-	"floppy_8",
-	NULL
+	"floppy_8"
 };
 
 

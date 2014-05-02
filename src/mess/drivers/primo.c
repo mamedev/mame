@@ -243,7 +243,6 @@ static const cassette_interface primo_cassette_interface =
 	primo_ptp_format,
 	&primo_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 

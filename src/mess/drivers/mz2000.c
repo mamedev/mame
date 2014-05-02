@@ -797,14 +797,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface mz2000_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
 	NULL
 };
 
@@ -813,8 +807,7 @@ static const cassette_interface mz2000_cassette_interface =
 	mz700_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"mz_cass",
-	NULL
+	"mz_cass"
 };
 
 static MACHINE_CONFIG_START( mz2000, mz2000_state )

@@ -21,6 +21,8 @@ public:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~snapshot_image_device();
 
+	static void static_set_interface(device_t &device, const char *_interface) { downcast<snapshot_image_device &>(device).m_interface = _interface; }
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
@@ -37,7 +39,6 @@ public:
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
-	void set_interface(const char *_interface) { m_interface = _interface; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -88,13 +89,13 @@ extern const device_type QUICKLOAD;
 	static_cast<snapshot_image_device *>(device)->set_handler(SNAPSHOT_LOAD_DELEGATE(_class,_load), _file_extensions, _delay);
 
 #define MCFG_SNAPSHOT_INTERFACE(_interface)                         \
-	static_cast<snapshot_image_device *>(device)->set_interface(_interface);
+	snapshot_image_device::static_set_interface(*device, _interface);
 
 #define MCFG_QUICKLOAD_ADD(_tag, _class, _load, _file_extensions, _delay)   \
 	MCFG_DEVICE_ADD(_tag, QUICKLOAD, 0) \
 	static_cast<quickload_image_device *>(device)->set_handler(QUICKLOAD_LOAD_DELEGATE(_class,_load), _file_extensions, _delay);
 
 #define MCFG_QUICKLOAD_INTERFACE(_interface)                         \
-	static_cast<quickload_image_device *>(device)->set_interface(_interface);
+	quickload_image_device::static_set_interface(*device, _interface);
 
 #endif /* __SNAPQUIK_H__ */

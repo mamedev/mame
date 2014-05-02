@@ -311,8 +311,7 @@ static const cassette_interface h8_cassette_interface =
 	NULL,
 	//(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
 	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"h8_cass",
-	NULL
+	"h8_cass"
 };
 
 static MACHINE_CONFIG_START( h8, h8_state )

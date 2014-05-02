@@ -808,8 +808,7 @@ static const cassette_interface amstrad_cassette_interface =
 	cdt_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"cpc_cass",
-	NULL
+	"cpc_cass"
 };
 
 static SLOT_INTERFACE_START( amstrad_floppies )

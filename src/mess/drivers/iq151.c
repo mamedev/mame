@@ -366,8 +366,7 @@ static const cassette_interface iq151_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
-	"iq151_cass",
-	NULL
+	"iq151_cass"
 };
 
 static SLOT_INTERFACE_START(iq151_cart)

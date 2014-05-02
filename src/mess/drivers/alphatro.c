@@ -449,8 +449,7 @@ static const cassette_interface alphatro_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"alphatro_cass",
-	NULL
+	"alphatro_cass"
 };
 
 static MACHINE_CONFIG_START( alphatro, alphatro_state )

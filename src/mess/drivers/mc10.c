@@ -482,7 +482,6 @@ static const cassette_interface mc10_cassette_interface =
 	coco_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
 	NULL
 };
 
@@ -491,8 +490,7 @@ static const cassette_interface alice32_cassette_interface =
 	alice32_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"alice32_cass",
-	NULL
+	"alice32_cass"
 };
 
 static const mc6847_interface mc10_mc6847_intf =

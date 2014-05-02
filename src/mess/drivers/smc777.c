@@ -1040,15 +1040,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface smc777_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(smc777),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)

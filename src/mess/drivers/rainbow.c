@@ -1204,15 +1204,9 @@ const wd17xx_interface rainbow_wd17xx_interface =
 
 static const floppy_interface floppy_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_80,
 	LEGACY_FLOPPY_OPTIONS_NAME( dec100_floppy ),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_START( rainbow, rainbow_state )

@@ -270,21 +270,14 @@ static const cassette_interface svi318_cassette_interface =
 	svi_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	"svi318_cass",
-	NULL
+	"svi318_cass"
 };
 
 static const floppy_interface svi318_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(svi318),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )

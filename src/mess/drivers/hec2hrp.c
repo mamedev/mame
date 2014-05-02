@@ -385,7 +385,6 @@ static const cassette_interface hector_cassette_interface =
 	hector_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 
@@ -409,14 +408,8 @@ const wd17xx_interface hector_wd17xx_interface =
 
 const floppy_interface minidisc_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(hector_minidisc),
-	NULL,
 	NULL
 };
 

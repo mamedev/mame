@@ -349,7 +349,6 @@ static const cassette_interface pk8000_cassette_interface =
 	fmsx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
 	NULL
 };
 

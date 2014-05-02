@@ -320,8 +320,7 @@ static const cassette_interface radio86_cassette_interface =
 	rkr_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"radio86_cass",
-	NULL
+	"radio86_cass"
 };
 
 
