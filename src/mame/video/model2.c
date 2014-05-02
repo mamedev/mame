@@ -1014,9 +1014,9 @@ static void model2_3d_frame_start( model2_state *state )
 	raster->max_z = 0;
 }
 
-static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	raster_state *raster = state->m_raster;
+	raster_state *raster = m_raster;
 	INT32       z;
 
 	/* if we have nothing to render, bail */
@@ -1024,7 +1024,7 @@ static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, cons
 		return;
 
 #if MODEL2_VIDEO_DEBUG
-	if (machine.input().code_pressed(KEYCODE_Q))
+	if (machine().input().code_pressed(KEYCODE_Q))
 	{
 		UINT32  i;
 
@@ -1039,7 +1039,7 @@ static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, cons
 				fprintf( f, "v1.x = %f, v1.y = %f, v1.z = %f\n", raster->tri_list[i].v[1].x, raster->tri_list[i].v[1].y, raster->tri_list[i].v[1].pz );
 				fprintf( f, "v2.x = %f, v2.y = %f, v2.z = %f\n", raster->tri_list[i].v[2].x, raster->tri_list[i].v[2].y, raster->tri_list[i].v[2].pz );
 
-				fprintf( f, "tri z: %04x\n", raster->tri_list[i].pz );
+				fprintf( f, "tri z: %04x\n", raster->tri_list[i].z );
 				fprintf( f, "texheader - 0: %04x\n", raster->tri_list[i].texheader[0] );
 				fprintf( f, "texheader - 1: %04x\n", raster->tri_list[i].texheader[1] );
 				fprintf( f, "texheader - 2: %04x\n", raster->tri_list[i].texheader[2] );
@@ -1075,13 +1075,13 @@ static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, cons
 			{
 				/* project and render */
 				model2_3d_project( tri );
-				model2_3d_render( state, bitmap, tri, cliprect );
+				model2_3d_render( this, bitmap, tri, cliprect );
 
 				tri = (triangle *)tri->next;
 			}
 		}
 	}
-	poly_wait(state->m_poly, "End of frame");
+	poly_wait(m_poly, "End of frame");
 }
 
 /* 3D Rasterizer main data input port */
@@ -2741,7 +2741,7 @@ UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &b
 	geo_parse(this);
 
 	/* have the rasterizer output the frame */
-	model2_3d_frame_end( this, bitmap, cliprect );
+	model2_3d_frame_end( bitmap, cliprect );
 
 	m_sys24_bitmap.fill(0, cliprect);
 	tile->draw(screen, m_sys24_bitmap, cliprect, 3, 0, 0);
