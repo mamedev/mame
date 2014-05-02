@@ -219,6 +219,7 @@ public:
 	hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
+	void battery_load(void *buffer, int length, void *def_buffer);
 	void battery_save(const void *buffer, int length);
 
 	const char *image_type_name()  const { return device_typename(image_type()); }

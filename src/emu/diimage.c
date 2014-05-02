@@ -500,8 +500,13 @@ UINT32 device_image_interface::crc()
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
 	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
-
 	image_battery_load_by_name(device().machine().options(), fname, buffer, length, fill);
+}
+
+void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
+{
+	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+	image_battery_load_by_name(device().machine().options(), fname, buffer, length, def_buffer);
 }
 
 /*-------------------------------------------------
