@@ -504,6 +504,23 @@ static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( hangplt_map, AS_PROGRAM, 32, gticlub_state )
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(gticlub_k001604_char_r, gticlub_k001604_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)
+	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION("user2", 0)   /* Data ROM */
+	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
+ADDRESS_MAP_END
+
 /**********************************************************************/
 
 static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, gticlub_state )
@@ -1041,7 +1058,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(gticlub_map)
+	MCFG_CPU_PROGRAM_MAP(hangplt_map)
 
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
