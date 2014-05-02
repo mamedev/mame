@@ -187,6 +187,10 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 	}
 }
 
+MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
+{
+}
+
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( abc1600_mover )
 //-------------------------------------------------
@@ -207,6 +211,7 @@ static MACHINE_CONFIG_FRAGMENT( abc1600_mover )
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(32)
 	MCFG_MC6845_UPDATE_ROW_CB(abc1600_mover_device, crtc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(abc1600_mover_device, crtc_update)
 MACHINE_CONFIG_END
 
 
