@@ -45,7 +45,6 @@ private:
 	// internal state
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
-	void *          m_psg;
 	devcb2_write_line m_irq_handler;
 };
 
