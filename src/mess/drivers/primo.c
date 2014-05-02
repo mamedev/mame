@@ -238,14 +238,6 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050   /* sample frequency */
 };
 
-static const cassette_interface primo_cassette_interface =
-{
-	primo_ptp_format,
-	&primo_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( primoa32, primo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
@@ -276,7 +268,10 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss", 0)
 	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp", 0)
 
-	MCFG_CASSETTE_ADD( "cassette", primo_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(primo_ptp_format)
+	MCFG_CASSETTE_CREATE_OPTS(&primo_cassette_options)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_ADD(NULL)

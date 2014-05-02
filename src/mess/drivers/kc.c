@@ -87,14 +87,6 @@ extern SLOT_INTERFACE_START(kc85_exp)
 SLOT_INTERFACE_END
 
 
-static const cassette_interface kc_cassette_interface =
-{
-	kc_cassette_formats,
-	NULL,
-	CASSETTE_PLAY,
-	"kc_cass"
-};
-
 static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
@@ -141,7 +133,10 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("kc_cass")
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
@@ -222,7 +217,10 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("kc_cass")
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)

@@ -57,7 +57,6 @@ DAC and bitbanger values written should be reflected in the read.
 
 #include "includes/coco.h"
 #include "cpu/m6809/m6809.h"
-#include "formats/coco_cas.h"
 #include "debug/debugcpu.h"
 
 
@@ -1196,19 +1195,6 @@ const cococart_interface coco_state::cartridge_config =
 	DEVCB_DRIVER_LINE_MEMBER(coco_state, cart_w),       // coco_cart_w,
 	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_NMI),  // coco_nmi_w,
 	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_HALT)  // coco_halt_w
-};
-
-
-//-------------------------------------------------
-//  coco_cassette_interface
-//-------------------------------------------------
-
-const cassette_interface coco_state::coco_cassette_interface =
-{
-	coco_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
 };
 
 

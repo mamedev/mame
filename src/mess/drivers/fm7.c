@@ -1991,14 +1991,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL                  /* portB write */
 };
 
-static const cassette_interface fm7_cassette_interface =
-{
-	fm7_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"fm7_cass"
-};
-
 static const floppy_interface fm7_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_DSHD,
@@ -2041,7 +2033,10 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
-	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2092,7 +2087,10 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
-	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2144,7 +2142,10 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_PALETTE_ADD("palette", 8 + 4096)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
-	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2199,7 +2200,10 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
-	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2247,7 +2251,10 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
-	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 

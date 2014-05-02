@@ -632,14 +632,6 @@ QUICKLOAD_LOAD_MEMBER( tvc_state,tvc64)
 }
 
 
-static const cassette_interface tvc_cassette_interface =
-{
-	tvc64_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED),
-	"tvc_cass"
-};
-
 extern SLOT_INTERFACE_START(tvc_exp)
 	SLOT_INTERFACE("hbf", TVC_HBF)          // Videoton HBF floppy interface
 SLOT_INTERFACE_END
@@ -709,7 +701,10 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", tvc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(tvc64_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
+	MCFG_CASSETTE_INTERFACE("tvc_cass")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)

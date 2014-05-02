@@ -548,14 +548,6 @@ static INPUT_PORTS_START( sol20 )
 INPUT_PORTS_END
 
 
-static const cassette_interface sol20_cassette_interface =
-{
-	sol20_cassette_formats,//cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER(sol20_state::sol20_boot)
 {
@@ -755,8 +747,14 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
 
 	// devices
-	MCFG_CASSETTE_ADD( "cassette", sol20_cassette_interface )
-	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(sol20_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	
+	MCFG_CASSETTE_ADD( "cassette2" )
+	MCFG_CASSETTE_FORMATS(sol20_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)
 	MCFG_AY31015_RX_CLOCK(4800.0)

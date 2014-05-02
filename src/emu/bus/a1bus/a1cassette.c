@@ -22,16 +22,10 @@ const device_type A1BUS_CASSETTE = &device_creator<a1bus_cassette_device>;
 
 /* sound output */
 
-static const cassette_interface apple1_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	"apple1_cass"
-};
-
 MACHINE_CONFIG_FRAGMENT( cassette )
-	MCFG_CASSETTE_ADD("cassette", apple1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("apple1_cass")
 MACHINE_CONFIG_END
 
 ROM_START( cassette )

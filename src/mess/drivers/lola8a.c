@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	MCFG_PALETTE_INIT_OWNER(lola8a_state, lola8a)
 
 	/* Cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

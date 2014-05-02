@@ -343,15 +343,6 @@ UINT32 pk8000_state::screen_update_pk8000(screen_device &screen, bitmap_ind16 &b
 	return pk8000_video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
 
-/* Machine driver */
-static const cassette_interface pk8000_cassette_interface =
-{
-	fmsx_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL
-};
-
 static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 1780000)
@@ -389,7 +380,9 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", pk8000_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

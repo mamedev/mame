@@ -695,14 +695,6 @@ void nano_state::machine_reset()
 
 /* Machine Drivers */
 
-static const cassette_interface tmc1800_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 {
 	UINT8 *ptr = m_rom->base();
@@ -741,7 +733,8 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -771,7 +764,8 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -796,7 +790,8 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -821,7 +816,8 @@ static MACHINE_CONFIG_START( nano, nano_state )
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
-	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

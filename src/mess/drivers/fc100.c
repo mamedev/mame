@@ -475,15 +475,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 	}
 }
 
-static const cassette_interface fc100_cassette_interface =
-{
-	fc100_cassette_formats,
-	NULL,
-	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-
 //******************** MACHINE ******************************
 
 void fc100_state::machine_start()
@@ -560,7 +551,10 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
-	MCFG_CASSETTE_ADD("cassette", fc100_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16) // gives 19200

@@ -241,14 +241,6 @@ void poly880_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface poly880_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( poly880, poly880_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
@@ -274,7 +266,8 @@ static MACHINE_CONFIG_START( poly880, poly880_state )
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL_7_3728MHz/16)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_CASSETTE_ADD("cassette", poly880_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -313,15 +313,6 @@ void kim1_state::machine_reset()
 }
 
 
-static const cassette_interface kim1_cassette_interface =
-{
-	kim1_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	NULL
-};
-
-
 static MACHINE_CONFIG_START( kim1, kim1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
@@ -346,7 +337,10 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 
 	MCFG_DEVICE_ADD("miot_u3", MOS6530, 1000000)
 
-	MCFG_CASSETTE_ADD( "cassette", kim1_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(kim1_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", kim1_state, kim1_update_leds, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
 MACHINE_CONFIG_END

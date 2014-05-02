@@ -1309,14 +1309,6 @@ void tandy200_state::machine_start()
 	save_item(NAME(m_tp));
 }
 
-static const cassette_interface kc85_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 WRITE_LINE_MEMBER( kc85_state::kc85_sod_w )
 {
 	m_cassette->output(state ? +1.0 : -1.0);
@@ -1378,7 +1370,8 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kc85_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(kc85_state, write_centronics_select))
 
-	MCFG_CASSETTE_ADD("cassette", kc85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1429,7 +1422,8 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kc85_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(kc85_state, write_centronics_select))
 
-	MCFG_CASSETTE_ADD("cassette", kc85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1489,7 +1483,9 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
-	MCFG_CASSETTE_ADD("cassette", kc85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* option ROM cartridge */
@@ -1558,7 +1554,8 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD("cassette", kc85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")

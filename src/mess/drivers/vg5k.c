@@ -351,15 +351,6 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 }
 
 
-static const cassette_interface vg5k_cassette_interface =
-{
-	vg5k_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
-	"vg5k_cass"
-};
-
-
 static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	/* basic machine hardware */
@@ -394,7 +385,10 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", vg5k_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(vg5k_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
+	MCFG_CASSETTE_INTERFACE("vg5k_cass")
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)

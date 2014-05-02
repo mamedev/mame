@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", 0.5)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)

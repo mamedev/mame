@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
 	MCFG_INS8154_OUT_A_CB(WRITE8(acrnsys1_state, ins8154_b1_port_a_w))
 	MCFG_INS8154_OUT_B_CB(WRITE8(acrnsys1_state, acrnsys1_led_segment_w))
 	MCFG_DEVICE_ADD("ic8_7445", TTL74145, 0)
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
 MACHINE_CONFIG_END

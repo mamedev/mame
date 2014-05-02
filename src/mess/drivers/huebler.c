@@ -306,14 +306,6 @@ void amu880_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface amu880_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout amu880_charlayout =
 {
@@ -367,7 +359,9 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(amu880_state, cassette_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_CASSETTE_ADD("cassette", amu880_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */

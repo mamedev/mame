@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(z9001_state, cass_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
 /* ROM definition */

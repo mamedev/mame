@@ -654,15 +654,6 @@ static const floppy_interface nes_floppy_interface =
 };
 
 
-static const cassette_interface fc_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"fc_cass"
-};
-
-
 static MACHINE_CONFIG_START( nes, nes_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
@@ -755,7 +746,10 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")
 
-	MCFG_CASSETTE_ADD( "tape", fc_cassette_interface )
+	MCFG_CASSETTE_ADD( "tape" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("fc_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 

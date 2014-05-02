@@ -293,13 +293,6 @@ WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }
-static const cassette_interface jr100_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL
-};
 
 TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 {
@@ -402,7 +395,8 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	MCFG_CASSETTE_ADD( "cassette", jr100_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_tick", jr100_state, sound_tick, attotime::from_hz(XTAL_14_31818MHz / 16))
 

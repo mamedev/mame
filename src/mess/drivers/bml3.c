@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bml3_state, write_acia_clock))
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

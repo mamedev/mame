@@ -142,14 +142,6 @@ static INPUT_PORTS_START( apogee )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 INPUT_PORTS_END
 
-static const cassette_interface apogee_cassette_interface =
-{
-	rka_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"apogee_cass"
-};
-
 static const INT16 speaker_levels[] = {-32767, -10922, 10922, 32767};
 
 static const speaker_interface apogee_speaker_interface =
@@ -270,7 +262,11 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
-	MCFG_CASSETTE_ADD( "cassette", apogee_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rka_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("apogee_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","apogee")
 MACHINE_CONFIG_END
 

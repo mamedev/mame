@@ -395,25 +395,6 @@ static INPUT_PORTS_START( m5 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) /* 1st line, 1st key from right! */
 INPUT_PORTS_END
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cassette_interface cassette_intf
-//-------------------------------------------------
-
-static const cassette_interface cassette_intf =
-{
-	sordm5_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL
-};
-
-
 //-------------------------------------------------
 //  TMS9928a_interface vdp_intf
 //-------------------------------------------------
@@ -615,7 +596,9 @@ static MACHINE_CONFIG_START( m5, m5_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD("cassette", cassette_intf)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(sordm5_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))

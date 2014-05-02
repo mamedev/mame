@@ -90,14 +90,6 @@ FLOPPY_FORMATS_MEMBER( asst128_state::asst128_formats )
 	FLOPPY_ASST128_FORMAT
 FLOPPY_FORMATS_END
 
-static const cassette_interface asst128_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
@@ -112,7 +104,8 @@ static MACHINE_CONFIG_START( asst128, asst128_state )
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_REMOVE("mb:cassette")
-	MCFG_CASSETTE_ADD("mb:cassette", asst128_cassette_interface)
+	MCFG_CASSETTE_ADD("mb:cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_cga", pc_isa8_cards, "cga_mc1502", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_lpt", pc_isa8_cards, "lpt", true)

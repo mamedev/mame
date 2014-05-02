@@ -13,6 +13,7 @@
 #include "includes/coco3.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
+#include "formats/coco_cas.h"
 #include "coco3.lh"
 
 
@@ -269,7 +270,9 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
-	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "printer")
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(PIA1_TAG, pia6821_device, ca1_w))

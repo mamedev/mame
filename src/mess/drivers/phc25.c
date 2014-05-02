@@ -351,16 +351,6 @@ static const ay8910_interface ay8910_intf =
 	DEVCB_NULL
 };
 
-/* Cassette Configuration */
-
-static const cassette_interface phc25_cassette_interface =
-{
-	phc25_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( phc25, phc25_state )
@@ -378,7 +368,10 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette", phc25_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(phc25_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(phc25_state, write_centronics_busy))
 

@@ -401,14 +401,6 @@ INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static const cassette_interface laser_cassette_interface =
-{
-	vtech2_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL
-};
-
 static const floppy_interface vtech2_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_SSDD_40,
@@ -447,7 +439,9 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CASSETTE_ADD( "cassette", laser_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

@@ -256,9 +256,6 @@ static const z80_daisy_config rs128_daisy_chain[] =
 	{ NULL }
 };
 
-/*-------------------------------------------------
-    cassette_interface mtx_cassette_interface
--------------------------------------------------*/
 
 TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 {
@@ -266,14 +263,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 
 	m_z80ctc->trg3(data);
 }
-
-static const cassette_interface mtx_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
 
 /*-------------------------------------------------
     mtx_tms9928a_interface
@@ -332,7 +321,9 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
-	MCFG_CASSETTE_ADD("cassette", mtx_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */

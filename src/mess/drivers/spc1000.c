@@ -297,14 +297,6 @@ static const ay8910_interface spc1000_ay_interface =
 	DEVCB_NULL   // portB_w
 };
 
-static const cassette_interface spc1000_cassette_interface =
-{
-	spc1000_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL
-};
-
 // irq is inverted in emulation, so we need this trampoline
 WRITE_LINE_MEMBER( spc1000_state::irq_w )
 {
@@ -346,7 +338,9 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", spc1000_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

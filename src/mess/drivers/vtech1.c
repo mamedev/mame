@@ -887,14 +887,6 @@ static const speaker_interface vtech1_speaker_interface =
 	speaker_levels
 };
 
-static const cassette_interface laser_cassette_interface =
-{
-	vtech1_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL
-};
-
 static const mc6847_interface vtech1_mc6847_bw_intf =
 {
 	"screen",
@@ -975,7 +967,9 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", vtech1_state, vtech1, "vz", 1.5)
 
-	MCFG_CASSETTE_ADD( "cassette", laser_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(vtech1_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

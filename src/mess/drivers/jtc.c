@@ -681,14 +681,6 @@ void jtc_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface jtc_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout jtces23_charlayout =
 {
@@ -739,7 +731,8 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette", jtc_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")

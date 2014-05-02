@@ -383,15 +383,6 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static const cassette_interface pv2000_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED),
-	NULL
-};
-
-
 /* Machine Drivers */
 static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
@@ -418,7 +409,8 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", pv2000_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

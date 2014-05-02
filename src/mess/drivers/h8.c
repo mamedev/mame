@@ -305,15 +305,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	}
 }
 
-static const cassette_interface h8_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	//(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"h8_cass"
-};
-
 static MACHINE_CONFIG_START( h8, h8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
@@ -339,7 +330,10 @@ static MACHINE_CONFIG_START( h8, h8_state )
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(h8_state, write_cassette_clock))
 
-	MCFG_CASSETTE_ADD("cassette", h8_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("h8_cass")
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_c", h8_state, h8_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_p", h8_state, h8_p, attotime::from_hz(40000))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_timer", h8_state, h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE))

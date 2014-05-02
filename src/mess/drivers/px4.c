@@ -1359,14 +1359,6 @@ PALETTE_INIT_MEMBER(px4_state, px4p)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static const cassette_interface px4_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( px4, px4_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
@@ -1406,7 +1398,9 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// external cassette
-	MCFG_CASSETTE_ADD("extcas", px4_cassette_interface)
+	MCFG_CASSETTE_ADD("extcas")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	
 	MCFG_TIMER_DRIVER_ADD("extcas_timer", px4_state, ext_cassette_read)
 
 	// sio port

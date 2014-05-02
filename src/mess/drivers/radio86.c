@@ -315,15 +315,6 @@ INPUT_PORTS_START( ms7007 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 INPUT_PORTS_END
 
-static const cassette_interface radio86_cassette_interface =
-{
-	rkr_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"radio86_cass"
-};
-
-
 /* F4 Character Displayer */
 static const gfx_layout radio86_charlayout =
 {
@@ -383,7 +374,11 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
-	MCFG_CASSETTE_ADD( "cassette", radio86_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rkr_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("radio86_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","radio86")
 MACHINE_CONFIG_END
 

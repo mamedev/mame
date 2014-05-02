@@ -1062,15 +1062,6 @@ static const ay8910_interface msx_ay8910_interface =
 #define MSX_VISIBLE_XBORDER_PIXELS  8
 #define MSX_VISIBLE_YBORDER_PIXELS  24
 
-static const cassette_interface msx_cassette_interface =
-{
-	fmsx_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	"msx_cass"
-};
-
-
 static MACHINE_CONFIG_FRAGMENT( msx_cartslot_1 )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("mx1,rom")
@@ -1224,7 +1215,10 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", msx_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)	
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
@@ -1313,7 +1307,10 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", msx_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)	
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* real time clock */
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
@@ -1378,7 +1375,10 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", msx_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)	
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* real time clock */
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)

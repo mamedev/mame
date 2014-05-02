@@ -531,19 +531,6 @@ UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 //**************************************************************************
 
 //-------------------------------------------------
-//  cassette_interface ace_cassette_interface
-//-------------------------------------------------
-
-static const cassette_interface ace_cassette_interface =
-{
-	ace_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	NULL
-};
-
-
-//-------------------------------------------------
 //  ay8910_interface psg_intf
 //-------------------------------------------------
 
@@ -724,7 +711,10 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette", ace_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(ace_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)

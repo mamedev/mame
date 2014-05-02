@@ -246,14 +246,6 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface c80_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED ),
-	NULL
-};
-
 static MACHINE_CONFIG_START( c80, c80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
@@ -275,7 +267,9 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_CASSETTE_ADD("cassette", c80_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED )
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -273,16 +273,6 @@ static const z80_daisy_config mpf1_daisy_chain[] =
 	{ NULL }
 };
 
-/* Cassette Interface */
-
-static const cassette_interface mpf1_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL
-};
-
 /* Machine Initialization */
 
 TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
@@ -330,7 +320,8 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
 
-	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1)
@@ -362,7 +353,8 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
 
-	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1b)
@@ -400,7 +392,8 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
 
-	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

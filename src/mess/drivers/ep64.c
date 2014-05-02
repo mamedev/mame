@@ -460,26 +460,6 @@ static INPUT_PORTS_START( ep64 )
 INPUT_PORTS_END
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-
-//-------------------------------------------------
-//  cassette_interface cass_intf
-//-------------------------------------------------
-
-static const cassette_interface cass_intf =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	"ep64_cass"
-};
-
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -545,8 +525,13 @@ static MACHINE_CONFIG_START( ep64, ep64_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DAVE_TAG, dave_device, int2_w))
 
-	MCFG_CASSETTE_ADD(CASSETTE1_TAG, cass_intf)
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG, cass_intf)
+	MCFG_CASSETTE_ADD(CASSETTE1_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("ep64_cass")
+	
+	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("ep64_cass")
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)

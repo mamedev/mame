@@ -161,14 +161,6 @@ static INPUT_PORTS_START (dai)
 		PORT_BIT(0xcb, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static const cassette_interface dai_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout dai_charlayout =
 {
@@ -230,7 +222,8 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", dai_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* tms5501 */
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)

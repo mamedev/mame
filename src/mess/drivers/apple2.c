@@ -939,14 +939,6 @@ PALETTE_INIT_MEMBER(apple2_state,apple2)
 	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
 
-static const cassette_interface apple2_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	NULL
-};
-
 static SLOT_INTERFACE_START(apple2_slot0_cards)
 	SLOT_INTERFACE("lang", A2BUS_LANG)      /* Apple II Language Card */
 SLOT_INTERFACE_END
@@ -1064,7 +1056,8 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
@@ -1079,7 +1072,8 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
@@ -1090,7 +1084,8 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 
 	/* keyboard controller */
 	MCFG_DEVICE_MODIFY("ay3600")
@@ -1115,7 +1110,8 @@ static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 
 	// TK2000 doesn't have slots, and it doesn't emulate a language card
 	// C05A maps RAM from C100-FFFF, C05B maps ROM

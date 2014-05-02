@@ -317,15 +317,6 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const cassette_interface mz700_cassette_interface =
-{
-	mz700_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"mz_cass"
-};
-
-
 static MACHINE_CONFIG_START( mz700, mz_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
@@ -372,7 +363,11 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 
 	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
 
-	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("mz_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
 
 	/* internal ram */

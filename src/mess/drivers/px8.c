@@ -719,22 +719,6 @@ static GFXDECODE_START( px8 )
 GFXDECODE_END
 
 /***************************************************************************
-    DEVICE CONFIGURATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    cassette_interface px8_cassette_interface
--------------------------------------------------*/
-
-static const cassette_interface px8_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-/***************************************************************************
     MACHINE INITIALIZATION
 ***************************************************************************/
 
@@ -811,7 +795,8 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	/* devices */
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
 
-	MCFG_CASSETTE_ADD("cassette", px8_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

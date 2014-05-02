@@ -598,22 +598,11 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 };
 
 
-//-------------------------------------------------
-//  cassette_interface cassette_intf
-//-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 {
 	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
 }
-
-static const cassette_interface cassette_intf =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
 
 /* Machine Start */
 
@@ -716,7 +705,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", tiki100_state, tape_tick, attotime::from_hz(44100))
 
 	/* sound hardware */

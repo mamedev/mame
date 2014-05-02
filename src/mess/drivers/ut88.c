@@ -175,14 +175,6 @@ static INPUT_PORTS_START( ut88mini )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
-static const cassette_interface ut88_cassette_interface =
-{
-	rku_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"ut88_cass"
-};
-
 /* Machine driver */
 static MACHINE_CONFIG_START( ut88, ut88_state )
 	/* basic machine hardware */
@@ -217,7 +209,11 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_I8255_IN_PORTB_CB(READ8(ut88_state, ut88_8255_portb_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(ut88_state, ut88_8255_portc_r))
 
-	MCFG_CASSETTE_ADD( "cassette", ut88_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rku_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("ut88_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
@@ -236,7 +232,12 @@ static MACHINE_CONFIG_START( ut88mini, ut88_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CASSETTE_ADD( "cassette", ut88_cassette_interface )
+
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rku_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("ut88_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 

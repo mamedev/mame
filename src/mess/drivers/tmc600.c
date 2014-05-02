@@ -252,14 +252,6 @@ void tmc600_state::machine_start()
 
 /* Machine Drivers */
 
-static const cassette_interface tmc600_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
@@ -279,7 +271,8 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD("cassette", tmc600_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

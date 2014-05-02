@@ -137,16 +137,6 @@ static const ay8910_interface intv_ay8914_ecs_interface =
 	DEVCB_NULL
 };
 
-/*
-static const cassette_interface ecs_cassette_interface =
-{
-    cassette_default_formats,
-    NULL,
-    (cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED),
-    NULL
-};
-*/
-
 /* graphics output */
 
 static const gfx_layout intvkbd_charlayout =
@@ -855,7 +845,7 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* cassette */
-	//MCFG_CASSETTE_ADD( "cassette", ecs_cassette_interface )
+	//MCFG_CASSETTE_ADD( "cassette" )
 
 MACHINE_CONFIG_END
 

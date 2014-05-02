@@ -73,14 +73,6 @@ static ADDRESS_MAP_START( orionpro_io , AS_IO, 8, orion_state )
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionpro_io_r, orionpro_io_w )
 ADDRESS_MAP_END
 
-static const cassette_interface orion_cassette_interface =
-{
-	rko_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"orion_cass"
-};
-
 FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
@@ -127,7 +119,11 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", orion_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("orion_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","orion_cass")
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
@@ -209,7 +205,11 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", orion_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("orion_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","orion_cass")
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
@@ -281,7 +281,11 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", orion_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("orion_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","orion_cass")
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)

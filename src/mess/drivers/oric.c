@@ -778,14 +778,6 @@ static const ay8910_interface oric_ay_interface =
 };
 
 
-static const cassette_interface oric_cassette_interface =
-{
-	oric_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( oric, oric_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
@@ -815,7 +807,10 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", oric_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(oric_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
 
 	/* via */

@@ -139,15 +139,6 @@ static INPUT_PORTS_START( pk8020 )
 		PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-/* Machine driver */
-static const cassette_interface pk8020_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL
-};
-
 static LEGACY_FLOPPY_OPTIONS_START(pk8020)
 	LEGACY_FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -245,7 +236,8 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", pk8020_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pk8020_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","korvet_flop")

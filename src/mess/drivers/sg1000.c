@@ -540,18 +540,6 @@ WRITE8_MEMBER( sc3000_state::ppi_pc_w )
 }
 
 /*-------------------------------------------------
-    cassette_interface sc3000_cassette_interface
--------------------------------------------------*/
-
-const cassette_interface sc3000_cassette_interface =
-{
-	sc3000_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"sc3000_cass"
-};
-
-/*-------------------------------------------------
     I8255 INTERFACE
 -------------------------------------------------*/
 
@@ -811,7 +799,10 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 
-	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(sc3000_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("sc3000_cass")
 
 	/* cartridge */
 	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
@@ -876,7 +867,10 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(sc3000_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("sc3000_cass")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")

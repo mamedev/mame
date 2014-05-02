@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(a6809_state, kbd_put))
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_c", a6809_state, a6809_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_p", a6809_state, a6809_p, attotime::from_hz(40000))
 MACHINE_CONFIG_END

@@ -119,14 +119,6 @@ static INPUT_PORTS_START( vector06 )
 
 INPUT_PORTS_END
 
-static const cassette_interface vector_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 static LEGACY_FLOPPY_OPTIONS_START(vector)
 	LEGACY_FLOPPY_OPTION(vector, "fdd", "Vector disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -189,7 +181,8 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_romdisk_portb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(vector06_state, vector06_romdisk_portc_w))
 
-	MCFG_CASSETTE_ADD("cassette", vector_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)

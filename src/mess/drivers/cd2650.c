@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	/* Devices */
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(cd2650_state, kbd_put))
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -139,14 +139,6 @@ static const struct CassetteOptions poly88_cassette_options =
 	7200    /* sample frequency */
 };
 
-static const cassette_interface poly88_cassette_interface =
-{
-	cassette_default_formats,
-	&poly88_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout poly88_charlayout =
 {
@@ -192,7 +184,9 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", poly88_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_CREATE_OPTS(&poly88_cassette_options)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)

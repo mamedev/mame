@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

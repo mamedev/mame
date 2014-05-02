@@ -803,14 +803,6 @@ speed of 3.8 MHz */
  */
 
 
-static const cassette_interface amstrad_cassette_interface =
-{
-	cdt_cassette_formats,
-	NULL,
-	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"cpc_cass"
-};
-
 static SLOT_INTERFACE_START( amstrad_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
 SLOT_INTERFACE_END
@@ -898,7 +890,11 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("cpc_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
@@ -989,7 +985,10 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("cpc_cass")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 

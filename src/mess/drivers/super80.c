@@ -646,15 +646,6 @@ static const z80_daisy_config super80_daisy_chain[] =
 	{ NULL }
 };
 
-static const cassette_interface super80_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-
 //-------------------------------------------------
 //  Z80DMA
 //-------------------------------------------------
@@ -739,7 +730,9 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_h", super80_state, timer_h, attotime::from_hz(100)) // half-speed
@@ -824,7 +817,9 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 MACHINE_CONFIG_END

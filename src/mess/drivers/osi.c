@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( uk101, uk101_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -807,7 +807,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

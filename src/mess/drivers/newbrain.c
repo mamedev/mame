@@ -1295,14 +1295,6 @@ INTERRUPT_GEN_MEMBER(newbrain_state::newbrain_interrupt)
 
 /* Machine Drivers */
 
-static const cassette_interface newbrain_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout newbrain_charlayout =
 {
@@ -1340,8 +1332,11 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_FRAGMENT_ADD(newbrain_video)
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette", newbrain_cassette_interface)
-	MCFG_CASSETTE_ADD("cassette2", newbrain_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	
+	MCFG_CASSETTE_ADD("cassette2")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

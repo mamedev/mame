@@ -399,19 +399,6 @@ static const z80_daisy_config abc80_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  cassette_interface abc80_cassette_interface
-//-------------------------------------------------
-
-static const cassette_interface abc80_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
-
-//-------------------------------------------------
 //  ABC80_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
@@ -546,7 +533,8 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc80_state, pio_pb_w))
 
-	MCFG_CASSETTE_ADD("cassette", abc80_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
 	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(abc80_state, keydown_w))

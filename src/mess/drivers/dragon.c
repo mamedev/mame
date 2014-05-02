@@ -9,6 +9,7 @@
 #include "includes/dragon.h"
 #include "includes/dgnalpha.h"
 #include "imagedev/cassette.h"
+#include "formats/coco_cas.h"
 #include "cpu/m6809/m6809.h"
 #include "bus/coco/coco_232.h"
 #include "bus/coco/coco_orch90.h"
@@ -155,7 +156,10 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, dragon_state::sam6883_config)
 	MCFG_SAM6883_RES_CALLBACK(READ8(dragon_state, sam_read))
-	MCFG_CASSETTE_ADD("cassette", dragon_state::coco_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_DEVICE_ADD(PRINTER_TAG, PRINTER, 0)
 
 	// video hardware

@@ -686,30 +686,6 @@ WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 	}
 }
 
-/*-------------------------------------------------
-    cassette_interface crvision_cassette_interface
--------------------------------------------------*/
-
-static const cassette_interface crvision_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-/*-------------------------------------------------
-    cassette_interface lasr2001_cassette_interface
--------------------------------------------------*/
-
-static const cassette_interface lasr2001_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /***************************************************************************
     MACHINE INITIALIZATION
 ***************************************************************************/
@@ -873,7 +849,9 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(crvision_state, pia_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
 
-	MCFG_CASSETTE_ADD("cassette", crvision_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
@@ -954,7 +932,8 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(laser2001_state, pia_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(laser2001_state, pia_cb2_w))
 
-	MCFG_CASSETTE_ADD("cassette", lasr2001_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(laser2001_state, write_centronics_busy))

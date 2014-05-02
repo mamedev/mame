@@ -602,9 +602,6 @@ static const floppy_interface atom_floppy_interface =
 	"floppy_5_25"
 };
 
-/*-------------------------------------------------
-    cassette_interface atom_cassette_interface
--------------------------------------------------*/
 
 TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
 {
@@ -614,14 +611,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
 
 	m_hz2400 = !m_hz2400;
 }
-
-static const cassette_interface atom_cassette_interface =
-{
-	atom_cassette_formats,
-	NULL,
-	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
 
 /*-------------------------------------------------
     mc6847_interface vdg_intf
@@ -823,7 +812,10 @@ static MACHINE_CONFIG_START( atom, atom_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(atom_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
 	/* cartridge */
@@ -907,7 +899,9 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")	
+	MCFG_CASSETTE_FORMATS(atom_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

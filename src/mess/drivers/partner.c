@@ -134,14 +134,6 @@ static INPUT_PORTS_START( partner )
 INPUT_PORTS_END
 
 /* Machine driver */
-static const cassette_interface partner_cassette_interface =
-{
-	rkp_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"partner_cass"
-};
-
 FLOPPY_FORMATS_MEMBER( partner_state::floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
@@ -211,7 +203,11 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
-	MCFG_CASSETTE_ADD( "cassette", partner_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rkp_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("partner_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","partner_cass")
 
 	MCFG_FD1793x_ADD("wd1793", XTAL_16MHz / 16)

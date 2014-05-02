@@ -170,14 +170,6 @@ ROM_START(electron)
 	/* 3c000 15 available for cartridges with a language ROM */
 ROM_END
 
-static const cassette_interface electron_cassette_interface =
-{
-	uef_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL
-};
-
 static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_CPU_ADD( "maincpu", M6502, 2000000 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem)
@@ -199,7 +191,9 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_CASSETTE_ADD( "cassette", electron_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(uef_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

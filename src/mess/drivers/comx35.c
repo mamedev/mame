@@ -515,19 +515,6 @@ WRITE8_MEMBER( comx35_state::sc_w )
 
 
 //-------------------------------------------------
-//  cassette_interface cassette_intf
-//-------------------------------------------------
-
-static const cassette_interface cassette_intf =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-
-//-------------------------------------------------
 //  COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
@@ -634,7 +621,8 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CDP1871_D11_CALLBACK(IOPORT("D11"))
 	MCFG_CDP1871_DA_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3))
 	MCFG_QUICKLOAD_ADD("quickload", comx35_state, comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD("cassette", cassette_intf)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
@@ -683,7 +671,8 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CDP1871_D11_CALLBACK(IOPORT("D11"))
 	MCFG_CDP1871_DA_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3))
 	MCFG_QUICKLOAD_ADD("quickload", comx35_state, comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD("cassette", cassette_intf)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")

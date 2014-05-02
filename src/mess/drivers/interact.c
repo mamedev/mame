@@ -97,15 +97,6 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 
 ADDRESS_MAP_END
 
-/* Cassette definition */
-static const cassette_interface interact_cassette_interface =
-{
-	hector_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
-	"interact_cass"
-};
-
 /* Discrete Sound */
 static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_INPUT_LOGIC(NODE_01)
@@ -165,7 +156,11 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_CASSETTE_ADD( "cassette", interact_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
+	MCFG_CASSETTE_INTERFACE("interact_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","interact")
 
 	/* printer */
@@ -208,7 +203,10 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_CASSETTE_ADD( "cassette", interact_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
+	MCFG_CASSETTE_INTERFACE("interact_cass")
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)

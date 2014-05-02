@@ -585,24 +585,10 @@ WRITE8_MEMBER( compis_state::ppi_pc_w )
 	m_isbx0->opt0_w(BIT(data, 7));
 }
 
-//-------------------------------------------------
-//  cassette_interface compis_cassette_interface
-//-------------------------------------------------
-
 TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
 {
 	m_maincpu->tmrin0_w(m_cassette->input() > 0.0);
 }
-
-static const cassette_interface compis_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -709,7 +695,9 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)

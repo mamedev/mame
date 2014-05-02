@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_15MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats)

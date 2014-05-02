@@ -141,30 +141,6 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-    DEVICE INTERFACES
-***************************************************************************/
-
-
-// Deck 1 can play and record
-static const cassette_interface aim65_1_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-// Deck 2 can only record
-static const cassette_interface aim65_2_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -292,8 +268,13 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
 
-	MCFG_CASSETTE_ADD( "cassette", aim65_1_cassette_interface )
-	MCFG_CASSETTE_ADD( "cassette2", aim65_2_cassette_interface )
+	// Deck 1 can play and record
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+
+	// Deck 2 can only record
+	MCFG_CASSETTE_ADD( "cassette2" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_CARTSLOT_ADD("z26")
 	MCFG_CARTSLOT_EXTENSION_LIST("z26")

@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 
 	/* Devices */
 	MCFG_K7659_KEYBOARD_ADD()
-	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
 
 	MCFG_DEVICE_ADD("z80pio_u", Z80PIO, XTAL_10MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

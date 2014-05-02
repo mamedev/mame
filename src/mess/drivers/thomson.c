@@ -592,23 +592,6 @@ static const floppy_interface thomson_floppy_interface =
 };
 
 
-/********************* devices ************************/
-const cassette_interface to7_cassette_interface =
-{
-	to7_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
-const cassette_interface mo5_cassette_interface =
-{
-	mo5_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_START( to7, thomson_state )
@@ -645,7 +628,9 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* cassette */
-	MCFG_CASSETTE_ADD( "cassette", to7_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(to7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 /* timer */
 	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
@@ -1098,7 +1083,8 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo5)
 
-	MCFG_CASSETTE_MODIFY( "cassette", mo5_cassette_interface )
+	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
@@ -2164,7 +2150,8 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo6)
 
-	MCFG_CASSETTE_MODIFY( "cassette", mo5_cassette_interface )
+	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 

@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_RAM_DEFAULT_SIZE("32k")
 	MCFG_RAM_EXTRA_OPTIONS("16k")
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( cp1, cp1_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_cp1)
 
-	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
 
 	MCFG_QUICKLOAD_ADD("quickload", cp1_state, quickload, "obj", 1)
 MACHINE_CONFIG_END

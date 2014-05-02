@@ -516,14 +516,6 @@ PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const cassette_interface samcoupe_cassette_interface =
-{
-	tzx_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"samcoupe_cass"
-};
-
 FLOPPY_FORMATS_MEMBER( samcoupe_state::floppy_formats )
 	FLOPPY_MGT_FORMAT
 FLOPPY_FORMATS_END
@@ -562,7 +554,11 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
 	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL_32_768kHz)
-	MCFG_CASSETTE_ADD("cassette", samcoupe_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("samcoupe_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 
 	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)

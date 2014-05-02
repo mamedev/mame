@@ -169,14 +169,6 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-static const cassette_interface p1_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 DRIVER_INIT_MEMBER( p1_state, poisk1 )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -270,7 +262,8 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_ISA8_SLOT_ADD("isa", "isa3", p1_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("isa", "isa4", p1_isa8_cards, NULL, false)
 
-	MCFG_CASSETTE_ADD( "cassette", p1_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )

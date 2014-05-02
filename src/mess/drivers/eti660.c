@@ -198,14 +198,6 @@ WRITE8_MEMBER( eti660_state::pia_pa_w )
 
 /* Machine Drivers */
 
-static const cassette_interface eti660_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( eti660, eti660_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
@@ -233,7 +225,8 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 	MCFG_PIA_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
 
-	MCFG_CASSETTE_ADD("cassette", eti660_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

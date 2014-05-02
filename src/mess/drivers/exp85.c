@@ -175,14 +175,6 @@ void exp85_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface exp85_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 static MACHINE_CONFIG_START( exp85, exp85_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
@@ -202,7 +194,8 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_DEVICE_ADD(I8355_TAG, I8355, XTAL_6_144MHz/2)
 	MCFG_I8355_IN_PA_CB(READ8(exp85_state, i8355_a_r))
 	MCFG_I8355_OUT_PA_CB(WRITE8(exp85_state, i8355_a_w))
-	MCFG_CASSETTE_ADD("cassette", exp85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)

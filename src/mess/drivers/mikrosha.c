@@ -139,16 +139,6 @@ static INPUT_PORTS_START( mikrosha )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
-/* Machine driver */
-static const cassette_interface mikrosha_cassette_interface =
-{
-	rkm_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"mikrosha_cass"
-};
-
-
 WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
 }
@@ -243,7 +233,11 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
-	MCFG_CASSETTE_ADD( "cassette", mikrosha_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("mikrosha_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")
 MACHINE_CONFIG_END
 

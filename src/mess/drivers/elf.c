@@ -215,14 +215,6 @@ void elf2_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface elf_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 {
 	int size = image.length();
@@ -274,7 +266,9 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
 	MCFG_OUTPUT_NAME("digit1")
 
-	MCFG_CASSETTE_ADD("cassette", elf_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+
 	MCFG_QUICKLOAD_ADD("quickload", elf2_state, elf, "bin", 0)
 
 	/* internal ram */

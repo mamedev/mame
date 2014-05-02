@@ -386,14 +386,6 @@ UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 /**********************************************************************************************************/
 
-static const cassette_interface sorcerer_cassette_interface =
-{
-	sorcerer_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"sorcerer_cass"
-};
-
 static const floppy_interface sorcerer_floppy_interface =
 {
 	FLOPPY_STANDARD_8_SSSD,
@@ -446,8 +438,15 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)
 	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", 3)
 
-	MCFG_CASSETTE_ADD( "cassette", sorcerer_cassette_interface )
-	MCFG_CASSETTE_ADD( "cassette2", sorcerer_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(sorcerer_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
+	
+	MCFG_CASSETTE_ADD( "cassette2" )
+	MCFG_CASSETTE_FORMATS(sorcerer_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

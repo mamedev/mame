@@ -243,14 +243,6 @@ static HD44780_PIXEL_UPDATE(sr16_pixel_update)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
-static const cassette_interface hr16_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	"hr16_cass"
-};
-
 static MACHINE_CONFIG_START( hr16, alesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
@@ -270,7 +262,9 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
 
-	MCFG_CASSETTE_ADD( "cassette", hr16_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("hr16_cass")
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

@@ -361,14 +361,6 @@ UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static const cassette_interface iq151_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	"iq151_cass"
-};
-
 static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("video32", IQ151_VIDEO32)            // video32
 	SLOT_INTERFACE("video64", IQ151_VIDEO64)            // video64
@@ -416,7 +408,10 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(iq151_state, ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_state, ppi_portc_w))
 
-	MCFG_CASSETTE_ADD( "cassette", iq151_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("iq151_cass")
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
 
 	/* cartridge */

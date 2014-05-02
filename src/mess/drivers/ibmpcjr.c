@@ -547,14 +547,6 @@ static GFXDECODE_START( pcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
-static const cassette_interface pcjr_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
-};
-
 const ins8250_interface pcjr_com_interface =
 {
 	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_txd),
@@ -657,7 +649,8 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", pcjr_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_UPD765A_ADD("fdc", false, false)
 

@@ -186,14 +186,6 @@ void bob85_state::machine_reset()
 {
 }
 
-static const cassette_interface bob85_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL
-};
-
 WRITE_LINE_MEMBER( bob85_state::sod_w )
 {
 	m_cass->output(state ? +1.0 : -1.0);
@@ -216,7 +208,8 @@ static MACHINE_CONFIG_START( bob85, bob85_state )
 	MCFG_DEFAULT_LAYOUT(layout_bob85)
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette", bob85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 MACHINE_CONFIG_END
 
 /* ROM definition */
