@@ -385,7 +385,7 @@ void z80dart_device::trigger_interrupt(int index, int state)
 		{
 			priority = (prio_level == 2) ? index + 4 : ((index * 2) + prio_level);
 		}
-		if ((index == CHANNEL_B) && (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR))
+		if (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR)
 		{
 			vector = (!index << 2) | state;
 			if((m_chanA->m_wr[1] & 0x18) == z80dart_channel::WR2_MODE_8086_8088)
@@ -401,7 +401,7 @@ void z80dart_device::trigger_interrupt(int index, int state)
 	else
 	{
 		priority = (index << 2) | state;
-		if ((index == CHANNEL_B) && (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR))
+		if (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR)
 		{
 			// status affects vector
 			vector = (m_chanB->m_wr[2] & 0xf1) | (!index << 3) | (state << 1);
@@ -1315,6 +1315,7 @@ void z80dart_channel::update_serial()
 	{
 		set_tra_rate(m_txc / clocks);
 	}
+	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
 }
 
 

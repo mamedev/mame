@@ -5,10 +5,10 @@
     Phill Harvey-Smith
     2009-11-29.
 */
-
+#include "emu.h"
 #include "cpu/i86/i186.h"
-#include "machine/z80sio.h"
-#include "machine/wd17xx.h"
+#include "machine/z80dart.h"
+#include "machine/wd_fdc.h"
 #include "bus/scsi/scsi.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
@@ -21,8 +21,6 @@
 #define IOCPU_TAG   "iocpu"
 
 #define num_ioports             0x80
-#define NIMBUS_KEYROWS          11
-#define KEYBOARD_QUEUE_SIZE     32
 
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
@@ -64,15 +62,6 @@ struct t_nimbus_brush
 	UINT16  save_colour;
 };
 
-
-struct keyboard_t
-{
-	UINT8       keyrows[NIMBUS_KEYROWS];
-	emu_timer   *keyscan_timer;
-	UINT8       queue[KEYBOARD_QUEUE_SIZE];
-	UINT8       head;
-	UINT8       tail;
-};
 
 // Static data related to Floppy and SCSI hard disks
 struct nimbus_drives_t
@@ -172,7 +161,6 @@ extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
 #define EXTERNAL_INT_PC8031_8C  0x8c
 #define EXTERNAL_INT_PC8031_8E  0x8E
 #define EXTERNAL_INT_PC8031_8F  0x8F
-#define EXTERNAL_INT_Z80SIO     0x9C
 
 
 /* Memory controler */
@@ -194,15 +182,9 @@ extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
 
 #define Z80SIO_TAG          "z80sio"
 
-extern const z80sio_interface nimbus_sio_intf;
-
 /* Floppy/Fixed drive interface */
 
 #define FDC_TAG                 "wd2793"
-#define FDC_PAUSE               10000
-
-extern const wd17xx_interface nimbus_wd17xx_interface;
-
 
 #define NO_DRIVE_SELECTED   0xFF
 
@@ -308,7 +290,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, MSM5205_TAG),
-		m_ay8910(*this, AY8910_TAG),
 		m_scsibus(*this, SCSIBUS_TAG),
 		m_ram(*this, RAM_TAG),
 		m_eeprom(*this, ER59256_TAG),
@@ -317,13 +298,14 @@ public:
 		m_palette(*this, "palette"),
 		m_scsi_data_out(*this, "scsi_data_out"),
 		m_scsi_data_in(*this, "scsi_data_in"),
-		m_scsi_ctrl_out(*this, "scsi_ctrl_out")
+		m_scsi_ctrl_out(*this, "scsi_ctrl_out"),
+		m_fdc(*this, FDC_TAG),
+		m_z80sio(*this, Z80SIO_TAG)
 	{
 	}
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
-	required_device<ay8910_device> m_ay8910;
 	required_device<SCSI_PORT_DEVICE> m_scsibus;
 	required_device<ram_device> m_ram;
 	required_device<er59256_device> m_eeprom;
@@ -333,9 +315,10 @@ public:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_ctrl_out;
+	required_device<wd2793_t> m_fdc;
+	required_device<z80sio2_device> m_z80sio;
 
 	UINT32 m_debug_machine;
-	keyboard_t m_keyboard;
 	nimbus_drives_t m_nimbus_drives;
 	ipc_interface_t m_ipc_interface;
 	UINT8 m_mcu_reg080;
@@ -356,8 +339,9 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
 	DECLARE_READ16_MEMBER(nimbus_io_r);
 	DECLARE_WRITE16_MEMBER(nimbus_io_w);
-	DECLARE_READ8_MEMBER(nimbus_disk_r);
-	DECLARE_WRITE8_MEMBER(nimbus_disk_w);
+	DECLARE_READ8_MEMBER(scsi_r);
+	DECLARE_WRITE8_MEMBER(scsi_w);
+	DECLARE_WRITE8_MEMBER(fdc_ctl_w);
 	DECLARE_READ8_MEMBER(nimbus_pc8031_r);
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
 	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
@@ -366,8 +350,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port_w);
 	DECLARE_READ8_MEMBER(nimbus_iou_r);
 	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
-	DECLARE_READ8_MEMBER(nimbus_sound_ay8910_r);
-	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_w);
 	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);
 	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_portb_w);
 	DECLARE_READ8_MEMBER(nimbus_mouse_js_r);
@@ -385,14 +367,10 @@ public:
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 	TIMER_CALLBACK_MEMBER(mouse_callback);
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
-	DECLARE_WRITE8_MEMBER(sio_dtr_w);
-	DECLARE_WRITE16_MEMBER(sio_serial_transmit);
-	DECLARE_READ16_MEMBER(sio_serial_receive);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
@@ -400,8 +378,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_msm5205_vck);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_iena);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 
-	IRQ_CALLBACK_MEMBER(int_callback);
 	UINT8 get_pixel(UINT16 x, UINT16 y);
 	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
 	UINT16 read_pixel_data(UINT16 x, UINT16 y);
@@ -427,12 +405,7 @@ public:
 	void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si);
 	void nimbus_bank_memory();
 	void memory_reset();
-	void keyboard_reset();
-	void queue_scancode(UINT8 scancode);
-	int keyboard_queue_read();
-	void scan_keyboard();
 	void fdc_reset();
-	void set_disk_int(int state);
 	UINT8 fdc_driveno(UINT8 drivesel);
 	void hdc_reset();
 	void hdc_ctrl_write(UINT8 data);

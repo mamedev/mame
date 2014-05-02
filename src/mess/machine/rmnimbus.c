@@ -53,20 +53,9 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 
 */
 
-
-#include "emu.h"
 #include "debugger.h"
-#include "cpu/i86/i186.h"
-#include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/i8251.h"
-#include "machine/6522via.h"
-#include "bus/scsi/scsi.h"
-
 #include "includes/rmnimbus.h"
 
 
@@ -76,14 +65,6 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 /*-------------------------------------------------------------------------*/
 
 /* CPU 80186 */
-#define LATCH_INTS          1
-#define LOG_PORTS           0
-#define LOG_INTERRUPTS      0
-#define LOG_INTERRUPTS_EXT  0
-#define LOG_TIMER           0
-#define LOG_OPTIMIZATION    0
-#define LOG_DMA             0
-#define CPU_RESUME_TRIGGER  7123
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
 #define LOG_DISK_FDD        0
@@ -102,37 +83,9 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #define DEBUG_SET_STATE(flags)    ((state->m_debug_machine & (flags))==(flags))
 
 #define DEBUG_NONE          0x0000000
-#define DMA_BREAK           0x0000001
 #define DECODE_BIOS         0x0000002
 #define DECODE_BIOS_RAW     0x0000004
 #define DECODE_DOS21        0x0000008
-
-
-/* Z80 SIO */
-
-const z80sio_interface nimbus_sio_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,sio_interrupt),         /* interrupt handler */
-	DEVCB_NULL, //sio_dtr_w,             /* DTR changed handler */
-	DEVCB_NULL,                     /* RTS changed handler */
-	DEVCB_NULL,                     /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(rmnimbus_state,sio_serial_transmit),  /* transmit handler */
-	DEVCB_DRIVER_MEMBER16(rmnimbus_state,sio_serial_receive)        /* receive handler */
-};
-
-/* Floppy drives WD2793 */
-
-
-
-
-const wd17xx_interface nimbus_wd17xx_interface =
-{
-	DEVCB_LINE_GND,
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,nimbus_fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,nimbus_fdc_drq_w),
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 
 static const UINT16 def_config[16] =
 {
@@ -192,11 +145,9 @@ READ8_MEMBER(rmnimbus_state::cascade_callback)
 void rmnimbus_state::machine_reset()
 {
 	/* CPU */
-//  nimbus_cpu_reset();
 	iou_reset();
 	fdc_reset();
 	hdc_reset();
-	keyboard_reset();
 	pc8031_reset();
 	rmni_sound_reset();
 	memory_reset();
@@ -218,10 +169,6 @@ DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 
 void rmnimbus_state::machine_start()
 {
-	/* init cpu */
-//  nimbus_cpu_init();
-
-	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::keyscan_callback),this));
 	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::mouse_callback),this));
 
 	/* setup debug commands */
@@ -235,6 +182,7 @@ void rmnimbus_state::machine_start()
 	}
 
 	m_debug_machine=DEBUG_NONE;
+	m_fdc->dden_w(0);
 }
 
 static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[])
@@ -1039,83 +987,6 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_io_w)
 	}
 }
 
-
-/*
-    Keyboard emulation
-
-*/
-
-void rmnimbus_state::keyboard_reset()
-{
-	memset(m_keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
-
-	// Setup timer to scan m_keyboard.
-	m_keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
-}
-
-void rmnimbus_state::queue_scancode(UINT8 scancode)
-{
-	m_keyboard.queue[m_keyboard.head] = scancode;
-	m_keyboard.head++;
-	m_keyboard.head %= ARRAY_LENGTH(m_keyboard.queue);
-}
-
-int rmnimbus_state::keyboard_queue_read()
-{
-	int data;
-	if (m_keyboard.tail == m_keyboard.head)
-		return -1;
-
-	data = m_keyboard.queue[m_keyboard.tail];
-
-	if (LOG_KEYBOARD)
-		logerror("keyboard_queue_read(): Keyboard Read 0x%02x\n",data);
-
-	m_keyboard.tail++;
-	m_keyboard.tail %= ARRAY_LENGTH(m_keyboard.queue);
-	return data;
-}
-
-void rmnimbus_state::scan_keyboard()
-{
-	UINT8   keyrow;
-	UINT8   row;
-	UINT8   bitno;
-	UINT8   mask;
-	static const char *const keynames[] = {
-		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9",
-		"KEY10"
-	};
-
-	for(row=0;row<NIMBUS_KEYROWS;row++)
-	{
-		keyrow=machine().root_device().ioport(keynames[row])->read();
-
-		for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
-		{
-			if(!(keyrow & mask) && (m_keyboard.keyrows[row] & mask))
-			{
-				if (LOG_KEYBOARD) logerror("keypress %02X\n",(row<<3)+bitno);
-				queue_scancode((row<<3)+bitno);
-			}
-
-			if((keyrow & mask) && !(m_keyboard.keyrows[row] & mask))
-			{
-				if (LOG_KEYBOARD) logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);
-				queue_scancode(0x80+(row<<3)+bitno);
-			}
-		}
-
-		m_keyboard.keyrows[row]=keyrow;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(rmnimbus_state::keyscan_callback)
-{
-	scan_keyboard();
-}
-
 /*
 
 Z80SIO, used for the keyboard interface
@@ -1135,46 +1006,20 @@ WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
 		m_sio_int_state=state;
 
 		if(state)
-			external_int(0,EXTERNAL_INT_Z80SIO);
+			external_int(0, m_z80sio->m1_r());
 	}
-}
-
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(rmnimbus_state::sio_dtr_w)
-{
-	if (offset == 1)
-	{
-	}
-}
-#endif
-
-WRITE16_MEMBER(rmnimbus_state::sio_serial_transmit)
-{
-}
-
-READ16_MEMBER(rmnimbus_state::sio_serial_receive)
-{
-	if(offset==0)
-	{
-		return keyboard_queue_read();
-	}
-	else
-		return -1;
 }
 
 /* Floppy disk */
 
 void rmnimbus_state::fdc_reset()
 {
-	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
-
 	m_nimbus_drives.reg400=0;
 	m_scsi_ctrl_out->write(0);
 	m_nimbus_drives.int_ff=0;
-	fdc->set_pause_time(FDC_PAUSE);
 }
 
-void rmnimbus_state::set_disk_int(int state)
+WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 {
 	if(LOG_DISK)
 		logerror("nimbus_drives_intrq = %d\n",state);
@@ -1186,11 +1031,6 @@ void rmnimbus_state::set_disk_int(int state)
 		if(state)
 			external_int(0,EXTERNAL_INT_DISK);
 	}
-}
-
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
-{
-	set_disk_int(state);
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
@@ -1231,51 +1071,41 @@ UINT8 rmnimbus_state::fdc_driveno(UINT8 drivesel)
     7   !REQ from HDD
 */
 
-READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
+READ8_MEMBER(rmnimbus_state::scsi_r)
 {
 	int result = 0;
-	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
 
 	int pc=space.device().safe_pc();
-	legacy_floppy_image_device *drive = machine().device<legacy_floppy_image_device>(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
+	char drive[5];
+	floppy_image_device *floppy;
+
+	sprintf(drive, "%d", FDC_DRIVE());
+	floppy = m_fdc->subdevice<floppy_connector>(drive)->get_device();
 
 	switch(offset*2)
 	{
-		case 0x08 :
-			result = fdc->status_r(space, 0);
-			if (LOG_DISK_FDD) logerror("Disk status=%2.2X\n",result);
-			break;
-		case 0x0A :
-			result = fdc->track_r(space, 0);
-			break;
-		case 0x0C :
-			result = fdc->sector_r(space, 0);
-			break;
-		case 0x0E :
-			result = fdc->data_r(space, 0);
-			break;
-		case 0x10 :
+		case 0x00 :
 			result |= !m_scsi_req << 7;
 			result |= !m_scsi_cd << 6;
 			result |= !m_scsi_io << 5;
 			result |= !m_scsi_bsy << 4;
 			result |= m_scsi_msg << 3;
-			result |= FDC_MOTOR() << 2;
-			result |= !drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX) << 1;
-			result |= drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 0;
+			if(floppy)
+			{
+				result |= FDC_MOTOR() << 2;
+				result |= (!floppy->idx_r()) << 1;
+				result |= floppy->ready_r() << 0;
+			}
 			break;
-		case 0x18 :
+		case 0x08 :
 			result = m_scsi_data_in->read();
 			hdc_post_rw();
 		default:
 			break;
 	}
 
-	if(LOG_DISK_FDD && ((offset*2)<=0x10))
-		logerror("Nimbus FDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
-
-	if((LOG_DISK_HDD) && ((offset*2)>=0x10))
-		logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x400,result);
+	if(LOG_DISK_HDD)
+		logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
 
 	return result;
 }
@@ -1291,7 +1121,31 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
     5   fdc motor on
     6   hdc drq enabled
     7   fdc drq enabled
+*/
+WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
+{
+	UINT8 reg400_old = m_nimbus_drives.reg400;
+	char drive[5];
+	floppy_image_device *floppy;
 
+	m_nimbus_drives.reg400 = data;
+
+	sprintf(drive, "%d", FDC_DRIVE());
+	floppy = m_fdc->subdevice<floppy_connector>(drive)->get_device();
+
+	m_fdc->set_floppy(floppy);
+	if(floppy)
+	{
+		floppy->ss_w(FDC_SIDE());
+		floppy->mon_w(!FDC_MOTOR());
+	}
+
+	// if we enable hdc drq with a pending condition, act on it
+	if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
+		hdc_drq();
+}
+
+/*
     0x410 write bits
 
     0   SCSI reset
@@ -1299,45 +1153,15 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
     2   SCSI IRQ Enable
 */
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
+WRITE8_MEMBER(rmnimbus_state::scsi_w)
 {
-	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
-	int                 pc=space.device().safe_pc();
-	UINT8               reg400_old = m_nimbus_drives.reg400;
+	int pc=space.device().safe_pc();
 
-	if(LOG_DISK_FDD && ((offset*2)<=0x10))
-		logerror("Nimbus FDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
-
-	if((LOG_DISK_HDD) && (((offset*2)>=0x10) || (offset==0)))
-		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
+	if(LOG_DISK_HDD)
+		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
 
 	switch(offset*2)
 	{
-		case 0x00 :
-			m_nimbus_drives.reg400=data;
-			fdc->set_drive(FDC_DRIVE());
-			fdc->set_side(FDC_SIDE());
-
-			// Nimbus FDC is hard wired for double density
-			//fdc->set_density(DEN_MFM_LO);
-
-			// if we enable hdc drq with a pending condition, act on it
-			if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
-				hdc_drq();
-
-			break;
-		case 0x08 :
-			fdc->command_w(space, 0, data);
-			break;
-		case 0x0A :
-			fdc->track_w(space, 0, data);
-			break;
-		case 0x0C :
-			fdc->sector_w(space, 0, data);
-			break;
-		case 0x0E :
-			fdc->data_w(space, 0, data);
-			break;
 		case 0x10 :
 			m_scsi_ctrl_out->write(data);
 			break;
@@ -1361,7 +1185,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 
 	// If we enable the HDC interupt, and an interrupt is pending, go deal with it.
 	if (m_scsi_iena && !last && !m_scsi_io && !m_scsi_cd && !m_scsi_req)
-		set_disk_int(1);
+		nimbus_fdc_intrq_w(1);
 }
 
 void rmnimbus_state::hdc_post_rw()
@@ -1644,38 +1468,12 @@ void rmnimbus_state::iou_reset()
 
 void rmnimbus_state::rmni_sound_reset()
 {
-	//m_ay8910->reset();
 	m_msm->reset_w(1);
 
 	m_last_playmode = MSM5205_S48_4B;
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;
-}
-
-READ8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_r)
-{
-	UINT8   result=0;
-
-	if ((offset*2)==0)
-		result = m_ay8910->data_r(space, 0);
-
-	return result;
-}
-
-WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_w)
-{
-	int pc=space.device().safe_pc();
-
-	if(LOG_SOUND)
-		logerror("Nimbus SoundW %05X write of %02X to %04X\n",pc,data,(offset*2)+0xE0);
-
-	switch (offset*2)
-	{
-		case 0x00   : m_ay8910->data_address_w(space, 1, data); break;
-		case 0x02   : m_ay8910->data_address_w(space, 0, data); break;
-	}
-
 }
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
@@ -1915,10 +1713,4 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_via_irq_w)
 {
 	if(state)
 		external_int(VIA_INT,0x00);
-}
-
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_ack_w)
-{
-	via6522_device *via_1 = machine().device<via6522_device>(VIA_TAG);
-	via_1->write_ca1(!state); /* ack seems to be inverted? */
 }

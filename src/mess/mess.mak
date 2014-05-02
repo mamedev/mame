@@ -1644,6 +1644,7 @@ $(MESSOBJ)/rm.a:                \
 	$(MESS_DRIVERS)/rmnimbus.o  \
 	$(MESS_MACHINE)/rmnimbus.o  \
 	$(MESS_VIDEO)/rmnimbus.o    \
+	$(MESS_MACHINE)/rmnkbd.o    \
 
 $(MESSOBJ)/robotron.a:          \
 	$(MESS_DRIVERS)/a5105.o     \
