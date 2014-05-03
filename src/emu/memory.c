@@ -745,16 +745,18 @@ private:
 	template<typename _UintType>
 	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
 	{
-		device_execute_interface *intf;
-		bool is_octal = false;
-		if (m_space.device().interface(intf))
-			is_octal = intf->is_octal();
-
 		if (m_space.log_unmap() && !m_space.debugger_access())
+		{
+			device_execute_interface *intf;
+			bool is_octal = false;
+			if (m_space.device().interface(intf))
+				is_octal = intf->is_octal();
+
 			logerror("%s: unmapped %s memory read from %s & %s\n",
 						m_space.machine().describe_context(), m_space.name(),
 						core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),is_octal),
 						core_i64_format(mask, 2 * sizeof(_UintType),is_octal));
+		}
 		return m_space.unmap();
 	}
 
@@ -816,17 +818,19 @@ private:
 	template<typename _UintType>
 	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
 	{
-		device_execute_interface *intf;
-		bool is_octal = false;
-		if (m_space.device().interface(intf))
-			is_octal = intf->is_octal();
-
 		if (m_space.log_unmap() && !m_space.debugger_access())
+		{
+			device_execute_interface *intf;
+			bool is_octal = false;
+			if (m_space.device().interface(intf))
+				is_octal = intf->is_octal();
+
 			logerror("%s: unmapped %s memory write to %s = %s & %s\n",
 					m_space.machine().describe_context(), m_space.name(),
 					core_i64_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars(),is_octal),
 					core_i64_format(data, 2 * sizeof(_UintType),is_octal),
 					core_i64_format(mask, 2 * sizeof(_UintType),is_octal));
+		}
 	}
 
 	template<typename _UintType>
@@ -1618,6 +1622,13 @@ void memory_manager::initialize()
 	// find all the allocated pointers
 	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 		space->locate_memory();
+
+	// disable logging of unmapped access when
+	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
+	{
+		if (!machine().options().log() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
+			space->set_log_unmap(false);
+	}
 
 	// register a callback to reset banks when reloading state
 	machine().save().register_postload(save_prepost_delegate(FUNC(memory_manager::bank_reattach), this));
