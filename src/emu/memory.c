@@ -1623,7 +1623,7 @@ void memory_manager::initialize()
 	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 		space->locate_memory();
 
-	// disable logging of unmapped access when
+	// disable logging of unmapped access when no one receives it
 	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 	{
 		if (!machine().options().log() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
