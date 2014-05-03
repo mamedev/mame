@@ -107,8 +107,6 @@ void williams_state::state_save_register()
 	save_item(NAME(m_cocktail));
 	save_item(NAME(m_blitterram));
 	save_item(NAME(m_blitter_remap_index));
-	save_item(NAME(m_blaster_color0));
-	save_item(NAME(m_blaster_video_control));
 	save_item(NAME(m_tilemap_xscroll));
 	save_item(NAME(m_williams2_fg_color));
 }
@@ -122,11 +120,13 @@ VIDEO_START_MEMBER(williams_state,williams)
 }
 
 
-VIDEO_START_MEMBER(williams_state,blaster)
+VIDEO_START_MEMBER(blaster_state,blaster)
 {
 	blitter_init(m_blitter_config, memregion("proms")->base());
 	create_palette_lookup();
 	state_save_register();
+	save_item(NAME(m_blaster_color0));
+	save_item(NAME(m_blaster_video_control));
 }
 
 
@@ -179,7 +179,7 @@ UINT32 williams_state::screen_update_williams(screen_device &screen, bitmap_rgb3
 }
 
 
-UINT32 williams_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
 	int x, y;
@@ -439,14 +439,14 @@ WRITE8_MEMBER(williams_state::williams2_xscroll_high_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::blaster_remap_select_w)
+WRITE8_MEMBER(blaster_state::blaster_remap_select_w)
 {
 	m_blitter_remap_index = data;
 	m_blitter_remap = m_blitter_remap_lookup + data * 256;
 }
 
 
-WRITE8_MEMBER(williams_state::blaster_video_control_w)
+WRITE8_MEMBER(blaster_state::blaster_video_control_w)
 {
 	m_blaster_video_control = data;
 }

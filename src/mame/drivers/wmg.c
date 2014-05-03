@@ -78,8 +78,6 @@ class wmg_state : public williams_state
 public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_soundcpu(*this, "soundcpu")
 		, m_p_ram(*this, "nvram")
 	{ }
 
@@ -99,8 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 	void wmg_def_install_io_space(address_space &space);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
 	required_shared_ptr<UINT8> m_p_ram;
 };
 

@@ -85,7 +85,7 @@ WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
 	m_soundcpu->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Same as above, but for second sound board */
-WRITE_LINE_MEMBER(williams_state::williams_snd_irq_b)
+WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2b");
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
@@ -334,23 +334,6 @@ WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data);
 }
-
-TIMER_CALLBACK_MEMBER(williams_state::blaster_deferred_snd_cmd_w)
-{
-	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
-	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
-	UINT8 l_data = param | 0x80;
-	UINT8 r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
-
-	pia_2l->portb_w(l_data); pia_2l->cb1_w((l_data == 0xff) ? 0 : 1);
-	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);
-}
-
-WRITE8_MEMBER(williams_state::blaster_snd_cmd_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::blaster_deferred_snd_cmd_w),this), data);
-}
-
 
 TIMER_CALLBACK_MEMBER(williams_state::williams2_deferred_snd_cmd_w)
 {
@@ -631,7 +614,7 @@ WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams_state,blaster)
+MACHINE_START_MEMBER(blaster_state,blaster)
 {
 	MACHINE_START_CALL_MEMBER(williams_common);
 
@@ -646,20 +629,20 @@ MACHINE_START_MEMBER(williams_state,blaster)
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,blaster)
+MACHINE_RESET_MEMBER(blaster_state,blaster)
 {
 	MACHINE_RESET_CALL_MEMBER(williams_common);
 }
 
 
-inline void williams_state::update_blaster_banking()
+inline void blaster_state::update_blaster_banking()
 {
 	membank("bank1")->set_entry(m_vram_bank * (m_blaster_bank + 1));
 	membank("bank2")->set_entry(m_vram_bank * (m_blaster_bank + 1));
 }
 
 
-WRITE8_MEMBER(williams_state::blaster_vram_select_w)
+WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_vram_bank = data & 0x01;
@@ -673,10 +656,28 @@ WRITE8_MEMBER(williams_state::blaster_vram_select_w)
 }
 
 
-WRITE8_MEMBER(williams_state::blaster_bank_select_w)
+WRITE8_MEMBER(blaster_state::blaster_bank_select_w)
 {
 	m_blaster_bank = data & 15;
 	update_blaster_banking();
+}
+
+
+TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
+{
+	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
+	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
+	UINT8 l_data = param | 0x80;
+	UINT8 r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
+
+	pia_2l->portb_w(l_data); pia_2l->cb1_w((l_data == 0xff) ? 0 : 1);
+	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);
+}
+
+
+WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::blaster_deferred_snd_cmd_w),this), data);
 }
 
 
