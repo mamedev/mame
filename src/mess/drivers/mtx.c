@@ -391,8 +391,8 @@ ROM_START( mtx512 )
 	ROM_LOAD( "80z.bin", 0x0000, 0x1000, CRC(ea6fe865) SHA1(f84883f79bed34501e5828336894fad929bddbb5) )
 
 	/* Device GAL16V8 converted from PAL14L4 JEDEC map */
-	ROM_REGION( 0x116, "plds", 0 )
-	ROM_LOAD( "Memotech-MTX512.bin", 0x0000, 0x0116, CRC(31f88133) SHA1(5bef3ce764121b3510b538824b2768f082b422bb) )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "Memotech-MTX512.bin", 0x0000, 0x0117, CRC(31f88133) SHA1(5bef3ce764121b3510b538824b2768f082b422bb) )
 ROM_END
 
 #define rom_mtx500  rom_mtx512
