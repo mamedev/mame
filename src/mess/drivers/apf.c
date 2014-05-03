@@ -26,16 +26,13 @@ APF M1000/MP1000 and Imagination Machine
 RAM switch
 ----------
 - The M1000 only had available the 1K video ram (0000-03FF)
-- Space Destroyer needs more, so it includes another 1K in the cart (-ram 1K to enable it)
+- Space Destroyer needs more, so it includes another 1K in the cart
 - The MPA-10 base includes 8K of RAM (A000-BFFF) (-ram 8K)
 - A very few games need 16K which requires hacking the pcb (-ram 16K)
 - Basic will work with 8K or 16K.
 
-- On the M1000, only the 1K option has any affect. 8K and 16K are ignored.
-- On the IMAG, all ram switches work, however the 1K option gives you 9K. This is because
-  the MPA-10 8K ram is always there.
-
-
+- On the M1000, ram options (8K and 16K) are ignored.
+- On the IMAG, ram options (8K and 16K) work.
 
 
 Status of cart-based games
@@ -54,7 +51,7 @@ hangman - works
 pinball - works
 movblock - works
 rocket patrol - works, some bad colours
-space destroyer - works but you must use -ram 1K option
+space destroyer - works
 ufo - works
 
 
@@ -90,6 +87,7 @@ class apf_state : public driver_device
 public:
 	apf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_has_cart_ram(false)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
@@ -111,12 +109,14 @@ public:
 	DECLARE_WRITE8_MEMBER(apf_dischw_w);
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(apf_cart);
 private:
 	UINT8 m_latch;
 	UINT8 m_keyboard_data;
 	UINT8 m_pad_data;
 	UINT8 m_portb;
 	bool m_ca2;
+	bool m_has_cart_ram;
 	virtual void machine_reset();
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<m6800_cpu_device> m_maincpu;
@@ -127,6 +127,7 @@ private:
 	optional_device<pia6821_device> m_pia1;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<wd1770_device> m_fdc;
+	dynamic_buffer m_cart_ram;
 };
 
 
@@ -136,11 +137,11 @@ READ8_MEMBER( apf_state::videoram_r )
 	{
 		// Need the cpu and crtc to be locked together for proper graphics
 		// This is a hack to fix Rocket Patrol and Blackjack
-		if (BIT(m_pad_data, 6) && (m_ram->size() != 1*1024))
+		if (BIT(m_pad_data, 6) && !m_has_cart_ram)
 			offset -= 0x400;
 
 		// This is a hack to fix Space Destroyer
-		if (BIT(m_pad_data, 6) && (m_ram->size() == 1*1024))
+		if (BIT(m_pad_data, 6) && m_has_cart_ram)
 			offset -= 0x120;
 
 		UINT16 part1 = offset & 0x1f;
@@ -245,11 +246,11 @@ void apf_state::machine_reset()
 			space.write_byte(0xa002, 0xe5);
 	}
 
-	/* 1K indicates special mapping for space destroyer */
-	if (m_ram->size() == 1*1024)
+	/* Space Destroyer has 1K of on-cart RAM */
+	if (m_has_cart_ram)
 	{
 		space.unmap_readwrite(0x9800, 0x9fff);
-		space.install_ram(0x9800, 0x9bff, m_ram->pointer());
+		space.install_ram(0x9800, 0x9bff, m_cart_ram);
 	}
 }
 
@@ -476,6 +477,51 @@ static INPUT_PORTS_START( apfimag )
 	PORT_BIT(0xff, 0xff, IPT_UNUSED)
 INPUT_PORTS_END
 
+
+DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
+{
+	UINT8 *ROM = memregion("cart")->base();
+	UINT32 cart_size;
+	
+	if (image.software_entry() == NULL)
+	{
+		cart_size = image.length();
+		if (cart_size > 0x3800)
+		{
+			logerror("%s extends beyond the expected size for an APF cart.\n", image.filename());
+			return IMAGE_INIT_FAIL;
+		}
+
+		image.fread(ROM, cart_size);
+		
+		// attempt to identify Space Destroyer, which needs 1K of additional RAM
+		if (cart_size == 0x1800)
+		{
+			m_has_cart_ram = true;
+			m_cart_ram.resize(0x400);
+		}
+	}
+	else
+	{
+		cart_size = image.get_software_region_length("rom");
+		if (cart_size > 0x3800)
+		{
+			logerror("%s extends beyond the expected size for an APF cart.\n", image.filename());
+			return IMAGE_INIT_FAIL;
+		}
+
+		memcpy(ROM, image.get_software_region("rom"), cart_size);
+
+		if (image.get_software_region("ram"))
+		{
+			m_has_cart_ram = true;
+			m_cart_ram.resize(image.get_software_region_length("ram"));
+		}
+	}
+	
+	return IMAGE_INIT_PASS;
+}
+
 static LEGACY_FLOPPY_OPTIONS_START(apfimag)
 	LEGACY_FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -535,10 +581,11 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,16K")
+	MCFG_RAM_EXTRA_OPTIONS("16K")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("apfm1000_cart")
+	MCFG_CARTSLOT_LOAD(apf_state, apf_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","apfm1000")
@@ -584,7 +631,6 @@ ROM_START(apfm1000)
 	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(3) )
 
 	ROM_REGION(0x3800,"cart", ROMREGION_ERASEFF)
-	ROM_CART_LOAD("cart", 0x0000, 0x3800, ROM_OPTIONAL)
 ROM_END
 
 #define rom_apfimag rom_apfm1000
