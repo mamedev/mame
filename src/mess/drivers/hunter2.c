@@ -11,15 +11,10 @@
     No schematics or manuals available.
 
     TODO:
-    - NSC810 device to be connected, the device is not emulated
-    - Fix keyboard
-    - Add ports 60,80-85,BB
+    - Add ports 83 and 85
     - Need software
     - Add whatever image devices existed
-    - Add serial port
     - Probably lots of other stuff
-    - The machine is scanning the keyboard, but when a key is pressed,
-      nothing happens.
 
 ****************************************************************************/
 
@@ -101,7 +96,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write) // device not yet emulated
+	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write)
 //  AM_RANGE(0x00, 0x00) AM_READ(port00_r)
 //  AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
 //  AM_RANGE(0x02, 0x02) AM_READ(port02_r)
@@ -311,7 +306,7 @@ WRITE8_MEMBER( hunter2_state::porte0_w )
 		m_bank3->set_bank(2 + data);
 	}
 	else
-	if ((data >= 0x80) && (data <= 0x8f))
+	if ((data >= 0x80))
 	{
 		UINT8 bank = data & 0x0f;
 		m_bank1->set_bank(16 + (bank*3));
