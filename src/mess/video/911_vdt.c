@@ -178,6 +178,7 @@ void vdt911_device::device_start()
 
 	m_keyboard_data_ready = false;
 	m_display_enable = false;
+	m_blink_state = false;
 
 	m_keyint_line.resolve();
 	m_lineint_line.resolve();
