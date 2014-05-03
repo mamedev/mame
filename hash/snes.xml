@@ -4654,14 +4654,17 @@ more investigation needed...
 	</software>
 
 	<software name="popntwinjs" cloneof="popntwin">
-		<!-- Notes: empty header -->
+		<!-- Notes: The original cart was dumped as hirom, even if it is lorom
+		Internal header is "wrong" (see 0x21 at offset 0x7fd5). The currently included
+		dump has been obtained by de-interleaving the original file, but it has to be
+		confirmed from a real cart! -->
 		<description>Pop'n TwinBee (Jpn, Sample)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
+			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pop'n twinbee (japan) (sample).sfc" size="1048576" crc="fdd56eb2" sha1="28a6524a4f48a4d48bdadee6e1fc1862dea0fe00" offset="0x000000" status="baddump" />
+				<rom name="pop'n twinbee (japan) (sample).sfc" size="1048576" crc="843e1f01" sha1="96db035849e8b482fb2d899b6aaa5fc1e9ad5a74" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
