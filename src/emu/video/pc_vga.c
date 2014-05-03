@@ -6038,9 +6038,9 @@ READ8_MEMBER(cirrus_vga_device::mem_r)
 	{
 		offset &= 0xffff;
 		if(gc_mode_ext & 0x20)
-			return vga.memory[(offset+gc_bank_0*0x4000)];
+			return vga.memory[(offset+gc_bank_0*0x4000) % vga.svga_intf.vram_size];
 		else
-			return vga.memory[(offset+gc_bank_0*0x1000)];
+			return vga.memory[(offset+gc_bank_0*0x1000) % vga.svga_intf.vram_size];
 	}
 
 	return vga_device::mem_r(space,offset,mem_mask);
@@ -6052,9 +6052,9 @@ WRITE8_MEMBER(cirrus_vga_device::mem_w)
 	{
 		offset &= 0xffff;
 		if(gc_mode_ext & 0x20)
-			vga.memory[(offset+gc_bank_0*0x4000)] = data;
+			vga.memory[(offset+gc_bank_0*0x4000) % vga.svga_intf.vram_size] = data;
 		else
-			vga.memory[(offset+gc_bank_0*0x1000)] = data;
+			vga.memory[(offset+gc_bank_0*0x1000) % vga.svga_intf.vram_size] = data;
 	}
 	else
 		vga_device::mem_w(space,offset,data,mem_mask);
