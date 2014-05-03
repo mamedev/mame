@@ -2243,6 +2243,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/esripsys.o $(VIDEO)/esripsys.o \
 	$(DRIVERS)/ettrivia.o \
 	$(DRIVERS)/extrema.o \
+	$(DRIVERS)/fireball.o \
 	$(DRIVERS)/flipjack.o \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
@@ -2416,7 +2417,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wms.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
-
+	
 
 #-------------------------------------------------
 # layout dependencies
@@ -2563,6 +2564,8 @@ $(DRIVERS)/ecoinfr.o:   $(LAYOUT)/ecoinfr.lh
 $(DRIVERS)/ecoinf2.o:   $(LAYOUT)/ecoinf2.lh
 
 $(DRIVERS)/ecoinf3.o:   $(LAYOUT)/ecoinf3.lh
+
+$(DRIVERS)/fireball.o:  $(LAYOUT)/fireball.lh
 
 $(DRIVERS)/firebeat.o:  $(LAYOUT)/firebeat.lh
 
