@@ -491,7 +491,6 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
-#include "machine/6821pia.h"
 #include "machine/ticket.h"
 #include "includes/williams.h"
 #include "machine/nvram.h"
@@ -619,8 +618,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams2_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1")
+	AM_RANGE(0x8000, 0x87ff) AM_DEVICE("bank8000", address_map_bank_device, amap8)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_SHARE("williams2_tile")
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
 	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
@@ -636,6 +636,11 @@ static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams2_state )
 	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
 	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( williams2_bank8000_map, AS_PROGRAM, 8, williams2_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("vram8000")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(williams2_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 
@@ -1652,6 +1657,13 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 
 	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
 	MCFG_CPU_PROGRAM_MAP(williams2_sound_map)
+
+	MCFG_DEVICE_ADD("bank8000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(williams2_bank8000_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)

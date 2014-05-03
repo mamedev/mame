@@ -6,6 +6,7 @@
 
 
 #include "machine/6821pia.h"
+#include "machine/bankdev.h"
 #include "audio/williams.h"
 
 class williams_state : public driver_device
@@ -153,9 +154,11 @@ class williams2_state : public williams_state
 public:
 	williams2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag),
+		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_williams2_tileram(*this, "williams2_tile") { }
 
+	required_device<address_map_bank_device> m_bank8000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<UINT8> m_williams2_tileram;
 
@@ -193,8 +196,6 @@ public:
 	DECLARE_MACHINE_RESET(williams2);
 	DECLARE_VIDEO_START(williams2);
 	UINT32 screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void williams2_postload();
 };
 
 

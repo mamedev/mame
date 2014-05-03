@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "machine/ticket.h"
 #include "includes/williams.h"
 #include "sound/dac.h"
@@ -134,8 +133,8 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
 MACHINE_START_MEMBER(williams_state,williams_common)
 {
 	/* configure the memory bank */
-	membank("bank1")->configure_entry(0, m_videoram);
 	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
+	membank("bank1")->configure_entry(0, m_videoram);
 
 	save_item(NAME(m_vram_bank));
 }
@@ -220,22 +219,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
  *
  *************************************/
 
-void williams2_state::williams2_postload()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	williams2_bank_select_w(space, 0, m_vram_bank);
-}
-
-
 MACHINE_START_MEMBER(williams2_state,williams2)
 {
 	/* configure memory banks */
-	membank("bank1")->configure_entry(0, m_videoram);
 	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
+	membank("bank1")->configure_entry(0, m_videoram);
+	membank("vram8000")->set_base(&m_videoram[0x8000]);
 
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(williams2_state::williams2_postload), this));
 }
 
 
@@ -283,27 +275,21 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 	{
 		/* page 0 is video ram */
 		case 0:
-			space.install_read_bank(0x0000, 0x8fff, "bank1");
-			space.install_write_bank(0x8000, 0x87ff, "bank4");
 			membank("bank1")->set_entry(0);
-			membank("bank4")->set_base(&m_videoram[0x8000]);
+			m_bank8000->set_bank(0);
 			break;
 
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			space.install_read_bank(0x0000, 0x8fff, "bank1");
-			space.install_write_bank(0x8000, 0x87ff, "bank4");
 			membank("bank1")->set_entry(1 + ((m_vram_bank & 6) >> 1));
-			membank("bank4")->set_base(&m_videoram[0x8000]);
+			m_bank8000->set_bank(0);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			space.install_read_bank(0x8000, 0x87ff, "bank4");
-			space.install_write_handler(0x8000, 0x87ff, write8_delegate(FUNC(williams2_state::williams2_paletteram_w),this));
 			membank("bank1")->set_entry(1 + ((m_vram_bank & 4) >> 1));
-			membank("bank4")->set_base(m_generic_paletteram_8);
+			m_bank8000->set_bank(1);
 			break;
 	}
 }
@@ -619,11 +605,11 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 	MACHINE_START_CALL_MEMBER(williams_common);
 
 	/* banking is different for blaster */
-	membank("bank1")->configure_entry(0, m_videoram);
 	membank("bank1")->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
+	membank("bank1")->configure_entry(0, m_videoram);
 
-	membank("bank2")->configure_entry(0, m_videoram + 0x4000);
 	membank("bank2")->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
+	membank("bank2")->configure_entry(0, &m_videoram[0x4000]);
 
 	save_item(NAME(m_blaster_bank));
 }
@@ -658,7 +644,7 @@ WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
 
 WRITE8_MEMBER(blaster_state::blaster_bank_select_w)
 {
-	m_blaster_bank = data & 15;
+	m_blaster_bank = data & 0x0f;
 	update_blaster_banking();
 }
 
