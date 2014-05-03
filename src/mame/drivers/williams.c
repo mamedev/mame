@@ -618,7 +618,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams_state )
+static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_SHARE("williams2_tile")
@@ -634,13 +634,13 @@ static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams_state )
 	AM_RANGE(0xcb60, 0xcb7f) AM_WRITE(williams2_xscroll_high_w)
 	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
 	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
-	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
+	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
 /* mysticm and inferno: D000-DFFF is RAM */
-static ADDRESS_MAP_START( williams2_d000_ram_map, AS_PROGRAM, 8, williams_state )
+static ADDRESS_MAP_START( williams2_d000_ram_map, AS_PROGRAM, 8, williams2_state )
 	AM_IMPORT_FROM(williams2_common_map)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -648,7 +648,7 @@ ADDRESS_MAP_END
 
 
 /* tshoot and joust2: D000-DFFF is ROM */
-static ADDRESS_MAP_START( williams2_d000_rom_map, AS_PROGRAM, 8, williams_state )
+static ADDRESS_MAP_START( williams2_d000_rom_map, AS_PROGRAM, 8, williams2_state )
 	AM_IMPORT_FROM(williams2_common_map)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -676,7 +676,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, williams_state )
 ADDRESS_MAP_END
 
 /* Same as above, but for second sound board */
-static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, williams_state )
+static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, blaster_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2b", pia6821_device, read, write)
@@ -691,7 +691,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams2_sound_map, AS_PROGRAM, 8, williams_state )
+static ADDRESS_MAP_START( williams2_sound_map, AS_PROGRAM, 8, williams2_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
@@ -1644,7 +1644,7 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( williams2, williams_state )
+static MACHINE_CONFIG_START( williams2, williams2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
@@ -1653,12 +1653,12 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
 	MCFG_CPU_PROGRAM_MAP(williams2_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(williams_state,williams2)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams2)
+	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
+	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams2_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("254_timer", williams_state, williams2_endscreen_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
+	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -1667,9 +1667,9 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams2)
+	MCFG_SCREEN_UPDATE_DRIVER(williams2_state, screen_update_williams2)
 
-	MCFG_VIDEO_START_OVERRIDE(williams_state,williams2)
+	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1685,7 +1685,7 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state,williams2_snd_cmd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams2_state,williams2_snd_cmd_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
@@ -1707,11 +1707,11 @@ static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
 	MCFG_DEVICE_MODIFY("pia_0")
 	MCFG_PIA_CA2_HANDLER(NULL)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
 MACHINE_CONFIG_END
 
 
@@ -1723,17 +1723,17 @@ static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(READ8(williams_state,tshoot_input_port_0_3_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state,tshoot_lamp_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(williams2_state,tshoot_input_port_0_3_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams2_state,tshoot_lamp_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state,tshoot_maxvol_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(williams2_state,tshoot_maxvol_w))
 MACHINE_CONFIG_END
 
 
@@ -2958,21 +2958,21 @@ DRIVER_INIT_MEMBER(williams_state,lottofun)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams_state,mysticm)
+DRIVER_INIT_MEMBER(williams2_state,mysticm)
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_MYSTICM);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,tshoot)
+DRIVER_INIT_MEMBER(williams2_state,tshoot)
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,inferno)
+DRIVER_INIT_MEMBER(williams2_state,inferno)
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
@@ -3038,8 +3038,8 @@ GAME( 1985, alienaru,   alienar,  alienar,        alienar, williams_state,  alie
 GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", GAME_SUPPORTS_SAVE )
 
 /* 2nd Generation Williams hardware with tilemaps */
-GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams_state,  mysticm,  ROT0,   "Williams", "Mystic Marathon", GAME_SUPPORTS_SAVE )
-GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams_state,  mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", GAME_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
-GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams_state,   tshoot,   ROT0,   "Williams", "Turkey Shoot", GAME_SUPPORTS_SAVE )
-GAME( 1984, inferno,    0,        williams2,      inferno, williams_state,  inferno,  ROT0,   "Williams", "Inferno (Williams)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", GAME_SUPPORTS_SAVE )
+GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", GAME_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
+GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams2_state,  tshoot,   ROT0,   "Williams", "Turkey Shoot", GAME_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        williams2,      inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", GAME_SUPPORTS_SAVE )
 GAME( 1986, joust2,     0,        joust2,         joust2, joust2_state,     joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest", GAME_SUPPORTS_SAVE )

@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(williams_state::mysticm_main_irq)
+WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(williams_state::mysticm_main_irq)
 }
 
 
-WRITE_LINE_MEMBER(williams_state::tshoot_main_irq)
+WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
@@ -172,7 +172,7 @@ MACHINE_RESET_MEMBER(williams_state,williams)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_va11_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
@@ -189,7 +189,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_va11_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(williams_state::williams2_endscreen_off_callback)
+TIMER_CALLBACK_MEMBER(williams2_state::williams2_endscreen_off_callback)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
@@ -198,7 +198,7 @@ TIMER_CALLBACK_MEMBER(williams_state::williams2_endscreen_off_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_endscreen_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
@@ -206,7 +206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_endscreen_callback)
 	pia_0->ca1_w(0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(m_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams_state::williams2_endscreen_off_callback),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams2_state::williams2_endscreen_off_callback),this));
 
 	/* set a timer for next frame */
 	timer.adjust(m_screen->time_until_pos(254));
@@ -220,14 +220,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_endscreen_callback)
  *
  *************************************/
 
-void williams_state::williams2_postload()
+void williams2_state::williams2_postload()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	williams2_bank_select_w(space, 0, m_vram_bank);
 }
 
 
-MACHINE_START_MEMBER(williams_state,williams2)
+MACHINE_START_MEMBER(williams2_state,williams2)
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entry(0, m_videoram);
@@ -235,11 +235,11 @@ MACHINE_START_MEMBER(williams_state,williams2)
 
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(williams_state::williams2_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(williams2_state::williams2_postload), this));
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,williams2)
+MACHINE_RESET_MEMBER(williams2_state,williams2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -274,7 +274,7 @@ WRITE8_MEMBER(williams_state::williams_vram_select_w)
 }
 
 
-WRITE8_MEMBER(williams_state::williams2_bank_select_w)
+WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 {
 	m_vram_bank = data & 0x07;
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(williams_state::williams2_bank_select_w)
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
 			space.install_read_bank(0x8000, 0x87ff, "bank4");
-			space.install_write_handler(0x8000, 0x87ff, write8_delegate(FUNC(williams_state::williams2_paletteram_w),this));
+			space.install_write_handler(0x8000, 0x87ff, write8_delegate(FUNC(williams2_state::williams2_paletteram_w),this));
 			membank("bank1")->set_entry(1 + ((m_vram_bank & 4) >> 1));
 			membank("bank4")->set_base(m_generic_paletteram_8);
 			break;
@@ -335,16 +335,16 @@ WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data);
 }
 
-TIMER_CALLBACK_MEMBER(williams_state::williams2_deferred_snd_cmd_w)
+TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 
 	pia_2->porta_w(param);
 }
 
-WRITE8_MEMBER(williams_state::williams2_snd_cmd_w)
+WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams2_deferred_snd_cmd_w),this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams2_state::williams2_deferred_snd_cmd_w),this), data);
 }
 
 
@@ -447,7 +447,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 }
 
 
-WRITE8_MEMBER(williams_state::williams2_watchdog_reset_w)
+WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
@@ -462,7 +462,7 @@ WRITE8_MEMBER(williams_state::williams2_watchdog_reset_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams2_7segment_w)
+WRITE8_MEMBER(williams2_state::williams2_7segment_w)
 {
 	int n;
 	char dot;
@@ -701,7 +701,7 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
-READ8_MEMBER(williams_state::tshoot_input_port_0_3_r)
+READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
 {
 	/* merge in the gun inputs with the standard data */
 	int data = ioport("IN0")->read();
@@ -713,14 +713,14 @@ READ8_MEMBER(williams_state::tshoot_input_port_0_3_r)
 }
 
 
-WRITE_LINE_MEMBER(williams_state::tshoot_maxvol_w)
+WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
 {
 	/* something to do with the sound volume */
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
 }
 
 
-WRITE8_MEMBER(williams_state::tshoot_lamp_w)
+WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
 {
 	/* set the grenade lamp */
 	output_set_value("Grenade_lamp", (~data & 0x4)>>2 );
