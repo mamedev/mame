@@ -116,7 +116,7 @@ void *malloc_file_line(size_t size, const char *file, int line, bool array, bool
 		memset(result, 0, size);
 	else
 	{
-#if !__has_feature(memory_sanitizer) && defined(INITIALIZE_ALLOCATED_MEMORY)
+#if !__has_feature(memory_sanitizer) && defined(INITIALIZE_ALLOCATED_MEMORY) && !defined(MAME_DEBUG_FAST)
 		memset(result, 0xdd, size);
 #endif
 	}
