@@ -72,7 +72,7 @@ ifneq ($(OS2_SHELL),)
 TARGETOS = os2
 else
 
-UNAME = $(shell uname -a)
+UNAME = $(shell uname -mps)
 
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
 TARGETOS = linux
