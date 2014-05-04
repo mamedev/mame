@@ -279,7 +279,6 @@ public:
 	DECLARE_DRIVER_INIT(peplussb);
 	DECLARE_DRIVER_INIT(peplussbw);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -301,6 +300,26 @@ static const UINT16 id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a
 #define CPU_CLOCK           ((MASTER_CLOCK)/2)      /* divided by 2 - 7474 */
 #define MC6845_CLOCK        ((MASTER_CLOCK)/8/3)
 #define SOUND_CLOCK         ((MASTER_CLOCK)/12)
+
+
+/* prototypes */
+
+static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
+
+static MC6845_INTERFACE( mc6845_intf )
+{
+	false,                  /* show border area */
+	0,0,0,0,                /* visarea adjustment */
+	8,                      /* number of pixels per video memory address */
+	NULL,                   /* before pixel update callback */
+	NULL,                   /* row update callback */
+	NULL,                   /* after pixel update callback */
+	DEVCB_NULL,             /* callback for display state changes */
+	DEVCB_NULL,             /* callback for cursor state changes */
+	DEVCB_NULL,             /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(peplus_state,crtc_vsync),  /* VSYNC callback */
+	crtc_addr               /* update address callback */
+};
 
 
 /**************
@@ -358,11 +377,11 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 
 /* ROCKWELL 6545 - Transparent Memory Addressing */
 
-MC6845_ON_UPDATE_ADDR_CHANGED(peplus_state::crtc_addr)
+static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
-	m_vid_address = address;
+	peplus_state *state = device->machine().driver_data<peplus_state>();
+	state->m_vid_address = address;
 }
-
 
 WRITE8_MEMBER(peplus_state::peplus_crtc_mode_w)
 {
@@ -1331,13 +1350,9 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_PALETTE_ADD("palette", 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(peplus_state, crtc_vsync))
-
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
 	MCFG_X2404P_ADD("i2cmem")
+
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1512,7 +1527,7 @@ ROM_START( pepp0014 ) /* Normal board : Standard Draw Poker (PP0014) - Multi Reg
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   QJ       1    2    3    4    5   8  25  50 300   400
+   QJ       1    2    3    4    5   8  25  50 300    400
   % Range: 92.3-94.3%  Optimum: 96.3%  Hit Frequency: 45.6%
      Programs Available: PP0014
 */
@@ -1533,7 +1548,7 @@ ROM_START( pepp0014a ) /* Normal board : Standard Draw Poker (PP0014) - 100 Coin
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   QJ       1    2    3    4    5   8  25  50 300   400
+   QJ       1    2    3    4    5   8  25  50 300    400
   % Range: 92.3-94.3%  Optimum: 96.3%  Hit Frequency: 45.6%
      Programs Available: PP0014
 */
@@ -1570,7 +1585,7 @@ ROM_START( pepp0040 ) /* Normal board : Standard Draw Poker (PP0040) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   WA       1    2    3    4    5   7  20  50 300   800
+   WA       1    2    3    4    5   7  20  50 300    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
      Programs Available: PP0040, X000040P
 */
@@ -1733,7 +1748,7 @@ ROM_START( pepp0055 ) /* Normal board : Deuces Wild Poker (PP0055) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -1755,7 +1770,7 @@ ROM_START( pepp0055a ) /* Normal board : Deuces Wild Poker (PP0055) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -1777,7 +1792,7 @@ ROM_START( pepp0055b ) /* Normal board : Deuces Wild Poker (PP0055) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -1800,7 +1815,7 @@ ROM_START( pepp0057 ) /* Normal board : Deuces Wild Poker (PP0057) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P34A      1    2    2   3   5   9  15  25 200 250    800
   % Range: 96.8-98.8%  Optimum: 100.8%  Hit Frequency: 45.3%
      Programs Available: PP0057
@@ -1822,7 +1837,7 @@ ROM_START( pepp0057a ) /* Normal board : Deuces Wild Poker (PP0057) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P34A      1    2    2   3   5   9  15  25 200 250    800
   % Range: 96.8-98.8%  Optimum: 100.8%  Hit Frequency: 45.3%
      Programs Available: PP0057
@@ -1845,7 +1860,7 @@ ROM_START( pepp0059 ) /* Normal board : Two Pair or Better (PP0059) */
 /*
 PayTable  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------
-   FA      2    3    5    7  11  50 100 250   800
+   FA      2    3    5    7  11  50 100 250    800
   % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 24.1%
      Programs Available: PP0059, PP0424 - Non Double-up Only
 */
@@ -1866,7 +1881,7 @@ ROM_START( pepp0059a ) /* Normal board : Two Pair or Better (PP0059) */
 /*
 PayTable  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------
-   FA      2    3    5    7  11  50 100 250   800
+   FA      2    3    5    7  11  50 100 250    800
   % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 24.1%
      Programs Available: PP0059, PP0424 - Non Double-up Only
 */
@@ -2086,7 +2101,7 @@ ROM_START( pepp0125 ) /* Normal board : Deuces Wild Poker (PP0125) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P62A      1    2    2   3   5   9  15  25 200 250    800
   % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 44.4%
      Programs Available: PP0125, PP0418, X000291P, PP0291 - Non Double-up Only
@@ -2109,7 +2124,7 @@ ROM_START( pepp0126 ) /* Normal board : Deuces Wild Poker (PP0126) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P63A      1    2    2   3   5   9  12  20 200 250    800
   % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 45.4%
      Programs Available: PP0126, X000126P
@@ -2132,7 +2147,7 @@ ROM_START( pepp0127 ) /* Normal board : Deuces Joker Wild Poker (PP0127) */
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
 PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
---------------------------------------------------------------------
+---------------------------------------------------------------------
   P65N      1    2    3   3   3   6   9   12    25  800  1000  2000
   % Range: 95.1-97.1%  Optimum: 99.1%  Hit Frequency: 50.4%
      Programs Available: PP0127
@@ -2155,7 +2170,7 @@ ROM_START( pepp0127a ) /* Normal board : Deuces Joker Wild Poker (PP0127) - Mult
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
 PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
---------------------------------------------------------------------
+---------------------------------------------------------------------
   P65N      1    2    3   3   3   6   9   12    25  800  1000  2000
   % Range: 95.1-97.1%  Optimum: 99.1%  Hit Frequency: 50.4%
      Programs Available: PP0127
@@ -2177,7 +2192,7 @@ ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) - 10/23
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P77A      1    2    3    4    5   8  25  40  80  50 250    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.5%
      Programs Available: PP0158, X000158P
@@ -2199,7 +2214,7 @@ ROM_START( pepp0158a ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) - 10/2
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P77A      1    2    3    4    5   8  25  40  80  50 250    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.5%
      Programs Available: PP0158, X000158P
@@ -2221,7 +2236,7 @@ ROM_START( pepp0158b ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P77A      1    2    3    4    5   8  25  40  80  50 250    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.5%
      Programs Available: PP0158, X000158P
@@ -2244,7 +2259,7 @@ ROM_START( pepp0159 ) /* Normal board : Standard Draw Poker (PP0159) - Multi Reg
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   ???      1    2    3    4    5   7  25  50 250   1000
+  ????      1    2    3    4    5   7  25  50 250   1000
   % Range: 92.5-94.5%  Optimum: 96.5%  Hit Frequency: 45.5%
      Programs Available: PP0159
 */
@@ -2312,7 +2327,7 @@ ROM_START( pepp0178 ) /* Normal board : 4 of a Kind Bonus Poker w/ operator sele
                                           Aor?
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K*  SF  RF  (Bonus)
 -----------------------------------------------------------------
-   ??       1    2    3    4    6   9  25  25   50 250    800
+  ????      1    2    3    4    6   9  25  25   50 250    800
 
 * Operator selectable Special 4 of a Kind. Maxbet payout is 250 same as SF at Maxbet
 
@@ -2376,7 +2391,7 @@ ROM_START( pepp0190 ) /* Normal board : Deuces Wild Poker (No Double-up) (PP0190
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P57A      1    2    3   4   4   8  10  20 200 250    800
   % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.5%
      Programs Available: PP0417, X000417P, X000190P & PP0190 - Non Double-up Only
@@ -2398,7 +2413,7 @@ ROM_START( pepp0190a ) /* Normal board : Deuces Wild Poker  (PP0190) - Multi Reg
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P57A      1    2    3   4   4   8  10  20 200 250    800
   % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.5%
      Programs Available: PP0417, X000417P, X000190P & PP0190 - Non Double-up Only
@@ -2486,7 +2501,7 @@ ROM_START( pepp0203 ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P90A      1    2    3    4    5   7  25  40  80  50 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
@@ -2531,7 +2546,7 @@ ROM_START( pepp0203b ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P90A      1    2    3    4    5   7  25  40  80  50 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
@@ -2554,7 +2569,7 @@ ROM_START( pepp0203c ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) - Mult
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P90A      1    2    3    4    5   7  25  40  80  50 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
@@ -2640,7 +2655,7 @@ ROM_START( pepp0224 ) /* Normal board : Deuces Wild Poker (No Double-up) (PP0224
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P47A      1    2    2   3   4  13  16  22 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
@@ -2662,7 +2677,7 @@ ROM_START( pepp0224a ) /* Normal board : Deuces Wild Poker (No Double-up) (PP022
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P47A      1    2    2   3   4  13  16  22 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
@@ -2699,7 +2714,7 @@ ROM_START( pepp0242 ) /* Normal board : Deuces Wild Poker (PP0242) - Multi Regio
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P56A      1    2    3   3   4   8  10  20 200 250    800
   % Range: 89.4-91.4%  Optimum: 93.4%  Hit Frequency: 45.1%
      Programs Available: PP0242, X000242P
@@ -2721,7 +2736,7 @@ ROM_START( pepp0249 ) /* Normal board : Deuces Wild Poker (PP0249) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   ????      1    2    3   4   4  ??  ??  25 200 250    ???
      Programs Available: PP0249
 */
@@ -2742,8 +2757,8 @@ ROM_END
 ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
 /*
 PayTable  6s-10s  Js+  2PR  3K   STR  FL  FH  4K  SF   RF  (Bonus)
------------------------------------------------------------------
-  ??        1      2    3    4    6    6  12  50 200  1000   ???
+------------------------------------------------------------------
+  ????      1      2    3    4    6    6  12  50 200  1000   ???
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0250_733-778.u68",   0x00000, 0x10000, CRC(4c919598) SHA1(fe73503c6ccb3c5746fb96be58cd5b740c819713) ) /* Game Version: 733, Library Version: 778 */
@@ -2762,7 +2777,7 @@ ROM_START( pepp0265 ) /* Normal board : 4 of a Kind Bonus Poker (PP0265) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
  P101A      1    2    3    4    5   6  25  40  80  50 250    800
   % Range: 92.5-94.5%  Optimum: 96.9%  Hit Frequency: 45.5%
      Programs Available: PP0265, X000265P, PP0403 & PP0410 - Non Double-up Only
@@ -2784,7 +2799,7 @@ ROM_START( pepp0265a ) /* Normal board : 4 of a Kind Bonus Poker (PP0265) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
  P101A      1    2    3    4    5   6  25  40  80  50 250    800
   % Range: 92.5-94.5%  Optimum: 96.9%  Hit Frequency: 45.5%
      Programs Available: PP0265, X000265P, PP0403 & PP0410 - Non Double-up Only
@@ -2851,7 +2866,7 @@ ROM_START( pepp0290 ) /* Normal board : Deuces Wild Poker (PP0290) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P47A      1    2    2   3   4  13  16  22 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
@@ -2873,7 +2888,7 @@ ROM_START( pepp0291 ) /* Normal board : Deuces Wild Poker (No Double-up) (PP0291
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P62A      1    2    3   4   4   9  15  25 200 250    800
   % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 44.4%
      Programs Available: PP0125, PP0418, X000291P & PP0291 - Non Double-up Only
@@ -2895,7 +2910,7 @@ ROM_START( pepp0409 ) /* Normal board : 4 of a Kind Bonus Poker (No Double-up) (
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P90A      1    2    3    4    5   7  25  40  80  50 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
@@ -2917,7 +2932,7 @@ ROM_START( pepp0410 ) /* Normal board : 4 of a Kind Bonus Poker (No Double-up) (
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
  P101A      1    2    3    4    5   6  25  40  80  50 250    800
   % Range: 92.5-94.5%  Optimum: 96.9%  Hit Frequency: 45.5%
      Programs Available: PP0265, X000265P, PP0403 & PP0410 - Non Double-up Only
@@ -2939,7 +2954,7 @@ ROM_START( pepp0417 ) /* Normal board : Deuces Wild Poker (No Double-up) (PP0417
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P57A      1    2    3   4   4   8  10  20 200 250    800
   % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.5%
      Programs Available: PP0417, X000417P & PP0190 - Non Double-up Only
@@ -2961,7 +2976,7 @@ ROM_START( pepp0417a ) /* Normal board : Deuces Wild Poker (No Double-up) (PP041
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P57A      1    2    3   4   4   8  10  20 200 250    800
   % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.5%
      Programs Available: PP0417, X000417P & PP0190 - Non Double-up Only
@@ -3113,7 +3128,7 @@ ROM_START( pepp0431 ) /* Normal board : Deuces Joker Wild Poker (PP0431) - Multi
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
 PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
---------------------------------------------------------------------
+---------------------------------------------------------------------
   P76N      1    1    3   3   3   6   9   12    25  800  1000  2000
   % Range: 95.1-97.1%  Optimum: 99.1%  Hit Frequency: 50.4%
      Programs Available: PP0431, PP0812, PP0813, X000225P & PP0225 - Non Double-up Only
@@ -3241,7 +3256,7 @@ ROM_START( pepp0452 ) /* Normal board : Double Deuces Wild Poker (PP0452) */
 /*
                                         w/D     wo/D
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P236A     1    2    2   3   4  11  16  25 400 250    800
   % Range: 95.6-97.6%  Optimum: 99.6%  Hit Frequency: 45.1%
      Programs Available: PP0452, X000452P
@@ -3328,7 +3343,7 @@ ROM_START( pepp0488 ) /* Normal board : Standard Draw Poker (PP0488) - 01/12/95 
 /*
 PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 --------------------------------------------------------
-  ???       1    1   2   4    5   8  25  50 250   1000
+  ????      1    1   2   4    5   8  25  50 250   1000
   % Range: 98.4-100.4%  Optimum: 102.4%  Hit Frequency: ???
 
 NOTE: Will work with the standard CG740 + CAP740 graphics for a non-localized game.
@@ -3350,7 +3365,7 @@ ROM_START( pepp0508 ) /* Normal board : Loose Deuce Poker (PP0508) */
 /*
                                        w/D     W/oD
 PayTable   3K  STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
------------------------------------------------------------------
+-----------------------------------------------------------
   P313A     1    2   2   3   4   8  12  25 500 250    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.2%
      Programs Available: PP0508, X000508P
@@ -3372,7 +3387,7 @@ ROM_START( pepp0509 ) /* Normal board : Standard Draw Poker (No Double-up) (PP05
 /*
 PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 --------------------------------------------------------
-   ??       1    2   3    4   6  10  25  50 250    800
+  ????      1    2   3    4   6  10  25  50 250    800
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0509_783-779.u68",   0x00000, 0x10000, CRC(a7c9b166) SHA1(3565070b9beba9aa50662253cafafa00f4f5abfa) ) /* Game Version: 782, Library Version: 779 */
@@ -3391,7 +3406,7 @@ ROM_START( pepp0510 ) /* Normal board : Standard Draw Poker (PP0510) */
 /*
 PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 --------------------------------------------------------
-   ??       1    2   3    4   7   9  25  50 250    800
+  ????      1    2   3    4   7   9  25  50 250    800
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0510_782-779.u68",   0x00000, 0x10000, CRC(40ce3464) SHA1(230725ac3dd6eb6f891d4abfbcb4c41592531d4e) ) /* Game Version: 782, Library Version: 779 */
@@ -3676,7 +3691,7 @@ ROM_START( pepp0542 ) /* Normal board : One Eyed Jacks (PP0542) Use SET001 to se
                                              Wild    Wild
 PayTable    As  2PR  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 -----------------------------------------------------------------
-   ??        1   1    1   2    4   5  10  ??  ??  ?? 250    800
+  ????       1   1    1   2    4   5  10  ??  ??  ?? 250    800
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0542_905-923.u68",   0x00000, 0x10000, CRC(f4fe3db5) SHA1(18521a569aae8d89e82f9709edc03badae153dd4) ) /* Game Version: 905, Library Version: 923 */
@@ -3847,8 +3862,8 @@ ROM_END
 ROM_START( pepp0760 ) /* Normal board : Double Down Stud Poker (PP0760) */
 /*
 PayTable  8s-10s  Js+  2PR  3K   STR  FL  FH  4K  SF   RF  (Bonus)
------------------------------------------------------------------
-  ???       1      2    3    4    6    9  12  50 200  1000   ???
+------------------------------------------------------------------
+  ????      1      2    3    4    6    9  12  50 200  1000   ???
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0760_a4v-a6d.u68",   0x00000, 0x10000, CRC(1c26076c) SHA1(612ac66bbb0827b81dc9c6bc23fa7558445481bc) ) /* Game Version: A4V, Library Version: A6D */
@@ -3867,7 +3882,7 @@ ROM_START( pepp0763 ) /* Normal board : 4 of a Kind Bonus Poker (PP0763) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
  P597A      1    1    3    5    8  10  25  40  80  50 250    800
   % Range: 90.2-92.2%  Optimum: 94.2%  Hit Frequency: 42.7%
      Programs Available: PP0763, X000763P
@@ -3891,8 +3906,8 @@ Paytable for Royal Deuces lined up with paytable from PP0775:
 
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
-  ???       1    1    3   4   5   8  25  80 250 250    800
+------------------------------------------------------------
+  ????      1    1    3   4   5   8  25  80 250 250    800
   % Range: 95.1-97.1%  Optimum: 99.1%  Hit Frequency: ???
      Programs Available: PP0775
 */
@@ -3913,8 +3928,8 @@ ROM_START( peip0041 ) /* Normal board : Double Deuces Wild - French (IP0041) */
 /*
                                        w/J     w/oJ
 PayTable   3K  STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------------
- PI13A      1   2    2   3   4  11  16  25 400 250   800
+-----------------------------------------------------------
+ PI13A      1   2    2   3   4  11  16  25 400 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.1%
      Programs Available: IP0041
 
@@ -4344,7 +4359,7 @@ ROM_START( pex0040p ) /* Superboard : Standard Draw Poker (X000040P+XP000038) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   WA       1    2    3    4    5   7  20  50 300   800
+   WA       1    2    3    4    5   7  20  50 300    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
      Programs Available: PP0040, X000040P
 */
@@ -4441,7 +4456,7 @@ ROM_START( pex0054p ) /* Superboard : Deuces Wild Poker (X000054P+XP000038) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P21A      1    2    2   3   4   8  10  20 200 300    800
   % Range: 87.4-89.4%  Optimum: 91.4%  Hit Frequency: 45.3%
      Programs Available: PP0054, X000054P
@@ -4466,7 +4481,7 @@ ROM_START( pex0055p ) /* Superboard : Deuces Wild Poker (X000055P+XP000019) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4491,7 +4506,7 @@ ROM_START( pex0055pa ) /* Superboard : Deuces Wild Poker (X000055P+XP000022) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4516,7 +4531,7 @@ ROM_START( pex0055pb ) /* Superboard : Deuces Wild Poker (X000055P+XP000023) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4541,7 +4556,7 @@ ROM_START( pex0055pc ) /* Superboard : Deuces Wild Poker (X000055P+XP000028) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4566,7 +4581,7 @@ ROM_START( pex0055pd ) /* Superboard : Deuces Wild Poker (X000055P+XP000035) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4591,7 +4606,7 @@ ROM_START( pex0055pe ) /* Superboard : Deuces Wild Poker (X000055P+XP000038) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4616,7 +4631,7 @@ ROM_START( pex0055pf ) /* Superboard : Deuces Wild Poker (X000055P+XP000040) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4641,7 +4656,7 @@ ROM_START( pex0055pg ) /* Superboard : Deuces Wild Poker (X000055P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4666,7 +4681,7 @@ ROM_START( pex0055ph ) /* Superboard : Deuces Wild Poker (X000055P+XP000055) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4691,7 +4706,7 @@ ROM_START( pex0055pi ) /* Superboard : Deuces Wild Poker (X000055P+XP000063) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4716,7 +4731,7 @@ ROM_START( pex0055pj ) /* Superboard : Deuces Wild Poker (X000055P+XP000075) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4741,7 +4756,7 @@ ROM_START( pex0055pk ) /* Superboard : Deuces Wild Poker (X000055P+XP000079) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4766,7 +4781,7 @@ ROM_START( pex0055pl ) /* Superboard : Deuces Wild Poker (X000055P+XP000094) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4791,7 +4806,7 @@ ROM_START( pex0055pm ) /* Superboard : Deuces Wild Poker (X000055P+XP000095) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4816,7 +4831,7 @@ ROM_START( pex0055pn ) /* Superboard : Deuces Wild Poker (X000055P+XP000098) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4841,7 +4856,7 @@ ROM_START( pex0055po ) /* Superboard : Deuces Wild Poker (X000055P+XP000102) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4866,7 +4881,7 @@ ROM_START( pex0055pp ) /* Superboard : Deuces Wild Poker (X000055P+XP000104) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4891,7 +4906,7 @@ ROM_START( pex0055pq ) /* Superboard : Deuces Wild Poker (X000055P+XP000112) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4916,7 +4931,7 @@ ROM_START( pex0055pr ) /* Superboard : Deuces Wild Poker (X000055P+XP000126) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P32A      1    2    2   3   4  10  15  25 200 250    800
   % Range: 90.8-92.8%  Optimum: 94.8%  Hit Frequency: 45.1%
      Programs Available: PP0055, X000055P, PP0723
@@ -4989,7 +5004,7 @@ ROM_START( pex0158p ) /* Superboard : 4 of a Kind Bonus Poker (X000158P+XP000038
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P77A      1    2    3    4    5   8  25  40  80  50 250    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.5%
      Programs Available: PP0158, X000158P
@@ -5063,7 +5078,7 @@ ROM_START( pex0190p ) /* Superboard : Deuces Wild Poker (X000190P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P57A      1    2    3   4   4   8  10  20 200 250    800
   % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.5%
      Programs Available: PP0417, X000417P, X000190P & PP0190 - Non Double-up Only
@@ -5112,7 +5127,7 @@ ROM_START( pex0203p ) /* Superboard : 4 of a Kind Bonus Poker (X000203P+XP000038
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P90A      1    2    3    4    5   7  25  40  80  50 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
@@ -5137,7 +5152,7 @@ ROM_START( pex0224p ) /* Superboard : Deuces Wild Poker (X000224P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P47A      1    2    2   3   4  13  16  22 200 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.9%
      Programs Available: PP0290, X000224P & PP0224 - Non Double-up Only
@@ -5163,7 +5178,7 @@ ROM_START( pex0225p ) /* Superboard : Dueces Joker Wild Poker 1-100 Coins (X0002
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
 PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
---------------------------------------------------------------------
+---------------------------------------------------------------------
   P76N      1    1    3   3   3   6   9   12    25  800  1000  2000
   % Range: 95.1-97.1%  Optimum: 99.1%  Hit Frequency: 50.4%
      Programs Available: PP0431, PP0812, PP0813, X000225P & PP0225 - Non Double-up Only
@@ -5188,7 +5203,7 @@ ROM_START( pex0242p ) /* Superboard : Deuces Wild Poker (X000242P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P56A      1    2    3   3   4   8  10  20 200 250    800
   % Range: 89.4-91.4%  Optimum: 93.4%  Hit Frequency: 45.1%
      Programs Available: PP0242, X000242P
@@ -5213,7 +5228,7 @@ ROM_START( pex0265p ) /* Superboard : 4 of a Kind Bonus Poker (X000265P+XP000038
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
  P101A      1    2    3    4    5   6  25  40  80  50 250    800
   % Range: 92.5-94.5%  Optimum: 96.9%  Hit Frequency: 45.5%
      Programs Available: PP0265, X000265P, PP0403 & PP0410 - Non Double-up Only
@@ -5238,7 +5253,7 @@ ROM_START( pex0291p ) /* Superboard : Deuces Wild Poker (X000291P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P62A      1    2    3   4   4   9  15  25 200 250    800
   % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 44.4%
      Programs Available: PP0418, X000291P & PP0291 - Non Double-up Only
@@ -5263,7 +5278,7 @@ ROM_START( pex0417p ) /* Superboard : Deuces Wild Poker (X000417P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+-----------------------------------------------------------
   P57A      1    2    3   4   4   8  10  20 200 250    800
   % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.5%
      Programs Available: PP0417, X000417P & PP0190 - Non Double-up Only
@@ -5289,7 +5304,7 @@ ROM_START( pex0430p ) /* Superboard : Dueces Joker Wild Poker (X000430P+XP000079
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
 PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
---------------------------------------------------------------------
+---------------------------------------------------------------------
   P73N      1    2    3   3   3   5   8   10    25  800  1000  2000
   % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 50.5%
      Programs Available: PP0430, X000430P
@@ -5410,7 +5425,7 @@ ROM_START( pex0452p ) /* Superboard : Double Deuces Wild Poker (X000452P+XP00003
 /*
                                         w/D     wo/D
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
   P236A     1    2    2   3   4  11  16  25 400 250    800
   % Range: 95.6-97.6%  Optimum: 99.6%  Hit Frequency: 45.1%
      Programs Available: PP0452, X000452P
@@ -5534,7 +5549,7 @@ ROM_START( pex0508p ) /* Superboard : Loose Deuce Deuces Wild Poker (X000508P+XP
 /*
                                        w/D     W/oD
 PayTable   3K  STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
------------------------------------------------------------------
+-----------------------------------------------------------
   P313A     1    2   2   3   4   8  12  25 500 250    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.2%
      Programs Available: PP0508, X000508P
@@ -5659,7 +5674,7 @@ ROM_START( pex0537p ) /* Superboard : Standard Draw Poker (X000537P+XP000038) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
- P259A      1    2    3    4    5   7  35  50 250   800
+ P259A      1    2    3    4    5   7  35  50 250    800
   % Range: 92.2-94.2%  Optimum: 96.2%  Hit Frequency: 45.5%
      Programs Available: PP0537, X000537P
 
@@ -5836,7 +5851,7 @@ ROM_START( pex0763p ) /* Superboard : 4 of a Kind Bonus Poker (X000763P+XP000038
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
  P597A      1    1    3    5    8  10  25  40  80  50 250    800
   % Range: 90.2-92.2%  Optimum: 94.2%  Hit Frequency: 42.7%
      Programs Available: PP0763, X000763P
@@ -6214,7 +6229,7 @@ ROM_START( pex2066p ) /* Superboard : Double Double Bonus Poker (X002066P+XP0000
                                       5-K 2-4     with   with
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 -----------------------------------------------------------------------------
-  P505A     1    1    3   4    6   9  50  80 160   160    400  50 250    800
+  P505A     1    1    3   4    6   9  50  80 160   160   400  50 250    800
   % Range: 95.0-97.0%  Optimum: 99.0%  Hit Frequency: 44.7%
      Programs Available: X002066P
 */
@@ -6241,7 +6256,7 @@ ROM_START( pex2067p ) /* Superboard : Double Double Bonus Poker (X002067P+XP0000
                                       5-K 2-4     with   with
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 -----------------------------------------------------------------------------
-  P505A     1    1    3   4    5   9  50  80 160   160    400  50 250    800
+  P505A     1    1    3   4    5   9  50  80 160   160   400  50 250    800
   % Range: 93.9-95.9%  Optimum: 97.9%  Hit Frequency: 44.8%
      Programs Available: X002067P
 */
@@ -6266,7 +6281,7 @@ ROM_START( pex2068p ) /* Superboard : Double Double Bonus Poker (X002068P+XP0000
                                                    2-4    4A
                                       5-K 2-4      4K    with
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  with A  2-4  SF  RF  (Bonus)
------------------------------------------------------------------------------
+------------------------------------------------------------------------------
   P506A     1    1    3   4    5   8  50  80 160   160    400  50 250    800
   % Range: 92.8-94.8%  Optimum: 96.8%  Hit Frequency: 44.8%
      Programs Available: X002068P
@@ -6321,7 +6336,7 @@ ROM_START( pex2070p ) /* Superboard : Double Double Bonus Poker (X002070P+XP0000
                                       5-K 2-4     with   with
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 -----------------------------------------------------------------------------
-  P508A     1    1    3   4    5   6  50  80 160   160    400  50 250    800
+  P508A     1    1    3   4    5   6  50  80 160   160   400  50 250    800
   % Range: 90.5-92.5%  Optimum: 94.5%  Hit Frequency: 45.0%
      Programs Available: X002070P
 */
@@ -6469,8 +6484,8 @@ ROM_START( pex2241p ) /* Superboard : 4 of a Kind Bonus Poker 1-100 Coins (X0022
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
-  P77A      1    2    3    4    5   8  25  40  80  50 800    800
+------------------------------------------------------------------
+  ????      1    2    3    4    5   8  25  40  80  50 800    800
   % Range: 95.2-97.2%  Optimum: 99.2%  Hit Frequency: 45.5%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6493,8 +6508,8 @@ ROM_START( pex2244p ) /* Superboard : Double Bonus Poker 1-100 Coins (X002244P+X
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
-  P323A     1    1    3    5    7   9  50  80 160  50 800    800
+------------------------------------------------------------------
+  ????      1    1    3    5    7   9  50  80 160  50 800    800
   % Range: 91.2-97.1%  Optimum: 99.1%  Hit Frequency: 43.2%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6517,7 +6532,7 @@ ROM_START( pex2245p ) /* Superboard : Standard Draw Poker (X002245P+XP000055) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   WA       1    2    3    4    5   6  25  50 250    800
+  ????      1    2    3    4    5   6  25  50 800    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
      Programs Available: X002245P
 */
@@ -6541,7 +6556,7 @@ ROM_START( pex2245pa ) /* Superboard : Standard Draw Poker (X002245P+XP000079) *
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   WA       1    2    3    4    5   6  25  50 250    800
+  ????      1    2    3    4    5   6  25  50 800    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
      Programs Available: X002245P
 */
@@ -6564,7 +6579,7 @@ ROM_END
 ROM_START( pex2250p ) /* Superboard : Shockwave Poker (X002250P+XP000050) */
 /*
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
------------------------------------------------------------------
+---------------------------------------------------------
  P598BA     1    1    3   5    8  11  25 100 250    800
   % Range: 94.5-96.5%  Optimum: 98.5%  Hit Frequency: 42.6%
      Programs Available: X002250P
@@ -6588,7 +6603,7 @@ ROM_END
 ROM_START( pex2251p ) /* Superboard : Shockwave Poker (X002251P+XP000050) */
 /*
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
------------------------------------------------------------------
+---------------------------------------------------------
   P719A     1    1    3   5    8  12  25 100 250    800
   % Range: 95.6-97.6%  Optimum: 99.6%  Hit Frequency: 42.6%
      Programs Available: X002251P
@@ -6734,7 +6749,7 @@ ROM_END
 ROM_START( pex2302p ) /* Superboard : Bonus Poker Deluxe (X002302P+XP000038) */
 /*
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
------------------------------------------------------------------
+---------------------------------------------------------
   P902A     1    1    3   4    5   6  80  50 250    800
   % Range: 91.4-93.4%  Optimum: 95.4%  Hit Frequency: 45.2%
      Programs Available: X002302P
@@ -6967,7 +6982,7 @@ ROM_START( pex2440p ) /* Superboard : Deuces Wild Poker (X002440P+XP000053) */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
-----------------------------------------------------------
+------------------------------------------------------------
  P129A      1    2    3   4   4  10  16  25 200 250    800
   % Range: 95.7-97.7%  Optimum: 99.7%  Hit Frequency: 44.3%
      Programs Available: PP0469, X002440P
@@ -6992,7 +7007,7 @@ ROM_START( pex2461p ) /* Superboard : Joker Poker (X002461P+XP000055) */
 /*
                                        w/J     w/oJ
 PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
-----------------------------------------------------------------
+-----------------------------------------------------------
   NCJ       1   2   4    5   8  16 100 100 400 100    800
   % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 30.1%
      Programs Available: X002461P
@@ -7011,6 +7026,236 @@ PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
+ROM_END
+
+ROM_START( pekoc766 ) /* Superboard : Standard Draw Poker (PP0766) English / Spanish - Key On Credit */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    2    3    4    5   8  25  50 300    400
+  % Range: 92.6-94.6%  Optimum: 96.4%  Hit Frequency: ??.?%
+     Programs Available: PP0766 A5W-A6F
+
+Same as US paytable QJ
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0766_a5w-a6f.u67",   0x00000, 0x10000, CRC(e6bfa03b) SHA1(c4a281ab441747db4fefb09f0f07d3718855a9ca) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0766_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc801 ) /* Superboard : 10's or Better (PP0801) English / Spanish - Key On Credit */
+/*
+PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????     1     1    3    4    5   8  25  50 300   1000
+  % Range: 85.2-87.2%  Optimum: 89.2%  Hit Frequency: 49.0%
+     Programs Available: PP0801 A5W-A6F
+
+Same as US paytable P8B
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0801_a5w-a6f.u67",   0x00000, 0x10000, CRC(d026b27a) SHA1(fb54699444b1e1950288881d4c7950980535c0f6) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0801_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc802 ) /* Superboard : Standard Draw Poker (PP0802) English / Spanish - Key On Credit */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    2    3    4    5   6  25  50 250   1000
+  % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
+     Programs Available: PP0802 A5W-A6F
+
+Same as US paytable GA
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0803_a5w-a6f.u67",   0x00000, 0x10000, CRC(93ea790c) SHA1(ec331565c058b173e343a0d3f6c28bab7f0b10d8) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0802_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc803 ) /* Superboard : Joker Poker (PP0830) English / Spanish - Key On Credit */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0803_a5w-a6f.u67",   0x00000, 0x10000, CRC(26ec73b3) SHA1(0f592d21e83b73f37943b80ded6e83ee7b9c3edf) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0803_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc803a ) /* Superboard : Joker Poker (PP0803) English / Spanish - Key On Credit */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0803_a50-a6n.u67",   0x00000, 0x10000, CRC(40c18868) SHA1(d0e899fd09c1b49e2b93671770e4981c0a3a3501) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0803_data_a50-a6n.u66",   0x00000, 0x10000, CRC(eea95084) SHA1(fddf0d645437f606a31f72a56183d9a879b29418) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc804 ) /* Superboard : Bonus poker Deluxe - Key On Credit */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    1    3    4    5   7  80  50 250    800
+  % Range: 92.3-94.3%  Optimum: 96.3%  Hit Frequency: 45.2%
+     Programs Available: PP0804 A5W-A6F
+
+Same as US paytable P253A
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0804_a5w-a6f.u67",   0x00000, 0x10000, CRC(86a1a37b) SHA1(37c29120870e7ac613e4c06999cc52febb3dd3b0) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0804_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc806 ) /* Superboard : Standard Draw Poker - Key On Credit */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    2    3    4    5   6  25  50 250   1000
+  % Range: 91.5-93.5%  Optimum: 95.5%  Hit Frequency: 45.3%
+     Programs Available: PP0806 A5W-A6F
+
+Same as US paytable GB
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0806_a5w-a6f.u67",   0x00000, 0x10000, CRC(299b2f73) SHA1(c0adc3a4b7f3c5a0e99d85be7f77a42fd6fb5160) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0806_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc818 ) /* Superboard : Joker Poker (Aces or Better) - Key On Credit */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0818_a5w-a6f.u67",   0x00000, 0x10000, CRC(38b1f3ca) SHA1(d869fbacdd918b146072ca820530cc041aa54568) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0818_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc819 ) /* Superboard : Bonus poker Deluxe - Key On Credit */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    1    2    4    6   9  60  50 250    800
+  % Range: 83.6-85.6%  Optimum: 87.6%  Hit Frequency: ??.?%
+     Programs Available: PP0818 A5W-A6F
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0819_a5w-a6f.u67",   0x00000, 0x10000, CRC(f84a0415) SHA1(b501cf3a165b65f8ad2d908c6cb70ea86c0c41e7) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0819_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc825 ) /* Superboard : White Hot Aces - Key On Credit */
+/*
+                                      5-K 2-4
+PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
+-----------------------------------------------------------------
+  ????      1    1    3   4    5  10  50 120 240  80 250    800
+  % Range: 91.4-93.4%  Optimum: 95.4%  Hit Frequency: 44.7%
+     Programs Available: PP0825 A59-A7C
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0825_a59-a7c.u67",   0x00000, 0x10000, CRC(f1b7b2e0) SHA1(afa2236541230f546ae55093b4f0389691467c97) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0825_data_a59-a7c.u66",   0x00000, 0x10000, CRC(f343c99b) SHA1(9cf14c6f281d77485ef7244bd5bd64042cf5a85c) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
 ROM_END
 
 ROM_START( pex0838s ) /* Superboard : Five Times Pay Slots (X000835S+XS000002) - 2 Coins Max / 1 Pay Line */
@@ -7749,6 +7994,18 @@ GAMEL(1995, pex2377p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2420p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002420P+XP000064) Deuces Wild Bonus Poker - French", 0, layout_pe_poker )
 GAMEL(1995, pex2440p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002440P+XP000053) Deuces Wild Poker",  0, layout_pe_poker )
 GAMEL(1995, pex2461p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002461P+XP000055) Joker Poker (Two Pair or Better)", 0, layout_pe_poker )
+
+/* Superboard : Poker (Key On Credit) */
+GAMEL(1995, pekoc766,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0766 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
+GAMEL(1995, pekoc801,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0801 A5W-A6F) 10's or Better",       0, layout_pe_poker )
+GAMEL(1995, pekoc802,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0802 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
+GAMEL(1995, pekoc803,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0803 A5W-A6F) Joker Poker",          0, layout_pe_poker )
+GAMEL(1995, pekoc803a, pekoc803,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0803 A50-A6N) Joker Poker",          0, layout_pe_poker )
+GAMEL(1995, pekoc804,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0804 A5W-A6F) Bonus Poker Deluxe",   0, layout_pe_poker )
+GAMEL(1995, pekoc806,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0806 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
+GAMEL(1995, pekoc818,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0818 A5W-A6F) Joker Poker (Aces or Better)", 0, layout_pe_poker )
+GAMEL(1995, pekoc819,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0819 A5W-A6F) Bonus Poker Deluxe",   0, layout_pe_poker )
+GAMEL(1995, pekoc825,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0825 A59-A7C) White Hot Aces",       0, layout_pe_poker )
 
 /* Superboard : Multi-Poker */
 GAMEL(1995, pexm001p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00001P+XMP00003) Multi-Poker",        0, layout_pe_poker )
