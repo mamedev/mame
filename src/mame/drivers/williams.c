@@ -509,32 +509,23 @@
 
 static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8, williams_state )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
-	/* range from 0xc000-0xcfff is mapped programmatically below */
-	AM_RANGE(0xc000, 0xc00f) AM_SHARE("paletteram")
-	AM_RANGE(0xc400, 0xc4ff) AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("bankc000", address_map_bank_device, amap8)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(defender_bank_select_w)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-void williams_state::defender_install_io_space(address_space &space)
-{
-	pia6821_device *pia_0 = space.machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = space.machine().device<pia6821_device>("pia_1");
-
-	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	space.install_write_bank    (0xc000, 0xc00f, 0, 0x03e0, "bank4");
-	space.install_write_handler    (0xc010, 0xc01f, 0, 0x03e0, write8_delegate(FUNC(williams_state::defender_video_control_w),this));
-	space.install_write_handler    (0xc3ff, 0xc3ff, write8_delegate(FUNC(williams_state::williams_watchdog_reset_w),this));
-	space.install_read_bank(0xc400, 0xc4ff, 0, 0x0300, "bank3");
-	space.install_write_handler(0xc400, 0xc4ff, 0, 0x0300, write8_delegate(FUNC(williams_state::williams_cmos_w),this));
-	space.install_read_handler     (0xc800, 0xcbff, 0, 0x03e0, read8_delegate(FUNC(williams_state::williams_video_counter_r),this));
-	space.install_readwrite_handler(0xcc00, 0xcc03, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_1), write8_delegate(FUNC(pia6821_device::write), pia_1));
-	space.install_readwrite_handler(0xcc04, 0xcc07, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_0), write8_delegate(FUNC(pia6821_device::write), pia_0));
-	membank("bank3")->set_base(m_nvram);
-	membank("bank4")->set_base(m_generic_paletteram_8);
-}
+static ADDRESS_MAP_START( defender_bankc000_map, AS_PROGRAM, 8, williams_state )
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x03e0) AM_WRITEONLY AM_SHARE("paletteram")
+	AM_RANGE(0x03ff, 0x03ff) AM_WRITE(williams_watchdog_reset_w)
+	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x03e0) AM_WRITE(defender_video_control_w)
+	AM_RANGE(0x0400, 0x04ff) AM_MIRROR(0x0300) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0x0800, 0x0bff) AM_READ(williams_video_counter_r)
+	AM_RANGE(0x0c00, 0x0c03) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0x0c04, 0x0c07) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
+	AM_RANGE(0x1000, 0x9fff) AM_ROM AM_REGION("maincpu", 0x10000)
+	AM_RANGE(0xa000, 0xffff) AM_NOP
+ADDRESS_MAP_END
 
 
 
@@ -1432,17 +1423,17 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( defender, williams_state )
+static MACHINE_CONFIG_START( williams, williams_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(defender_map)
+	MCFG_CPU_PROGRAM_MAP(williams_map)
 
 	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
-	MCFG_CPU_PROGRAM_MAP(defender_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
+	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
@@ -1451,7 +1442,7 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
@@ -1480,27 +1471,35 @@ static MACHINE_CONFIG_START( defender, williams_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jin, defender ) // needs a different screen size or the credit text is clipped
-	/* basic machine hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 315, 7, 245)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( williams, defender )
+static MACHINE_CONFIG_DERIVED( defender, williams )
 
 	/* basic machine hardware */
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(williams_map)
+	MCFG_CPU_PROGRAM_MAP(defender_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PROGRAM_MAP(defender_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
+	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(defender_bankc000_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+
+	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
+
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
+	MCFG_SCREEN_VISIBLE_AREA(12, 304-1, 7, 247-1)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( jin, defender ) // needs a different screen size or the credit text is clipped
+	/* basic machine hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 315, 7, 247-1)
 MACHINE_CONFIG_END
 
 
@@ -1538,24 +1537,6 @@ static MACHINE_CONFIG_DERIVED( lottofun, williams )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( alienar, defender )
-
-	/* basic machine hardware */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(williams_map)
-
-	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
-
-	/* pia */
-	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( sinistar, williams )
 
 	/* basic machine hardware */
@@ -1582,7 +1563,7 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 8, 239-1)
+	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 8, 240-1)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
@@ -3045,8 +3026,8 @@ GAME( 1983, blaster,    0,        blaster,        blaster, blaster_state,   blas
 GAME( 1983, blastero,   blaster,  blaster,        blaster, blaster_state,   blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", GAME_SUPPORTS_SAVE )
 GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", GAME_SUPPORTS_SAVE ) // mono sound
 GAME( 1985, spdball,    0,        spdball,        spdball, williams_state,  spdball,  ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1985, alienar,    0,        alienar,        alienar, williams_state,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", GAME_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  alienar,        alienar, williams_state,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", GAME_SUPPORTS_SAVE )
+GAME( 1985, alienar,    0,        williams_muxed, alienar, williams_state,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", GAME_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  williams_muxed, alienar, williams_state,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", GAME_SUPPORTS_SAVE )
 GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", GAME_SUPPORTS_SAVE )
 
 /* 2nd Generation Williams hardware with tilemaps */

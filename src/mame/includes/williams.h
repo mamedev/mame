@@ -18,6 +18,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_bankc000(*this, "bankc000"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram") { }
@@ -42,7 +43,6 @@ public:
 	UINT16 m_blitter_clip_address;
 	UINT8 m_blitter_window_enable;
 	UINT8 m_cocktail;
-	UINT8 m_vram_bank;
 	UINT8 m_port_select;
 	rgb_t *m_palette_lookup;
 	UINT8 m_blitterram[8];
@@ -94,13 +94,11 @@ public:
 	DECLARE_READ8_MEMBER(williams_input_port_49way_0_5_r);
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 
-	void defender_postload();
 	void state_save_register();
 	void create_palette_lookup();
 	void blitter_init(int blitter_config, const UINT8 *remap_prom);
 	inline void blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte);
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
-	void defender_install_io_space(address_space &space);
 
 	DECLARE_WRITE_LINE_MEMBER(williams_main_irq);
 	DECLARE_WRITE_LINE_MEMBER(williams_main_firq);
@@ -108,6 +106,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<address_map_bank_device> m_bankc000;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
@@ -129,7 +128,8 @@ public:
 
 	rgb_t m_blaster_color0;
 	UINT8 m_blaster_video_control;
-	UINT8 m_blaster_bank;
+	UINT8 m_vram_bank;
+	UINT8 m_rom_bank;
 
 	DECLARE_WRITE8_MEMBER(blaster_vram_select_w);
 	DECLARE_WRITE8_MEMBER(blaster_bank_select_w);
