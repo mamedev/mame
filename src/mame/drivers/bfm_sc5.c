@@ -17,6 +17,7 @@
 #include "machine/mcf5206e.h"
 #include "bfm_sc5.lh"
 #include "video/awpvid.h"
+#include "bfm_sc45_helper.h"
 
 
 

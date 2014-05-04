@@ -932,6 +932,7 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc5sw.o \
 	$(DRIVERS)/bfm_ad5.o \
 	$(DRIVERS)/bfm_ad5sw.o \
+	$(DRIVERS)/bfm_sc45_helper.o \
 	$(DRIVERS)/bfm_swp.o \
 	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
@@ -2496,7 +2497,8 @@ $(DRIVERS)/bfm_sc2.o:   $(LAYOUT)/sc2_vfd.lh \
 			$(LAYOUT)/sltblgtk.lh
 
 $(DRIVERS)/bfm_sc4.o:   $(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh
+			$(LAYOUT)/sc4_dmd.lh \
+			$(LAYOUT)/sc4dnd.lh
 
 $(DRIVERS)/bfm_sc4h.o:  $(LAYOUT)/bfm_sc4.lh \
 			$(LAYOUT)/sc4_dmd.lh
