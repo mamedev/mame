@@ -45,18 +45,18 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_READ8_MEMBER(port02_r);
-	DECLARE_WRITE8_MEMBER(port60_w);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_READ8_MEMBER(serial_dsr_r);
+	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_READ8_MEMBER(serial_rx_r);
+	DECLARE_WRITE8_MEMBER(display_ctrl_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(port81_w);
-	DECLARE_WRITE8_MEMBER(port82_w);
-	DECLARE_WRITE8_MEMBER(port84_w);
-	DECLARE_WRITE8_MEMBER(port86_w);
-	DECLARE_WRITE8_MEMBER(portbb_w);
-	DECLARE_WRITE8_MEMBER(porte0_w);
+	DECLARE_WRITE8_MEMBER(serial_tx_w);
+	DECLARE_WRITE8_MEMBER(serial_dtr_w);
+	DECLARE_WRITE8_MEMBER(serial_rts_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(irqctrl_w);
+	DECLARE_WRITE8_MEMBER(memmap_w);
 	DECLARE_PALETTE_INIT(hunter2);
 	DECLARE_DRIVER_INIT(hunter2);
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
@@ -97,22 +97,18 @@ static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write)
-//  AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-//  AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
-//  AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-//  AM_RANGE(0x03, 0x1F) AM_WRITENOP
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(display_ctrl_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(port81_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(port82_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE(port84_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(port86_w)
-	AM_RANGE(0xbb, 0xbb) AM_WRITE(portbb_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(serial_tx_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(serial_dtr_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE(serial_rts_w)
+	AM_RANGE(0x86, 0x86) AM_WRITE(speaker_w)
+	AM_RANGE(0xbb, 0xbb) AM_WRITE(irqctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(memmap_w)
 ADDRESS_MAP_END
 
 
@@ -189,7 +185,7 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 INPUT_PORTS_END
 
-READ8_MEMBER( hunter2_state::port00_r )
+READ8_MEMBER( hunter2_state::keyboard_r )
 {
 	UINT8 i,data = 0xff;
 	for (i = 0; i < 7; i++)
@@ -201,11 +197,10 @@ READ8_MEMBER( hunter2_state::port00_r )
 			data &= ioport(kbdrow)->read();
 		}
 	}
-	//if (data < 0xff) printf("%X ",data);
 	return data;
 }
 
-READ8_MEMBER( hunter2_state::port01_r )
+READ8_MEMBER( hunter2_state::serial_dsr_r )
 {
 	UINT8 res = 0x00;
 
@@ -215,13 +210,13 @@ READ8_MEMBER( hunter2_state::port01_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::port01_w )
+WRITE8_MEMBER( hunter2_state::keyboard_w )
 {
 	m_keydata = data;
 	//logerror("Key row select %02x\n",data);
 }
 
-READ8_MEMBER( hunter2_state::port02_r )
+READ8_MEMBER( hunter2_state::serial_rx_r )
 {
 	UINT8 res = 0x28;
 
@@ -233,7 +228,7 @@ READ8_MEMBER( hunter2_state::port02_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::port60_w )
+WRITE8_MEMBER( hunter2_state::display_ctrl_w )
 {
 /* according to the website,
 Bit 2: Backlight toggle
@@ -246,25 +241,25 @@ WRITE8_MEMBER( hunter2_state::port80_w )
 {
 }
 
-WRITE8_MEMBER( hunter2_state::port81_w )
+WRITE8_MEMBER( hunter2_state::serial_tx_w )
 {
 	m_rs232->write_txd(data & 0x01);
 //  logerror("TXD write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::port82_w )
+WRITE8_MEMBER( hunter2_state::serial_dtr_w )
 {
 	m_rs232->write_dtr(data & 0x01);
 //  logerror("DTR write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::port84_w )
+WRITE8_MEMBER( hunter2_state::serial_rts_w )
 {
 	m_rs232->write_rts(data & 0x01);
 //  logerror("RTS write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::port86_w )
+WRITE8_MEMBER( hunter2_state::speaker_w )
 {
 	m_speaker->level_w(BIT(data, 0));
 }
@@ -275,7 +270,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER( hunter2_state::portbb_w )
+WRITE8_MEMBER( hunter2_state::irqctrl_w )
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -297,7 +292,7 @@ data   bank0    bank1    bank2
 ....
 8F     61       62       63
 */
-WRITE8_MEMBER( hunter2_state::porte0_w )
+WRITE8_MEMBER( hunter2_state::memmap_w )
 {
 	if (data < 0x0a)
 	{
@@ -306,7 +301,7 @@ WRITE8_MEMBER( hunter2_state::porte0_w )
 		m_bank3->set_bank(2 + data);
 	}
 	else
-	if ((data >= 0x80))
+	if (data >= 0x80)
 	{
 		UINT8 bank = data & 0x0f;
 		m_bank1->set_bank(16 + (bank*3));
@@ -355,7 +350,7 @@ WRITE_LINE_MEMBER(hunter2_state::cts_w)
 	if(BIT(m_irq_mask, 1))
 	{
 		m_maincpu->set_input_line(NSC800_RSTC, state);
-		printf("CTS: RSTC set %i\n",state);
+		popmessage("CTS: RSTC set %i\n",state);
 	}
 }
 
@@ -367,7 +362,7 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
+	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
 	MCFG_CPU_IO_MAP(hunter2_io)
 
@@ -391,17 +386,15 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
-	// this is all guess
+	// this is all a guess
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-//MCFG_TIMER_DRIVER_ADD_PERIODIC("hunter_a", hunter2_state, a_timer, attotime::from_hz(61))
-
 	MCFG_NSC810_ADD("iotimer",XTAL_4MHz,XTAL_4MHz)
-	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,port00_r))
-	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,port01_r))
-	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,port01_w))
-	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,port02_r))
+	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,keyboard_r))
+	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,serial_dsr_r))
+	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,keyboard_w))
+	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,serial_rx_r))
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
 
