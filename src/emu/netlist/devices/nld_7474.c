@@ -7,7 +7,8 @@
 
 ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
 {
-	static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
+    // 0: High-to-low 40 ns, 1: Low-to-high 25 ns
+	static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 	OUTLOGIC(m_Q, stateQ, delay[stateQ]);
 	OUTLOGIC(m_QQ, stateQQ, delay[stateQQ]);
 }
@@ -27,6 +28,7 @@ NETLIB_UPDATE(7474)
 	{
 		sub.newstate(1, 1);
 		sub.m_CLK.inactivate();
+		m_D.inactivate();
 	}
 	if (!INPLOGIC(m_PREQ))
 	{
@@ -84,7 +86,7 @@ NETLIB_RESET(7474sub)
 	m_nextD = 0;
 	/* FIXME: required by pong doubles - need a mechanism to set this from netlist */
 	m_Q.initial(1);
-	m_QQ.initial(0);
+	m_QQ.initial(1);
 }
 
 NETLIB_START(7474_dip)
