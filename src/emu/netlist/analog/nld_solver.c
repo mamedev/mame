@@ -841,17 +841,18 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		m_mat_solvers.add(ms);
 
-		SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), (*groups[i].first())->m_head->name().cstr()));
-		SOLVER_VERBOSE_OUT(("       has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic"));
-		SOLVER_VERBOSE_OUT(("       has %s elements\n", ms->is_timestep() ? "timestep" : "no timestep"));
+        netlist().log("Solver %s", ms->name().cstr());
+        netlist().log("       # %d ==> %d nets %s", i, groups[i].count(), (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		netlist().log("       has %s elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
+		netlist().log("       has %s elements", ms->is_timestep() ? "timestep" : "no timestep");
 		for (int j=0; j<groups[i].count(); j++)
 		{
-			SOLVER_VERBOSE_OUT(("Net %d: %s\n", j, groups[i][j]->name().cstr()));
+		    netlist().log("Net %d: %s", j, groups[i][j]->name().cstr());
 			netlist_net_t *n = groups[i][j];
 			for (int k = 0; k < n->m_core_terms.count(); k++)
 			{
-			    ATTR_UNUSED netlist_core_terminal_t *p = n->m_core_terms[k];
-				SOLVER_VERBOSE_OUT(("   %s\n", p->name().cstr()));
+			    const netlist_core_terminal_t *p = n->m_core_terms[k];
+			    netlist().log("   %s", p->name().cstr());
 			}
 		}
 	}

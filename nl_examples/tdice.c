@@ -2,8 +2,12 @@
 // copyright-holders:DICE Team,couriersud
 /*
  * Changelog:
- *      - Original version imported from DICE
+ *      - Added discrete paddle potentiometers (couriersud)
  *      - Changes made to run in MAME (couriersud)
+ *      - Original version imported from DICE
+ *
+ * TODO:
+ *      - implement trimmers
  *
  * The MAME team has asked for and received written confirmation from the
  * author of DICE to use, modify and redistribute code under
@@ -68,11 +72,11 @@
 
 static Mono555Desc a3_555_desc(K_OHM(100.0), U_FARAD(0.1));
 
-static Mono555Desc a10_555_desc(K_OHM(70.0), U_FARAD(0.1));
-static Mono555Desc b10_555_desc(K_OHM(70.0), U_FARAD(0.1));
+static Mono555Desc a10_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
+static Mono555Desc b10_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
 
-static Mono555Desc b9a_555_desc(K_OHM(70.0), U_FARAD(0.1));
-static Mono555Desc b9b_555_desc(K_OHM(70.0), U_FARAD(0.1));
+static Mono555Desc b9a_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
+static Mono555Desc b9b_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
 
 static Mono555Desc f5_555_desc(K_OHM(330.0), U_FARAD(4.7));
 static Mono555Desc g5_555_desc(K_OHM(220.0), U_FARAD(1.0));
@@ -137,6 +141,18 @@ CIRCUIT_LAYOUT( pongdoubles )
     //CHIP("B10", 555_Mono, &b10_555_desc)
     CHIP_555_Mono(B10, &b10_555_desc)
 
+    // NETLIST - analog start
+    POT(B10_POT, RES_K(1))     // This is a guess!!
+    PARAM(B10_POT.DIALLOG, 1)  // Log Dial ...
+    RES(B10_RPRE, 470)
+
+    NET_C(B10_POT.1, V5)
+    NET_C(B10_POT.3, GND)
+    NET_C(B10_POT.2, B10_RPRE.1)
+    NET_C(B10_RPRE.2, B10.5)
+    // NETLIST - analog end
+
+
 	CHIP("C10", 7404)
 	CHIP("A7", 7493)
 	CHIP("B8", 7400)
@@ -144,7 +160,19 @@ CIRCUIT_LAYOUT( pongdoubles )
     
     //CHIP("A10", 555_Mono, &a10_555_desc)
     CHIP_555_Mono(A10, &a10_555_desc)
-	CHIP("A9", 7493)
+
+    // NETLIST - analog start
+    POT(A10_POT, RES_K(1))     // This is a guess!!
+    PARAM(A10_POT.DIALLOG, 1)  // Log Dial ...
+    RES(A10_RPRE, 470)
+
+    NET_C(A10_POT.1, V5)
+    NET_C(A10_POT.3, GND)
+    NET_C(A10_POT.2, A10_RPRE.1)
+    NET_C(A10_RPRE.2, A10.5)
+    // NETLIST - analog end
+
+    CHIP("A9", 7493)
 
 	CHIP("H4", 7474)
 	
@@ -208,8 +236,31 @@ CIRCUIT_LAYOUT( pongdoubles )
 
     //CHIP("B9A", 555_Mono, &b9a_555_desc)
     CHIP_555_Mono(B9A, &b9a_555_desc)
+
+    // NETLIST - analog start
+    POT(B9A_POT, RES_K(1))     // This is a guess!!
+    PARAM(B9A_POT.DIALLOG, 1)  // Log Dial ...
+    RES(B9A_RPRE, 470)
+
+    NET_C(B9A_POT.1, V5)
+    NET_C(B9A_POT.3, GND)
+    NET_C(B9A_POT.2, B9A_RPRE.1)
+    NET_C(B9A_RPRE.2, B9A.5)
+    // NETLIST - analog end
+
     //CHIP("B9B", 555_Mono, &b9b_555_desc)
     CHIP_555_Mono(B9B, &b9b_555_desc)
+
+    // NETLIST - analog start
+    POT(B9B_POT, RES_K(1))     // This is a guess!!
+    PARAM(B9B_POT.DIALLOG, 1)  // Log Dial ...
+    RES(B9B_RPRE, 470)
+
+    NET_C(B9B_POT.1, V5)
+    NET_C(B9B_POT.3, GND)
+    NET_C(B9B_POT.2, B9B_RPRE.1)
+    NET_C(B9B_RPRE.2, B9B.5)
+    // NETLIST - analog end
 
     CHIP_SERIES_RC(C33, &c33_desc)
 
@@ -235,11 +286,11 @@ CIRCUIT_LAYOUT( pongdoubles )
 #endif
 
     //CHIP("COIN", COIN_INPUT)
-    CHIP_INPUT(COIN)
+    CHIP_INPUT_ACTIVE_LOW(COIN)
     //CHIP("LATCH", LATCH)
     CHIP_LATCH(LATCH)
     //CHIP("START", START_INPUT)
-    CHIP_INPUT(START)
+    CHIP_INPUT_ACTIVE_HIGH(START)
     //CHIP("DIPSW1", DIPSWITCH, &dipswitch1_desc)
     SWITCH2(DIPSW1)
     SWITCH2(DIPSW2)
