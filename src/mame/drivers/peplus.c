@@ -1329,6 +1329,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", peplus)
 	MCFG_PALETTE_ADD("palette", 16*16*2)
+	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
