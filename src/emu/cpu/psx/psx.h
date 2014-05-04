@@ -136,6 +136,8 @@ enum
 class psxcpu_state
 {
 public:
+	virtual ~psxcpu_state() {};
+
 	virtual UINT32 pc() = 0;
 	virtual UINT32 delayr() = 0;
 	virtual UINT32 delayv() = 0;
@@ -150,6 +152,7 @@ class psxcpu_device : public cpu_device,
 public:
 	// construction/destruction
 	psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~psxcpu_device() {};
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_gpu_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(object); }

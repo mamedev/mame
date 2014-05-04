@@ -65,7 +65,7 @@ March 2013 NPW:
 //**************************************************************************
 
 // turn off 'unreferenced label' errors
-#ifdef __GNUC__
+#if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)
 #pragma GCC diagnostic ignored "-Wunused-label"
 #endif
 #ifdef _MSC_VER
