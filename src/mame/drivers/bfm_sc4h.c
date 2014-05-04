@@ -166,7 +166,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 							if (mem_mask&0xff00)
 							{
 								retvalue |= (sec.read_data_line() << (6+8));
-								retvalue |= 0xbf00; // coin?
+								retvalue |= ioport("IN-COIN")->read() << 8; // coin?
 								//printf("%08x maincpu read access offset %08x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, mem_mask, cs);
 							}
 							return retvalue;
@@ -1052,6 +1052,14 @@ INPUT_PORTS_START( sc4_raw ) // completley unmapped, but named inputs for all th
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT(           0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN-COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // 1 PND
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // 50p
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) // 20p
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) // 10p
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) // ??
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) // 5p
 INPUT_PORTS_END
 
 
