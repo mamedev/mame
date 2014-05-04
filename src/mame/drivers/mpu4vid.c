@@ -2062,8 +2062,8 @@ ROM_START( v4vgpok )
 	ROM_LOAD16_BYTE("video-8.bin",  0x060001, 0x010000,  CRC(076efdc8) SHA1(bef0a1d8f0e7486ee5dc7407ce5c96854cefa5cf))
 
 	/*characteriser chip*/
-	ROM_REGION( 0x116, "plds", 0 )
-	ROM_LOAD( "ic18-palce16v8h.bin", 0x0000, 0x0116, CRC(f144738a) SHA1(8e563aaff07ad23864e3019737cbdf4490b70d8f) )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "ic18-palce16v8h.bin", 0x0000, 0x0117, CRC(f144738a) SHA1(8e563aaff07ad23864e3019737cbdf4490b70d8f) )
 ROM_END
 
 
