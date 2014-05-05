@@ -454,7 +454,7 @@ public:
 	required_device<midway_ioasic_device> m_ioasic;
 	galileo_data m_galileo;
 	widget_data m_widget;
-	device_t *m_voodoo;
+	voodoo_device *m_voodoo;
 	UINT8 m_voodoo_stalled;
 	UINT8 m_cpu_stalled_on_voodoo;
 	UINT32 m_cpu_stalled_offset;
@@ -555,7 +555,7 @@ void seattle_state::machine_start()
 {
 	int index;
 
-	m_voodoo = machine().device("voodoo");
+	m_voodoo = machine().device<voodoo_device>("voodoo");
 
 	/* allocate timers for the galileo */
 	m_galileo.timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
@@ -1066,7 +1066,7 @@ void seattle_state::galileo_perform_dma(address_space &space, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(m_voodoo, space, (dstaddr & 0xffffff) / 4, space.read_dword(srcaddr), 0xffffffff);
+				m_voodoo->voodoo_w(space, (dstaddr & 0xffffff) / 4, space.read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1350,7 +1350,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 	/* if we're not stalled, just write and get out */
 	if (!m_voodoo_stalled)
 	{
-		voodoo_w(m_voodoo, space, offset, data, mem_mask);
+		m_voodoo->voodoo_w(space, offset, data, mem_mask);
 		return;
 	}
 
@@ -1417,7 +1417,7 @@ WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
 			if (m_cpu_stalled_on_voodoo)
 			{
 				address_space &space = m_maincpu->space(AS_PROGRAM);
-				voodoo_w(m_voodoo, space, m_cpu_stalled_offset, m_cpu_stalled_data, m_cpu_stalled_mem_mask);
+				m_voodoo->voodoo_w(space, m_cpu_stalled_offset, m_cpu_stalled_data, m_cpu_stalled_mem_mask);
 			}
 			m_cpu_stalled_on_voodoo = FALSE;
 
@@ -1782,7 +1782,7 @@ READ32_MEMBER(seattle_state::seattle_ide_r)
 static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase") // wg3dh only has 4MB; sfrush, blitz99 8MB
-	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD("voodoo", voodoo_device, voodoo_r) AM_WRITE(seattle_voodoo_w)
 	AM_RANGE(0x0a0001f0, 0x0a0001f7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read_cs0, write_cs0)
 	AM_RANGE(0x0a0003f0, 0x0a0003f7) AM_READ(seattle_ide_r) AM_DEVWRITE("ide", bus_master_ide_controller_device, write_cs1)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP                     // IDE-related, but annoying

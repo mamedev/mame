@@ -206,7 +206,8 @@ public:
 		m_k001005(*this, "k001005"),
 		m_k001006_1(*this, "k001006_1"),
 		m_k001006_2(*this, "k001006_2"),
-		m_generic_paletteram_32(*this, "paletteram") { }
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_konppc(*this, "konppc") { }
 
 
 	required_device<cpu_device> m_maincpu;
@@ -222,6 +223,7 @@ public:
 	optional_device<k001006_device> m_k001006_1;
 	optional_device<k001006_device> m_k001006_2;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_device<konppc_device> m_konppc;
 
 	UINT32 *m_sharc_dataram;
 	UINT8 m_led_reg0;
@@ -404,7 +406,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)    /* CG Board 0 IRQ Ack */
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-			set_cgboard_id((data >> 4) & 3);
+			m_konppc->set_cgboard_id((data >> 4) & 3);
 			m_out4->write(data, 0xff);
 			osd_printf_debug("System register 1 = %02X\n", data);
 			break;
@@ -467,10 +469,10 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE(ccu_r, ccu_w)
 	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x740a0000, 0x740a3fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)        /* 21N 21K 23N 23K */
-	AM_RANGE(0x78010000, 0x7801ffff) AM_WRITE_LEGACY(cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)        /* 21N 21K 23N 23K */
+	AM_RANGE(0x78010000, 0x7801ffff) AM_DEVWRITE("konppc", konppc_device, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
-	AM_RANGE(0x780c0000, 0x780c0007) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0007) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)               /* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)      /* LANC Buffer RAM (27E) */
@@ -493,11 +495,11 @@ static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_device, tile_r, tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_device, char_r, char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)      /* 21N 21K 23N 23K */
-	AM_RANGE(0x78010000, 0x7801ffff) AM_MIRROR(0x80000000) AM_WRITE_LEGACY(cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)      /* 21N 21K 23N 23K */
+	AM_RANGE(0x78010000, 0x7801ffff) AM_MIRROR(0x80000000) AM_DEVWRITE("konppc", konppc_device, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001006_2", k001006_device, read, write)
-	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)             /* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)    /* LANC Buffer RAM (27E) */
@@ -551,10 +553,10 @@ WRITE32_MEMBER(zr107_state::dsp_dataram_w)
 }
 
 static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, zr107_state )
-	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
+	AM_RANGE(0x400000, 0x41ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_DEVREADWRITE("k001005", k001005_device, read, write)
-	AM_RANGE(0x700000, 0x7000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
+	AM_RANGE(0x700000, 0x7000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -822,6 +824,10 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
 	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	
+	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
+	MCFG_KONPPC_CGBOARD_NUMBER(1)
+	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_ZR107)
 MACHINE_CONFIG_END
 
 
@@ -899,6 +905,10 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
 	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	
+	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
+	MCFG_KONPPC_CGBOARD_NUMBER(1)
+	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_GTICLUB)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -912,13 +922,11 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 
 DRIVER_INIT_MEMBER(zr107_state,zr107)
 {
-	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_ZR107);
 	init_common();
 }
 
 DRIVER_INIT_MEMBER(zr107_state,jetwave)
 {
-	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_GTICLUB);
 	init_common();
 }
 

@@ -821,9 +821,9 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 static ADDRESS_MAP_START( magictg_map, AS_PROGRAM, 32, magictg_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8MB RAM
 	AM_RANGE(0x00800000, 0x0081003f) AM_RAM // ?
-	AM_RANGE(0x0a000000, 0x0affffff) AM_DEVREADWRITE_LEGACY("voodoo_0", voodoo_r, voodoo_w)
+	AM_RANGE(0x0a000000, 0x0affffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
 #if defined(USE_TWO_3DFX)
-	AM_RANGE(0x0b000000, 0x0bffffff) AM_DEVREADWRITE_LEGACY("voodoo_1", voodoo_r, voodoo_w)
+	AM_RANGE(0x0b000000, 0x0bffffff) AM_DEVREADWRITE("voodoo_1", voodoo_device, voodoo_r, voodoo_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(zr36120_r, zr36120_w)
 #else
 	AM_RANGE(0x0b000000, 0x0b000fff) AM_READWRITE(zr36120_r, zr36120_w)
