@@ -19,7 +19,6 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/flt_rc.h"
 #include "includes/popeye.h"
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
