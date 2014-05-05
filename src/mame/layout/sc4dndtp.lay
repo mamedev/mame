@@ -1,57 +1,57 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 <element name="SteppersReel1" defstate="0">
-<reel stateoffset="45748" symbollist="bell,cherry,blue7  sym,melon,single bar,plum,triple bar,lemon,red7,cherry,melon  sym,plum,double bar,cherry,blue7,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="bell,grape + 1,grape+red,red7,grape + 2,red7+red,grape,melon,melon,lemon + 1,lemon,cherry,lemon,cherry,cherry + 2,cherry"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
 <element name="SteppersReel2" defstate="0">
-<reel stateoffset="45748" symbollist="bell,cherry,red7,melon,sbar   sym,plum,triple bar,lemon,blue7,cherry,melon,plum,dbar   sym,cherry,red7,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="bell + 1,lemon,wild+red,cherry + 1,cherry,red7,grape,grape + 2,grape,cherry,melon + 3,cherry,cherry,wild+red,lemon,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
 <element name="SteppersReel3" defstate="0">
-<reel stateoffset="45748" symbollist="bell,cherry,blue7,melon,single bar,plum,triple bar,lemon  sym,red7,cherry,melon,plum,double bar,cherry,blue7,lemon  sym"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="bell,lemon+red,lemon,lemon,grape + 2,grape,grape,cherry + 2,cherry,cherry+red,melon,melon,cherry + 1,lemon,red7 + 4,red7"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
 <element name="SteppersReel4" defstate="0">
-<reel stateoffset="45748" symbollist="bell,cherry,blue7,melon,single bar,plum   sym,triple bar,lemon,blank,cherry,melon,plum,dbar   sym,cherry,red7,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="12,11,10,9,8,7,6,5,4,3,2,1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
 <element name="SteppersReel5" defstate="0">
-<reel stateoffset="45748" symbollist="num 12,num 11,num 10,num 9,num 8,num 7,num 6,num 5,num 4,num 3,num 2,num 1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="1.50PND,10p,20p,5PND,1p,1PND,1.20PND,80p,meg streak,2.50PND,3PND,3.50PND,4PND,4.50PND,50p,2PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
 <element name="SteppersReel6" defstate="0">
-<reel stateoffset="45748" symbollist="10p,20p,50p,4PND,1p,2PND,3PND,1PND,meg streak,1.50PND,2.50PND,3.50PND,5PND,30p,40p,80p"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="4PND,10p,20p,25PND,1p,2PND,3PND,1PND,meg streak,6PND,7PND,8PND,10PND,15PND,50p,5PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
 <element name="SteppersReel7" defstate="0">
-<reel stateoffset="45748" symbollist="4PND,10p,20p,50p,1p,2PND,3PND,1PND,meg streak,6PND,7PND,8PND,10PND,15PND,25PND,5PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+<reel stateoffset="45748" symbollist="4PND,10p,20p,35PND,1p,2PND,3PND,1PND,meg streak,6PND,8PND,10PND,15PND,20PND,50p,5PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
 </element>
-<element name="lamplabelel0"><text string="cancel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel0"><text string="canc/coll"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel1"><text string="hold1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel2"><text string="hold2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel3"><text string="hold3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel4"><text string="hold4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel5"><text string="chnge stk"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel6"><text string="collect"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel7"><text string="transfer"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel8"><text string="cash bust"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel9"><text string="4 nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel10"><text string="3 nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel11"><text string="2 nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel12"><text string="1 nudge"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel2"><text string="hold2/hi"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel3"><text string="hold3/lo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel4"><text string="chg stake"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel5"><text string="exchange"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel6"><text string="transfer"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel7"><text string="start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel8"><text string="winline 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel9"><text string="winline 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel10"><text string="winline 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel11"><text string="winline 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel12"><text string="winline 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel13"><text string="(00:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel14"><text string="(00:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel15"><text string="(00:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel16"><text string="strt exch"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel17"><text string="nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel18"><text string="stake   1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel19"><text string="stake   2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel20"><text string="bot sym 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel21"><text string="bot sym 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel22"><text string="bot sym 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel23"><text string="botsymon1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel24"><text string="botsymon2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel25"><text string="botsymon3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel26"><text string="reel arrw"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel27"><text string="feat 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel28"><text string="feat 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel29"><text string="cash 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel30"><text string="cash 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel16"><text string="(01:00)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel17"><text string="trail lp1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel18"><text string="trail lp2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel19"><text string="trail lp3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel20"><text string="trail lp4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel21"><text string="pow bon t"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel22"><text string="trail lp5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel23"><text string="pow bon b"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel24"><text string="trail lp6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel25"><text string="trail lp7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel26"><text string="trl held"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel27"><text string="gamb lp1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel28"><text string="gamb lp2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel29"><text string="(01:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel30"><text string="(01:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel31"><text string="(01:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel32"><text string="reel1 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel33"><text string="reel1 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -59,215 +59,215 @@
 <element name="lamplabelel35"><text string="reel2 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel36"><text string="reel2 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel37"><text string="reel2 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel38"><text string="(02:06)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel38"><text string="gamb lp8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel39"><text string="acceptor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel40"><text string="(02:08)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel41"><text string="lose"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel42"><text string="feat 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel43"><text string="feat 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel44"><text string="cash 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel45"><text string="cash 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel40"><text string="gamb lp7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel41"><text string="gamb lp6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel42"><text string="gamb lp3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel43"><text string="gamb lp5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel44"><text string="gamb lp4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel45"><text string="(02:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel46"><text string="(02:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel47"><text string="(02:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel48"><text string="reel3 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel49"><text string="reel3 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel50"><text string="reel3 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel51"><text string="reel4 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel52"><text string="reel4 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel53"><text string="reel4 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel54"><text string="feat 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel55"><text string="feat 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel56"><text string="cash 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel57"><text string="cash 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel58"><text string="feat 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel59"><text string="feat 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel60"><text string="cash 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel61"><text string="cash 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel62"><text string="cash 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel63"><text string="cash 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel64"><text string="feat 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel65"><text string="hilo reel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel66"><text string="feat 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel67"><text string="box red 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel68"><text string="box red 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel69"><text string="box red 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel70"><text string="name 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel71"><text string="name 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel72"><text string="name 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel73"><text string="name 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel74"><text string="name 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel75"><text string="name 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel76"><text string="(04:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel77"><text string="(04:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel51"><text string="(03:03)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel52"><text string="hilo mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel53"><text string="(03:05)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel54"><text string="gamb lp14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel55"><text string="gamb lp13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel56"><text string="gamb lp15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel57"><text string="gamb lp12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel58"><text string="gamb lp9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel59"><text string="gamb lp11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel60"><text string="gamb lp10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel61"><text string="(03:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel62"><text string="(03:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel63"><text string="(03:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel64"><text string="reel5 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel65"><text string="reel5 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel66"><text string="reel5 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel67"><text string="no lose"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel68"><text string="tick top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel69"><text string="tick mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel70"><text string="tick bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel71"><text string="stk off1l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel72"><text string="stk off2l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel73"><text string="stk off1r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel74"><text string="stk off2r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel75"><text string="mega st"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel76"><text string="going hi"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel77"><text string="going lo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel78"><text string="(04:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel79"><text string="(04:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel80"><text string="board 14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel81"><text string="board 15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel82"><text string="board 16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel83"><text string="board 17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel84"><text string="board 18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel85"><text string="board 19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel86"><text string="board 20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel87"><text string="(05:07)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel88"><text string="board 21"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel89"><text string="bord20 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel90"><text string="innrbrd16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel91"><text string="board 22"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel92"><text string="takeoffer"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel93"><text string="(05:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel94"><text string="(05:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel95"><text string="(05:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel96"><text string="board 13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel97"><text string="board 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel98"><text string="innrbrd11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel99"><text string="innrbrd10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel100"><text string="innrbrd12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel101"><text string="1p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel102"><text string="innrbrd13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel103"><text string="innrbrd14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel104"><text string="innrbrd15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel105"><text string="5 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel106"><text string="innrbrd17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel107"><text string="board 23"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel108"><text string="cash 14l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel109"><text string="csh14 rrd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel110"><text string="(06:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel80"><text string="super 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel81"><text string="super6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel82"><text string="super 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel83"><text string="super7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel84"><text string="super 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel85"><text string="super8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel86"><text string="name1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel87"><text string="name6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel88"><text string="name2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel89"><text string="name7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel90"><text string="name3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel91"><text string="name8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel92"><text string="name4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel93"><text string="name9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel94"><text string="name5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel95"><text string="box 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel96"><text string="super 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel97"><text string="super4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel98"><text string="(06:02)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel99"><text string="acc/con l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel100"><text string="super 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel101"><text string="super5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel102"><text string="box 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel103"><text string="box val 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel104"><text string="box 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel105"><text string="box val 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel106"><text string="box 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel107"><text string="box val 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel108"><text string="box 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel109"><text string="box val 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel110"><text string="box val 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel111"><text string="(06:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel112"><text string="board 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel113"><text string="innr brd9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel114"><text string="50p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel115"><text string="20p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel116"><text string="10p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel117"><text string="6 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel118"><text string="7 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel119"><text string="8 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel120"><text string="innrbrd18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel121"><text string="board 24"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel122"><text string="feat 13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel123"><text string="feat 13rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel124"><text string="cash 13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel125"><text string="cash 13rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel126"><text string="cash 14r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel127"><text string="csh14 lrd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel128"><text string="board 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel129"><text string="innr brd8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel130"><text string="3 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel131"><text string="2 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel132"><text string="1 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel133"><text string="10 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel134"><text string="15 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel135"><text string="25 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel136"><text string="innrbrd19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel137"><text string="board 25"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel138"><text string="feat 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel139"><text string="feat 12rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel140"><text string="cash 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel141"><text string="cash 12rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel142"><text string="(08:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel143"><text string="insrt 5pd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel144"><text string="board 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel145"><text string="innr brd7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel146"><text string="deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel147"><text string="4 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel148"><text string="mega strk"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel149"><text string="nodeal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel150"><text string="innrbrd20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel151"><text string="board 26"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel152"><text string="feat 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel153"><text string="feat 11rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel154"><text string="cash 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel155"><text string="cash 11rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel156"><text string="(09:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel157"><text string="(09:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel158"><text string="(09:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel159"><text string="insrt10pd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel160"><text string="board 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel161"><text string="innr brd6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel162"><text string="innr brd5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel163"><text string="innr brd4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel164"><text string="innr brd3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel165"><text string="innr brd2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel166"><text string="innr brd1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel167"><text string="board 27"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel168"><text string="feat 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel169"><text string="feat 10rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel170"><text string="cash 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel171"><text string="cash 10rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel172"><text string="(10:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel173"><text string="(10:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel174"><text string="(10:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel175"><text string="insrt20pd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel176"><text string="board 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel177"><text string="board 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel178"><text string="bord 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel179"><text string="board 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel180"><text string="board 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel181"><text string="board 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel182"><text string="board 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel183"><text string="board hi"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel184"><text string="board 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel185"><text string="board 28"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel186"><text string="feat 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel187"><text string="feat 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel188"><text string="cash 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel189"><text string="cash 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel190"><text string="(11:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel112"><text string="super 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel113"><text string="super1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel114"><text string="super 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel115"><text string="super2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel116"><text string="super 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel117"><text string="super3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel118"><text string="outer15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel119"><text string="outer16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel120"><text string="outer17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel121"><text string="outer18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel122"><text string="outer19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel123"><text string="outer20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel124"><text string="outer21"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel125"><text string="ver   lbo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel126"><text string="ver   pub"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel127"><text string="ver  arcd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel128"><text string="feat 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel129"><text string="feat11 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel130"><text string="feat 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel131"><text string="feat 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel132"><text string="feat 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel133"><text string="feat 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel134"><text string="outer14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel135"><text string="inner11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel136"><text string="inner12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel137"><text string="inner13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel138"><text string="inner14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel139"><text string="inner15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel140"><text string="inner16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel141"><text string="outer23"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel142"><text string="outer22"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel143"><text string="fiver"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel144"><text string="feat 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel145"><text string="feat12 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel146"><text string="feat 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel147"><text string="feat10 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel148"><text string="feat 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel149"><text string="feat 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel150"><text string="outer13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel151"><text string="inner10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel152"><text string="deal val1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel153"><text string="deal val2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel154"><text string="acc/con r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel155"><text string="deal val9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel156"><text string="dealval10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel157"><text string="inner17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel158"><text string="outer24"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel159"><text string="tenner"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel160"><text string="feat 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel161"><text string="feat 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel162"><text string="feat 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel163"><text string="feat 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel164"><text string="feat 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel165"><text string="feat 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel166"><text string="outer12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel167"><text string="inner9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel168"><text string="deal val3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel169"><text string="deal val4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel170"><text string="dealval11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel171"><text string="dealval12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel172"><text string="dealval13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel173"><text string="inner18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel174"><text string="outer25"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel175"><text string="twenty"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel176"><text string="feat 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel177"><text string="feat 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel178"><text string="feat 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel179"><text string="feat 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel180"><text string="feat 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel181"><text string="feat 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel182"><text string="outer11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel183"><text string="inner8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel184"><text string="deal val5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel185"><text string="deal val6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel186"><text string="deal val7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel187"><text string="dealval14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel188"><text string="dealval15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel189"><text string="inner19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel190"><text string="outer26"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel191"><text string="no change"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel192"><text string="bonus 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel193"><text string="bonus 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel194"><text string="bonus 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel195"><text string="bonus 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel196"><text string="mstreak 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel197"><text string="mstreak 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel198"><text string="mstreak 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel199"><text string="mstreak 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel200"><text string="feat 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel201"><text string="feat 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel202"><text string="cash 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel203"><text string="cash 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel204"><text string="feat 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel205"><text string="feat 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel206"><text string="cash 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel207"><text string="cash 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel208"><text string="extralif1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel209"><text string="extralif2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel210"><text string="extralif3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel211"><text string="extralif4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel212"><text string="sstreak 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel213"><text string="sstreak 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel214"><text string="sstreak 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel215"><text string="sstreak 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel216"><text string="streak 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel217"><text string="streak 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel218"><text string="streak 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel219"><text string="feat 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel220"><text string="feat 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel221"><text string="cash 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel222"><text string="cash 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel223"><text string="(13:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel224"><text string="top sym 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel225"><text string="topsy r 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel226"><text string="top sym 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel227"><text string="topsy r 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel228"><text string="top sym 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel229"><text string="topsy r 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel230"><text string="top sym 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel231"><text string="board lo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel232"><text string="no lose"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel233"><text string="streak 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel234"><text string="(14:10)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel235"><text string="(14:11)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel236"><text string="(14:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel237"><text string="(14:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel238"><text string="(14:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel239"><text string="(14:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel240"><text string="(15:00)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel241"><text string="(15:01)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel242"><text string="(15:02)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel243"><text string="(15:03)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel244"><text string="(15:04)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel245"><text string="(15:05)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="lamplabelel246"><text string="(15:06)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel192"><text string="cash 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel193"><text string="cash11 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel194"><text string="cash 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel195"><text string="cash 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel196"><text string="cash 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel197"><text string="cash 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel198"><text string="outer10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel199"><text string="inner7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel200"><text string="deal val8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel201"><text string="phone1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel202"><text string="phone2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel203"><text string="phone3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel204"><text string="play dond"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel205"><text string="dealval16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel206"><text string="inner20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel207"><text string="outer27"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel208"><text string="cash 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel209"><text string="cash12 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel210"><text string="cash 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel211"><text string="cash10 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel212"><text string="cash 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel213"><text string="cash 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel214"><text string="outer9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel215"><text string="inner6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel216"><text string="inner5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel217"><text string="take deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel218"><text string="inner4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel219"><text string="inner3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel220"><text string="inner2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel221"><text string="no deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel222"><text string="inner1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel223"><text string="outer28"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel224"><text string="cash 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel225"><text string="cash 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel226"><text string="cash 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel227"><text string="cash 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel228"><text string="cash 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel229"><text string="cash 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel230"><text string="ex life 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel231"><text string="ex life 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel232"><text string="outer8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel233"><text string="outer7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel234"><text string="outer6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel235"><text string="outer5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel236"><text string="outer4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel237"><text string="outer3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel238"><text string="outer2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel239"><text string="outer1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel240"><text string="cash 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel241"><text string="cash 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel242"><text string="cash 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel243"><text string="cash 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel244"><text string="cash 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel245"><text string="cash 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel246"><text string="ex life 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel247"><text string="(15:07)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel248"><text string="(15:08)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="lamplabelel249"><text string="(15:09)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -283,17 +283,17 @@
 <element name="inputlabel1-1"><text string="hold 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel1-2"><text string="hold 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel1-3"><text string="hold 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel1-4"><text string="hold 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel1-4"><text string="ch stk"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel1-5"><text string="hpunit"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel2-0"><text string="cstake"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel2-1"><text string="colect"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel2-2"><text string="transf"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-0"><text string="exchng"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-1"><text string="trnsfr"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-2"><text string="start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel2-3"><text string="refill"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel2-4"><text string="start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-4"><text string="IN2-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel2-5"><text string="IN2-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel8-0"><text string="nodeal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel8-1"><text string="deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-<element name="inputlabel8-2"><text string="c or b"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-1"><text string="dond"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-2"><text string="deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel8-3"><text string="IN8-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel8-4"><text string="IN8-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 <element name="inputlabel8-5"><text string="IN8-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -361,15 +361,15 @@
 <bezel name="lamplabel2" element="lamplabelel2"><bounds x="428" y="-10" width="23" height="10" /></bezel>
 <bezel name="lamp3" element="buttonlamp" state="0" inputtag="IN-1" inputmask="0x08"><bounds x="452" y="0" width="23" height="16" /></bezel>
 <bezel name="lamplabel3" element="lamplabelel3"><bounds x="452" y="-10" width="23" height="10" /></bezel>
-<bezel name="lamp4" element="buttonlamp" state="0" inputtag="IN-1" inputmask="0x10"><bounds x="476" y="0" width="23" height="16" /></bezel>
+<bezel name="lamp4" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x01"><bounds x="476" y="0" width="23" height="16" /></bezel>
 <bezel name="lamplabel4" element="lamplabelel4"><bounds x="476" y="-10" width="23" height="10" /></bezel>
-<bezel name="lamp5" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x01"><bounds x="500" y="0" width="23" height="16" /></bezel>
+<bezel name="lamp5" element="matrixlamp" state="0"><bounds x="500" y="0" width="23" height="16"/></bezel>
 <bezel name="lamplabel5" element="lamplabelel5"><bounds x="500" y="-10" width="23" height="10" /></bezel>
-<bezel name="lamp6" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x02"><bounds x="524" y="0" width="23" height="16" /></bezel>
+<bezel name="lamp6" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x04"><bounds x="524" y="0" width="23" height="16" /></bezel>
 <bezel name="lamplabel6" element="lamplabelel6"><bounds x="524" y="-10" width="23" height="10" /></bezel>
-<bezel name="lamp7" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x04"><bounds x="548" y="0" width="23" height="16" /></bezel>
+<bezel name="lamp7" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x10"><bounds x="548" y="0" width="23" height="16" /></bezel>
 <bezel name="lamplabel7" element="lamplabelel7"><bounds x="548" y="-10" width="23" height="10" /></bezel>
-<bezel name="lamp8" element="buttonlamp" state="0" inputtag="IN-8" inputmask="0x04"><bounds x="572" y="0" width="23" height="16" /></bezel>
+<bezel name="lamp8" element="matrixlamp" state="0"><bounds x="572" y="0" width="23" height="16"/></bezel>
 <bezel name="lamplabel8" element="lamplabelel8"><bounds x="572" y="-10" width="23" height="10" /></bezel>
 <bezel name="lamp9" element="matrixlamp" state="0"><bounds x="596" y="0" width="23" height="16"/></bezel>
 <bezel name="lamplabel9" element="lamplabelel9"><bounds x="596" y="-10" width="23" height="10" /></bezel>
@@ -385,7 +385,7 @@
 <bezel name="lamplabel14" element="lamplabelel14"><bounds x="716" y="-10" width="23" height="10" /></bezel>
 <bezel name="lamp15" element="unusedlamp" state="0"><bounds x="740" y="0" width="23" height="16"/></bezel>
 <bezel name="lamplabel15" element="lamplabelel15"><bounds x="740" y="-10" width="23" height="10" /></bezel>
-<bezel name="lamp16" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x10"><bounds x="380" y="28" width="23" height="16" /></bezel>
+<bezel name="lamp16" element="unusedlamp" state="0"><bounds x="380" y="28" width="23" height="16"/></bezel>
 <bezel name="lamplabel16" element="lamplabelel16"><bounds x="380" y="18" width="23" height="10" /></bezel>
 <bezel name="lamp17" element="matrixlamp" state="0"><bounds x="404" y="28" width="23" height="16"/></bezel>
 <bezel name="lamplabel17" element="lamplabelel17"><bounds x="404" y="18" width="23" height="10" /></bezel>
@@ -411,9 +411,9 @@
 <bezel name="lamplabel27" element="lamplabelel27"><bounds x="644" y="18" width="23" height="10" /></bezel>
 <bezel name="lamp28" element="matrixlamp" state="0"><bounds x="668" y="28" width="23" height="16"/></bezel>
 <bezel name="lamplabel28" element="lamplabelel28"><bounds x="668" y="18" width="23" height="10" /></bezel>
-<bezel name="lamp29" element="matrixlamp" state="0"><bounds x="692" y="28" width="23" height="16"/></bezel>
+<bezel name="lamp29" element="unusedlamp" state="0"><bounds x="692" y="28" width="23" height="16"/></bezel>
 <bezel name="lamplabel29" element="lamplabelel29"><bounds x="692" y="18" width="23" height="10" /></bezel>
-<bezel name="lamp30" element="matrixlamp" state="0"><bounds x="716" y="28" width="23" height="16"/></bezel>
+<bezel name="lamp30" element="unusedlamp" state="0"><bounds x="716" y="28" width="23" height="16"/></bezel>
 <bezel name="lamplabel30" element="lamplabelel30"><bounds x="716" y="18" width="23" height="10" /></bezel>
 <bezel name="lamp31" element="unusedlamp" state="0"><bounds x="740" y="28" width="23" height="16"/></bezel>
 <bezel name="lamplabel31" element="lamplabelel31"><bounds x="740" y="18" width="23" height="10" /></bezel>
@@ -441,11 +441,11 @@
 <!-- Label not drawn
 <bezel name="lamplabel37" element="lamplabelel37"><bounds x="50" y="324" width="50" height="10" /></bezel>
 -->
-<bezel name="lamp38" element="unusedlamp" state="0"><bounds x="524" y="56" width="23" height="16"/></bezel>
+<bezel name="lamp38" element="matrixlamp" state="0"><bounds x="524" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel38" element="lamplabelel38"><bounds x="524" y="46" width="23" height="10" /></bezel>
 <bezel name="lamp39" element="matrixlamp" state="0"><bounds x="548" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel39" element="lamplabelel39"><bounds x="548" y="46" width="23" height="10" /></bezel>
-<bezel name="lamp40" element="unusedlamp" state="0"><bounds x="572" y="56" width="23" height="16"/></bezel>
+<bezel name="lamp40" element="matrixlamp" state="0"><bounds x="572" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel40" element="lamplabelel40"><bounds x="572" y="46" width="23" height="10" /></bezel>
 <bezel name="lamp41" element="matrixlamp" state="0"><bounds x="596" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel41" element="lamplabelel41"><bounds x="596" y="46" width="23" height="10" /></bezel>
@@ -455,7 +455,7 @@
 <bezel name="lamplabel43" element="lamplabelel43"><bounds x="644" y="46" width="23" height="10" /></bezel>
 <bezel name="lamp44" element="matrixlamp" state="0"><bounds x="668" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel44" element="lamplabelel44"><bounds x="668" y="46" width="23" height="10" /></bezel>
-<bezel name="lamp45" element="matrixlamp" state="0"><bounds x="692" y="56" width="23" height="16"/></bezel>
+<bezel name="lamp45" element="unusedlamp" state="0"><bounds x="692" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel45" element="lamplabelel45"><bounds x="692" y="46" width="23" height="10" /></bezel>
 <bezel name="lamp46" element="unusedlamp" state="0"><bounds x="716" y="56" width="23" height="16"/></bezel>
 <bezel name="lamplabel46" element="lamplabelel46"><bounds x="716" y="46" width="23" height="10" /></bezel>
@@ -473,18 +473,12 @@
 <!-- Label not drawn
 <bezel name="lamplabel50" element="lamplabelel50"><bounds x="100" y="324" width="50" height="10" /></bezel>
 -->
-<bezel name="lamp51" element="reellamp" state="0"><bounds x="150" y="300" width="50" height="17"/></bezel>
-<!-- Label not drawn
-<bezel name="lamplabel51" element="lamplabelel51"><bounds x="150" y="290" width="50" height="10" /></bezel>
--->
-<bezel name="lamp52" element="reellamp" state="0"><bounds x="150" y="317" width="50" height="17"/></bezel>
-<!-- Label not drawn
-<bezel name="lamplabel52" element="lamplabelel52"><bounds x="150" y="307" width="50" height="10" /></bezel>
--->
-<bezel name="lamp53" element="reellamp" state="0"><bounds x="150" y="334" width="50" height="17"/></bezel>
-<!-- Label not drawn
-<bezel name="lamplabel53" element="lamplabelel53"><bounds x="150" y="324" width="50" height="10" /></bezel>
--->
+<bezel name="lamp51" element="unusedlamp" state="0"><bounds x="452" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel51" element="lamplabelel51"><bounds x="452" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp52" element="matrixlamp" state="0"><bounds x="476" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel52" element="lamplabelel52"><bounds x="476" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp53" element="unusedlamp" state="0"><bounds x="500" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel53" element="lamplabelel53"><bounds x="500" y="74" width="23" height="10" /></bezel>
 <bezel name="lamp54" element="matrixlamp" state="0"><bounds x="524" y="84" width="23" height="16"/></bezel>
 <bezel name="lamplabel54" element="lamplabelel54"><bounds x="524" y="74" width="23" height="10" /></bezel>
 <bezel name="lamp55" element="matrixlamp" state="0"><bounds x="548" y="84" width="23" height="16"/></bezel>
@@ -499,18 +493,24 @@
 <bezel name="lamplabel59" element="lamplabelel59"><bounds x="644" y="74" width="23" height="10" /></bezel>
 <bezel name="lamp60" element="matrixlamp" state="0"><bounds x="668" y="84" width="23" height="16"/></bezel>
 <bezel name="lamplabel60" element="lamplabelel60"><bounds x="668" y="74" width="23" height="10" /></bezel>
-<bezel name="lamp61" element="matrixlamp" state="0"><bounds x="692" y="84" width="23" height="16"/></bezel>
+<bezel name="lamp61" element="unusedlamp" state="0"><bounds x="692" y="84" width="23" height="16"/></bezel>
 <bezel name="lamplabel61" element="lamplabelel61"><bounds x="692" y="74" width="23" height="10" /></bezel>
-<bezel name="lamp62" element="matrixlamp" state="0"><bounds x="716" y="84" width="23" height="16"/></bezel>
+<bezel name="lamp62" element="unusedlamp" state="0"><bounds x="716" y="84" width="23" height="16"/></bezel>
 <bezel name="lamplabel62" element="lamplabelel62"><bounds x="716" y="74" width="23" height="10" /></bezel>
-<bezel name="lamp63" element="matrixlamp" state="0"><bounds x="740" y="84" width="23" height="16"/></bezel>
+<bezel name="lamp63" element="unusedlamp" state="0"><bounds x="740" y="84" width="23" height="16"/></bezel>
 <bezel name="lamplabel63" element="lamplabelel63"><bounds x="740" y="74" width="23" height="10" /></bezel>
-<bezel name="lamp64" element="matrixlamp" state="0"><bounds x="380" y="112" width="23" height="16"/></bezel>
-<bezel name="lamplabel64" element="lamplabelel64"><bounds x="380" y="102" width="23" height="10" /></bezel>
-<bezel name="lamp65" element="matrixlamp" state="0"><bounds x="404" y="112" width="23" height="16"/></bezel>
-<bezel name="lamplabel65" element="lamplabelel65"><bounds x="404" y="102" width="23" height="10" /></bezel>
-<bezel name="lamp66" element="matrixlamp" state="0"><bounds x="428" y="112" width="23" height="16"/></bezel>
-<bezel name="lamplabel66" element="lamplabelel66"><bounds x="428" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp64" element="reellamp" state="0"><bounds x="200" y="334" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel64" element="lamplabelel64"><bounds x="200" y="324" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp65" element="reellamp" state="0"><bounds x="200" y="317" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel65" element="lamplabelel65"><bounds x="200" y="307" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp66" element="reellamp" state="0"><bounds x="200" y="300" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel66" element="lamplabelel66"><bounds x="200" y="290" width="50" height="10" /></bezel>
+-->
 <bezel name="lamp67" element="matrixlamp" state="0"><bounds x="452" y="112" width="23" height="16"/></bezel>
 <bezel name="lamplabel67" element="lamplabelel67"><bounds x="452" y="102" width="23" height="10" /></bezel>
 <bezel name="lamp68" element="matrixlamp" state="0"><bounds x="476" y="112" width="23" height="16"/></bezel>
@@ -529,9 +529,9 @@
 <bezel name="lamplabel74" element="lamplabelel74"><bounds x="620" y="102" width="23" height="10" /></bezel>
 <bezel name="lamp75" element="matrixlamp" state="0"><bounds x="644" y="112" width="23" height="16"/></bezel>
 <bezel name="lamplabel75" element="lamplabelel75"><bounds x="644" y="102" width="23" height="10" /></bezel>
-<bezel name="lamp76" element="unusedlamp" state="0"><bounds x="668" y="112" width="23" height="16"/></bezel>
+<bezel name="lamp76" element="matrixlamp" state="0"><bounds x="668" y="112" width="23" height="16"/></bezel>
 <bezel name="lamplabel76" element="lamplabelel76"><bounds x="668" y="102" width="23" height="10" /></bezel>
-<bezel name="lamp77" element="unusedlamp" state="0"><bounds x="692" y="112" width="23" height="16"/></bezel>
+<bezel name="lamp77" element="matrixlamp" state="0"><bounds x="692" y="112" width="23" height="16"/></bezel>
 <bezel name="lamplabel77" element="lamplabelel77"><bounds x="692" y="102" width="23" height="10" /></bezel>
 <bezel name="lamp78" element="unusedlamp" state="0"><bounds x="716" y="112" width="23" height="16"/></bezel>
 <bezel name="lamplabel78" element="lamplabelel78"><bounds x="716" y="102" width="23" height="10" /></bezel>
@@ -551,7 +551,7 @@
 <bezel name="lamplabel85" element="lamplabelel85"><bounds x="500" y="130" width="23" height="10" /></bezel>
 <bezel name="lamp86" element="matrixlamp" state="0"><bounds x="524" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel86" element="lamplabelel86"><bounds x="524" y="130" width="23" height="10" /></bezel>
-<bezel name="lamp87" element="unusedlamp" state="0"><bounds x="548" y="140" width="23" height="16"/></bezel>
+<bezel name="lamp87" element="matrixlamp" state="0"><bounds x="548" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel87" element="lamplabelel87"><bounds x="548" y="130" width="23" height="10" /></bezel>
 <bezel name="lamp88" element="matrixlamp" state="0"><bounds x="572" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel88" element="lamplabelel88"><bounds x="572" y="130" width="23" height="10" /></bezel>
@@ -563,17 +563,17 @@
 <bezel name="lamplabel91" element="lamplabelel91"><bounds x="644" y="130" width="23" height="10" /></bezel>
 <bezel name="lamp92" element="matrixlamp" state="0"><bounds x="668" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel92" element="lamplabelel92"><bounds x="668" y="130" width="23" height="10" /></bezel>
-<bezel name="lamp93" element="unusedlamp" state="0"><bounds x="692" y="140" width="23" height="16"/></bezel>
+<bezel name="lamp93" element="matrixlamp" state="0"><bounds x="692" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel93" element="lamplabelel93"><bounds x="692" y="130" width="23" height="10" /></bezel>
-<bezel name="lamp94" element="unusedlamp" state="0"><bounds x="716" y="140" width="23" height="16"/></bezel>
+<bezel name="lamp94" element="matrixlamp" state="0"><bounds x="716" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel94" element="lamplabelel94"><bounds x="716" y="130" width="23" height="10" /></bezel>
-<bezel name="lamp95" element="unusedlamp" state="0"><bounds x="740" y="140" width="23" height="16"/></bezel>
+<bezel name="lamp95" element="matrixlamp" state="0"><bounds x="740" y="140" width="23" height="16"/></bezel>
 <bezel name="lamplabel95" element="lamplabelel95"><bounds x="740" y="130" width="23" height="10" /></bezel>
 <bezel name="lamp96" element="matrixlamp" state="0"><bounds x="380" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel96" element="lamplabelel96"><bounds x="380" y="158" width="23" height="10" /></bezel>
 <bezel name="lamp97" element="matrixlamp" state="0"><bounds x="404" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel97" element="lamplabelel97"><bounds x="404" y="158" width="23" height="10" /></bezel>
-<bezel name="lamp98" element="matrixlamp" state="0"><bounds x="428" y="168" width="23" height="16"/></bezel>
+<bezel name="lamp98" element="unusedlamp" state="0"><bounds x="428" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel98" element="lamplabelel98"><bounds x="428" y="158" width="23" height="10" /></bezel>
 <bezel name="lamp99" element="matrixlamp" state="0"><bounds x="452" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel99" element="lamplabelel99"><bounds x="452" y="158" width="23" height="10" /></bezel>
@@ -597,7 +597,7 @@
 <bezel name="lamplabel108" element="lamplabelel108"><bounds x="668" y="158" width="23" height="10" /></bezel>
 <bezel name="lamp109" element="matrixlamp" state="0"><bounds x="692" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel109" element="lamplabelel109"><bounds x="692" y="158" width="23" height="10" /></bezel>
-<bezel name="lamp110" element="unusedlamp" state="0"><bounds x="716" y="168" width="23" height="16"/></bezel>
+<bezel name="lamp110" element="matrixlamp" state="0"><bounds x="716" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel110" element="lamplabelel110"><bounds x="716" y="158" width="23" height="10" /></bezel>
 <bezel name="lamp111" element="unusedlamp" state="0"><bounds x="740" y="168" width="23" height="16"/></bezel>
 <bezel name="lamplabel111" element="lamplabelel111"><bounds x="740" y="158" width="23" height="10" /></bezel>
@@ -661,7 +661,7 @@
 <bezel name="lamplabel140" element="lamplabelel140"><bounds x="668" y="214" width="23" height="10" /></bezel>
 <bezel name="lamp141" element="matrixlamp" state="0"><bounds x="692" y="224" width="23" height="16"/></bezel>
 <bezel name="lamplabel141" element="lamplabelel141"><bounds x="692" y="214" width="23" height="10" /></bezel>
-<bezel name="lamp142" element="unusedlamp" state="0"><bounds x="716" y="224" width="23" height="16"/></bezel>
+<bezel name="lamp142" element="matrixlamp" state="0"><bounds x="716" y="224" width="23" height="16"/></bezel>
 <bezel name="lamplabel142" element="lamplabelel142"><bounds x="716" y="214" width="23" height="10" /></bezel>
 <bezel name="lamp143" element="matrixlamp" state="0"><bounds x="740" y="224" width="23" height="16"/></bezel>
 <bezel name="lamplabel143" element="lamplabelel143"><bounds x="740" y="214" width="23" height="10" /></bezel>
@@ -669,13 +669,13 @@
 <bezel name="lamplabel144" element="lamplabelel144"><bounds x="380" y="242" width="23" height="10" /></bezel>
 <bezel name="lamp145" element="matrixlamp" state="0"><bounds x="404" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel145" element="lamplabelel145"><bounds x="404" y="242" width="23" height="10" /></bezel>
-<bezel name="lamp146" element="buttonlamp" state="0" inputtag="IN-8" inputmask="0x02"><bounds x="428" y="252" width="23" height="16" /></bezel>
+<bezel name="lamp146" element="matrixlamp" state="0"><bounds x="428" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel146" element="lamplabelel146"><bounds x="428" y="242" width="23" height="10" /></bezel>
 <bezel name="lamp147" element="matrixlamp" state="0"><bounds x="452" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel147" element="lamplabelel147"><bounds x="452" y="242" width="23" height="10" /></bezel>
 <bezel name="lamp148" element="matrixlamp" state="0"><bounds x="476" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel148" element="lamplabelel148"><bounds x="476" y="242" width="23" height="10" /></bezel>
-<bezel name="lamp149" element="buttonlamp" state="0" inputtag="IN-8" inputmask="0x01"><bounds x="500" y="252" width="23" height="16" /></bezel>
+<bezel name="lamp149" element="matrixlamp" state="0"><bounds x="500" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel149" element="lamplabelel149"><bounds x="500" y="242" width="23" height="10" /></bezel>
 <bezel name="lamp150" element="matrixlamp" state="0"><bounds x="524" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel150" element="lamplabelel150"><bounds x="524" y="242" width="23" height="10" /></bezel>
@@ -689,11 +689,11 @@
 <bezel name="lamplabel154" element="lamplabelel154"><bounds x="620" y="242" width="23" height="10" /></bezel>
 <bezel name="lamp155" element="matrixlamp" state="0"><bounds x="644" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel155" element="lamplabelel155"><bounds x="644" y="242" width="23" height="10" /></bezel>
-<bezel name="lamp156" element="unusedlamp" state="0"><bounds x="668" y="252" width="23" height="16"/></bezel>
+<bezel name="lamp156" element="matrixlamp" state="0"><bounds x="668" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel156" element="lamplabelel156"><bounds x="668" y="242" width="23" height="10" /></bezel>
-<bezel name="lamp157" element="unusedlamp" state="0"><bounds x="692" y="252" width="23" height="16"/></bezel>
+<bezel name="lamp157" element="matrixlamp" state="0"><bounds x="692" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel157" element="lamplabelel157"><bounds x="692" y="242" width="23" height="10" /></bezel>
-<bezel name="lamp158" element="unusedlamp" state="0"><bounds x="716" y="252" width="23" height="16"/></bezel>
+<bezel name="lamp158" element="matrixlamp" state="0"><bounds x="716" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel158" element="lamplabelel158"><bounds x="716" y="242" width="23" height="10" /></bezel>
 <bezel name="lamp159" element="matrixlamp" state="0"><bounds x="740" y="252" width="23" height="16"/></bezel>
 <bezel name="lamplabel159" element="lamplabelel159"><bounds x="740" y="242" width="23" height="10" /></bezel>
@@ -721,11 +721,11 @@
 <bezel name="lamplabel170" element="lamplabelel170"><bounds x="620" y="270" width="23" height="10" /></bezel>
 <bezel name="lamp171" element="matrixlamp" state="0"><bounds x="644" y="280" width="23" height="16"/></bezel>
 <bezel name="lamplabel171" element="lamplabelel171"><bounds x="644" y="270" width="23" height="10" /></bezel>
-<bezel name="lamp172" element="unusedlamp" state="0"><bounds x="668" y="280" width="23" height="16"/></bezel>
+<bezel name="lamp172" element="matrixlamp" state="0"><bounds x="668" y="280" width="23" height="16"/></bezel>
 <bezel name="lamplabel172" element="lamplabelel172"><bounds x="668" y="270" width="23" height="10" /></bezel>
-<bezel name="lamp173" element="unusedlamp" state="0"><bounds x="692" y="280" width="23" height="16"/></bezel>
+<bezel name="lamp173" element="matrixlamp" state="0"><bounds x="692" y="280" width="23" height="16"/></bezel>
 <bezel name="lamplabel173" element="lamplabelel173"><bounds x="692" y="270" width="23" height="10" /></bezel>
-<bezel name="lamp174" element="unusedlamp" state="0"><bounds x="716" y="280" width="23" height="16"/></bezel>
+<bezel name="lamp174" element="matrixlamp" state="0"><bounds x="716" y="280" width="23" height="16"/></bezel>
 <bezel name="lamplabel174" element="lamplabelel174"><bounds x="716" y="270" width="23" height="10" /></bezel>
 <bezel name="lamp175" element="matrixlamp" state="0"><bounds x="740" y="280" width="23" height="16"/></bezel>
 <bezel name="lamplabel175" element="lamplabelel175"><bounds x="740" y="270" width="23" height="10" /></bezel>
@@ -757,7 +757,7 @@
 <bezel name="lamplabel188" element="lamplabelel188"><bounds x="668" y="298" width="23" height="10" /></bezel>
 <bezel name="lamp189" element="matrixlamp" state="0"><bounds x="692" y="308" width="23" height="16"/></bezel>
 <bezel name="lamplabel189" element="lamplabelel189"><bounds x="692" y="298" width="23" height="10" /></bezel>
-<bezel name="lamp190" element="unusedlamp" state="0"><bounds x="716" y="308" width="23" height="16"/></bezel>
+<bezel name="lamp190" element="matrixlamp" state="0"><bounds x="716" y="308" width="23" height="16"/></bezel>
 <bezel name="lamplabel190" element="lamplabelel190"><bounds x="716" y="298" width="23" height="10" /></bezel>
 <bezel name="lamp191" element="matrixlamp" state="0"><bounds x="740" y="308" width="23" height="16"/></bezel>
 <bezel name="lamplabel191" element="lamplabelel191"><bounds x="740" y="298" width="23" height="10" /></bezel>
@@ -823,7 +823,7 @@
 <bezel name="lamplabel221" element="lamplabelel221"><bounds x="692" y="354" width="23" height="10" /></bezel>
 <bezel name="lamp222" element="matrixlamp" state="0"><bounds x="716" y="364" width="23" height="16"/></bezel>
 <bezel name="lamplabel222" element="lamplabelel222"><bounds x="716" y="354" width="23" height="10" /></bezel>
-<bezel name="lamp223" element="unusedlamp" state="0"><bounds x="740" y="364" width="23" height="16"/></bezel>
+<bezel name="lamp223" element="matrixlamp" state="0"><bounds x="740" y="364" width="23" height="16"/></bezel>
 <bezel name="lamplabel223" element="lamplabelel223"><bounds x="740" y="354" width="23" height="10" /></bezel>
 <bezel name="lamp224" element="matrixlamp" state="0"><bounds x="380" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel224" element="lamplabelel224"><bounds x="380" y="382" width="23" height="10" /></bezel>
@@ -845,31 +845,31 @@
 <bezel name="lamplabel232" element="lamplabelel232"><bounds x="572" y="382" width="23" height="10" /></bezel>
 <bezel name="lamp233" element="matrixlamp" state="0"><bounds x="596" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel233" element="lamplabelel233"><bounds x="596" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp234" element="unusedlamp" state="0"><bounds x="620" y="392" width="23" height="16"/></bezel>
+<bezel name="lamp234" element="matrixlamp" state="0"><bounds x="620" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel234" element="lamplabelel234"><bounds x="620" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp235" element="unusedlamp" state="0"><bounds x="644" y="392" width="23" height="16"/></bezel>
+<bezel name="lamp235" element="matrixlamp" state="0"><bounds x="644" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel235" element="lamplabelel235"><bounds x="644" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp236" element="unusedlamp" state="0"><bounds x="668" y="392" width="23" height="16"/></bezel>
+<bezel name="lamp236" element="matrixlamp" state="0"><bounds x="668" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel236" element="lamplabelel236"><bounds x="668" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp237" element="unusedlamp" state="0"><bounds x="692" y="392" width="23" height="16"/></bezel>
+<bezel name="lamp237" element="matrixlamp" state="0"><bounds x="692" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel237" element="lamplabelel237"><bounds x="692" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp238" element="unusedlamp" state="0"><bounds x="716" y="392" width="23" height="16"/></bezel>
+<bezel name="lamp238" element="matrixlamp" state="0"><bounds x="716" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel238" element="lamplabelel238"><bounds x="716" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp239" element="unusedlamp" state="0"><bounds x="740" y="392" width="23" height="16"/></bezel>
+<bezel name="lamp239" element="matrixlamp" state="0"><bounds x="740" y="392" width="23" height="16"/></bezel>
 <bezel name="lamplabel239" element="lamplabelel239"><bounds x="740" y="382" width="23" height="10" /></bezel>
-<bezel name="lamp240" element="unusedlamp" state="0"><bounds x="380" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp240" element="matrixlamp" state="0"><bounds x="380" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel240" element="lamplabelel240"><bounds x="380" y="410" width="23" height="10" /></bezel>
-<bezel name="lamp241" element="unusedlamp" state="0"><bounds x="404" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp241" element="matrixlamp" state="0"><bounds x="404" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel241" element="lamplabelel241"><bounds x="404" y="410" width="23" height="10" /></bezel>
-<bezel name="lamp242" element="unusedlamp" state="0"><bounds x="428" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp242" element="matrixlamp" state="0"><bounds x="428" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel242" element="lamplabelel242"><bounds x="428" y="410" width="23" height="10" /></bezel>
-<bezel name="lamp243" element="unusedlamp" state="0"><bounds x="452" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp243" element="matrixlamp" state="0"><bounds x="452" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel243" element="lamplabelel243"><bounds x="452" y="410" width="23" height="10" /></bezel>
-<bezel name="lamp244" element="unusedlamp" state="0"><bounds x="476" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp244" element="matrixlamp" state="0"><bounds x="476" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel244" element="lamplabelel244"><bounds x="476" y="410" width="23" height="10" /></bezel>
-<bezel name="lamp245" element="unusedlamp" state="0"><bounds x="500" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp245" element="matrixlamp" state="0"><bounds x="500" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel245" element="lamplabelel245"><bounds x="500" y="410" width="23" height="10" /></bezel>
-<bezel name="lamp246" element="unusedlamp" state="0"><bounds x="524" y="420" width="23" height="16"/></bezel>
+<bezel name="lamp246" element="matrixlamp" state="0"><bounds x="524" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel246" element="lamplabelel246"><bounds x="524" y="410" width="23" height="10" /></bezel>
 <bezel name="lamp247" element="unusedlamp" state="0"><bounds x="548" y="420" width="23" height="16"/></bezel>
 <bezel name="lamplabel247" element="lamplabelel247"><bounds x="548" y="410" width="23" height="10" /></bezel>

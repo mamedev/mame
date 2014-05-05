@@ -123,6 +123,15 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 // find where the button definitions are in the ROM to make creating input ports easier for games using common test mode code
 // not ALL games have a comprehensive list, but enough do to make this a worthwile debugging aid.
+
+struct sc4inputinfo
+{
+	astring name;
+	bool used;
+};
+
+sc4inputinfo sc4inputs[32][16];
+
 bool compare_input_code(running_machine &machine, int addr)
 {
 	UINT16 *src = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
@@ -140,6 +149,19 @@ bool compare_input_code(running_machine &machine, int addr)
 
 int find_input_strings(running_machine &machine)
 {
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			char tempstr[32];
+			sprintf(tempstr, "IN%d-%d", i, j);
+
+			sc4inputs[i][j].name = tempstr;
+			sc4inputs[i][j].used = false;
+		}
+	}
+
+
 	int foundat = -1;
 	UINT32 startblock = 0;
 	UINT32 endblock = 0;
@@ -167,6 +189,7 @@ int find_input_strings(running_machine &machine)
 					UINT16 portpos = rom[j + 0];
 					int port = (portpos & 0x1f);
 					int pos = (portpos >> 5);
+					
 					UINT16 unk2 = rom[j + 1];
 					UINT32 stringaddr = (rom[j + 2] << 16) | rom[j + 3];
 
@@ -187,6 +210,32 @@ int find_input_strings(running_machine &machine)
 						}
 							
 					}
+
+					tempstring.trimspace();
+					tempstring.makelower();
+
+
+					//if (pos <= 5)
+					{
+						if (sc4inputs[port][pos].used == false)
+						{
+							sc4inputs[port][pos].used = true;
+							sc4inputs[port][pos].name = tempstring;
+						}
+						else
+						{
+							printf("position already used?\n");
+
+							sc4inputs[port][pos].name.cat(" OR ");
+							sc4inputs[port][pos].name.cat(tempstring);
+						}
+					}
+					//else
+					//{
+					//	printf("invalid port position?\n");
+					//}
+					
+
 					
 					sc45helperlog("%s", tempstring.cstr());
 
@@ -198,12 +247,108 @@ int find_input_strings(running_machine &machine)
 		}
 	}
 
+	sc45helperlog("------------ INPUT STRUCTURE -----------------\n");
+
+	// i'm not sure exactly how many ports are valid for inputs, or if different
+	// hardware can also be connected to them, buttons typically map in
+	// ports 1,2, then jump to 8,9, and sometimes 10 (sc4dndys)
+	// some games appear to have mistakes in their tables (sc4dndclc claims the
+	// %age key maps over the dips?)
+	// dips are on the motherboard and the 16 switches appear mapped at 16,17,18,19 split 5-5-5-1 (I'm assuming this can't move)
+	// the green service mode button in port 20 is also on the motherboard (I'm assuming this can't move)
+	//
+	// sometimes an upper bit (0x100) is set for hopper related ports?
+
+	int ignoreports[32][16] =
+	{
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{  1,  2,  3,  4,  5,  6, -1, -1,    -4, -1, -1, -1, -1, -1, -1, -1, }, // port 1
+		{  7,  8,  9, 10, 11, 12, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 2
+		{ -1, -1, -2, -2, -2, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -4, -1, -1, -1, -1, -1, -1, -1, },
+		{ -2, -2, -2, -2, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -2, -2, -2, -2, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ 13, 14, 15, 16, 17, 18, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 8
+		{ 19, 20, 21, 22, 23, 24, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 9
+		{ 25, 26, 27, 28, 29, 30, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 10
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -3, -3, -3, -3, -3, -1, -1, -1,    -4, -1, -1, -1, -1, -1, -1, -1, }, // port 16
+		{ -3, -3, -3, -3, -3, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 17
+		{ -3, -3, -3, -3, -3, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 18
+		{ -3, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 19
+		{ -3, -2, -2, -2, -2, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 20
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }
+	};
+
+	int buttons_used = 1;
+
+	printf("INPUT_PORTS_START( %s ) // this structure is generated\n", machine.system().name);
+	printf("	PORT_INCLUDE( sc4_base )\n");
+
+	for (int i = 0; i < 32; i++)
+	{
+		int thisportused = 0;
+
+		for (int j = 0; j < 16; j++)
+		{
+			if (sc4inputs[i][j].used == true)
+			{
+				if (thisportused == 0)
+				{
+					printf("	PORT_MODIFY(\"IN-%d\")\n", i);
+					thisportused = 1;
+				}
+
+				if (ignoreports[i][j] > 0)
+				{
+					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, IPT_BUTTON%d ) PORT_NAME(\"%s\")\n", 1 << j, ignoreports[i][j], sc4inputs[i][j].name.cstr());
+					buttons_used++;
+				}
+				else if (ignoreports[i][j] == -3)
+				{
+					printf("	// 0x%04x - \"%s\" // standard input (motherboard)\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -2)
+				{
+					printf("	// 0x%04x - \"%s\" // standard input (expected here)\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -1)
+				{
+					printf("	// 0x%04x - \"%s\" // unexpected here\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -4)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended input, mapping not understood\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				buttons_used++;
+			}
+		}
+	}
+
+	printf("INPUT_PORTS_END\n");
+
 	return foundat;
 }
 
 struct lampinfo
 {
 	astring lampname;
+	astring lampname_alt;
 	bool used;
 	int x, y;
 	int width, height;
@@ -221,7 +366,7 @@ void set_clickable_temp(running_machine &machine, astring teststring, int clickp
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			if (!strcmp(teststring.cstr(), lamps[y][x].lampname.cstr()))
+			if (!strcmp(teststring.cstr(), lamps[y][x].lampname_alt.cstr()))
 			{
 				lamps[y][x].clickport = clickport;
 				lamps[y][x].clickmask = clickmask;
@@ -235,7 +380,29 @@ void set_clickable_temp(running_machine &machine, astring teststring, int clickp
 
 int find_lamp_strings(running_machine &machine)
 {
-	if (strcmp(machine.system().name, "sc4dnd"))
+
+	int startblock = -1;
+	int endblock = -1;
+
+
+	if (!strcmp(machine.system().name, "sc4dnd"))
+	{
+		// these are for sc4dnd ONLY, need to work out how the code calculates them
+		startblock = 0x1cac0;
+		endblock =   0x1cf9a;
+	}
+	else if (!strcmp(machine.system().name, "sc4dndtp"))
+	{
+		startblock = 0x2175c;
+		endblock = 0x21cb4;
+	}
+	else if (!strcmp(machine.system().name, "sc4dnddw"))
+	{
+		startblock = 0x18a8e;
+		endblock = 0x18fc2;
+	}
+
+	if (startblock == -1)
 		return 0;
 	
 
@@ -266,9 +433,7 @@ int find_lamp_strings(running_machine &machine)
 
 
 
-	// these are for sc4dnd ONLY, need to work out how the code calculates them
-	int startblock = 0x1cac0;
-	int endblock =   0x1cf9a;
+
 
 
 	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
@@ -338,6 +503,25 @@ int find_lamp_strings(running_machine &machine)
 		}
 	}
 
+	sc45helperlog("\n\n");
+	// print out some input text labels for specific rows
+	d = 0;
+	for (int y = 0; y < 6; y++)
+	{
+		int actualrows[] = { 1, 2, 8, 9, 10, 20 };
+		int realy = actualrows[y];
+
+		for (int x = 0; x < 6; x++)
+		{
+			sc45helperlog("<element name=\"inputlabel%d-%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", realy,x,sc4inputs[realy][x].name.cstr());
+	
+		}
+	}
+	sc45helperlog("\n");
+
+
+
+
 	// some stuff needed by the matrix layout
 	sc45helperlog("<element name=\"matrixlamp\">\n");
 	sc45helperlog("<rect state =\"0\"><bounds x=\"0\" y=\"0\" width=\"7\" height=\"7\" /><color red=\"0.7\" green=\"0.7\" blue=\"0.7\" /></rect>\n");
@@ -359,6 +543,11 @@ int find_lamp_strings(running_machine &machine)
 	sc45helperlog("<rect state =\"1\"><bounds x=\"0\" y=\"0\" width=\"7\" height=\"7\" /><color red=\"0.0\" green=\"1.0\" blue=\"0.0\" /></rect>\n");
 	sc45helperlog("<rect state =\"2\"><bounds x=\"0\" y=\"0\" width=\"7\" height=\"7\" /><color red=\"0.0\" green=\"0.0\" blue=\"1.0\" /></rect>\n");
 	sc45helperlog("</element>\n");
+	sc45helperlog("<element name=\"button\">\n");
+	sc45helperlog("<rect state =\"0\"><bounds x=\"0\" y=\"0\" width=\"7\" height=\"7\" /><color red=\"0.2\" green=\"0.8\" blue=\"0.2\" /></rect>\n");
+	sc45helperlog("<rect state =\"1\"><bounds x=\"0\" y=\"0\" width=\"7\" height=\"7\" /><color red=\"0.2\" green=\"0.9\" blue=\"0.2\" /></rect>\n");
+	sc45helperlog("<rect state =\"2\"><bounds x=\"0\" y=\"0\" width=\"7\" height=\"7\" /><color red=\"0.2\" green=\"1.0\" blue=\"0.2\" /></rect>\n");
+	sc45helperlog("</element>\n");
 	sc45helperlog("<element name=\"vfd0\">\n");
 	sc45helperlog("<led14segsc><color red=\"0\" green=\"0.6\" blue=\"1.0\" /></led14segsc>\n");
 	sc45helperlog("</element>\n");
@@ -372,6 +561,24 @@ int find_lamp_strings(running_machine &machine)
 
 
 	sc45helperlog("<view name=\"AWP Simulated Video (No Artwork)\">\n");
+
+	// copy the button strings so we can modify some for easier comparisons
+	d = 0;
+	for (int y = 0; y < 16; y++)
+	{
+		for (int x = 0; x < 16; x++)
+		{
+			lamps[y][x].lampname_alt = lamps[y][x].lampname;
+
+			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "hold2/hi")) lamps[y][x].lampname_alt = "hold2";
+			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "hold3/lo")) lamps[y][x].lampname_alt = "hold3";
+			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "chg stake")) lamps[y][x].lampname_alt = "chnge stk";
+			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "canc/coll")) lamps[y][x].lampname_alt = "cancel";
+			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "start")) lamps[y][x].lampname_alt = "strt exch";
+
+		}
+	}
+
 
 	// try to find some specific named elements and move them around
 	d = 0;
@@ -396,7 +603,7 @@ int find_lamp_strings(running_machine &machine)
 				for (int x = 0; x < 16; x++)
 				{
 
-					if (!strcmp(tempname2, lamps[y][x].lampname.cstr()))
+					if (!strcmp(tempname2, lamps[y][x].lampname_alt.cstr()))
 					{
 						//sc45helperlog("%s found\n", tempname2);
 						lamps[y][x].draw_label = false;
@@ -411,7 +618,7 @@ int find_lamp_strings(running_machine &machine)
 					}
 					else
 					{
-						//printf("%s:%s:\n", tempname2, lamps[y][x].lampname.cstr());
+						//printf("%s:%s:\n", tempname2, lamps[y][x].lampname_alt.cstr());
 					}
 
 				}
@@ -456,6 +663,23 @@ int find_lamp_strings(running_machine &machine)
 			if (lamps[y][x].draw_label == false) sc45helperlog("<!-- Label not drawn\n");
 			sc45helperlog("<bezel name=\"lamplabel%d\" element=\"lamplabelel%d\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"10\" /></bezel>\n", d,d, lamps[y][x].x, lamps[y][x].y-10, lamps[y][x].width);
 			if (lamps[y][x].draw_label == false) sc45helperlog("-->\n");
+
+			d++;
+		}
+	}
+
+	// print out a simple matrix of some of the most common inputs, 
+	d = 0;
+	for (int y = 0; y < 6; y++)
+	{
+		int actualrows[] = { 1, 2, 8, 9, 10, 20 };
+		int realy = actualrows[y];
+
+		for (int x = 0; x < 6; x++)
+		{
+			sc45helperlog("<bezel name=\"input%d-%d\" element=\"button\" state=\"0\" inputtag=\"IN-%d\" inputmask=\"0x%02x\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" /></bezel>\n", realy,x, realy, 1<<x, 180+x*20, 0+y*20, 19, 10);
+
+			sc45helperlog("<bezel name=\"inputlab%d-%d\" element=\"inputlabel%d-%d\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"10\" /></bezel>\n", realy,x,realy,x, 180+x*20,  0+(y*20)-10, 19);
 
 			d++;
 		}
@@ -533,23 +757,69 @@ int find_lamp_strings(running_machine &machine)
 
 int find_reel_strings(running_machine &machine)
 {
-	if (strcmp(machine.system().name, "sc4dnd"))
-		return 0;
-	
+	int startblock = -1;
+	int endblock = -1;
+
+	dynamic_array<int> reelsizes;
+
 	// these are for sc4dnd ONLY, need to work out how the code calculates them
 	
 	// this list is 4 * 16 symbols for the regular reels, 12 symbols for the number spin, and 2 groups of 16 depending on jackpot/stake keys used for the prize reel
 	// code that points at these is likely to be complex because it's conditional on the game code / mode..
-	int reelsizes[] = { 16, 16, 16, 16, 12, 16, 16 };
+	if (!strcmp(machine.system().name, "sc4dnd"))
+	{
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(12);
+		reelsizes.append(16);
+		reelsizes.append(16);
+
+		startblock = 0x8d74c;
+	}
+	else if (!strcmp(machine.system().name, "sc4dndtp"))
+	{
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(12);
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(16);
+
+		startblock = 0x9d252;
+	}
+	else if (!strcmp(machine.system().name, "sc4dnddw"))
+	{
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(16);
+		reelsizes.append(12);
+		reelsizes.append(20);
+		reelsizes.append(20);
+		reelsizes.append(20);
+
+		startblock = 0x9b8c8;
+	}
+
+
 	int total_reel_symbols = 0;
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < reelsizes.count(); i++)
 	{
 		total_reel_symbols += reelsizes[i];
 	}
 
-	int startblock = 0x8d74c;
-	int endblock =   startblock + 4 * (total_reel_symbols);
+	endblock =   startblock + 4 * (total_reel_symbols);
+
+
+
+	if (startblock == -1)
+		return 0;
+	
+
+
 
 
 	UINT16 *rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
@@ -580,6 +850,10 @@ int find_reel_strings(running_machine &machine)
 			}
 			
 			UINT32 stringaddr = (rom[j + 0] << 16) | rom[j + 1];
+			stringaddr &= 0xfffff;
+
+			if (stringaddr >= (0x10000 - 16))
+				continue;
 
 			//sc45helperlog("addr %08x  ", stringaddr);
 			

@@ -2498,10 +2498,9 @@ $(DRIVERS)/bfm_sc2.o:   $(LAYOUT)/sc2_vfd.lh \
 
 $(DRIVERS)/bfm_sc4.o:   $(LAYOUT)/bfm_sc4.lh \
 			$(LAYOUT)/sc4_dmd.lh \
-			$(LAYOUT)/sc4dnd.lh
-
-$(DRIVERS)/bfm_sc4h.o:  $(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh
+			$(LAYOUT)/sc4dnd.lh \
+			$(LAYOUT)/sc4dndtp.lh \
+			$(LAYOUT)/sc4dnddw.lh		
 
 $(DRIVERS)/bfm_sc5.o:   $(LAYOUT)/bfm_sc5.lh
 

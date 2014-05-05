@@ -2,9 +2,7 @@
 
     Scorpion 4 Hardware Platform (c)1996 Bell Fruit Manufacturing
 
-    Skeleton Driver
-
-    THIS DRIVER IS NOT WORKING
+    preliminary driver
 
     -----------------
 
@@ -23,9 +21,30 @@
     This file contains the hardware emulation, for the supported sets
     see bfm_sc4.c
 
-    ---
-    note, if game says 'read meters' simply press CTRL then 'B'
-    I think we're stuck in some king of free play test mode so Start 1 will spin and give you credit
+    The hopper(s) are not currently emulated, many of the games can
+	be operated in 'Door Open' mode granting you free credits.
+
+	Most games will show a RAM error on first boot due, after that they
+	will initialize their NVRAM.
+
+	If 'Read Meters' is shown press the 'Cancel' button (this moves around
+	per game, so where it maps might not be obvious)  Doing this will allow
+	the games to run in Door Open mode, pressing 'Start' (also moves around)
+	will allow you to test the game.  Not all games have this feature.
+
+	Pressing the service key ('Green Button') often allows test mode to be
+	entered, some games have more comprehensive tests than others.
+
+	Various (poorly programmed) sets require specific Jackpot 'keys' etc. to
+	boot and won't even warn you if they're invalid, others allow you to
+	set options if keys are not present. (again the buttons to do so move
+	between games)
+
+	Many games have missing sound roms, incorrect sound roms, or badly
+	dumped sound roms.  We also have several dumps where only sound roms
+	are present.
+
+	Many of the titles here were also released on the SC5 platform.
 
 */
 
@@ -36,11 +55,10 @@
 #include "machine/68307.h"
 #include "machine/68340.h"
 #include "includes/bfm_sc45.h"
-#include "bfm_sc4.lh"
 #include "video/awpvid.h"
 //DMD01
 #include "cpu/m6809/m6809.h"
-#include "sc4_dmd.lh"
+
 
 
 UINT8 sc4_state::read_input_matrix(running_machine &machine, int row)
@@ -554,7 +572,7 @@ UINT8 sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UIN
 {
 	int pc = space.device().safe_pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
-	return machine().rand();
+	return 0xbb;// machine().rand();
 }
 
 UINT16 sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask)
@@ -705,7 +723,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
+//	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(sc4_state, bfm_sc4_irqhandler))
@@ -731,7 +749,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
 	/* video hardware */
 
-	MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
+	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
 	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
 	MCFG_BF_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
@@ -924,7 +942,7 @@ INPUT_PORTS_START( sc4_raw ) // completley unmapped, but named inputs for all th
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT(           0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN-A") 
+	PORT_START("IN-10") 
 	PORT_DIPNAME( 0x01, 0x00, "IN 10-0 (STRB 10 Data 0)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -943,7 +961,7 @@ INPUT_PORTS_START( sc4_raw ) // completley unmapped, but named inputs for all th
 	PORT_BIT(           0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
-	PORT_START("IN-B")
+	PORT_START("IN-11")
 	PORT_DIPNAME( 0x01, 0x00, "IN 11-0 (STRB 11 Data 0)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1066,21 +1084,21 @@ INPUT_PORTS_END
 INPUT_PORTS_START( sc4_base ) // just some fairly generic defaults we map to games where there isn't a specific mapping yet
 	PORT_INCLUDE ( sc4_raw )
 	PORT_MODIFY("IN-1")
-	PORT_CANCEL(0x01)
-	PORT_HOLD1(0x02)
-	PORT_HOLD2(0x04)
-	PORT_HOLD3(0x08)
-	PORT_CUSTOMSC4_1(0x10, "Custom 1")
-
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("IN1-0")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("IN1-1")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("IN1-2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("IN1-3")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("IN1-4")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("IN1-5")
 
 	PORT_MODIFY("IN-2")
-	PORT_CUSTOMSC4_2(0x01, "Custom 2")
-	PORT_CUSTOMSC4_3(0x02, "Custom 3")
-	PORT_CUSTOMSC4_4(0x04, "Custom 4")
-	PORT_CUSTOMSC4_5(0x08, "Custom 5")
-	PORT_CUSTOMSC4_6(0x10, "Custom 6")
-
-
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("IN2-0")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("IN2-1")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("IN2-2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("IN2-3")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("IN2-4")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_NAME("IN2-5")
+	
 	PORT_MODIFY("IN-3")
 	PORT_DIPNAME( 0x04, 0x00, "IN 3-2 (STK 4  3.2)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1120,6 +1138,29 @@ INPUT_PORTS_START( sc4_base ) // just some fairly generic defaults we map to gam
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	
+	PORT_MODIFY("IN-8")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_NAME("IN8-0")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_NAME("IN8-1")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON15) PORT_NAME("IN8-2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON16) PORT_NAME("IN8-3")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON17) PORT_NAME("IN8-4")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON18) PORT_NAME("IN8-5")
+
+	PORT_MODIFY("IN-9")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON19) PORT_NAME("IN9-0")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON20) PORT_NAME("IN9-1")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON21) PORT_NAME("IN9-2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON22) PORT_NAME("IN9-3")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON23) PORT_NAME("IN9-4")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON24) PORT_NAME("IN9-5")
+
+	PORT_MODIFY("IN-10")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON25) PORT_NAME("IN10-0")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON26) PORT_NAME("IN10-1")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON27) PORT_NAME("IN10-2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON28) PORT_NAME("IN10-3")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON29) PORT_NAME("IN10-4")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON30) PORT_NAME("IN10-5")
 
 	PORT_MODIFY("IN-20")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Green Button")
