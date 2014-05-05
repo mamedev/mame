@@ -32,7 +32,6 @@ enum map_handler_type
 	AMH_NOP,
 	AMH_UNMAP,
 	AMH_DEVICE_DELEGATE,
-	AMH_LEGACY_SPACE_HANDLER,
 	AMH_PORT,
 	AMH_BANK,
 	AMH_DEVICE_SUBMAP
@@ -127,19 +126,11 @@ public:
 	read16_delegate         m_rproto16;             // 16-bit read proto-delegate
 	read32_delegate         m_rproto32;             // 32-bit read proto-delegate
 	read64_delegate         m_rproto64;             // 64-bit read proto-delegate
-	read8_space_func        m_rspace8;              // 8-bit legacy address space handler
-	read16_space_func       m_rspace16;             // 16-bit legacy address space handler
-	read32_space_func       m_rspace32;             // 32-bit legacy address space handler
-	read64_space_func       m_rspace64;             // 64-bit legacy address space handler
 	write8_delegate         m_wproto8;              // 8-bit write proto-delegate
 	write16_delegate        m_wproto16;             // 16-bit write proto-delegate
 	write32_delegate        m_wproto32;             // 32-bit write proto-delegate
 	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
-	write8_space_func       m_wspace8;              // 8-bit legacy address space handler
-	write16_space_func      m_wspace16;             // 16-bit legacy address space handler
-	write32_space_func      m_wspace32;             // 32-bit legacy address space handler
-	write64_space_func      m_wspace64;             // 64-bit legacy address space handler
-
+	
 	setoffset_delegate       m_soproto;              // set offset proto-delegate
 	address_map_delegate    m_submap_delegate;
 	int                     m_submap_bits;
@@ -153,33 +144,21 @@ public:
 
 protected:
 	// internal handler setters for 8-bit functions
-	void internal_set_handler(read8_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(write8_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(read8_space_func rfunc, const char *rstring, write8_space_func wfunc,  const char *wstring, UINT64 mask);
 	void internal_set_handler(device_t &device, read8_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, write8_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, read8_delegate rfunc, write8_delegate wfunc, UINT64 mask);
 
 	// internal handler setters for 16-bit functions
-	void internal_set_handler(read16_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(write16_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(read16_space_func rfunc, const char *rstring, write16_space_func wfunc, const char *wstring, UINT64 mask);
 	void internal_set_handler(device_t &device, read16_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, write16_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, read16_delegate rfunc, write16_delegate wfunc, UINT64 mask);
 
 	// internal handler setters for 32-bit functions
-	void internal_set_handler(read32_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(write32_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(read32_space_func rfunc, const char *rstring, write32_space_func wfunc, const char *wstring, UINT64 mask);
 	void internal_set_handler(device_t &device, read32_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, write32_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, read32_delegate rfunc, write32_delegate wfunc, UINT64 mask);
 
 	// internal handler setters for 64-bit functions
-	void internal_set_handler(read64_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(write64_space_func func, const char *string, UINT64 mask);
-	void internal_set_handler(read64_space_func rfunc, const char *rstring, write64_space_func wfunc, const char *wstring, UINT64 mask);
 	void internal_set_handler(device_t &device, read64_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, write64_delegate func, UINT64 mask);
 	void internal_set_handler(device_t &device, read64_delegate rfunc, write64_delegate wfunc, UINT64 mask);
@@ -199,9 +178,6 @@ public:
 	address_map_entry8(address_map &map, offs_t start, offs_t end);
 
 	// native-size handlers
-	void set_handler(read8_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(write8_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(read8_space_func rfunc, const char *rstring, write8_space_func wfunc, const char *wstring) { internal_set_handler(rfunc, rstring, wfunc, wstring, 0); }
 	void set_handler(device_t &device, read8_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, write8_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, read8_delegate rfunc, write8_delegate wfunc) { internal_set_handler(device, rfunc, wfunc, 0); }
@@ -217,17 +193,11 @@ public:
 	address_map_entry16(address_map &map, offs_t start, offs_t end);
 
 	// native-size handlers
-	void set_handler(read16_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(write16_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(read16_space_func rfunc, const char *rstring, write16_space_func wfunc, const char *wstring) { internal_set_handler(rfunc, rstring, wfunc, wstring, 0); }
 	void set_handler(device_t &device, read16_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, write16_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, read16_delegate rfunc, write16_delegate wfunc) { internal_set_handler(device, rfunc, wfunc, 0); }
 
 	// 8-bit handlers
-	void set_handler(read8_space_func func, const char *string, UINT16 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(write8_space_func func, const char *string, UINT16 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(read8_space_func rfunc, const char *rstring, write8_space_func wfunc, const char *wstring, UINT16 mask) { internal_set_handler(rfunc, rstring, wfunc, wstring, mask); }
 	void set_handler(device_t &device, read8_delegate func, UINT16 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, write8_delegate func, UINT16 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, read8_delegate rfunc, write8_delegate wfunc, UINT16 mask) { internal_set_handler(device, rfunc, wfunc, mask); }
@@ -243,25 +213,16 @@ public:
 	address_map_entry32(address_map &map, offs_t start, offs_t end);
 
 	// native-size handlers
-	void set_handler(read32_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(write32_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(read32_space_func rfunc, const char *rstring, write32_space_func wfunc, const char *wstring) { internal_set_handler(rfunc, rstring, wfunc, wstring, 0); }
 	void set_handler(device_t &device, read32_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, write32_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, read32_delegate rfunc, write32_delegate wfunc) { internal_set_handler(device, rfunc, wfunc, 0); }
 
 	// 16-bit handlers
-	void set_handler(read16_space_func func, const char *string, UINT32 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(write16_space_func func, const char *string, UINT32 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(read16_space_func rfunc, const char *rstring, write16_space_func wfunc, const char *wstring, UINT32 mask) { internal_set_handler(rfunc, rstring, wfunc, wstring, mask); }
 	void set_handler(device_t &device, read16_delegate func, UINT32 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, write16_delegate func, UINT32 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, read16_delegate rfunc, write16_delegate wfunc, UINT32 mask) { internal_set_handler(device, rfunc, wfunc, mask); }
 
 	// 8-bit handlers
-	void set_handler(read8_space_func func, const char *string, UINT32 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(write8_space_func func, const char *string, UINT32 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(read8_space_func rfunc, const char *rstring, write8_space_func wfunc, const char *wstring, UINT32 mask) { internal_set_handler(rfunc, rstring, wfunc, wstring, mask); }
 	void set_handler(device_t &device, read8_delegate func, UINT32 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, write8_delegate func, UINT32 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, read8_delegate rfunc, write8_delegate wfunc, UINT32 mask) { internal_set_handler(device, rfunc, wfunc, mask); }
@@ -277,33 +238,21 @@ public:
 	address_map_entry64(address_map &map, offs_t start, offs_t end);
 
 	// native-size handlers
-	void set_handler(read64_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(write64_space_func func, const char *string) { internal_set_handler(func, string, 0); }
-	void set_handler(read64_space_func rfunc, const char *rstring, write64_space_func wfunc, const char *wstring) { internal_set_handler(rfunc, rstring, wfunc, wstring, 0); }
 	void set_handler(device_t &device, read64_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, write64_delegate func) { internal_set_handler(device, func, 0); }
 	void set_handler(device_t &device, read64_delegate rfunc, write64_delegate wfunc) { internal_set_handler(device, rfunc, wfunc, 0); }
 
 	// 32-bit handlers
-	void set_handler(read32_space_func func, const char *string, UINT64 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(write32_space_func func, const char *string, UINT64 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(read32_space_func rfunc, const char *rstring, write32_space_func wfunc, const char *wstring, UINT64 mask) { internal_set_handler(rfunc, rstring, wfunc, wstring, mask); }
 	void set_handler(device_t &device, read32_delegate func, UINT64 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, write32_delegate func, UINT64 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, read32_delegate rfunc, write32_delegate wfunc, UINT64 mask) { internal_set_handler(device, rfunc, wfunc, mask); }
 
 	// 16-bit handlers
-	void set_handler(read16_space_func func, const char *string, UINT64 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(write16_space_func func, const char *string, UINT64 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(read16_space_func rfunc, const char *rstring, write16_space_func wfunc, const char *wstring, UINT64 mask) { internal_set_handler(rfunc, rstring, wfunc, wstring, mask); }
 	void set_handler(device_t &device, read16_delegate func, UINT64 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, write16_delegate func, UINT64 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, read16_delegate rfunc, write16_delegate wfunc, UINT64 mask) { internal_set_handler(device, rfunc, wfunc, mask); }
 
 	// 8-bit handlers
-	void set_handler(read8_space_func func, const char *string, UINT64 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(write8_space_func func, const char *string, UINT64 mask) { internal_set_handler(func, string, mask); }
-	void set_handler(read8_space_func rfunc, const char *rstring, write8_space_func wfunc, const char *wstring, UINT64 mask) { internal_set_handler(rfunc, rstring, wfunc, wstring, mask); }
 	void set_handler(device_t &device, read8_delegate func, UINT64 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, write8_delegate func, UINT64 mask) { internal_set_handler(device, func, mask); }
 	void set_handler(device_t &device, read8_delegate rfunc, write8_delegate wfunc, UINT64 mask) { internal_set_handler(device, rfunc, wfunc, mask); }
@@ -409,26 +358,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 	curentry->set_mask(_mask);
 #define AM_MIRROR(_mirror) \
 	curentry->set_mirror(_mirror);
-
-// legacy space writes
-#define AM_WRITE_LEGACY(_handler) \
-	curentry->set_handler(_handler, #_handler);
-
-// legacy space reads/writes
-#define AM_READWRITE_LEGACY(_rhandler, _whandler) \
-	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler);
-
-// legacy device reads
-#define AM_DEVREAD_LEGACY(_tag, _handler) \
-	curentry->set_handler(device, read_delegate(&_handler, #_handler, _tag, (device_t *)0));
-
-// legacy device writes
-#define AM_DEVWRITE_LEGACY(_tag, _handler) \
-	curentry->set_handler(device, write_delegate(&_handler, #_handler, _tag, (device_t *)0));
-
-// legacy device reads/writes
-#define AM_DEVREADWRITE_LEGACY(_tag, _rhandler, _whandler) \
-	curentry->set_handler(device, read_delegate(&_rhandler, #_rhandler, _tag, (device_t *)0), write_delegate(&_whandler, #_whandler, _tag, (device_t *)0));
 
 // driver data reads
 #define AM_READ(_handler) \
