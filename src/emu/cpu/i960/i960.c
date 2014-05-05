@@ -2013,6 +2013,7 @@ void i960_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
+	save_item(NAME(m_IP));
 	save_item(NAME(m_PIP));
 	save_item(NAME(m_SAT));
 	save_item(NAME(m_PRCB));
@@ -2023,6 +2024,10 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_fp));
 	save_item(NAME(m_rcache));
 	save_item(NAME(m_rcache_frame_addr));
+	save_item(NAME(m_rcache_pos));
+	save_item(NAME(m_immediate_irq));
+	save_item(NAME(m_immediate_vector));
+	save_item(NAME(m_immediate_pri));
 
 	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
 	state_add( I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
