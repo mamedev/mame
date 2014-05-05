@@ -109,9 +109,8 @@ static void amiga_ar1_nmi( running_machine &machine )
 	}
 }
 
-static WRITE16_HANDLER( amiga_ar1_chipmem_w )
+WRITE16_MEMBER( amiga_state::amiga_ar1_chipmem_w )
 {
-	amiga_state *state = space.machine().driver_data<amiga_state>();
 	int pc = space.device().safe_pc();
 
 	/* see if we're inside the AR1 rom */
@@ -127,14 +126,14 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		}
 	}
 
-	(*state->m_chip_ram_w)(state,  offset * 2, data );
+	(*m_chip_ram_w)(this, offset * 2, data );
 }
 
 static void amiga_ar1_check_overlay( running_machine &machine )
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 
-	state->m_maincpu_program_space->install_legacy_write_handler(0x000000, 0x00007f, FUNC(amiga_ar1_chipmem_w));
+	state->m_maincpu_program_space->install_write_handler(0x000000, 0x00007f, write16_delegate(FUNC(amiga_state::amiga_ar1_chipmem_w),state));
 }
 
 static void amiga_ar1_init( running_machine &machine )
@@ -249,16 +248,15 @@ READ16_MEMBER( amiga_state::amiga_ar23_mode_r )
 	return mem[offset];
 }
 
-static WRITE16_HANDLER( amiga_ar23_chipmem_w )
+WRITE16_MEMBER( amiga_state::amiga_ar23_chipmem_w )
 {
-	amiga_state *state = space.machine().driver_data<amiga_state>();
 	if ( offset == (0x08/2) )
 	{
 		if ( amigacrt.ar23_mode & 1 )
 			amiga_ar23_freeze(space.machine());
 	}
 
-	(*state->m_chip_ram_w)(state,  offset * 2, data );
+	(*m_chip_ram_w)(this,  offset * 2, data );
 }
 
 static void amiga_ar23_freeze( running_machine &machine )
@@ -284,7 +282,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 		state->membank("bank1")->set_entry(2);
 
 		/* writes go to chipram */
-		state->m_maincpu_program_space->install_legacy_write_handler(0x000000, state->m_chip_ram.bytes() - 1, FUNC(amiga_ar23_chipmem_w));
+		state->m_maincpu_program_space->install_write_handler(0x000000, state->m_chip_ram.bytes() - 1, write16_delegate(FUNC(amiga_state::amiga_ar23_chipmem_w),state));
 
 		/* trigger NMI irq */
 		machine.device("maincpu")->execute().set_input_line(7, PULSE_LINE);
@@ -343,7 +341,7 @@ static void amiga_ar23_check_overlay( running_machine &machine )
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 	amigacrt.ar23_mode = 3;
-	state->m_maincpu_program_space->install_legacy_write_handler(0x000000, 0x00000f, FUNC(amiga_ar23_chipmem_w));
+	state->m_maincpu_program_space->install_write_handler(0x000000, 0x00000f, write16_delegate(FUNC(amiga_state::amiga_ar23_chipmem_w),state));
 }
 
 void amiga_state::amiga_ar23_init( running_machine &machine, int ar3 )

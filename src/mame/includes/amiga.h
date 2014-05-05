@@ -530,6 +530,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(amiga_m68k_reset);
 	
 	IRQ_CALLBACK_MEMBER(amiga_ar1_irqack);
+	DECLARE_WRITE16_MEMBER( amiga_ar1_chipmem_w );
+	DECLARE_WRITE16_MEMBER( amiga_ar23_chipmem_w );
 	
 	int m_centronics_busy;
 	int m_centronics_perror;
