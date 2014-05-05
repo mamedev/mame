@@ -856,7 +856,7 @@ UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 {
 	int base_x = 32;
 	int base_y = 25;
-	int x, x2, y;
+	int x, x2, y, width;
 	bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
 	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + 256 - 1);
@@ -887,7 +887,7 @@ UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 		/* body */
 		x = 0;
-		int width = m_data[y].m_sample_count;
+		width = m_data[y].m_sample_count;
 		pixel_t *RESTRICT pixels = bitmap_addr(bitmap, base_y + y, base_x);
 		while(x < width)
 		{
@@ -911,24 +911,22 @@ UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		}
 
 		/* right border */
-		for (x = base_x + 256; x <= max_x; x++)
-		{
-			*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
-		}
+		if (width)
+			for (x = base_x + 256; x <= max_x; x++)
+				*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
 
 		/* artifacting */
 		m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
 	}
 
+	width = m_data[191].m_sample_count;
+
 	/* bottom border */
-	for (y = base_y + 192; y <= max_y; y++)
-	{
-		for (x = min_x; x <= max_x; x++)
-		{
-			int width = m_data[191].m_sample_count;
-			*bitmap_addr(bitmap, y, x) = border_value(m_data[191].m_mode[width - 1], palette, is_mc6847t1);
-		}
-	}
+	if (width)
+		for (y = base_y + 192; y <= max_y; y++)
+			for (x = min_x; x <= max_x; x++)
+				*bitmap_addr(bitmap, y, x) = border_value(m_data[191].m_mode[width - 1], palette, is_mc6847t1);
+
 	return 0;
 }
 
