@@ -1754,9 +1754,12 @@ void S3C24_CLASS_NAME::s3c24xx_gpio_reset()
 
 UINT32 S3C24_CLASS_NAME::iface_gpio_port_r(int port, UINT32 mask)
 {
-	if (!m_port_r.isnull())
+	if (!m_port_r_cb.isnull())
 	{
-		return (m_port_r)( port, mask);
+		// TO CHECK : masking is not done in any of handlers
+		// devcb2 do it automatically so guess is masks are not proper right now
+		// without masking works fine
+		return (m_port_r_cb)( port ); //, mask);
 	}
 	else
 	{
@@ -3475,7 +3478,7 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	verboselog( machine(), 1, "s3c24xx device start\n");
 	m_pin_r_cb.resolve();
 	m_pin_w_cb.resolve_safe();
-	m_port_r.resolve(m_iface_gpio.port_r, *this);
+	m_port_r_cb.resolve();
 	m_port_w_cb.resolve();
 	m_scl_w_cb.resolve();
 	m_sda_r_cb.resolve();

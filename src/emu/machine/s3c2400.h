@@ -17,14 +17,14 @@
 #define MCFG_S3C2400_PALETTE(_palette_tag) \
 	s3c2400_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#define S3C2400_INTERFACE(name) \
-	const s3c2400_interface(name) =
-
 #define MCFG_S3C2400_CORE_PIN_R_CB(_devcb) \
 	devcb = &s3c2400_device::set_core_pin_r_callback(*device, DEVCB2_##_devcb);
  
 #define MCFG_S3C2400_CORE_PIN_W_CB(_devcb) \
 	devcb = &s3c2400_device::set_core_pin_w_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_S3C2400_GPIO_PORT_R_CB(_devcb) \
+	devcb = &s3c2400_device::set_gpio_port_r_callback(*device, DEVCB2_##_devcb);
 	
 #define MCFG_S3C2400_GPIO_PORT_W_CB(_devcb) \
 	devcb = &s3c2400_device::set_gpio_port_w_callback(*device, DEVCB2_##_devcb);
@@ -58,19 +58,6 @@ enum
 	S3C2400_GPIO_PORT_G
 };
 
-/*******************************************************************************
-    TYPE DEFINITIONS
-*******************************************************************************/
-
-struct s3c2400_interface_gpio
-{
-	devcb_read32 port_r;
-};
-
-struct s3c2400_interface
-{
-	s3c2400_interface_gpio m_iface_gpio;
-};
 
 /*******************************************************************************
     MACROS & CONSTANTS
@@ -360,8 +347,7 @@ struct s3c2400_interface
 #define S3C24XX_DMA_COUNT   4
 #define S3C24XX_SPI_COUNT   1
 
-class s3c2400_device : public device_t,
-								public s3c2400_interface
+class s3c2400_device : public device_t
 {
 public:
 	s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -371,6 +357,7 @@ public:
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	template<class _Object> static devcb2_base &set_core_pin_r_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_pin_r_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_core_pin_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_pin_w_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_port_r_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_gpio_port_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_port_w_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_i2c_scl_w_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_scl_w_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_i2c_sda_r_callback(device_t &device, _Object object) { return downcast<s3c2400_device &>(device).m_sda_r_cb.set_callback(object); }
@@ -380,7 +367,6 @@ public:
 	static void set_lcd_flags(device_t &device, int flags) { downcast<s3c2400_device &>(device).m_flags = flags; }
 
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 private:
@@ -890,7 +876,7 @@ public:
 	required_device<device_t> m_cpu;
 	devcb2_read32 m_pin_r_cb;
 	devcb2_write32 m_pin_w_cb;
-	devcb_resolved_read32 m_port_r;
+	devcb2_read32 m_port_r_cb;
 	devcb2_write32 m_port_w_cb;
 	devcb2_write_line m_scl_w_cb;
 	devcb2_read_line m_sda_r_cb;

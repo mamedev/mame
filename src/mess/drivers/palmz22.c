@@ -275,12 +275,6 @@ DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 {
 }
 
-static S3C2410_INTERFACE( palmz22_s3c2410_intf )
-{
-	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_r) }
-};
-
 static NAND_INTERFACE( palmz22_nand_intf )
 {
 	NAND_CHIP_K9F5608U0D_J
@@ -302,9 +296,9 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
-	MCFG_DEVICE_CONFIG(palmz22_s3c2410_intf)
 	MCFG_S3C2410_PALETTE("palette")
 	MCFG_S3C2410_CORE_PIN_R_CB(READ32(palmz22_state, s3c2410_core_pin_r))
+	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(palmz22_state, s3c2410_gpio_port_r))
 	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(palmz22_state, s3c2410_gpio_port_w))
 	MCFG_S3C2410_ADC_DATA_R_CB(READ32(palmz22_state, s3c2410_adc_data_r))
 	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(palmz22_state, s3c2410_nand_command_w))

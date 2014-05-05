@@ -45,6 +45,7 @@ s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, d
 		m_cpu(*this, ":maincpu"),
 		m_pin_r_cb(*this),
 		m_pin_w_cb(*this),
+		m_port_r_cb(*this),
 		m_port_w_cb(*this),
 		m_scl_w_cb(*this),
 		m_sda_r_cb(*this),
@@ -91,20 +92,6 @@ s3c2410_device::~s3c2410_device()
 void s3c2410_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<s3c2410_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void s3c2410_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const s3c2410_interface *intf = reinterpret_cast<const s3c2410_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<s3c2410_interface *>(this) = *intf;
 }
 
 //-------------------------------------------------

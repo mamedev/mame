@@ -558,15 +558,6 @@ static INPUT_PORTS_START( touryuu )
 	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static const s3c2410_interface bballoon_s3c2410_intf =
-{
-	// GPIO (port read / port write)
-	{ DEVCB_DRIVER_MEMBER32(ghosteo_state,s3c2410_gpio_port_r) }
-};
-
-
-
 READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 {
 	UINT32 ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
@@ -631,9 +622,9 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
-	MCFG_DEVICE_CONFIG(bballoon_s3c2410_intf)
 	MCFG_S3C2410_PALETTE("palette")
 	MCFG_S3C2410_CORE_PIN_R_CB(READ32(ghosteo_state, s3c2410_core_pin_r))
+	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(ghosteo_state, s3c2410_gpio_port_r))
 	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(ghosteo_state, s3c2410_gpio_port_w))
 	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_scl_w))
 	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(ghosteo_state, s3c2410_i2c_sda_r))
