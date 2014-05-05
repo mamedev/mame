@@ -24,13 +24,13 @@ NETLIB_UPDATE(7474sub)
 
 NETLIB_UPDATE(7474)
 {
-	if (!INPLOGIC(m_PREQ) && !INPLOGIC(m_CLRQ))
-	{
-		sub.newstate(1, 1);
-		sub.m_CLK.inactivate();
-		m_D.inactivate();
-	}
-	if (!INPLOGIC(m_PREQ))
+	if (INPLOGIC(m_PREQ) && INPLOGIC(m_CLRQ))
+    {
+        m_D.activate();
+        sub.m_nextD = INPLOGIC(m_D);
+        sub.m_CLK.activate_lh();
+    }
+	else if (!INPLOGIC(m_PREQ))
 	{
 		sub.newstate(1, 0);
 		sub.m_CLK.inactivate();
@@ -43,11 +43,11 @@ NETLIB_UPDATE(7474)
 		m_D.inactivate();
 	}
 	else
-	{
-		m_D.activate();
-		sub.m_nextD = INPLOGIC(m_D);
-		sub.m_CLK.activate_lh();
-	}
+    {
+        sub.newstate(1, 1);
+        sub.m_CLK.inactivate();
+        m_D.inactivate();
+    }
 }
 
 NETLIB_START(7474)

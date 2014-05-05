@@ -101,7 +101,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	ANALOG_INPUT(V5, 5)
 #define VCC "V5", Q
 #define GND "GND", Q
-    
+
     CHIP("F9",  7493)
 	CHIP("F10", 7493)
 	CHIP("F7", 74107)
@@ -157,7 +157,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("A7", 7493)
 	CHIP("B8", 7400)
 	CHIP("A8", 7420)
-    
+
     //CHIP("A10", 555_Mono, &a10_555_desc)
     CHIP_555_Mono(A10, &a10_555_desc)
 
@@ -175,7 +175,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     CHIP("A9", 7493)
 
 	CHIP("H4", 7474)
-	
+
 	CHIP("B3", 7400)
 	CHIP("D2", 7404)
 
@@ -184,7 +184,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("G7", 74107)
 	CHIP("H7", 7420)
 	CHIP("E2", 7400)
-	
+
 	CHIP("B4", 9316)
 	CHIP("A4", 9316)
 	CHIP("B5", 7483)
@@ -194,7 +194,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("E7", 7400)
     //CHIP("F5", 555_Mono, &f5_555_desc)
     CHIP_555_Mono(F5, &f5_555_desc)
-    
+
     //CHIP("G5", 555_Mono, &g5_555_desc)
     CHIP_555_Mono(G5, &g5_555_desc)
 	CHIP("C3", 7474)
@@ -203,12 +203,12 @@ CIRCUIT_LAYOUT( pongdoubles )
     CHIP("F2", 7493)
 	CHIP("H2", 7400)
 	CHIP("H3", 74107)
-	
+
 	CHIP("B7", 7450)
 	CHIP("A6", 7474)
 	CHIP("A5", 7486)
 	//CHIP("D10", 74107)
-	
+
 	CHIP("C8", 7490)
 	CHIP("D8", 7490)
     CHIP("C9", 74107)
@@ -227,7 +227,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 
     CHIP("J1", 7474)
     CHIP("F1", 7427)
-    
+
     CHIP("J10", 7400)
     CHIP("H10", 7474)
     CHIP("G10", 7474)
@@ -270,10 +270,10 @@ CIRCUIT_LAYOUT( pongdoubles )
 
     CHIP("PAD2", PADDLE2_VERTICAL_INPUT, &pad2_desc)
     PADDLE_CONNECTION("PAD2", "B10")
-    
+
     CHIP("PAD3", PADDLE3_VERTICAL_INPUT, &pad3_desc)
     PADDLE_CONNECTION("PAD3", "B9B")
-    
+
     CHIP("PAD4", PADDLE4_VERTICAL_INPUT, &pad4_desc)
     PADDLE_CONNECTION("PAD4", "B9A")
 
@@ -453,7 +453,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     CONNECTION("F6", 13, "G6", 1)
     CONNECTION(V4, "G6", 2)
     CONNECTION("H6", 3, "G6", 13)
-    
+
     #define VBLANK "F6", 13
     #define VBLANK_n "F6", 10
 
@@ -463,7 +463,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     CONNECTION(H256_n, "F4", 11)
     CONNECTION(CLK, "F4", 9)
     CONNECTION(VCC, "F4", 10)
-    
+
     CONNECTION("F4", 6, "G4", 5)
     CONNECTION(H256, "G4", 4)
 
@@ -504,7 +504,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     CONNECTION(H128, "E4", 1)
 	CONNECTION(H128, "E4", 2)
 	CONNECTION(H128, "E4", 13)
-	
+
 	CONNECTION("E4", 12, "E4", 5)
 	CONNECTION(H64, "E4", 4)
 	CONNECTION(H256, "E4", 3)
@@ -512,22 +512,22 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("E4", 12, "E3", 9)
 	CONNECTION(H64, "E3", 10)
 	CONNECTION(H256, "E3", 11)
-	
+
 	CONNECTION("E3", 8, "E4", 9)
 	CONNECTION("E3", 8, "E4", 10)
 	CONNECTION("E3", 8, "E4", 11)
-	
+
 	CONNECTION("E4", 6, "D3", 8)
 	CONNECTION("E4", 8, "D3", 9)
-	
+
 	CONNECTION(V32, "G2", 2)
 	CONNECTION(V32, "G2", 3)
-	
+
 	CONNECTION("G2", 1, "F3", 1)
 	CONNECTION(V64, "F3", 2)
 	CONNECTION(V128, "F3", 4)
 	CONNECTION("D3", 10, "F3", 5)
-	
+
 	CONNECTION("C7", 7, "C6", 7)
 	CONNECTION("C7", 9, "C6", 1)
 	CONNECTION("D7", 7, "C6", 2)
@@ -537,31 +537,31 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION(VCC, "C6", 5)
 
 
-	// Score display circuit 
+	// Score display circuit
 	CONNECTION(H16, "E5", 3)
-	
+
 	CONNECTION(H4, "C4", 12)
 	CONNECTION(H8, "C4", 13)
-	
+
 	CONNECTION("E5", 4, "E6", 9)
 	CONNECTION(H4, "E6", 10)
 	CONNECTION(H8, "E6", 11)
-	
+
 	CONNECTION("C4", 11, "D3", 5)
 	CONNECTION("E5", 4, "D3", 6)
-	
+
 	CONNECTION(V8, "E6", 3)
 	CONNECTION(V4, "E6", 4)
 	CONNECTION("E5", 4, "E6", 5)
-	
+
 	CONNECTION(V4, "E3", 1)
 	CONNECTION(V8, "E3", 2)
 	CONNECTION(H16, "E3", 13)
-	
+
 	CONNECTION("E5", 1, "E3", 12)
-	
+
 	CONNECTION(V16, "E5", 5)
-	
+
 	CONNECTION("E5", 6, "D5", 1)
 	CONNECTION("C6", 15, "D5", 2)
 	CONNECTION("E6", 8, "D5", 13)
@@ -573,23 +573,23 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("D3", 4, "C5", 9)
 	CONNECTION("E5", 6, "C5", 10)
 	CONNECTION("C6", 12, "C5", 11)
-	
+
 	CONNECTION("D3", 4, "D6", 1)
 	CONNECTION("C6", 11, "D6", 2)
 	CONNECTION(V16, "D6", 13)
-	
+
 	CONNECTION("C6", 13, "D5", 9)
 	CONNECTION("E5", 6, "D5", 10)
 	CONNECTION("E6", 6, "D5", 11)
-	
+
 	CONNECTION("C6", 14, "D5", 3)
 	CONNECTION("E5", 2, "D5", 4)
 	CONNECTION("E5", 6, "D5", 5)
-	
+
 	CONNECTION("E5", 2, "D6", 3)
 	CONNECTION(V16, "D6", 4)
 	CONNECTION("C6", 10, "D6", 5)
-	
+
 	CONNECTION("D5", 12, "D4", 12)
 	CONNECTION("D6", 8, "D4", 5)
 	CONNECTION("C5", 8, "D4", 4)
@@ -598,11 +598,11 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("D5", 8, "D4", 11)
 	CONNECTION("D5", 6, "D4", 6)
 	CONNECTION("D6", 6, "D4", 3)
-	
+
 
     // Coin / Start Logic
     CONNECTION("COIN", 1, "C10", 5)
-    
+
     // Capacitor C33 used to drive a ~0.1ms low pulse
     // onto A3 pin 2 at the falling edge of COIN.
     CONNECTION("COIN", 1, "C33", 1)
@@ -612,7 +612,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     CONNECTION("C33", 3, "A3", 2)
 
     CONNECTION("A3", 3, "D2", 11)
-    
+
     CONNECTION(VCC, "B2", 4)
     CONNECTION("D2", 10, "B2", 3)
     CONNECTION("C10", 6, "B2", 2)
@@ -652,12 +652,12 @@ CIRCUIT_LAYOUT( pongdoubles )
 
     CONNECTION("H10", 9, "J10", 4)
     CONNECTION("H10", 6, "J10", 5)
-        
+
     CONNECTION("H6", 11, "G10", 10)
     CONNECTION(VCC, "G10", 12)
     CONNECTION("B3", 3, "G10", 11)
     CONNECTION("J10", 6, "G10", 13) // Schematic shows pin 10
-    
+
     CONNECTION("J10", 6, "E5", 9) // Schematic says E6?
 
     #define ATTRACT_n "D2", 4
@@ -667,28 +667,28 @@ CIRCUIT_LAYOUT( pongdoubles )
     #define SRST_n "J10", 6
 
 
-    // Game Control Logic			
+    // Game Control Logic
 	CONNECTION("H7", 6, "E7", 9)
 	CONNECTION("H6", 8, "E7", 10)
-	
+
 	CONNECTION("E7", 8, "D2", 13)
-	
+
 	CONNECTION("D2", 12, "E2", 1)
 	CONNECTION(ATTRACT_n, "E2", 2)
-	
+
 	CONNECTION(SRST_n, "E7", 4)
     CONNECTION("E7", 8, "E7", 5)
-	
+
 	CONNECTION("E7", 6, "E7", 1)
 	CONNECTION("E7", 6, "E7", 2)
-	
+
 	CONNECTION("E7", 3, "F5", 2)
 	CONNECTION(VCC, "F5", 4)
-			
+
 	CONNECTION(ATTRACT, "E6", 1)
 	CONNECTION("B3", 3, "E6", 2)
 	CONNECTION("F5", 3, "E6", 13)
-	
+
 	CONNECTION("E6", 12, "B6", 12)
 	CONNECTION("E6", 12, "B6", 13)
 	CONNECTION(VCC, "B6", 10)
@@ -701,7 +701,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     // Horizontal Ball Counter
 	CONNECTION(ATTRACT_n, "E2", 4)
     CONNECTION("B6", 8, "E2", 5)
-	
+
 	CONNECTION("H5", 8, "G8", 3)
 	CONNECTION("H5", 6, "G8", 4)
 	CONNECTION(GND, "G8", 5)
@@ -711,7 +711,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION(VCC, "G8", 7)
 	CONNECTION("H6", 6, "G8", 10)
 	CONNECTION("G6", 8, "G8", 9)
-	
+
 	CONNECTION(GND, "H8", 3)
 	CONNECTION(GND, "H8", 4)
 	CONNECTION(GND, "H8", 5)
@@ -721,19 +721,19 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("G8", 15, "H8", 7)
 	CONNECTION(VCC, "H8", 10)
 	CONNECTION("G6", 8, "H8", 9)
-	
+
 	CONNECTION(VCC, "G7", 8)
 	CONNECTION(VCC, "G7", 11)
 	CONNECTION("H8", 15, "G7", 9)
 	CONNECTION("E2", 6, "G7", 10)
-	
+
 	CONNECTION("G8", 12, "H7", 9)
 	CONNECTION("G8", 11, "H7", 10)
 	CONNECTION("H8", 15, "H7", 12)
 	CONNECTION("G7", 5, "H7", 13)
 
     #define HVID_n "H7", 8
-	
+
 	CONNECTION("H8", 15, "G6", 9)
 	CONNECTION("G8", 15, "G6", 10)
 	CONNECTION("G7", 5, "G6", 11)
@@ -742,7 +742,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION(HVID_n, "H7", 2)
 	CONNECTION(HVID_n, "H7", 4)
 	CONNECTION(HVID_n, "H7", 5)
-	
+
 	#define HVID "H7", 6
 
 
@@ -756,7 +756,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION(VCC, "B4", 7)
 	CONNECTION("F6", 10, "B4", 10)
 	CONNECTION("B3", 6, "B4", 9)
-	
+
 	CONNECTION(GND, "A4", 3)
 	CONNECTION(GND, "A4", 4)
 	CONNECTION(GND, "A4", 5)
@@ -766,14 +766,14 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("B4", 15, "A4", 7)
 	CONNECTION(VCC, "A4", 10)
 	CONNECTION("B3", 6, "A4", 9)
-	
+
 	CONNECTION("B4", 15, "B3", 5)
 	CONNECTION("A4", 15, "B3", 4)
-	
+
 	CONNECTION("B4", 12, "E3", 3)
 	CONNECTION("B4", 11, "E3", 4)
 	CONNECTION("A4", 15, "E3", 5)
-	
+
 	CONNECTION("E3", 6, "D3", 11)
 	CONNECTION("E3", 6, "D3", 12)
 
@@ -784,19 +784,19 @@ CIRCUIT_LAYOUT( pongdoubles )
 	// Hit Logic
 	CONNECTION(HVID_n, "G2", 5)
 	CONNECTION(VVID_n, "G2", 6)
-	
+
 	CONNECTION("G1", 10, "G4", 1)
 	CONNECTION("G2", 4, "G4", 2)
 
 	CONNECTION("G1", 12, "G4", 13)
 	CONNECTION("G2", 4, "G4", 12)
-	
+
 	CONNECTION("G4", 3, "B3", 9)
 	CONNECTION("G4", 11, "B3", 10)
-	
+
 	CONNECTION("B3", 8, "B3", 12)
 	CONNECTION("B3", 8, "B3", 13)
-	
+
     #define HIT   "B3", 8
     #define HIT_n "B3", 11
 
@@ -804,33 +804,33 @@ CIRCUIT_LAYOUT( pongdoubles )
     // Horizontal Ball Control
 	CONNECTION("E2", 8, "E2", 12)
 	CONNECTION("C3", 6, "E2", 13)
-	
+
 	CONNECTION("E7", 6, "F2", 2)
 	CONNECTION("E7", 6, "F2", 3)
 	CONNECTION("E2", 11, "F2", 14)
 	CONNECTION("F2", 12, "F2", 1)
-	
+
 	CONNECTION("F2", 8, "G2", 11)
 	CONNECTION("F2", 11, "G2", 12)
-	
+
 	CONNECTION("F2", 8, "E2", 9)
 	CONNECTION("F2", 11, "E2", 10)
-	
+
 	CONNECTION("G2", 13, "H2", 1)
 	CONNECTION("G2", 13, "H2", 2)
-	
+
 	CONNECTION("H2", 3, "H2", 12)
 	CONNECTION("E2", 8, "H2", 13)
-	
+
 	CONNECTION("H2", 11, "H2", 9)
 	CONNECTION("E8", 6, "H2", 10)
-	
+
 	CONNECTION("H2", 3, "H2", 4)
 	CONNECTION("E8", 6, "H2", 5)
 
 	CONNECTION(H256_n, "G2", 8)
 	CONNECTION("E8", 6, "G2", 9)
-	
+
 	CONNECTION(VCC, "H3", 8)
 	CONNECTION("G2", 10, "H3", 9)
 	CONNECTION("H5", 3, "H3", 11)
@@ -840,13 +840,13 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("G2", 10, "H3", 12)
 	CONNECTION(GND, "H3", 4)
 	CONNECTION("H2", 6, "H3", 13)
-	
+
 	CONNECTION("H3", 5, "H5", 1)
 	CONNECTION("H3", 3, "H5", 2)
 
 	CONNECTION("G5", 3, "C2", 12)
 	CONNECTION(ATTRACT, "C2", 13)
-    
+
 	CONNECTION("C2", 11, "D2", 1)
 
 	CONNECTION("H4", 8, "H4", 12)
@@ -856,10 +856,10 @@ CIRCUIT_LAYOUT( pongdoubles )
 
     CONNECTION("H5", 3, "H5", 12)
 	CONNECTION("H4", 9, "H5", 13)
-	
+
 	CONNECTION("H5", 3, "H5", 4)
 	CONNECTION("H4", 8, "H5", 5)
-	
+
 	CONNECTION("H5", 11, "H5", 10)
 	CONNECTION("H5", 6, "H5", 9)
 
@@ -893,44 +893,44 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION(H256_n, "B7", 2)
 	CONNECTION("A9", 11, "B7", 4)
 	CONNECTION(H256, "B7", 5)
-	
+
 	CONNECTION(ATTRACT, "D2", 5)
-    
+
 	CONNECTION("B1", 7, "A6", 12)
 	CONNECTION(HIT, "A6", 11)
 	CONNECTION("D2", 6, "A6", 13)
 	CONNECTION(VCC, "A6", 10)
-	
+
 	CONNECTION("A1", 7, "A6", 2)
 	CONNECTION(HIT, "A6", 3)
 	CONNECTION("D2", 6, "A6", 1)
 	CONNECTION(VCC, "A6", 4)
-	
+
 	CONNECTION("A1", 9, "B6", 2)
 	CONNECTION(HIT, "B6", 3)
 	CONNECTION("D2", 6, "B6", 1)
 	CONNECTION(VCC, "B6", 4)
-	
+
 	CONNECTION(VVID, "D10", 1)
 	CONNECTION("F6", 13, "D10", 12)
 	CONNECTION(VVID, "D10", 4)
 	CONNECTION("B3", 11, "D10", 13)
-	
+
 	CONNECTION("A6", 8, "A5", 9)
 	CONNECTION("D10", 3, "A5", 10)
 
 	CONNECTION("D10", 3, "A5", 4)
 	CONNECTION("A6", 6, "A5", 5)
-	
+
 	CONNECTION("D10", 3, "B7", 1)
 	CONNECTION("B6", 6, "B7", 13)
 	CONNECTION("B6", 5, "B7", 10) // Pins 5&6 swapped compared to Pong
 	CONNECTION("D10", 2, "B7", 9)
-	
+
 	CONNECTION("B7", 8, "C5", 1)
 	CONNECTION("B7", 8, "C5", 2)
 	CONNECTION("B7", 8, "C5", 13)
-	
+
 	CONNECTION("A5", 8, "B5", 10)
 	CONNECTION("A5", 6, "B5", 8)
 	CONNECTION("B7", 8, "B5", 3)
@@ -946,94 +946,94 @@ CIRCUIT_LAYOUT( pongdoubles )
     // Paddle 1 Vertical
 	CONNECTION(V256_n, "B10", 2)
 	CONNECTION(VCC, "B10", 4)
-	
+
 	CONNECTION("B10", 3, "C10", 3)
-	
+
 	CONNECTION(HSYNC_n, "B8", 4)
 	CONNECTION("A8", 8, "B8", 5)
-	
+
 	CONNECTION("B10", 3, "A7", 2)
 	CONNECTION("B10", 3, "A7", 3)
 	CONNECTION("B8", 6, "A7", 14)
 	CONNECTION("A7", 12, "A7", 1)
-	
+
 	CONNECTION("A7", 12, "A8", 10)
 	CONNECTION("A7", 9, "A8", 9)
 	CONNECTION("A7", 8, "A8", 12)
 	CONNECTION("A7", 11, "A8", 13)
-	
+
 	CONNECTION("C10", 4, "B8", 1)
 	CONNECTION("A8", 8, "B8", 2)
 
 	// Paddle 1N Vertical
     CONNECTION(V256_n, "B9A", 2)
 	CONNECTION(VCC, "B9A", 4)
-	
+
 	CONNECTION("B9A", 3, "G1", 1)
-	
+
 	CONNECTION(HSYNC_n, "E1", 1)
 	CONNECTION("A2", 8, "E1", 2)
-	
+
 	CONNECTION("B9A", 3, "D1", 2)
 	CONNECTION("B9A", 3, "D1", 3)
 	CONNECTION("E1", 3, "D1", 14)
 	CONNECTION("D1", 12, "D1", 1)
-	
+
 	CONNECTION("D1", 12, "A2", 10)
 	CONNECTION("D1", 9, "A2", 9)
 	CONNECTION("D1", 8, "A2", 12)
 	CONNECTION("D1", 11, "A2", 13)
-	
+
 	CONNECTION("G1", 2, "E1", 12)
 	CONNECTION("A2", 8, "E1", 13)
-	
 
-	
+
+
 	// Paddle 2 Vertical
 	CONNECTION(V256_n, "A10", 2)
 	CONNECTION(VCC, "A10", 4)
-	
+
 	CONNECTION("A10", 3, "C10", 1)
-	
+
 	CONNECTION("A8", 6, "B8", 9)
 	CONNECTION(HSYNC_n, "B8", 10)
-	
+
 	CONNECTION("A10", 3, "A9", 2)
 	CONNECTION("A10", 3, "A9", 3)
 	CONNECTION("B8", 8, "A9", 14)
 	CONNECTION("A9", 12, "A9", 1)
-	
+
 	CONNECTION("A9", 12, "A8", 2)
 	CONNECTION("A9", 9, "A8", 1)
 	CONNECTION("A9", 8, "A8", 4)
 	CONNECTION("A9", 11, "A8", 5)
-	
+
 	CONNECTION("C10", 2, "B8", 13)
 	CONNECTION("A8", 6, "B8", 12)
 
 	// Paddle 2N Vertical
     CONNECTION(V256_n, "B9B", 2)
 	CONNECTION(VCC, "B9B", 4)
-	
+
 	CONNECTION("B9B", 3, "G1", 3)
-	
+
 	CONNECTION(HSYNC_n, "E1", 4)
 	CONNECTION("A2", 6, "E1", 5)
-	
+
 	CONNECTION("B9B", 3, "C1", 2)
 	CONNECTION("B9B", 3, "C1", 3)
 	CONNECTION("E1", 6, "C1", 14)
 	CONNECTION("C1", 12, "C1", 1)
-	
+
 	CONNECTION("C1", 12, "A2", 5)
 	CONNECTION("C1", 9, "A2", 4)
 	CONNECTION("C1", 8, "A2", 2)
 	CONNECTION("C1", 11, "A2", 1)
-	
+
 	CONNECTION("G1", 4, "E1", 9)
 	CONNECTION("A2", 6, "E1", 10)
-	
-	
+
+
     // Paddle N Horizontal
     CONNECTION(H64, "G1", 5)
 
@@ -1068,14 +1068,14 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CONNECTION("D2", 4, "H4", 4)
 	CONNECTION(H4, "H4", 3)
 	CONNECTION(H128, "H4", 2)
-	
+
 	CONNECTION(H128, "G4", 10)
 	CONNECTION("H4", 6, "G4", 9)
-	
+
 	CONNECTION("G4", 8, "G3", 9)
 	CONNECTION(H256, "G3", 10)
 	CONNECTION("B8", 3, "G3", 11)
-	
+
 	CONNECTION("B8", 11, "G3", 1)
 	CONNECTION(H256_n, "G3", 2)
 	CONNECTION("G4", 8, "G3", 13)
@@ -1093,30 +1093,30 @@ CIRCUIT_LAYOUT( pongdoubles )
 	// Sound
 	CONNECTION("E7", 8, "G5", 2)
 	CONNECTION(VCC, "G5", 4)
-	
+
 	CONNECTION("G5", 3, "C4", 10)
 	CONNECTION(V32, "C4", 9)
-	
+
 	CONNECTION(VCC, "C3", 2)
 	CONNECTION(VCC, "C3", 4)
 	CONNECTION(HIT_n, "C3", 1)
 	CONNECTION("A4", 15, "C3", 3)
-	
+
 	CONNECTION("C3", 6, "C4", 1)
 	CONNECTION("A4", 14, "C4", 2)
-	
+
 	CONNECTION(VVID, "F4", 1)
 	CONNECTION("F6", 13, "F4", 12)
 	CONNECTION(VVID_n, "F4", 4)
 	CONNECTION("B6", 9, "F4", 13)
-	
+
 	CONNECTION("F4", 3, "C4", 5)
 	CONNECTION("A4", 13, "C4", 4)
-	
+
 	CONNECTION("C4", 6, "C5", 3)
 	CONNECTION("C4", 3, "C5", 4)
 	CONNECTION("C4", 8, "C5", 5)
-	
+
 
 
 
@@ -1126,26 +1126,26 @@ CIRCUIT_LAYOUT( pongdoubles )
 
 	CONNECTION("H4", 8, "F6", 2)
 	CONNECTION("E2", 3, "F6", 3)
-	
+
 	CONNECTION("F6", 4, "C8", 14)
 	CONNECTION("C8", 12, "C8", 1)
 	CONNECTION(SRST, "C8", 2)
 	CONNECTION(SRST, "C8", 3)
 	CONNECTION(GND, "C8", 6)
 	CONNECTION(GND, "C8", 7)
-		
+
 	CONNECTION("F6", 1, "D8", 14)
 	CONNECTION("D8", 12, "D8", 1)
 	CONNECTION(SRST, "D8", 2)
 	CONNECTION(SRST, "D8", 3)
 	CONNECTION(GND, "D8", 6)
 	CONNECTION(GND, "D8", 7)
-	
+
 	CONNECTION("C8", 11, "C9", 12)
 	CONNECTION(VCC, "C9", 1)
 	CONNECTION(VCC, "C9", 4)
 	CONNECTION(SRST_n, "C9", 13)
-	
+
 	CONNECTION("D8", 11, "C9", 9)
 	CONNECTION(VCC, "C9", 8)
 	CONNECTION(VCC, "C9", 11)
@@ -1168,7 +1168,7 @@ CIRCUIT_LAYOUT( pongdoubles )
     //CONNECTION("DIPSW1", 6, "D9", 4)
 	CONNECTION("DIPSW2", Q, "D9", 4)
 	CONNECTION("C9", 5, "D9", 5)
-	
+
     CONNECTION("D9", 12, "B3", 1)
     CONNECTION("D9", 6, "B3", 2)
 
