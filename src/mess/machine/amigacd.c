@@ -122,7 +122,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	}
 }
 
-static READ16_HANDLER( amiga_dmac_r )
+READ16_MEMBER( amiga_state::amiga_dmac_r )
 {
 	offset &= 0xff;
 
@@ -256,7 +256,7 @@ static READ16_HANDLER( amiga_dmac_r )
 	return 0;
 }
 
-static WRITE16_HANDLER( amiga_dmac_w )
+WRITE16_MEMBER( amiga_state::amiga_dmac_w )
 {
 	offset &= 0xff;
 
@@ -391,8 +391,8 @@ static void dmac_install(running_machine &machine, offs_t base)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 	address_space &space = *state->m_maincpu_program_space;
-	space.install_legacy_read_handler(base, base + 0xFFFF, FUNC(amiga_dmac_r));
-	space.install_legacy_write_handler(base, base + 0xFFFF, FUNC(amiga_dmac_w));
+	space.install_read_handler(base, base + 0xFFFF, read16_delegate(FUNC(amiga_state::amiga_dmac_r),state));
+	space.install_write_handler(base, base + 0xFFFF, write16_delegate(FUNC(amiga_state::amiga_dmac_w),state));
 }
 
 static void dmac_uninstall(running_machine &machine, offs_t base)

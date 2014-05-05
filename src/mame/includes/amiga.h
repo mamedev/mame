@@ -532,6 +532,9 @@ public:
 	IRQ_CALLBACK_MEMBER(amiga_ar1_irqack);
 	DECLARE_WRITE16_MEMBER( amiga_ar1_chipmem_w );
 	DECLARE_WRITE16_MEMBER( amiga_ar23_chipmem_w );
+
+	DECLARE_READ16_MEMBER( amiga_dmac_r );
+	DECLARE_WRITE16_MEMBER( amiga_dmac_w );
 	
 	int m_centronics_busy;
 	int m_centronics_perror;
