@@ -314,9 +314,14 @@ int find_input_strings(running_machine &machine)
 					thisportused = 1;
 				}
 
-				if (ignoreports[i][j] > 0)
+				if (ignoreports[i][j] > 0 && ignoreports[i][j] <= 16)
 				{
 					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, IPT_BUTTON%d ) PORT_NAME(\"%s\")\n", 1 << j, ignoreports[i][j], sc4inputs[i][j].name.cstr());
+					buttons_used++;
+				}
+				else if (ignoreports[i][j] > 16)
+				{
+					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(\"%s\")\n", 1 << j, sc4inputs[i][j].name.cstr());
 					buttons_used++;
 				}
 				else if (ignoreports[i][j] == -3)
