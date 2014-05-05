@@ -149,7 +149,6 @@ bits(7:4) and bit(24)), X, and Y:
 #include "video/rgbutil.h"
 #include "voodoo.h"
 #include "vooddefs.h"
-#include "devlegcy.h"
 
 
 /*************************************
@@ -5037,48 +5036,7 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	init_save_state(device);
 }
 
-static DEVICE_START( voodoo_1 )
-{
-	common_start_voodoo(device, TYPE_VOODOO_1);
-}
-static DEVICE_START( voodoo_2 )
-{
-	common_start_voodoo(device, TYPE_VOODOO_2);
-}
 
-static DEVICE_START( voodoo_banshee )
-{
-	common_start_voodoo(device, TYPE_VOODOO_BANSHEE);
-}
-
-static DEVICE_START( voodoo_3 )
-{
-	common_start_voodoo(device, TYPE_VOODOO_3);
-}
-
-/*-------------------------------------------------
-    device exit callback
--------------------------------------------------*/
-
-static DEVICE_STOP( voodoo )
-{
-	voodoo_state *v = get_safe_token(device);
-
-	/* release the work queue, ensuring all work is finished */
-	if (v->poly != NULL)
-		poly_free(v->poly);
-}
-
-
-/*-------------------------------------------------
-    device reset callback
--------------------------------------------------*/
-
-static DEVICE_RESET( voodoo )
-{
-	voodoo_state *v = get_safe_token(device);
-	soft_reset(v);
-}
 
 /***************************************************************************
     COMMAND HANDLERS
@@ -5734,7 +5692,8 @@ void voodoo_device::device_config_complete()
 
 void voodoo_device::device_reset()
 {
-	DEVICE_RESET_NAME( voodoo )(this);
+	voodoo_state *v = get_safe_token(this);
+	soft_reset(v);
 }
 
 //-------------------------------------------------
@@ -5743,7 +5702,11 @@ void voodoo_device::device_reset()
 
 void voodoo_device::device_stop()
 {
-	DEVICE_STOP_NAME( voodoo )(this);
+	voodoo_state *v = get_safe_token(this);
+
+	/* release the work queue, ensuring all work is finished */
+	if (v->poly != NULL)
+		poly_free(v->poly);
 }
 
 
@@ -5760,7 +5723,7 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_1_device::device_start()
 {
-	DEVICE_START_NAME( voodoo_1 )(this);
+	common_start_voodoo(this, TYPE_VOODOO_1);
 }
 
 
@@ -5777,7 +5740,7 @@ voodoo_2_device::voodoo_2_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_2_device::device_start()
 {
-	DEVICE_START_NAME( voodoo_2 )(this);
+	common_start_voodoo(this, TYPE_VOODOO_2);
 }
 
 
@@ -5794,7 +5757,7 @@ voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, cons
 
 void voodoo_banshee_device::device_start()
 {
-	DEVICE_START_NAME( voodoo_banshee )(this);
+	common_start_voodoo(this, TYPE_VOODOO_BANSHEE);
 }
 
 
@@ -5811,7 +5774,7 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_3_device::device_start()
 {
-	DEVICE_START_NAME( voodoo_3 )(this);
+	common_start_voodoo(this, TYPE_VOODOO_3);
 }
 
 
