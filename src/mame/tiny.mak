@@ -79,6 +79,7 @@ MACHINES += RIOT6532
 MACHINES += PIT8253
 MACHINES += Z80CTC
 MACHINES += 68681
+MACHINES += BANKDEV
 
 #-------------------------------------------------
 # specify available bus cores

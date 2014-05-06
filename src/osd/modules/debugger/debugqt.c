@@ -27,8 +27,12 @@
 #include "qt/debugqtbreakpointswindow.h"
 #include "debugqt.h"
 
-const osd_debugger_type OSD_DEBUGGER_QT = &osd_debugger_creator<debugger_qt>;
 
+osd_debugger_interface *qt_osd_debugger_creator(const osd_interface &osd)
+{
+	return new debugger_qt(osd);
+}
+const osd_debugger_type OSD_DEBUGGER_QT = &qt_osd_debugger_creator;
 
 //============================================================
 //  "Global" variables to make QT happy
