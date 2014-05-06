@@ -142,9 +142,9 @@ MACHINE_CONFIG_END
 ROM_START(vectrex)
 	ROM_REGION(0x18000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "bios0", "exec rom")
-	ROMX_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
+	ROMX_LOAD("exec_rom.bin", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "bios1", "exec rom intl 284001-1")
-	ROMX_LOAD("exec rom intl 284001-1.bin", 0xe000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
+	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0xe000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
 
 //	The following fastboots are listed here for reference and documentation
 //	ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
@@ -235,7 +235,7 @@ MACHINE_CONFIG_END
 ROM_START(raaspec)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("spectrum.bin", 0x0000, 0x8000, CRC(20af7f3f) SHA1(7ce85db8dd32687ad7629631ae113820371faf7c))
-	ROM_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
+	ROM_LOAD("exec_rom.bin", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
 ROM_END
 
 /***************************************************************************
