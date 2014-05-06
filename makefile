@@ -864,7 +864,7 @@ tests: $(REGTESTS)
 
 mak: maketree $(MAKEMAK_TARGET)
 	@echo Rebuilding $(SUBTARGET).mak...
-	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst -I$(SRC)/emu -I$(SRC)/mame -I$(SRC)/mame/layout -I$(SRC)/mess -I$(SRC)/mess/layout $(SRC) > $(SUBTARGET).mak
+	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst -I. -I$(SRC)/emu -I$(SRC)/mame -I$(SRC)/mame/layout -I$(SRC)/mess -I$(SRC)/mess/layout $(SRC) > $(SUBTARGET).mak
 	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst > $(SUBTARGET).lst
 
 #-------------------------------------------------
