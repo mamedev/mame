@@ -39,9 +39,9 @@ private:
 	static inline _PixelType dest_rgb_to_pixel(UINT32 r, UINT32 g, UINT32 b) { return dest_assemble_rgb(r >> _SrcShiftR, g >> _SrcShiftG, b >> _SrcShiftB); }
 
 	// source 32-bit pixels are in MAME standardized format
-	static inline UINT32 source32_r(rgb_t pixel) { return (pixel >> (16 + _SrcShiftR)) & (0xff >> _SrcShiftR); }
-	static inline UINT32 source32_g(rgb_t pixel) { return (pixel >> ( 8 + _SrcShiftG)) & (0xff >> _SrcShiftG); }
-	static inline UINT32 source32_b(rgb_t pixel) { return (pixel >> ( 0 + _SrcShiftB)) & (0xff >> _SrcShiftB); }
+	static inline UINT32 source32_r(UINT32 pixel) { return (pixel >> (16 + _SrcShiftR)) & (0xff >> _SrcShiftR); }
+	static inline UINT32 source32_g(UINT32 pixel) { return (pixel >> ( 8 + _SrcShiftG)) & (0xff >> _SrcShiftG); }
+	static inline UINT32 source32_b(UINT32 pixel) { return (pixel >> ( 0 + _SrcShiftB)) & (0xff >> _SrcShiftB); }
 
 	// destination pixel masks are based on the template parameters as well
 	static inline UINT32 dest_r(_PixelType pixel) { return (pixel >> _DstShiftR) & (0xff >> _SrcShiftR); }
@@ -49,7 +49,7 @@ private:
 	static inline UINT32 dest_b(_PixelType pixel) { return (pixel >> _DstShiftB) & (0xff >> _SrcShiftB); }
 
 	// generic conversion with special optimization for destinations in the standard format
-	static inline _PixelType source32_to_dest(rgb_t pixel)
+	static inline _PixelType source32_to_dest(UINT32 pixel)
 	{
 		if (_SrcShiftR == 0 && _SrcShiftG == 0 && _SrcShiftB == 0 && _DstShiftR == 16 && _DstShiftG == 8 && _DstShiftB == 0)
 			return pixel;
@@ -329,7 +329,7 @@ private:
 	//  draw_aa_pixel - draw an antialiased pixel
 	//-------------------------------------------------
 
-	static inline void draw_aa_pixel(_PixelType *dstdata, UINT32 pitch, int x, int y, rgb_t col)
+	static inline void draw_aa_pixel(_PixelType *dstdata, UINT32 pitch, int x, int y, UINT32 col)
 	{
 		_PixelType *dest = dstdata + y * pitch + x;
 		UINT32 dpix = _NoDestRead ? 0 : *dest;

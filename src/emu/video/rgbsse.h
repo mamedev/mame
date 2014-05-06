@@ -330,7 +330,7 @@ INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbint *colors
     four pixel values
 -------------------------------------------------*/
 
-INLINE rgb_t rgb_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+INLINE UINT32 rgb_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	__m128i color00 = _mm_cvtsi32_si128(rgb00);
 	__m128i color01 = _mm_cvtsi32_si128(rgb01);
@@ -360,7 +360,7 @@ INLINE rgb_t rgb_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rg
     four pixel values
 -------------------------------------------------*/
 
-INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+INLINE UINT32 rgba_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	return rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 }
@@ -371,7 +371,7 @@ INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t r
     four pixel values
 -------------------------------------------------*/
 
-INLINE void rgbint_bilinear_filter(rgbint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+INLINE void rgbint_bilinear_filter(rgbint *color, UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	__m128i color00 = _mm_cvtsi32_si128(rgb00);
 	__m128i color01 = _mm_cvtsi32_si128(rgb01);
@@ -399,7 +399,7 @@ INLINE void rgbint_bilinear_filter(rgbint *color, rgb_t rgb00, rgb_t rgb01, rgb_
     four pixel values
 -------------------------------------------------*/
 
-INLINE void rgbaint_bilinear_filter(rgbaint *color, rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
+INLINE void rgbaint_bilinear_filter(rgbaint *color, UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	rgbint_bilinear_filter(color, rgb00, rgb01, rgb10, rgb11, u, v);
 }
