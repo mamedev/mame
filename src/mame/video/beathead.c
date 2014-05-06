@@ -99,23 +99,6 @@ WRITE32_MEMBER( beathead_state::finescroll_w )
 
 /*************************************
  *
- *  Palette handling
- *
- *************************************/
-
-WRITE32_MEMBER( beathead_state::palette_w )
-{
-	int newword = COMBINE_DATA(&m_paletteram[offset]);
-	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
-	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
-	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
-	m_palette->set_pen_color(offset, pal6bit(r), pal6bit(g), pal6bit(b));
-}
-
-
-
-/*************************************
- *
  *  HSYNC RAM handling
  *
  *************************************/

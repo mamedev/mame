@@ -30,8 +30,7 @@ public:
 		m_subcpu2(*this, "sub2"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
@@ -111,7 +110,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
 	DECLARE_READ16_MEMBER(roundup5_vram_r);
 	DECLARE_WRITE16_MEMBER(roundup5_vram_w);
-	DECLARE_WRITE16_MEMBER(roundup5_palette_w);
 	DECLARE_WRITE16_MEMBER(roundup5_text_w);
 	DECLARE_READ16_MEMBER(cyclwarr_videoram0_r);
 	DECLARE_READ16_MEMBER(cyclwarr_videoram1_r);
@@ -144,7 +142,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 /*----------- defined in machine/tatsumi.c -----------*/

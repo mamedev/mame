@@ -19,8 +19,7 @@ public:
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_text_ram;
@@ -47,7 +46,6 @@ public:
 	DECLARE_WRITE16_MEMBER(twin16_CPUB_register_w);
 	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
 	DECLARE_WRITE16_MEMBER(twin16_text_ram_w);
-	DECLARE_WRITE16_MEMBER(twin16_paletteram_word_w);
 	DECLARE_WRITE16_MEMBER(fround_gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(twin16_video_register_w);
 	DECLARE_READ16_MEMBER(twin16_sprite_status_r);
@@ -79,7 +77,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 class cuebrickj_state : public twin16_state

@@ -180,6 +180,9 @@
 #define MCFG_PALETTE_FORMAT(_format) \
 	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
 
+#define MCFG_PALETTE_MEMBITS(_width) \
+	palette_device::static_set_membits(*device, _width);
+
 #define MCFG_PALETTE_ENDIANNESS(_endianness) \
 	palette_device::static_set_endianness(*device, _endianness);
 
@@ -322,6 +325,7 @@ public:
 	// static configuration
 	static void static_set_init(device_t &device, palette_init_delegate init);
 	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
+	static void static_set_membits(device_t &device, int membits);
 	static void static_set_endianness(device_t &device, endianness_t endianness);
 	static void static_set_entries(device_t &device, int entries);
 	static void static_set_indirect_entries(device_t &device, int entries);
@@ -414,8 +418,10 @@ private:
 	int                 m_indirect_entries;     // number of indirect colors in the palette
 	bool                m_enable_shadows;       // are shadows enabled?
 	bool                m_enable_hilights;      // are hilights enabled?
-	endianness_t        m_endianness;           // endianness of palette RAM
-	bool                m_endianness_supplied;  // endianness supplied in static config
+	int                 m_membits;              // width of palette RAM, if different from native
+	bool                m_membits_supplied;     // true if membits forced in static config
+	endianness_t        m_endianness;           // endianness of palette RAM, if different from native
+	bool                m_endianness_supplied;  // true if endianness forced in static config
 
 	// palette RAM
 	raw_to_rgb_converter m_raw_to_rgb;          // format of palette RAM

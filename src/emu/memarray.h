@@ -58,7 +58,8 @@ public:
 	void set(const memory_array &array);
 
 	// piecewise configuration
-	void set_endianness(endianness_t endianness) { set(m_base, m_bytes, m_membits, endianness, m_bytes_per_entry); }
+	void set_membits(int membits);
+	void set_endianness(endianness_t endianness);
 
 	// getters
 	void *base() const { return m_base; }

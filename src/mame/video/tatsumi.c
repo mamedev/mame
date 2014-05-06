@@ -46,39 +46,6 @@ WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset/0x10);
 }
 
-
-WRITE16_MEMBER(tatsumi_state::roundup5_palette_w)
-{
-//  static int hack=0;
-	int word;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-//  if (offset==0xbfe)
-//      hack++;
-
-//  if (hack>1)
-//      return;
-
-/*
-apache 3 schematics state
-
-bit 4:  250
-bit 3:  500
-bit 2:  1k
-bit 1:  2k
-bit 0:  3.9kOhm resistor
-
-*/
-
-//  logerror("PAL: %04x %02x\n",offset,data);
-
-	offset&=~1;
-	word = ((m_generic_paletteram_16[offset] & 0xff)<<8) | (m_generic_paletteram_16[offset+1] & 0xff);
-	m_palette->set_pen_color(offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
-}
-
-
 WRITE16_MEMBER(tatsumi_state::roundup5_text_w)
 {
 	UINT16 *videoram = m_videoram;
