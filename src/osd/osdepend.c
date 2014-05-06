@@ -10,7 +10,6 @@
 
 
 #include "emu.h"
-#include "emuopts.h"
 #include "osdepend.h"
 #include "portmidi/portmidi.h"
 #include "modules/sound/none.h"
@@ -160,7 +159,7 @@ void osd_interface::init(running_machine &machine)
 
 	m_machine = &machine;
 	
-	emu_options &options = downcast<emu_options &>(machine.options());
+	osd_options &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
 		g_print_verbose = true;
