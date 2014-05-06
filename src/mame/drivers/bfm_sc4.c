@@ -38796,30 +38796,6 @@ GAMEL( 200?, sc4gdclbi   ,sc4gdclb,  sc4, sc4gdclb, sc4_state, sc4gdclb, ROT0, "
 GAMEL( 200?, sc4gdclbj   ,sc4gdclb,  sc4, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4gdclbk   ,sc4gdclb,  sc4, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
-static const stepper_interface* sc4gbcas_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpoint_interface_200step_reel,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4gbcas)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4gbcas_reel_configs;
-}
-
-// this one is a variation of lucky balls
-// PR1034 CASINO GOLDEN BALLS         PR1034 GOLDEN BALLS SOUNDS11
-GAMEL( 200?, sc4gbcas    ,0,         sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gbcasa   ,sc4gbcas,  sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gbcasb   ,sc4gbcas,  sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gbcasc   ,sc4gbcas,  sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
 static const stepper_interface* sc4gball_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
@@ -38836,12 +38812,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4gball)
 	m_reel_setup = sc4gball_reel_configs;
 }
 
-// this is a football themed game...
+INPUT_PORTS_START( sc4gball ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
+// this is a football themed game... completely different to golden balls casino
 // PR1604 AWP GOLDEN BALLS         PR1604 GOLDEN BALLS SOUNDS12      GOLDEN BALLS  S.SITE
-GAMEL( 200?, sc4gball    ,0,         sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gballa   ,sc4gball,  sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gballb   ,sc4gball,  sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gballc   ,sc4gball,  sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gball    ,0,         sc4, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gballa   ,sc4gball,  sc4, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gballb   ,sc4gball,  sc4, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gballc   ,sc4gball,  sc4, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4gunp_reel_configs[6] =
 {
@@ -38859,15 +38894,79 @@ DRIVER_INIT_MEMBER(sc4_state,sc4gunp)
 	m_reel_setup = sc4gunp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4gunp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collec")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("do/die")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("sp d/d")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk bns")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("s mess")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("tk str")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR3046 AWP THE GUNPOWDER SLOT S4         PR3016 GUNPOWDER SLOT SOUNDS11    GUNPOWDER SLOT  S.SITE
-GAMEL( 200?, sc4gunp     ,0,         sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpa    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpb    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpc    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpd    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpe    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpf    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gunpg    ,sc4gunp,   sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunp     ,0,         sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpa    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpb    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpc    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpd    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpe    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpf    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gunpg    ,sc4gunp,   sc4, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4hapnt_reel_configs[6] =
 {
@@ -38885,78 +38984,143 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hapnt)
 	m_reel_setup = sc4hapnt_reel_configs;
 }
 
+INPUT_PORTS_START( sc4hapnt ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-4")
+        // 0x0002 - "hoplow" // known extended(?) input, sometimes 'hop hi'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk not")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1306 AWP HAPPY NOTES         PR1306 HAPPY NOTES SOUNDS11
-GAMEL( 200?, sc4hapnt    ,0,         sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hapnta   ,sc4hapnt,  sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hapntb   ,sc4hapnt,  sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hapntc   ,sc4hapnt,  sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hapntd   ,sc4hapnt,  sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hapnte   ,sc4hapnt,  sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-static const stepper_interface* sc4hntcs_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4hntcsm)
-{
-	DRIVER_INIT_CALL(sc4mbus);
-	m_reel_setup = sc4hntcs_reel_configs;
-}
+GAMEL( 200?, sc4hapnt    ,0,         sc4, sc4hapnt, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hapnta   ,sc4hapnt,  sc4, sc4hapnt, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hapntb   ,sc4hapnt,  sc4, sc4hapnt, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hapntc   ,sc4hapnt,  sc4, sc4hapnt, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hapntd   ,sc4hapnt,  sc4, sc4hapnt, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hapnte   ,sc4hapnt,  sc4, sc4hapnt, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hntcs)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4hntcs_reel_configs;
-}
-
-// PR1327 CASINO HAPPY NOTES         HAPPY NOTES S.SITE  PR1327 CAS_HAPPY_NOTES SOUNDS11
-GAMEL( 200?, sc4hntcs    ,0,         sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsa   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsb   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsc   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-// PR1327 CASINO HAPPY NOTES         PR1327 CAS_HAPPY_NOTES SOUNDS11
-GAMEL( 200?, sc4hntcsd   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcse   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsf   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsg   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsh   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsi   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsj   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsk   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsl   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsm   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsn   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcso   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsp   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsq   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcsr   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hntcss   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 20)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-
-
-
+INPUT_PORTS_START( sc4hellb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("shoot")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("spins")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1419 AWP HELLS BELLS         PR1402 HELLS BELLS SOUNDS11
-GAMEL( 200?, sc4hellb    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbb   ,sc4hellb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbc   ,sc4hellb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbd   ,sc4hellb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbe   ,sc4hellb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbf   ,sc4hellb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellb    ,0,         sc4, sc4hellb, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbb   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbc   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbd   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbe   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbf   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PAY UINT ERR 17
 // PR1419 AWP HELLS BELLS         PR1402 HELLS BELLS SOUNDS11       HELLS BELLS S.SITE
-GAMEL( 200?, sc4hellbg   ,sc4hellb,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbh   ,sc4hellb,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbi   ,sc4hellb,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hellbj   ,sc4hellb,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbg   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbh   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbi   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hellbj   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4hill_reel_configs[6] =
 {
@@ -38974,9 +39138,77 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hill)
 	m_reel_setup = sc4hill_reel_configs;
 }
 
+INPUT_PORTS_START( sc4hill ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel OR coll")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tkstep")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("lorght")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("lomid")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("loleft")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hirght")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("himid")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("hileft")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1643 AWP HILLBILLIONAIRE SCORP4         PR1613 HILLBILLIONAIRE SOUNDS11   HILLBILLIONAIRE S.SITE
-GAMEL( 200?, sc4hill     ,0,         sc4, sc4, sc4_state, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hilla    ,sc4hill,   sc4, sc4, sc4_state, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hill     ,0,         sc4, sc4hill, sc4_state, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hilla    ,sc4hill,   sc4, sc4hill, sc4_state, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4hiss_reel_configs[6] =
@@ -38995,15 +39227,67 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hiss)
 	m_reel_setup = sc4hiss_reel_configs;
 }
 
+INPUT_PORTS_START( sc4hiss ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("stake")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refil")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("c hi")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("b hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("f hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("step")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "lock" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2176 HISSING QUID         VIPA SOUNDS         HISSING QUID
-GAMEL( 200?, sc4hiss     ,0,         sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissa    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissb    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissc    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissd    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hisse    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissf    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissg    ,sc4hiss,   sc4, sc4, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hiss     ,0,         sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hissa    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hissb    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hissc    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hissd    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hisse    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hissf    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hissg    ,sc4hiss,   sc4, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4hotrd_reel_configs[6] =
@@ -39022,10 +39306,74 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hotrd)
 	m_reel_setup = sc4hotrd_reel_configs;
 }
 
+INPUT_PORTS_START( sc4hotrd ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("lose")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("hole8")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("hole7")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hole6")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("hole5")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("hole4")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("hole3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_3 ) PORT_NAME("hole2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_4 ) PORT_NAME("hole1")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1733 AWP HOT ROD SCORP4         PR1713 HOT ROD SOUNDS11         HOT ROD S.SITE
-GAMEL( 200?, sc4hotrd    ,0,         sc4, sc4, sc4_state, sc4hotrd, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotrda   ,sc4hotrd,  sc4, sc4, sc4_state, sc4hotrd, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotrd    ,0,         sc4, sc4hotrd, sc4_state, sc4hotrd, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotrda   ,sc4hotrd,  sc4, sc4hotrd, sc4_state, sc4hotrd, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4hotsh_reel_configs[6] =
 {
@@ -39043,9 +39391,77 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hotsh)
 	m_reel_setup = sc4hotsh_reel_configs;
 }
 
+INPUT_PORTS_START( sc4hotsh ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collec")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exchan")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("transf")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("h or m")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk str")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk bon")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk tip")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("ply hs")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("bankit")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("shoot")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR3231 AWP HOT SHOT SCORP4         PR3211 HOT SHOT SOUNDS11         HOT SHOT  S.SITE
-GAMEL( 200?, sc4hotsh    ,0,         sc4, sc4, sc4_state, sc4hotsh, ROT0, "BFM","Hot Shot (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotsha   ,sc4hotsh,  sc4, sc4, sc4_state, sc4hotsh, ROT0, "BFM","Hot Shot (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotsh    ,0,         sc4, sc4hotsh, sc4_state, sc4hotsh, ROT0, "BFM","Hot Shot (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotsha   ,sc4hotsh,  sc4, sc4hotsh, sc4_state, sc4hotsh, ROT0, "BFM","Hot Shot (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4hotwd_reel_configs[6] =
@@ -39065,15 +39481,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hotwd)
 }
 
 
+INPUT_PORTS_START( sc4hotwd ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2 OR high")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3 OR low")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk fea")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk sht")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk haz")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("tk ss")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1311 HOT WAD         PR1311 HOT WAD SOUNDS11
-GAMEL( 200?, sc4hotwd    ,0,         sc4, sc4, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwda   ,sc4hotwd,  sc4, sc4, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwd    ,0,         sc4, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwda   ,sc4hotwd,  sc4, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PAY UNIT ERR 17
 // PR1311 HOT WAD         PR1311 HOT WAD SOUNDS11         2 HOT WAD S.SITE
-GAMEL( 200?, sc4hotwdb   ,sc4hotwd,  sc4, sc4, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwdc   ,sc4hotwd,  sc4, sc4, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwdd   ,sc4hotwd,  sc4, sc4, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwde   ,sc4hotwd,  sc4, sc4, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwdb   ,sc4hotwd,  sc4, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwdc   ,sc4hotwd,  sc4, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwdd   ,sc4hotwd,  sc4, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwde   ,sc4hotwd,  sc4, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4celeb_reel_configs[6] =
@@ -39092,13 +39568,73 @@ DRIVER_INIT_MEMBER(sc4_state,sc4celeb)
 	m_reel_setup = sc4celeb_reel_configs;
 }
 
+INPUT_PORTS_START( sc4celeb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("get me")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1603 AWP IM A CELEBRITY         PR1603 IM A CELEB SOUNDS11        IM A CELEBRITY  S.SITE
-GAMEL( 200?, sc4celeb    ,0,         sc4, sc4, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4celeba   ,sc4celeb,  sc4, sc4, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4celebb   ,sc4celeb,  sc4, sc4, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4celebc   ,sc4celeb,  sc4, sc4, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4celebd   ,sc4celeb,  sc4, sc4, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4celeb    ,0,         sc4, sc4celeb, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4celeba   ,sc4celeb,  sc4, sc4celeb, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4celebb   ,sc4celeb,  sc4, sc4celeb, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4celebc   ,sc4celeb,  sc4, sc4celeb, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4celebd   ,sc4celeb,  sc4, sc4celeb, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4inspn_reel_configs[6] =
@@ -39117,9 +39653,53 @@ DRIVER_INIT_MEMBER(sc4_state,sc4inspn)
 	m_reel_setup = sc4inspn_reel_configs;
 }
 
+INPUT_PORTS_START( sc4inspn ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("can/co")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("take s")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("cashpo")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "lock" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2555 INNER SPIN V013         INNERSPINSND            INNER SPIN
-GAMEL( 200?, sc4inspn    ,0,         sc4, sc4, sc4_state, sc4inspn, ROT0, "Mazooma","Inner Spin (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4inspna   ,sc4inspn,  sc4, sc4, sc4_state, sc4inspn, ROT0, "Mazooma","Inner Spin (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4inspn    ,0,         sc4, sc4inspn, sc4_state, sc4inspn, ROT0, "Mazooma","Inner Spin (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4inspna   ,sc4inspn,  sc4, sc4inspn, sc4_state, sc4inspn, ROT0, "Mazooma","Inner Spin (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4ijob_reel_configs[6] =
@@ -39138,22 +39718,85 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ijob)
 	m_reel_setup = sc4ijob_reel_configs;
 }
 
+INPUT_PORTS_START( sc4ijob ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("can/co")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ply it")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("get aw")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("streak")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("leave")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 
 // PR2366 AWP THE ITALIAN JOB S4         PR2366 THE ITALIAN JOB SOUNDS11   ITALIAN JOB S.SITE
-GAMEL( 200?, sc4ijob     ,0,         sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijoba    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobb    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobc    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobd    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobe    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobf    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobg    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobh    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobi    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobj    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobk    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobl    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ijobm    ,sc4ijob,   sc4, sc4, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijob     ,0,         sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijoba    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobb    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobc    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobd    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobe    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobf    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobg    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobh    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobi    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobj    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobk    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobl    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ijobm    ,sc4ijob,   sc4, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4ldvl_reel_configs[6] =
 {
@@ -39171,11 +39814,73 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ldvl)
 	m_reel_setup = sc4ldvl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4ldvl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("chgstk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk cas")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("move u")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk cpo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk sho")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2376 LITTLE DEVIL         LDEVIL SOUNDS         LITTLE DEVIL
-GAMEL( 200?, sc4ldvl     ,0,         sc4, sc4, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldvla    ,sc4ldvl,   sc4, sc4, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldvlb    ,sc4ldvl,   sc4, sc4, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldvlc    ,sc4ldvl,   sc4, sc4, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ldvl     ,0,         sc4, sc4ldvl, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ldvla    ,sc4ldvl,   sc4, sc4ldvl, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ldvlb    ,sc4ldvl,   sc4, sc4ldvl, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ldvlc    ,sc4ldvl,   sc4, sc4ldvl, sc4_state, sc4ldvl, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4lotrr_reel_configs[6] =
@@ -39194,14 +39899,73 @@ DRIVER_INIT_MEMBER(sc4_state,sc4lotrr)
 	m_reel_setup = sc4lotrr_reel_configs;
 }
 
+INPUT_PORTS_START( sc4lotrr ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1427 AWP RETURN OF THE KING         PR1413 RETURN OF THE  SOUNDS11    RETURN OF KING  S.SITE
-GAMEL( 200?, sc4lotrr    ,0,         sc4, sc4, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4lotrra   ,sc4lotrr,  sc4, sc4, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4lotrrb   ,sc4lotrr,  sc4, sc4, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4lotrrc   ,sc4lotrr,  sc4, sc4, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lotrr    ,0,         sc4, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lotrra   ,sc4lotrr,  sc4, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lotrrb   ,sc4lotrr,  sc4, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lotrrc   ,sc4lotrr,  sc4, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PAY UNIT ERR 17
-GAMEL( 200?, sc4lotrrd   ,sc4lotrr,  sc4, sc4, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4lotrre   ,sc4lotrr,  sc4, sc4, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lotrrd   ,sc4lotrr,  sc4, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lotrre   ,sc4lotrr,  sc4, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4manic_reel_configs[6] =
 {
@@ -39219,15 +39983,77 @@ DRIVER_INIT_MEMBER(sc4_state,sc4manic)
 	m_reel_setup = sc4manic_reel_configs;
 }
 
+INPUT_PORTS_START( sc4manic ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collct")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("tra/ex")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("sta/ga")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bankit")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk bns")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR3034 AWP MANIC MINER SCORP4         PR3004 MANIC MINER SOUNDS11       MANIC MINER S.SITE
-GAMEL( 200?, sc4manic    ,0,         sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manica   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manicb   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manicc   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manicd   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manice   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manicf   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4manicg   ,sc4manic,  sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manic    ,0,         sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manica   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manicb   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manicc   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manicd   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manice   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manicf   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4manicg   ,sc4manic,  sc4, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4mmm_reel_configs[6] =
 {
@@ -39245,16 +40071,78 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mmm)
 	m_reel_setup = sc4mmm_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mmm ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("tk fea")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bon ga")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("step")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("take m")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("p supe")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
+
 
 // PR2282 MENTALMONEYMONSTERS         MMMO SOUNDS          MONEY MONSTERS
-GAMEL( 200?, sc4mmm      ,0,         sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmma     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmb     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmc     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmd     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmme     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmf     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmg     ,sc4mmm,    sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmm      ,0,         sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmma     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmmb     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmmc     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmmd     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmme     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmmf     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmmg     ,sc4mmm,    sc4, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4mmad_reel_configs[6] =
 {
@@ -39272,16 +40160,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mmad)
 	m_reel_setup = sc4mmad_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mmad ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("stake")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exch")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trans")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("step")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("f hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("b hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("c hi")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "tpdor" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2533 MONEY MADNESS         MONM SOUNDS         MONEY MADNESS
-GAMEL( 200?, sc4mmad     ,0,         sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmada    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmadb    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmadc    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmad     ,0,         sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmada    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmadb    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmadc    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR2533) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR0000 MONEY MADNESS         MONM SOUNDS         MONEY MADNESS  (did Mazooma mess up this release? it has an invalid project code of PR0000, and 3 of the sets are missing their other half)
-GAMEL( 200?, sc4mmadd    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmade    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4mmadf    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4mmadg    ,sc4mmad,   sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4mmadd    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmade    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4mmadf    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4mmadg    ,sc4mmad,   sc4, sc4mmad, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
 
 
 static const stepper_interface* sc4mdm_reel_configs[6] =
@@ -39300,9 +40243,73 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mdm)
 	m_reel_setup = sc4mdm_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mdm ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collec")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("b or b")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("pl mon")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("leave")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("take")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("tk str")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR3333 AWP MONOPOLY DOUBLE MONEY S4         PR3308 MPOLY D MONEY SOUNDS11     DOUBLE MONEY  S.SITE
-GAMEL( 200?, sc4mdm      ,0,         sc4, sc4, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mdma     ,sc4mdm,    sc4, sc4, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mdm      ,0,         sc4, sc4mdm, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mdma     ,sc4mdm,    sc4, sc4mdm, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4mhn_reel_configs[6] =
 {
@@ -39320,9 +40327,76 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mhn)
 	m_reel_setup = sc4mhn_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mhn ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("lh1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("lh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("lh3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("lh4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("rh4")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("rh3")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("rh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("rh1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refil")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("shot")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("c hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("b hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("f hi")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("step")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2380 MONOPOLY HERE AND NOW         MR2R SOUNDS         NITH
-GAMEL( 200?, sc4mhn      ,0,         sc4, sc4, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mhna     ,sc4mhn,    sc4, sc4, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mhn      ,0,         sc4, sc4mhn, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mhna     ,sc4mhn,    sc4, sc4mhn, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4mhp_reel_configs[6] =
@@ -39341,24 +40415,86 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mhp)
 	m_reel_setup = sc4mhp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mhp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("can/co")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hot p")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("transf")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("streak")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b or b")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("refuse")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("sell")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2345 AWP MONOPOLY HOT PROPERTY S4         PR2345 HOT PROPERTY SOUNDS11      HOT PROPERTY  S.SITE
-GAMEL( 200?, sc4mhp      ,0,         sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 471
-GAMEL( 200?, sc4mhpa     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 472
-GAMEL( 200?, sc4mhpb     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 271
-GAMEL( 200?, sc4mhpc     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 471
-GAMEL( 200?, sc4mhpd     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 472
-GAMEL( 200?, sc4mhpe     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 271
-GAMEL( 200?, sc4mhpf     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 475
-GAMEL( 200?, sc4mhpg     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 571
-GAMEL( 200?, sc4mhph     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 572
-GAMEL( 200?, sc4mhpi     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 475
-GAMEL( 200?, sc4mhpj     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 571
-GAMEL( 200?, sc4mhpk     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 572
-GAMEL( 200?, sc4mhpl     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 411
-GAMEL( 200?, sc4mhpm     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 272
-GAMEL( 200?, sc4mhpn     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 272
-GAMEL( 200?, sc4mhpo     ,sc4mhp,    sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mhp      ,0,         sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 471
+GAMEL( 200?, sc4mhpa     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 472
+GAMEL( 200?, sc4mhpb     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 271
+GAMEL( 200?, sc4mhpc     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 471
+GAMEL( 200?, sc4mhpd     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 472
+GAMEL( 200?, sc4mhpe     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 271
+GAMEL( 200?, sc4mhpf     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 475
+GAMEL( 200?, sc4mhpg     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 571
+GAMEL( 200?, sc4mhph     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 572
+GAMEL( 200?, sc4mhpi     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 475
+GAMEL( 200?, sc4mhpj     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 571
+GAMEL( 200?, sc4mhpk     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 572
+GAMEL( 200?, sc4mhpl     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 411
+GAMEL( 200?, sc4mhpm     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 272
+GAMEL( 200?, sc4mhpn     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // 272
+GAMEL( 200?, sc4mhpo     ,sc4mhp,    sc4, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4mmb_reel_configs[6] =
 {
@@ -39376,10 +40512,68 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mmb)
 	m_reel_setup = sc4mmb_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mmb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stake")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("takfet")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("sneakp")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("gamfet")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("gambon")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1931 AWP MONOLOLY MONEY BAGS SCORP4         PR1911 MPOLY MONEYBAGS SOUNDS11   MONEYBAGS S.SITE
-GAMEL( 200?, sc4mmb      ,0,         sc4, sc4, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmba     ,sc4mmb,    sc4, sc4, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmb      ,0,         sc4, sc4mmb, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmba     ,sc4mmb,    sc4, sc4mmb, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4mrh_reel_configs[6] =
 {
@@ -39397,14 +40591,70 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mrh)
 	m_reel_setup = sc4mrh_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mrh ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel OR collec")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("transf")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("autopl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "top up OR top up" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green OR test" // standard input (motherboard)
+        // 0x0002 - "cshdor" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+        // 0x0010 - "serdor" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2363 RED HOT MONOP         MONOPOLY  ARCADE  MONO SOUNDS         MONOPOLY
-GAMEL( 200?, sc4mrh      ,0,         sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mrha     ,sc4mrh,    sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mrhb     ,sc4mrh,    sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mrhc     ,sc4mrh,    sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mrhd     ,sc4mrh,    sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mrhe     ,sc4mrh,    sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mrh      ,0,         sc4, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mrha     ,sc4mrh,    sc4, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mrhb     ,sc4mrh,    sc4, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mrhc     ,sc4mrh,    sc4, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mrhd     ,sc4mrh,    sc4, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mrhe     ,sc4mrh,    sc4, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4mr2r_reel_configs[6] =
 {
@@ -39422,14 +40672,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mr2r)
 	m_reel_setup = sc4mr2r_reel_configs;
 }
 
+INPUT_PORTS_START( sc4mr2r ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("lh1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("lh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("lh3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("lh4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("rh4")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("rh3")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("rh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("rh1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("step")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("take m")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("bon ga")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("p supe")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2329 MONOPOLY ROAD TO RICHES         MR2R SOUNDS          ROAD TO RICHES
-GAMEL( 200?, sc4mr2r     ,0,         sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2ra    ,sc4mr2r,   sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2rb    ,sc4mr2r,   sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2rc    ,sc4mr2r,   sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2rd    ,sc4mr2r,   sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2re    ,sc4mr2r,   sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2r     ,0,         sc4, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2ra    ,sc4mr2r,   sc4, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2rb    ,sc4mr2r,   sc4, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2rc    ,sc4mr2r,   sc4, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2rd    ,sc4mr2r,   sc4, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2re    ,sc4mr2r,   sc4, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4nmare_reel_configs[6] =
 {
@@ -39447,12 +40758,76 @@ DRIVER_INIT_MEMBER(sc4_state,sc4nmare)
 	m_reel_setup = sc4nmare_reel_configs;
 }
 
+INPUT_PORTS_START( sc4nmare ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collct")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("hold 4")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("s or g")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("grab")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("slash")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk stk")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("d or a")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR3032 AWP NIGHTMARE ON ELM STREET S4         PR3002 ELM STREET SOUNDS11        NIGHTMARE ELM ST  S.SITE
-GAMEL( 200?, sc4nmare    ,0,         sc4, sc4, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmarea   ,sc4nmare,  sc4, sc4, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmareb   ,sc4nmare,  sc4, sc4, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmarec   ,sc4nmare,  sc4, sc4, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nmare    ,0,         sc4, sc4nmare, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nmarea   ,sc4nmare,  sc4, sc4nmare, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nmareb   ,sc4nmare,  sc4, sc4nmare, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nmarec   ,sc4nmare,  sc4, sc4nmare, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4potp_reel_configs[6] =
@@ -39471,23 +40846,139 @@ DRIVER_INIT_MEMBER(sc4_state,sc4potp)
 	m_reel_setup = sc4potp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4potp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("c feat")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1612 PICK OF THE PACK         PR1612 PICK OF THE PACK SOUNDS11  PICK OF THE PACK  S.SITE
-GAMEL( 200?, sc4potp     ,0,         sc4, sc4, sc4_state, sc4potp, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4potpa    ,sc4potp,   sc4, sc4, sc4_state, sc4potp, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4potp     ,0,         sc4, sc4potp, sc4_state, sc4potp, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4potpa    ,sc4potp,   sc4, sc4potp, sc4_state, sc4potp, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+
+INPUT_PORTS_START( sc4ppcr ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel OR colect")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("autopl")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("transf")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "top up" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "cshdor" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2279  PINK PANTHER CLOUSEAUS REVENGE         REVENGE QPS REVENGE SOUNDS
-GAMEL( 200?, sc4ppcr     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcra    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcrb    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcrd    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcre    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcrf    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcrg    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcrh    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcri    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppcrj    ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcr     ,0,         sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcra    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcrb    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcrd    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcre    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcrf    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcrg    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcrh    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcri    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppcrj    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2279 CLOUSEAU TOP BOX         COROST_TRIPLE SOUNDS           REVENGE TIME
 GAMEL( 200?, sc4ppcrtb   ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge Top Box (Mazooma) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
@@ -39508,27 +40999,152 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ppctc)
 	m_reel_setup = sc4ppctc_reel_configs;
 }
 
+INPUT_PORTS_START( sc4ppctc ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collec")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exchag")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("transf")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("b leav")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b take")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk clu")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk bon")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("cs bus")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("tk str")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("leave")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("pl ctc")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_3 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2407 AWP PINK PANTHER CRACK THE CODE SCORP4         PR2407 CRACK THE CODE SOUNDS11    CRACK THE CODE  S.SITE
-GAMEL( 200?, sc4ppctc    ,0,         sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctca   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctcb   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctcc   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctcd   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctce   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctcf   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppctcg   ,sc4ppctc,  sc4, sc4, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctc    ,0,         sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctca   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctcb   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctcc   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctcd   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctce   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctcf   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppctcg   ,sc4ppctc,  sc4, sc4ppctc, sc4_state, sc4ppctc, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+
+INPUT_PORTS_START( sc4ppdym ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel OR collec")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("blank")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("autopl")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill OR refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "top up OR top up" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test OR grnbut OR test" // standard input (motherboard)
+        // 0x0002 - "cshdor" // standard input (expected here)
+        // 0x0004 - "cshdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+        // 0x0010 - "serdor" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2330 PINK PANTHER DYM         PINK PANTHER DYM  QPS DYMT SOUNDS         PINK PANTHER DYM    -
-GAMEL( 200?, sc4ppdym    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymb   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymc   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymd   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymf   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymg   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymh   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppdymi   ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdym    ,0,         sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymb   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymc   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymd   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymf   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymg   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymh   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppdymi   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2333 PINK PANTHER TOP BOX         DYMT SOUNDS           ALL YOUR BASE
 GAMEL( 200?, sc4ppdymtb  ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money Top Box (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4ppdymtba ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money Top Box (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
@@ -39549,14 +41165,74 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pony)
 	m_reel_setup = sc4pony_reel_configs;
 }
 
+INPUT_PORTS_START( sc4pony ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("shoot")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("spins")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1408 PONY EXPRESS         PR1408 PONY EXPRESS SOUNDS11      PONY EXPRESS  S.SITE
-GAMEL( 200?, sc4pony     ,0,         sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponya    ,sc4pony,   sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponyb    ,sc4pony,   sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponyc    ,sc4pony,   sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponyd    ,sc4pony,   sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponye    ,sc4pony,   sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4pony     ,0,         sc4, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ponya    ,sc4pony,   sc4, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ponyb    ,sc4pony,   sc4, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ponyc    ,sc4pony,   sc4, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ponyd    ,sc4pony,   sc4, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ponye    ,sc4pony,   sc4, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
 
 static const stepper_interface* sc4popey_reel_configs[6] =
 {
@@ -39574,13 +41250,76 @@ DRIVER_INIT_MEMBER(sc4_state,sc4popey)
 	m_reel_setup = sc4popey_reel_configs;
 }
 
+INPUT_PORTS_START( sc4popey ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("can/co")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ply it")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("streak")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("s or s")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("leave")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2417 AWP POPEYE S4         PR2417 POPEYE SOUNDS11         POPEYE  S.SITE
-GAMEL( 200?, sc4popey    ,0,         sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4popeya   ,sc4popey,  sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4popeyb   ,sc4popey,  sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4popeyc   ,sc4popey,  sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4popeyd   ,sc4popey,  sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4popeye   ,sc4popey,  sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4popey    ,0,         sc4, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4popeya   ,sc4popey,  sc4, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4popeyb   ,sc4popey,  sc4, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4popeyc   ,sc4popey,  sc4, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4popeyd   ,sc4popey,  sc4, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4popeye   ,sc4popey,  sc4, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4pwrbl_reel_configs[6] =
@@ -39599,11 +41338,82 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pwrbl)
 	m_reel_setup = sc4pwrbl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4pwrbl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collct")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-7")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_7_0 ) PORT_NAME("tilt")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("r ball")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("lose")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("hole 8")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("hole 7")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hole 6")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("hole 5")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("hole 4")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("hole 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_3 ) PORT_NAME("hole 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_4 ) PORT_NAME("hole 1")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // sequel to gamball, mechanical?
 // PR1614 AWP POWERBALL         POWERBALL S.SITE  PR1614 POWERBALL SOUNDS11
-GAMEL( 200?, sc4pwrbl    ,0,         sc4, sc4, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4pwrbla   ,sc4pwrbl,  sc4, sc4, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4pwrbl    ,0,         sc4, sc4pwrbl, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4pwrbla   ,sc4pwrbl,  sc4, sc4pwrbl, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4quidv_reel_configs[6] =
@@ -39622,61 +41432,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4quidv)
 	m_reel_setup = sc4quidv_reel_configs;
 }
 
+INPUT_PORTS_START( sc4quidv ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("lh1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("lh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("lh3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("lh4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("rh4")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("rh3")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("rh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("rh1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk bon")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test OR test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2342 QUID VICIOUS         QUIDV SOUNDS         QUID VICIOUS
-GAMEL( 200?, sc4quidv    ,0,         sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4quidva   ,sc4quidv,  sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4quidvb   ,sc4quidv,  sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4quidvc   ,sc4quidv,  sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-static const stepper_interface* sc4rhx_reel_configs[6] =
-{
-	&starpoint_interface_200step_reel,
-	&starpoint_interface_200step_reel,
-	&starpoint_interface_200step_reel,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4rhx)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4rhx_reel_configs;
-}
-
-DRIVER_INIT_MEMBER(sc4_state,sc4rhx_mbus)
-{
-	DRIVER_INIT_CALL(sc4mbus);
-	m_reel_setup = sc4rhx_reel_configs;
-}
-
-// PR2077  RED HOT X         REDX SOUNDS         RED HOT X
-GAMEL( 200?, sc4rhx      ,0,         sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxa     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxd     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxe     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxj     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxk     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4rhxl     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxm     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-// PR2077  RED HOT X         RED HOT X ARCADE  REDX SOUNDS         RED HOT X
-GAMEL( 200?, sc4rhxb     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxc     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxh     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxi     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxf     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxg     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxn     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxo     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxp     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 17)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxq     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 18)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxr     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 19)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxs     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 20)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxt     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 21)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxu     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 22)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxv     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 23)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxw     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 24)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
+GAMEL( 200?, sc4quidv    ,0,         sc4, sc4quidv, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4quidva   ,sc4quidv,  sc4, sc4quidv, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4quidvb   ,sc4quidv,  sc4, sc4quidv, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4quidvc   ,sc4quidv,  sc4, sc4quidv, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4rhxcs_reel_configs[6] =
 {
@@ -39694,19 +41514,70 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rhxcs)
 	m_reel_setup = sc4rhxcs_reel_configs;
 }
 
-// PR2364 CASINO RED HOT X         RED HOT X CRHX SOUNDS         RED HOT X
-GAMEL( 200?, sc4rhxcs    ,0,         sc4, sc4, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsa   ,sc4rhxcs,  sc4, sc4, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsb   ,sc4rhxcs,  sc4, sc4, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsc   ,sc4rhxcs,  sc4, sc4, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsd   ,sc4rhxcs,  sc4, sc4, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcse   ,sc4rhxcs,  sc4, sc4, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+INPUT_PORTS_START( sc4rhxcs ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel OR collec")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("transf")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("autopl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "top up OR top up" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green OR test" // standard input (motherboard)
+        // 0x0002 - "cshdor" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+        // 0x0010 - "serdor" // standard input (expected here)
+INPUT_PORTS_END
 
-// PR2056  RED HOT X CLUB         REDX SOUNDS         RED HOT X CLUB
-GAMEL( 200?, sc4rhxcl    ,0,         sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcla   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxclb   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxclc   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+// PR2364 CASINO RED HOT X         RED HOT X CRHX SOUNDS         RED HOT X
+GAMEL( 200?, sc4rhxcs    ,0,         sc4, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcsa   ,sc4rhxcs,  sc4, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcsb   ,sc4rhxcs,  sc4, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcsc   ,sc4rhxcs,  sc4, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcsd   ,sc4rhxcs,  sc4, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcse   ,sc4rhxcs,  sc4, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -39726,11 +41597,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4redsq)
 	m_reel_setup = sc4redsq_reel_configs;
 }
 
+INPUT_PORTS_START( sc4redsq ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cnccol")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("exch")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("t nuds")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("t cash")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("m rght")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("m down")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("m left")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("m up")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("t cpot")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
+
 // PR2557 RED SQUARE         REDS SOUNDS            RED SQUARE
-GAMEL( 200?, sc4redsq    ,0,         sc4, sc4, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4redsqa   ,sc4redsq,  sc4, sc4, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4redsqb   ,sc4redsq,  sc4, sc4, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4redsqc   ,sc4redsq,  sc4, sc4, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4redsq    ,0,         sc4, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4redsqa   ,sc4redsq,  sc4, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4redsqb   ,sc4redsq,  sc4, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4redsqc   ,sc4redsq,  sc4, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4rosts_reel_configs[6] =
@@ -39749,16 +41671,72 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rosts)
 	m_reel_setup = sc4rosts_reel_configs;
 }
 
+INPUT_PORTS_START( sc4rosts ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("ex/tra")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk win")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk nud")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR3256 CLUB RONNIE O SULLIVANS TOURNAMENT SCORP4         RONNIE OSULLIVAN  CLUB  PR3256 RONNIE O SOUNDS11         RONNIE SULLIVAN
-GAMEL( 200?, sc4rosts    ,0,         sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostsa   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostsb   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostsc   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostsd   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostse   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostsf   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rostsg   ,sc4rosts,  sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rosts    ,0,         sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostsa   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostsb   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostsc   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostsd   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostse   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostsf   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rostsg   ,sc4rosts,  sc4, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4rovrt_reel_configs[6] =
 {
@@ -39776,14 +41754,80 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rovrt)
 	m_reel_setup = sc4rovrt_reel_configs;
 }
 
+INPUT_PORTS_START( sc4rovrt ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("shoot")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("c hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("b hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("f hi")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("step")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up OR top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2311 ROVERS RETURN         ROVERS RETURN SOUNDS         ROVERS RETURN
-GAMEL( 200?, sc4rovrt    ,0,         sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rovrta   ,sc4rovrt,  sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rovrtb   ,sc4rovrt,  sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rovrtc   ,sc4rovrt,  sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rovrtd   ,sc4rovrt,  sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4rovrte   ,sc4rovrt,  sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rovrt    ,0,         sc4, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rovrta   ,sc4rovrt,  sc4, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rovrtb   ,sc4rovrt,  sc4, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rovrtc   ,sc4rovrt,  sc4, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rovrtd   ,sc4rovrt,  sc4, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rovrte   ,sc4rovrt,  sc4, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4showt_reel_configs[6] =
 {
@@ -39801,15 +41845,79 @@ DRIVER_INIT_MEMBER(sc4_state,sc4showt)
 	m_reel_setup = sc4showt_reel_configs;
 }
 
+INPUT_PORTS_START( sc4showt ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collec")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchan")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("transf")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bankit")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("p show")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("streak")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("c cash")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("sh tim")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR3043 AWP SHOW TIME S4         PR3013 SHOWTIME SOUNDS11         SHOW TIME S.SITE
-GAMEL( 200?, sc4showt    ,0,         sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4showta   ,sc4showt,  sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4showtb   ,sc4showt,  sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4showtc   ,sc4showt,  sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4showtd   ,sc4showt,  sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4showte   ,sc4showt,  sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4showtf   ,sc4showt,  sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showt    ,0,         sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showta   ,sc4showt,  sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showtb   ,sc4showt,  sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showtc   ,sc4showt,  sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showtd   ,sc4showt,  sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showte   ,sc4showt,  sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4showtf   ,sc4showt,  sc4, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4spice_reel_configs[6] =
@@ -39828,11 +41936,65 @@ DRIVER_INIT_MEMBER(sc4_state,sc4spice)
 	m_reel_setup = sc4spice_reel_configs;
 }
 
+INPUT_PORTS_START( sc4spice ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collct")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trf/ex")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1921 AWP SPICE IT UP SCORP4         PR1901 SPICE IT UP SOUNDS11       SPICE IT UP S.SITE
-GAMEL( 200?, sc4spice    ,0,         sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4spicea   ,sc4spice,  sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4spiceb   ,sc4spice,  sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4spicec   ,sc4spice,  sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4spice    ,0,         sc4, sc4spice, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4spicea   ,sc4spice,  sc4, sc4spice, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4spiceb   ,sc4spice,  sc4, sc4spice, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4spicec   ,sc4spice,  sc4, sc4spice, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4sus_reel_configs[6] =
 {
@@ -39850,15 +42012,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4sus)
 	m_reel_setup = sc4sus_reel_configs;
 }
 
+INPUT_PORTS_START( sc4sus ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk csh")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk bon")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test OR test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2255 SUITUSIR         SUIT SOUNDS         SUITS U SIR
-GAMEL( 200?, sc4sus      ,0,         sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4susc     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4susf     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4susg     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sush     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4susi     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4susj     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4susk     ,sc4sus,    sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sus      ,0,         sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4susc     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4susf     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4susg     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sush     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4susi     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4susj     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4susk     ,sc4sus,    sc4, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4sslam_reel_configs[6] =
 {
@@ -39876,9 +42098,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4sslam)
 	m_reel_setup = sc4sslam_reel_configs;
 }
 
+INPUT_PORTS_START( sc4sslam ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("colwin")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("payout")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("sprslm")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("selins")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("chgstk")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("maxbet")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR3081 CLUB SUPER SLAM         SUPER SLAM  CLUB  PR3080 SUPER SLAM SOUNDS11
-GAMEL( 200?, sc4sslam    ,0,         sc4, sc4, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sslama   ,sc4sslam,  sc4, sc4, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sslam    ,0,         sc4, sc4sslam, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sslama   ,sc4sslam,  sc4, sc4sslam, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4swbak_reel_configs[6] =
@@ -39897,11 +42172,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4swbak)
 	m_reel_setup = sc4swbak_reel_configs;
 }
 
+INPUT_PORTS_START( sc4swbak ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        // 0x0100 - "hoplo" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("tk fea")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk3" // standard input (expected here)
+        // 0x0008 - "stk1" // standard input (expected here)
+        // 0x0010 - "stk2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "jp 1" // standard input (expected here)
+        // 0x0002 - "jp 2" // standard input (expected here)
+        // 0x0004 - "jp 3" // standard input (expected here)
+        // 0x0008 - "jp 4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pc 1" // standard input (expected here)
+        // 0x0002 - "pc 2" // standard input (expected here)
+        // 0x0004 - "pc 3" // standard input (expected here)
+        // 0x0008 - "pc 4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("gamble")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "topdr" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "dump" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2235 SWITCHBACK         SWBK SOUNDS         SWITCHBACK
-GAMEL( 200?, sc4swbak    ,0,         sc4, sc4, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4swbaka   ,sc4swbak,  sc4, sc4, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4swbakb   ,sc4swbak,  sc4, sc4, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4swbakc   ,sc4swbak,  sc4, sc4, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4swbak    ,0,         sc4, sc4swbak, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4swbaka   ,sc4swbak,  sc4, sc4swbak, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4swbakb   ,sc4swbak,  sc4, sc4swbak, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4swbakc   ,sc4swbak,  sc4, sc4swbak, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4ttpie_reel_configs[6] =
@@ -39920,17 +42255,76 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ttpie)
 	m_reel_setup = sc4ttpie_reel_configs;
 }
 
+INPUT_PORTS_START( sc4ttpie ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 4")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("cstake")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("checkm")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1714 AWP TAKE THE PIECE S4         PR1714 TAKE THE PIECE SOUNDS11    TAKETHEPIECE  S.SITE
-GAMEL( 200?, sc4ttpie    ,0,         sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttpiec   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpie    ,0,         sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpiec   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR1734 AWP TAKE THE PIECE S4         PR1714 TAKE THE PIECE SOUNDS11    TAKETHEPIECE  S.SITE
-GAMEL( 200?, sc4ttpiea   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttpieb   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttpied   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttpiee   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttpief   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttpieg   ,sc4ttpie,  sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpiea   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpieb   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpied   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpiee   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpief   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttpieg   ,sc4ttpie,  sc4, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4typ_reel_configs[6] =
@@ -39949,12 +42343,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4typ)
 	m_reel_setup = sc4typ_reel_configs;
 }
 
+INPUT_PORTS_START( sc4typ ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("cstake")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("colect")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("open r")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("reject")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("accept")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("open l")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("c or b")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR3031 AWP TAKE YOUR PICK S4         PR3001 TAKE YOUR PICK SOUNDS11    TAKE YOUR PICK  S.SITE
-GAMEL( 200?, sc4typ      ,0,         sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4typa     ,sc4typ,    sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4typb     ,sc4typ,    sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4typc     ,sc4typ,    sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4typ      ,0,         sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4typa     ,sc4typ,    sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4typb     ,sc4typ,    sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4typc     ,sc4typ,    sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4trail_reel_configs[6] =
 {
@@ -39972,68 +42429,57 @@ DRIVER_INIT_MEMBER(sc4_state,sc4trail)
 	m_reel_setup = sc4trail_reel_configs;
 }
 
+INPUT_PORTS_START( sc4trail ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("canc")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("step OR tke ft")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("nuds")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("cash")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2170 TRAIL BLAZER         TRAB SOUNDS                  TRAIL BLAZER
-GAMEL( 200?, sc4trail    ,0,         sc4, sc4, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4traila   ,sc4trail,  sc4, sc4, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4trailb   ,sc4trail,  sc4, sc4, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4trailc   ,sc4trail,  sc4, sc4, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-static const stepper_interface* sc4vivam_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4vivam)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4vivam_reel_configs;
-}
-
-
-// PR6907 VIVA MEXICO         PR6907 VIVA MEXICO SOUNDS11
-GAMEL( 200?, sc4vivam    ,0,         sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivama   ,sc4vivam,  sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivamb   ,sc4vivam,  sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivamc   ,sc4vivam,  sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-static const stepper_interface* sc4vivcs_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4vivcs)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4vivcs_reel_configs;
-}
-
-
-
-//  PR6927 CASINO VIVA MEXICO         PR6927 VIVAMEXICO SOUNDS11
-// these do nothing..
-GAMEL( 200?, sc4vivcs    ,0,         sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivcsa   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-// PR6927 CASINO VIVA MEXICO         PR6927 VIVAMEXICO SOUNDS21
-// these boot
-GAMEL( 200?, sc4vivcsb   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivcsc   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivcsd   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivcse   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivcsf   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4vivcsg   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
+GAMEL( 200?, sc4trail    ,0,         sc4, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4traila   ,sc4trail,  sc4, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4trailb   ,sc4trail,  sc4, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4trailc   ,sc4trail,  sc4, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -40053,14 +42499,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bpb)
 	m_reel_setup = sc4bpb_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bpb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("gamble")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("throws")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1728 AWP BULLY'S PRIZE BOARD         PR1708 B PRIZE BOARD SOUNDS11     BULLYSPRIZEBOARD  S.SITE
-GAMEL( 200?, sc4bpb      ,0,         sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bpbc     ,sc4bpb,    sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bpb      ,0,         sc4, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bpbc     ,sc4bpb,    sc4, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR1728 AWP BULLY'S PRIZE BOARD S4         PR1708 B PRIZE BOARD SOUNDS11     BULLYSPRIZEBOARD  S.SITE
-GAMEL( 200?, sc4bpba     ,sc4bpb,    sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bpbb     ,sc4bpb,    sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bpbd     ,sc4bpb,    sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bpbe     ,sc4bpb,    sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bpba     ,sc4bpb,    sc4, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bpbb     ,sc4bpb,    sc4, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bpbd     ,sc4bpb,    sc4, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bpbe     ,sc4bpb,    sc4, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4bsp_reel_configs[6] =
@@ -40079,16 +42586,78 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bsp)
 	m_reel_setup = sc4bsp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bsp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collct")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("tra/ex")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("sta/ga")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bankit")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk bns")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR3040 AWP BULLYS STAR PRIZE SCORP4         PR3012 BULLYS STAR P SOUNDS11     BULLYS STARPRIZE  S.SITE
-GAMEL( 200?, sc4bsp      ,0,         sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bspa     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bspb     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bspc     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bspd     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bspg     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bsp      ,0,         sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspa     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspb     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspc     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspd     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspg     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR3042 AWP BULLYS STAR PRIZE SCORP4         PR3012 BULLYS STAR P SOUNDS11     BULLYS STARPRIZE  S.SITE
-GAMEL( 200?, sc4bspe     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bspf     ,sc4bsp,    sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspe     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bspf     ,sc4bsp,    sc4, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4chain_reel_configs[6] =
@@ -40107,12 +42676,79 @@ DRIVER_INIT_MEMBER(sc4_state,sc4chain)
 	m_reel_setup = sc4chain_reel_configs;
 }
 
+INPUT_PORTS_START( sc4chain ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("cas lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("ch stp")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("db gam")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("ft stp")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("fet lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("c feat")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("cas hi")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_3 ) PORT_NAME("c doub")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_4 ) PORT_NAME("fet hi")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1316 AWP CHAIN REACTION         PR1312 CHAIN REACT SOUNDS11
-GAMEL( 200?, sc4chain    ,0,         sc4, sc4, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chaina   ,sc4chain,  sc4, sc4, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chainb   ,sc4chain,  sc4, sc4, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chainc   ,sc4chain,  sc4, sc4, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chain    ,0,         sc4, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chaina   ,sc4chain,  sc4, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chainb   ,sc4chain,  sc4, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chainc   ,sc4chain,  sc4, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4clown_reel_configs[6] =
@@ -40131,23 +42767,135 @@ DRIVER_INIT_MEMBER(sc4_state,sc4clown)
 	m_reel_setup = sc4clown_reel_configs;
 }
 
+INPUT_PORTS_START( sc4clown ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel OR coll")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tkstep")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("lorght")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("lomid")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("loleft")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hirght")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("himid")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("hileft")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1727 AWP CLOWN AROUND SCORP4         PR1707 CLOWN AROUND SOUNDS11      CLOWN AROUND  S.SITE
-GAMEL( 200?, sc4clown    ,0,         sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clowna   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clownb   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clownc   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clownd   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clowne   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clownf   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clowng   ,sc4clown,  sc4, sc4, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clown    ,0,         sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clowna   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clownb   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clownc   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clownd   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clowne   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clownf   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clowng   ,sc4clown,  sc4, sc4clown, sc4_state, sc4clown, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+INPUT_PORTS_START( sc4mowow ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("canc")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("h cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("h nuds")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tkspin")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tkcpot")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
 
 /* wrong sound roms */
-GAMEL( 200?, sc4mowow    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR2118 MONOPOLY WOTW         WOTW SOUNDS         MONOPOLY WOTW   8P
-GAMEL( 200?, sc4mowowa   ,sc4mowow,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
-GAMEL( 200?, sc4mowowb   ,sc4mowow,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
-GAMEL( 200?, sc4mowowc   ,sc4mowow,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
+GAMEL( 200?, sc4mowow    ,0,         sc4, sc4mowow, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR2118 MONOPOLY WOTW         WOTW SOUNDS         MONOPOLY WOTW   8P
+GAMEL( 200?, sc4mowowa   ,sc4mowow,  sc4, sc4mowow, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
+GAMEL( 200?, sc4mowowb   ,sc4mowow,  sc4, sc4mowow, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
+GAMEL( 200?, sc4mowowc   ,sc4mowow,  sc4, sc4mowow, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
 
 GAMEL( 200?, sc4mwwtb    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR2389  WHEEL OF WEALTH         WOWT SOUNDS         WHEEL OF WEAL
 GAMEL( 200?, sc4mwwtba   ,sc4mwwtb,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
@@ -40172,8 +42920,70 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bwow)
 	m_reel_setup = sc4bwow_reel_configs;
 }
 
-GAMEL( 200?, sc4bwow   ,0,       sc4, sc4, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1726 AWP WHEEL OF WEALTH         PR1706 WHEEL OF WEALTH SOUNDS11   WHEEL OF WEALTH S.SITE
-GAMEL( 200?, sc4bwowa  ,sc4bwow, sc4, sc4, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
+INPUT_PORTS_START( sc4bwow ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("r or d")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("w of w")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("featur")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
+GAMEL( 200?, sc4bwow   ,0,       sc4, sc4bwow, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1726 AWP WHEEL OF WEALTH         PR1706 WHEEL OF WEALTH SOUNDS11   WHEEL OF WEALTH S.SITE
+GAMEL( 200?, sc4bwowa  ,sc4bwow, sc4, sc4bwow, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // ^^
 
 
 static const stepper_interface* sc4nunsm_reel_configs[6] =
@@ -40192,17 +43002,70 @@ DRIVER_INIT_MEMBER(sc4_state,sc4nunsm)
 	m_reel_setup = sc4nunsm_reel_configs;
 }
 
+INPUT_PORTS_START( sc4nunsm ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("stake")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("step")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("f hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("b hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("c hi")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "tpdor" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2166 NUN N ROSES          NANR SOUNDS         NUNS N ROSES
-GAMEL( 200?, sc4nunsm    ,0,         sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmb   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmc   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmd   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsme   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmf   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmg   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmh   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmi   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4nunsmj   ,sc4nunsm,  sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsm    ,0,         sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmb   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmc   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmd   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsme   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmf   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmg   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmh   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmi   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4nunsmj   ,sc4nunsm,  sc4, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4acesh_reel_configs[6] =
@@ -40221,11 +43084,54 @@ DRIVER_INIT_MEMBER(sc4_state,sc4acesh)
 	m_reel_setup = sc4acesh_reel_configs;
 }
 
+INPUT_PORTS_START( sc4acesh ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("stop")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold a")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold b")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold c")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("xchnge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2070 ACES HIGH         ACEHI SOUNDS            ACES HIGH
-GAMEL( 200?, sc4acesh    ,0,         sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4acesha   ,sc4acesh,  sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4aceshb   ,sc4acesh,  sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4aceshc   ,sc4acesh,  sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4acesh    ,0,         sc4, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4acesha   ,sc4acesh,  sc4, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4aceshb   ,sc4acesh,  sc4, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4aceshc   ,sc4acesh,  sc4, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4bed_reel_configs[6] =
@@ -40244,14 +43150,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bed)
 	m_reel_setup = sc4bed_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bed ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk cas")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk pic")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("move u")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("lef hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("mid hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("rgt hi")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2094 BEDAZZLED         BEDZ SOUNDS         BEDAZZLED
-GAMEL( 200?, sc4bed      ,0,         sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4beda     ,sc4bed,    sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedb     ,sc4bed,    sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedc     ,sc4bed,    sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedd     ,sc4bed,    sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bede     ,sc4bed,    sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bed      ,0,         sc4, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4beda     ,sc4bed,    sc4, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedb     ,sc4bed,    sc4, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedc     ,sc4bed,    sc4, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedd     ,sc4bed,    sc4, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bede     ,sc4bed,    sc4, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4bedcl_reel_configs[6] =
 {
@@ -40269,14 +43224,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bedcl)
 	m_reel_setup = sc4bedcl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bedcl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("xfer")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("pick")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("mov up")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
-GAMEL( 200?, sc4bedcl    ,0,         sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedcl    ,0,         sc4, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
-GAMEL( 200?, sc4bedcla   ,sc4bedcl,  sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedclb   ,sc4bedcl,  sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedclc   ,sc4bedcl,  sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedcld   ,sc4bedcl,  sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedcla   ,sc4bedcl,  sc4, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedclb   ,sc4bedcl,  sc4, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedclc   ,sc4bedcl,  sc4, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedcld   ,sc4bedcl,  sc4, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4bblas_reel_configs[6] =
 {
@@ -40300,14 +43312,58 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bblas_mbus)
 	m_reel_setup = sc4bblas_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bblas ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bonus")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk cas")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("blast")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2083 BIG BLASTER         BBST SOUNDS         BIG BLASTER
-GAMEL( 200?, sc4bblas    ,0,         sc4, sc4, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bblasa   ,sc4bblas,  sc4, sc4, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bblasb   ,sc4bblas,  sc4, sc4, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bblasc   ,sc4bblas,  sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bblasd   ,sc4bblas,  sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bblase   ,sc4bblas,  sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bblasf   ,sc4bblas,  sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblas    ,0,         sc4, sc4bblas, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblasa   ,sc4bblas,  sc4, sc4bblas, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblasb   ,sc4bblas,  sc4, sc4bblas, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblasc   ,sc4bblas,  sc4, sc4bblas, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblasd   ,sc4bblas,  sc4, sc4bblas, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblase   ,sc4bblas,  sc4, sc4bblas, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bblasf   ,sc4bblas,  sc4, sc4bblas, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4bankb_reel_configs[6] =
@@ -40326,13 +43382,57 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bankb)
 	m_reel_setup = sc4bankb_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bankb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collet")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("shoot")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("cash")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("spin")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "lock" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
-GAMEL( 200?, sc4bankb    ,0,         sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bankba   ,sc4bankb,  sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bankb    ,0,         sc4, sc4bankb, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bankba   ,sc4bankb,  sc4, sc4bankb, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR???? BANKETYBANK 011         BANKETYBANKSND           BANKETY BANK
-GAMEL( 200?, sc4bb       ,sc4bankb,  sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bba      ,sc4bankb,  sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bb       ,sc4bankb,  sc4, sc4bankb, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bba      ,sc4bankb,  sc4, sc4bankb, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4bobcl_reel_configs[6] =
 {
@@ -40350,9 +43450,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bobcl)
 	m_reel_setup = sc4bobcl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bobcl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trans")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("step")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("level1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("level2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("level3")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("level4")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
-GAMEL( 200?, sc4bobcl    ,0,         sc4, sc4, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bobcla   ,sc4bobcl,  sc4, sc4, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bobcl    ,0,         sc4, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bobcla   ,sc4bobcl,  sc4, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4brksp_reel_configs[6] =
 {
@@ -40370,9 +43532,56 @@ DRIVER_INIT_MEMBER(sc4_state,sc4brksp)
 	m_reel_setup = sc4brksp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4brksp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("excnge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk fet")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("mv rht")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("mv lft")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk stp")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
-GAMEL( 200?, sc4brksp    ,0,         sc4, sc4, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4brkspa   ,sc4brksp,  sc4, sc4, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4brksp    ,0,         sc4, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4brkspa   ,sc4brksp,  sc4, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4bulcl_reel_configs[6] =
 {
@@ -40390,17 +43599,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bulcl)
 	m_reel_setup = sc4bulcl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bulcl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("st/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk win")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk nud")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1753 CLUB BULLSEYE         BULLSEYE  CLUB  PR1751 BULLSEYE SOUNDS11         BULLSYE
-GAMEL( 200?, sc4bulcl    ,0,         sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulcla   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulclb   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulclc   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulcld   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulcle   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulclf   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulclg   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulclh   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bulcli   ,sc4bulcl,  sc4, sc4, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulcl    ,0,         sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulcla   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulclb   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulclc   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulcld   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulcle   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulclf   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulclg   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulclh   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bulcli   ,sc4bulcl,  sc4, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4carry_reel_configs[6] =
 {
@@ -40418,61 +43685,275 @@ DRIVER_INIT_MEMBER(sc4_state,sc4carry)
 	m_reel_setup = sc4carry_reel_configs;
 }
 
+INPUT_PORTS_START( sc4carry ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("colect")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1 OR high")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2 OR low")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("bonus")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tkcash")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1113 CARRY ON WINNING         PR1113 CARRY ON WINNING SOUNDS11
-GAMEL( 200?, sc4carry    ,0,         sc4, sc4, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4carrya   ,sc4carry,  sc4, sc4, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4carry    ,0,         sc4, sc4carry, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4carrya   ,sc4carry,  sc4, sc4carry, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+INPUT_PORTS_START( sc4cbaz ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3 OR high")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4 OR low")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk cml")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk bon")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("shoot")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1349 CLUB CASH BAZAAR         PR1349 CLUB CASH BAZAAR SOUNDS11
-GAMEL( 200?, sc4cbaz     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbaza    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazb    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazc    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazd    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbaze    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazf    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazg    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazh    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazi    ,sc4cbaz,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbaz     ,0,         sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbaza    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazb    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazc    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazd    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbaze    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazf    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazg    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazh    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazi    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // These alarm through startup and don't boot, are they missing something like a DMD?
 // PR1349 CLUB CASH BAZAAR         CLUB CASH BAZAAR  CLUB  PR1349 CLUB CASH BAZAAR SOUNDS11
-GAMEL( 200?, sc4cbazj    ,sc4cbaz,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cbazk    ,sc4cbaz,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazj    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4mbus, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cbazk    ,sc4cbaz,   sc4, sc4cbaz, sc4_state, sc4mbus, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
+INPUT_PORTS_START( sc4clash ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("canc")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exch")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tkcash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("moveup")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tkpick")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tknuds")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2118 CASH ON THE LASH         COTL SOUNDS         CASH ON THE LASH
-GAMEL( 200?, sc4clash    ,0,         sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clasha   ,sc4clash,  sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashb   ,sc4clash,  sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashc   ,sc4clash,  sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashd   ,sc4clash,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashe   ,sc4clash,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashf   ,sc4clash,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashg   ,sc4clash,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clash    ,0,         sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clasha   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clashb   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clashc   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clashd   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clashe   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clashf   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clashg   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
-
+INPUT_PORTS_START( sc4cckey ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("transf")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0002 - "hop hi" // known extended(?) input, sometimes 'hop hi'
+        // 0x0008 - "htopup" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "cshdor" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1426 CASINO CRAZY FRUITS GOLD         PR1426 CRAZY F GOLD SOUNDS11      CRAZY FRUIT GOLD  S.SITE  (set was marked as Casino Crazy Keys)
-GAMEL( 200?, sc4cckey    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeya   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyb   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyc   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyd   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeye   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyf   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyg   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyh   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyj   ,sc4cckey,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyi   ,sc4cckey,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyk   ,sc4cckey,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyl   ,sc4cckey,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeym   ,sc4cckey,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyn   ,sc4cckey,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cckeyo   ,sc4cckey,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckey    ,0,         sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeya   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyb   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyc   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyd   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeye   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyf   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyg   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyh   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyj   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyi   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyk   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyl   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeym   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyn   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cckeyo   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4clclo_reel_configs[6] =
 {
@@ -40490,8 +43971,66 @@ DRIVER_INIT_MEMBER(sc4_state,sc4clclo)
 	m_reel_setup = sc4clclo_reel_configs;
 }
 
+INPUT_PORTS_START( sc4clclo ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("lh1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("lh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("lh3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("lh4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("rh4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("rh3")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("rh2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("rh1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("level1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("level3")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("level2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
-GAMEL( 200?, sc4clclo    ,0,         sc4, sc4, sc4_state, sc4clclo, ROT0, "QPS","Club Clouseau (QPS) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clclo    ,0,         sc4, sc4clclo, sc4_state, sc4clclo, ROT0, "QPS","Club Clouseau (QPS) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4cjcl_reel_configs[6] =
 {
@@ -40509,56 +44048,230 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cjcl)
 	m_reel_setup = sc4cjcl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4cjcl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trans")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "hop2lo" // unexpected here
+        // 0x0002 - "hop1lo OR hop lo" // known extended(?) input, sometimes 'hop hi'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("nudges")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("shots")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("cash")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("spr mt")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("bell")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1621 CLUB COOL JEWELS         PR1621 COOL SOUNDS11         CLUB COOL JEWELS  CLUB
-GAMEL( 200?, sc4cjcl     ,0,         sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjcla    ,sc4cjcl,   sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjclb    ,sc4cjcl,   sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjclc    ,sc4cjcl,   sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjcld    ,sc4cjcl,   sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjcle    ,sc4cjcl,   sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjclf    ,sc4cjcl,   sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjcl     ,0,         sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjcla    ,sc4cjcl,   sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjclb    ,sc4cjcl,   sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjclc    ,sc4cjcl,   sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjcld    ,sc4cjcl,   sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjcle    ,sc4cjcl,   sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjclf    ,sc4cjcl,   sc4, sc4cjcl, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
+INPUT_PORTS_START( sc4crcp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("ex/tra")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk swg")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR3241 CLUB COPS AND ROBBERS PLATINUM SCORP4         COPS & ROBRS PLT  CLUB  PR3241 C N R PLATINUM SOUNDS11      COPS AND ROBBERS
-GAMEL( 200?, sc4crcp     ,0,         sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpa    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpc    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpd    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpe    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpf    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpg    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcph    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpi    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crcpj    ,sc4crcp,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcp     ,0,         sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpa    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpc    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpd    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpe    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpf    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpg    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcph    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpi    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcpj    ,sc4crcp,   sc4, sc4crcp, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4crgc ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk swg")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1348 CLUB COPS AND ROBBERS GOLD         PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAMEL( 2003, sc4crgc     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgca    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcb    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcc    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcd    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgce    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcf    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcg    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgch    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgci    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcj    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgck    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcl    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcm    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgco    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcq    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgct    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcw    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 18)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgc     ,0,         sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgca    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcb    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcc    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcd    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgce    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcf    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcg    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgch    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgci    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcj    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgck    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcl    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcm    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgco    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcq    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgct    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcw    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 18)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR1348 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAMEL( 2003, sc4crgcr    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 21)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcu    ,sc4crgc,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 22)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcn    ,sc4crgc,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 19)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcp    ,sc4crgc,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 20)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcr    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 21)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcu    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 22)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcn    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 19)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcp    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 20)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR1348 !500 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAMEL( 2003, sc4crgcs    ,sc4crgc,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 23)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 2003, sc4crgcv    ,sc4crgc,   sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 24)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcs    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 23)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 2003, sc4crgcv    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 24)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -40579,13 +44292,69 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cfcla)
 	m_reel_setup = sc4cfcla_reel_configs;
 }
 
+INPUT_PORTS_START( sc4cfcla ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        // 0x0100 - "pndlow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        // 0x0100 - "10plow" // unexpected here
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1396 CLASSIC CRAZY FRUITS         PR1396 CLSIC CRAZY FRUITS SND11
-GAMEL( 200?, sc4cfcla    ,0,         sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfclab   ,sc4cfcla,  sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfclac   ,sc4cfcla,  sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfclad   ,sc4cfcla,  sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfclae   ,sc4cfcla,  sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfclaf   ,sc4cfcla,  sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfcla    ,0,         sc4, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfclab   ,sc4cfcla,  sc4, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfclac   ,sc4cfcla,  sc4, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfclad   ,sc4cfcla,  sc4, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfclae   ,sc4cfcla,  sc4, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfclaf   ,sc4cfcla,  sc4, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4cfdu_reel_configs[6] =
 {
@@ -40603,11 +44372,67 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cfdu)
 	m_reel_setup = sc4cfdu_reel_configs;
 }
 
+INPUT_PORTS_START( sc4cfdu ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 //  PR1107 CRAZY FRUITS DOWNUNDER         PR1107 DOWN UNDER SOUNDS11
-GAMEL( 200?, sc4cfdu     ,0,         sc4, sc4, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfdua    ,sc4cfdu,   sc4, sc4, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfdub    ,sc4cfdu,   sc4, sc4, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfduc    ,sc4cfdu,   sc4, sc4, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfdu     ,0,         sc4, sc4cfdu, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfdua    ,sc4cfdu,   sc4, sc4cfdu, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfdub    ,sc4cfdu,   sc4, sc4cfdu, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfduc    ,sc4cfdu,   sc4, sc4cfdu, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4cfgcl_reel_configs[6] =
@@ -40626,11 +44451,72 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cfgcl)
 	m_reel_setup = sc4cfgcl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4cfgcl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("trans")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "hop2lo" // unexpected here
+        // 0x0002 - "hop1lo OR hop lo" // known extended(?) input, sometimes 'hop hi'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("nudges")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("shots")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("cash")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("spr mt")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("bell")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1620 CLUB CRAZY FRUITS GOLD         PR1620 CRAZY SOUNDS11         CRAZY FRUITS  CLUB
-GAMEL( 200?, sc4cfgcl    ,0,         sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfgcla   ,sc4cfgcl,  sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfgclb   ,sc4cfgcl,  sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfgclc   ,sc4cfgcl,  sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfgcl    ,0,         sc4, sc4cfgcl, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfgcla   ,sc4cfgcl,  sc4, sc4cfgcl, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfgclb   ,sc4cfgcl,  sc4, sc4cfgcl, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfgclc   ,sc4cfgcl,  sc4, sc4cfgcl, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4derby_reel_configs[6] =
@@ -40649,36 +44535,311 @@ DRIVER_INIT_MEMBER(sc4_state,sc4derby)
 	m_reel_setup = sc4derby_reel_configs;
 }
 
+INPUT_PORTS_START( sc4derby ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk prz")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk bon")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk mat")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk fea")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("tk csh")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1006  DEMOLITION DERBY         PR1006 DEMDERBY SOUNDS11
-GAMEL( 200?, sc4derby    ,0,         sc4, sc4, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbya   ,sc4derby,  sc4, sc4, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbyb   ,sc4derby,  sc4, sc4, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbyc   ,sc4derby,  sc4, sc4, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbyd   ,sc4derby,  sc4, sc4, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbye   ,sc4derby,  sc4, sc4, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4derby    ,0,         sc4, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4derbya   ,sc4derby,  sc4, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4derbyb   ,sc4derby,  sc4, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4derbyc   ,sc4derby,  sc4, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4derbyd   ,sc4derby,  sc4, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4derbye   ,sc4derby,  sc4, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4dbldm ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("btn 2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("btn 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("btn 4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("btn 5")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("max")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bet2")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("bet1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("bet3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("bet5")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("bet4")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("bet6")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "lock" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2558 DOUBLE DIAMOND 011         DOUBLEDIAMONDSND          DOUBLE DIAMOND
-GAMEL( 200?, sc4dbldm    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Double Diamond (Qps) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dbldm    ,0,         sc4, sc4dbldm, sc4_state, sc4, ROT0, "Qps","Double Diamond (Qps) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4dyna ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk csh")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk bon")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("blast")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk skl")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dils 1" // standard input (motherboard)
+        // 0x0002 - "dils 2" // standard input (motherboard)
+        // 0x0004 - "dils 3" // standard input (motherboard)
+        // 0x0008 - "dils 4" // standard input (motherboard)
+        // 0x0010 - "dils 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dils 6" // standard input (motherboard)
+        // 0x0002 - "dils 7" // standard input (motherboard)
+        // 0x0004 - "dils 8" // standard input (motherboard)
+        // 0x0008 - "dils 9" // standard input (motherboard)
+        // 0x0010 - "dils10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dils11" // standard input (motherboard)
+        // 0x0002 - "dils12" // standard input (motherboard)
+        // 0x0004 - "dils13" // standard input (motherboard)
+        // 0x0008 - "dils14" // standard input (motherboard)
+        // 0x0010 - "dils15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dils16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1104 DYNAMITE         PR1104 DYNAMITE SOUNDS11
-GAMEL( 200?, sc4dyna     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dynaa    ,sc4dyna,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dyna     ,0,         sc4, sc4dyna, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dynaa    ,sc4dyna,   sc4, sc4dyna, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4easy ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0002 - "hoplow" // known extended(?) input, sometimes 'hop hi'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk csh")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("step")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("shoot")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1017 EASY STREAK         PR1017 EASY STREAK SOUNDS11           EASY STREAK
-GAMEL( 200?, sc4easy     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4easya    ,sc4easy,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4easyb    ,sc4easy,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4easyc    ,sc4easy,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4easyd    ,sc4easy,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4easye    ,sc4easy,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4easyf    ,sc4easy,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easy     ,0,         sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easya    ,sc4easy,   sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easyb    ,sc4easy,   sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easyc    ,sc4easy,   sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easyd    ,sc4easy,   sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easye    ,sc4easy,   sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4easyf    ,sc4easy,   sc4, sc4easy, sc4_state, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4clbmn ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        // 0x0100 - "hopfit" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stake")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("takfet")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("trnsfr")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("sneakp")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("gamfet")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("gambon")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 //PROJECT NUMBER PR1955 CLUB MONEYBAGS         MONEY BAGS  CLUB  PR1955 C M MONEYBAGS SOUNDS11       DEAL OR NO DEAL   5-10-20   10-20-30   20-30-50  30-50-100
-GAMEL( 200?, sc4clbmn    ,0,         sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clbmna   ,sc4clbmn,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clbmnb   ,sc4clbmn,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4clbmnc   ,sc4clbmn,  sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clbmn    ,0,         sc4, sc4clbmn, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clbmna   ,sc4clbmn,  sc4, sc4clbmn, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clbmnb   ,sc4clbmn,  sc4, sc4clbmn, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4clbmnc   ,sc4clbmn,  sc4, sc4clbmn, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4boomb_reel_configs[6] =
@@ -40697,9 +44858,72 @@ DRIVER_INIT_MEMBER(sc4_state,sc4boomb)
 	m_reel_setup = sc4boomb_reel_configs;
 }
 
+INPUT_PORTS_START( sc4boomb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("collec")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ch stk")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("auctio")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("leave")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("take")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("c or b")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 //PROJECT NUMBER PR3332 AWP MONOPOLY BOOM OR BUST S4         PR3307 MPOLY BOOM OR B SOUNDS11   BOOM OR BUST  S.SITE
-GAMEL( 200?, sc4boomb    ,0,         sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4boomba   ,sc4boomb,  sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4boomb    ,0,         sc4, sc4boomb, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4boomba   ,sc4boomb,  sc4, sc4boomb, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -40719,23 +44943,82 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fever)
 	m_reel_setup = sc4fever_reel_configs;
 }
 
+INPUT_PORTS_START( sc4fever ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0002 - "hoplow" // known extended(?) input, sometimes 'hop hi'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "pzkey1" // standard input (expected here)
+        // 0x0002 - "pzkey2" // standard input (expected here)
+        // 0x0004 - "pzkey3" // standard input (expected here)
+        // 0x0008 - "pzkey4" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "pckey1" // standard input (expected here)
+        // 0x0002 - "pckey2" // standard input (expected here)
+        // 0x0004 - "pckey3" // standard input (expected here)
+        // 0x0008 - "pckey4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("t blts")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("t feat")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("t nuds")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("t ko")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // we have FEVER SOUNDS12 but it accepts those?
 // PR1007 FEVER         PR1007 FEVER SOUNDS11
-GAMEL( 200?, sc4fever    ,0,         sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevera   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverb   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverc   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverd   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevere   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverf   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverg   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverh   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverk   ,sc4fever,  sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fever    ,0,         sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevera   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverb   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverc   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverd   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevere   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverf   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverg   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverh   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4feverk   ,sc4fever,  sc4, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
-
-// PR7054 POWER BALL         POWERBALL SOUNDS
-GAMEL( 200?, sc4pwrbq    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4pwrbqa   ,sc4pwrbq,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 /**********************************************************************************************************************************/
@@ -40759,8 +45042,58 @@ DRIVER_INIT_MEMBER(sc4_state,sc4aztec)
 	m_reel_setup = sc4aztec_reel_configs;
 }
 
+INPUT_PORTS_START( sc4aztec ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kop")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("zijdeu OR l hop OR r hop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("munt")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "dump" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
-GAMEL( 200?, sc4aztec    ,0,         sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )// PR1225 AZTEC CASINO
+GAMEL( 200?, sc4aztec    ,0,         sc4, sc4aztec, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )// PR1225 AZTEC CASINO
 GAMEL( 200?, sc4azteca   ,sc4aztec,  sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1215 AZTEC EURO
 
 
@@ -40780,9 +45113,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4helrd)
 	m_reel_setup = sc4helrd_reel_configs;
 }
 
+INPUT_PORTS_START( sc4helrd ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("vast 4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("munt")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1254 HELLRAISER ART12         95004326 HELLRAISER PR1254
-GAMEL( 200?, sc4helrd    ,0,         sc4, sc4, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4helrs    ,sc4helrd,  sc4, sc4, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4helrd    ,0,         sc4, sc4helrd, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4helrs    ,sc4helrd,  sc4, sc4helrd, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4heatw_reel_configs[6] =
@@ -40801,10 +45188,61 @@ DRIVER_INIT_MEMBER(sc4_state,sc4heatw)
 	m_reel_setup = sc4heatw_reel_configs;
 }
 
-
+INPUT_PORTS_START( sc4heatw ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("k inze")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("munt")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1216 HEATWAVE ART 12         95004287 HEATWAVE PR1156
-GAMEL( 200?, sc4heatw    ,0,         sc4, sc4, sc4_state, sc4heatw, ROT0, "BFM","Heatwave (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4heatw    ,0,         sc4, sc4heatw, sc4_state, sc4heatw, ROT0, "BFM","Heatwave (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4colos_reel_configs[6] =
@@ -40823,9 +45261,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4colos)
 	m_reel_setup = sc4colos_reel_configs;
 }
 
+INPUT_PORTS_START( sc4colos ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies m")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies b")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies c")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem m" // unexpected here
+        // 0x0004 - "neem w" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
-GAMEL( 200?, sc4colos    ,0,         sc4, sc4, sc4_state, sc4colos, ROT0, "BFM","Colossus (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4colos    ,0,         sc4, sc4colos, sc4_state, sc4colos, ROT0, "BFM","Colossus (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4fevdt_reel_configs[6] =
 {
@@ -40843,10 +45335,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fevdt)
 	m_reel_setup = sc4fevdt_reel_configs;
 }
 
+INPUT_PORTS_START( sc4fevdt ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies i")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 //  PR1202 FEVER         95004239 FEVER PR7157
-GAMEL( 200?, sc4fevdt    ,0,         sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevdta   ,sc4fevdt,  sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevdtb   ,sc4fevdt,  sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevdt    ,0,         sc4, sc4fevdt, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevdta   ,sc4fevdt,  sc4, sc4fevdt, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevdtb   ,sc4fevdt,  sc4, sc4fevdt, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4fevnx_reel_configs[6] =
 {
@@ -40864,9 +45409,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fevnx)
 	m_reel_setup = sc4fevnx_reel_configs;
 }
 
+INPUT_PORTS_START( sc4fevnx ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("k inze")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("k spel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("key/go")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1216 FEVER ART12         95004318 FEVER T N PR1251
-GAMEL( 200?, sc4fevnx    ,0,         sc4, sc4, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevnxa   ,sc4fevnx,  sc4, sc4, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevnx    ,0,         sc4, sc4fevnx, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4fevnxa   ,sc4fevnx,  sc4, sc4fevnx, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4game_reel_configs[6] =
 {
@@ -40884,8 +45483,111 @@ DRIVER_INIT_MEMBER(sc4_state,sc4game)
 	m_reel_setup = sc4game_reel_configs;
 }
 
-GAMEL( 200?, sc4gamcs    ,0,         sc4, sc4, sc4_state, sc4game, ROT0, "BFM","The Game Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1224 THE GAME CASINO         95004285 THEGAME PR1153
-GAMEL( 200?, sc4game     ,sc4gamcs,  sc4, sc4, sc4_state, sc4game, ROT0, "BFM","The Game (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1213 THE GAME         95004285 THEGAME PR1153
+INPUT_PORTS_START( sc4gamcs ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kop")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("zijdeu OR l hop OR r hop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("munt")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "dump" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4game ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("munt")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem c" // unexpected here
+        // 0x0004 - "neem w" // standard input (expected here)
+        // 0x0010 - "info/l" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
+GAMEL( 200?, sc4gamcs    ,0,         sc4, sc4gamcs, sc4_state, sc4game, ROT0, "BFM","The Game Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1224 THE GAME CASINO         95004285 THEGAME PR1153
+GAMEL( 200?, sc4game     ,sc4gamcs,  sc4, sc4game,  sc4_state, sc4game, ROT0, "BFM","The Game (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1213 THE GAME         95004285 THEGAME PR1153
 
 static const stepper_interface* sc4goud_reel_configs[6] =
 {
@@ -40903,8 +45605,71 @@ DRIVER_INIT_MEMBER(sc4_state,sc4goud)
 	m_reel_setup = sc4goud_reel_configs;
 }
 
+INPUT_PORTS_START( sc4goud ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("herste")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("neem p")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("stop OR wissel")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("uitbet")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("player")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("hi lef")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("hi mid")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hi rig")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("neem g")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("lo lef")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("lo mid")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_3 ) PORT_NAME("lo rig")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_4 ) PORT_NAME("neem s")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
+
 // PR1211 GOUDKOORTS         95004288 GOUDKOORTS PR1151
-GAMEL( 200?, sc4goud     ,0,         sc4, sc4, sc4_state, sc4goud, ROT0, "BFM","Goudkoorts (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4goud     ,0,         sc4, sc4goud, sc4_state, sc4goud, ROT0, "BFM","Goudkoorts (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4lasv_reel_configs[6] =
@@ -40923,9 +45688,53 @@ DRIVER_INIT_MEMBER(sc4_state,sc4lasv)
 	m_reel_setup = sc4lasv_reel_configs;
 }
 
+INPUT_PORTS_START( sc4lasv ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("k inze")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("k spel")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0008 - "vegas" // standard input (expected here)
+        // 0x0010 - "call a" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0004 - "black" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1209 LAS VEGAS         95004261 LASVEGAS PR7159
-GAMEL( 200?, sc4lasv     ,0,         sc4, sc4, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4lasva    ,sc4lasv,   sc4, sc4, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lasv     ,0,         sc4, sc4lasv, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4lasva    ,sc4lasv,   sc4, sc4lasv, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4miljo_reel_configs[6] =
 {
@@ -40943,9 +45752,115 @@ DRIVER_INIT_MEMBER(sc4_state,sc4miljo)
 	m_reel_setup = sc4miljo_reel_configs;
 }
 
+INPUT_PORTS_START( sc4miljo ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("k inze")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("munt")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
-GAMEL( 200?, sc4miljo    ,0,         sc4, sc4, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
-GAMEL( 200?, sc4milja    ,sc4miljo,  sc4, sc4, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
+INPUT_PORTS_START( sc4milja ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("k inze")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("k spel")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "roep b" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
+GAMEL( 200?, sc4miljo    ,0,         sc4, sc4miljo, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
+GAMEL( 200?, sc4milja    ,sc4miljo,  sc4, sc4milja, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
 
 static const stepper_interface* sc4paytm_reel_configs[6] =
 {
@@ -40963,8 +45878,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4paytm)
 	m_reel_setup = sc4paytm_reel_configs;
 }
 
+INPUT_PORTS_START( sc4paytm ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies i")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "roep b" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 //  PR1205 PAY TIME         95004224 PAYTIME PR7156             PAY TIME
-GAMEL( 200?, sc4paytm    ,0,         sc4, sc4, sc4_state, sc4paytm, ROT0, "BFM","Pay Time (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4paytm    ,0,         sc4, sc4paytm, sc4_state, sc4paytm, ROT0, "BFM","Pay Time (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4pglcs_reel_configs[6] =
@@ -40983,10 +45952,59 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pglcs)
 	m_reel_setup = sc4pglcs_reel_configs;
 }
 
+INPUT_PORTS_START( sc4pglcs ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kop")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("zijdeu OR l hop OR r hop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("munt")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hgst" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "dump" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 //  PR1261 PHARAOH'S GOLD         95004316 CAS PHAR GOLD PR1261
-GAMEL( 200?, sc4pglcs    ,0,         sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4pglcsa   ,sc4pglcs,  sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4pglcsb   ,sc4pglcs,  sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4pglcs    ,0,         sc4, sc4pglcs, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4pglcsa   ,sc4pglcs,  sc4, sc4pglcs, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4pglcsb   ,sc4pglcs,  sc4, sc4pglcs, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4redad_reel_configs[6] =
 {
@@ -41004,10 +46022,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4redad)
 	m_reel_setup = sc4redad_reel_configs;
 }
 
+INPUT_PORTS_START( sc4redad ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies i")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "naar c" // unexpected here
+        // 0x0004 - "neem w" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1206 RED ALERT         95004266 REDALERT PR1051
-GAMEL( 200?, sc4redad    ,0,         sc4, sc4, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4redada   ,sc4redad,  sc4, sc4, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4redad    ,0,         sc4, sc4redad, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4redada   ,sc4redad,  sc4, sc4redad, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4rvlnx_reel_configs[6] =
@@ -41026,9 +46097,60 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rvlnx)
 	m_reel_setup = sc4rvlnx_reel_configs;
 }
 
+INPUT_PORTS_START( sc4rvlnx ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("herste")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem c" // unexpected here
+        // 0x0010 - "info/l" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1252 REVOLUTION  NEXT         95004320 REVOLUTIONTN PR1252
-GAMEL( 200?, sc4rvlnx    ,0,         sc4, sc4, sc4_state, sc4rvlnx, ROT0, "BFM","Revolution The Next (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rvlnx    ,0,         sc4, sc4rvlnx, sc4_state, sc4rvlnx, ROT0, "BFM","Revolution The Next (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4rvl_reel_configs[6] =
 {
@@ -41046,9 +46168,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rvl)
 	m_reel_setup = sc4rvl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4rvl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("herste")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "r behe" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1203 REVOLUTION         95004259 REVOLUTION PR7158
-GAMEL( 200?, sc4rvl      ,0,         sc4, sc4, sc4_state, sc4rvl, ROT0, "BFM","Revolution (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rvl      ,0,         sc4, sc4rvl, sc4_state, sc4rvl, ROT0, "BFM","Revolution (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4rio_reel_configs[6] =
 {
@@ -41066,8 +46242,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rio)
 	m_reel_setup = sc4rio_reel_configs;
 }
 
+INPUT_PORTS_START( sc4rio ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies i")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "neem w" // unexpected here
+        // 0x0002 - "neem h" // unexpected here
+        // 0x0004 - "uitbet" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "black" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1222    RIO GRANDE         95004309 RIO GRANDE SOUNDS11
-GAMEL( 200?, sc4rio      ,0,         sc4, sc4, sc4_state, sc4rio, ROT0, "BFM","Rio Grande (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rio      ,0,         sc4, sc4rio, sc4_state, sc4rio, ROT0, "BFM","Rio Grande (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4strbr_reel_configs[6] =
@@ -41086,13 +46316,122 @@ DRIVER_INIT_MEMBER(sc4_state,sc4strbr)
 	m_reel_setup = sc4strbr_reel_configs;
 }
 
+INPUT_PORTS_START( sc4strbr ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies i")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem c" // unexpected here
+        // 0x0004 - "neem s" // standard input (expected here)
+        // 0x0010 - "info/l" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4strbra ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("neem s")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem h" // unexpected here
+        // 0x0004 - "neem w" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1219 STARS 'N BARS         95004290 STARSNBARS PR1159
-GAMEL( 200?, sc4strbr    ,0,         sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars (PR1219) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4strbrb   ,sc4strbr,  sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars (PR1219) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4strbr    ,0,         sc4, sc4strbr, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars (PR1219) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4strbrb   ,sc4strbr,  sc4, sc4strbr, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars (PR1219) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR1263 SNBA ART13 STARS 'N' BARS ARCADE - ART13         95004290 STARSNBARS PR1159
-GAMEL( 200?, sc4strbra   ,sc4strbr,  sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4strbrc   ,sc4strbr,  sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4strbrd   ,sc4strbr,  sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4strbra   ,sc4strbr,  sc4, sc4strbra, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4strbrc   ,sc4strbr,  sc4, sc4strbra, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4strbrd   ,sc4strbr,  sc4, sc4strbra, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4twilt_reel_configs[6] =
 {
@@ -41111,8 +46450,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4twilt)
 }
 
 
+INPUT_PORTS_START( sc4twilt ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("vast 4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem c" // unexpected here
+        // 0x0010 - "info/l" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1214 TWILIGHT         95004299 TWILIGHT PR1154
-GAMEL( 200?, sc4twilt    ,0,         sc4, sc4, sc4_state, sc4twilt, ROT0, "BFM","Twilight (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4twilt    ,0,         sc4, sc4twilt, sc4_state, sc4twilt, ROT0, "BFM","Twilight (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4monsp_reel_configs[6] =
@@ -41131,8 +46524,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4monsp)
 	m_reel_setup = sc4monsp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4monsp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 4")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("herst")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("munt")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1218 MONEY SPINNER ART12         95004291 MONEYSPINNER PR1158
-GAMEL( 200?, sc4monsp    ,0,         sc4, sc4, sc4_state, sc4monsp, ROT0, "BFM","Money Spinner (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4monsp    ,0,         sc4, sc4monsp, sc4_state, sc4monsp, ROT0, "BFM","Money Spinner (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4ivply_reel_configs[6] =
@@ -41151,9 +46598,64 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ivply)
 	m_reel_setup = sc4ivply_reel_configs;
 }
 
+INPUT_PORTS_START( sc4ivply ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("vast 4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 
 // PR1227 4PLAY ART13         95004313 4PLAY PR1227
-GAMEL( 200?, sc4ivply    ,0,         sc4, sc4, sc4_state, sc4ivply, ROT0, "BFM","4 Play (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ivply    ,0,         sc4, sc4ivply, sc4_state, sc4ivply, ROT0, "BFM","4 Play (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4ccc_reel_configs[6] =
 {
@@ -41172,8 +46674,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ccc)
 }
 
 
+INPUT_PORTS_START( sc4ccc ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("vast 4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        // 0x0010 - "roep" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
-GAMEL( 200?, sc4ccc      ,0,         sc4, sc4, sc4_state, sc4ccc, ROT0, "BFM","Criss Cross Crazy (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ccc      ,0,         sc4, sc4ccc, sc4_state, sc4ccc, ROT0, "BFM","Criss Cross Crazy (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4valqp_reel_configs[6] =
 {
@@ -41191,8 +46748,61 @@ DRIVER_INIT_MEMBER(sc4_state,sc4valqp)
 	m_reel_setup = sc4valqp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4valqp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("spel")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("inzet")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2040E VALHALLA...PR2040 SOUNDS V1.... (non-standard header)
-GAMEL( 200?, sc4valqp    ,0,         sc4, sc4, sc4_state, sc4valqp, ROT0, "Qps / Eurocoin","Valhalla (Dutch) (Qps) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4valqp    ,0,         sc4, sc4valqp, sc4_state, sc4valqp, ROT0, "Qps / Eurocoin","Valhalla (Dutch) (Qps) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4winxp_reel_configs[6] =
@@ -41211,8 +46821,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4winxp)
 	m_reel_setup = sc4winxp_reel_configs;
 }
 
+INPUT_PORTS_START( sc4winxp ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("vast 4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("kies i")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("kies s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n hoog" // unexpected here
+        // 0x0004 - "n winb" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR1207 WIN XPLOSION         95004265 WINXPLOSION PR1053
-GAMEL( 200?, sc4winxp    ,0,         sc4, sc4, sc4_state, sc4winxp, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4winxp    ,0,         sc4, sc4winxp, sc4_state, sc4winxp, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4xcash_reel_configs[6] =
@@ -41231,9 +46895,57 @@ DRIVER_INIT_MEMBER(sc4_state,sc4xcash)
 	m_reel_setup = sc4xcash_reel_configs;
 }
 
+INPUT_PORTS_START( sc4xcash ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("uitbet")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("test s")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("test s")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("test s")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("test s")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("zijdeu OR l hop OR r hop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("test s")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0010 - "roep b" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "dump" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1264 XTRA CASH ART13 XTRA CASH CASINO (LOTECH) - ART13         95004321 XTRACASH PR1264
-GAMEL( 200?, sc4xcash    ,0,         sc4, sc4, sc4_state, sc4xcash, ROT0, "BFM","Xtra Cash Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4xcash    ,0,         sc4, sc4xcash, sc4_state, sc4xcash, ROT0, "BFM","Xtra Cash Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4helld_reel_configs[6] =
 {
@@ -41251,9 +46963,62 @@ DRIVER_INIT_MEMBER(sc4_state,sc4helld)
 	m_reel_setup = sc4helld_reel_configs;
 }
 
+INPUT_PORTS_START( sc4helld ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herste")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("kies m")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("k basi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("k club")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem m" // unexpected here
+        // 0x0004 - "neem w" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1201 HELLS BELLS         95004211 HELLS BELLS PR6945         HELLS  BELLS  (non english?)
-GAMEL( 200?, sc4helld    ,0,         sc4, sc4, sc4_state, sc4helld, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4helld    ,0,         sc4, sc4helld, sc4_state, sc4helld, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4cashn_reel_configs[6] =
 {
@@ -41271,9 +47036,61 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cashn)
 	m_reel_setup = sc4cashn_reel_configs;
 }
 
+INPUT_PORTS_START( sc4cashn ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("herst")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("inzet")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "n club" // unexpected here
+        // 0x0010 - "player" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
+
 
 // PR2038E Dutch12 Cashanova  (not a standard string)
-GAMEL( 200?, sc4cashn    ,0,         sc4, sc4, sc4_state, sc4cashn, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cashn    ,0,         sc4, sc4cashn, sc4_state, sc4cashn, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4czfra_reel_configs[6] =
@@ -41292,213 +47109,737 @@ DRIVER_INIT_MEMBER(sc4_state,sc4czfra)
 	m_reel_setup = sc4czfra_reel_configs;
 }
 
+INPUT_PORTS_START( sc4czfra ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("vast 1")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("vast 2")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("vast 3")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("herste")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("stop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("ruilen")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("start")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_4 ) PORT_NAME("bijvul")
+        PORT_MODIFY("IN-3")
+        // 0x0001 - "uitbet" // unexpected here
+        // 0x0002 - "neem w" // unexpected here
+        // 0x0004 - "neem l" // standard input (expected here)
+        // 0x0008 - "neem s" // standard input (expected here)
+        // 0x0010 - "info/l" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0001 - "l hop" // unexpected here
+        // 0x0002 - "r hop" // known extended(?) input, sometimes 'hop hi'
+        // 0x0004 - "l hop" // unexpected here
+        // 0x0008 - "r hop" // known extended(?) input, sometimes 'hop top'
+        // 0x0010 - "hopper" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "l lege" // standard input (expected here)
+        // 0x0002 - "r lege" // standard input (expected here)
+        // 0x0004 - "dump" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "green" // standard input (motherboard)
+        // 0x0002 - "cashbo" // standard input (expected here)
+        // 0x0008 - "zijdeu" // standard input (expected here)
+        // 0x0010 - "boekho" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR1212 CRAZY FRUITS          PR1152 CRAZY FRUITS SOUNDS11
-GAMEL( 200?, sc4czfra    ,0, sc4, sc4, sc4_state, sc4czfra, ROT0, "BFM","Crazy Fruits (Dutch) (PR1212, CRAZ) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4czfra    ,0, sc4, sc4czfra, sc4_state, sc4czfra, ROT0, "BFM","Crazy Fruits (Dutch) (PR1212, CRAZ) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
-
-/**********************************************************************************************************************************/
-/*  Games below are German versions, and seem to be build on very different code even when titles match other games               */
-/*   all seem to freeze after startup                                                                                             */
-/**********************************************************************************************************************************/
-
-
-static const stepper_interface* sc4polen_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4polen)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4polen_reel_configs;
-}
-
-// PR7012 GERMAN POLE POSITION         PR7012 SOUNDS
-GAMEL( 200?, sc4polen    ,0,         sc4, sc4, sc4_state, sc4polen, ROT0, "Nova","Pole Position (German) (PR7012, GPOS) (Nova) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-static const stepper_interface* sc4valnv_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4valnv)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4valnv_reel_configs;
-}
-
-
-// PR7025 GERMAN VALHALLA         7025 VER1 SOUNDS
-GAMEL( 200?, sc4valnv    ,0,         sc4, sc4, sc4_state, sc4valnv, ROT0, "Nova","Valhalla (German) (PR7025, GVAL) (Nova) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-static const stepper_interface* sc4wernr_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4wernr)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4wernr_reel_configs;
-}
-
-//  PR7027 GERMAN WERNER         PR7027 SOUNDS V1
-GAMEL( 200?, sc4wernr    ,0,         sc4, sc4, sc4_state, sc4wernr, ROT0, "Nova","Werner (German) (PR7027, GWER) (Nova) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4wrnlt    ,sc4wernr,  sc4, sc4, sc4_state, sc4wernr, ROT0, "Nova","Werner (German) (PR7027, GWER) (Nova) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 /**********************************************************************************************************************************/
 /*  Games below don't do enough to add real configs yet                                                                           */
 /**********************************************************************************************************************************/
 
-// not sure this is SC4, it crashes MAME and the addresses it accesses look strange
-GAMEL( 200?, sc4milro    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Millionaires Row (Scorpion 4?)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+INPUT_PORTS_START( sc4adsnt ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("gamble")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("grabs")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("featur")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 //  PR1611 AWP ANT AND DECS         PR1611 ANT AND DECS  SOUNDS11     ANT AND DECS  S.SITE
-GAMEL( 200?, sc4adsnt    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4adsnta   ,sc4adsnt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4adsnt    ,0,         sc4, sc4adsnt, sc4_state, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4adsnta   ,sc4adsnt,  sc4, sc4adsnt, sc4_state, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+INPUT_PORTS_START( sc4slad ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR1411 AWP SNAKES AND LADDERS         PR1411 SNAKES A L SOUNDS11        SNAKES & LADDERS  S.SITE
-GAMEL( 200?, sc4slad     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4slada    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sladb    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sladc    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sladd    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4slade    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sladf    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sladg    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4sladh    ,sc4slad,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4slad     ,0,         sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4slada    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sladb    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sladc    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sladd    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4slade    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sladf    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sladg    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4sladh    ,sc4slad,   sc4, sc4slad, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4magci ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("magic")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "topup" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "botdor" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR2535 MAGIC CIRCLE STANDARD 011         MAGICSND
-GAMEL( 200?, sc4magci    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcik   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magci    ,0,         sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcik   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD 021         MAGICSND
-GAMEL( 200?, sc4magcia   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (021) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcil   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (021) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcia   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (021) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcil   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (021) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD 031         MAGICSND
-GAMEL( 200?, sc4magcib   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (031) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcim   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (031) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcib   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (031) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcim   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (031) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD 012         MAGICSND
-GAMEL( 200?, sc4magcic   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcin   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcid   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcio   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcic   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcin   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcid   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcio   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 //P R2535 MAGIC CIRCLE STANDARD 022         MAGICSND
-GAMEL( 200?, sc4magcie   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (022) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcip   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (022) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcie   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (022) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcip   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (022) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD 032         MAGICSND
-GAMEL( 200?, sc4magcif   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (032) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magciq   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (032) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcif   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (032) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magciq   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (032) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD  013         MAGICSND
-GAMEL( 200?, sc4magcig   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (013) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcir   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (013) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcig   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (013) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcir   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (013) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD  014         MAGICSND
-GAMEL( 200?, sc4magcih   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (014) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcis   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (014) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcih   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (014) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcis   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (014) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD  024         MAGICSND
-GAMEL( 200?, sc4magcii   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (024) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magcit   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (024) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcii   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (024) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcit   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (024) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2535 MAGIC CIRCLE STANDARD  034         MAGICSND
-GAMEL( 200?, sc4magcij   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (034) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4magciu   ,sc4magci,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (034) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magcij   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (034) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4magciu   ,sc4magci,  sc4, sc4magci, sc4_state, sc4, ROT0, "Qps","Magic Circle (034) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4dcrls ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("streak")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("transf")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "topup" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        // 0x0002 - "dil sw" // standard input (motherboard)
+        // 0x0004 - "dil sw" // standard input (motherboard)
+        // 0x0008 - "dil sw" // standard input (motherboard)
+        // 0x0010 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil sw" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "botdor" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR2544 DOUBLE CRAZY REELS 021         DCRZYSND
-GAMEL( 200?, sc4dcrls    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dcrlsf   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrls    ,0,         sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsf   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2544 DOUBLE CRAZY REELS 031         DCRZYSND
-GAMEL( 200?, sc4dcrlsa   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dcrlsg   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsa   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsg   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2544 DOUBLE CRAZY REELS 022         DCRZYSND
-GAMEL( 200?, sc4dcrlsb   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dcrlsh   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsb   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsh   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2544 DOUBLE CRAZY REELS 032         DCRZYSND
-GAMEL( 200?, sc4dcrlsc   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dcrlsi   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsc   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsi   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2544 DOUBLE CRAZY REELS 023         DCRZYSND
-GAMEL( 200?, sc4dcrlsd   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dcrlsj   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsd   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsj   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2544 DOUBLE CRAZY REELS 033         DCRZYSND
-GAMEL( 200?, sc4dcrlse   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4dcrlsk   ,sc4dcrls,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlse   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4dcrlsk   ,sc4dcrls,  sc4, sc4dcrls, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4gshot ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("auto")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("trans")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "topup" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "botdor" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR2564 GOLDEN SHOT Standard Version         GOLDENSHOTLOTECHSND
-GAMEL( 200?, sc4gshot    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gshotb   ,sc4gshot,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gshot    ,0,         sc4, sc4gshot, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gshotb   ,sc4gshot,  sc4, sc4gshot, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 // PR2564 GOLDEN SHOT Arcade Version         GOLDENSHOTLOTECHSND
-GAMEL( 200?, sc4gshota   ,sc4gshot,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4gshotc   ,sc4gshot,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gshota   ,sc4gshot,  sc4, sc4gshot, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gshotc   ,sc4gshot,  sc4, sc4gshot, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4cj ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("c feat")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR1416 COOL JEWELS         PR1416 COOL JEWELS SOUNDS11       COOL JEWELS S.SITE
-GAMEL( 200?, sc4cj       ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cja      ,sc4cj,     sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjb      ,sc4cj,     sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjc      ,sc4cj,     sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cjd      ,sc4cj,     sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4cj       ,0,         sc4, sc4cj, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cja      ,sc4cj,     sc4, sc4cj, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjb      ,sc4cj,     sc4, sc4cj, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjc      ,sc4cj,     sc4, sc4cj, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cjd      ,sc4cj,     sc4, sc4cj, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+
+INPUT_PORTS_START( sc4crnjw ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("red  b")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("oran b")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("bonus")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("blue b")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("gren b")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERROR 17
 // PR1638 AWP CROWN JEWELS         PR1608 CROWN JEWELS SOUNDS11      CROWN JEWELS  S.SITE
-GAMEL( 200?, sc4crnjw    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4crnjwa   ,sc4crnjw,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crnjw    ,0,         sc4, sc4crnjw, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4crnjwa   ,sc4crnjw,  sc4, sc4crnjw, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+INPUT_PORTS_START( sc4jjok ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper fit'
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 2" // standard input (expected here)
+        // 0x0010 - "stk 3" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("lo nud")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("lo csh")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("lo fet")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("hi nud")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hi csh")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("hi fet")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("bonus")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil1" // standard input (motherboard)
+        // 0x0002 - "dil2" // standard input (motherboard)
+        // 0x0004 - "dil3" // standard input (motherboard)
+        // 0x0008 - "dil4" // standard input (motherboard)
+        // 0x0010 - "dil5" // standard input (motherboard)
+        // 0x0100 - "htopup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil6" // standard input (motherboard)
+        // 0x0002 - "dil7" // standard input (motherboard)
+        // 0x0004 - "dil8" // standard input (motherboard)
+        // 0x0008 - "dil9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR1609 JACKPOT JOKERS         PR1609 JACKPOT JOKERS SOUNDS11    JACKPOT JOKERS  S.SITE
-GAMEL( 200?, sc4jjok     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Jokers (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjoka    ,sc4jjok,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Jokers (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjok     ,0,         sc4, sc4jjok, sc4_state, sc4, ROT0, "BFM","Jackpot Jokers (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjoka    ,sc4jjok,   sc4, sc4jjok, sc4_state, sc4, ROT0, "BFM","Jackpot Jokers (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
-
-// fails to boot, like many of the Pole Position sets, probably needs some specific dips setting due to buggy code?
-// PR7008 CHUBBY DOES VEGAS         VEGAS SOUNDS11
-GAMEL( 200?, sc4chub     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chuba    ,sc4chub,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chubb    ,sc4chub,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+INPUT_PORTS_START( sc4copsr ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("coll")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("hpunit")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "cshdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PAY UNIT ERR 17
 // PR1412 AWP COPS AND ROBBERS         PR1412 COPS AND ROBBERS SOUNDS11  COPS AND ROBBERS  S.SITE
-GAMEL( 200?, sc4copsr    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsra   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsrb   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsrc   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsrd   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsre   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsrf   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsrg   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsrh   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4copsri   ,sc4copsr,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsr    ,0,         sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsra   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsrb   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsrc   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsrd   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsre   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsrf   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsrg   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsrh   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4copsri   ,sc4copsr,  sc4, sc4copsr, sc4_state, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+INPUT_PORTS_START( sc4druby ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("autopl")
+        PORT_BIT( 0x0020, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_5 ) PORT_NAME("pndlow OR 10plow")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("transf")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0008 - "htopup" // known extended(?) input, sometimes 'hop top'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-6")
+        // 0x0001 - "perc1" // standard input (expected here)
+        // 0x0002 - "perc2" // standard input (expected here)
+        // 0x0004 - "perc3" // standard input (expected here)
+        // 0x0008 - "perc4" // standard input (expected here)
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "cshdor" // standard input (expected here)
+        // 0x0004 - "serdor" // standard input (expected here)
+        // 0x0008 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // gives an 'init comms' countdown
 // PR1439 DIAMONDS & RUBIES         PR1436 TRIPLE CASINO SOUNDS11
-GAMEL( 200?, sc4druby    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4drubya   ,sc4druby,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4drubyb   ,sc4druby,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4drubyc   ,sc4druby,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4drubyd   ,sc4druby,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4druby    ,0,         sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4drubya   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4drubyb   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4drubyc   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4drubyd   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 /****************************************************************************************************************************************************************************************************************/
@@ -41528,21 +47869,111 @@ DRIVER_INIT_MEMBER(sc4_state,sc4abra)
 	m_reel_setup = sc4abra_reel_configs;
 }
 
+INPUT_PORTS_START( sc4abra ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("stake")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exch")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("xfer")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("step")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("f hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("b hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("c hi")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "tpdor" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
 
 // missing sound roms
 // PR2540 ABRACADABRA         ABRA SOUNDS         ABRACADABRA
-GAMEL( 200?, sc4abra     ,0,         sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 1, 041)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4abraa    ,sc4abra,   sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 2, 041)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4abrab    ,sc4abra,   sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 3, 044)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4abrac    ,sc4abra,   sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 4, 044)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4abrad    ,sc4abra,   sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 5, 014)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4abrae    ,sc4abra,   sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 6, 014)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4abra     ,0,         sc4, sc4abra, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 1, 041)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4abraa    ,sc4abra,   sc4, sc4abra, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 2, 041)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4abrab    ,sc4abra,   sc4, sc4abra, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 3, 044)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4abrac    ,sc4abra,   sc4, sc4abra, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 4, 044)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4abrad    ,sc4abra,   sc4, sc4abra, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 5, 014)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4abrae    ,sc4abra,   sc4, sc4abra, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 6, 014)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+
+INPUT_PORTS_START( sc4alad ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("take")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("ko")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("blast")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("cash")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("winspn")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+INPUT_PORTS_END
 
 // bad / missing sound roms
 // PR7068 ALADDIN'S CAVE         CAVE SOUNDS
-GAMEL( 200?, sc4alad     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4alada    ,sc4alad,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4alad     ,0,         sc4, sc4alad, sc4_state, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4alada    ,sc4alad,   sc4, sc4alad, sc4_state, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -41563,22 +47994,58 @@ DRIVER_INIT_MEMBER(sc4_state,sc4bigdl)
 	m_reel_setup = sc4bigdl_reel_configs;
 }
 
+INPUT_PORTS_START( sc4bigdl ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("collet")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("nudges")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("feats")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("knock")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("cash")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "lock" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // missing sound roms, doesn't play
 // PR2501 BIG DEAL         BIGDEALSND             BIG DEAL
-GAMEL( 200?, sc4bigdl    ,0,         sc4, sc4, sc4_state, sc4bigdl, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bigdla   ,sc4bigdl,  sc4, sc4, sc4_state, sc4bigdl, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bigdl    ,0,         sc4, sc4bigdl, sc4_state, sc4bigdl, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bigdla   ,sc4bigdl,  sc4, sc4bigdl, sc4_state, sc4bigdl, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
-
-
-// no sound roms, doesn't init properly (doesn't even attempt reel test)
-// PR7011 BLUE RINSE         BRINSE SOUNDS
-GAMEL( 200?, sc4blue     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bluea    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4blueb    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bluec    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4blued    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bluee    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4brix_reel_configs[6] =
@@ -41598,36 +48065,6 @@ DRIVER_INIT_MEMBER(sc4_state,sc4brix)
 }
 
 
-// no sound roms
-// PR2023.GERMAN BRIX...........PR2023,German BRIX,......PR2023 SOUNDS V1  (non-standard header)
-GAMEL( 200?, sc4brix     ,0,         sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4brixa    ,sc4brix,   sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4brixb    ,sc4brix,   sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-static const stepper_interface* sc4bugs_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4bugs)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4bugs_reel_configs;
-}
-
-
-// no sound roms
-// PR7109 BUGS MONEY         PR7109 BUGS MONEY SOUNDS11            BUGS MONEY
-GAMEL( 200?, sc4bugs     ,0,         sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bugsa    ,sc4bugs,   sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bugsb    ,sc4bugs,   sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4bugsc    ,sc4bugs,   sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4cconx_reel_configs[6] =
@@ -41663,6 +48100,43 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cconxd)
 	m_reel_setup = sc4cconxd_reel_configs;
 }
 
+INPUT_PORTS_START( sc4cconxd ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("take")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("auto")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exchge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("bonusn")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+INPUT_PORTS_END
 
 // no sound roms
 // PR7038 CASH CONNEXION         MTOM SOUNDS
@@ -41670,12 +48144,7 @@ GAMEL( 200?, sc4cconx    ,0,         sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazoo
 GAMEL( 200?, sc4cconxa   ,sc4cconx,  sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4cconxb   ,sc4cconx,  sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4cconxc   ,sc4cconx,  sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cconxd   ,sc4cconx,  sc4, sc4, sc4_state, sc4cconxd, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // this one won't init without a 200 step reel
-
-// PR7029 MONEY TO MONEY         MTOM SOUNDS
-GAMEL( 200?, sc4m2m      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4m2ma     ,sc4m2m,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
+GAMEL( 200?, sc4cconxd   ,sc4cconx,  sc4, sc4cconxd, sc4_state, sc4cconxd, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // this one won't init without a 200 step reel
 
 static const stepper_interface* sc4ccrus_reel_configs[6] =
 {
@@ -41693,66 +48162,63 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ccrus)
 	m_reel_setup = sc4ccrus_reel_configs;
 }
 
+INPUT_PORTS_START( sc4ccrus ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("excnge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold 1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold 2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold 3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("higher")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("lower")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-4")
+        // 0x0010 - "top up" // known extended(?) input, sometimes 'top up'
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("tk fet")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("tk csh")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("tk zpb")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("tk zpr")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("tk p r")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("tk p b")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
+
 // no sound roms (probably doesn't want cashanova, but check)
 // PR2006 CASH CRUSADERS         CASH SOUNDS            CASH CRUSADERS
-GAMEL( 200?, sc4ccrus    ,0,         sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ccrusa   ,sc4ccrus,  sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4ccrusb   ,sc4ccrus,  sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ccrus    ,0,         sc4, sc4ccrus, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ccrusa   ,sc4ccrus,  sc4, sc4ccrus, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4ccrusb   ,sc4ccrus,  sc4, sc4ccrus, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
-
-static const stepper_interface* sc4chand_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4chand)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4chand_reel_configs;
-}
-
-// no sound roms
-// PR7108 CASH IN HAND         PR7108 CASH IN HAND SOUNDS11           CASH IN HAND
-GAMEL( 200?, sc4chand    ,0,         sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chanda   ,sc4chand,  sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chandb   ,sc4chand,  sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4chandc   ,sc4chand,  sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-static const stepper_interface* sc4cinv_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4cinv)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4cinv_reel_configs;
-}
-
-
-// no sound roms
-//  PR6809 CASHINVADERS         PR6809 CASHINVADERS SOUNDS
-GAMEL( 200?, sc4cinv     ,0,         sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinva    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvb    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvc    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvd    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinve    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvf    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvg    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvh    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4cinvi    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 static const stepper_interface* sc4jjc_reel_configs[6] =
@@ -41772,40 +48238,129 @@ DRIVER_INIT_MEMBER(sc4_state,sc4jjc)
 	m_reel_setup = sc4jjc_reel_configs;
 }
 
+INPUT_PORTS_START( sc4jjc ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancl")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("stake")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold3")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exch")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("xfer")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("c lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("b lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("f lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("step")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("f hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("b hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("c hi")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14" // standard input (motherboard)
+        // 0x0010 - "dil15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "dorlk" // standard input (expected here)
+        // 0x0004 - "tpdor" // standard input (expected here)
+        // 0x0008 - "cshbx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2152 JUMPIN JACK CASH         JACK SOUNDS         JUMPIN JACK CASH
-GAMEL( 200?, sc4jjc      ,0,         sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjca     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjcb     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjcc     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjcd     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjce     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjcf     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjcg     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjch     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jjci     ,sc4jjc,    sc4, sc4, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjc      ,0,         sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjca     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjcb     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjcc     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjcd     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjce     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjcf     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjcg     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjch     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jjci     ,sc4jjc,    sc4, sc4jjc, sc4_state, sc4jjc, ROT0, "Mazooma","Jumping Jack Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
-
-// PR7103 JUNGLE BUCKS         PR7103 JUNGLEBUCKS SOUNDS11           JUNGLE BUCKS
-GAMEL( 200?, sc4jbuck    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jbucka   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jbuckb   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jbuckc   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4jbuckd   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
+INPUT_PORTS_START( sc4kkong ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("coll")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("exchge")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("transf")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("cash")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("c pot")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("dice")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("nudge")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "topup" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "test" // standard input (motherboard)
+        // 0x0002 - "lock" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
 
 // PR2161 KING KONG CASH 000         KKCSH SOUNDS          KING KONG CASH
-GAMEL( 200?, sc4kkong    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkonga   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongb   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongc   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongd   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkonge   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongf   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongg   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongh   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongi   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4kkongj   ,sc4kkong,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkong    ,0,         sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkonga   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongb   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongc   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongd   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkonge   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongf   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongg   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongh   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongi   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4kkongj   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 static const stepper_interface* sc4knok_reel_configs[6] =
 {
@@ -41840,14 +48395,101 @@ DRIVER_INIT_MEMBER(sc4_state,sc4knokb)
 	m_reel_setup = sc4knokb_reel_configs;
 }
 
+INPUT_PORTS_START( sc4knok ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("colect")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("auto n")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("take f")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("ko")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("hi c")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("lo c")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("lo n")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("hi n")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+INPUT_PORTS_END
+
 
 // PR7061 KNOCKOUT         KOUT SOUNDS
-GAMEL( 200?, sc4knok     ,0,         sc4, sc4, sc4_state, sc4knok, ROT0, "Mazooma","Knockout (PR7061, KOUT) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4knoka    ,sc4knok,   sc4, sc4, sc4_state, sc4knok, ROT0, "Mazooma","Knockout (PR7061, KOUT) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-// I think this is a different game
+GAMEL( 200?, sc4knok     ,0,         sc4, sc4knok, sc4_state, sc4knok, ROT0, "Mazooma","Knockout (PR7061, KOUT) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4knoka    ,sc4knok,   sc4, sc4knok, sc4_state, sc4knok, ROT0, "Mazooma","Knockout (PR7061, KOUT) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+INPUT_PORTS_START( sc4knokb ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cancel")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold a")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold b")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold c")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("stop")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("xchnge")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("take")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil  1" // standard input (motherboard)
+        // 0x0002 - "dil  2" // standard input (motherboard)
+        // 0x0004 - "dil  3" // standard input (motherboard)
+        // 0x0008 - "dil  4" // standard input (motherboard)
+        // 0x0010 - "dil  5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil  6" // standard input (motherboard)
+        // 0x0002 - "dil  7" // standard input (motherboard)
+        // 0x0004 - "dil  8" // standard input (motherboard)
+        // 0x0008 - "dil  9" // standard input (motherboard)
+        // 0x0010 - "dil 10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil 11" // standard input (motherboard)
+        // 0x0002 - "dil 12" // standard input (motherboard)
+        // 0x0004 - "dil 13" // standard input (motherboard)
+        // 0x0008 - "dil 14" // standard input (motherboard)
+        // 0x0010 - "dil 15" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil 16" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "testsw" // standard input (motherboard)
+        // 0x0002 - "dor lk" // standard input (expected here)
+        // 0x0004 - "tp dor" // standard input (expected here)
+        // 0x0008 - "csh bx" // standard input (expected here)
+        // 0x0010 - "deflt" // standard input (expected here)
+INPUT_PORTS_END
+
+// This is a different game
 // PR2057 KNOCK OUT         PKOT SOUNDS            KNOCK OUT
-GAMEL( 200?, sc4knokb    ,sc4knok,   sc4, sc4, sc4_state, sc4knokb, ROT0, "Mazooma","Knockout (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4knokc    ,sc4knok,   sc4, sc4, sc4_state, sc4knokb, ROT0, "Mazooma","Knockout (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4knokb    ,0,         sc4, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4knokc    ,sc4knokb,  sc4, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -41867,18 +48509,75 @@ DRIVER_INIT_MEMBER(sc4_state,sc4maxcc)
 	m_reel_setup = sc4maxcc_reel_configs;
 }
 
+INPUT_PORTS_START( sc4maxcc ) // this structure is generated
+        PORT_INCLUDE( sc4_base )
+        PORT_MODIFY("IN-1")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_0 ) PORT_NAME("cn/col")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_1 ) PORT_NAME("hold1")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_2 ) PORT_NAME("hold2")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_3 ) PORT_NAME("hold3")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_1_4 ) PORT_NAME("hold4")
+        PORT_MODIFY("IN-2")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_0 ) PORT_NAME("stop")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_1 ) PORT_NAME("exchng")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_2 ) PORT_NAME("start")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_2_3 ) PORT_NAME("refill")
+        PORT_MODIFY("IN-3")
+        // 0x0004 - "stk 4" // standard input (expected here)
+        // 0x0008 - "stk 3" // standard input (expected here)
+        // 0x0010 - "stk 2" // standard input (expected here)
+        PORT_MODIFY("IN-4")
+        // 0x0100 - "hoplow" // known extended input, usually 'hopper low'
+        PORT_MODIFY("IN-5")
+        // 0x0001 - "priz4" // standard input (expected here)
+        // 0x0002 - "priz3" // standard input (expected here)
+        // 0x0004 - "priz2" // standard input (expected here)
+        // 0x0008 - "priz1" // standard input (expected here)
+        PORT_MODIFY("IN-8")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_0 ) PORT_NAME("nud lo")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_1 ) PORT_NAME("fet lo")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_2 ) PORT_NAME("knk lo")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_3 ) PORT_NAME("knk hi")
+        PORT_BIT( 0x0010, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_8_4 ) PORT_NAME("fet hi")
+        PORT_MODIFY("IN-9")
+        PORT_BIT( 0x0001, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_0 ) PORT_NAME("nud hi")
+        PORT_BIT( 0x0002, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_1 ) PORT_NAME("tk nud")
+        PORT_BIT( 0x0004, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_2 ) PORT_NAME("tk fet")
+        PORT_BIT( 0x0008, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_9_3 ) PORT_NAME("tk knk")
+        PORT_MODIFY("IN-16")
+        // 0x0001 - "dil 1" // standard input (motherboard)
+        // 0x0002 - "dil 2" // standard input (motherboard)
+        // 0x0004 - "dil 3" // standard input (motherboard)
+        // 0x0008 - "dil 4" // standard input (motherboard)
+        // 0x0010 - "dil 5" // standard input (motherboard)
+        // 0x0100 - "top up" // known extended input, usually 'top up'
+        PORT_MODIFY("IN-17")
+        // 0x0001 - "dil 6" // standard input (motherboard)
+        // 0x0002 - "dil 7" // standard input (motherboard)
+        // 0x0004 - "dil 8" // standard input (motherboard)
+        // 0x0008 - "dil 9" // standard input (motherboard)
+        // 0x0010 - "dil10" // standard input (motherboard)
+        PORT_MODIFY("IN-18")
+        // 0x0001 - "dil11" // standard input (motherboard)
+        // 0x0002 - "dil12" // standard input (motherboard)
+        // 0x0004 - "dil13" // standard input (motherboard)
+        // 0x0008 - "dil14 OR perc1" // standard input (motherboard)
+        // 0x0010 - "dil15 OR perc2" // standard input (motherboard)
+        PORT_MODIFY("IN-19")
+        // 0x0001 - "dil16 OR perc3" // standard input (motherboard)
+        PORT_MODIFY("IN-20")
+        // 0x0001 - "grnbut" // standard input (motherboard)
+        // 0x0002 - "dorlok" // standard input (expected here)
+        // 0x0004 - "topdor" // standard input (expected here)
+        // 0x0008 - "botdor" // standard input (expected here)
+        // 0x0010 - "hopdmp" // standard input (expected here)
+INPUT_PORTS_END
+
 // PR2130 CLUB MAXIMUS CASH         MAXIMUS CASH  CLUB  CMAX SOUNDS         MAXIMUS CASH
-GAMEL( 200?, sc4maxcc    ,0,         sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4maxcca   ,sc4maxcc,  sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4maxccb   ,sc4maxcc,  sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4maxccc   ,sc4maxcc,  sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-
-
-// PR6904 MONEY BAGS         PR6904 MONEY BAGS SOUNDS11
-GAMEL( 200?, sc4mbags    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mbagsa   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mbagsb   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4mbagsc   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4maxcc    ,0,         sc4, sc4maxcc, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4maxcca   ,sc4maxcc,  sc4, sc4maxcc, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4maxccb   ,sc4maxcc,  sc4, sc4maxcc, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4maxccc   ,sc4maxcc,  sc4, sc4maxcc, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 // sound roms are bad, missing first 0x10000 bytes with header
@@ -44821,6 +51520,391 @@ GAMEL( 200?, sc4clbtmd   ,sc4clbtm,  sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BF
 GAMEL( 200?, sc4clbtme   ,sc4clbtm,  sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_sc4_dmd )
 
 
+
+static const stepper_interface* sc4gbcas_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4gbcas)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gbcas_reel_configs;
+}
+
+// this one is a variation of lucky balls
+// PR1034 CASINO GOLDEN BALLS         PR1034 GOLDEN BALLS SOUNDS11
+GAMEL( 200?, sc4gbcas    ,0,         sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gbcasa   ,sc4gbcas,  sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gbcasb   ,sc4gbcas,  sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4gbcasc   ,sc4gbcas,  sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4hntcs_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4hntcsm)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4hntcs_reel_configs;
+}
+
+
+DRIVER_INIT_MEMBER(sc4_state,sc4hntcs)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4hntcs_reel_configs;
+}
+
+// PR1327 CASINO HAPPY NOTES         HAPPY NOTES S.SITE  PR1327 CAS_HAPPY_NOTES SOUNDS11
+GAMEL( 200?, sc4hntcs    ,0,         sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsa   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsb   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsc   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+// PR1327 CASINO HAPPY NOTES         PR1327 CAS_HAPPY_NOTES SOUNDS11
+GAMEL( 200?, sc4hntcsd   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcse   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsf   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsg   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsh   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsi   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsj   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsk   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsl   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsm   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsn   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcso   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsp   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsq   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcsr   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4hntcss   ,sc4hntcs,  sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 20)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4rhx_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4rhx)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4rhx_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4rhx_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4rhx_reel_configs;
+}
+
+// PR2077  RED HOT X         REDX SOUNDS         RED HOT X
+GAMEL( 200?, sc4rhx      ,0,         sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxa     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxd     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxe     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxj     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxk     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4rhxl     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxm     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+// PR2077  RED HOT X         RED HOT X ARCADE  REDX SOUNDS         RED HOT X
+GAMEL( 200?, sc4rhxb     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxc     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxh     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxi     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx_mbus, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxf     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxg     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxn     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 15)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxo     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 16)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxp     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 17)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxq     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 18)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxr     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 19)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxs     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 20)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxt     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 21)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxu     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 22)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxv     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 23)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxw     ,sc4rhx,    sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 24)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+// PR2056  RED HOT X CLUB         REDX SOUNDS         RED HOT X CLUB
+GAMEL( 200?, sc4rhxcl    ,0,         sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcla   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxclb   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxclc   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4vivam_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4vivam)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4vivam_reel_configs;
+}
+
+
+// PR6907 VIVA MEXICO         PR6907 VIVA MEXICO SOUNDS11
+GAMEL( 200?, sc4vivam    ,0,         sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivama   ,sc4vivam,  sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivamb   ,sc4vivam,  sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivamc   ,sc4vivam,  sc4, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4vivcs_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4vivcs)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4vivcs_reel_configs;
+}
+
+
+
+//  PR6927 CASINO VIVA MEXICO         PR6927 VIVAMEXICO SOUNDS11
+// these do nothing..
+GAMEL( 200?, sc4vivcs    ,0,         sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivcsa   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+// PR6927 CASINO VIVA MEXICO         PR6927 VIVAMEXICO SOUNDS21
+// these boot
+GAMEL( 200?, sc4vivcsb   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivcsc   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivcsd   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivcse   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivcsf   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4vivcsg   ,sc4vivcs,  sc4, sc4, sc4_state, sc4vivcs, ROT0, "BFM","Casino Viva Mexico (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+// PR7054 POWER BALL         POWERBALL SOUNDS
+GAMEL( 200?, sc4pwrbq    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4pwrbqa   ,sc4pwrbq,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+
+static const stepper_interface* sc4bugs_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+// fails to boot, like many of the Pole Position sets, probably needs some specific dips setting due to buggy code?
+// PR7008 CHUBBY DOES VEGAS         VEGAS SOUNDS11
+GAMEL( 200?, sc4chub     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chuba    ,sc4chub,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chubb    ,sc4chub,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+// no sound roms, doesn't init properly (doesn't even attempt reel test)
+// PR7011 BLUE RINSE         BRINSE SOUNDS
+GAMEL( 200?, sc4blue     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bluea    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4blueb    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bluec    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4blued    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bluee    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+DRIVER_INIT_MEMBER(sc4_state,sc4bugs)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bugs_reel_configs;
+}
+
+
+// no sound roms
+// PR7109 BUGS MONEY         PR7109 BUGS MONEY SOUNDS11            BUGS MONEY
+GAMEL( 200?, sc4bugs     ,0,         sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bugsa    ,sc4bugs,   sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bugsb    ,sc4bugs,   sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4bugsc    ,sc4bugs,   sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+// PR7029 MONEY TO MONEY         MTOM SOUNDS
+GAMEL( 200?, sc4m2m      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4m2ma     ,sc4m2m,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4chand_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4chand)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4chand_reel_configs;
+}
+
+// no sound roms
+// PR7108 CASH IN HAND         PR7108 CASH IN HAND SOUNDS11           CASH IN HAND
+GAMEL( 200?, sc4chand    ,0,         sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chanda   ,sc4chand,  sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chandb   ,sc4chand,  sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4chandc   ,sc4chand,  sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4cinv_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4cinv)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cinv_reel_configs;
+}
+
+
+// no sound roms
+//  PR6809 CASHINVADERS         PR6809 CASHINVADERS SOUNDS
+GAMEL( 200?, sc4cinv     ,0,         sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinva    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvb    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvc    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvd    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinve    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvf    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvg    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvh    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4cinvi    ,sc4cinv,   sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+// PR7103 JUNGLE BUCKS         PR7103 JUNGLEBUCKS SOUNDS11           JUNGLE BUCKS
+GAMEL( 200?, sc4jbuck    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jbucka   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jbuckb   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jbuckc   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4jbuckd   ,sc4jbuck,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jungle Bucks (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+// PR6904 MONEY BAGS         PR6904 MONEY BAGS SOUNDS11
+GAMEL( 200?, sc4mbags    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mbagsa   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mbagsb   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4mbagsc   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+
+
+
+/**********************************************************************************************************************************/
+/*  Games below are German versions, and seem to be build on very different code even when titles match other games               */
+/*   all seem to freeze after startup      - none have input structures                                                           */
+/**********************************************************************************************************************************/
+
+
+static const stepper_interface* sc4polen_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4polen)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4polen_reel_configs;
+}
+
+// PR7012 GERMAN POLE POSITION         PR7012 SOUNDS
+GAMEL( 200?, sc4polen    ,0,         sc4, sc4, sc4_state, sc4polen, ROT0, "Nova","Pole Position (German) (PR7012, GPOS) (Nova) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4valnv_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4valnv)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4valnv_reel_configs;
+}
+
+
+// PR7025 GERMAN VALHALLA         7025 VER1 SOUNDS
+GAMEL( 200?, sc4valnv    ,0,         sc4, sc4, sc4_state, sc4valnv, ROT0, "Nova","Valhalla (German) (PR7025, GVAL) (Nova) (Scorpion 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
+static const stepper_interface* sc4wernr_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4wernr)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4wernr_reel_configs;
+}
+
+//  PR7027 GERMAN WERNER         PR7027 SOUNDS V1
+GAMEL( 200?, sc4wernr    ,0,         sc4, sc4, sc4_state, sc4wernr, ROT0, "Nova","Werner (German) (PR7027, GWER) (Nova) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4wrnlt    ,sc4wernr,  sc4, sc4, sc4_state, sc4wernr, ROT0, "Nova","Werner (German) (PR7027, GWER) (Nova) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+// no sound roms
+// PR2023.GERMAN BRIX...........PR2023,German BRIX,......PR2023 SOUNDS V1  (non-standard header)
+GAMEL( 200?, sc4brix     ,0,         sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4brixa    ,sc4brix,   sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4brixb    ,sc4brix,   sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/
@@ -44846,3 +51930,6 @@ GAMEL( 200?, sc4ctlcla   ,sc4ctlcl,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cop 
 // shows nothing, but alarms, do these go with the ad4 video roms?
 GAMEL( 200?, sc4ctlclb   ,sc4ctlcl,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4ctlclc   ,sc4ctlcl,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+// not sure this is SC4, it crashes MAME and the addresses it accesses look strange
+GAMEL( 200?, sc4milro    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Millionaires Row (Scorpion 4?)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
