@@ -262,13 +262,13 @@ int find_input_strings(running_machine &machine)
 	int ignoreports[32][16] =
 	{
 		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
-		{  1,  2,  3,  4,  5,  6, -1, -1,    -4, -1, -1, -1, -1, -1, -1, -1, }, // port 1
+		{  1,  2,  3,  4,  5,  6, -1, -1,    -7, -1, -1, -1, -1, -1, -1, -1, }, // port 1
 		{  7,  8,  9, 10, 11, 12, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 2
 		{ -1, -1, -2, -2, -2, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
-		{ -1, -1, -1, -1, -1, -1, -1, -1,    -4, -1, -1, -1, -1, -1, -1, -1, },
+		{ -1, -9, -1, -10,-8, -1, -1, -1,    -6, -1, -1, -1, -1, -1, -1, -1, }, // port 4
 		{ -2, -2, -2, -2, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
 		{ -2, -2, -2, -2, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
-		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
+		{ 31, 32, 33, 34, 35, 36, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 7 (sc4cfqpse?)
 		{ 13, 14, 15, 16, 17, 18, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 8
 		{ 19, 20, 21, 22, 23, 24, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 9
 		{ 25, 26, 27, 28, 29, 30, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 10
@@ -277,7 +277,7 @@ int find_input_strings(running_machine &machine)
 		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
 		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
 		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, },
-		{ -3, -3, -3, -3, -3, -1, -1, -1,    -4, -1, -1, -1, -1, -1, -1, -1, }, // port 16
+		{ -3, -3, -3, -3, -3, -1, -1, -1,    -5, -1, -1, -1, -1, -1, -1, -1, }, // port 16
 		{ -3, -3, -3, -3, -3, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 17
 		{ -3, -3, -3, -3, -3, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 18
 		{ -3, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }, // port 19
@@ -314,14 +314,9 @@ int find_input_strings(running_machine &machine)
 					thisportused = 1;
 				}
 
-				if (ignoreports[i][j] > 0 && ignoreports[i][j] <= 16)
+				if (ignoreports[i][j] > 0)
 				{
-					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, IPT_BUTTON%d ) PORT_NAME(\"%s\")\n", 1 << j, ignoreports[i][j], sc4inputs[i][j].name.cstr());
-					buttons_used++;
-				}
-				else if (ignoreports[i][j] > 16)
-				{
-					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(\"%s\")\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("	PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_%d_%d ) PORT_NAME(\"%s\")\n", 1 << j, i,j/*ignoreports[i][j]*/, sc4inputs[i][j].name.cstr());
 					buttons_used++;
 				}
 				else if (ignoreports[i][j] == -3)
@@ -339,6 +334,30 @@ int find_input_strings(running_machine &machine)
 				else if (ignoreports[i][j] == -4)
 				{
 					printf("	// 0x%04x - \"%s\" // known extended input, mapping not understood\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -5)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended input, usually 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -6)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended input, usually 'hopper low'\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -7)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended input, usually 'hopper fit'\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -8)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended(?) input, sometimes 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -9)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop hi'\n", 1 << j, sc4inputs[i][j].name.cstr());
+				}
+				else if (ignoreports[i][j] == -10)
+				{
+					printf("	// 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop top'\n", 1 << j, sc4inputs[i][j].name.cstr());
 				}
 				buttons_used++;
 			}
@@ -511,9 +530,9 @@ int find_lamp_strings(running_machine &machine)
 	sc45helperlog("\n\n");
 	// print out some input text labels for specific rows
 	d = 0;
-	for (int y = 0; y < 6; y++)
+	for (int y = 0; y < 7; y++)
 	{
-		int actualrows[] = { 1, 2, 8, 9, 10, 20 };
+		int actualrows[] = { 1, 2, 7, 8, 9, 10, 20 };
 		int realy = actualrows[y];
 
 		for (int x = 0; x < 6; x++)
@@ -675,9 +694,9 @@ int find_lamp_strings(running_machine &machine)
 
 	// print out a simple matrix of some of the most common inputs, 
 	d = 0;
-	for (int y = 0; y < 6; y++)
+	for (int y = 0; y < 7; y++)
 	{
-		int actualrows[] = { 1, 2, 8, 9, 10, 20 };
+		int actualrows[] = { 1, 2, 7, 8, 9, 10, 20 };
 		int realy = actualrows[y];
 
 		for (int x = 0; x < 6; x++)
