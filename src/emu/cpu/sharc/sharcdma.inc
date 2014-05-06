@@ -198,7 +198,7 @@ void adsp21062_device::sharc_dma_exec(int channel)
 			dst             = m_dma[channel].ext_index;
 			dst_modifier    = m_dma[channel].ext_modifier;
 			dst_count       = m_dma[channel].ext_count;
-			src             = m_dma[channel].int_index;
+			src             = (m_dma[channel].int_index & 0x1ffff) | 0x20000;
 			src_modifier    = m_dma[channel].int_modifier;
 			src_count       = m_dma[channel].int_count;
 		}
@@ -207,14 +207,9 @@ void adsp21062_device::sharc_dma_exec(int channel)
 			src             = m_dma[channel].ext_index;
 			src_modifier    = m_dma[channel].ext_modifier;
 			src_count       = m_dma[channel].ext_count;
-			dst             = m_dma[channel].int_index;
+			dst             = (m_dma[channel].int_index & 0x1ffff) | 0x20000;
 			dst_modifier    = m_dma[channel].int_modifier;
 			dst_count       = m_dma[channel].int_count;
-
-			if (dst < 0x20000)
-			{
-				dst |= 0x20000;
-			}
 		}
 
 		if (dtype)
