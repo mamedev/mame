@@ -465,7 +465,7 @@ void c352_device::device_start()
 
 	m_sample_rate_base = clock() / 288;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
 
 	// generate mulaw table for mulaw format samples
 	for (i = 0; i < 256; i++)

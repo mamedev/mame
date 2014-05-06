@@ -24,6 +24,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	virtual void machine_reset();
+	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 };
 
 static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
@@ -80,12 +81,11 @@ GFXDECODE_END
 
 // this gets called via a (i8275_dack_w), so does nothing currently
 // once fixed, pixel count needs adjusting
-static I8275_DISPLAY_PIXELS(tim100_display_pixels)
+I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 {
-	tim100_state *state = device->machine().driver_data<tim100_state>();
 	int i;
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = state->memregion("chargen")->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *charmap = memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 15) + (charcode << 4)];
 	if (vsp)
 	{
@@ -108,16 +108,6 @@ static I8275_DISPLAY_PIXELS(tim100_display_pixels)
 	}
 }
 
-static const i8275_interface tim100_i8276_interface = {
-	16, //12
-	0,
-	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST65_LINE),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	tim100_display_pixels
-};
-
 static MACHINE_CONFIG_START( tim100, tim100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
@@ -134,7 +124,10 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tim100 )
 
-	MCFG_I8275_ADD  ( "i8276", tim100_i8276_interface)
+	MCFG_DEVICE_ADD("i8276", I8275, XTAL_4_9152MHz)
+	MCFG_I8275_CHARACTER_WIDTH(16)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
+	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
 
 	MCFG_PALETTE_ADD("palette", 3)
 

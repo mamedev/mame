@@ -500,8 +500,13 @@ UINT32 device_image_interface::crc()
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
 	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
-
 	image_battery_load_by_name(device().machine().options(), fname, buffer, length, fill);
+}
+
+void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
+{
+	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+	image_battery_load_by_name(device().machine().options(), fname, buffer, length, def_buffer);
 }
 
 /*-------------------------------------------------
@@ -1029,9 +1034,6 @@ bool device_image_interface::finish_load()
 	if (m_is_loading)
 	{
 		image_checkhash();
-
-		if (m_from_swlist)
-			call_display_info();
 
 		if (has_been_created())
 		{

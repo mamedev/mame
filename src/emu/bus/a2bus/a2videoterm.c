@@ -47,29 +47,16 @@ const device_type A2BUS_AEVIEWMASTER80 = &device_creator<a2bus_aevm80_device>;
 
 #define MDA_CLOCK   16257000
 
-static MC6845_UPDATE_ROW( videoterm_update_row );
-
-static MC6845_INTERFACE( mc6845_mda_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	8,                  /* number of pixels per video memory address */
-	NULL,               /* begin_update */
-	videoterm_update_row,       /* update_row */
-	NULL,               /* end_update */
-	DEVCB_NULL,             /* on_de_changed */
-	DEVCB_NULL,             /* on_cur_changed */
-	DEVCB_NULL,         /* on hsync changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_videx80_device, vsync_changed),   /* on_vsync_changed */
-	NULL
-};
-
 MACHINE_CONFIG_FRAGMENT( a2videoterm )
 	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9, mc6845_mda_intf)
+	MCFG_MC6845_ADD(VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx80_device, vsync_changed))
 MACHINE_CONFIG_END
 
 ROM_START( a2videoterm )
@@ -347,10 +334,9 @@ void a2bus_videx80_device::write_c800(address_space &space, UINT16 offset, UINT8
 	}
 }
 
-static MC6845_UPDATE_ROW( videoterm_update_row )
+MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 {
-	a2bus_videx80_device    *vterm  = downcast<a2bus_videx80_device *>(device->owner());
-	const rgb_t *palette = vterm->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -358,14 +344,14 @@ static MC6845_UPDATE_ROW( videoterm_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ma + i ) & 0x7ff;
-		UINT8 chr = vterm->m_ram[ offset ];
-		UINT8 data = vterm->m_chrrom[ chr_base + chr * 16 ];
+		UINT8 chr = m_ram[ offset ];
+		UINT8 data = m_chrrom[ chr_base + chr * 16 ];
 		UINT8 fg = 15;
 		UINT8 bg = 0;
 
 		if ( i == cursor_x )
 		{
-			if ( vterm->m_framecnt & 0x08 )
+			if ( m_framecnt & 0x08 )
 			{
 				data = 0xFF;
 			}

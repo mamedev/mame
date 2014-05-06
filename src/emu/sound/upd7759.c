@@ -225,7 +225,7 @@ void upd7759_device::device_start()
 	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
 
 	/* allocate a stream channel */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	m_step = 4 * FRAC_ONE;
@@ -300,7 +300,7 @@ void upd7756_device::device_start()
 	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
 
 	/* allocate a stream channel */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	m_step = 4 * FRAC_ONE;

@@ -466,8 +466,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram") { }
 
 	int m_mux_data;
 	int m_palette_bank;
@@ -503,7 +502,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;	
 };
 
 
@@ -1003,26 +1001,6 @@ static GFXDECODE_START( majorpkr )
 GFXDECODE_END
 
 
-/***********************
-*    CRTC Interface    *
-***********************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,          /* show border area */
-	0,0,0,0,        /* visarea adjustment */
-	16,             /* number of pixels per video memory address */
-	NULL,           /* before pixel update callback */
-	NULL,           /* row update callback */
-	NULL,           /* after pixel update callback */
-	DEVCB_NULL,     /* callback for display state changes */
-	DEVCB_NULL,     /* callback for cursor state changes */
-	DEVCB_NULL,     /* HSYNC callback */
-	DEVCB_NULL,     /* VSYNC callback */
-	NULL            /* update address callback */
-};
-
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -1048,7 +1026,9 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majorpkr)
 	MCFG_PALETTE_ADD("palette", 0x100 * 16)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf) /* verified */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK) /* verified */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

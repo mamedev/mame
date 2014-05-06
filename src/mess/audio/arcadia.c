@@ -56,7 +56,7 @@ arcadia_sound_device::arcadia_sound_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 void arcadia_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, UVI_PAL*OSAMP, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, UVI_PAL*OSAMP);
 	m_lfsr    = LFSR_INIT;
 	m_tval    = 1;
 	logerror("arcadia_sound start\n");

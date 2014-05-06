@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_register_w);
 	DECLARE_READ16_MEMBER(crtc_status_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);
 

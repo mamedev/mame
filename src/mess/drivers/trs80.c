@@ -545,25 +545,10 @@ static GFXDECODE_START(meritum)
 GFXDECODE_END
 
 
-static const cassette_interface trs80l2_cassette_interface =
-{
-	trs80l2_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL,
-	NULL
-};
-
 static const floppy_interface trs80_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(trs80),
-	NULL,
 	NULL
 };
 
@@ -595,7 +580,7 @@ static MACHINE_CONFIG_START( trs80, trs80_state )       // the original model I,
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
@@ -605,7 +590,10 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
 
 	/* devices */
-	MCFG_CASSETTE_MODIFY( "cassette", trs80l2_cassette_interface )
+	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 	MCFG_FD1793_ADD("wd179x", trs80_wd17xx_interface ) // should be FD1771 or FD1791 but inverted data lines are too tricky to fix now
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(trs80_floppy_interface)

@@ -83,7 +83,7 @@ public:
 		m_grap2_1(*this,"grap2_1"),
 		m_grap2_2(*this,"grap2_2"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram")
+		m_paletteram(*this, "palette")
 	{ }
 
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -95,7 +95,7 @@ public:
 	required_device<kaneko_grap2_device> m_grap2_1;
 	required_device<kaneko_grap2_device> m_grap2_2;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	UINT16 m_priority_buffer_scrollx;
 	UINT16 m_priority_buffer_scrolly;
@@ -160,7 +160,7 @@ int galpani3_state::gp3_is_alpha_pen(int pen)
 
 	if (pen<0x4000)
 	{
-		dat = m_generic_paletteram_16[pen];
+		dat = m_paletteram[pen];
 	}
 	else if (pen<0x4100)
 	{

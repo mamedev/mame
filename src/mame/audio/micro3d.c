@@ -197,7 +197,7 @@ void micro3d_sound_device::device_config_complete()
 void micro3d_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	filter_init(machine(), &m_filter, machine().sample_rate());
 
 	configure_filter(&m_noise_filters[0], 2.7e3 + 2.7e3, 1.0e-6);

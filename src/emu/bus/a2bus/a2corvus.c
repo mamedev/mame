@@ -57,10 +57,14 @@ const device_type A2BUS_CORVUS = &device_creator<a2bus_corvus_device>;
 
 static MACHINE_CONFIG_FRAGMENT(corvus)
 	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_CONFIG_ADD("harddisk1", corvus_hdc_t::hd_intf)
-	MCFG_HARDDISK_CONFIG_ADD("harddisk2", corvus_hdc_t::hd_intf)
-	MCFG_HARDDISK_CONFIG_ADD("harddisk3", corvus_hdc_t::hd_intf)
-	MCFG_HARDDISK_CONFIG_ADD("harddisk4", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 MACHINE_CONFIG_END
 
 ROM_START( corvus )

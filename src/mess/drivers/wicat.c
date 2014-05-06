@@ -8,6 +8,14 @@ Wicat - various systems.
 
 ****************************************************************************/
 
+/*
+
+	TODO:
+
+	- video DMA is done line by line and needs to be in perfect sync
+
+*/
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
@@ -16,7 +24,7 @@ Wicat - various systems.
 #include "machine/mm58274c.h"
 #include "machine/mc2661.h"
 #include "machine/im6402.h"
-#include "video/i8275x.h"
+#include "video/i8275.h"
 #include "machine/am9517a.h"
 #include "machine/x2212.h"
 #include "machine/wd_fdc.h"
@@ -101,7 +109,7 @@ public:
 	required_device<mc2661_device> m_uart5;
 	required_device<mc2661_device> m_uart6;
 	required_device<cpu_device> m_videocpu;
-	required_device<i8275x_device> m_videoctrl;
+	required_device<i8275_device> m_videoctrl;
 	required_device<am9517a_device> m_videodma;
 	required_device<mc2661_device> m_videouart0;
 	required_device<mc2661_device> m_videouart1;
@@ -740,25 +748,12 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	{
 		int color = (romdata >> (7-i)) & 0x01;
 
-		if(linecount > 9)
+		if(vsp || linecount > 9)
 			color = 0;
 
 		bitmap.pix32(y, x + i) = pen[color];
 	}
 }
-
-AM9517A_INTERFACE( wicat_videodma_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(wicat_state,dma_hrq_w), // m_out_hreq_cb;
-	DEVCB_DRIVER_LINE_MEMBER(wicat_state,dma_nmi_cb), // m_out_eop_cb;
-
-	DEVCB_DRIVER_MEMBER(wicat_state,vram_r), // m_in_memr_cb;
-	DEVCB_DRIVER_MEMBER(wicat_state,vram_w), // m_out_memw_cb;
-
-	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_in_ior_cb[4];
-	{ DEVCB_DEVICE_MEMBER("video", i8275x_device, dack_w),DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_out_iow_cb[4];
-	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }  // m_out_dack_cb[4];
-};
 
 static MACHINE_CONFIG_START( wicat, wicat_state )
 	/* basic machine hardware */
@@ -856,7 +851,12 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_PROGRAM_MAP(wicat_video_mem)
 	MCFG_CPU_IO_MAP(wicat_video_io)
 
-	MCFG_AM9517A_ADD("videodma", XTAL_8MHz, wicat_videodma_intf)  // clock is a bit of guess
+	MCFG_DEVICE_ADD("videodma", AM9517A, XTAL_8MHz)  // clock is a bit of guess
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(wicat_state, dma_hrq_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(wicat_state, dma_nmi_cb))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(wicat_state, vram_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(wicat_state, vram_w))
+	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("video", i8275_device, dack_w))
 	MCFG_IM6402_ADD("videouart", 0, 0)
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wicat_state, kb_data_ready))
 
@@ -878,11 +878,11 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_SCREEN_SIZE(720,300)
 	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("video",i8275_device,screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_DEVICE_ADD("video", I8275x, XTAL_19_6608MHz/8)
+	MCFG_DEVICE_ADD("video", I8275, XTAL_19_6608MHz/8)
 	MCFG_I8275_CHARACTER_WIDTH(9)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("videodma",am9517a_device, dreq0_w))

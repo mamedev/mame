@@ -53,8 +53,6 @@ void chqflag_zoom_callback_1( running_machine &machine, int *code, int *color, i
 
 void chqflag_state::video_start()
 {
-	m_generic_paletteram_8.allocate(0x800);
-
 	m_sprite_colorbase = 0;
 	m_zoom_colorbase[0] = 0x10;
 	m_zoom_colorbase[1] = 0x02;

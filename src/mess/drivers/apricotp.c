@@ -50,31 +50,6 @@ enum
 //  VIDEO
 //**************************************************************************
 
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_UPDATE_ROW( fp_update_row )
-{
-}
-
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	fp_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
-
 void fp_state::video_start()
 {
 	// allocate memory
@@ -422,50 +397,6 @@ INPUT_PORTS_END
 */
 
 //-------------------------------------------------
-//  I8237_INTERFACE( dmac_intf )
-//-------------------------------------------------
-
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_w), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-
-//-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
@@ -573,7 +504,10 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000, crtc_intf)
+
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -582,7 +516,10 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
-	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
+	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 250000)
+	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
+	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_t, data_r))
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_t, data_w))
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 
 	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
@@ -591,7 +528,9 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
 
-	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, sio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))

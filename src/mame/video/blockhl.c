@@ -43,8 +43,6 @@ void blockhl_sprite_callback( running_machine &machine, int *code, int *color, i
 
 void blockhl_state::video_start()
 {
-	m_generic_paletteram_8.allocate(0x800);
-
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 16;
 	m_layer_colorbase[2] = 32;

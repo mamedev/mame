@@ -239,7 +239,7 @@ void upd1771c_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 4, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 4);
 
 	save_item(NAME(m_packet));
 	save_item(NAME(m_index));

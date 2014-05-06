@@ -639,12 +639,6 @@ static MACHINE_CONFIG_DERIVED( a500ntsc, ntsc )
 	MCFG_SOFTWARE_LIST_ADD("flop_ecs","amigaecs_flop")
 MACHINE_CONFIG_END
 
-struct cdrom_interface cdtv_cdrom =
-{
-	"cdrom",
-	NULL
-};
-
 static MACHINE_CONFIG_DERIVED_CLASS( cdtv, ntsc, cdtv_state)
 	MCFG_CPU_REPLACE("maincpu", M68000, CDTV_CLOCK_X1 / 4)
 	MCFG_CPU_PROGRAM_MAP(cdtv_mem)
@@ -668,7 +662,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( cdtv, ntsc, cdtv_state)
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	/* cdrom */
-	MCFG_CDROM_ADD( "cdrom", cdtv_cdrom)
+	MCFG_CDROM_ADD( "cdrom")
+	MCFG_CDROM_INTERFACE("cdrom")
+	
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
 
 	MCFG_DEVICE_ADD("tpi6525", TPI6525, 0)

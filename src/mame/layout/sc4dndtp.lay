@@ -1,0 +1,1284 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+<element name="SteppersReel1" defstate="0">
+<reel stateoffset="45748" symbollist="bell,grape + 1,grape+red,red7,grape + 2,red7+red,grape,melon,melon,lemon + 1,lemon,cherry,lemon,cherry,cherry + 2,cherry"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="SteppersReel2" defstate="0">
+<reel stateoffset="45748" symbollist="bell + 1,lemon,wild+red,cherry + 1,cherry,red7,grape,grape + 2,grape,cherry,melon + 3,cherry,cherry,wild+red,lemon,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="SteppersReel3" defstate="0">
+<reel stateoffset="45748" symbollist="bell,lemon+red,lemon,lemon,grape + 2,grape,grape,cherry + 2,cherry,cherry+red,melon,melon,cherry + 1,lemon,red7 + 4,red7"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="SteppersReel4" defstate="0">
+<reel stateoffset="45748" symbollist="12,11,10,9,8,7,6,5,4,3,2,1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="SteppersReel5" defstate="0">
+<reel stateoffset="45748" symbollist="1.50PND,10p,20p,5PND,1p,1PND,1.20PND,80p,meg streak,2.50PND,3PND,3.50PND,4PND,4.50PND,50p,2PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="SteppersReel6" defstate="0">
+<reel stateoffset="45748" symbollist="4PND,10p,20p,25PND,1p,2PND,3PND,1PND,meg streak,6PND,7PND,8PND,10PND,15PND,50p,5PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="SteppersReel7" defstate="0">
+<reel stateoffset="45748" symbollist="4PND,10p,20p,35PND,1p,2PND,3PND,1PND,meg streak,6PND,8PND,10PND,15PND,20PND,50p,5PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+</element>
+<element name="lamplabelel0"><text string="canc/coll"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel1"><text string="hold1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel2"><text string="hold2/hi"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel3"><text string="hold3/lo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel4"><text string="chg stake"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel5"><text string="exchange"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel6"><text string="transfer"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel7"><text string="start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel8"><text string="winline 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel9"><text string="winline 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel10"><text string="winline 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel11"><text string="winline 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel12"><text string="winline 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel13"><text string="(00:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel14"><text string="(00:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel15"><text string="(00:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel16"><text string="(01:00)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel17"><text string="trail lp1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel18"><text string="trail lp2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel19"><text string="trail lp3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel20"><text string="trail lp4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel21"><text string="pow bon t"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel22"><text string="trail lp5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel23"><text string="pow bon b"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel24"><text string="trail lp6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel25"><text string="trail lp7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel26"><text string="trl held"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel27"><text string="gamb lp1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel28"><text string="gamb lp2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel29"><text string="(01:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel30"><text string="(01:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel31"><text string="(01:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel32"><text string="reel1 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel33"><text string="reel1 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel34"><text string="reel1 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel35"><text string="reel2 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel36"><text string="reel2 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel37"><text string="reel2 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel38"><text string="gamb lp8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel39"><text string="acceptor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel40"><text string="gamb lp7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel41"><text string="gamb lp6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel42"><text string="gamb lp3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel43"><text string="gamb lp5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel44"><text string="gamb lp4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel45"><text string="(02:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel46"><text string="(02:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel47"><text string="(02:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel48"><text string="reel3 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel49"><text string="reel3 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel50"><text string="reel3 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel51"><text string="(03:03)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel52"><text string="hilo mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel53"><text string="(03:05)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel54"><text string="gamb lp14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel55"><text string="gamb lp13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel56"><text string="gamb lp15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel57"><text string="gamb lp12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel58"><text string="gamb lp9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel59"><text string="gamb lp11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel60"><text string="gamb lp10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel61"><text string="(03:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel62"><text string="(03:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel63"><text string="(03:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel64"><text string="reel5 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel65"><text string="reel5 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel66"><text string="reel5 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel67"><text string="no lose"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel68"><text string="tick top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel69"><text string="tick mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel70"><text string="tick bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel71"><text string="stk off1l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel72"><text string="stk off2l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel73"><text string="stk off1r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel74"><text string="stk off2r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel75"><text string="mega st"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel76"><text string="going hi"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel77"><text string="going lo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel78"><text string="(04:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel79"><text string="(04:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel80"><text string="super 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel81"><text string="super6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel82"><text string="super 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel83"><text string="super7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel84"><text string="super 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel85"><text string="super8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel86"><text string="name1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel87"><text string="name6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel88"><text string="name2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel89"><text string="name7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel90"><text string="name3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel91"><text string="name8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel92"><text string="name4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel93"><text string="name9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel94"><text string="name5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel95"><text string="box 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel96"><text string="super 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel97"><text string="super4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel98"><text string="(06:02)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel99"><text string="acc/con l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel100"><text string="super 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel101"><text string="super5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel102"><text string="box 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel103"><text string="box val 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel104"><text string="box 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel105"><text string="box val 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel106"><text string="box 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel107"><text string="box val 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel108"><text string="box 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel109"><text string="box val 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel110"><text string="box val 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel111"><text string="(06:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel112"><text string="super 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel113"><text string="super1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel114"><text string="super 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel115"><text string="super2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel116"><text string="super 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel117"><text string="super3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel118"><text string="outer15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel119"><text string="outer16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel120"><text string="outer17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel121"><text string="outer18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel122"><text string="outer19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel123"><text string="outer20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel124"><text string="outer21"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel125"><text string="ver   lbo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel126"><text string="ver   pub"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel127"><text string="ver  arcd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel128"><text string="feat 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel129"><text string="feat11 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel130"><text string="feat 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel131"><text string="feat 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel132"><text string="feat 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel133"><text string="feat 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel134"><text string="outer14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel135"><text string="inner11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel136"><text string="inner12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel137"><text string="inner13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel138"><text string="inner14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel139"><text string="inner15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel140"><text string="inner16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel141"><text string="outer23"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel142"><text string="outer22"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel143"><text string="fiver"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel144"><text string="feat 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel145"><text string="feat12 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel146"><text string="feat 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel147"><text string="feat10 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel148"><text string="feat 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel149"><text string="feat 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel150"><text string="outer13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel151"><text string="inner10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel152"><text string="deal val1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel153"><text string="deal val2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel154"><text string="acc/con r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel155"><text string="deal val9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel156"><text string="dealval10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel157"><text string="inner17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel158"><text string="outer24"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel159"><text string="tenner"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel160"><text string="feat 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel161"><text string="feat 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel162"><text string="feat 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel163"><text string="feat 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel164"><text string="feat 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel165"><text string="feat 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel166"><text string="outer12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel167"><text string="inner9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel168"><text string="deal val3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel169"><text string="deal val4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel170"><text string="dealval11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel171"><text string="dealval12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel172"><text string="dealval13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel173"><text string="inner18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel174"><text string="outer25"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel175"><text string="twenty"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel176"><text string="feat 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel177"><text string="feat 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel178"><text string="feat 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel179"><text string="feat 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel180"><text string="feat 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel181"><text string="feat 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel182"><text string="outer11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel183"><text string="inner8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel184"><text string="deal val5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel185"><text string="deal val6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel186"><text string="deal val7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel187"><text string="dealval14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel188"><text string="dealval15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel189"><text string="inner19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel190"><text string="outer26"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel191"><text string="no change"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel192"><text string="cash 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel193"><text string="cash11 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel194"><text string="cash 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel195"><text string="cash 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel196"><text string="cash 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel197"><text string="cash 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel198"><text string="outer10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel199"><text string="inner7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel200"><text string="deal val8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel201"><text string="phone1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel202"><text string="phone2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel203"><text string="phone3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel204"><text string="play dond"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel205"><text string="dealval16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel206"><text string="inner20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel207"><text string="outer27"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel208"><text string="cash 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel209"><text string="cash12 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel210"><text string="cash 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel211"><text string="cash10 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel212"><text string="cash 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel213"><text string="cash 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel214"><text string="outer9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel215"><text string="inner6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel216"><text string="inner5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel217"><text string="take deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel218"><text string="inner4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel219"><text string="inner3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel220"><text string="inner2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel221"><text string="no deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel222"><text string="inner1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel223"><text string="outer28"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel224"><text string="cash 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel225"><text string="cash 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel226"><text string="cash 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel227"><text string="cash 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel228"><text string="cash 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel229"><text string="cash 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel230"><text string="ex life 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel231"><text string="ex life 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel232"><text string="outer8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel233"><text string="outer7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel234"><text string="outer6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel235"><text string="outer5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel236"><text string="outer4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel237"><text string="outer3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel238"><text string="outer2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel239"><text string="outer1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel240"><text string="cash 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel241"><text string="cash 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel242"><text string="cash 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel243"><text string="cash 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel244"><text string="cash 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel245"><text string="cash 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel246"><text string="ex life 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel247"><text string="(15:07)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel248"><text string="(15:08)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel249"><text string="(15:09)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel250"><text string="(15:10)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel251"><text string="(15:11)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel252"><text string="(15:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel253"><text string="(15:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel254"><text string="(15:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="lamplabelel255"><text string="(15:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+
+<element name="inputlabel1-0"><text string="cancel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel1-1"><text string="hold 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel1-2"><text string="hold 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel1-3"><text string="hold 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel1-4"><text string="ch stk"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel1-5"><text string="hpunit"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-0"><text string="exchng"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-1"><text string="trnsfr"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-2"><text string="start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-3"><text string="refill"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-4"><text string="IN2-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel2-5"><text string="IN2-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-0"><text string="nodeal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-1"><text string="dond"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-2"><text string="deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-3"><text string="IN8-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-4"><text string="IN8-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel8-5"><text string="IN8-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel9-0"><text string="IN9-0"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel9-1"><text string="IN9-1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel9-2"><text string="IN9-2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel9-3"><text string="IN9-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel9-4"><text string="IN9-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel9-5"><text string="IN9-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel10-0"><text string="IN10-0"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel10-1"><text string="IN10-1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel10-2"><text string="IN10-2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel10-3"><text string="IN10-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel10-4"><text string="IN10-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel10-5"><text string="IN10-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel20-0"><text string="grnbut"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel20-1"><text string="dorlok"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel20-2"><text string="serdor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel20-3"><text string="cshdor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel20-4"><text string="hopdmp"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+<element name="inputlabel20-5"><text string="IN20-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+<element name="matrixlamp">
+<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.7" green="0.7" blue="0.7" /></rect>
+<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.0" blue="1.0" /></rect>
+<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="1.0" blue="0.0" /></rect>
+</element>
+<element name="unusedlamp">
+<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.0" blue="0.5" /></rect>
+<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.5" blue="0.0" /></rect>
+</element>
+<element name="reellamp">
+<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+</element>
+<element name="buttonlamp">
+<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.6" green="0.7" blue="0.6" /></rect>
+<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="1.0" blue="0.0" /></rect>
+<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.0" blue="1.0" /></rect>
+</element>
+<element name="button">
+<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="0.8" blue="0.2" /></rect>
+<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="0.9" blue="0.2" /></rect>
+<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="1.0" blue="0.2" /></rect>
+</element>
+<element name="vfd0">
+<led14segsc><color red="0" green="0.6" blue="1.0" /></led14segsc>
+</element>
+<element name="digit" defstate="10">
+<led7seg><color red="1.0" green="0.3" blue="0.0" /></led7seg>
+</element>
+<element name="Steppers" defstate="0">
+<simplecounter maxstate="999" digits="3"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></simplecounter>
+</element>
+
+
+<view name="AWP Simulated Video (No Artwork)">
+<bezel name="lamp0" element="buttonlamp" state="0" inputtag="IN-1" inputmask="0x01"><bounds x="380" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel0" element="lamplabelel0"><bounds x="380" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp1" element="buttonlamp" state="0" inputtag="IN-1" inputmask="0x02"><bounds x="404" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel1" element="lamplabelel1"><bounds x="404" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp2" element="buttonlamp" state="0" inputtag="IN-1" inputmask="0x04"><bounds x="428" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel2" element="lamplabelel2"><bounds x="428" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp3" element="buttonlamp" state="0" inputtag="IN-1" inputmask="0x08"><bounds x="452" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel3" element="lamplabelel3"><bounds x="452" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp4" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x01"><bounds x="476" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel4" element="lamplabelel4"><bounds x="476" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp5" element="matrixlamp" state="0"><bounds x="500" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel5" element="lamplabelel5"><bounds x="500" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp6" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x04"><bounds x="524" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel6" element="lamplabelel6"><bounds x="524" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp7" element="buttonlamp" state="0" inputtag="IN-2" inputmask="0x10"><bounds x="548" y="0" width="23" height="16" /></bezel>
+<bezel name="lamplabel7" element="lamplabelel7"><bounds x="548" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp8" element="matrixlamp" state="0"><bounds x="572" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel8" element="lamplabelel8"><bounds x="572" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp9" element="matrixlamp" state="0"><bounds x="596" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel9" element="lamplabelel9"><bounds x="596" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp10" element="matrixlamp" state="0"><bounds x="620" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel10" element="lamplabelel10"><bounds x="620" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp11" element="matrixlamp" state="0"><bounds x="644" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel11" element="lamplabelel11"><bounds x="644" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp12" element="matrixlamp" state="0"><bounds x="668" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel12" element="lamplabelel12"><bounds x="668" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp13" element="unusedlamp" state="0"><bounds x="692" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel13" element="lamplabelel13"><bounds x="692" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp14" element="unusedlamp" state="0"><bounds x="716" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel14" element="lamplabelel14"><bounds x="716" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp15" element="unusedlamp" state="0"><bounds x="740" y="0" width="23" height="16"/></bezel>
+<bezel name="lamplabel15" element="lamplabelel15"><bounds x="740" y="-10" width="23" height="10" /></bezel>
+<bezel name="lamp16" element="unusedlamp" state="0"><bounds x="380" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel16" element="lamplabelel16"><bounds x="380" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp17" element="matrixlamp" state="0"><bounds x="404" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel17" element="lamplabelel17"><bounds x="404" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp18" element="matrixlamp" state="0"><bounds x="428" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel18" element="lamplabelel18"><bounds x="428" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp19" element="matrixlamp" state="0"><bounds x="452" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel19" element="lamplabelel19"><bounds x="452" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp20" element="matrixlamp" state="0"><bounds x="476" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel20" element="lamplabelel20"><bounds x="476" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp21" element="matrixlamp" state="0"><bounds x="500" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel21" element="lamplabelel21"><bounds x="500" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp22" element="matrixlamp" state="0"><bounds x="524" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel22" element="lamplabelel22"><bounds x="524" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp23" element="matrixlamp" state="0"><bounds x="548" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel23" element="lamplabelel23"><bounds x="548" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp24" element="matrixlamp" state="0"><bounds x="572" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel24" element="lamplabelel24"><bounds x="572" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp25" element="matrixlamp" state="0"><bounds x="596" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel25" element="lamplabelel25"><bounds x="596" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp26" element="matrixlamp" state="0"><bounds x="620" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel26" element="lamplabelel26"><bounds x="620" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp27" element="matrixlamp" state="0"><bounds x="644" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel27" element="lamplabelel27"><bounds x="644" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp28" element="matrixlamp" state="0"><bounds x="668" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel28" element="lamplabelel28"><bounds x="668" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp29" element="unusedlamp" state="0"><bounds x="692" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel29" element="lamplabelel29"><bounds x="692" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp30" element="unusedlamp" state="0"><bounds x="716" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel30" element="lamplabelel30"><bounds x="716" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp31" element="unusedlamp" state="0"><bounds x="740" y="28" width="23" height="16"/></bezel>
+<bezel name="lamplabel31" element="lamplabelel31"><bounds x="740" y="18" width="23" height="10" /></bezel>
+<bezel name="lamp32" element="reellamp" state="0"><bounds x="0" y="300" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel32" element="lamplabelel32"><bounds x="0" y="290" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp33" element="reellamp" state="0"><bounds x="0" y="317" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel33" element="lamplabelel33"><bounds x="0" y="307" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp34" element="reellamp" state="0"><bounds x="0" y="334" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel34" element="lamplabelel34"><bounds x="0" y="324" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp35" element="reellamp" state="0"><bounds x="50" y="300" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel35" element="lamplabelel35"><bounds x="50" y="290" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp36" element="reellamp" state="0"><bounds x="50" y="317" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel36" element="lamplabelel36"><bounds x="50" y="307" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp37" element="reellamp" state="0"><bounds x="50" y="334" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel37" element="lamplabelel37"><bounds x="50" y="324" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp38" element="matrixlamp" state="0"><bounds x="524" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel38" element="lamplabelel38"><bounds x="524" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp39" element="matrixlamp" state="0"><bounds x="548" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel39" element="lamplabelel39"><bounds x="548" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp40" element="matrixlamp" state="0"><bounds x="572" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel40" element="lamplabelel40"><bounds x="572" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp41" element="matrixlamp" state="0"><bounds x="596" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel41" element="lamplabelel41"><bounds x="596" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp42" element="matrixlamp" state="0"><bounds x="620" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel42" element="lamplabelel42"><bounds x="620" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp43" element="matrixlamp" state="0"><bounds x="644" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel43" element="lamplabelel43"><bounds x="644" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp44" element="matrixlamp" state="0"><bounds x="668" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel44" element="lamplabelel44"><bounds x="668" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp45" element="unusedlamp" state="0"><bounds x="692" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel45" element="lamplabelel45"><bounds x="692" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp46" element="unusedlamp" state="0"><bounds x="716" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel46" element="lamplabelel46"><bounds x="716" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp47" element="unusedlamp" state="0"><bounds x="740" y="56" width="23" height="16"/></bezel>
+<bezel name="lamplabel47" element="lamplabelel47"><bounds x="740" y="46" width="23" height="10" /></bezel>
+<bezel name="lamp48" element="reellamp" state="0"><bounds x="100" y="300" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel48" element="lamplabelel48"><bounds x="100" y="290" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp49" element="reellamp" state="0"><bounds x="100" y="317" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel49" element="lamplabelel49"><bounds x="100" y="307" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp50" element="reellamp" state="0"><bounds x="100" y="334" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel50" element="lamplabelel50"><bounds x="100" y="324" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp51" element="unusedlamp" state="0"><bounds x="452" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel51" element="lamplabelel51"><bounds x="452" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp52" element="matrixlamp" state="0"><bounds x="476" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel52" element="lamplabelel52"><bounds x="476" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp53" element="unusedlamp" state="0"><bounds x="500" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel53" element="lamplabelel53"><bounds x="500" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp54" element="matrixlamp" state="0"><bounds x="524" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel54" element="lamplabelel54"><bounds x="524" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp55" element="matrixlamp" state="0"><bounds x="548" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel55" element="lamplabelel55"><bounds x="548" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp56" element="matrixlamp" state="0"><bounds x="572" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel56" element="lamplabelel56"><bounds x="572" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp57" element="matrixlamp" state="0"><bounds x="596" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel57" element="lamplabelel57"><bounds x="596" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp58" element="matrixlamp" state="0"><bounds x="620" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel58" element="lamplabelel58"><bounds x="620" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp59" element="matrixlamp" state="0"><bounds x="644" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel59" element="lamplabelel59"><bounds x="644" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp60" element="matrixlamp" state="0"><bounds x="668" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel60" element="lamplabelel60"><bounds x="668" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp61" element="unusedlamp" state="0"><bounds x="692" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel61" element="lamplabelel61"><bounds x="692" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp62" element="unusedlamp" state="0"><bounds x="716" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel62" element="lamplabelel62"><bounds x="716" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp63" element="unusedlamp" state="0"><bounds x="740" y="84" width="23" height="16"/></bezel>
+<bezel name="lamplabel63" element="lamplabelel63"><bounds x="740" y="74" width="23" height="10" /></bezel>
+<bezel name="lamp64" element="reellamp" state="0"><bounds x="200" y="334" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel64" element="lamplabelel64"><bounds x="200" y="324" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp65" element="reellamp" state="0"><bounds x="200" y="317" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel65" element="lamplabelel65"><bounds x="200" y="307" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp66" element="reellamp" state="0"><bounds x="200" y="300" width="50" height="17"/></bezel>
+<!-- Label not drawn
+<bezel name="lamplabel66" element="lamplabelel66"><bounds x="200" y="290" width="50" height="10" /></bezel>
+-->
+<bezel name="lamp67" element="matrixlamp" state="0"><bounds x="452" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel67" element="lamplabelel67"><bounds x="452" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp68" element="matrixlamp" state="0"><bounds x="476" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel68" element="lamplabelel68"><bounds x="476" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp69" element="matrixlamp" state="0"><bounds x="500" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel69" element="lamplabelel69"><bounds x="500" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp70" element="matrixlamp" state="0"><bounds x="524" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel70" element="lamplabelel70"><bounds x="524" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp71" element="matrixlamp" state="0"><bounds x="548" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel71" element="lamplabelel71"><bounds x="548" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp72" element="matrixlamp" state="0"><bounds x="572" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel72" element="lamplabelel72"><bounds x="572" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp73" element="matrixlamp" state="0"><bounds x="596" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel73" element="lamplabelel73"><bounds x="596" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp74" element="matrixlamp" state="0"><bounds x="620" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel74" element="lamplabelel74"><bounds x="620" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp75" element="matrixlamp" state="0"><bounds x="644" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel75" element="lamplabelel75"><bounds x="644" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp76" element="matrixlamp" state="0"><bounds x="668" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel76" element="lamplabelel76"><bounds x="668" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp77" element="matrixlamp" state="0"><bounds x="692" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel77" element="lamplabelel77"><bounds x="692" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp78" element="unusedlamp" state="0"><bounds x="716" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel78" element="lamplabelel78"><bounds x="716" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp79" element="unusedlamp" state="0"><bounds x="740" y="112" width="23" height="16"/></bezel>
+<bezel name="lamplabel79" element="lamplabelel79"><bounds x="740" y="102" width="23" height="10" /></bezel>
+<bezel name="lamp80" element="matrixlamp" state="0"><bounds x="380" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel80" element="lamplabelel80"><bounds x="380" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp81" element="matrixlamp" state="0"><bounds x="404" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel81" element="lamplabelel81"><bounds x="404" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp82" element="matrixlamp" state="0"><bounds x="428" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel82" element="lamplabelel82"><bounds x="428" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp83" element="matrixlamp" state="0"><bounds x="452" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel83" element="lamplabelel83"><bounds x="452" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp84" element="matrixlamp" state="0"><bounds x="476" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel84" element="lamplabelel84"><bounds x="476" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp85" element="matrixlamp" state="0"><bounds x="500" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel85" element="lamplabelel85"><bounds x="500" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp86" element="matrixlamp" state="0"><bounds x="524" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel86" element="lamplabelel86"><bounds x="524" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp87" element="matrixlamp" state="0"><bounds x="548" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel87" element="lamplabelel87"><bounds x="548" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp88" element="matrixlamp" state="0"><bounds x="572" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel88" element="lamplabelel88"><bounds x="572" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp89" element="matrixlamp" state="0"><bounds x="596" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel89" element="lamplabelel89"><bounds x="596" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp90" element="matrixlamp" state="0"><bounds x="620" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel90" element="lamplabelel90"><bounds x="620" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp91" element="matrixlamp" state="0"><bounds x="644" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel91" element="lamplabelel91"><bounds x="644" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp92" element="matrixlamp" state="0"><bounds x="668" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel92" element="lamplabelel92"><bounds x="668" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp93" element="matrixlamp" state="0"><bounds x="692" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel93" element="lamplabelel93"><bounds x="692" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp94" element="matrixlamp" state="0"><bounds x="716" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel94" element="lamplabelel94"><bounds x="716" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp95" element="matrixlamp" state="0"><bounds x="740" y="140" width="23" height="16"/></bezel>
+<bezel name="lamplabel95" element="lamplabelel95"><bounds x="740" y="130" width="23" height="10" /></bezel>
+<bezel name="lamp96" element="matrixlamp" state="0"><bounds x="380" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel96" element="lamplabelel96"><bounds x="380" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp97" element="matrixlamp" state="0"><bounds x="404" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel97" element="lamplabelel97"><bounds x="404" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp98" element="unusedlamp" state="0"><bounds x="428" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel98" element="lamplabelel98"><bounds x="428" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp99" element="matrixlamp" state="0"><bounds x="452" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel99" element="lamplabelel99"><bounds x="452" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp100" element="matrixlamp" state="0"><bounds x="476" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel100" element="lamplabelel100"><bounds x="476" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp101" element="matrixlamp" state="0"><bounds x="500" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel101" element="lamplabelel101"><bounds x="500" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp102" element="matrixlamp" state="0"><bounds x="524" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel102" element="lamplabelel102"><bounds x="524" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp103" element="matrixlamp" state="0"><bounds x="548" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel103" element="lamplabelel103"><bounds x="548" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp104" element="matrixlamp" state="0"><bounds x="572" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel104" element="lamplabelel104"><bounds x="572" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp105" element="matrixlamp" state="0"><bounds x="596" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel105" element="lamplabelel105"><bounds x="596" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp106" element="matrixlamp" state="0"><bounds x="620" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel106" element="lamplabelel106"><bounds x="620" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp107" element="matrixlamp" state="0"><bounds x="644" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel107" element="lamplabelel107"><bounds x="644" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp108" element="matrixlamp" state="0"><bounds x="668" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel108" element="lamplabelel108"><bounds x="668" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp109" element="matrixlamp" state="0"><bounds x="692" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel109" element="lamplabelel109"><bounds x="692" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp110" element="matrixlamp" state="0"><bounds x="716" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel110" element="lamplabelel110"><bounds x="716" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp111" element="unusedlamp" state="0"><bounds x="740" y="168" width="23" height="16"/></bezel>
+<bezel name="lamplabel111" element="lamplabelel111"><bounds x="740" y="158" width="23" height="10" /></bezel>
+<bezel name="lamp112" element="matrixlamp" state="0"><bounds x="380" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel112" element="lamplabelel112"><bounds x="380" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp113" element="matrixlamp" state="0"><bounds x="404" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel113" element="lamplabelel113"><bounds x="404" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp114" element="matrixlamp" state="0"><bounds x="428" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel114" element="lamplabelel114"><bounds x="428" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp115" element="matrixlamp" state="0"><bounds x="452" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel115" element="lamplabelel115"><bounds x="452" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp116" element="matrixlamp" state="0"><bounds x="476" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel116" element="lamplabelel116"><bounds x="476" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp117" element="matrixlamp" state="0"><bounds x="500" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel117" element="lamplabelel117"><bounds x="500" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp118" element="matrixlamp" state="0"><bounds x="524" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel118" element="lamplabelel118"><bounds x="524" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp119" element="matrixlamp" state="0"><bounds x="548" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel119" element="lamplabelel119"><bounds x="548" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp120" element="matrixlamp" state="0"><bounds x="572" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel120" element="lamplabelel120"><bounds x="572" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp121" element="matrixlamp" state="0"><bounds x="596" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel121" element="lamplabelel121"><bounds x="596" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp122" element="matrixlamp" state="0"><bounds x="620" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel122" element="lamplabelel122"><bounds x="620" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp123" element="matrixlamp" state="0"><bounds x="644" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel123" element="lamplabelel123"><bounds x="644" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp124" element="matrixlamp" state="0"><bounds x="668" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel124" element="lamplabelel124"><bounds x="668" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp125" element="matrixlamp" state="0"><bounds x="692" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel125" element="lamplabelel125"><bounds x="692" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp126" element="matrixlamp" state="0"><bounds x="716" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel126" element="lamplabelel126"><bounds x="716" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp127" element="matrixlamp" state="0"><bounds x="740" y="196" width="23" height="16"/></bezel>
+<bezel name="lamplabel127" element="lamplabelel127"><bounds x="740" y="186" width="23" height="10" /></bezel>
+<bezel name="lamp128" element="matrixlamp" state="0"><bounds x="380" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel128" element="lamplabelel128"><bounds x="380" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp129" element="matrixlamp" state="0"><bounds x="404" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel129" element="lamplabelel129"><bounds x="404" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp130" element="matrixlamp" state="0"><bounds x="428" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel130" element="lamplabelel130"><bounds x="428" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp131" element="matrixlamp" state="0"><bounds x="452" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel131" element="lamplabelel131"><bounds x="452" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp132" element="matrixlamp" state="0"><bounds x="476" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel132" element="lamplabelel132"><bounds x="476" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp133" element="matrixlamp" state="0"><bounds x="500" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel133" element="lamplabelel133"><bounds x="500" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp134" element="matrixlamp" state="0"><bounds x="524" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel134" element="lamplabelel134"><bounds x="524" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp135" element="matrixlamp" state="0"><bounds x="548" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel135" element="lamplabelel135"><bounds x="548" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp136" element="matrixlamp" state="0"><bounds x="572" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel136" element="lamplabelel136"><bounds x="572" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp137" element="matrixlamp" state="0"><bounds x="596" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel137" element="lamplabelel137"><bounds x="596" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp138" element="matrixlamp" state="0"><bounds x="620" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel138" element="lamplabelel138"><bounds x="620" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp139" element="matrixlamp" state="0"><bounds x="644" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel139" element="lamplabelel139"><bounds x="644" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp140" element="matrixlamp" state="0"><bounds x="668" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel140" element="lamplabelel140"><bounds x="668" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp141" element="matrixlamp" state="0"><bounds x="692" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel141" element="lamplabelel141"><bounds x="692" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp142" element="matrixlamp" state="0"><bounds x="716" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel142" element="lamplabelel142"><bounds x="716" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp143" element="matrixlamp" state="0"><bounds x="740" y="224" width="23" height="16"/></bezel>
+<bezel name="lamplabel143" element="lamplabelel143"><bounds x="740" y="214" width="23" height="10" /></bezel>
+<bezel name="lamp144" element="matrixlamp" state="0"><bounds x="380" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel144" element="lamplabelel144"><bounds x="380" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp145" element="matrixlamp" state="0"><bounds x="404" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel145" element="lamplabelel145"><bounds x="404" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp146" element="matrixlamp" state="0"><bounds x="428" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel146" element="lamplabelel146"><bounds x="428" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp147" element="matrixlamp" state="0"><bounds x="452" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel147" element="lamplabelel147"><bounds x="452" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp148" element="matrixlamp" state="0"><bounds x="476" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel148" element="lamplabelel148"><bounds x="476" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp149" element="matrixlamp" state="0"><bounds x="500" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel149" element="lamplabelel149"><bounds x="500" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp150" element="matrixlamp" state="0"><bounds x="524" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel150" element="lamplabelel150"><bounds x="524" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp151" element="matrixlamp" state="0"><bounds x="548" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel151" element="lamplabelel151"><bounds x="548" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp152" element="matrixlamp" state="0"><bounds x="572" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel152" element="lamplabelel152"><bounds x="572" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp153" element="matrixlamp" state="0"><bounds x="596" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel153" element="lamplabelel153"><bounds x="596" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp154" element="matrixlamp" state="0"><bounds x="620" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel154" element="lamplabelel154"><bounds x="620" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp155" element="matrixlamp" state="0"><bounds x="644" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel155" element="lamplabelel155"><bounds x="644" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp156" element="matrixlamp" state="0"><bounds x="668" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel156" element="lamplabelel156"><bounds x="668" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp157" element="matrixlamp" state="0"><bounds x="692" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel157" element="lamplabelel157"><bounds x="692" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp158" element="matrixlamp" state="0"><bounds x="716" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel158" element="lamplabelel158"><bounds x="716" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp159" element="matrixlamp" state="0"><bounds x="740" y="252" width="23" height="16"/></bezel>
+<bezel name="lamplabel159" element="lamplabelel159"><bounds x="740" y="242" width="23" height="10" /></bezel>
+<bezel name="lamp160" element="matrixlamp" state="0"><bounds x="380" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel160" element="lamplabelel160"><bounds x="380" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp161" element="matrixlamp" state="0"><bounds x="404" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel161" element="lamplabelel161"><bounds x="404" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp162" element="matrixlamp" state="0"><bounds x="428" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel162" element="lamplabelel162"><bounds x="428" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp163" element="matrixlamp" state="0"><bounds x="452" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel163" element="lamplabelel163"><bounds x="452" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp164" element="matrixlamp" state="0"><bounds x="476" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel164" element="lamplabelel164"><bounds x="476" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp165" element="matrixlamp" state="0"><bounds x="500" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel165" element="lamplabelel165"><bounds x="500" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp166" element="matrixlamp" state="0"><bounds x="524" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel166" element="lamplabelel166"><bounds x="524" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp167" element="matrixlamp" state="0"><bounds x="548" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel167" element="lamplabelel167"><bounds x="548" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp168" element="matrixlamp" state="0"><bounds x="572" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel168" element="lamplabelel168"><bounds x="572" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp169" element="matrixlamp" state="0"><bounds x="596" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel169" element="lamplabelel169"><bounds x="596" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp170" element="matrixlamp" state="0"><bounds x="620" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel170" element="lamplabelel170"><bounds x="620" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp171" element="matrixlamp" state="0"><bounds x="644" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel171" element="lamplabelel171"><bounds x="644" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp172" element="matrixlamp" state="0"><bounds x="668" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel172" element="lamplabelel172"><bounds x="668" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp173" element="matrixlamp" state="0"><bounds x="692" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel173" element="lamplabelel173"><bounds x="692" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp174" element="matrixlamp" state="0"><bounds x="716" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel174" element="lamplabelel174"><bounds x="716" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp175" element="matrixlamp" state="0"><bounds x="740" y="280" width="23" height="16"/></bezel>
+<bezel name="lamplabel175" element="lamplabelel175"><bounds x="740" y="270" width="23" height="10" /></bezel>
+<bezel name="lamp176" element="matrixlamp" state="0"><bounds x="380" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel176" element="lamplabelel176"><bounds x="380" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp177" element="matrixlamp" state="0"><bounds x="404" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel177" element="lamplabelel177"><bounds x="404" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp178" element="matrixlamp" state="0"><bounds x="428" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel178" element="lamplabelel178"><bounds x="428" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp179" element="matrixlamp" state="0"><bounds x="452" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel179" element="lamplabelel179"><bounds x="452" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp180" element="matrixlamp" state="0"><bounds x="476" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel180" element="lamplabelel180"><bounds x="476" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp181" element="matrixlamp" state="0"><bounds x="500" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel181" element="lamplabelel181"><bounds x="500" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp182" element="matrixlamp" state="0"><bounds x="524" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel182" element="lamplabelel182"><bounds x="524" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp183" element="matrixlamp" state="0"><bounds x="548" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel183" element="lamplabelel183"><bounds x="548" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp184" element="matrixlamp" state="0"><bounds x="572" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel184" element="lamplabelel184"><bounds x="572" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp185" element="matrixlamp" state="0"><bounds x="596" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel185" element="lamplabelel185"><bounds x="596" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp186" element="matrixlamp" state="0"><bounds x="620" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel186" element="lamplabelel186"><bounds x="620" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp187" element="matrixlamp" state="0"><bounds x="644" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel187" element="lamplabelel187"><bounds x="644" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp188" element="matrixlamp" state="0"><bounds x="668" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel188" element="lamplabelel188"><bounds x="668" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp189" element="matrixlamp" state="0"><bounds x="692" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel189" element="lamplabelel189"><bounds x="692" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp190" element="matrixlamp" state="0"><bounds x="716" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel190" element="lamplabelel190"><bounds x="716" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp191" element="matrixlamp" state="0"><bounds x="740" y="308" width="23" height="16"/></bezel>
+<bezel name="lamplabel191" element="lamplabelel191"><bounds x="740" y="298" width="23" height="10" /></bezel>
+<bezel name="lamp192" element="matrixlamp" state="0"><bounds x="380" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel192" element="lamplabelel192"><bounds x="380" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp193" element="matrixlamp" state="0"><bounds x="404" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel193" element="lamplabelel193"><bounds x="404" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp194" element="matrixlamp" state="0"><bounds x="428" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel194" element="lamplabelel194"><bounds x="428" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp195" element="matrixlamp" state="0"><bounds x="452" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel195" element="lamplabelel195"><bounds x="452" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp196" element="matrixlamp" state="0"><bounds x="476" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel196" element="lamplabelel196"><bounds x="476" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp197" element="matrixlamp" state="0"><bounds x="500" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel197" element="lamplabelel197"><bounds x="500" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp198" element="matrixlamp" state="0"><bounds x="524" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel198" element="lamplabelel198"><bounds x="524" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp199" element="matrixlamp" state="0"><bounds x="548" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel199" element="lamplabelel199"><bounds x="548" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp200" element="matrixlamp" state="0"><bounds x="572" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel200" element="lamplabelel200"><bounds x="572" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp201" element="matrixlamp" state="0"><bounds x="596" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel201" element="lamplabelel201"><bounds x="596" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp202" element="matrixlamp" state="0"><bounds x="620" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel202" element="lamplabelel202"><bounds x="620" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp203" element="matrixlamp" state="0"><bounds x="644" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel203" element="lamplabelel203"><bounds x="644" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp204" element="matrixlamp" state="0"><bounds x="668" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel204" element="lamplabelel204"><bounds x="668" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp205" element="matrixlamp" state="0"><bounds x="692" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel205" element="lamplabelel205"><bounds x="692" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp206" element="matrixlamp" state="0"><bounds x="716" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel206" element="lamplabelel206"><bounds x="716" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp207" element="matrixlamp" state="0"><bounds x="740" y="336" width="23" height="16"/></bezel>
+<bezel name="lamplabel207" element="lamplabelel207"><bounds x="740" y="326" width="23" height="10" /></bezel>
+<bezel name="lamp208" element="matrixlamp" state="0"><bounds x="380" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel208" element="lamplabelel208"><bounds x="380" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp209" element="matrixlamp" state="0"><bounds x="404" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel209" element="lamplabelel209"><bounds x="404" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp210" element="matrixlamp" state="0"><bounds x="428" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel210" element="lamplabelel210"><bounds x="428" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp211" element="matrixlamp" state="0"><bounds x="452" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel211" element="lamplabelel211"><bounds x="452" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp212" element="matrixlamp" state="0"><bounds x="476" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel212" element="lamplabelel212"><bounds x="476" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp213" element="matrixlamp" state="0"><bounds x="500" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel213" element="lamplabelel213"><bounds x="500" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp214" element="matrixlamp" state="0"><bounds x="524" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel214" element="lamplabelel214"><bounds x="524" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp215" element="matrixlamp" state="0"><bounds x="548" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel215" element="lamplabelel215"><bounds x="548" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp216" element="matrixlamp" state="0"><bounds x="572" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel216" element="lamplabelel216"><bounds x="572" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp217" element="matrixlamp" state="0"><bounds x="596" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel217" element="lamplabelel217"><bounds x="596" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp218" element="matrixlamp" state="0"><bounds x="620" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel218" element="lamplabelel218"><bounds x="620" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp219" element="matrixlamp" state="0"><bounds x="644" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel219" element="lamplabelel219"><bounds x="644" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp220" element="matrixlamp" state="0"><bounds x="668" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel220" element="lamplabelel220"><bounds x="668" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp221" element="matrixlamp" state="0"><bounds x="692" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel221" element="lamplabelel221"><bounds x="692" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp222" element="matrixlamp" state="0"><bounds x="716" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel222" element="lamplabelel222"><bounds x="716" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp223" element="matrixlamp" state="0"><bounds x="740" y="364" width="23" height="16"/></bezel>
+<bezel name="lamplabel223" element="lamplabelel223"><bounds x="740" y="354" width="23" height="10" /></bezel>
+<bezel name="lamp224" element="matrixlamp" state="0"><bounds x="380" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel224" element="lamplabelel224"><bounds x="380" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp225" element="matrixlamp" state="0"><bounds x="404" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel225" element="lamplabelel225"><bounds x="404" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp226" element="matrixlamp" state="0"><bounds x="428" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel226" element="lamplabelel226"><bounds x="428" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp227" element="matrixlamp" state="0"><bounds x="452" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel227" element="lamplabelel227"><bounds x="452" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp228" element="matrixlamp" state="0"><bounds x="476" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel228" element="lamplabelel228"><bounds x="476" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp229" element="matrixlamp" state="0"><bounds x="500" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel229" element="lamplabelel229"><bounds x="500" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp230" element="matrixlamp" state="0"><bounds x="524" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel230" element="lamplabelel230"><bounds x="524" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp231" element="matrixlamp" state="0"><bounds x="548" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel231" element="lamplabelel231"><bounds x="548" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp232" element="matrixlamp" state="0"><bounds x="572" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel232" element="lamplabelel232"><bounds x="572" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp233" element="matrixlamp" state="0"><bounds x="596" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel233" element="lamplabelel233"><bounds x="596" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp234" element="matrixlamp" state="0"><bounds x="620" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel234" element="lamplabelel234"><bounds x="620" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp235" element="matrixlamp" state="0"><bounds x="644" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel235" element="lamplabelel235"><bounds x="644" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp236" element="matrixlamp" state="0"><bounds x="668" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel236" element="lamplabelel236"><bounds x="668" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp237" element="matrixlamp" state="0"><bounds x="692" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel237" element="lamplabelel237"><bounds x="692" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp238" element="matrixlamp" state="0"><bounds x="716" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel238" element="lamplabelel238"><bounds x="716" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp239" element="matrixlamp" state="0"><bounds x="740" y="392" width="23" height="16"/></bezel>
+<bezel name="lamplabel239" element="lamplabelel239"><bounds x="740" y="382" width="23" height="10" /></bezel>
+<bezel name="lamp240" element="matrixlamp" state="0"><bounds x="380" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel240" element="lamplabelel240"><bounds x="380" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp241" element="matrixlamp" state="0"><bounds x="404" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel241" element="lamplabelel241"><bounds x="404" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp242" element="matrixlamp" state="0"><bounds x="428" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel242" element="lamplabelel242"><bounds x="428" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp243" element="matrixlamp" state="0"><bounds x="452" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel243" element="lamplabelel243"><bounds x="452" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp244" element="matrixlamp" state="0"><bounds x="476" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel244" element="lamplabelel244"><bounds x="476" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp245" element="matrixlamp" state="0"><bounds x="500" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel245" element="lamplabelel245"><bounds x="500" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp246" element="matrixlamp" state="0"><bounds x="524" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel246" element="lamplabelel246"><bounds x="524" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp247" element="unusedlamp" state="0"><bounds x="548" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel247" element="lamplabelel247"><bounds x="548" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp248" element="unusedlamp" state="0"><bounds x="572" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel248" element="lamplabelel248"><bounds x="572" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp249" element="unusedlamp" state="0"><bounds x="596" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel249" element="lamplabelel249"><bounds x="596" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp250" element="unusedlamp" state="0"><bounds x="620" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel250" element="lamplabelel250"><bounds x="620" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp251" element="unusedlamp" state="0"><bounds x="644" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel251" element="lamplabelel251"><bounds x="644" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp252" element="unusedlamp" state="0"><bounds x="668" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel252" element="lamplabelel252"><bounds x="668" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp253" element="unusedlamp" state="0"><bounds x="692" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel253" element="lamplabelel253"><bounds x="692" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp254" element="unusedlamp" state="0"><bounds x="716" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel254" element="lamplabelel254"><bounds x="716" y="410" width="23" height="10" /></bezel>
+<bezel name="lamp255" element="unusedlamp" state="0"><bounds x="740" y="420" width="23" height="16"/></bezel>
+<bezel name="lamplabel255" element="lamplabelel255"><bounds x="740" y="410" width="23" height="10" /></bezel>
+<bezel name="input1-0" element="button" state="0" inputtag="IN-1" inputmask="0x01"><bounds x="180" y="0" width="19" height="10" /></bezel>
+<bezel name="inputlab1-0" element="inputlabel1-0"><bounds x="180" y="-10" width="19" height="10" /></bezel>
+<bezel name="input1-1" element="button" state="0" inputtag="IN-1" inputmask="0x02"><bounds x="200" y="0" width="19" height="10" /></bezel>
+<bezel name="inputlab1-1" element="inputlabel1-1"><bounds x="200" y="-10" width="19" height="10" /></bezel>
+<bezel name="input1-2" element="button" state="0" inputtag="IN-1" inputmask="0x04"><bounds x="220" y="0" width="19" height="10" /></bezel>
+<bezel name="inputlab1-2" element="inputlabel1-2"><bounds x="220" y="-10" width="19" height="10" /></bezel>
+<bezel name="input1-3" element="button" state="0" inputtag="IN-1" inputmask="0x08"><bounds x="240" y="0" width="19" height="10" /></bezel>
+<bezel name="inputlab1-3" element="inputlabel1-3"><bounds x="240" y="-10" width="19" height="10" /></bezel>
+<bezel name="input1-4" element="button" state="0" inputtag="IN-1" inputmask="0x10"><bounds x="260" y="0" width="19" height="10" /></bezel>
+<bezel name="inputlab1-4" element="inputlabel1-4"><bounds x="260" y="-10" width="19" height="10" /></bezel>
+<bezel name="input1-5" element="button" state="0" inputtag="IN-1" inputmask="0x20"><bounds x="280" y="0" width="19" height="10" /></bezel>
+<bezel name="inputlab1-5" element="inputlabel1-5"><bounds x="280" y="-10" width="19" height="10" /></bezel>
+<bezel name="input2-0" element="button" state="0" inputtag="IN-2" inputmask="0x01"><bounds x="180" y="20" width="19" height="10" /></bezel>
+<bezel name="inputlab2-0" element="inputlabel2-0"><bounds x="180" y="10" width="19" height="10" /></bezel>
+<bezel name="input2-1" element="button" state="0" inputtag="IN-2" inputmask="0x02"><bounds x="200" y="20" width="19" height="10" /></bezel>
+<bezel name="inputlab2-1" element="inputlabel2-1"><bounds x="200" y="10" width="19" height="10" /></bezel>
+<bezel name="input2-2" element="button" state="0" inputtag="IN-2" inputmask="0x04"><bounds x="220" y="20" width="19" height="10" /></bezel>
+<bezel name="inputlab2-2" element="inputlabel2-2"><bounds x="220" y="10" width="19" height="10" /></bezel>
+<bezel name="input2-3" element="button" state="0" inputtag="IN-2" inputmask="0x08"><bounds x="240" y="20" width="19" height="10" /></bezel>
+<bezel name="inputlab2-3" element="inputlabel2-3"><bounds x="240" y="10" width="19" height="10" /></bezel>
+<bezel name="input2-4" element="button" state="0" inputtag="IN-2" inputmask="0x10"><bounds x="260" y="20" width="19" height="10" /></bezel>
+<bezel name="inputlab2-4" element="inputlabel2-4"><bounds x="260" y="10" width="19" height="10" /></bezel>
+<bezel name="input2-5" element="button" state="0" inputtag="IN-2" inputmask="0x20"><bounds x="280" y="20" width="19" height="10" /></bezel>
+<bezel name="inputlab2-5" element="inputlabel2-5"><bounds x="280" y="10" width="19" height="10" /></bezel>
+<bezel name="input8-0" element="button" state="0" inputtag="IN-8" inputmask="0x01"><bounds x="180" y="40" width="19" height="10" /></bezel>
+<bezel name="inputlab8-0" element="inputlabel8-0"><bounds x="180" y="30" width="19" height="10" /></bezel>
+<bezel name="input8-1" element="button" state="0" inputtag="IN-8" inputmask="0x02"><bounds x="200" y="40" width="19" height="10" /></bezel>
+<bezel name="inputlab8-1" element="inputlabel8-1"><bounds x="200" y="30" width="19" height="10" /></bezel>
+<bezel name="input8-2" element="button" state="0" inputtag="IN-8" inputmask="0x04"><bounds x="220" y="40" width="19" height="10" /></bezel>
+<bezel name="inputlab8-2" element="inputlabel8-2"><bounds x="220" y="30" width="19" height="10" /></bezel>
+<bezel name="input8-3" element="button" state="0" inputtag="IN-8" inputmask="0x08"><bounds x="240" y="40" width="19" height="10" /></bezel>
+<bezel name="inputlab8-3" element="inputlabel8-3"><bounds x="240" y="30" width="19" height="10" /></bezel>
+<bezel name="input8-4" element="button" state="0" inputtag="IN-8" inputmask="0x10"><bounds x="260" y="40" width="19" height="10" /></bezel>
+<bezel name="inputlab8-4" element="inputlabel8-4"><bounds x="260" y="30" width="19" height="10" /></bezel>
+<bezel name="input8-5" element="button" state="0" inputtag="IN-8" inputmask="0x20"><bounds x="280" y="40" width="19" height="10" /></bezel>
+<bezel name="inputlab8-5" element="inputlabel8-5"><bounds x="280" y="30" width="19" height="10" /></bezel>
+<bezel name="input9-0" element="button" state="0" inputtag="IN-9" inputmask="0x01"><bounds x="180" y="60" width="19" height="10" /></bezel>
+<bezel name="inputlab9-0" element="inputlabel9-0"><bounds x="180" y="50" width="19" height="10" /></bezel>
+<bezel name="input9-1" element="button" state="0" inputtag="IN-9" inputmask="0x02"><bounds x="200" y="60" width="19" height="10" /></bezel>
+<bezel name="inputlab9-1" element="inputlabel9-1"><bounds x="200" y="50" width="19" height="10" /></bezel>
+<bezel name="input9-2" element="button" state="0" inputtag="IN-9" inputmask="0x04"><bounds x="220" y="60" width="19" height="10" /></bezel>
+<bezel name="inputlab9-2" element="inputlabel9-2"><bounds x="220" y="50" width="19" height="10" /></bezel>
+<bezel name="input9-3" element="button" state="0" inputtag="IN-9" inputmask="0x08"><bounds x="240" y="60" width="19" height="10" /></bezel>
+<bezel name="inputlab9-3" element="inputlabel9-3"><bounds x="240" y="50" width="19" height="10" /></bezel>
+<bezel name="input9-4" element="button" state="0" inputtag="IN-9" inputmask="0x10"><bounds x="260" y="60" width="19" height="10" /></bezel>
+<bezel name="inputlab9-4" element="inputlabel9-4"><bounds x="260" y="50" width="19" height="10" /></bezel>
+<bezel name="input9-5" element="button" state="0" inputtag="IN-9" inputmask="0x20"><bounds x="280" y="60" width="19" height="10" /></bezel>
+<bezel name="inputlab9-5" element="inputlabel9-5"><bounds x="280" y="50" width="19" height="10" /></bezel>
+<bezel name="input10-0" element="button" state="0" inputtag="IN-10" inputmask="0x01"><bounds x="180" y="80" width="19" height="10" /></bezel>
+<bezel name="inputlab10-0" element="inputlabel10-0"><bounds x="180" y="70" width="19" height="10" /></bezel>
+<bezel name="input10-1" element="button" state="0" inputtag="IN-10" inputmask="0x02"><bounds x="200" y="80" width="19" height="10" /></bezel>
+<bezel name="inputlab10-1" element="inputlabel10-1"><bounds x="200" y="70" width="19" height="10" /></bezel>
+<bezel name="input10-2" element="button" state="0" inputtag="IN-10" inputmask="0x04"><bounds x="220" y="80" width="19" height="10" /></bezel>
+<bezel name="inputlab10-2" element="inputlabel10-2"><bounds x="220" y="70" width="19" height="10" /></bezel>
+<bezel name="input10-3" element="button" state="0" inputtag="IN-10" inputmask="0x08"><bounds x="240" y="80" width="19" height="10" /></bezel>
+<bezel name="inputlab10-3" element="inputlabel10-3"><bounds x="240" y="70" width="19" height="10" /></bezel>
+<bezel name="input10-4" element="button" state="0" inputtag="IN-10" inputmask="0x10"><bounds x="260" y="80" width="19" height="10" /></bezel>
+<bezel name="inputlab10-4" element="inputlabel10-4"><bounds x="260" y="70" width="19" height="10" /></bezel>
+<bezel name="input10-5" element="button" state="0" inputtag="IN-10" inputmask="0x20"><bounds x="280" y="80" width="19" height="10" /></bezel>
+<bezel name="inputlab10-5" element="inputlabel10-5"><bounds x="280" y="70" width="19" height="10" /></bezel>
+<bezel name="input20-0" element="button" state="0" inputtag="IN-20" inputmask="0x01"><bounds x="180" y="100" width="19" height="10" /></bezel>
+<bezel name="inputlab20-0" element="inputlabel20-0"><bounds x="180" y="90" width="19" height="10" /></bezel>
+<bezel name="input20-1" element="button" state="0" inputtag="IN-20" inputmask="0x02"><bounds x="200" y="100" width="19" height="10" /></bezel>
+<bezel name="inputlab20-1" element="inputlabel20-1"><bounds x="200" y="90" width="19" height="10" /></bezel>
+<bezel name="input20-2" element="button" state="0" inputtag="IN-20" inputmask="0x04"><bounds x="220" y="100" width="19" height="10" /></bezel>
+<bezel name="inputlab20-2" element="inputlabel20-2"><bounds x="220" y="90" width="19" height="10" /></bezel>
+<bezel name="input20-3" element="button" state="0" inputtag="IN-20" inputmask="0x08"><bounds x="240" y="100" width="19" height="10" /></bezel>
+<bezel name="inputlab20-3" element="inputlabel20-3"><bounds x="240" y="90" width="19" height="10" /></bezel>
+<bezel name="input20-4" element="button" state="0" inputtag="IN-20" inputmask="0x10"><bounds x="260" y="100" width="19" height="10" /></bezel>
+<bezel name="inputlab20-4" element="inputlabel20-4"><bounds x="260" y="90" width="19" height="10" /></bezel>
+<bezel name="input20-5" element="button" state="0" inputtag="IN-20" inputmask="0x20"><bounds x="280" y="100" width="19" height="10" /></bezel>
+<bezel name="inputlab20-5" element="inputlabel20-5"><bounds x="280" y="90" width="19" height="10" /></bezel>
+
+<bezel name="matrix0" element="matrixlamp" state="0"><bounds x="4" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix1" element="matrixlamp" state="0"><bounds x="4" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix2" element="matrixlamp" state="0"><bounds x="4" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix3" element="matrixlamp" state="0"><bounds x="4" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix4" element="matrixlamp" state="0"><bounds x="4" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix5" element="matrixlamp" state="0"><bounds x="4" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix6" element="matrixlamp" state="0"><bounds x="4" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix7" element="matrixlamp" state="0"><bounds x="4" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix8" element="matrixlamp" state="0"><bounds x="8" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix9" element="matrixlamp" state="0"><bounds x="8" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix10" element="matrixlamp" state="0"><bounds x="8" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix11" element="matrixlamp" state="0"><bounds x="8" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix12" element="matrixlamp" state="0"><bounds x="8" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix13" element="matrixlamp" state="0"><bounds x="8" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix14" element="matrixlamp" state="0"><bounds x="8" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix15" element="matrixlamp" state="0"><bounds x="8" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix16" element="matrixlamp" state="0"><bounds x="12" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix17" element="matrixlamp" state="0"><bounds x="12" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix18" element="matrixlamp" state="0"><bounds x="12" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix19" element="matrixlamp" state="0"><bounds x="12" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix20" element="matrixlamp" state="0"><bounds x="12" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix21" element="matrixlamp" state="0"><bounds x="12" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix22" element="matrixlamp" state="0"><bounds x="12" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix23" element="matrixlamp" state="0"><bounds x="12" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix24" element="matrixlamp" state="0"><bounds x="16" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix25" element="matrixlamp" state="0"><bounds x="16" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix26" element="matrixlamp" state="0"><bounds x="16" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix27" element="matrixlamp" state="0"><bounds x="16" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix28" element="matrixlamp" state="0"><bounds x="16" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix29" element="matrixlamp" state="0"><bounds x="16" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix30" element="matrixlamp" state="0"><bounds x="16" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix31" element="matrixlamp" state="0"><bounds x="16" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix32" element="matrixlamp" state="0"><bounds x="20" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix33" element="matrixlamp" state="0"><bounds x="20" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix34" element="matrixlamp" state="0"><bounds x="20" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix35" element="matrixlamp" state="0"><bounds x="20" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix36" element="matrixlamp" state="0"><bounds x="20" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix37" element="matrixlamp" state="0"><bounds x="20" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix38" element="matrixlamp" state="0"><bounds x="20" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix39" element="matrixlamp" state="0"><bounds x="20" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix40" element="matrixlamp" state="0"><bounds x="28" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix41" element="matrixlamp" state="0"><bounds x="28" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix42" element="matrixlamp" state="0"><bounds x="28" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix43" element="matrixlamp" state="0"><bounds x="28" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix44" element="matrixlamp" state="0"><bounds x="28" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix45" element="matrixlamp" state="0"><bounds x="28" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix46" element="matrixlamp" state="0"><bounds x="28" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix47" element="matrixlamp" state="0"><bounds x="28" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix48" element="matrixlamp" state="0"><bounds x="32" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix49" element="matrixlamp" state="0"><bounds x="32" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix50" element="matrixlamp" state="0"><bounds x="32" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix51" element="matrixlamp" state="0"><bounds x="32" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix52" element="matrixlamp" state="0"><bounds x="32" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix53" element="matrixlamp" state="0"><bounds x="32" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix54" element="matrixlamp" state="0"><bounds x="32" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix55" element="matrixlamp" state="0"><bounds x="32" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix56" element="matrixlamp" state="0"><bounds x="36" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix57" element="matrixlamp" state="0"><bounds x="36" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix58" element="matrixlamp" state="0"><bounds x="36" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix59" element="matrixlamp" state="0"><bounds x="36" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix60" element="matrixlamp" state="0"><bounds x="36" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix61" element="matrixlamp" state="0"><bounds x="36" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix62" element="matrixlamp" state="0"><bounds x="36" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix63" element="matrixlamp" state="0"><bounds x="36" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix64" element="matrixlamp" state="0"><bounds x="40" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix65" element="matrixlamp" state="0"><bounds x="40" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix66" element="matrixlamp" state="0"><bounds x="40" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix67" element="matrixlamp" state="0"><bounds x="40" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix68" element="matrixlamp" state="0"><bounds x="40" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix69" element="matrixlamp" state="0"><bounds x="40" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix70" element="matrixlamp" state="0"><bounds x="40" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix71" element="matrixlamp" state="0"><bounds x="40" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix72" element="matrixlamp" state="0"><bounds x="44" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix73" element="matrixlamp" state="0"><bounds x="44" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix74" element="matrixlamp" state="0"><bounds x="44" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix75" element="matrixlamp" state="0"><bounds x="44" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix76" element="matrixlamp" state="0"><bounds x="44" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix77" element="matrixlamp" state="0"><bounds x="44" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix78" element="matrixlamp" state="0"><bounds x="44" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix79" element="matrixlamp" state="0"><bounds x="44" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix80" element="matrixlamp" state="0"><bounds x="52" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix81" element="matrixlamp" state="0"><bounds x="52" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix82" element="matrixlamp" state="0"><bounds x="52" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix83" element="matrixlamp" state="0"><bounds x="52" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix84" element="matrixlamp" state="0"><bounds x="52" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix85" element="matrixlamp" state="0"><bounds x="52" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix86" element="matrixlamp" state="0"><bounds x="52" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix87" element="matrixlamp" state="0"><bounds x="52" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix88" element="matrixlamp" state="0"><bounds x="56" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix89" element="matrixlamp" state="0"><bounds x="56" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix90" element="matrixlamp" state="0"><bounds x="56" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix91" element="matrixlamp" state="0"><bounds x="56" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix92" element="matrixlamp" state="0"><bounds x="56" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix93" element="matrixlamp" state="0"><bounds x="56" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix94" element="matrixlamp" state="0"><bounds x="56" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix95" element="matrixlamp" state="0"><bounds x="56" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix96" element="matrixlamp" state="0"><bounds x="60" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix97" element="matrixlamp" state="0"><bounds x="60" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix98" element="matrixlamp" state="0"><bounds x="60" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix99" element="matrixlamp" state="0"><bounds x="60" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix100" element="matrixlamp" state="0"><bounds x="60" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix101" element="matrixlamp" state="0"><bounds x="60" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix102" element="matrixlamp" state="0"><bounds x="60" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix103" element="matrixlamp" state="0"><bounds x="60" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix104" element="matrixlamp" state="0"><bounds x="64" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix105" element="matrixlamp" state="0"><bounds x="64" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix106" element="matrixlamp" state="0"><bounds x="64" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix107" element="matrixlamp" state="0"><bounds x="64" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix108" element="matrixlamp" state="0"><bounds x="64" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix109" element="matrixlamp" state="0"><bounds x="64" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix110" element="matrixlamp" state="0"><bounds x="64" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix111" element="matrixlamp" state="0"><bounds x="64" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix112" element="matrixlamp" state="0"><bounds x="68" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix113" element="matrixlamp" state="0"><bounds x="68" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix114" element="matrixlamp" state="0"><bounds x="68" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix115" element="matrixlamp" state="0"><bounds x="68" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix116" element="matrixlamp" state="0"><bounds x="68" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix117" element="matrixlamp" state="0"><bounds x="68" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix118" element="matrixlamp" state="0"><bounds x="68" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix119" element="matrixlamp" state="0"><bounds x="68" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix120" element="matrixlamp" state="0"><bounds x="76" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix121" element="matrixlamp" state="0"><bounds x="76" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix122" element="matrixlamp" state="0"><bounds x="76" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix123" element="matrixlamp" state="0"><bounds x="76" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix124" element="matrixlamp" state="0"><bounds x="76" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix125" element="matrixlamp" state="0"><bounds x="76" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix126" element="matrixlamp" state="0"><bounds x="76" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix127" element="matrixlamp" state="0"><bounds x="76" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix128" element="matrixlamp" state="0"><bounds x="80" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix129" element="matrixlamp" state="0"><bounds x="80" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix130" element="matrixlamp" state="0"><bounds x="80" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix131" element="matrixlamp" state="0"><bounds x="80" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix132" element="matrixlamp" state="0"><bounds x="80" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix133" element="matrixlamp" state="0"><bounds x="80" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix134" element="matrixlamp" state="0"><bounds x="80" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix135" element="matrixlamp" state="0"><bounds x="80" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix136" element="matrixlamp" state="0"><bounds x="84" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix137" element="matrixlamp" state="0"><bounds x="84" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix138" element="matrixlamp" state="0"><bounds x="84" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix139" element="matrixlamp" state="0"><bounds x="84" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix140" element="matrixlamp" state="0"><bounds x="84" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix141" element="matrixlamp" state="0"><bounds x="84" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix142" element="matrixlamp" state="0"><bounds x="84" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix143" element="matrixlamp" state="0"><bounds x="84" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix144" element="matrixlamp" state="0"><bounds x="88" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix145" element="matrixlamp" state="0"><bounds x="88" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix146" element="matrixlamp" state="0"><bounds x="88" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix147" element="matrixlamp" state="0"><bounds x="88" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix148" element="matrixlamp" state="0"><bounds x="88" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix149" element="matrixlamp" state="0"><bounds x="88" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix150" element="matrixlamp" state="0"><bounds x="88" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix151" element="matrixlamp" state="0"><bounds x="88" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix152" element="matrixlamp" state="0"><bounds x="92" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix153" element="matrixlamp" state="0"><bounds x="92" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix154" element="matrixlamp" state="0"><bounds x="92" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix155" element="matrixlamp" state="0"><bounds x="92" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix156" element="matrixlamp" state="0"><bounds x="92" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix157" element="matrixlamp" state="0"><bounds x="92" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix158" element="matrixlamp" state="0"><bounds x="92" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix159" element="matrixlamp" state="0"><bounds x="92" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix160" element="matrixlamp" state="0"><bounds x="100" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix161" element="matrixlamp" state="0"><bounds x="100" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix162" element="matrixlamp" state="0"><bounds x="100" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix163" element="matrixlamp" state="0"><bounds x="100" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix164" element="matrixlamp" state="0"><bounds x="100" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix165" element="matrixlamp" state="0"><bounds x="100" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix166" element="matrixlamp" state="0"><bounds x="100" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix167" element="matrixlamp" state="0"><bounds x="100" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix168" element="matrixlamp" state="0"><bounds x="104" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix169" element="matrixlamp" state="0"><bounds x="104" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix170" element="matrixlamp" state="0"><bounds x="104" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix171" element="matrixlamp" state="0"><bounds x="104" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix172" element="matrixlamp" state="0"><bounds x="104" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix173" element="matrixlamp" state="0"><bounds x="104" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix174" element="matrixlamp" state="0"><bounds x="104" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix175" element="matrixlamp" state="0"><bounds x="104" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix176" element="matrixlamp" state="0"><bounds x="108" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix177" element="matrixlamp" state="0"><bounds x="108" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix178" element="matrixlamp" state="0"><bounds x="108" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix179" element="matrixlamp" state="0"><bounds x="108" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix180" element="matrixlamp" state="0"><bounds x="108" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix181" element="matrixlamp" state="0"><bounds x="108" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix182" element="matrixlamp" state="0"><bounds x="108" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix183" element="matrixlamp" state="0"><bounds x="108" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix184" element="matrixlamp" state="0"><bounds x="112" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix185" element="matrixlamp" state="0"><bounds x="112" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix186" element="matrixlamp" state="0"><bounds x="112" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix187" element="matrixlamp" state="0"><bounds x="112" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix188" element="matrixlamp" state="0"><bounds x="112" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix189" element="matrixlamp" state="0"><bounds x="112" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix190" element="matrixlamp" state="0"><bounds x="112" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix191" element="matrixlamp" state="0"><bounds x="112" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix192" element="matrixlamp" state="0"><bounds x="116" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix193" element="matrixlamp" state="0"><bounds x="116" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix194" element="matrixlamp" state="0"><bounds x="116" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix195" element="matrixlamp" state="0"><bounds x="116" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix196" element="matrixlamp" state="0"><bounds x="116" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix197" element="matrixlamp" state="0"><bounds x="116" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix198" element="matrixlamp" state="0"><bounds x="116" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix199" element="matrixlamp" state="0"><bounds x="116" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix200" element="matrixlamp" state="0"><bounds x="124" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix201" element="matrixlamp" state="0"><bounds x="124" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix202" element="matrixlamp" state="0"><bounds x="124" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix203" element="matrixlamp" state="0"><bounds x="124" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix204" element="matrixlamp" state="0"><bounds x="124" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix205" element="matrixlamp" state="0"><bounds x="124" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix206" element="matrixlamp" state="0"><bounds x="124" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix207" element="matrixlamp" state="0"><bounds x="124" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix208" element="matrixlamp" state="0"><bounds x="128" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix209" element="matrixlamp" state="0"><bounds x="128" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix210" element="matrixlamp" state="0"><bounds x="128" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix211" element="matrixlamp" state="0"><bounds x="128" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix212" element="matrixlamp" state="0"><bounds x="128" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix213" element="matrixlamp" state="0"><bounds x="128" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix214" element="matrixlamp" state="0"><bounds x="128" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix215" element="matrixlamp" state="0"><bounds x="128" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix216" element="matrixlamp" state="0"><bounds x="132" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix217" element="matrixlamp" state="0"><bounds x="132" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix218" element="matrixlamp" state="0"><bounds x="132" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix219" element="matrixlamp" state="0"><bounds x="132" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix220" element="matrixlamp" state="0"><bounds x="132" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix221" element="matrixlamp" state="0"><bounds x="132" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix222" element="matrixlamp" state="0"><bounds x="132" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix223" element="matrixlamp" state="0"><bounds x="132" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix224" element="matrixlamp" state="0"><bounds x="136" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix225" element="matrixlamp" state="0"><bounds x="136" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix226" element="matrixlamp" state="0"><bounds x="136" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix227" element="matrixlamp" state="0"><bounds x="136" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix228" element="matrixlamp" state="0"><bounds x="136" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix229" element="matrixlamp" state="0"><bounds x="136" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix230" element="matrixlamp" state="0"><bounds x="136" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix231" element="matrixlamp" state="0"><bounds x="136" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix232" element="matrixlamp" state="0"><bounds x="140" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix233" element="matrixlamp" state="0"><bounds x="140" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix234" element="matrixlamp" state="0"><bounds x="140" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix235" element="matrixlamp" state="0"><bounds x="140" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix236" element="matrixlamp" state="0"><bounds x="140" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix237" element="matrixlamp" state="0"><bounds x="140" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix238" element="matrixlamp" state="0"><bounds x="140" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix239" element="matrixlamp" state="0"><bounds x="140" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix240" element="matrixlamp" state="0"><bounds x="148" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix241" element="matrixlamp" state="0"><bounds x="148" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix242" element="matrixlamp" state="0"><bounds x="148" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix243" element="matrixlamp" state="0"><bounds x="148" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix244" element="matrixlamp" state="0"><bounds x="148" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix245" element="matrixlamp" state="0"><bounds x="148" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix246" element="matrixlamp" state="0"><bounds x="148" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix247" element="matrixlamp" state="0"><bounds x="148" y="68" width="3" height="3" /></bezel>
+<bezel name="matrix248" element="matrixlamp" state="0"><bounds x="152" y="40" width="3" height="3" /></bezel>
+<bezel name="matrix249" element="matrixlamp" state="0"><bounds x="152" y="44" width="3" height="3" /></bezel>
+<bezel name="matrix250" element="matrixlamp" state="0"><bounds x="152" y="48" width="3" height="3" /></bezel>
+<bezel name="matrix251" element="matrixlamp" state="0"><bounds x="152" y="52" width="3" height="3" /></bezel>
+<bezel name="matrix252" element="matrixlamp" state="0"><bounds x="152" y="56" width="3" height="3" /></bezel>
+<bezel name="matrix253" element="matrixlamp" state="0"><bounds x="152" y="60" width="3" height="3" /></bezel>
+<bezel name="matrix254" element="matrixlamp" state="0"><bounds x="152" y="64" width="3" height="3" /></bezel>
+<bezel name="matrix255" element="matrixlamp" state="0"><bounds x="152" y="68" width="3" height="3" /></bezel>
+
+<bezel name="digit0" element="digit" state="0"><bounds x="150" y="80" width="9" height="19"/></bezel>
+<bezel name="digit1" element="digit" state="0"><bounds x="150" y="100" width="9" height="19"/></bezel>
+<bezel name="digit2" element="digit" state="0"><bounds x="140" y="80" width="9" height="19"/></bezel>
+<bezel name="digit3" element="digit" state="0"><bounds x="140" y="100" width="9" height="19"/></bezel>
+<bezel name="digit4" element="digit" state="0"><bounds x="130" y="80" width="9" height="19"/></bezel>
+<bezel name="digit5" element="digit" state="0"><bounds x="130" y="100" width="9" height="19"/></bezel>
+<bezel name="digit6" element="digit" state="0"><bounds x="120" y="80" width="9" height="19"/></bezel>
+<bezel name="digit7" element="digit" state="0"><bounds x="120" y="100" width="9" height="19"/></bezel>
+<bezel name="digit8" element="digit" state="0"><bounds x="110" y="80" width="9" height="19"/></bezel>
+<bezel name="digit9" element="digit" state="0"><bounds x="110" y="100" width="9" height="19"/></bezel>
+<bezel name="digit10" element="digit" state="0"><bounds x="100" y="80" width="9" height="19"/></bezel>
+<bezel name="digit11" element="digit" state="0"><bounds x="100" y="100" width="9" height="19"/></bezel>
+<bezel name="digit12" element="digit" state="0"><bounds x="90" y="80" width="9" height="19"/></bezel>
+<bezel name="digit13" element="digit" state="0"><bounds x="90" y="100" width="9" height="19"/></bezel>
+<bezel name="digit14" element="digit" state="0"><bounds x="80" y="80" width="9" height="19"/></bezel>
+<bezel name="digit15" element="digit" state="0"><bounds x="80" y="100" width="9" height="19"/></bezel>
+<bezel name="digit16" element="digit" state="0"><bounds x="70" y="80" width="9" height="19"/></bezel>
+<bezel name="digit17" element="digit" state="0"><bounds x="70" y="100" width="9" height="19"/></bezel>
+<bezel name="digit18" element="digit" state="0"><bounds x="60" y="80" width="9" height="19"/></bezel>
+<bezel name="digit19" element="digit" state="0"><bounds x="60" y="100" width="9" height="19"/></bezel>
+<bezel name="digit20" element="digit" state="0"><bounds x="50" y="80" width="9" height="19"/></bezel>
+<bezel name="digit21" element="digit" state="0"><bounds x="50" y="100" width="9" height="19"/></bezel>
+<bezel name="digit22" element="digit" state="0"><bounds x="40" y="80" width="9" height="19"/></bezel>
+<bezel name="digit23" element="digit" state="0"><bounds x="40" y="100" width="9" height="19"/></bezel>
+<bezel name="digit24" element="digit" state="0"><bounds x="30" y="80" width="9" height="19"/></bezel>
+<bezel name="digit25" element="digit" state="0"><bounds x="30" y="100" width="9" height="19"/></bezel>
+<bezel name="digit26" element="digit" state="0"><bounds x="20" y="80" width="9" height="19"/></bezel>
+<bezel name="digit27" element="digit" state="0"><bounds x="20" y="100" width="9" height="19"/></bezel>
+<bezel name="digit28" element="digit" state="0"><bounds x="10" y="80" width="9" height="19"/></bezel>
+<bezel name="digit29" element="digit" state="0"><bounds x="10" y="100" width="9" height="19"/></bezel>
+<bezel name="digit30" element="digit" state="0"><bounds x="0" y="80" width="9" height="19"/></bezel>
+<bezel name="digit31" element="digit" state="0"><bounds x="0" y="100" width="9" height="19"/></bezel>
+
+<bezel name="vfd0" element="vfd0" state="0"><bounds x="0" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd1" element="vfd0" state="0"><bounds x="10" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd2" element="vfd0" state="0"><bounds x="20" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd3" element="vfd0" state="0"><bounds x="30" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd4" element="vfd0" state="0"><bounds x="40" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd5" element="vfd0" state="0"><bounds x="50" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd6" element="vfd0" state="0"><bounds x="60" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd7" element="vfd0" state="0"><bounds x="70" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd8" element="vfd0" state="0"><bounds x="80" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd9" element="vfd0" state="0"><bounds x="90" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd10" element="vfd0" state="0"><bounds x="100" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd11" element="vfd0" state="0"><bounds x="110" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd12" element="vfd0" state="0"><bounds x="120" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd13" element="vfd0" state="0"><bounds x="130" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd14" element="vfd0" state="0"><bounds x="140" y="10" width="9" height="17"/></bezel>
+<bezel name="vfd15" element="vfd0" state="0"><bounds x="150" y="10" width="9" height="17"/></bezel>
+<bezel name="reel1" element="Steppers" state="0"><bounds x="40" y="350" width="10" height="5" /></bezel>
+<bezel name="sreel1" element="SteppersReel1" state="0"><bounds x="0" y="300" width="50" height="50" /></bezel>
+<bezel name="reel2" element="Steppers" state="0"><bounds x="90" y="350" width="10" height="5" /></bezel>
+<bezel name="sreel2" element="SteppersReel2" state="0"><bounds x="50" y="300" width="50" height="50" /></bezel>
+<bezel name="reel3" element="Steppers" state="0"><bounds x="140" y="350" width="10" height="5" /></bezel>
+<bezel name="sreel3" element="SteppersReel3" state="0"><bounds x="100" y="300" width="50" height="50" /></bezel>
+<bezel name="reel4" element="Steppers" state="0"><bounds x="190" y="350" width="10" height="5" /></bezel>
+<bezel name="sreel4" element="SteppersReel4" state="0"><bounds x="150" y="300" width="50" height="50" /></bezel>
+<bezel name="reel5" element="Steppers" state="0"><bounds x="240" y="350" width="10" height="5" /></bezel>
+<bezel name="sreel5" element="SteppersReel5" state="0"><bounds x="200" y="300" width="50" height="50" /></bezel>
+<bezel name="reel6" element="Steppers" state="0"><bounds x="290" y="350" width="10" height="5" /></bezel>
+<bezel name="sreel6" element="SteppersReel6" state="0"><bounds x="250" y="300" width="50" height="50" /></bezel>
+</view>
+</mamelayout>

@@ -72,6 +72,9 @@ YMZ294: 0 I/O port
 #define YM2149_PIN26_LOW            (0x10)
 
 
+#define AY8910_NUM_CHANNELS 3
+
+
 struct ay8910_interface
 {
 	int                 flags;          /* Flags */
@@ -81,17 +84,6 @@ struct ay8910_interface
 	devcb_write8        portAwrite;
 	devcb_write8        portBwrite;
 };
-
-/*********** An interface for SSG of YM2203 ***********/
-
-void *ay8910_start_ym(device_t *device, const ay8910_interface *intf);
-
-void ay8910_stop_ym(void *chip);
-void ay8910_reset_ym(void *chip);
-void ay8910_set_clock_ym(void *chip, int clock);
-void ay8910_set_volume(void *chip ,int channel, int volume);
-void ay8910_write_ym(void *chip, int addr, int data);
-int ay8910_read_ym(void *chip);
 
 class ay8910_device : public device_t,
 									public device_sound_interface
@@ -114,20 +106,65 @@ public:
 	DECLARE_WRITE8_MEMBER( address_data_w );
 
 	void set_volume(int channel,int volume);
-
+	void ay_set_clock(int clock);
+	
+	struct ay_ym_param
+	{
+		double r_up;
+		double r_down;
+		int    res_count;
+		double res[32];
+	};
+	
+	void ay8910_write_ym(int addr, int data);
+	int ay8910_read_ym();
+	void ay8910_reset_ym();
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	virtual void device_stop();
 	virtual void device_reset();
+
+	inline UINT16 mix_3D();
+	void ay8910_write_reg(int r, int v);
+	void build_mixer_table();
+	void ay8910_statesave();
+	
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	const ay8910_interface *m_ay8910_config;
-	void *m_psg;
+	int m_streams;
+	int m_ready;
+	sound_stream *m_channel;
+	const ay8910_interface *m_intf;
+	INT32 m_register_latch;
+	UINT8 m_regs[16];
+	INT32 m_last_enable;
+	INT32 m_count[AY8910_NUM_CHANNELS];
+	UINT8 m_output[AY8910_NUM_CHANNELS];
+	UINT8 m_prescale_noise;
+	INT32 m_count_noise;
+	INT32 m_count_env;
+	INT8 m_env_step;
+	UINT32 m_env_volume;
+	UINT8 m_hold,m_alternate,m_attack,m_holding;
+	INT32 m_rng;
+	UINT8 m_env_step_mask;
+	/* init parameters ... */
+	int m_step;
+	int m_zero_is_off;
+	UINT8 m_vol_enabled[AY8910_NUM_CHANNELS];
+	const ay_ym_param *m_par;
+	const ay_ym_param *m_par_env;
+	INT32 m_vol_table[AY8910_NUM_CHANNELS][16];
+	INT32 m_env_table[AY8910_NUM_CHANNELS][32];
+	INT32 m_vol3d_table[8*32*32*32];
+	devcb_resolved_read8 m_portAread;
+	devcb_resolved_read8 m_portBread;
+	devcb_resolved_write8 m_portAwrite;
+	devcb_resolved_write8 m_portBwrite;
 };
 
 extern const device_type AY8910;
@@ -173,9 +210,6 @@ class ym2149_device : public ay8910_device
 public:
 	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ym2149_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-protected:
-	// device-level overrides
-	virtual void device_start();
 };
 
 extern const device_type YM2149;

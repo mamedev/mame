@@ -568,17 +568,6 @@ WRITE_LINE_MEMBER(macrossp_state::irqhandler)
 	//  m_audiocpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const es5506_interface es5506_config =
-{
-	"ensoniq.0",
-	"ensoniq.1",
-	"ensoniq.2",
-	"ensoniq.3",
-	1,             /* channels */
-	DEVCB_DRIVER_LINE_MEMBER(macrossp_state,irqhandler)
-};
-
-
 void macrossp_state::machine_start()
 {
 	save_item(NAME(m_sndpending));
@@ -623,7 +612,12 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
-	MCFG_SOUND_CONFIG(es5506_config)
+	MCFG_ES5506_REGION0("ensoniq.0")
+	MCFG_ES5506_REGION1("ensoniq.1")
+	MCFG_ES5506_REGION2("ensoniq.2")
+	MCFG_ES5506_REGION3("ensoniq.3")
+	MCFG_ES5506_CHANNELS(1)               /* channels */
+	MCFG_ES5506_IRQ_CB(WRITELINE(macrossp_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END

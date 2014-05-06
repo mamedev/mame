@@ -3151,7 +3151,7 @@ void z80_device::take_interrupt()
 
 	/* else call back the cpu interface to retrieve the vector */
 	else
-		irq_vector = (*m_irq_callback)(this, 0);
+		irq_vector = m_irq_callback(*this, 0);
 
 	LOG(("Z80 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 
@@ -3392,7 +3392,7 @@ void z80_device::device_start()
 
 	if (static_config() != NULL)
 		m_daisy.init(this, (const z80_daisy_config *)static_config());
-	m_irq_callback = static_standard_irq_callback;
+	m_irq_callback = device_irq_acknowledge_delegate(FUNC(z80_device::standard_irq_callback_member), this);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;            /* Zero flag is set */

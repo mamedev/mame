@@ -46,6 +46,7 @@ public:
 	DECLARE_PALETTE_INIT(sm1800);
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
+	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 };
 
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
@@ -85,12 +86,11 @@ INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)
 	m_irq_state ^= 1;
 }
 
-static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
+I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
 	int i;
-	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = state->memregion("chargen")->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *charmap = memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;
@@ -104,17 +104,6 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 	for(i=0;i<8;i++)
 		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
-
-const i8275_interface sm1800_i8275_interface = {
-	8,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	sm1800_display_pixels
-};
-
 
 WRITE8_MEMBER( sm1800_state::sm1800_8255_portb_w )
 {
@@ -188,7 +177,9 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(sm1800_state, sm1800_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(sm1800_state, sm1800_8255_portc_w))
 
-	MCFG_I8275_ADD  ("i8275", sm1800_i8275_interface)
+	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(sm1800_state, crtc_display_pixels)
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 MACHINE_CONFIG_END

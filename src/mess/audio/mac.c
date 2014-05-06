@@ -61,7 +61,7 @@ void mac_sound_device::device_start()
 	mac_state *mac = machine().driver_data<mac_state>();
 
 	m_snd_cache = auto_alloc_array_clear(machine(), UINT8, SND_CACHE_SIZE);
-	m_mac_stream = machine().sound().stream_alloc(*this, 0, 1, MAC_SAMPLE_RATE, this);
+	m_mac_stream = machine().sound().stream_alloc(*this, 0, 1, MAC_SAMPLE_RATE);
 
 	m_ram = machine().device<ram_device>(RAM_TAG);
 	m_mac_model = mac->m_model;

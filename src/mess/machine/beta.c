@@ -194,14 +194,8 @@ WRITE8_MEMBER(beta_disk_device::data_w)
 
 static const floppy_interface beta_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(trd),
-	NULL,
 	NULL
 };
 

@@ -125,7 +125,7 @@ void gameboy_sound_device::device_config_complete()
 
 void gameboy_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	m_rate = machine().sample_rate();
 
 	save_item(NAME(m_snd_regs));

@@ -23,25 +23,14 @@ const device_type C1531 = &device_creator<c1531_device>;
 
 
 //-------------------------------------------------
-//  cassette_interface cbm_cassette_interface
-//-------------------------------------------------
-
-const cassette_interface cbm_cassette_interface =
-{
-	cbm_cassette_formats,
-	NULL,
-	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	"cbm_cass",
-	NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG( c2n )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c2n )
-	MCFG_CASSETTE_ADD("cassette", cbm_cassette_interface )
+	MCFG_CASSETTE_ADD("cassette" )
+	MCFG_CASSETTE_FORMATS(cbm_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("cbm_cass")
 MACHINE_CONFIG_END
 
 

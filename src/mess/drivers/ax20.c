@@ -96,14 +96,8 @@ GFXDECODE_END
 
 static const floppy_interface ax20_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40, // TODO
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
 	NULL
 };
 

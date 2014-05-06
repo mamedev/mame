@@ -35,7 +35,7 @@ awacs_device::awacs_device(const machine_config &mconfig, const char *tag, devic
 void awacs_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22050, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22050);
 
 	memset(m_regs, 0, sizeof(m_regs));
 

@@ -149,7 +149,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_handler.resolve_safe();
 
-	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate, this);
+	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate);
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 

@@ -18,17 +18,6 @@
 #define VERBOSE             0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-/* Default cassette_interface for drivers only wav files */
-const cassette_interface default_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	CASSETTE_PLAY,
-	"cass",
-	NULL
-};
-
-
 // device type definition
 const device_type CASSETTE = &device_creator<cassette_image_device>;
 
@@ -37,9 +26,13 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 //-------------------------------------------------
 
 cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__)
-	, device_image_interface(mconfig, *this)
-	, m_state(CASSETTE_STOPPED)
+	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
+	device_image_interface(mconfig, *this),
+	m_state(CASSETTE_STOPPED),
+	m_formats(cassette_default_formats),
+	m_create_opts(NULL),
+	m_default_state(CASSETTE_PLAY),
+	m_interface(NULL)	
 {
 }
 
@@ -59,21 +52,6 @@ cassette_image_device::~cassette_image_device()
 
 void cassette_image_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const cassette_interface *intf = reinterpret_cast<const cassette_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cassette_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_formats, 0, sizeof(m_formats));
-		memset(&m_create_opts, 0, sizeof(m_create_opts));
-		memset(&m_default_state, 0, sizeof(m_default_state));
-		memset(&m_interface, 0, sizeof(m_interface));
-		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
-	}
-
 	m_extension_list[0] = '\0';
 	for (int i = 0; m_formats[i]; i++ )
 		image_specify_extension( m_extension_list, 256, m_formats[i]->extensions );

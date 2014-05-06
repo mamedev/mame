@@ -207,7 +207,7 @@ void scsp_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
 }
 
 //-------------------------------------------------

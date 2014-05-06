@@ -121,9 +121,9 @@ public:
 	int get_display_mode(UINT8 mode);
 	offs_t get_char_rom_offset();
 	int get_color(UINT8 data);
-	void draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
-	void draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
-	void draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
+	MC6845_UPDATE_ROW(draw_alpha);
+	MC6845_UPDATE_ROW(draw_graphics_1);
+	MC6845_UPDATE_ROW(draw_graphics_2);
 
 	DECLARE_READ8_MEMBER( video_ram_r );
 	DECLARE_WRITE8_MEMBER( video_ram_w );
@@ -171,6 +171,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// system status register
 	int m_pit1;

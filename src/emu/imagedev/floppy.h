@@ -70,7 +70,6 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual void call_display_info() {}
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 	virtual const char *image_interface() const = 0;
 	virtual iodevice_t image_type() const { return IO_FLOPPY; }

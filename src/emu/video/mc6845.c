@@ -89,43 +89,35 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 #define ATTR_ALTERNATE_CHARSET      BIT(attr, 7)
 
 
-void mc6845_device::device_config_complete()
-{
-	const mc6845_interface *intf = reinterpret_cast<const mc6845_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<mc6845_interface *>(this) = *intf;
-	}
-	else
-	{
-		m_show_border_area = false;
-		m_visarea_adjust_min_x = 0;
-		m_visarea_adjust_max_x = 0;
-		m_visarea_adjust_min_y = 0;
-		m_visarea_adjust_max_y = 0;
-		m_hpixels_per_column = 0;
-		m_begin_update = NULL;
-		m_update_row = NULL;
-		m_end_update = NULL;
-		m_on_update_addr_changed = NULL;
-		memset(&m_out_de_func, 0, sizeof(m_out_de_func));
-		memset(&m_out_cur_func, 0, sizeof(m_out_cur_func));
-		memset(&m_out_hsync_func, 0, sizeof(m_out_hsync_func));
-		memset(&m_out_vsync_func, 0, sizeof(m_out_vsync_func));
-	}
-}
-
-
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false),
+		m_show_border_area(true),
+		m_visarea_adjust_min_x(0),
+		m_visarea_adjust_max_x(0),
+		m_visarea_adjust_min_y(0),
+		m_visarea_adjust_max_y(0),
+		m_hpixels_per_column(0),
+		m_out_de_cb(*this),
+		m_out_cur_cb(*this),
+		m_out_hsync_cb(*this),
+		m_out_vsync_cb(*this)
 {
 }
 
 mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6845, "MC6845 CRTC", tag, owner, clock, "mc6845", __FILE__),
-		device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false),
+		m_show_border_area(true),
+		m_visarea_adjust_min_x(0),
+		m_visarea_adjust_max_x(0),
+		m_visarea_adjust_min_y(0),
+		m_visarea_adjust_max_y(0),
+		m_hpixels_per_column(0),
+		m_out_de_cb(*this),
+		m_out_cur_cb(*this),
+		m_out_hsync_cb(*this),
+		m_out_vsync_cb(*this)
 {
 }
 
@@ -138,7 +130,7 @@ void mc6845_device::device_post_load()
 
 void mc6845_device::call_on_update_address(int strobe)
 {
-	if (m_on_update_addr_changed)
+	if (!m_on_update_addr_changed_cb.isnull())
 		m_upd_trans_timer->adjust(attotime::zero, (m_update_addr << 8) | strobe);
 	else
 		fatalerror("M6845: transparent memory mode without handler\n");
@@ -573,11 +565,11 @@ void mc6845_device::update_counters()
 
 void mc6845_device::set_de(int state)
 {
-	if ( m_de != state )
+	if (m_de != state)
 	{
 		m_de = state;
 
-		if ( m_de )
+		if (m_de)
 		{
 			/* If the upd_adr_timer was running, cancel it */
 			m_upd_adr_timer->adjust(attotime::never);
@@ -589,44 +581,37 @@ void mc6845_device::set_de(int state)
 				update_upd_adr_timer();
 		}
 
-		if ( !m_res_out_de_func.isnull() )
-			m_res_out_de_func( m_de );
+		m_out_de_cb(m_de);
 	}
 }
 
 
 void mc6845_device::set_hsync(int state)
 {
-	if ( m_hsync != state )
+	if (m_hsync != state)
 	{
 		m_hsync = state;
-
-		if ( !m_res_out_hsync_func.isnull() )
-			m_res_out_hsync_func( m_hsync );
+		m_out_hsync_cb(m_hsync);
 	}
 }
 
 
 void mc6845_device::set_vsync(int state)
 {
-	if ( m_vsync != state )
+	if (m_vsync != state)
 	{
 		m_vsync = state;
-
-		if ( !m_res_out_vsync_func.isnull() )
-			m_res_out_vsync_func( m_vsync );
+		m_out_vsync_cb(m_vsync);
 	}
 }
 
 
 void mc6845_device::set_cur(int state)
 {
-	if ( m_cur != state )
+	if (m_cur != state)
 	{
 		m_cur = state;
-
-		if ( !m_res_out_cur_func.isnull() )
-			m_res_out_cur_func( m_cur );
+		m_out_cur_cb(m_cur);
 	}
 }
 
@@ -807,7 +792,7 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			int strobe = (param & 0xff);
 
 			/* call the callback function -- we know it exists */
-			m_on_update_addr_changed(this, addr, strobe);
+			m_on_update_addr_changed_cb(addr, strobe);
 
 			if(!m_update_ready_bit && MODE_TRANSPARENT_BLANK)
 			{
@@ -928,7 +913,7 @@ void mc6845_device::update_cursor_state()
 }
 
 
-UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param)
+UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* compute the current raster line */
 	UINT8 ra = y % (m_max_ras_addr + 1);
@@ -955,11 +940,11 @@ UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle 
 		UINT8 cr = y / (m_max_ras_addr + 1);
 		UINT16 ma = (cr << 8) | cc;
 
-		m_update_row(this, bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp, param);
+		m_update_row_cb(bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 	else
 	{
-		m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp, param);
+		m_update_row_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 
 	/* update MA if the last raster address */
@@ -976,15 +961,11 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	if (m_has_valid_parameters)
 	{
-		UINT16 y;
-
-		void *param = NULL;
-
-		assert(m_update_row != NULL);
+		assert(!m_update_row_cb.isnull());
 
 		/* call the set up function if any */
-		if (m_begin_update != NULL)
-			param = m_begin_update(this, bitmap, cliprect);
+		if (!m_begin_update_cb.isnull())
+			m_begin_update_cb(bitmap, cliprect);
 
 		if (cliprect.min_y == 0)
 		{
@@ -993,14 +974,14 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 
 		/* for each row in the visible region */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (UINT16 y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			this->draw_scanline(y, bitmap, cliprect, param);
+			this->draw_scanline(y, bitmap, cliprect);
 		}
 
 		/* call the tear down function if any */
-		if (m_end_update != NULL)
-			m_end_update(this, bitmap, cliprect, param);
+		if (!m_end_update_cb.isnull())
+			m_end_update_cb(bitmap, cliprect);
 	}
 	else
 	{
@@ -1017,10 +998,16 @@ void mc6845_device::device_start()
 	assert(m_hpixels_per_column > 0);
 
 	/* resolve callbacks */
-	m_res_out_de_func.resolve(m_out_de_func, *this);
-	m_res_out_cur_func.resolve(m_out_cur_func, *this);
-	m_res_out_hsync_func.resolve(m_out_hsync_func, *this);
-	m_res_out_vsync_func.resolve(m_out_vsync_func, *this);
+	m_out_de_cb.resolve_safe();
+	m_out_cur_cb.resolve_safe();
+	m_out_hsync_cb.resolve_safe();
+	m_out_vsync_cb.resolve_safe();
+
+	/* bind delegates */
+	m_begin_update_cb.bind_relative_to(*owner());
+	m_update_row_cb.bind_relative_to(*owner());
+	m_end_update_cb.bind_relative_to(*owner());
+	m_on_update_addr_changed_cb.bind_relative_to(*owner());
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);
@@ -1257,7 +1244,8 @@ void mos8563_device::device_start()
 	m_supports_status_reg_d7 = true;
 	m_update_ready_bit = 1;
 
-	m_update_row = vdc_update_row;
+	// default update_row delegate
+	m_update_row_cb =  mc6845_update_row_delegate(FUNC(mos8563_device::vdc_update_row), this);
 
 	m_char_blink_state = false;
 	m_char_blink_count = 0;
@@ -1318,19 +1306,14 @@ void mos8568_device::device_start()
 void mc6845_device::device_reset()
 {
 	/* internal registers other than status remain unchanged, all outputs go low */
-	if ( !m_res_out_de_func.isnull() )
-		m_res_out_de_func( FALSE );
+	m_out_de_cb(false);
 
-	if ( !m_res_out_hsync_func.isnull() )
-		m_res_out_hsync_func( FALSE );
+	m_out_hsync_cb(false);
 
-	if ( !m_res_out_vsync_func.isnull() )
-		m_res_out_vsync_func( FALSE );
+	m_out_vsync_cb(false);
 
-	if ( ! m_line_timer->enabled( ) )
-	{
-		m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 1, m_clock ) );
-	}
+	if (!m_line_timer->enabled())
+		m_line_timer->adjust(attotime::from_ticks(m_horiz_char_total + 1, m_clock));
 
 	m_light_pen_latched = false;
 
@@ -1520,9 +1503,9 @@ void mos8563_device::update_cursor_state()
 }
 
 
-UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param)
+UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 ra = mc6845_device::draw_scanline(y, bitmap, cliprect, param);
+	UINT8 ra = mc6845_device::draw_scanline(y, bitmap, cliprect);
 
 	if (ra == m_max_ras_addr)
 		m_current_disp_addr = (m_current_disp_addr + m_row_addr_incr) & 0x3fff;
@@ -1531,31 +1514,31 @@ UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle
 }
 
 
-void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
 	const pen_t *pen = m_palette->pens();
-
+	
 	ra += (m_vert_scroll & 0x0f);
 	ra &= 0x0f;
-
+	
 	UINT8 cth = (m_horiz_char >> 4) + (HSS_DBL ? 0 : 1);
 	UINT8 cdh = (m_horiz_char & 0x0f) + (HSS_DBL ? 0 : 1);
 	UINT8 cdv = m_vert_char_disp;
-
+	
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = read_videoram(ma + column);
 		UINT8 attr = 0;
-
+		
 		int fg = m_color >> 4;
 		int bg = m_color & 0x0f;
-
+		
 		if (HSS_ATTR)
 		{
 			offs_t attr_addr = m_attribute_addr + ma + column;
 			attr = read_videoram(attr_addr);
 		}
-
+		
 		if (HSS_TEXT)
 		{
 			if (HSS_ATTR)
@@ -1563,15 +1546,15 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				fg = ATTR_FOREGROUND;
 				bg = ATTR_BACKGROUND;
 			}
-
+			
 			if (VSS_RVS) code ^= 0xff;
-
+			
 			for (int bit = 0; bit < cdh; bit++)
 			{
 				int x = (m_horiz_scroll & 0x0f) - cth + (column * cth) + bit;
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
-
+				
 				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
 			}
 		}
@@ -1581,9 +1564,9 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			{
 				fg = ATTR_COLOR;
 			}
-
+			
 			offs_t font_addr;
-
+			
 			if (m_max_ras_addr < 16)
 			{
 				font_addr = ((m_char_base_addr & 0xe0) << 8) | (ATTR_ALTERNATE_CHARSET << 12) | (code << 4) | (ra & 0x0f);
@@ -1592,33 +1575,26 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			{
 				font_addr = ((m_char_base_addr & 0xc0) << 8) | (ATTR_ALTERNATE_CHARSET << 13) | (code << 5) | (ra & 0x1f);
 			}
-
+			
 			UINT8 data = read_videoram(font_addr);
-
+			
 			if (ra >= cdv) data = 0;
 			if (ATTR_UNDERLINE && (ra == m_underline_ras)) data = 0xff;
 			if (ATTR_BLINK && !m_char_blink_state) data = 0;
 			if (ATTR_REVERSE) data ^= 0xff;
 			if (column == cursor_x) data ^= 0xff;
 			if (VSS_RVS) data ^= 0xff;
-
+			
 			for (int bit = 0; bit < cdh; bit++)
 			{
 				int x = (m_horiz_scroll & 0x0f) - cth + (column * cth) + bit;
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
-
+				
 				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
-
+				
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}
 		}
 	}
-}
-
-MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
-{
-	mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
-
-	mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }

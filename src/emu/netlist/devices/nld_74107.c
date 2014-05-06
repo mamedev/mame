@@ -47,17 +47,17 @@ NETLIB_RESET(74107A)
 
 ATTR_HOT inline void NETLIB_NAME(74107Asub)::newstate(const netlist_sig_t state)
 {
-	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+	const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 
-	OUTLOGIC(m_Q, state, delay[state ^ 1]);
-	OUTLOGIC(m_QQ, state ^ 1, delay[state]);
+	OUTLOGIC(m_Q, state, delay[state]);
+	OUTLOGIC(m_QQ, state ^ 1, delay[state ^ 1]);
 }
 
 NETLIB_UPDATE(74107Asub)
 {
 	const netlist_sig_t t = m_Q.net().Q();
-	newstate((!t & m_Q1) | (t & m_Q2) | m_F);
-	if (UNEXPECTED(m_Q1 ^ 1))
+	newstate(((t ^ 1) & m_Q1) | (t & m_Q2) | m_F);
+	if (m_Q1 ^ 1)
 		m_clk.inactivate();
 }
 

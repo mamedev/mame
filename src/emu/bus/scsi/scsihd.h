@@ -21,8 +21,6 @@ public:
 	scsihd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	static struct harddisk_interface hd_intf;
-
 protected:
 	virtual void device_start();
 };

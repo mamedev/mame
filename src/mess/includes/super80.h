@@ -20,8 +20,6 @@
     d2 super80v video or colour bankswitch (1=video ram, 0=colour ram)
     d2 super80 screen off (=2mhz) or on (bursts of 2mhz at 50hz = 1mhz) */
 
-// NOTE: ioport_array is buggy in this driver, do not use it
-
 class super80_state : public driver_device
 {
 public:
@@ -37,14 +35,7 @@ public:
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_io_dsw(*this, "DSW")
 		, m_io_config(*this, "CONFIG")
-		, m_io_x0(*this, "KEY.0")
-		, m_io_x1(*this, "KEY.1")
-		, m_io_x2(*this, "KEY.2")
-		, m_io_x3(*this, "KEY.3")
-		, m_io_x4(*this, "KEY.4")
-		, m_io_x5(*this, "KEY.5")
-		, m_io_x6(*this, "KEY.6")
-		, m_io_x7(*this, "KEY.7")
+		, m_io_keyboard(*this, "KEY")
 		, m_crtc(*this, "crtc")
 		, m_dma(*this, "dma")
 		, m_fdc (*this, "fdc")
@@ -79,6 +70,7 @@ public:
 	DECLARE_VIDEO_START(super80v);
 	DECLARE_PALETTE_INIT(super80m);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(super80);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT32 screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -121,25 +113,10 @@ private:
 	required_device<output_latch_device> m_cent_data_out;
 	required_ioport m_io_dsw;
 	required_ioport m_io_config;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
-	required_ioport m_io_x2;
-	required_ioport m_io_x3;
-	required_ioport m_io_x4;
-	required_ioport m_io_x5;
-	required_ioport m_io_x6;
-	required_ioport m_io_x7;
+	required_ioport_array<8> m_io_keyboard;
 	optional_device<mc6845_device> m_crtc;
 	optional_device<z80dma_device> m_dma;
 	optional_device<wd2793_t> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 };
-
-
-/*----------- defined in video/super80.c -----------*/
-MC6845_UPDATE_ROW( super80v_update_row );
-
-/*----------- defined in machine/super80.c -----------*/
-
-extern const z80pio_interface super80_pio_intf;

@@ -170,16 +170,6 @@ WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 }
 
 
-static const riot6532_interface r6532_interface =
-{
-	DEVCB_NULL,                         /* port A read handler */
-	DEVCB_NULL,                         /* port B read handler */
-	DEVCB_NULL,                         /* port A write handler */
-	DEVCB_DRIVER_MEMBER(gameplan_state,r6532_soundlatch_w), /* port B write handler */
-	DEVCB_DRIVER_LINE_MEMBER(gameplan_state,r6532_irq)              /* IRQ callback */
-};
-
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -983,7 +973,9 @@ static MACHINE_CONFIG_START( gameplan, gameplan_state )
 	MCFG_CPU_ADD("audiocpu", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(gameplan_audio_map)
 
-	MCFG_RIOT6532_ADD("riot", GAMEPLAN_AUDIO_CPU_CLOCK, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, GAMEPLAN_AUDIO_CPU_CLOCK)
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gameplan_state, r6532_soundlatch_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(gameplan_state, r6532_irq))
 
 	MCFG_MACHINE_START_OVERRIDE(gameplan_state,gameplan)
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)

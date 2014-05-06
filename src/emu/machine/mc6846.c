@@ -116,6 +116,8 @@ void mc6846_device::device_reset()
 	m_csr1_to_be_cleared = 0;
 	m_csr2_to_be_cleared = 0;
 	m_timer_started = 0;
+	m_old_cif = 0;
+	m_old_cto = 0;
 	m_interval->reset();
 	m_one_shot->reset();
 }

@@ -585,53 +585,10 @@ WRITE8_MEMBER( compis_state::ppi_pc_w )
 	m_isbx0->opt0_w(BIT(data, 7));
 }
 
-//-------------------------------------------------
-//  I8274_INTERFACE( mpsc_intf )
-//-------------------------------------------------
-
-static I8274_INTERFACE( mpsc_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(I80186_TAG, i80186_cpu_device, int3_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  cassette_interface compis_cassette_interface
-//-------------------------------------------------
-
 TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
 {
 	m_maincpu->tmrin0_w(m_cassette->input() > 0.0);
 }
-
-static const cassette_interface compis_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
-	NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -725,13 +682,22 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
 	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 
-	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
+	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int3_w))
 
 	MCFG_DEVICE_ADD(MM58174A_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)

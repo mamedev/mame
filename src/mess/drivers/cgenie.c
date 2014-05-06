@@ -482,15 +482,6 @@ static const ay8910_interface cgenie_ay8910_interface =
 };
 
 
-static const cassette_interface cgenie_cassette_interface =
-{
-	cgenie_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED),
-	NULL,
-	NULL
-};
-
 // This is currently broken
 static LEGACY_FLOPPY_OPTIONS_START(cgenie )
 	LEGACY_FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
@@ -503,14 +494,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface cgenie_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(cgenie),
-	NULL,
 	NULL
 };
 
@@ -547,7 +532,9 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_SOUND_CONFIG(cgenie_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CASSETTE_ADD( "cassette", cgenie_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 
 	MCFG_FD1793_ADD("wd179x", cgenie_wd17xx_interface ) // TODO confirm type
 

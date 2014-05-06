@@ -393,7 +393,7 @@ void snk6502_sound_device::device_start()
 	// 38.99 Hz update (according to schematic)
 	set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	m_tone_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE, this);
+	m_tone_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
 }
 
 inline void snk6502_sound_device::validate_tone_channel(int channel)

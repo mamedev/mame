@@ -278,14 +278,20 @@ static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 MACHINE_CONFIG_END
 
 ROM_START(lindbios)
+	ROM_REGION32_LE(0x100000, "mb_bios", 0) // location 3j7
+	ROM_SYSTEM_BIOS(0, "bios0", "6.0.0010 alternate version")
+	ROMX_LOAD("6.0.0010a.bin", 0x00000, 0x100000, CRC(10dd9b76) SHA1(1fdf1f921bc395846a7c3180fbdbc4ca287a9670), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "bios1", "6.0.0009")
+	ROMX_LOAD("6.0.0009.bin", 0x00000, 0x100000, CRC(5ffdfbf8) SHA1(605bc4967b749b4e6d13fc2ebb845ba956a259a7), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "bios2", "6.0.0010")
+	ROMX_LOAD("6.0.0010.bin", 0x00000, 0x100000, CRC(ea2bf888) SHA1(c9c5b6f0d4f4f36620939b15dd2f128a74347e37), ROM_BIOS(3) )
+
+
 	ROM_REGION(0x400000, "jvs_bios", 0)
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0))
 
 	ROM_REGION(0x10000, "vid_bios", 0)
 	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275))
-
-	ROM_REGION32_LE(0x100000, "mb_bios", 0)
-	ROM_LOAD("mb_bios.3j7", 0x000000, 0x100000, CRC(10dd9b76) SHA1(1fdf1f921bc395846a7c3180fbdbc4ca287a9670))
 ROM_END
 
 GAME(1999, lindbios, 0, lindbergh, at_keyboard, driver_device, 0, ROT0, "Sega Lindbergh", "Sega Lindbergh Bios", GAME_IS_SKELETON)

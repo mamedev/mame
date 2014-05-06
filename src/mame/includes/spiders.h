@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 #include "sound/discrete.h"
+#include "video/mc6845.h"
 
 #define NUM_PENS    (8)
 
@@ -39,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spiders_audio_a_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_b_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_ctrl_w);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 };

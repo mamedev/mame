@@ -29,6 +29,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	UINT8 *m_rom, *m_chrrom;
 	UINT8 m_ram[256*16];

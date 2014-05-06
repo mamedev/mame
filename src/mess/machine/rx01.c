@@ -26,15 +26,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface rx01_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_8_SSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(rx01),
-	"floppy_8",
-	NULL
+	"floppy_8"
 };
 
 

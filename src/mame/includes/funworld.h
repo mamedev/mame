@@ -33,6 +33,7 @@ public:
 	DECLARE_DRIVER_INIT(dino4);
 	DECLARE_DRIVER_INIT(ctunk);
 	DECLARE_DRIVER_INIT(rcdino4);
+	DECLARE_DRIVER_INIT(rcdinch);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_VIDEO_START(funworld);
 	DECLARE_PALETTE_INIT(funworld);

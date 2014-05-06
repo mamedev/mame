@@ -18,14 +18,15 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MACPDS_BUS_ADD(_tag, _cputag, _config) \
+#define MCFG_MACPDS_BUS_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, MACPDS, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	macpds_device::static_set_cputag(*device, _cputag);
+
 #define MCFG_MACPDS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, MACPDS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	macpds_slot_device::static_set_macpds_slot(*device, _nbtag, _tag);
+
 #define MCFG_MACPDS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 
@@ -64,17 +65,11 @@ protected:
 // device type definition
 extern const device_type MACPDS_SLOT;
 
-// ======================> macpds_interface
-
-struct macpds_interface
-{
-	int foo;
-};
 
 class device_macpds_card_interface;
+
 // ======================> macpds_device
-class macpds_device : public device_t,
-					public macpds_interface
+class macpds_device : public device_t
 {
 public:
 	// construction/destruction
@@ -93,7 +88,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	// internal state
 	cpu_device   *m_maincpu;

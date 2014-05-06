@@ -830,21 +830,6 @@ void m20_state::machine_reset()
 }
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	16,         /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
 {
 	m_i8259->ir4_w(state);
@@ -922,7 +907,10 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("i8259", pic8259_device, ir0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 

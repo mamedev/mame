@@ -343,7 +343,7 @@ void h8_timer8_channel_device::timer_tick()
 }
 
 h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, "H8H 8-bits timer channel", tag, owner, clock, "h8h_16bits_timer_channel", __FILE__)
+	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, "H8H 8-bits timer channel", tag, owner, clock, "h8h_8bits_timer_channel", __FILE__)
 {
 }
 

@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 #include "machine/z80dart.h"
 #include "machine/upd765.h"
-#include "video/i8275x.h"
+#include "video/i8275.h"
 #include "video/upd7220.h"
 
 #define SCREEN_TAG      "screen"
@@ -67,7 +67,7 @@ public:
 	required_device<i8212_device> m_iop;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
-	required_device<i8275x_device> m_crtc;
+	required_device<i8275_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
 	required_device<upd7220_device> m_hgdc;

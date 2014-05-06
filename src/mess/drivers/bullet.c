@@ -711,7 +711,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
+//  Z80CTC
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
@@ -732,17 +732,8 @@ WRITE_LINE_MEMBER( bullet_state::dart_rxtxca_w )
 	m_dart->rxca_w(state);
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dart_rxtxca_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
-};
-
-
 //-------------------------------------------------
-//  Z80DART_INTERFACE( dart_intf )
+//  Z80DART
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( bullet_state::dartardy_w )
@@ -757,32 +748,8 @@ WRITE_LINE_MEMBER( bullet_state::dartbrdy_w )
 	update_dma_rdy();
 }
 
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartardy_w),
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartbrdy_w),
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 void bullet_state::update_dma_rdy()
@@ -851,20 +818,8 @@ WRITE8_MEMBER(bullet_state::io_write_byte)
 	m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bullet_state, dma_mreq_r),
-	DEVCB_DRIVER_MEMBER(bullet_state, dma_mreq_w),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_write_byte)
-};
-
-
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( bulletf_dma_intf )
+//  Z80DMA for bulletf (not used currently)
 //-------------------------------------------------
 
 void bulletf_state::update_dma_rdy()
@@ -893,22 +848,8 @@ WRITE8_MEMBER( bulletf_state::dma_mreq_w )
 	m_ram->pointer()[(DMB6 << 16) | offset] = data;
 }
 
-#if 0
-static Z80DMA_INTERFACE( bulletf_dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bulletf_state, dma_mreq_r),
-	DEVCB_DRIVER_MEMBER(bulletf_state, dma_mreq_w),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(bullet_state, io_write_byte)
-};
-#endif
-
-
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  Z80PIO
 //-------------------------------------------------
 
 DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_busy )
@@ -959,17 +900,6 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 	return data;
 }
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bullet_state, pio_pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 WRITE8_MEMBER( bulletf_state::pio_pa_w )
 {
@@ -997,18 +927,6 @@ WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
 {
 	m_centronics->write_strobe(!state);
 }
-
-static Z80PIO_INTERFACE( bulletf_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER("scsi_ctrl_in", input_buffer_device, read),
-	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_w),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, cstrb_w)
-};
-
 
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
@@ -1191,11 +1109,38 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(bullet_state, dart_rxtxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
+
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(bullet_state, dartardy_w))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(bullet_state, dartbrdy_w))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_16MHz/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(bullet_state, dma_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bullet_state, dma_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(bullet_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bullet_state, io_write_byte))
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_16MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PB_CB(READ8(bullet_state, pio_pb_r))
+	
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
@@ -1244,11 +1189,40 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(bullet_state, dart_rxtxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)
+
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(bullet_state, dartardy_w))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(bullet_state, dartbrdy_w))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_16MHz/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(bullet_state, dma_mreq_r))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bullet_state, dma_mreq_w))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(bullet_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bullet_state, io_write_byte))
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_16MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("scsi_ctrl_in", input_buffer_device, read))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(bulletf_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(bulletf_state, cstrb_w))
+
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, rib_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))

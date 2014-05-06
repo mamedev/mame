@@ -314,6 +314,8 @@ public:
 
 	int m_centronics_busy;
 	int m_centronics_perror;
+	
+	MC6854_OUT_FRAME_CB(to7_network_got_frame);
 
 protected:
 	required_device<cpu_device> m_maincpu;

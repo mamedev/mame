@@ -91,24 +91,23 @@ the access to the video memory is unclear to me at the moment.
 #define GCtrlFS     0x20    /* labeled F/S, not yet sure of function Fast or Slow scan ? */
 #define GCtrlAddrLines  0xC0    /* Top two address lines for text mode */
 
-#define IsTextMode  (state->m_GCtrl & GCtrlChrGfx) ? 1 : 0                  // Is this text mode ?
-#define IsGfx16     ((~state->m_GCtrl & GCtrlChrGfx) && (~state->m_GCtrl & GCtrlControl)) ? 1 : 0   // is this 320x256x16bpp mode
-#define IsGfx2      ((state->m_GCtrl & GCtrlHiLo) && (~state->m_GCtrl & GCtrlFS)) ? 1 : 0       // Is this a 2 colour mode
-#define SWChar      (state->m_GCtrl & GCtrlSWChar)>>1                   // Swchar bit
+#define IsTextMode  (m_GCtrl & GCtrlChrGfx) ? 1 : 0                  // Is this text mode ?
+#define IsGfx16     ((~m_GCtrl & GCtrlChrGfx) && (~m_GCtrl & GCtrlControl)) ? 1 : 0   // is this 320x256x16bpp mode
+#define IsGfx2      ((m_GCtrl & GCtrlHiLo) && (~m_GCtrl & GCtrlFS)) ? 1 : 0       // Is this a 2 colour mode
+#define SWChar      (m_GCtrl & GCtrlSWChar)>>1                   // Swchar bit
 
-static MC6845_UPDATE_ROW( dgnbeta_update_row )
+MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = state->m_videoram;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *videoram = m_videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 	if(IsTextMode)
 	{
-		UINT8 *chr_gen = state->memregion("gfx1")->base();
+		UINT8 *chr_gen = memregion("gfx1")->base();
 		for ( i = 0; i < x_count; i++ )
 		{
-			UINT32 offset = ( ( ma + i ) | ((state->m_GCtrl & GCtrlAddrLines)<<8)) << 1;
+			UINT32 offset = ( ( ma + i ) | ((m_GCtrl & GCtrlAddrLines)<<8)) << 1;
 			UINT8 chr = videoram[ offset ];
 			UINT8 attr = videoram[ offset +1 ];
 
@@ -122,7 +121,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			int ULActive=(UnderLine && (ra==9) && ~SWChar);
 
 			/* Invert forground and background if flashing char and flash acive */
-			int Invert=(FlashChar & state->m_FlashBit);
+			int Invert=(FlashChar & m_FlashBit);
 
 			/* Underline inverts flash */
 			if (ULActive)
@@ -215,7 +214,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			{
 				for (Dot=0;Dot<16;Dot=Dot+1)
 				{
-					Colour=state->m_ColourRAM[((Word&0x8000)>>15)];
+					Colour=m_ColourRAM[((Word&0x8000)>>15)];
 
 					*p = palette[Colour]; p++;
 
@@ -227,7 +226,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			{
 				for (Dot=0;Dot<8;Dot++)
 				{
-					Colour=state->m_ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
+					Colour=m_ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
 					*p = palette[Colour]; p++;
 					*p = palette[Colour]; p++;
 
@@ -255,21 +254,6 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_vsync_changed)
 
 	dgn_beta_frame_interrupt(state);
 }
-
-MC6845_INTERFACE( dgnbeta_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	16 /*?*/,
-	NULL,
-	dgnbeta_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,dgnbeta_vsync_changed),
-	NULL
-};
 
 
 /* Set video control register from I28 port B, the control register is laid out as */

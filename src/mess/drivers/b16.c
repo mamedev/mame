@@ -255,22 +255,6 @@ void b16_state::machine_reset()
 }
 
 
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 READ8_MEMBER(b16_state::memory_read_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
@@ -282,17 +266,6 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
-
-static I8237_INTERFACE( b16_dma8237_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(b16_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(b16_state, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
 
 
 static MACHINE_CONFIG_START( b16, b16_state )
@@ -311,8 +284,13 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_I8237_ADD("8237dma", XTAL_14_31818MHz/2, b16_dma8237_interface)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz/5)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
+	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL_14_31818MHz/2)
+	MCFG_I8237_IN_MEMR_CB(READ8(b16_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(b16_state, memory_write_byte))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", b16)
 	MCFG_PALETTE_ADD("palette", 8)

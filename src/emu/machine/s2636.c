@@ -120,7 +120,7 @@ void s2636_device::device_start()
 	save_item(NAME(m_bitmap));
 	save_item(NAME(m_collision_bitmap));
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 	save_item(NAME(m_size));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_level));

@@ -199,7 +199,7 @@ void segag80r_state::video_start()
 	m_gfxdecode->gfx(0)->set_source(&videoram[0x800]);
 
 	/* allocate paletteram */
-	m_generic_paletteram_8.allocate(0x80);
+	m_paletteram.resize(0x80);
 
 	/* initialize the particulars for each type of background PCB */
 	switch (m_background_pcb)
@@ -262,7 +262,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 	if ((offset & 0x1000) && (m_video_control & 0x02))
 	{
 		offset &= 0x3f;
-		m_generic_paletteram_8[offset] = data;
+		m_paletteram[offset] = data;
 		g80_set_palette_entry(offset, data);
 		return;
 	}
@@ -426,7 +426,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
 	if ((offset & 0x1fc0) == 0x1040 && (m_video_control & 0x40))
 	{
 		offs_t paloffs = offset & 0x3f;
-		m_generic_paletteram_8[paloffs | 0x40] = data;
+		m_paletteram[paloffs | 0x40] = data;
 		g80_set_palette_entry(paloffs | 0x40, data);
 		/* note that since the background board is not integrated with the main board */
 		/* writes here also write through to regular videoram */
@@ -496,7 +496,7 @@ WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
 	if ((offset & 0x1fc0) == 0x1040 && (m_video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		m_generic_paletteram_8[paloffs | 0x40] = data;
+		m_paletteram[paloffs | 0x40] = data;
 		g80_set_palette_entry(paloffs | 0x40, data);
 		return;
 	}
@@ -579,7 +579,7 @@ WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
 	if ((offset & 0x1fc0) == 0x1000 && (m_video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		m_generic_paletteram_8[paloffs | 0x40] = data;
+		m_paletteram[paloffs | 0x40] = data;
 		g80_set_palette_entry(paloffs | 0x40, data);
 		return;
 	}
@@ -683,7 +683,7 @@ void segag80r_state::draw_background_spaceod(bitmap_ind16 &bitmap, const rectang
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int effx = ((x + m_spaceod_hcounter) ^ flipmask) + xoffset;
-			UINT8 fgpix = m_generic_paletteram_8[dst[x]];
+			UINT8 fgpix = m_paletteram[dst[x]];
 			UINT8 bgpix = src[effx & xmask] & 0x3f;
 
 			/* the background detect flag is set if:

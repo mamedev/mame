@@ -1870,21 +1870,6 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	true,       /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 READ8_MEMBER(x1_state::memory_read_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
@@ -1908,17 +1893,6 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
 }
-
-static Z80DMA_INTERFACE( x1_dma )
-{
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(x1_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(x1_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(x1_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(x1_state, io_write_byte)
-};
 
 /*************************************
  *
@@ -2252,43 +2226,6 @@ static GFXDECODE_START( x1 )
 //  GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
-/*************************************
- *
- *  CTC
- *
- *************************************/
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),        // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),       // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),       // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg2),       // ZC/TO2 callback
-};
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },
@@ -2322,23 +2259,6 @@ static const ay8910_interface ay8910_config =
 };
 
 // (ym-2151 handler here)
-
-/*************************************
- *
- *  Cassette configuration
- *
- *************************************/
-
-static const cassette_interface x1_cassette_interface =
-{
-	x1_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"x1_cass",
-	NULL
-};
-
-
 /*************************************
  *
  *  Machine Functions
@@ -2538,15 +2458,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface x1_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(x1),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_START( x1, x1_state )
@@ -2556,7 +2470,11 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_CPU_CONFIG(x1_daisy)
 
-	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4, ctc_intf )
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
@@ -2579,7 +2497,10 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider
+	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
@@ -2606,7 +2527,11 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_CASSETTE_ADD("cassette",x1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("x1_cass")	
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
@@ -2623,8 +2548,16 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_CPU_CONFIG(x1turbo_daisy)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
-	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , sio_intf )
-	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
+	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("x1_cpu", INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(x1_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(x1_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(x1_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(x1_state, io_write_byte))
 
 	MCFG_DEVICE_REMOVE("fdc")
 	MCFG_MB8877_ADD("fdc",x1turbo_mb8877a_interface)

@@ -73,6 +73,7 @@ public:
 	DECLARE_DRIVER_INIT(sapizps3b);
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT32 screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
@@ -407,10 +408,9 @@ UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
 {
-	sapi1_state *state = device->machine().driver_data<sapi1_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -420,7 +420,7 @@ static MC6845_UPDATE_ROW( update_row )
 		inv = gfx = 0;
 		if (x == cursor_x) inv ^= 0xff;
 		mem = (2*(ma + x)) & 0xfff;
-		chr = state->m_p_videoram[mem] & 0x3f;
+		chr = m_p_videoram[mem] & 0x3f;
 
 		if (ra < 8)
 			gfx = MHB2501[(chr<<3) | ra] ^ inv;
@@ -434,23 +434,6 @@ static MC6845_UPDATE_ROW( update_row )
 		*p++ = palette[BIT(gfx, 0)];
 	}
 }
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	6,                  /* number of pixels per video memory address */
-	NULL,               /* before pixel update callback */
-	update_row,         /* row update callback */
-	NULL,               /* after pixel update callback */
-	DEVCB_NULL,         /* callback for display state changes */
-	DEVCB_NULL,         /* callback for cursor state changes */
-	DEVCB_NULL,         /* HSYNC callback */
-	DEVCB_NULL,         /* VSYNC callback */
-	NULL                /* update address callback */
-};
-
-
 
 /**************************************
 
@@ -598,7 +581,12 @@ static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)
 	MCFG_CPU_IO_MAP(sapi3b_io)
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // guess
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // guess
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(6)
+	MCFG_MC6845_UPDATE_ROW_CB(sapi1_state, crtc_update_row)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_NO_PALETTE

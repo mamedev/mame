@@ -989,28 +989,6 @@ WRITE8_MEMBER(meritm_state::meritm_io_pio_port_b_w)
 	*/
 };
 
-static Z80PIO_INTERFACE( meritm_audio_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_a_r),
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_a_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_b_r),
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_b_w),
-	DEVCB_NULL
-};
-
-static Z80PIO_INTERFACE( meritm_io_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_INPUT_PORT("PIO1_PORTA"),
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_io_pio_port_a_w),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("PIO1_PORTB"),
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_io_pio_port_b_w),
-	DEVCB_NULL
-};
-
 static const z80_daisy_config meritm_daisy_chain[] =
 {
 	{ "z80pio_0" },
@@ -1097,8 +1075,19 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))	// used LMP x DRIVE
 	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
 
-	MCFG_Z80PIO_ADD( "z80pio_0", SYSTEM_CLK/6, meritm_audio_pio_intf )
-	MCFG_Z80PIO_ADD( "z80pio_1", SYSTEM_CLK/6, meritm_io_pio_intf )
+	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, SYSTEM_CLK/6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(meritm_state, meritm_audio_pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_audio_pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(meritm_state, meritm_audio_pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_audio_pio_port_b_w))
+
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, SYSTEM_CLK/6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(IOPORT("PIO1_PORTA"))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_io_pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(IOPORT("PIO1_PORTB"))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_io_pio_port_b_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)

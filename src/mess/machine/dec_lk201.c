@@ -18,7 +18,7 @@
    to => PORT 0 @ KBD controller.
 
 ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
-..KBD17:|[R] |F19 |[R] |F20|PF4|N--- N,| Enter
+..KBD17:|[R] |F19 |[R] |F20|PF4|N- | N,| Enter
 ........|    |    |    |   |   |   NOTE1)
 ........|    |G22 |    |G23|E23|D23|C23| A23
 --------|----|----|----|---|---|---|---|---
@@ -89,7 +89,7 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 
 ---
   [R] = Reserved
-  NOTE 1) N0--N9, N---, N and N. refer to numeric keypad
+  NOTE 1) N0-N9, N-, N. and N, refer to numeric keypad
   NOTE 2) N0 can be divided into 2 keys.
   Normally only the N0 keyswitch is implemented as a double-sized key.
   NOTE 3) Return key occupies 2 positions that are
@@ -429,7 +429,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_START("KBD17")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num ,") PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num -") // duplicate...see KBD13
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) // PORT_NAME("Num -") = duplicate...see KBD13
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_MINUS_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20") 
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )

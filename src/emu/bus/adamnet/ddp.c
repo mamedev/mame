@@ -71,27 +71,12 @@ static ADDRESS_MAP_START( adam_ddp_io, AS_IO, 8, adam_digital_data_pack_device )
 	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READ(p4_r) AM_WRITENOP
 ADDRESS_MAP_END
 
-
-//-------------------------------------------------
-//  cassette_interface adam_cassette_interface
-//-------------------------------------------------
-
 static const struct CassetteOptions adam_cassette_options =
 {
 	2,      /* channels */
 	16,     /* bits per sample */
 	44100   /* sample frequency */
 };
-
-static const cassette_interface adam_cassette_interface =
-{
-	coleco_adam_cassette_formats,
-	&adam_cassette_options,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	"adam_cass",
-	NULL
-};
-
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( adam_ddp )
@@ -102,8 +87,17 @@ static MACHINE_CONFIG_FRAGMENT( adam_ddp )
 	MCFG_CPU_PROGRAM_MAP(adam_ddp_mem)
 	MCFG_CPU_IO_MAP(adam_ddp_io)
 
-	MCFG_CASSETTE_ADD("cassette", adam_cassette_interface)
-	MCFG_CASSETTE_ADD("cassette2", adam_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(coleco_adam_cassette_formats)
+	MCFG_CASSETTE_CREATE_OPTS(&adam_cassette_options)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("adam_cass")
+
+	MCFG_CASSETTE_ADD("cassette2")
+	MCFG_CASSETTE_FORMATS(coleco_adam_cassette_formats)
+	MCFG_CASSETTE_CREATE_OPTS(&adam_cassette_options)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_INTERFACE("adam_cass")
 MACHINE_CONFIG_END
 
 

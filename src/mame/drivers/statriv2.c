@@ -564,21 +564,6 @@ static GFXDECODE_START( vertical )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  TMS9927 interface
- *
- *************************************/
-
-static const tms9927_interface tms9927_intf =
-{
-	8,
-	NULL
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -610,7 +595,8 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
+	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)

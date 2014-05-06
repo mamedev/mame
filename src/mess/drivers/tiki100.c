@@ -463,30 +463,6 @@ UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-/* Z80-DART Interface */
-
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Z80-PIO Interface */
 
 DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_ack )
@@ -558,17 +534,6 @@ WRITE8_MEMBER( tiki100_state::pio_pb_w )
 	m_cassette->output(BIT(data, 6) ? -1 : 1);
 }
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_r),
-	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_w),
-	DEVCB_NULL
-};
-
 /* Z80-CTC Interface */
 
 TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
@@ -592,14 +557,6 @@ WRITE_LINE_MEMBER( tiki100_state::ctc_z2_w )
 {
 	m_ctc->trg3(state);
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z0_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
-	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z2_w),
-};
 
 /* FD1797 Interface */
 
@@ -641,23 +598,11 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 };
 
 
-//-------------------------------------------------
-//  cassette_interface cassette_intf
-//-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 {
 	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
 }
-
-static const cassette_interface cassette_intf =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
-	NULL
-};
 
 /* Machine Start */
 
@@ -717,10 +662,30 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	// pixel clock 20.01782 MHz
 
 	/* devices */
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, dart_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/4, pio_intf)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PB_CB(READ8(tiki100_state, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(tiki100_state, pio_pb_w))
+
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(tiki100_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(tiki100_state, ctc_z2_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
+
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_8MHz/8) // FD1767PL-02 or FD1797-PL
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
@@ -740,7 +705,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", tiki100_state, tape_tick, attotime::from_hz(44100))
 
 	/* sound hardware */

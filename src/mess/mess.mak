@@ -1627,7 +1627,6 @@ $(MESSOBJ)/psion.a:             \
 $(MESSOBJ)/radio.a:             \
 	$(MESS_DRIVERS)/radio86.o   \
 	$(MESS_MACHINE)/radio86.o   \
-	$(MESS_VIDEO)/radio86.o     \
 	$(MESS_DRIVERS)/apogee.o    \
 	$(MESS_DRIVERS)/partner.o   \
 	$(MESS_MACHINE)/partner.o   \
@@ -1645,6 +1644,7 @@ $(MESSOBJ)/rm.a:                \
 	$(MESS_DRIVERS)/rmnimbus.o  \
 	$(MESS_MACHINE)/rmnimbus.o  \
 	$(MESS_VIDEO)/rmnimbus.o    \
+	$(MESS_MACHINE)/rmnkbd.o    \
 
 $(MESSOBJ)/robotron.a:          \
 	$(MESS_DRIVERS)/a5105.o     \

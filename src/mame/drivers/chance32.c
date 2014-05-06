@@ -440,22 +440,6 @@ void chance32_state::machine_reset()
 }
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	16,         /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
 static MACHINE_CONFIG_START( chance32, chance32_state )
 
 	/* basic machine hardware */
@@ -463,7 +447,6 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_CPU_PROGRAM_MAP(chance32_map)
 	MCFG_CPU_IO_MAP(chance32_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,7 +458,9 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16, mc6845_intf)   /* 52.786 Hz (similar to Major Poker) */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16)   /* 52.786 Hz (similar to Major Poker) */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chance32)
 	MCFG_PALETTE_ADD("palette", 0x800)

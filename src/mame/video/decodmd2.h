@@ -42,6 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(status_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_firq);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);
 

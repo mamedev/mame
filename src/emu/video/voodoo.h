@@ -79,18 +79,6 @@ int voodoo_get_type(device_t *device);
 int voodoo_is_stalled(device_t *device);
 void voodoo_set_init_enable(device_t *device, UINT32 newval);
 
-DECLARE_READ32_DEVICE_HANDLER( voodoo_r );
-DECLARE_WRITE32_DEVICE_HANDLER( voodoo_w );
-
-DECLARE_READ32_DEVICE_HANDLER( banshee_r );
-DECLARE_WRITE32_DEVICE_HANDLER( banshee_w );
-DECLARE_READ32_DEVICE_HANDLER( banshee_fb_r );
-DECLARE_WRITE32_DEVICE_HANDLER( banshee_fb_w );
-DECLARE_READ32_DEVICE_HANDLER( banshee_io_r );
-DECLARE_WRITE32_DEVICE_HANDLER( banshee_io_w );
-DECLARE_READ32_DEVICE_HANDLER( banshee_rom_r );
-
-
 /* ----- device interface ----- */
 
 class voodoo_device : public device_t
@@ -98,6 +86,9 @@ class voodoo_device : public device_t
 public:
 	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~voodoo_device();
+
+	DECLARE_READ32_MEMBER( voodoo_r );
+	DECLARE_WRITE32_MEMBER( voodoo_w );
 
 	// access to legacy token
 	struct voodoo_state *token() const { assert(m_token != NULL); return m_token; }
@@ -137,9 +128,22 @@ class voodoo_banshee_device : public voodoo_device
 {
 public:
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ32_MEMBER( banshee_r );
+	DECLARE_WRITE32_MEMBER( banshee_w );
+	DECLARE_READ32_MEMBER( banshee_fb_r );
+	DECLARE_WRITE32_MEMBER( banshee_fb_w );
+	DECLARE_READ32_MEMBER( banshee_io_r );
+	DECLARE_WRITE32_MEMBER( banshee_io_w );
+	DECLARE_READ32_MEMBER( banshee_rom_r );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
+	DECLARE_READ32_MEMBER( banshee_agp_r );
+	DECLARE_WRITE32_MEMBER( banshee_agp_w );
+	DECLARE_READ8_MEMBER( banshee_vga_r );
+	DECLARE_WRITE8_MEMBER( banshee_vga_w );
 };
 
 extern const device_type VOODOO_BANSHEE;

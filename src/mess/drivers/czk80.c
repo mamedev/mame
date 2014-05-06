@@ -151,48 +151,6 @@ WRITE_LINE_MEMBER( czk80_state::ctc_z2_w )
 {
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(czk80_state, ctc_z0_w),    /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(czk80_state, ctc_z1_w),    /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(czk80_state, ctc_z2_w)     /* ZC/TO2 callback */
-};
-
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY
-	DEVCB_NULL, // SYNC
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // IRQ
-	DEVCB_NULL, // port A read
-	DEVCB_NULL, // port A write
-	DEVCB_NULL,
-	DEVCB_NULL, // port B read
-	DEVCB_NULL, // port B write
-	DEVCB_NULL
-};
-
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
 {
@@ -242,9 +200,21 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(czk80_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_Z80CTC_ADD( "z80ctc",  XTAL_16MHz / 4, ctc_intf)
-	MCFG_Z80DART_ADD("z80dart", XTAL_16MHz / 4, dart_intf)
-	MCFG_Z80PIO_ADD( "z80pio",  XTAL_16MHz / 4, pio_intf)
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(czk80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
+
+	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, 0, 0, 0, 0 )
+	//MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_16MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 

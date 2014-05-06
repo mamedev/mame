@@ -589,12 +589,6 @@ static SLOT_INTERFACE_START( itt3030_floppies )
 SLOT_INTERFACE_END
 
 
-static struct tms9927_interface crtc_intf =
-{
-	16,     // pixels per video memory address
-	NULL    // "self-load data"?
-};
-
 static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	/* basic machine hardware */
@@ -620,8 +614,10 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+
 	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL_6MHz)
-	MCFG_DEVICE_CONFIG(crtc_intf)
+	MCFG_TMS9927_CHAR_WIDTH(16)
+
 	MCFG_FD1791x_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)

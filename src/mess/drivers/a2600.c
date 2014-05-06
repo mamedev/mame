@@ -1313,16 +1313,6 @@ READ8_MEMBER(a2600_state::riot_input_port_8_r)
 	return ioport("SWB")->read();
 }
 
-static const riot6532_interface r6532_interface =
-{
-	DEVCB_DRIVER_MEMBER(a2600_state,switch_A_r),
-	DEVCB_DRIVER_MEMBER(a2600_state,riot_input_port_8_r),
-	DEVCB_DRIVER_MEMBER(a2600_state,switch_A_w),
-	DEVCB_DRIVER_MEMBER(a2600_state,switch_B_w),
-	DEVCB_DRIVER_LINE_MEMBER(a2600_state, irq_callback)
-};
-
-
 void a2600_state::install_banks(int count, unsigned init)
 {
 	int i;
@@ -1905,15 +1895,6 @@ static INPUT_PORTS_START( a2600 )
 INPUT_PORTS_END
 
 
-static const cassette_interface a2600_cassette_interface =
-{
-	a26_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"a2600_cass",
-	NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,a26")
@@ -1953,14 +1934,22 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
+	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-	MCFG_CASSETTE_ADD( "cassette", a2600_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(a26_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("a2600_cass")	
 MACHINE_CONFIG_END
 
 
@@ -1992,14 +1981,22 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
+	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-	MCFG_CASSETTE_ADD( "cassette", a2600_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(a26_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("a2600_cass")
 MACHINE_CONFIG_END
 
 

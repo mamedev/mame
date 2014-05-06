@@ -135,72 +135,6 @@ WRITE8_MEMBER( ts802_state::io_write_byte )
 	m_io->write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), // BUSRQ?
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ts802_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(ts802_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(ts802_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(ts802_state, io_write_byte),
-
-};
-
-static Z80DART_INTERFACE( dart0_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY
-	DEVCB_NULL, // SYNC
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static Z80DART_INTERFACE( dart1_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY
-	DEVCB_NULL, // SYNC
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback - */
-	DEVCB_NULL,     /* ZC/TO1 callback - */
-	DEVCB_NULL      /* ZC/TO2 callback - */
-};
-
 static SLOT_INTERFACE_START( ts802_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -258,10 +192,24 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	/* Devices */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ts802_state, kbd_put))
-	MCFG_Z80DMA_ADD("z80dma", XTAL_16MHz / 4, dma_intf)
-	MCFG_Z80DART_ADD("z80dart1", XTAL_16MHz / 4, dart0_intf )
-	MCFG_Z80DART_ADD("z80dart2", XTAL_16MHz / 4, dart1_intf )
-	MCFG_Z80CTC_ADD("z80ctc", XTAL_16MHz / 4, ctc_intf)
+
+	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_16MHz / 4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(ts802_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(ts802_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(ts802_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(ts802_state, io_write_byte))
+
+	MCFG_Z80DART_ADD("z80dart1", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_Z80DART_ADD("z80dart2", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	MCFG_FD1793x_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

@@ -945,14 +945,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface ql_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(ql),
-	NULL,
 	NULL
 };
 
@@ -963,28 +957,6 @@ wd17xx_interface ql_wd17xx_interface =
 	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
-
-//-------------------------------------------------
-//  MICRODRIVE_CONFIG( mdv1_config )
-//-------------------------------------------------
-
-static MICRODRIVE_CONFIG( mdv1_config )
-{
-	NULL,
-	NULL,
-};
-
-
-//-------------------------------------------------
-//  MICRODRIVE_CONFIG( mdv2_config )
-//-------------------------------------------------
-
-static MICRODRIVE_CONFIG( mdv2_config )
-{
-	NULL,
-	NULL
-};
-
 
 
 //**************************************************************************
@@ -1151,9 +1123,9 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
 
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
-	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
+	MCFG_MICRODRIVE_ADD(MDV_1)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
-	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
+	MCFG_MICRODRIVE_ADD(MDV_2)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))

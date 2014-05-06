@@ -27,7 +27,22 @@ const device_type HC55516 = &device_creator<hc55516_device>;
 
 hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HC55516, "HC-55516", tag, owner, clock, "hc55516", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_channel(NULL),
+		m_active_clock_hi(0),
+		m_shiftreg_mask(0),
+		m_last_clock_state(0),
+		m_digit(0),
+		m_new_digit(0),
+		m_shiftreg(0),
+		m_curr_sample(0),
+		m_next_sample(0),
+		m_update_count(0),
+		m_filter(0),
+		m_integrator(0),
+		m_charge(0),
+		m_decay(0),
+		m_leak(0)
 {
 }
 hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -125,7 +140,7 @@ void hc55516_device::start_common(UINT8 _shiftreg_mask, int _active_clock_hi)
 	m_last_clock_state = 0;
 
 	/* create the stream */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
 
 	save_item(NAME(m_last_clock_state));
 	save_item(NAME(m_digit));

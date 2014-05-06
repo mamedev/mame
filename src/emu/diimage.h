@@ -104,7 +104,6 @@ typedef delegate<int (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
 typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
-typedef void (*device_image_display_info_func)(device_image_interface &image);
 
 //**************************************************************************
 //  MACROS
@@ -114,9 +113,6 @@ typedef void (*device_image_display_info_func)(device_image_interface &image);
 #define IMAGE_INIT_FAIL     TRUE
 #define IMAGE_VERIFY_PASS   FALSE
 #define IMAGE_VERIFY_FAIL   TRUE
-
-#define DEVICE_IMAGE_DISPLAY_INFO_NAME(name)       device_image_display_info_func##name
-#define DEVICE_IMAGE_DISPLAY_INFO(name)            void DEVICE_IMAGE_DISPLAY_INFO_NAME(name)(device_image_interface &image)
 
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
@@ -152,7 +148,6 @@ public:
 	virtual bool call_create(int format_type, option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
 	virtual void call_display() { }
-	virtual void call_display_info() { }
 	virtual device_image_partialhash_func get_partial_hash() const { return NULL; }
 	virtual bool core_opens_image_file() const { return TRUE; }
 	virtual iodevice_t image_type()  const = 0;
@@ -219,6 +214,7 @@ public:
 	hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
+	void battery_load(void *buffer, int length, void *def_buffer);
 	void battery_save(const void *buffer, int length);
 
 	const char *image_type_name()  const { return device_typename(image_type()); }

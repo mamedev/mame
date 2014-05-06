@@ -66,34 +66,34 @@ const device_type WANGPC_MVC = &device_creator<wangpc_mvc_device>;
 
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
-void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 {
 	for (int sx = 0; sx < 50; sx++)
 	{
 		offs_t addr = (y * 50) + sx;
 		UINT16 data = m_bitmap_ram[addr];
-
+		
 		for (int bit = 0; bit < 16; bit++)
 		{
 			int x = (sx * 16) + bit;
 			int color = BIT(data, 15) && de;
-
+			
 			bitmap.pix32(vbp + y, hbp + x) = PALETTE_MVC[color];
-
+			
 			data <<= 1;
 		}
 	}
-
+	
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT16 code = m_video_ram[((ma + column) & 0x7ff)];
 		UINT8 attr = code & 0xff;
-
+		
 		UINT8 new_ra = ra + 1;
-
+		
 		if (ATTR_SUPERSCRIPT)
 		{
 			new_ra = ra + 3;
@@ -102,33 +102,26 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 		{
 			new_ra = ra;
 		}
-
+		
 		offs_t addr = ((code >> 8) << 4) | (new_ra & 0x0f);
 		UINT16 data = m_char_ram[addr & 0xfff];
-
+		
 		if ((column == cursor_x) || (!ra && ATTR_OVERSCORE) || ((ra == 9) && ATTR_UNDERSCORE))
 		{
 			data = 0xffff;
 		}
-
+		
 		for (int bit = 0; bit < 10; bit++)
 		{
 			int x = (column * 10) + bit;
 			int color = ((BIT(data, 9) & !ATTR_BLANK) ^ ATTR_REVERSE);
-
+			
 			if ((color | bitmap.pix32(vbp + y, hbp + x)) & ATTR_BOLD) color = 2;
 			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black;
-
+			
 			data <<= 1;
 		}
 	}
-}
-
-static MC6845_UPDATE_ROW( wangpc_mvc_update_row )
-{
-	wangpc_mvc_device *mvc = downcast<wangpc_mvc_device *>(device->owner());
-
-	mvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }
 
 WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
@@ -138,22 +131,6 @@ WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
 		set_irq(ASSERT_LINE);
 	}
 }
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	10,
-	NULL,
-	wangpc_mvc_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_mvc_device, vsync_w),
-	NULL
-};
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_mvc )
@@ -167,7 +144,11 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_mvc )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL_14_31818MHz/16, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL_14_31818MHz/16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(10)
+	MCFG_MC6845_UPDATE_ROW_CB(wangpc_mvc_device, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_mvc_device, vsync_w))
 MACHINE_CONFIG_END
 
 

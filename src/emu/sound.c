@@ -48,7 +48,7 @@ const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAM
 //  sound_stream - constructor
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
+sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate,  stream_update_delegate callback)
 	: m_device(device),
 		m_next(NULL),
 		m_sample_rate(sample_rate),
@@ -64,17 +64,15 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		m_output_sampindex(0),
 		m_output_update_sampindex(0),
 		m_output_base_sampindex(0),
-		m_callback(callback),
-		m_param(param)
+		m_callback(callback)
 {
 	// get the device's sound interface
 	device_sound_interface *sound;
 	if (!device.interface(sound))
 		throw emu_fatalerror("Attempted to create a sound_stream with a non-sound device");
 
-	// this is also the implicit parameter if we are using our internal stub
-	if (m_callback == &sound_stream::device_stream_update_stub)
-		m_param = sound;
+	if(m_callback.isnull())
+		m_callback = stream_update_delegate(FUNC(device_sound_interface::sound_stream_update),(device_sound_interface *)sound);
 
 	// create a unique tag for saving
 	astring state_tag;
@@ -447,18 +445,6 @@ void sound_stream::apply_sample_rate_changes()
 
 
 //-------------------------------------------------
-//  device_stream_update_stub - stub callback for
-//  passing through to modern devices
-//-------------------------------------------------
-
-STREAM_UPDATE( sound_stream::device_stream_update_stub )
-{
-	device_sound_interface *sound = reinterpret_cast<device_sound_interface *>(param);
-	sound->sound_stream_update(*stream, inputs, outputs, samples);
-}
-
-
-//-------------------------------------------------
 //  recompute_sample_rate_data - recompute sample
 //  rate data, and all streams that are affected
 //  by this stream
@@ -633,7 +619,7 @@ void sound_stream::generate_samples(int samples)
 
 	// run the callback
 	VPRINTF(("  callback(%p, %d)\n", this, samples));
-	(*m_callback)(&m_device, this, m_param, m_input_array, m_output_array, samples);
+	m_callback(*this, m_input_array, m_output_array, samples);
 	VPRINTF(("  callback done\n"));
 }
 
@@ -868,12 +854,9 @@ sound_manager::~sound_manager()
 //  stream_alloc - allocate a new stream
 //-------------------------------------------------
 
-sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, void *param, sound_stream::stream_update_func callback)
+sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback)
 {
-	if (callback != NULL)
-		return &m_stream_list.append(*global_alloc(sound_stream(device, inputs, outputs, sample_rate, param, callback)));
-	else
-		return &m_stream_list.append(*global_alloc(sound_stream(device, inputs, outputs, sample_rate)));
+	return &m_stream_list.append(*global_alloc(sound_stream(device, inputs, outputs, sample_rate, callback)));
 }
 
 

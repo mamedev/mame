@@ -109,6 +109,9 @@ public:
 	DECLARE_MACHINE_START( pet40 );
 	DECLARE_MACHINE_RESET( pet40 );
 
+	MC6845_BEGIN_UPDATE( pet_begin_update );
+	MC6845_UPDATE_ROW( pet40_update_row );
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void check_interrupts();
@@ -206,6 +209,9 @@ public:
 
 	DECLARE_MACHINE_START( pet80 );
 	DECLARE_MACHINE_RESET( pet80 );
+
+	MC6845_UPDATE_ROW( pet80_update_row );
+	MC6845_UPDATE_ROW( cbm8296_update_row );
 };
 
 

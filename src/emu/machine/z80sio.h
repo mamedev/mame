@@ -153,7 +153,7 @@ private:
 
 
 // device type definition
-extern const device_type Z80SIO;
+extern const ATTR_DEPRECATED device_type Z80SIO;
 
 
 #endif

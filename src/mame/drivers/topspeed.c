@@ -522,19 +522,6 @@ GFXDECODE_END
 
 
 /***********************************************************
-                     DEVICES
-***********************************************************/
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_NULL, // Interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(topspeed_state, z80ctc_to0), // ZC/TO0 callback
-	DEVCB_NULL, // ZC/TO1 callback
-	DEVCB_NULL  // ZC/TO2 callback
-};
-
-
-/***********************************************************
                      MACHINE DRIVERS
 ***********************************************************/
 
@@ -583,7 +570,8 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_CPU_PROGRAM_MAP(z80_prg)
 	MCFG_CPU_IO_MAP(z80_io)
 
-	MCFG_Z80CTC_ADD("ctc", XTAL_16MHz / 4, ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(topspeed_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)

@@ -185,14 +185,8 @@ UINT32 jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 #if 0
 static const floppy_interface jupiter_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
 	NULL
 };
 #endif

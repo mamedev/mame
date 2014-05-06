@@ -129,7 +129,15 @@ void wd_fdc_t::soft_reset()
 	status_type_1 = true;
 	last_dir = 1;
 	intrq = false;
+	if (!intrq_cb.isnull())
+	{
+		intrq_cb(intrq);
+	}
 	drq = false;
+	if (!drq_cb.isnull())
+	{
+		drq_cb(drq);
+	}
 	hld = false;
 	intrq_cond = 0;
 	live_abort();

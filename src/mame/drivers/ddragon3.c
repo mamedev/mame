@@ -260,15 +260,15 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
 	flip_screen_set(data&1);
 }
 
-/*- Palette Reads/Writes -*/
+/*- Palette Reads/Writes - A5 and A6 are not connected */
 
-READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r)
+READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram_r)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w)
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	m_palette->write(space, offset, data, mem_mask);
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x140022, 0x140023) AM_READ_PORT("P2")
 	AM_RANGE(0x140024, 0x140025) AM_READ_PORT("P3")
 	AM_RANGE(0x140026, 0x140027) AM_READ_PORT("P4")
-	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r,wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(wwfwfest_paletteram_r,wwfwfest_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* Work Ram */
 ADDRESS_MAP_END
 
@@ -800,9 +800,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
 
 void ddragon3_state::machine_start()
 {
-	m_paletteram.resize(m_palette->entries());
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));

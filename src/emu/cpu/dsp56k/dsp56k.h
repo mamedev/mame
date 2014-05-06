@@ -30,6 +30,7 @@ class dsp56k_device : public legacy_cpu_device
 public:
 	dsp56k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_DIRECT_UPDATE_MEMBER(dsp56k_direct_handler);
 	DECLARE_READ16_MEMBER( program_r );
 	DECLARE_WRITE16_MEMBER( program_w );
 	DECLARE_READ16_MEMBER( peripheral_register_r );

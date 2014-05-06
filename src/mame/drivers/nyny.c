@@ -140,17 +140,11 @@ public:
 	INTERRUPT_GEN_MEMBER(update_pia_1);
 	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
 	inline void shift_star_generator(  );
+
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_END_UPDATE(crtc_end_update);
 };
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-
-
 
 
 /*************************************
@@ -252,31 +246,22 @@ WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 }
 
 
-static MC6845_BEGIN_UPDATE( begin_update )
+MC6845_BEGIN_UPDATE( nyny_state::crtc_begin_update )
 {
-	nyny_state *state = device->machine().driver_data<nyny_state>();
 	/* create the pens */
-	offs_t i;
-
-	for (i = 0; i < NUM_PENS; i++)
+	for (offs_t i = 0; i < NUM_PENS; i++)
 	{
-		state->m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
-
-	return state->m_pens;
 }
 
 
-static MC6845_UPDATE_ROW( update_row )
+MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 {
-	nyny_state *state = device->machine().driver_data<nyny_state>();
-	UINT8 cx;
-	pen_t *pens = (pen_t *)param;
 	UINT8 x = 0;
 
-	for (cx = 0; cx < x_count; cx++)
+	for (UINT8 cx = 0; cx < x_count; cx++)
 	{
-		int i;
 		UINT8 data1, data2, color1, color2;
 
 		/* the memory is hooked up to the MA, RA lines this way */
@@ -285,19 +270,19 @@ static MC6845_UPDATE_ROW( update_row )
 						((ra << 5) & 0x00e0) |
 						((ma << 0) & 0x001f);
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			offs = offs ^ 0x9fff;
 
-		data1 = state->m_videoram1[offs];
-		data2 = state->m_videoram2[offs];
-		color1 = state->m_colorram1[offs] & 0x07;
-		color2 = state->m_colorram2[offs] & 0x07;
+		data1 = m_videoram1[offs];
+		data2 = m_videoram2[offs];
+		color1 = m_colorram1[offs] & 0x07;
+		color2 = m_colorram2[offs] & 0x07;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			UINT8 bit1, bit2, color;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				bit1 = BIT(data1, 7);
 				bit2 = BIT(data2, 7);
@@ -320,7 +305,7 @@ static MC6845_UPDATE_ROW( update_row )
 			else
 				color = bit2 ? color2 : 0;
 
-			bitmap.pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = m_pens[color];
 
 			x += 1;
 		}
@@ -336,37 +321,29 @@ void nyny_state::shift_star_generator(  )
 }
 
 
-static MC6845_END_UPDATE( end_update )
+MC6845_END_UPDATE( nyny_state::crtc_end_update )
 {
-	nyny_state *state = device->machine().driver_data<nyny_state>();
-
 	/* draw the star field into the bitmap */
-	int y;
+	UINT16 delay_counter = m_star_delay_counter;
 
-	pen_t *pens = (pen_t *)param;
-	UINT16 delay_counter = state->m_star_delay_counter;
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int x;
-
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* check if the star status */
-			if (state->m_star_enable &&
-				(bitmap.pix32(y, x) == pens[0]) &&
-				((state->m_star_shift_reg & 0x80ff) == 0x00ff) &&
-				(((y & 0x01) ^ state->m_flipscreen) ^ (((x & 0x08) >> 3) ^ state->m_flipscreen)))
+			if (m_star_enable && (bitmap.pix32(y, x) == m_pens[0]) &&
+				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
+				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
 			{
-				UINT8 color = ((state->m_star_shift_reg & 0x0100) >>  8) |  /* R */
-								((state->m_star_shift_reg & 0x0400) >>  9) |    /* G */
-								((state->m_star_shift_reg & 0x1000) >> 10);     /* B */
+				UINT8 color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
+								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
+								((m_star_shift_reg & 0x1000) >> 10);     /* B */
 
-				bitmap.pix32(y, x) = pens[color];
+				bitmap.pix32(y, x) = m_pens[color];
 			}
 
 			if (delay_counter == 0)
-				state->shift_star_generator();
+				shift_star_generator();
 			else
 				delay_counter = delay_counter - 1;
 		}
@@ -378,23 +355,6 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 {
 	m_ic48_1->a_w(generic_space(), 0, state);
 }
-
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,                  /* show border area */
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of pixels per video memory address */
-	begin_update,           /* before pixel update callback */
-	update_row,             /* row update callback */
-	end_update,             /* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,display_enable_changed),    /* callback for display state changes */
-	DEVCB_NULL,             /* callback for cursor state changes */
-	DEVCB_NULL,             /* HSYNC callback */
-	DEVCB_NULL,             /* VSYNC callback */
-	NULL                    /* update address callback */
-};
-
 
 
 /*************************************
@@ -671,7 +631,13 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(nyny_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(nyny_state, crtc_update_row)
+	MCFG_MC6845_END_UPDATE_CB(nyny_state, crtc_end_update)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(nyny_state, display_enable_changed))
 
 	/* 74LS123 */
 	MCFG_DEVICE_ADD("ic48_1", TTL74123, 0)

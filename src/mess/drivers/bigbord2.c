@@ -135,6 +135,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT8 *m_p_chargen;                 /* character ROM */
 	UINT8 *m_p_videoram;                    /* Video RAM */
 	UINT8 *m_p_attribram;                   /* Attribute RAM */
@@ -239,18 +240,6 @@ WRITE8_MEMBER(bigbord2_state::io_write_byte)
 {
 	m_io->write_byte(offset, data);
 }
-
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT), // actually BUSRQ
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bigbord2_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(bigbord2_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(bigbord2_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(bigbord2_state, io_write_byte),
-
-};
 
 
 /* Read/Write Handlers */
@@ -411,32 +400,6 @@ static INPUT_PORTS_START( bigbord2 )
 INPUT_PORTS_END
 
 
-/* Z80 SIO */
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /* Z80 CTC */
 
 TIMER_DEVICE_CALLBACK_MEMBER(bigbord2_state::ctc_tick)
@@ -468,27 +431,6 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 	}
 }
 
-
-// other inputs of ctca:
-// trg0 = KBDSTB; trg1 = index pulse from fdc; trg2 = synca output from sio
-
-
-
-static Z80CTC_INTERFACE( ctca_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback - KBDCLK */
-	DEVCB_NULL,     /* ZC/TO1 callback - not connected */
-	DEVCB_NULL      /* ZC/TO2 callback - not connected */
-};
-
-static Z80CTC_INTERFACE( ctcb_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback - SIO channel B clock */
-	DEVCB_NULL,     /* ZC/TO1 callback - SIO channel A clock */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTCB_TAG, z80ctc_device, trg3) /* ZC/TO2 callback */
-};
 
 /* Z80 Daisy Chain */
 
@@ -570,10 +512,9 @@ static GFXDECODE_START( bigbord2 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bigbord2_charlayout, 0, 1 )
 GFXDECODE_END
 
-MC6845_UPDATE_ROW( bigbord2_update_row )
+MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 {
-	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -582,11 +523,11 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 	{
 		inv=0;
 		mem = (ma + x) & 0x7ff;
-		if (BIT(state->m_p_attribram[mem], 7)) inv^=0xff;
-		chr = state->m_p_videoram[mem];
+		if (BIT(m_p_attribram[mem], 7)) inv^=0xff;
+		chr = m_p_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
+		gfx = m_p_chargen[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT( gfx, 7 )];
@@ -599,22 +540,6 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 		*p++ = palette[BIT( gfx, 0 )];
 	}
 }
-
-static MC6845_INTERFACE( bigbord2_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	bigbord2_update_row,        /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, frame), // vsync
-	NULL
-};
-
 
 /* Machine Drivers */
 
@@ -638,14 +563,37 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bigbord2_state, ctc_tick, attotime::from_hz(MAIN_CLOCK))
 
 	/* devices */
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, MAIN_CLOCK, dma_intf)
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, MAIN_CLOCK, sio_intf)
-	MCFG_Z80CTC_ADD(Z80CTCA_TAG, MAIN_CLOCK, ctca_intf)
-	MCFG_Z80CTC_ADD(Z80CTCB_TAG, MAIN_CLOCK / 6, ctcb_intf)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, MAIN_CLOCK)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(bigbord2_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bigbord2_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(bigbord2_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bigbord2_state, io_write_byte))
+
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, MAIN_CLOCK, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD(Z80CTCA_TAG, Z80CTC, MAIN_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	// other inputs of ctca:
+	// trg0 = KBDSTB; trg1 = index pulse from fdc; trg2 = synca output from sio
+
+	MCFG_DEVICE_ADD(Z80CTCB_TAG, Z80CTC, MAIN_CLOCK / 6)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	// ZC0 = SIO channel B clock, ZC1 = SIO channel A clock
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTCB_TAG, z80ctc_device, trg3))
+
 	MCFG_MB8877x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_MC6845_ADD("crtc", MC6845, SCREEN_TAG, XTAL_16MHz / 8, bigbord2_crtc)
+
+	MCFG_MC6845_ADD("crtc", MC6845, SCREEN_TAG, XTAL_16MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bigbord2_state, frame))
+
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(bigbord2_state, bigbord2_kbd_put))
 

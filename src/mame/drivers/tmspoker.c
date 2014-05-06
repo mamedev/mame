@@ -545,25 +545,6 @@ static GFXDECODE_START( tmspoker )
 GFXDECODE_END
 
 
-/***********************
-*    CRTC Interface    *
-************************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -588,7 +569,9 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 MACHINE_CONFIG_END
 

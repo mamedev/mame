@@ -1506,6 +1506,7 @@ void tms5220_device::device_reset()
 	m_RNG = 0x1FFF;
 	memset(m_u, 0, sizeof(m_u));
 	memset(m_x, 0, sizeof(m_x));
+	m_schedule_dummy_read = 0;
 
 	if (m_speechrom)
 	{

@@ -256,6 +256,9 @@ void snes_ppu_device::device_start()
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
 
+	m_stat78 = 0;
+	memset(m_regs, 0x00, sizeof(m_regs));
+
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_scanlines[i].enable), i);

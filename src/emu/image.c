@@ -310,6 +310,12 @@ void image_init(running_machine &machine)
     image_battery_load_by_name - retrieves the battery
     backed RAM for an image. A filename may be supplied
     to the function.
+ 
+    The function comes in two flavors, depending on
+	what should happen when no battery is available:
+    we could fill the memory with a given value, or
+    pass a default battery (for a pre-initialized 
+    battery from factory)
 -------------------------------------------------*/
 
 void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, int fill)
@@ -327,6 +333,24 @@ void image_battery_load_by_name(emu_options &options, const char *filename, void
 
 	/* fill remaining bytes (if necessary) */
 	memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
+}
+
+void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, void *def_buffer)
+{
+	file_error filerr;
+	int bytes_read = 0;
+	
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(filename);
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* if no file was present, copy the default battery */
+	if (bytes_read == 0 && def_buffer)
+		memcpy((char *) buffer, (char *) def_buffer, length);
 }
 
 /*-------------------------------------------------

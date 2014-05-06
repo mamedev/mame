@@ -40,10 +40,6 @@
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
 	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config));
 
-// macros for defining read_line/write_line functions
-#define READ_LINE_DEVICE_HANDLER(name)      int  name(ATTR_UNUSED device_t *device)
-#define WRITE_LINE_DEVICE_HANDLER(name)     void name(ATTR_UNUSED device_t *device, ATTR_UNUSED int state)
-
 #define DECLARE_READ_LINE_MEMBER(name)      int  name()
 #define READ_LINE_MEMBER(name)              int  name()
 #define DECLARE_WRITE_LINE_MEMBER(name)     void name(ATTR_UNUSED int state)
@@ -89,12 +85,6 @@ device_t *device_creator(const machine_config &mconfig, const char *tag, device_
 
 // timer IDs for devices
 typedef UINT32 device_timer_id;
-
-
-// read/write types for I/O lines (similar to read/write handlers but no offset)
-typedef int (*read_line_device_func)(device_t *device);
-typedef void (*write_line_device_func)(device_t *device, int state);
-
 
 // ======================> device_t
 

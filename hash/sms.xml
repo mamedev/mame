@@ -2467,6 +2467,18 @@
 		</part>
 	</software>
 
+	<software name="robocop">
+		<description>Gangcheol RoboCop (Kor)</description>
+		<year>1992</year>
+		<publisher>Sieco</publisher>
+		<info name="alt_title" value="강철 로보캅" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="gangcheol robocop (kr).bin" size="65536" crc="ad522efd" sha1="26afbc7a049eecb6344bf4f0edef6339097c59a8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gangster">
 		<description>Gangster Town (Euro, USA, Bra)</description>
 		<year>1987</year>
@@ -3499,6 +3511,17 @@
 		</part>
 	</software>
 
+	<software name="lemming2">
+		<description>Lemmings 2 - The Tribes (Euro, Prototype)</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="lemmings 2 - the tribes [proto].bin" size="524288" crc="cf5aecca" sha1="30b97f8afac0044ceda2722f5fddd31ba30de571" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="loffire">
 		<description>Line of Fire (Euro, Bra, Kor)</description>
 		<year>1991</year>
@@ -3998,6 +4021,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="montezuma's revenge - featuring panama joe [proto].bin" size="131072" crc="575d0fcf" sha1="4f93e297425cb19ab6de2107795d210544171396" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mopirang">
+		<description>Mopiranger (Kor)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="포피레인저" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mopiranger (kr).bin" size="32768" crc="b49aa6fc" sha1="f18254c94d7c94e83ba970e6cc9fa03643e931ae" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4916,6 +4951,18 @@
 			<feature name="ic1" value="MPR-11400" />
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-11400.ic1" size="131072" crc="79ac8e7f" sha1="6a561bff2f8022261708b91722caf1ec0e63f9c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadfght">
+		<description>Road Fighter (Kor)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="로드화이터" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="road fighter (kr).bin" size="32768" crc="8034bd27" sha1="ad76e9126fad614629bea49e7ae19c3e4dfedd59" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

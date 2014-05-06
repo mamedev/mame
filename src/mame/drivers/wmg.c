@@ -78,8 +78,6 @@ class wmg_state : public williams_state
 public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_soundcpu(*this, "soundcpu")
 		, m_p_ram(*this, "nvram")
 	{ }
 
@@ -99,8 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 	void wmg_def_install_io_space(address_space &space);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
 	required_shared_ptr<UINT8> m_p_ram;
 };
 
@@ -471,8 +467,7 @@ static MACHINE_CONFIG_START( wmg, wmg_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
-	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)

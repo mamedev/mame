@@ -61,7 +61,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-/*----------- defined in audio/cchasm.c -----------*/
-
-extern const z80ctc_interface cchasm_ctc_intf;

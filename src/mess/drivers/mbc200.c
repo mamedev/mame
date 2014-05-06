@@ -133,26 +133,6 @@ void mbc200_state::machine_start()
 	m_floppy1->floppy_drive_set_ready_state(1, 1);
 }
 
-MC6845_UPDATE_ROW( mbc200_update_row )
-{
-}
-
-
-static MC6845_INTERFACE( mbc200_crtc )
-{
-	false,
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of dots per character */
-	NULL,
-	mbc200_update_row,      /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 void mbc200_state::video_start()
 {
 }
@@ -204,15 +184,9 @@ static const wd17xx_interface mbc200_mb8876_interface =
 };
 static const floppy_interface mbc200_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static const gfx_layout mbc200_chars_8x8 =
@@ -253,8 +227,9 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4, mbc200_crtc) // HD46505SP
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4) // HD46505SP
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 

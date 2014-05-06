@@ -165,6 +165,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbc_exp_rom );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
 
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -419,7 +421,6 @@ public: // HACK FOR MC6845
 
 /*----------- defined in machine/bbc.c -----------*/
 
-extern const mc6845_interface bbc_mc6845_intf;
 extern const wd17xx_interface bbc_wd17xx_interface;
 
 #endif /* BBC_H_ */

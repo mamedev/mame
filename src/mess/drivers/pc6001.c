@@ -2243,7 +2243,6 @@ static const cassette_interface pc6001_cassette_interface =
 	pc6001_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
 	NULL
 };
 #endif

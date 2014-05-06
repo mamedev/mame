@@ -235,21 +235,6 @@ static const UINT8 pal35[256] = {
 /********************   VIDEO SECTION   ************************************/
 /***************************************************************************/
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 static const gfx_layout charlayout =
 {
 	/* Todo  , just for sample */
@@ -627,7 +612,9 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

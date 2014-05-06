@@ -78,57 +78,35 @@ const rom_entry *c64_xl80_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
-void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 {
 	const pen_t *pen = m_palette->pens();
-
+	
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = m_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
 		UINT8 data = m_char_rom->base()[addr & 0x7ff];
-
+		
 		if (column == cursor_x)
 		{
 			data = 0xff;
 		}
-
+		
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) && de;
-
+			
 			bitmap.pix32(vbp + y, hbp + x) = pen[color];
-
+			
 			data <<= 1;
 		}
 	}
 }
-
-static MC6845_UPDATE_ROW( c64_xl80_update_row )
-{
-	c64_xl80_device *xl80 = downcast<c64_xl80_device *>(device->owner());
-	xl80->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,de,hbp,vbp,param);
-}
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	c64_xl80_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 
 //-------------------------------------------------
 //  GFXDECODE( c64_xl80 )
@@ -154,7 +132,10 @@ static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c64_xl80)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL_14_31818MHz, crtc_intf)
+	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL_14_31818MHz)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(c64_xl80_device, crtc_update_row)
 MACHINE_CONFIG_END
 
 

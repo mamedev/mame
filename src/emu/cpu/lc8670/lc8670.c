@@ -179,6 +179,9 @@ lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *
 		m_ppc(0),
 		m_bankswitch_func(*this)
 {
+	memset(m_sfr, 0x00, sizeof(m_sfr));
+	memset(m_timer0, 0x00, sizeof(m_timer0));
+	memset(m_timer1, 0x00, sizeof(m_timer1));
 }
 
 //-------------------------------------------------

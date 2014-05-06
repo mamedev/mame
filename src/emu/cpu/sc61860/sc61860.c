@@ -135,6 +135,8 @@ void sc61860_device::device_start()
 	m_dp = 0;
 	m_carry = 0;
 	m_zero = 0;
+	m_pc = 0;
+	m_debugger_temp = 0;
 	memset( m_ram, 0, sizeof(m_ram) );
 
 	save_item(NAME(m_p));

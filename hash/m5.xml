@@ -83,7 +83,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ディグダグ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="digdug.rom" size="8192" crc="9b207054" sha1="971f7bc1b6247d17a488f6e07eabc07580219ed9" offset="00000" />
+				<rom name="digdug.bin" size="8192" crc="9b207054" sha1="971f7bc1b6247d17a488f6e07eabc07580219ed9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ギャラックス" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="galax.rom" size="8192" crc="62c26c8c" sha1="5f73e90f9b551501e6fd5b9a63cfcfaea7691821" offset="00000" />
+				<rom name="galax.bin" size="8192" crc="62c26c8c" sha1="5f73e90f9b551501e6fd5b9a63cfcfaea7691821" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="パワーパック" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="powerpac.rom" size="8192" crc="3ce70f7f" sha1="2ee74f02f0249ff7192b4f29c1a061fc4f1eb920" offset="00000" />
+				<rom name="powerpac.bin" size="8192" crc="3ce70f7f" sha1="2ee74f02f0249ff7192b4f29c1a061fc4f1eb920" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ワープ&amp;ワープ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="warpwarp.rom" size="8192" crc="1b9e2e58" sha1="38c1721eb04188e1201c31dde2fc03963b685d69" offset="00000" />
+				<rom name="warpwarp.bin" size="8192" crc="1b9e2e58" sha1="38c1721eb04188e1201c31dde2fc03963b685d69" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -176,26 +176,50 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ムーンパトロール" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="moonpatrol.rom" size="8192" crc="1324c6c0" sha1="fa61c047b0051efa23a6607e4c1f7726ff683caf" offset="00000" />
+				<rom name="moonpatrol.bin" size="8192" crc="1324c6c0" sha1="fa61c047b0051efa23a6607e4c1f7726ff683caf" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="stepup">
-		<description>Step Up</description>
+	<software name="stepupj" cloneof="stepup">
+		<description>Step Up (Jpn)</description>
 		<year>1983</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="10" />
 		<info name="alt_title" value="ステップアップ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="step up (1983)(takara)(jp).bin" size="8192" crc="942cc7e8" sha1="9f61df71b6080c8ef5085b659179a10e2777a957" offset="00000" status="baddump" />
+				<rom name="stepup_jp.bin" size="8192" crc="db688ff8" sha1="abce8c52bcc73dd6a1b532b04bd7b1110d6ff4e9" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stepup">
+		<description>Step Up (Euro)</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="stepup_eu.bin" size="8192" crc="942cc7e8" sha1="9f61df71b6080c8ef5085b659179a10e2777a957" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pooyan">
 		<description>Pooyan</description>
+		<year>1982</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="11" />
+		<info name="alt_title" value="プーヤン" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pooyan.bin" size="8192" crc="91ba5073" sha1="b659b0f029927c36287720654fb538e53a2fcb76" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooyana" cloneof="pooyan">
+		<description>Pooyan (Alt)</description>
 		<year>1982</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="11" />
@@ -268,7 +292,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="アップルーン" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="apploon.rom" size="8192" crc="558cf858" sha1="743906ecab6439766fe374ccdf64b9c2acecbf97" offset="00000" />
+				<rom name="apploon.bin" size="8192" crc="558cf858" sha1="743906ecab6439766fe374ccdf64b9c2acecbf97" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +318,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="マッピー" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="mappy.rom" size="8192" crc="b83f6d83" sha1="c94c4def1a64fade08179b08b1d6f6178ff56a3f" offset="00000" />
+				<rom name="mappy.bin" size="8192" crc="b83f6d83" sha1="c94c4def1a64fade08179b08b1d6f6178ff56a3f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -333,7 +357,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ジャン狂" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="mahjong.rom" size="16384" crc="b32c9e08" sha1="0b24213ef49a6ad04bc8ecff616b94ccf0f7a8aa" offset="00000" />
+				<rom name="mahjong.bin" size="16384" crc="b32c9e08" sha1="0b24213ef49a6ad04bc8ecff616b94ccf0f7a8aa" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -346,7 +370,7 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="Adidas ラッキー シュート" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="adidas.rom" size="8192" crc="d6ef9cae" sha1="80314f4351b9c0ebeb48f7757694717950d5a9b0" offset="00000" />
+				<rom name="adidas.bin" size="8192" crc="d6ef9cae" sha1="80314f4351b9c0ebeb48f7757694717950d5a9b0" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

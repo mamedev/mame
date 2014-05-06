@@ -180,17 +180,6 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 	output_set_digit_value(8 - digit, led_data);
 }
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(vcs80_state, pio_pa_r), /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_DRIVER_MEMBER(vcs80_state, pio_pb_w), /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config vcs80_daisy_chain[] =
@@ -227,7 +216,10 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	MCFG_DEFAULT_LAYOUT( layout_vcs80 )
 
 	/* devices */
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_5MHz/2, pio_intf)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_5MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(vcs80_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(vcs80_state, pio_pb_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

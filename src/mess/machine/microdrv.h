@@ -21,13 +21,8 @@
 #define MDV_2 "mdv2"
 
 
-#define MCFG_MICRODRIVE_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MICRODRIVE_CONFIG(_name) \
-	const microdrive_interface (_name) =
-
+#define MCFG_MICRODRIVE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0)
 
 #define MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(_write) \
 	devcb = &microdrive_image_device::set_comms_out_wr_callback(*device, DEVCB2_##_write);
@@ -38,18 +33,9 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> microdrive_interface
-
-struct microdrive_interface
-{
-	const char *                    m_interface;
-	device_image_display_info_func  m_device_displayinfo;
-};
-
 // ======================> microdrive_image_device
 
 class microdrive_image_device : public device_t,
-								public microdrive_interface,
 								public device_image_interface
 {
 public:
@@ -62,7 +48,6 @@ public:
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const { return IO_CASSETTE; }

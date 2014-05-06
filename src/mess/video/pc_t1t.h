@@ -38,6 +38,14 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
 
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( t1000_text_inten_update_row );
+	MC6845_UPDATE_ROW( t1000_text_blink_update_row );
+	MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row );
+	MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row );
+	MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row );
+	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
+
 	required_device<mc6845_device> m_mc6845;
 	UINT8 m_mode_control, m_color_select;
 	UINT8 m_status;
@@ -56,7 +64,7 @@ public:
 
 	UINT8   m_address_data_ff;
 
-	mc6845_update_row_func  m_update_row;
+	int     m_update_row_type;
 	UINT8   m_display_enable;
 	UINT8   m_vsync;
 	UINT8   m_palette_base;
@@ -112,6 +120,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 
 	UINT8   *m_jxkanji;
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( pcjx_text_update_row );
+	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;

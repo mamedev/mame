@@ -156,14 +156,6 @@ WRITE8_MEMBER( sym1_state::sym1_riot_b_w )
 	m_ttl74145->write(data & 0x0f);
 }
 
-const riot6532_interface sym1_r6532_interface =
-{
-	DEVCB_DRIVER_MEMBER(sym1_state, sym1_riot_a_r),
-	DEVCB_DRIVER_MEMBER(sym1_state, sym1_riot_b_r),
-	DEVCB_DRIVER_MEMBER(sym1_state, sym1_riot_a_w),
-	DEVCB_DRIVER_MEMBER(sym1_state, sym1_riot_b_w)
-};
-
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
@@ -323,7 +315,11 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// devices
-	MCFG_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, SYM1_CLOCK)
+	MCFG_RIOT6532_IN_PA_CB(READ8(sym1_state, sym1_riot_a_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(sym1_state, sym1_riot_a_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(sym1_state, sym1_riot_b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(sym1_state, sym1_riot_b_w))
 
 	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
 	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(sym1_state, sym1_74145_output_0_w))

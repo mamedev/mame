@@ -122,7 +122,6 @@ void legacy_floppy_image_device::floppy_drive_init()
 	/* initialise flags */
 	m_flags = 0;
 	m_index_pulse_callback = NULL;
-	m_ready_state_change_callback = NULL;
 	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
 	m_idx = 0;
 
@@ -194,10 +193,7 @@ void legacy_floppy_image_device::floppy_drive_set_flag_state(int flag, int state
 		if (flag & FLOPPY_DRIVE_READY)
 		{
 			/* trigger state change callback */
-			m_out_rdy_func(new_state ? ASSERT_LINE : CLEAR_LINE);
-
-			if (m_ready_state_change_callback)
-				m_ready_state_change_callback(m_controller, this, new_state);
+			//m_out_rdy_func(new_state ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -270,7 +266,7 @@ void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 
 	/* set track 0 flag */
 	m_tk00 = (m_current_track == 0) ? CLEAR_LINE : ASSERT_LINE;
-	m_out_tk00_func(m_tk00);
+	//m_out_tk00_func(m_tk00);
 
 	/* clear disk changed flag */
 	m_dskchg = ASSERT_LINE;
@@ -393,11 +389,6 @@ void legacy_floppy_image_device::floppy_drive_set_index_pulse_callback(void (*ca
 	m_index_pulse_callback = callback;
 }
 
-void legacy_floppy_image_device::floppy_drive_set_ready_state_change_callback(void (*callback)(device_t *controller,device_t *img, int state))
-{
-	m_ready_state_change_callback = callback;
-}
-
 int legacy_floppy_image_device::floppy_drive_get_current_track()
 {
 	return m_current_track;
@@ -473,7 +464,7 @@ error:
 TIMER_CALLBACK_MEMBER( legacy_floppy_image_device::set_wpt )
 {
 	m_wpt = param;
-	m_out_wpt_func(param);
+	//m_out_wpt_func(param);
 }
 
 legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive)
@@ -645,7 +636,7 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
 		}
 
 		/* update track 0 line with new status */
-		m_out_tk00_func(m_tk00);
+		//m_out_tk00_func(m_tk00);
 	}
 
 	m_stp = state;
@@ -704,6 +695,7 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
 		device_image_interface(mconfig, *this),
+		m_out_idx_func(*this),
 		m_drtn(0),
 		m_stp(0),
 		m_wtg(0),
@@ -721,7 +713,6 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_current_track(0),
 		m_index_pulse_callback(NULL),
 		m_rpm(0.0f),
-		m_ready_state_change_callback(NULL),
 		m_id_index(0),
 		m_controller(NULL),
 		m_floppy(NULL),
@@ -736,6 +727,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
+		m_out_idx_func(*this),
 		m_drtn(0),
 		m_stp(0),
 		m_wtg(0),
@@ -753,7 +745,6 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_current_track(0),
 		m_index_pulse_callback(NULL),
 		m_rpm(0.0f),
-		m_ready_state_change_callback(NULL),
 		m_id_index(0),
 		m_controller(NULL),
 		m_floppy(NULL),
@@ -786,20 +777,20 @@ void legacy_floppy_image_device::device_start()
 	m_active = FALSE;
 
 	/* resolve callbacks */
-	m_out_idx_func.resolve(m_config->out_idx_func, *this);
-	m_in_mon_func.resolve(m_config->in_mon_func, *this);
-	m_out_tk00_func.resolve(m_config->out_tk00_func, *this);
-	m_out_wpt_func.resolve(m_config->out_wpt_func, *this);
-	m_out_rdy_func.resolve(m_config->out_rdy_func, *this);
+	m_out_idx_func.resolve_safe();
+	//m_in_mon_func.resolve(m_config->in_mon_func, *this);
+	//m_out_tk00_func.resolve(m_config->out_tk00_func, *this);
+	//m_out_wpt_func.resolve(m_config->out_wpt_func, *this);
+	//m_out_rdy_func.resolve(m_config->out_rdy_func, *this);
 //  m_out_dskchg_func.resolve(m_config->out_dskchg_func, *this);
 
 	/* by default we are not write-protected */
 	m_wpt = ASSERT_LINE;
-	m_out_wpt_func(m_wpt);
+	//m_out_wpt_func(m_wpt);
 
 	/* not at track 0 */
 	m_tk00 = ASSERT_LINE;
-	m_out_tk00_func(m_tk00);
+	//m_out_tk00_func(m_tk00);
 
 	/* motor off */
 	m_mon = ASSERT_LINE;
@@ -850,7 +841,7 @@ bool legacy_floppy_image_device::call_load()
 
 	/* push disk halfway into drive */
 	m_wpt = CLEAR_LINE;
-	m_out_wpt_func(m_wpt);
+	//m_out_wpt_func(m_wpt);
 
 	/* set timer for disk load */
 	int next_wpt;
@@ -879,17 +870,10 @@ void legacy_floppy_image_device::call_unload()
 
 	/* pull disk halfway out of drive */
 	m_wpt = CLEAR_LINE;
-	m_out_wpt_func(m_wpt);
+	//m_out_wpt_func(m_wpt);
 
 	/* set timer for disk eject */
 	machine().scheduler().timer_set(attotime::from_msec(250), timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt),this), ASSERT_LINE);
-}
-
-void legacy_floppy_image_device::call_display_info()
-{
-	if (((floppy_interface*)(this)->static_config())->device_displayinfo) {
-		((floppy_interface*)(this)->static_config())->device_displayinfo(*this);
-	}
 }
 
 bool legacy_floppy_image_device::is_creatable() const

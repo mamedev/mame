@@ -157,15 +157,6 @@ WRITE8_MEMBER( spectra_state::portb_w )
 }
 
 
-static const riot6532_interface riot6532_intf =
-{
-	DEVCB_DRIVER_MEMBER(spectra_state, porta_r),    // port a in
-	DEVCB_DRIVER_MEMBER(spectra_state, portb_r),    // port b in
-	DEVCB_DRIVER_MEMBER(spectra_state, porta_w),    // port a out
-	DEVCB_DRIVER_MEMBER(spectra_state, portb_w),    // port b in
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE) // interrupt
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 {
 	if (m_t_c > 0x10)
@@ -239,8 +230,16 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)  // actually a 6503
 	MCFG_CPU_PROGRAM_MAP(spectra_map)
-	MCFG_RIOT6532_ADD("riot", 3579545/4, riot6532_intf) // R6532
+
+	MCFG_DEVICE_ADD("riot", RIOT6532, 3579545/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(spectra_state, porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(spectra_state, porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(spectra_state, portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(spectra_state, portb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+
 	MCFG_NVRAM_ADD_1FILL("ram")
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 

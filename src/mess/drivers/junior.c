@@ -185,16 +185,6 @@ WRITE_LINE_MEMBER( junior_state::junior_riot_irq )
 }
 
 
-static const riot6532_interface junior_riot_interface =
-{
-	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_a_r),
-	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_b_r),
-	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_a_w),
-	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_b_w),
-	DEVCB_DRIVER_LINE_MEMBER(junior_state, junior_riot_irq)
-};
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
 {
 	int i;
@@ -231,12 +221,17 @@ static MACHINE_CONFIG_START( junior, junior_state )
 	MCFG_CPU_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_junior )
 
 	/* Devices */
-	MCFG_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL_1MHz)
+	MCFG_RIOT6532_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(junior_state, junior_riot_irq))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
 MACHINE_CONFIG_END
 

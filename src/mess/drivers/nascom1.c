@@ -258,24 +258,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static Z80PIO_INTERFACE( nascom1_z80pio_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
 	MCFG_CPU_IO_MAP(nascom1_io)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -295,13 +282,12 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_AY51013_READ_SI_CB(READ8(nascom1_state, nascom1_hd6402_si))
 	MCFG_AY51013_WRITE_SO_CB(WRITE8(nascom1_state, nascom1_hd6402_so))
 	
-
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_16MHz/8, nascom1_z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_16MHz/8)
 
 	/* devices */
 	MCFG_SNAPSHOT_ADD("snapshot", nascom1_state, nascom1, "nas", 0.5)
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -326,14 +312,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface nascom2_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(nascom2),
-	NULL,
 	NULL
 };
 

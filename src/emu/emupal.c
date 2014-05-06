@@ -25,6 +25,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 		m_indirect_entries(0),
 		m_enable_shadows(0),
 		m_enable_hilights(0),
+		m_membits_supplied(false),
 		m_endianness_supplied(false),
 		m_raw_to_rgb(raw_to_rgb_converter()),
 		m_palette(NULL),
@@ -50,6 +51,14 @@ void palette_device::static_set_init(device_t &device, palette_init_delegate ini
 void palette_device::static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb)
 {
 	downcast<palette_device &>(device).m_raw_to_rgb = raw_to_rgb;
+}
+
+
+void palette_device::static_set_membits(device_t &device, int membits)
+{
+	palette_device &palette = downcast<palette_device &>(device);
+	palette.m_membits = membits;
+	palette.m_membits_supplied = true;
 }
 
 
@@ -432,11 +441,21 @@ void palette_device::device_start()
 			m_paletteram_ext.set(*share_ext, bytes_per_entry / 2);
 		}
 
+		// override membits if provided
+		if (m_membits_supplied)
+		{
+			// forcing width only makes sense when narrower than the native bus width
+			assert_always(m_membits < share->width(), "Improper use of MCFG_PALETTE_MEMBITS");
+			m_paletteram.set_membits(m_membits);
+			if (share_ext != NULL)
+				m_paletteram_ext.set_membits(m_membits);
+		}
+		
 		// override endianness if provided
 		if (m_endianness_supplied)
 		{
 			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
-			assert(share_ext == NULL && share->width() / 8 < bytes_per_entry);
+			assert_always((share_ext == NULL && m_paletteram.membits() / 8 < bytes_per_entry), "Improper use of MCFG_PALETTE_ENDIANNESS");
 			m_paletteram.set_endianness(m_endianness);
 		}
 	}
@@ -561,7 +580,7 @@ void palette_device::allocate_palette()
 		m_shadow_group = numgroups++;
 	if (m_enable_hilights)
 		m_hilight_group = numgroups++;
-	assert_always(m_entries * numgroups <= 65536, "Error: palette has more than 65536 colors.");
+	assert_always(m_entries * numgroups <= 65536, "Palette has more than 65536 colors.");
 
 	// allocate a palette object containing all the colors and groups
 	m_palette = palette_t::alloc(m_entries, numgroups);

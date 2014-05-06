@@ -168,18 +168,6 @@ static INPUT_PORTS_START( sc1 )
 INPUT_PORTS_END
 
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_NULL,                                     /* callback when change interrupt status */
-	DEVCB_NULL,                                     /* port A read callback */
-	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_a_w),   /* port A write callback */
-	DEVCB_NULL,                                     /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_b_r),   /* port B read callback */
-	DEVCB_NULL,                                     /* port B write callback */
-	DEVCB_NULL                                      /* portB ready active callback */
-};
-
-
 static MACHINE_CONFIG_START( sc1, sc1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -190,7 +178,9 @@ static MACHINE_CONFIG_START( sc1, sc1_state )
 	MCFG_DEFAULT_LAYOUT(layout_sc1)
 
 	/* devices */
-	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, pio_intf)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc1_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(sc1_state, pio_port_b_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

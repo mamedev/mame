@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	/* Cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -509,17 +509,6 @@ WRITE8_MEMBER( dg680_state::port08_w )
 	m_protection[breg] = data;
 }
 
-static Z80PIO_INTERFACE( z80pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
-	DEVCB_DRIVER_MEMBER(dg680_state, porta_r),  // in port A
-	DEVCB_NULL,  // out port A
-	DEVCB_NULL, // ready line port A - this activates to ask for kbd data but not known if actually used
-	DEVCB_DRIVER_MEMBER(dg680_state, portb_r), // in port B
-	DEVCB_DRIVER_MEMBER(dg680_state, portb_w),                 // out port B
-	DEVCB_NULL
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
 {
 // ch0 is for the clock
@@ -536,14 +525,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(1);
 	m_ctc->trg3(0);
 }
-
-static Z80CTC_INTERFACE( z80ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
-	DEVCB_NULL,        // ZC/TO1 callback
-	DEVCB_NULL     // ZC/TO2 callback
-};
 
 static MACHINE_CONFIG_START( dg680, dg680_state )
 	/* basic machine hardware */
@@ -569,14 +550,23 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dg680_state, kbd_put))
 
 	/* Cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_8MHz / 4, z80ctc_intf )
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_8MHz / 4, z80pio_intf )
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_8MHz / 4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(dg680_state, porta_r))
+	// OUT_ARDY - this activates to ask for kbd data but not known if actually used
+	MCFG_Z80PIO_IN_PB_CB(READ8(dg680_state, portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(dg680_state, portb_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))
 MACHINE_CONFIG_END

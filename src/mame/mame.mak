@@ -14,7 +14,7 @@ ifeq ($(TARGET),mame)
 # $(SRC)/emu, as well as all the OSD objects and anything in the $(OBJ) tree
 depend: maketree $(MAKEDEP_TARGET)
 	@echo Rebuilding depend_emu.mak...
-	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/emu > depend_emu.mak
+	$(MAKEDEP) -I. $(INCPATH) -I$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/emu > depend_emu.mak
 	@echo Rebuilding depend_$(TARGET).mak...
 	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/$(TARGET) > depend_$(TARGET).mak
 endif
@@ -851,6 +851,8 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/offtwall.o $(VIDEO)/offtwall.o \
 	$(DRIVERS)/orbit.o $(AUDIO)/orbit.o $(VIDEO)/orbit.o \
 	$(DRIVERS)/pong.o \
+	$(DRIVERS)/nl_pong.o \
+	$(DRIVERS)/nl_pongd.o \
 	$(DRIVERS)/poolshrk.o $(AUDIO)/poolshrk.o $(VIDEO)/poolshrk.o \
 	$(DRIVERS)/quantum.o \
 	$(DRIVERS)/quizshow.o \
@@ -932,6 +934,7 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc5sw.o \
 	$(DRIVERS)/bfm_ad5.o \
 	$(DRIVERS)/bfm_ad5sw.o \
+	$(DRIVERS)/bfm_sc45_helper.o \
 	$(DRIVERS)/bfm_swp.o \
 	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
@@ -1309,7 +1312,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/gbusters.o $(VIDEO)/gbusters.o \
 	$(DRIVERS)/gijoe.o $(VIDEO)/gijoe.o \
 	$(DRIVERS)/gradius3.o $(VIDEO)/gradius3.o \
-	$(DRIVERS)/gticlub.o $(VIDEO)/gticlub.o \
+	$(DRIVERS)/gticlub.o \
 	$(DRIVERS)/gyruss.o $(VIDEO)/gyruss.o \
 	$(DRIVERS)/hcastle.o $(VIDEO)/hcastle.o \
 	$(DRIVERS)/hexion.o $(VIDEO)/hexion.o \
@@ -2243,6 +2246,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/esripsys.o $(VIDEO)/esripsys.o \
 	$(DRIVERS)/ettrivia.o \
 	$(DRIVERS)/extrema.o \
+	$(DRIVERS)/fireball.o \
 	$(DRIVERS)/flipjack.o \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
@@ -2416,7 +2420,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wms.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
-
+	
 
 #-------------------------------------------------
 # layout dependencies
@@ -2495,10 +2499,10 @@ $(DRIVERS)/bfm_sc2.o:   $(LAYOUT)/sc2_vfd.lh \
 			$(LAYOUT)/sltblgtk.lh
 
 $(DRIVERS)/bfm_sc4.o:   $(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh
-
-$(DRIVERS)/bfm_sc4h.o:  $(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh
+			$(LAYOUT)/sc4_dmd.lh \
+			$(LAYOUT)/sc4dnd.lh \
+			$(LAYOUT)/sc4dndtp.lh \
+			$(LAYOUT)/sc4dnddw.lh		
 
 $(DRIVERS)/bfm_sc5.o:   $(LAYOUT)/bfm_sc5.lh
 
@@ -2563,6 +2567,8 @@ $(DRIVERS)/ecoinfr.o:   $(LAYOUT)/ecoinfr.lh
 $(DRIVERS)/ecoinf2.o:   $(LAYOUT)/ecoinf2.lh
 
 $(DRIVERS)/ecoinf3.o:   $(LAYOUT)/ecoinf3.lh
+
+$(DRIVERS)/fireball.o:  $(LAYOUT)/fireball.lh
 
 $(DRIVERS)/firebeat.o:  $(LAYOUT)/firebeat.lh
 

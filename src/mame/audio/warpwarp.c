@@ -59,7 +59,7 @@ void warpwarp_sound_device::device_start()
 	for (int i = 0; i < 0x8000; i++)
 		m_decay[0x7fff - i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, CLOCK_16H, this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, CLOCK_16H);
 
 	m_sound_volume_timer = timer_alloc(TIMER_SOUND_VOLUME_DECAY);
 	m_music_volume_timer = timer_alloc(TIMER_MUSIC_VOLUME_DECAY);

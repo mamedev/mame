@@ -17,7 +17,7 @@ TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
   reading of the i/o $3c8 bit 1.
 - Add a proper FDC device.
-- Filetto: Add UM5100 sound chip ,might be connected to the prototyping card;
+- Filetto: Add UM5100 sound chip, might be connected to the prototyping card;
 - buzzer sound has issues in both games
 
 ********************************************************************************************
@@ -73,9 +73,9 @@ class pcxt_state : public driver_device
 public:
 	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_pit8253(*this,"pit8253"),
-			m_pic8259_1(*this,"pic8259_1"),
-			m_dma8237_1(*this,"dma8237_1") ,
+			m_pit8253(*this, "pit8253"),
+			m_pic8259_1(*this, "pic8259_1"),
+			m_dma8237_1(*this, "dma8237_1") ,
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker") { }
 
@@ -553,17 +553,6 @@ WRITE_LINE_MEMBER(pcxt_state::pc_dack1_w){ set_dma_channel(m_dma8237_1, 1, state
 WRITE_LINE_MEMBER(pcxt_state::pc_dack2_w){ set_dma_channel(m_dma8237_1, 2, state); }
 WRITE_LINE_MEMBER(pcxt_state::pc_dack3_w){ set_dma_channel(m_dma8237_1, 3, state); }
 
-static I8237_INTERFACE( dma8237_1_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pcxt_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(pcxt_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack3_w) }
-};
-
 /******************
 8259 IRQ controller
 ******************/
@@ -730,7 +719,14 @@ static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, wss_2_w))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(pcxt_state, sys_reset_w))
 
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
+	MCFG_DEVICE_ADD("dma8237_1", AM9517A, XTAL_14_31818MHz/3)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pcxt_state, pc_dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(pcxt_state, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pcxt_state, pc_dma_write_byte))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pcxt_state, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pcxt_state, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pcxt_state, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pcxt_state, pc_dack3_w))
 
 	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, NULL )
 

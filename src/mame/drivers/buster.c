@@ -312,21 +312,6 @@ static GFXDECODE_START( buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 PALETTE_INIT_MEMBER(buster_state, buster)
 {
 	int i;
@@ -350,7 +335,10 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4) //unknown clock / type
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buster)
 	MCFG_PALETTE_ADD("palette", 8)

@@ -32,7 +32,6 @@ public:
 	required_shared_ptr<UINT16> m_fg_videoram;
 //  required_shared_ptr<UINT16> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram;
-	dynamic_array<UINT16> m_paletteram;
 
 	/* video-related */
 	tilemap_t         *m_fg_tilemap;
@@ -86,7 +85,8 @@ class wwfwfest_state : public ddragon3_state
 public:
 	wwfwfest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddragon3_state(mconfig, type, tag),
-		m_fg0_videoram(*this, "fg0_videoram")
+		m_fg0_videoram(*this, "fg0_videoram"),
+		m_paletteram(*this, "palette")
 	{
 		vblank_level = 3;
 		raster_level = 2;
@@ -94,6 +94,7 @@ public:
 
 	/* wwfwfest has an extra layer */
 	required_shared_ptr<UINT16> m_fg0_videoram;
+	required_shared_ptr<UINT16> m_paletteram;
 	tilemap_t *m_fg0_tilemap;
 	DECLARE_WRITE16_MEMBER(wwfwfest_fg0_videoram_w);
 
@@ -103,8 +104,8 @@ public:
 	DECLARE_WRITE16_MEMBER(wwfwfest_scroll_write);
 	DECLARE_WRITE16_MEMBER(wwfwfest_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_flipscreen_w);
-	DECLARE_READ16_MEMBER(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r);
-	DECLARE_WRITE16_MEMBER(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w);
+	DECLARE_READ16_MEMBER(wwfwfest_paletteram_r);
+	DECLARE_WRITE16_MEMBER(wwfwfest_paletteram_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_soundwrite);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);

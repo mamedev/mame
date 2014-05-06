@@ -2644,17 +2644,6 @@ static SLOT_INTERFACE_START( towns_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static const upd71071_intf towns_dma_config =
-{
-	"maincpu",
-	4000000,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_DRIVER_MEMBER16(towns_state, towns_fdc_dma_r), DEVCB_DRIVER_MEMBER16(towns_state,towns_scsi_dma_r), DEVCB_NULL, DEVCB_DRIVER_MEMBER16(towns_state,towns_cdrom_dma_r) },
-	{ DEVCB_DRIVER_MEMBER16(towns_state, towns_fdc_dma_w), DEVCB_DRIVER_MEMBER16(towns_state,towns_scsi_dma_w), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
 static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
@@ -2681,12 +2670,6 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000 + 0x3d800, text_chars,  0, 16 )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
-
-struct cdrom_interface towns_cdrom =
-{
-	NULL,
-	NULL
-};
 
 static MACHINE_CONFIG_FRAGMENT( towns_base )
 	/* basic machine hardware */
@@ -2745,7 +2728,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
 
-	MCFG_CDROM_ADD("cdrom",towns_cdrom)
+	MCFG_CDROM_ADD("cdrom")
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
@@ -2759,8 +2742,22 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(towns_state, towns_scsi_irq))
 	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(towns_state, towns_scsi_drq))
 
-	MCFG_UPD71071_ADD("dma_1",towns_dma_config)
-	MCFG_UPD71071_ADD("dma_2",towns_dma_config)
+	MCFG_DEVICE_ADD("dma_1", UPD71071, 0)
+	MCFG_UPD71071_CPU("maincpu")
+	MCFG_UPD71071_CLOCK(4000000)
+	MCFG_UPD71071_DMA_READ_0_CB(READ16(towns_state, towns_fdc_dma_r))
+	MCFG_UPD71071_DMA_READ_1_CB(READ16(towns_state, towns_scsi_dma_r))
+	MCFG_UPD71071_DMA_READ_3_CB(READ16(towns_state, towns_cdrom_dma_r))
+	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(towns_state, towns_fdc_dma_w))
+	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))	
+	MCFG_DEVICE_ADD("dma_2", UPD71071, 0)
+	MCFG_UPD71071_CPU("maincpu")
+	MCFG_UPD71071_CLOCK(4000000)
+	MCFG_UPD71071_DMA_READ_0_CB(READ16(towns_state, towns_fdc_dma_r))
+	MCFG_UPD71071_DMA_READ_1_CB(READ16(towns_state, towns_scsi_dma_r))
+	MCFG_UPD71071_DMA_READ_3_CB(READ16(towns_state, towns_cdrom_dma_r))
+	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(towns_state, towns_fdc_dma_w))
+	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))	
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 

@@ -1220,15 +1220,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface mz2500_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_3_5",
-	NULL
+	"floppy_3_5"
 };
 
 static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )
@@ -1985,18 +1979,6 @@ READ8_MEMBER(mz2500_state::mz2500_pio1_portb_r)
 }
 #endif
 
-static Z80PIO_INTERFACE( mz2500_pio1_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER( mz2500_state,mz2500_pio1_porta_r ),
-	DEVCB_DRIVER_MEMBER( mz2500_state,mz2500_pio1_porta_w ),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER( mz2500_state,mz2500_pio1_porta_r ),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 READ8_MEMBER(mz2500_state::opn_porta_r)
 {
 	return m_ym_porta;
@@ -2080,30 +2062,6 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
 }
 
-static Z80SIO_INTERFACE( mz2500_sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
@@ -2119,8 +2077,12 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(mz2500_state, mz2500_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2500_state, mz2500_portc_w))
 
-	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
-	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 6000000)
+	MCFG_Z80PIO_IN_PA_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2500_state, mz2500_pio1_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
+
+	MCFG_Z80SIO0_ADD("z80sio", 6000000, 0, 0, 0, 0)
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))

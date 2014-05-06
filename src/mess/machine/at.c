@@ -215,29 +215,6 @@ WRITE_LINE_MEMBER( at_state::pc_dack5_w ) { pc_set_dma_channel(5, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack6_w ) { pc_set_dma_channel(6, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack7_w ) { pc_set_dma_channel(7, state); }
 
-I8237_INTERFACE( at_dma8237_1_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq0_w),
-	DEVCB_DRIVER_LINE_MEMBER(at_state, at_dma8237_out_eop),
-	DEVCB_DRIVER_MEMBER(at_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(at_state, pc_dma_write_byte),
-	{ DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_0_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_1_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_2_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_3_dack_r) },
-	{ DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_0_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_1_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_2_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_3_dack_w) },
-	{ DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack3_w) }
-};
-
-
-I8237_INTERFACE( at_dma8237_2_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(at_state, pc_dma_read_word),
-	DEVCB_DRIVER_MEMBER(at_state, pc_dma_write_word),
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_5_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_6_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_7_dack_r) },
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_5_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_6_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_7_dack_w) },
-	{ DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack4_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack5_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack6_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack7_w) }
-};
-
 READ8_MEMBER( at_state::at_portb_r )
 {
 	UINT8 data = m_at_speaker;

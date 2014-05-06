@@ -183,7 +183,7 @@ const pc_format::format pc_format::formats[] = {
 	},
 	{   /* 1200K 5 1/4 inch high density */
 		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
-		1200, 15, 40, 2, 512, {}, 1, {}, 80, 50, 22, 84
+		1200, 15, 80, 2, 512, {}, 1, {}, 80, 50, 22, 84
 	},
 	{   /*  720K 3 1/2 inch double density */
 		floppy_image::FF_35,  floppy_image::DSDD, floppy_image::MFM,
@@ -191,7 +191,7 @@ const pc_format::format pc_format::formats[] = {
 	},
 	{   /* 1200K 3 1/2 inch high density (japanese variant) - gaps unverified */
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
-		1200, 15, 40, 2, 512, {}, 1, {}, 80, 50, 22, 84
+		1000, 15, 80, 2, 512, {}, 1, {}, 80, 50, 22, 84
 	},
 	{   /* 1440K 3 1/2 inch high density */
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,

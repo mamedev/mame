@@ -80,39 +80,6 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 	m_floppy->ss_w(BIT(data, 2));
 }
 
-const z80pio_interface kayproii_pio_g_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-const z80pio_interface kayproii_pio_s_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),    /* read printer status */
-	DEVCB_DRIVER_MEMBER(kaypro_state, kayproii_pio_system_w),   /* activate various internal devices */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-const z80pio_interface kaypro4_pio_s_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),    /* read printer status */
-	DEVCB_DRIVER_MEMBER(kaypro_state, kaypro4_pio_system_w),    /* activate various internal devices */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL          /* portB ready active callback */
-};
-
 /***********************************************************
 
     KAYPRO2X SYSTEM PORT
@@ -166,7 +133,6 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 }
 
 
-
 /***********************************************************************
 
     SIO
@@ -196,45 +162,23 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     FFh    19200 */
 
 
-const z80sio_interface kaypro_sio_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(kaypro_state,kaypro_interrupt),    /* interrupt handler */
-	DEVCB_NULL,         /* DTR changed handler */
-	DEVCB_NULL,         /* RTS changed handler */
-	DEVCB_NULL,         /* BREAK changed handler */
-	DEVCB_NULL,         /* transmit handler - which channel is this for? */
-	DEVCB_NULL          /* receive handler - which channel is this for? */
-};
-
 READ8_MEMBER(kaypro_state::kaypro_sio_r)
 {
-	if (!offset)
-		return dynamic_cast<z80sio_device*>(machine().device("z80sio"))->data_read(0);
-	else
 	if (offset == 1)
-//      return z80sio_d_r(machine().device("z80sio"), 1);
 		return kay_kbd_d_r(machine());
 	else
-	if (offset == 2)
-		return dynamic_cast<z80sio_device*>(machine().device("z80sio"))->control_read(0);
-	else
-//      return z80sio_c_r(machine().device("z80sio"), 1);
+	if (offset == 3)
 		return kay_kbd_c_r(machine());
+	else
+		return m_sio->cd_ba_r(space, offset);
 }
 
 WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
 {
-	if (!offset)
-		dynamic_cast<z80sio_device*>(machine().device("z80sio"))->data_write(0, data);
-	else
 	if (offset == 1)
-//      z80sio_d_w(machine().device("z80sio"), 1, data);
 		kay_kbd_d_w(machine(), data);
 	else
-	if (offset == 2)
-		dynamic_cast<z80sio_device*>(machine().device("z80sio"))->control_write(0, data);
-	else
-		dynamic_cast<z80sio_device*>(machine().device("z80sio"))->control_write(1, data);
+		m_sio->cd_ba_w(space, offset, data);
 }
 
 

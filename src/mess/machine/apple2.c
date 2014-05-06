@@ -4,9 +4,6 @@
 
   Machine file to handle emulation of the Apple II series.
 
-  TODO:  Verify correctness of C08X switches.
-            - need to do double-read before write-enable RAM
-
 ***************************************************************************/
 
 #include "emu.h"

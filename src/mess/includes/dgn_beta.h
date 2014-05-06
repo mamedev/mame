@@ -193,6 +193,7 @@ public:
 	// Page IO at FE00
 	DECLARE_READ8_MEMBER(dgn_beta_page_r);
 	DECLARE_WRITE8_MEMBER(dgn_beta_page_w);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	/*  WD2797 FDC */
 	DECLARE_READ8_MEMBER(dgnbeta_wd2797_r);
@@ -218,10 +219,5 @@ public:
 /*----------- defined in machine/dgn_beta.c -----------*/
 
 extern const wd17xx_interface dgnbeta_wd17xx_interface;
-
-
-/*----------- defined in video/dgn_beta.c -----------*/
-
-extern const mc6845_interface dgnbeta_crtc6845_interface;
 
 #endif /* DGN_BETA_H_ */

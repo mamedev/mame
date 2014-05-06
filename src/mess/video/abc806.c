@@ -222,26 +222,25 @@ WRITE8_MEMBER( abc806_state::sso_w )
 //  MC6845_UPDATE_ROW( abc806_update_row )
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( abc806_update_row )
+MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 {
-	abc806_state *state = device->machine().driver_data<abc806_state>();
-	const pen_t *pen = state->m_palette->pens();
+	const pen_t *pen = m_palette->pens();
 
 //  UINT8 old_data = 0xff;
 	int fg_color = 7;
 	int bg_color = 0;
 	int underline = 0;
 	int flash = 0;
-	int e5 = state->m_40;
-	int e6 = state->m_40;
+	int e5 = m_40;
+	int e6 = m_40;
 	int th = 0;
 
-	y += state->m_sync + vbp;
+	y += m_sync + vbp;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 data = state->m_char_ram[(ma + column) & 0x7ff];
-		UINT8 attr = state->m_attr_ram[(ma + column) & 0x7ff];
+		UINT8 data = m_char_ram[(ma + column) & 0x7ff];
+		UINT8 attr = m_attr_ram[(ma + column) & 0x7ff];
 		UINT16 rad_addr;
 		UINT8 rad_data;
 
@@ -270,7 +269,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 				e6 = BIT(attr, 1);
 
 				// read attributes from next byte
-				attr = state->m_attr_ram[(ma + column + 1) & 0x7ff];
+				attr = m_attr_ram[(ma + column + 1) & 0x7ff];
 
 				if (attr != 0x00)
 				{
@@ -289,8 +288,8 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 			bg_color = (attr >> 3) & 0x07;
 			underline = BIT(attr, 6);
 			flash = BIT(attr, 7);
-			e5 = state->m_40;
-			e6 = state->m_40;
+			e5 = m_40;
+			e6 = m_40;
 		}
 
 		if (column == cursor_x)
@@ -299,14 +298,14 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		}
 		else
 		{
-			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (state->m_flshclk << 4) | ra;
-			rad_data = state->m_rad_prom->base()[rad_addr] & 0x0f;
+			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (m_flshclk << 4) | ra;
+			rad_data = m_rad_prom->base()[rad_addr] & 0x0f;
 
 			rad_data = ra; // HACK because the RAD prom is not dumped yet
 		}
 
 		UINT16 chargen_addr = (th << 12) | (data << 4) | rad_data;
-		UINT8 chargen_data = state->m_char_rom->base()[chargen_addr & 0xfff] << 2;
+		UINT8 chargen_data = m_char_rom->base()[chargen_addr & 0xfff] << 2;
 		int x = hbp + (column + 4) * ABC800_CHAR_WIDTH;
 
 		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
@@ -390,26 +389,6 @@ WRITE_LINE_MEMBER( abc806_state::vs_w )
 {
 	m_vsync = state;
 }
-
-
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	ABC800_CHAR_WIDTH,
-	NULL,
-	abc806_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(abc806_state, hs_w),
-	DEVCB_DRIVER_LINE_MEMBER(abc806_state, vs_w),
-	NULL
-};
 
 
 //-------------------------------------------------
@@ -523,7 +502,12 @@ PALETTE_INIT_MEMBER( abc806_state, abc806 )
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc806_video )
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
+	MCFG_MC6845_UPDATE_ROW_CB(abc806_state, abc806_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(abc806_state, hs_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(abc806_state, vs_w))
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)

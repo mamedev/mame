@@ -66,27 +66,6 @@ void macpds_device::static_set_cputag(device_t &device, const char *tag)
 	macpds.m_cputag = tag;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void macpds_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const macpds_interface *intf = reinterpret_cast<const macpds_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<macpds_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************

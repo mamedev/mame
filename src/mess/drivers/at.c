@@ -195,7 +195,20 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megapc_io, AS_IO, 32, at_state )
+static ADDRESS_MAP_START( megapc_io, AS_IO, 16, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff) // TODO: is this the correct type?
+	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megapcpl_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
@@ -300,8 +313,37 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(at_state, at_pit8254_out2_changed))
 
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
-	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(at_state, at_dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(at_state, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(at_state, pc_dma_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(at_state, pc_dma8237_0_dack_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(at_state, pc_dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(at_state, pc_dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(at_state, pc_dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(at_state, pc_dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(at_state, pc_dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(at_state, pc_dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(at_state, pc_dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(at_state, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(at_state, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(at_state, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(at_state, pc_dack3_w))
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(at_state, pc_dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(at_state, pc_dma_read_word))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(at_state, pc_dma_write_word))
+	MCFG_I8237_IN_IOR_1_CB(READ8(at_state, pc_dma8237_5_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(at_state, pc_dma8237_6_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(at_state, pc_dma8237_7_dack_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(at_state, pc_dma8237_5_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(at_state, pc_dma8237_6_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(at_state, pc_dma8237_7_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(at_state, pc_dack4_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(at_state, pc_dack5_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(at_state, pc_dack6_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(at_state, pc_dack7_w))
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(at_state, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )
@@ -684,9 +726,9 @@ static MACHINE_CONFIG_DERIVED( ct386sx, neat )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megapc, at386 )
-	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(at386_map)
+static MACHINE_CONFIG_DERIVED( megapc, atvga )
+	MCFG_CPU_REPLACE("maincpu", I386SX, XTAL_50MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(megapc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
@@ -697,7 +739,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_REPLACE("maincpu", I486, 66000000 / 2)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
-	MCFG_CPU_IO_MAP(megapc_io)
+	MCFG_CPU_IO_MAP(megapcpl_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 

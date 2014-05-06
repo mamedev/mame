@@ -265,26 +265,11 @@ WRITE_LINE_MEMBER(svi318_state::vdp_interrupt)
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static const cassette_interface svi318_cassette_interface =
-{
-	svi_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	"svi318_cass",
-	NULL
-};
-
 static const floppy_interface svi318_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(svi318),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
@@ -340,7 +325,10 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette", svi318_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(svi_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("svi318_cass")
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 
@@ -388,21 +376,6 @@ static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
 	MCFG_RAM_EXTRA_OPTIONS("96K,160K")
 MACHINE_CONFIG_END
 
-
-static MC6845_INTERFACE( svi806_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8 /*?*/,
-	NULL,
-	svi806_crtc6845_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
 
 /* F4 Character Displayer */
 static const gfx_layout svi328_charlayout =
@@ -460,7 +433,10 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svi328)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8, svi806_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)	/* ? */
+	MCFG_MC6845_UPDATE_ROW_CB(svi318_state, crtc_update_row)
 
 	MCFG_VIDEO_START_OVERRIDE(svi318_state, svi328_806 )
 
@@ -480,7 +456,10 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette", svi318_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(svi_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("svi318_cass")
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 

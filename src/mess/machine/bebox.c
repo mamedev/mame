@@ -633,31 +633,6 @@ WRITE_LINE_MEMBER(bebox_state::pc_dack1_w){ set_dma_channel(machine(), 1, state)
 WRITE_LINE_MEMBER(bebox_state::pc_dack2_w){ set_dma_channel(machine(), 2, state); }
 WRITE_LINE_MEMBER(bebox_state::pc_dack3_w){ set_dma_channel(machine(), 3, state); }
 
-
-I8237_INTERFACE( bebox_dma8237_1_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_dma8237_out_eop),
-	DEVCB_DRIVER_MEMBER(bebox_state, bebox_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(bebox_state, bebox_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bebox_state,bebox_dma8237_fdc_dack_r), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bebox_state,bebox_dma8237_fdc_dack_w), DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack3_w) }
-};
-
-
-I8237_INTERFACE( bebox_dma8237_2_config )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-
 /*************************************
  *
  *  8254 PIT

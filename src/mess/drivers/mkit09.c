@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( mkit09, mkit09_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -39,7 +39,7 @@ vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, d
 
 void vrc6snd_device::device_start()
 {
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
 
 	m_freqctrl = m_pulsectrl[0] = m_pulsectrl[1] = 0;
 	m_pulsefrql[0] = m_pulsefrql[1] = m_pulsefrqh[0] = m_pulsefrqh[1] = 0;

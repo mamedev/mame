@@ -150,6 +150,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 protected:
 	virtual void machine_start();
 	virtual void machine_reset();

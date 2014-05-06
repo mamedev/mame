@@ -43,7 +43,7 @@ void i5000snd_device::device_start()
 	m_lut_volume[0xff] = 0;
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400);
 
 	m_rom_base = (UINT16 *)device().machine().root_device().memregion(":i5000snd")->base();
 	m_rom_mask = device().machine().root_device().memregion(":i5000snd")->bytes() / 2 - 1;

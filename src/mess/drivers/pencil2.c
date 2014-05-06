@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* cartridge */
 //  MCFG_CARTSLOT_ADD("cart")

@@ -206,7 +206,7 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  Z80PIO
 //-------------------------------------------------
 
 READ8_MEMBER( luxor_55_10828_device::pio_pa_r )
@@ -286,18 +286,6 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 	m_fdc->hlt_w(BIT(data, 5));
 }
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pa_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pb_w),
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  z80_daisy_config daisy_chain
 //-------------------------------------------------
@@ -347,7 +335,13 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MCFG_CPU_IO_MAP(luxor_55_10828_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_4MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(luxor_55_10828_device, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(luxor_55_10828_device, pio_pa_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(luxor_55_10828_device, pio_pb_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(luxor_55_10828_device, pio_pb_w))
+
 	MCFG_MB8876x_ADD(MB8876_TAG, XTAL_4MHz/2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))

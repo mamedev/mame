@@ -526,22 +526,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
 static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -699,7 +683,9 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 1.5 MHz, measured */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

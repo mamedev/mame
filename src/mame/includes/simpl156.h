@@ -21,9 +21,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_systemram(*this, "systemram"),
 		m_sprgen(*this, "spritegen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram")
-	{ }
+		m_palette(*this, "palette") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -37,16 +35,11 @@ public:
 	required_shared_ptr<UINT32> m_systemram;
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	DECLARE_READ32_MEMBER(simpl156_inputs_read);
-	DECLARE_READ32_MEMBER(simpl156_palette_r);
-	DECLARE_WRITE32_MEMBER(simpl156_palette_w);
-	DECLARE_READ32_MEMBER(simpl156_system_r);
 	DECLARE_WRITE32_MEMBER(simpl156_eeprom_w);
 	DECLARE_READ32_MEMBER(simpl156_spriteram_r);
 	DECLARE_WRITE32_MEMBER(simpl156_spriteram_w);

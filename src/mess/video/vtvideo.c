@@ -191,6 +191,7 @@ READ8_MEMBER( vt100_video_device::lba7_r )
 WRITE8_MEMBER( vt100_video_device::dc012_w )
 {
 	// TODO: writes to 10C/0C should be treated differently (emulation disables the watchdog too often).
+	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
 	if (data == 0) // MHFU is disabled by writing 00 to port 010C.
 	{
 				//if (MHFU_FLAG == true)

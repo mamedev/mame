@@ -875,11 +875,13 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 		set_data_transfer(disk->m_esdi_defect_list, sizeof(disk->m_esdi_defect_list));
 		break;
 
+#if 0	// this command seems unused by Domain/OS, and it's unclear what the intent of the code is (it makes some versions of GCC quite unhappy)
 	case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
 		log_data();
 		alternate_track_address[0] = get_disk_track(cdb);
-		alternate_track_address[1] = get_disk_track(alternate_track_buffer-1);;
+		alternate_track_address[1] = get_disk_track(alternate_track_buffer-1);
 		break;
+#endif
 
 	case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
 		if (check_disk_address(cdb)) {

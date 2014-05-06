@@ -320,12 +320,6 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-static struct tms9927_interface crtc_intf =
-{
-	6,      // pixels per video memory address
-	NULL    // self-load data
-};
-
 READ8_MEMBER( compucolor2_state::xi_r )
 {
 	UINT8 data = 0xff;
@@ -465,8 +459,9 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+
 	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
-	MCFG_DEVICE_CONFIG(crtc_intf)
+	MCFG_TMS9927_CHAR_WIDTH(6)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 

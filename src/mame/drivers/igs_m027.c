@@ -34,17 +34,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_igs_mainram(*this, "igs_mainram"),
 		m_igs_cg_videoram(*this, "igs_cg_videoram"),
-		m_igs_palette32(*this, "igs_palette32"),
 		m_igs_tx_videoram(*this, "igs_tx_videoram"),
 		m_igs_bg_videoram(*this, "igs_bg_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT32> m_igs_mainram;
 	optional_shared_ptr<UINT32> m_igs_cg_videoram;
-	optional_shared_ptr<UINT32> m_igs_palette32;
 	optional_shared_ptr<UINT32> m_igs_tx_videoram;
 	optional_shared_ptr<UINT32> m_igs_bg_videoram;
 
@@ -79,7 +76,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
 
 
@@ -180,18 +176,6 @@ TILE_GET_INFO_MEMBER(igs_m027_state::get_bg_tilemap_tile_info)
 }
 
 
-/* Palette Layer */
-WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
-{
-	m_generic_paletteram_16.set_target(reinterpret_cast<UINT16 *>(m_igs_palette32.target()), 0x800);
-	COMBINE_DATA(&m_igs_palette32[offset]);
-	//paletteram_xGGGGGRRRRRBBBBB_word_w(offset*2,m_generic_paletteram_16[offset*2],0);
-	//paletteram_xGGGGGRRRRRBBBBB_word_w(offset*2+1,m_generic_paletteram_16[offset*2+1],0);
-	//if(data!=0)
-	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,m_igs_palette32[offset]);
-}
-
-
 
 void igs_m027_state::video_start()
 {
@@ -246,7 +230,7 @@ static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
 	AM_RANGE(0x18000000, 0x18007fff) AM_RAM
 
 	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_SHARE("igs_cg_videoram")        //0x200 * 1   CG PALETTE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE(igs_palette32_w) AM_SHARE("igs_palette32")        //0x200 * 1
+	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")        //0x200 * 1
 
 	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE(igs_tx_videoram_w) AM_SHARE("igs_tx_videoram") /* Text Layer */
 	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE(igs_bg_videoram_w) AM_SHARE("igs_bg_videoram") /* CG Layer */
@@ -419,7 +403,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
-
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
 

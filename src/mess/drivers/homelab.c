@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
 	MCFG_MEA8000_DAC("speech")
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
 MACHINE_CONFIG_END
 

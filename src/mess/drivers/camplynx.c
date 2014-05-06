@@ -103,6 +103,8 @@ public:
 	DECLARE_DRIVER_INIT(lynx48k);
 	DECLARE_PALETTE_INIT(camplynx);
 	DECLARE_MACHINE_RESET(lynx128k);
+	MC6845_UPDATE_ROW(lynx48k_update_row);
+	MC6845_UPDATE_ROW(lynx128k_update_row);
 	required_device<palette_device> m_palette;
 private:
 	virtual void video_start();
@@ -384,11 +386,10 @@ PALETTE_INIT_MEMBER(camplynx_state, camplynx)
 	}
 }
 
-static MC6845_UPDATE_ROW( lynx48k_update_row )
+MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
-	camplynx_state *state = device->machine().driver_data<camplynx_state>();
-	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
 
@@ -409,11 +410,10 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 	}
 }
 
-static MC6845_UPDATE_ROW( lynx128k_update_row )
+MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 {
-	camplynx_state *state = device->machine().driver_data<camplynx_state>();
-	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
 
@@ -438,38 +438,6 @@ void camplynx_state::video_start()
 {
 }
 
-static MC6845_INTERFACE( lynx48k_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	lynx48k_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
-
-static MC6845_INTERFACE( lynx128k_crtc6845_interface )
-{
-	false,
-	0,0,0,0,        /* visarea adjustment */
-	8,              /* dots per character */
-	NULL,
-	lynx128k_update_row,        /* callback to display one scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(camplynx_state, lynx128k_irq),  /* callback when cursor pin changes state */
-	DEVCB_NULL,
-	NULL
-};
-
-
 static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 
 	/* basic machine hardware */
@@ -492,8 +460,11 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx48k_crtc6845_interface)
+	/* devices */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lynx128k, camplynx_state )
@@ -520,8 +491,12 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128k_crtc6845_interface)
+	/* devices */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITE8(camplynx_state, lynx128k_irq))
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(camplynx_state,lynx48k)

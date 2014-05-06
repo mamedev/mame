@@ -125,6 +125,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port0d_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	INTERRUPT_GEN_MEMBER(irq_vs);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	required_device<palette_device> m_palette;
@@ -320,10 +321,9 @@ static GFXDECODE_START( amust )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amust_charlayout, 0, 1 )
 GFXDECODE_END
 
-MC6845_UPDATE_ROW( amust_update_row )
+MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 {
-	amust_state *state = device->machine().driver_data<amust_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -332,9 +332,9 @@ MC6845_UPDATE_ROW( amust_update_row )
 	{
 		inv = (x == cursor_x) ? 0xff : 0;
 		mem = (ma + x) & 0x7ff;
-		chr = state->m_p_videoram[mem];
+		chr = m_p_videoram[mem];
 		if (ra < 8)
-			gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
+			gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 		else
 			gfx = inv;
 
@@ -349,21 +349,6 @@ MC6845_UPDATE_ROW( amust_update_row )
 		*p++ = palette[BIT(gfx, 0)];
 	}
 }
-
-static MC6845_INTERFACE( amust_crtc )
-{
-	false,
-	0,0,0,0,                /* visarea adjustment */
-	8,                      /* number of dots per character */
-	NULL,
-	amust_update_row,       /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
 
 MACHINE_RESET_MEMBER( amust_state, amust )
 {
@@ -415,7 +400,11 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 8, amust_crtc)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)
+
 	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(amust_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)

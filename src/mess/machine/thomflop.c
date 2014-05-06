@@ -1639,27 +1639,25 @@ TIMER_CALLBACK_MEMBER( thomson_state::ans )
 
 */
 
-static void to7_network_got_frame( device_t *device, UINT8* data, int length )
+MC6854_OUT_FRAME_CB(thomson_state::to7_network_got_frame)
 {
-	int i;
-	LOG(( "%f to7_network_got_frame:", device->machine().time().as_double() ));
-	for ( i = 0; i < length; i++ )
+	LOG(( "%f to7_network_got_frame:", machine().time().as_double() ));
+	for ( int i = 0; i < length; i++ )
 		LOG(( " $%02X", data[i] ));
 	LOG(( "\n" ));
 
 	if ( data[1] == 0xff )
 	{
-		thomson_state *state = device->machine().driver_data<thomson_state>();
 		LOG(( "to7_network_got_frame: %i phones %i\n", data[2], data[0] ));
-		device->machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans),state));
-		state->m_mc6854->set_cts( 0 );
+		machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans), this));
+		m_mc6854->set_cts( 0 );
 	}
 	else if ( ! data[1] )
 	{
 		char name[33];
 		memcpy( name, data + 12, 32 );
 		name[32] = 0;
-		for (i=0;i<32;i++)
+		for (int i=0;i<32;i++)
 		{
 			if ( name[i]<32 || name[i]>=127 )
 				name[i]=' ';
@@ -1669,16 +1667,6 @@ static void to7_network_got_frame( device_t *device, UINT8* data, int length )
 				(data[10] == 2) ? "TO7/70" : "?", name ));
 	}
 }
-
-
-const mc6854_interface to7_network_iface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	to7_network_got_frame,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 void thomson_state::to7_network_init()

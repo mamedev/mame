@@ -348,7 +348,8 @@ public:
 		m_dsw(*this, "DSW"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog1(*this, "ANALOG1"),
-		m_analog2(*this, "ANALOG2"){ }
+		m_analog2(*this, "ANALOG2"),
+		m_konppc(*this, "konppc"){ }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
@@ -368,6 +369,7 @@ public:
 	required_device<adc12138_device> m_adc12138;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_eepromout;
 	optional_ioport m_analog1, m_analog2;
+	required_device<konppc_device> m_konppc;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -422,38 +424,38 @@ public:
 
 READ32_MEMBER(hornet_state::hornet_k037122_sram_r)
 {
-	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
+	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	return k037122->sram_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_sram_w)
 {
-	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
+	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	k037122->sram_w(space, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(hornet_state::hornet_k037122_char_r)
 {
-	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
+	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	return k037122->char_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_char_w)
 {
-	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
+	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	k037122->char_w(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(hornet_state::hornet_k037122_reg_r)
 {
-	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
+	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	return k037122->reg_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 {
-	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
+	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	k037122->reg_w(space, offset, data, mem_mask);
 }
 
@@ -627,7 +629,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-			set_cgboard_id((data >> 4) & 3);
+			m_konppc->set_cgboard_id((data >> 4) & 3);
 			break;
 	}
 }
@@ -706,8 +708,8 @@ static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(hornet_k037122_char_r, hornet_k037122_char_w)
 	AM_RANGE(0x74080000, 0x7408000f) AM_READWRITE(gun_r, gun_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
@@ -797,22 +799,22 @@ WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 }
 
 static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
-	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
+	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_SHARE("sharc_dataram0")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo0", voodoo_r, voodoo_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE_LEGACY(K033906_0_r, K033906_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo0", voodoo_device, voodoo_r, voodoo_w)
+	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
+	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32, hornet_state )
-	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
+	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_SHARE("sharc_dataram1")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo1", voodoo_r, voodoo_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE_LEGACY(K033906_1_r, K033906_1_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo1", voodoo_device, voodoo_r, voodoo_w)
+	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
+	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_1_r, K033906_1_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
@@ -1021,6 +1023,10 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
 	MCFG_ADC1213X_IPT_CONVERT_CB(hornet_state, adc12138_input_callback)
+	
+	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
+	MCFG_KONPPC_CGBOARD_NUMBER(1)
+	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
 MACHINE_CONFIG_END
 
 
@@ -1108,6 +1114,11 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
+	
+	MCFG_DEVICE_REMOVE("konppc")
+	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
+	MCFG_KONPPC_CGBOARD_NUMBER(2)
+	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( terabrst, hornet_2board )
@@ -1276,9 +1287,7 @@ void hornet_state::jamma_jvs_cmd_exec()
 
 DRIVER_INIT_MEMBER(hornet_state,hornet)
 {
-	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
-
+	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
 	ppc4xx_spu_set_tx_handler(m_maincpu, jamma_jvs_w);
@@ -1286,10 +1295,8 @@ DRIVER_INIT_MEMBER(hornet_state,hornet)
 
 DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
 {
-	init_konami_cgboard(machine(), 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
-	set_cgboard_texture_bank(machine(), 1, "bank6", memregion("user5")->base());
-
+	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
 	ppc4xx_spu_set_tx_handler(m_maincpu, jamma_jvs_w);

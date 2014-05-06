@@ -130,6 +130,7 @@ public:
 	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 protected:
 	required_device<i8251_device> m_uart;

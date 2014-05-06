@@ -225,15 +225,9 @@ CRUCLK*  51||52  DBIN
 // TODO: Connect other lines (think about how to propagate to the controller)
 static const floppy_interface ti99_4_floppy_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER( DEVICE_SELF_OWNER, peribox_device, indexhole ),   // Index hole (floppy out, line)
-	DEVCB_NULL,                             // Motor (floppy in, line)
-	DEVCB_NULL,                             // Track 0 (out, line)
-	DEVCB_NULL,                             // Write protect (out, line)
-	DEVCB_NULL,                             // Ready (out, line)
 	FLOPPY_STANDARD_5_25_DSHD,              // type
 	LEGACY_FLOPPY_OPTIONS_NAME(ti99),       // image formats
-	NULL,                                   // interface
-	NULL                                    // display info
+	NULL                                    // interface
 };
 
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -457,7 +451,19 @@ MACHINE_CONFIG_FRAGMENT( peribox_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -512,7 +518,18 @@ MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7nobwg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)	
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -554,7 +571,18 @@ MACHINE_CONFIG_FRAGMENT( peribox_998_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -597,7 +625,18 @@ MACHINE_CONFIG_FRAGMENT( peribox_sg_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot7 )
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -627,7 +666,18 @@ MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 

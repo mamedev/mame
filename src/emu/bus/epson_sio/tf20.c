@@ -80,29 +80,6 @@ ioport_constructor epson_tf20_device::device_input_ports() const
 //  machine configurations
 //-------------------------------------------------
 
-static UPD7201_INTERFACE( tf20_upd7201_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, epson_tf20_device, txda_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, epson_tf20_device, dtra_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
@@ -118,7 +95,9 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	// upd7201 serial interface
-	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
+	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(epson_tf20_device, txda_w))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(epson_tf20_device, dtra_w))
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("5a", true, true)

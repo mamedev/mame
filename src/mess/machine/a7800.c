@@ -55,16 +55,6 @@ WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
 		m_p2_one_button = data & 0x10;
 }
 
-const riot6532_interface a7800_r6532_interface =
-{
-	DEVCB_DRIVER_MEMBER(a7800_state,riot_joystick_r),
-	DEVCB_DRIVER_MEMBER(a7800_state,riot_console_button_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(a7800_state,riot_button_pullup_w),
-	DEVCB_NULL
-};
-
-
 /***************************************************************************
     DRIVER INIT
 ***************************************************************************/

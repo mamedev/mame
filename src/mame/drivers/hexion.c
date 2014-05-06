@@ -5,8 +5,6 @@ Hexion (GX122) (c) 1992 Konami
 driver by Nicola Salmoria
 
 Notes:
-- There are probably palette PROMs missing. Palette data doesn't seem to be
-  written anywhere in RAM.
 - The board has a 052591, which is used for protection in Thunder Cross and
   S.P.Y. In this game, however, the only thing it seems to do is clear the
   screen.

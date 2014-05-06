@@ -303,19 +303,6 @@ MACHINE_RESET_MEMBER(cdi_state,quizrr42)
 	m_scc->set_quizard_mcu_ack(0x57);
 }
 
-static DEVICE_IMAGE_DISPLAY_INFO(cdi_cdinfo)
-{
-	const char *compatibility = image.get_feature("compatibility");
-	if (compatibility)
-	{
-		if (!core_stricmp(compatibility, "DVC"))
-		{
-			osd_printf_warning("This software requires the Digital Video Cartridge to work.\n");
-			osd_printf_warning("Therefore, it might not work in MESS at present.\n");
-		}
-	}
-}
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -366,20 +353,16 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
 	MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
-struct cdrom_interface cdi_cdrom =
-{
-	"cdi_cdrom",
-	DEVICE_IMAGE_DISPLAY_INFO_NAME(cdi_cdinfo)
-};
-
 // Standard CD-i system, with CD-ROM image device (MESS) and Software List (MESS)
 static MACHINE_CONFIG_DERIVED( cdi_base, cdi )
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cdimono1, cdi_base )
-	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("cdi_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizard, cdi_base )

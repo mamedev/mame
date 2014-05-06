@@ -71,26 +71,6 @@ WRITE8_MEMBER(tourtabl_state::watchdog_w)
 	machine().watchdog_reset();
 }
 
-static const riot6532_interface r6532_interface_0 =
-{
-	DEVCB_INPUT_PORT("RIOT0_SWA"),  /* Port 6 */
-	DEVCB_INPUT_PORT("RIOT0_SWB"),  /* Port 7 */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tourtabl_state,watchdog_w),
-	DEVCB_NULL
-};
-
-
-static const riot6532_interface r6532_interface_1 =
-{
-	DEVCB_INPUT_PORT("RIOT1_SWA"),  /* Port 8 */
-	DEVCB_INPUT_PORT("RIOT1_SWB"),  /* Port 9 */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tourtabl_state,tourtabl_led_w),
-	DEVCB_NULL
-};
-
-
 static INPUT_PORTS_START( tourtabl )
 
 	PORT_START("PADDLE4")
@@ -171,8 +151,15 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)
-	MCFG_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
+	MCFG_DEVICE_ADD("riot1", RIOT6532, MASTER_CLOCK / 3)
+	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT0_SWA"))
+	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT0_SWB"))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, watchdog_w))
+
+	MCFG_DEVICE_ADD("riot2", RIOT6532, MASTER_CLOCK / 3)
+	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT1_SWA"))
+	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT1_SWB"))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, tourtabl_led_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)

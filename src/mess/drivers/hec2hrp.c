@@ -379,22 +379,6 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 	hector_reset(1, 0);
 }
 
-/* Cassette definition */
-static const struct CassetteOptions hector_cassette_options = {
-	1,      /* channels */
-	16,     /* bits per sample */
-	44100   /* sample frequency */
-};
-
-static const cassette_interface hector_cassette_interface =
-{
-	hector_cassette_formats,
-	&hector_cassette_options,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
-	NULL
-};
-
 /* Discrete Sound */
 static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_INPUT_LOGIC(NODE_01)
@@ -415,14 +399,8 @@ const wd17xx_interface hector_wd17xx_interface =
 
 const floppy_interface minidisc_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(hector_minidisc),
-	NULL,
 	NULL
 };
 
@@ -463,7 +441,9 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
@@ -507,7 +487,9 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
@@ -565,7 +547,9 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
@@ -618,7 +602,9 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
-	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
@@ -667,7 +653,9 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
-	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
@@ -721,7 +709,9 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)

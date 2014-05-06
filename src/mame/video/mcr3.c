@@ -148,18 +148,9 @@ VIDEO_START_MEMBER(mcr3_state,spyhuntpr)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr3_state::mcr3_paletteram_w)
-{
-	m_generic_paletteram_8[offset] = data;
-	offset &= 0x7f;
-
-	/* high bit of red comes from low bit of address */
-	m_palette->set_pen_color(offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
-}
-
 WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
 {
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 	offset = (offset & 0x0f) | (offset & 0x60) >> 1;
 
 	int r = (data & 0x07) >> 0;

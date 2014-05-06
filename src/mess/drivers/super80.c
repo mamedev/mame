@@ -5,6 +5,7 @@
 Super80.c written by Robbbert, 2005-2010.
 
 2010-12-19: Added V3.7 bios freshly dumped today.
+2014-04-28: Added disk system and did cleanups
 
 See the MESS sysinfo and wiki for usage
 documentation. Below for the most technical bits:
@@ -206,6 +207,12 @@ Port(hex)  Role       Comment
    Bit5    DR3SEL     1 = Drive 3 (Drive D) selected
    Bit6    SIDESEL    0 = Select Disk side 0, 1 = Select Disk side 1
    Bit7    DDEN*      0 = MFM (Double Density), 1 = FM (Single Density)
+
+ToDo:
+- Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
+       of the horrible inline editor they use)
+- Get disk system to work (no disk images available) only connected to super80r atm
+
 
 ***********************************************************************************************************/
 
@@ -639,33 +646,8 @@ static const z80_daisy_config super80_daisy_chain[] =
 	{ NULL }
 };
 
-static const cassette_interface super80_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
-	NULL
-};
-
-
-static MC6845_INTERFACE( super80v_crtc )
-{
-	false,
-	0,0,0,0,                /* visarea adjustment */
-	SUPER80V_DOTS,          /* number of dots per character */
-	NULL,
-	super80v_update_row,        /* handler to display a scanline */
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( super80_state::busreq_w )
@@ -700,19 +682,6 @@ WRITE8_MEMBER(super80_state::io_write_byte)
 	prog_space.write_byte(offset, data);
 }
 
-// busack on cpu connects to bai pin
-static Z80DMA_INTERFACE( dma_intf )
-{
-	//DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), //busreq - connects to busreq on cpu
-	DEVCB_DRIVER_LINE_MEMBER(super80_state, busreq_w), //busreq - connects to busreq on cpu
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //int/pulse - connects to IRQ0 on cpu
-	DEVCB_NULL, //ba0 - not connected
-	DEVCB_DRIVER_MEMBER(super80_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(super80_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(super80_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(super80_state, io_write_byte),
-};
-
 static SLOT_INTERFACE_START( super80_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -725,7 +694,10 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CPU_IO_MAP(super80_io)
 	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(super80_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(super80_state,pio_port_b_r))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(48.8)
@@ -758,7 +730,9 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_h", super80_state, timer_h, attotime::from_hz(100)) // half-speed
@@ -800,7 +774,10 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CPU_IO_MAP(super80v_io)
 	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(super80_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(super80_state,pio_port_b_r))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -812,7 +789,10 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(SUPER80V_DOTS)
+	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
@@ -837,7 +817,9 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 MACHINE_CONFIG_END
@@ -845,7 +827,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80r_io)
-	MCFG_Z80DMA_ADD("dma", MASTER_CLOCK/6, dma_intf)
+
+	MCFG_DEVICE_ADD("dma", Z80DMA, MASTER_CLOCK/6)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(super80_state, busreq_w))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//ba0 - not connected
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(super80_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(super80_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(super80_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(super80_state, io_write_byte))
+
 	MCFG_WD2793x_ADD("fdc", XTAL_2MHz)
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

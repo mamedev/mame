@@ -1568,24 +1568,6 @@ static const ay8910_interface ay8910_config2 =
 	DEVCB_DRIVER_MEMBER(aristmk4_state,pbltlp_out)  // Port B write - goes to lamps on the buttons x4 and light tower x4
 };
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	/* in fact is a mc6845 driving 4 pixels by memory address.
-	that's why the big horizontal parameters */
-
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	4,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 /* read m/c number */
 
 READ8_MEMBER(aristmk4_state::pa1_r)
@@ -1724,7 +1706,12 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_ca2))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_cb2))
 
-	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
+	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8) // TODO: type is unknown
+	/* in fact is a mc6845 driving 4 pixels by memory address.
+	 that's why the big horizontal parameters */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

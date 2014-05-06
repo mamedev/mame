@@ -67,8 +67,8 @@ public:
 			m_io8(*this, "IN-7"),
 			m_io9(*this, "IN-8"),
 			m_io10(*this, "IN-9"),
-			m_io11(*this, "IN-A"),
-			m_io12(*this, "IN-B")
+			m_io11(*this, "IN-10"),
+			m_io12(*this, "IN-11")
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;
@@ -602,63 +602,6 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	PORT_DIPSETTING(    0x0d, "70GBP" ) \
 	PORT_DIPSETTING(    0x0e, "14" ) \
 	PORT_DIPSETTING(    0x0f, "15" )
-
-// just use macros for these for now, makes changing them later easier.
-#define PORT_HOLD1( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Hold1")  PORT_CODE(KEYCODE_A)
-
-#define PORT_HOLD2( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_S) 
-
-#define PORT_HOLD3( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON11 )  PORT_NAME("Hold3") PORT_CODE(KEYCODE_D)
-
-#define PORT_HOLD4( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON12 )  PORT_NAME("Hold4") PORT_CODE(KEYCODE_F)
-
-#define PORT_HOLD5( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON13 )  PORT_NAME("Hold5") PORT_CODE(KEYCODE_G)
-
-#define PORT_HOLD6( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON14 )  PORT_NAME("Hold6") PORT_CODE(KEYCODE_H)
-
-#define PORT_HOLD7( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON15 )  PORT_NAME("Hold7") PORT_CODE(KEYCODE_J)
-
-#define PORT_CANCEL( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_2)
-
-#define PORT_STARTBTN( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-
-#define PORT_REFILL( bits ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Refill")
-
-#define PORT_CUSTOMSC4_1( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME(name) PORT_CODE(KEYCODE_Z)
-
-#define PORT_CUSTOMSC4_2( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME(name) PORT_CODE(KEYCODE_X)
-
-#define PORT_CUSTOMSC4_3( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME(name) PORT_CODE(KEYCODE_C)
-
-#define PORT_CUSTOMSC4_4( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME(name) PORT_CODE(KEYCODE_V)
-
-#define PORT_CUSTOMSC4_5( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME(name) PORT_CODE(KEYCODE_B)
-
-#define PORT_CUSTOMSC4_6( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME(name) PORT_CODE(KEYCODE_N)
-
-#define PORT_CUSTOMSC4_7( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME(name) PORT_CODE(KEYCODE_M)
-
-#define PORT_CUSTOMSC4_8( bits, name ) \
-	PORT_BIT( bits, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME(name) PORT_CODE(KEYCODE_COMMA)
-
-
 
 
 #define SC4_STANDARD_STAKE_KEY \

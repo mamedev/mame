@@ -8,7 +8,7 @@
 #include "z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 
 //TODO: These interfaces should default to DEVCB_NULL pointers and
 // the actual callbacks should be provided by the driver that instantiates the TLCS-Z80 CPU.
@@ -17,35 +17,6 @@
 //  m_tlcsz80->set_internal_ctc_interface (ctc_intf);
 //  m_tlcsz80->set_internal_pio_interface (pio_intf);
 //  m_tlcsz80->set_internal_sio_interface (sio_intf);
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(DEVICE_SELF_OWNER, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL, /* ZC/TO0 callback */
-	DEVCB_NULL, /* ZC/TO1 callback */
-	DEVCB_NULL  /* ZC/TO2 callback */
-};
-
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(DEVICE_SELF_OWNER, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const z80sio_interface sio_intf =
-{
-	DEVCB_CPU_INPUT_LINE(DEVICE_SELF_OWNER, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_NULL, /* DTR changed handler */
-	DEVCB_NULL, /* RTS changed handler */
-	DEVCB_NULL, /* BREAK changed handler */
-	DEVCB_NULL, /* transmit handler */
-	DEVCB_NULL  /* receive handler */
-};
 
 /* Daisy Chaining */
 
@@ -61,7 +32,7 @@ static const z80_daisy_config tlcsz80_daisy_chain[] =
 
 static ADDRESS_MAP_START( tlcs_z80_internal_io_map, AS_IO, 8, tlcs_z80_device )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(TLCSZ80_INTERNAL_CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x18, 0x1B) AM_DEVREADWRITE(TLCSZ80_INTERNAL_SIO_TAG, z80sio_device, read, write)
+	AM_RANGE(0x18, 0x1B) AM_DEVREADWRITE(TLCSZ80_INTERNAL_SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x1C, 0x1F) AM_DEVREADWRITE(TLCSZ80_INTERNAL_PIO_TAG, z80pio_device, read, write)
 //  AM_RANGE(0xF0, 0xF0) TODO: Watchdog Timer: Stand-by mode Register
 //  AM_RANGE(0xF1, 0xF1) TODO: Watchdog Timer: command Register
@@ -73,9 +44,14 @@ ADDRESS_MAP_END
 #define TLCS_Z80_CLOCK 8000000
 
 static MACHINE_CONFIG_FRAGMENT( tlcs_z80 )
-	MCFG_Z80CTC_ADD(TLCSZ80_INTERNAL_CTC_TAG, TLCS_Z80_CLOCK, ctc_intf)
-	MCFG_Z80SIO_ADD(TLCSZ80_INTERNAL_SIO_TAG, TLCS_Z80_CLOCK, sio_intf)
-	MCFG_Z80PIO_ADD(TLCSZ80_INTERNAL_PIO_TAG, TLCS_Z80_CLOCK, pio_intf)
+	MCFG_DEVICE_ADD(TLCSZ80_INTERNAL_CTC_TAG, Z80CTC, TLCS_Z80_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
+
+	MCFG_Z80SIO0_ADD(TLCSZ80_INTERNAL_SIO_TAG, TLCS_Z80_CLOCK, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD(TLCSZ80_INTERNAL_PIO_TAG, Z80PIO, TLCS_Z80_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 tlcs_z80_device::tlcs_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

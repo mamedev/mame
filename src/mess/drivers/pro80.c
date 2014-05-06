@@ -153,7 +153,7 @@ static MACHINE_CONFIG_START( pro80, pro80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
 /* ROM definition */

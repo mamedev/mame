@@ -1226,7 +1226,8 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 				size = 2352;
 				break;
 		}
-		core_fprintf(file, "%d %d %d %d %s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, filename, discoffs);
+		bool needquote = strchr(filename, ' ') != NULL;
+		core_fprintf(file, "%d %d %d %d %s%s%s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
@@ -2353,7 +2354,10 @@ static void do_extract_cd(parameters_t &params)
 				char temp[8];
 				sprintf(temp, "%02d", tracknum+1);
 				trackbin_name.cat(temp);
-				trackbin_name.cat(".bin");
+				if (toc->tracks[tracknum].trktype == CD_TRACK_AUDIO)
+					trackbin_name.cat(".raw");
+				else
+					trackbin_name.cat(".bin");
 
 				if (output_bin_file)
 				{

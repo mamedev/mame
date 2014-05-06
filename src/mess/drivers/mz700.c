@@ -317,16 +317,6 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const cassette_interface mz700_cassette_interface =
-{
-	mz700_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"mz_cass",
-	NULL
-};
-
-
 static MACHINE_CONFIG_START( mz700, mz_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
@@ -373,7 +363,11 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 
 	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
 
-	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("mz_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
 
 	/* internal ram */
@@ -406,7 +400,11 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_DEVICE_MODIFY("pit8253")
 	MCFG_PIT8253_CLK0(XTAL_17_73447MHz/16)
 
-	MCFG_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_17_73447MHz/5)
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(mz_state, mz800_z80pio_irq))
+	MCFG_Z80PIO_IN_PA_CB(READ8(mz_state, mz800_z80pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz_state, mz800_z80pio_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 

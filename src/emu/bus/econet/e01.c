@@ -157,16 +157,6 @@ WRITE_LINE_MEMBER( e01_device::econet_data_w )
 	m_econet->data_w(this, state);
 }
 
-static const mc6854_interface adlc_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, adlc_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, econet_data_w),
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 WRITE_LINE_MEMBER( e01_device::via_irq_w )
 {
 	m_via_irq = state;
@@ -265,7 +255,9 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(e01_device, via_irq_w))
 
-	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
+	MCFG_DEVICE_ADD(MC6854_TAG, MC6854, 0)
+	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(e01_device, adlc_irq_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(e01_device, econet_data_w))
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(e01_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(e01_device, fdc_drq_w))

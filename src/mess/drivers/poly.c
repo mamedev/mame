@@ -126,15 +126,6 @@ static const ptm6840_interface poly_ptm_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
-static const mc6854_interface adlc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 READ8_MEMBER( poly_state::videoram_r )
 {
 	return m_videoram[offset];
@@ -196,7 +187,7 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 1)
 	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(poly_state, write_acia_clock))
 
-	MCFG_MC6854_ADD("adlc", adlc_intf)
+	MCFG_DEVICE_ADD("adlc", MC6854, 0)
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(poly_state, kbd_put))

@@ -16,25 +16,6 @@
 #include "video/mc6845.h"
 #include "includes/twincobr.h"
 
-
-/* 6845 used for video sync signals only */
-MC6845_INTERFACE( twincobr_mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	2,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
-
 /***************************************************************************
     Callbacks for the TileMap code
 ***************************************************************************/

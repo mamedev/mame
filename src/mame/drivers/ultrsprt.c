@@ -9,7 +9,6 @@
 #include "cpu/powerpc/ppc.h"
 #include "sound/k054539.h"
 #include "machine/eepromser.h"
-#include "machine/konppc.h"
 #include "sound/k056800.h"
 
 class ultrsprt_state : public driver_device

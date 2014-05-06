@@ -345,18 +345,6 @@ WRITE_LINE_MEMBER( mm1_state::dack3_w )
 	update_tc();
 }
 
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_hrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_eop_w),
-	DEVCB_DRIVER_MEMBER(mm1_state, read),
-	DEVCB_DRIVER_MEMBER(mm1_state, write),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_r) },
-	{ DEVCB_DEVICE_MEMBER(I8275_TAG, i8275x_device, dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
-};
-
-
 WRITE_LINE_MEMBER( mm1_state::itxc_w )
 {
 	if (!m_intc)
@@ -380,7 +368,7 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 }
 
 //-------------------------------------------------
-//  UPD7201_INTERFACE( mpsc_intf )
+//  UPD7201
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mm1_state::drq2_w )
@@ -398,30 +386,6 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 		m_dmac->dreq1_w(ASSERT_LINE);
 	}
 }
-
-static UPD7201_INTERFACE( mpsc_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),    // receive DRQ
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),    // transmit DRQ
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 READ_LINE_MEMBER( mm1_state::dsra_r )
 {
@@ -503,7 +467,17 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_I8212_IRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
 	MCFG_I8212_DI_CALLBACK(DEVREAD8(KB_TAG, mm1_keyboard_t, read))
 
-	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, dmac_intf)
+	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, XTAL_6_144MHz/2)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(mm1_state, dma_hrq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(mm1_state, dma_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(mm1_state, read))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(mm1_state, write))
+	MCFG_I8237_IN_IOR_2_CB(READ8(mm1_state, mpsc_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(DEVREAD8(UPD765_TAG, upd765_family_device, mdma_r))
+	MCFG_I8237_OUT_IOW_0_CB(DEVWRITE8(I8275_TAG, i8275_device, dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(mm1_state, mpsc_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8(UPD765_TAG, upd765_family_device, mdma_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(mm1_state, dack3_w))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_6_144MHz/2/2)
@@ -519,7 +493,13 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
 
-	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
+	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(mm1_state, drq2_w))
+	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(mm1_state, drq1_w))
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)

@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( roundup5_v30_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x0d800, 0x0d801) AM_WRITEONLY AM_SHARE("ru5_unknown1") // VRAM2 X scroll (todo)
 	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITEONLY AM_SHARE("ru5_unknown2") // VRAM2 Y scroll (todo)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM_WRITE(roundup5_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0f000, 0x0ffff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
 	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(roundup5_vram_r, roundup5_vram_w)
@@ -892,6 +892,14 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	/* apache 3 schematics state
+	bit 4:  250
+	bit 3:  500
+	bit 2:  1k
+	bit 1:  2k
+	bit 0:  3.9kOhm resistor
+	*/
+
 	MCFG_VIDEO_START_OVERRIDE(tatsumi_state,apache3)
 
 	/* sound hardware */
@@ -933,6 +941,8 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", roundup5)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_MEMBITS(8)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(tatsumi_state,roundup5)
 

@@ -54,7 +54,8 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update);
 
 protected:
 	// device-level overrides

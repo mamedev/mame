@@ -204,6 +204,10 @@ WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
 
     Centipede is unusual because the sprite color code specifies the
     colors to use one by one, instead of a combination code.
+
+    FIXME: handle this using standard indirect colors instead of
+           custom implementation
+
     bit 5-4 = color to use for pen 11
     bit 3-2 = color to use for pen 10
     bit 1-0 = color to use for pen 01
@@ -213,7 +217,7 @@ WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
 
 WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 {
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* bit 2 of the output palette RAM is always pulled high, so we ignore */
 	/* any palette changes unless the write is to a palette RAM address */
@@ -328,6 +332,10 @@ PALETTE_INIT_MEMBER(centiped_state,warlords)
 
     Millipede is unusual because the sprite color code specifies the
     colors to use one by one, instead of a combination code.
+
+    FIXME: handle this using standard indirect colors instead of
+           custom implementation
+
     bit 7-6 = palette bank (there are 4 groups of 4 colors)
     bit 5-4 = color to use for pen 11
     bit 3-2 = color to use for pen 10
@@ -392,7 +400,7 @@ void centiped_state::milliped_set_color(offs_t offset, UINT8 data)
 
 WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
 {
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	milliped_set_color(offset, data);
 }
@@ -400,7 +408,7 @@ WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
 
 WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
 {
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
 	milliped_set_color(offset, ~memregion("proms")->base()[~data & 0x0f]);

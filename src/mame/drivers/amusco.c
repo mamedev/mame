@@ -99,6 +99,7 @@ public:
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 	UINT32 screen_update_amusco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(amusco_interrupt);
@@ -482,27 +483,10 @@ GFXDECODE_END
 *    CRTC Interface    *
 ************************/
 
-MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
+MC6845_ON_UPDATE_ADDR_CHANGED(amusco_state::crtc_addr)
 {
-//  amusco_state *state = device->machine().driver_data<amusco_state>();
-//  state->m_video_update_address = address;
+//  m_video_update_address = address;
 }
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	crtc_addr        /* update address callback */
-};
-
 
 INTERRUPT_GEN_MEMBER(amusco_state::amusco_vblank_irq)
 {
@@ -545,7 +529,10 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco_palette_init)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK, mc6845_intf) /* guess */
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_ADDR_CHANGED_CB(amusco_state, crtc_addr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

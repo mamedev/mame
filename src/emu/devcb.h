@@ -189,6 +189,22 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// read/write types for I/O lines (similar to read/write handlers but no offset)
+typedef int (*read_line_device_func)(device_t *device);
+typedef void (*write_line_device_func)(device_t *device, int state);
+
+// legacy device read/write handlers
+typedef UINT8   (*read8_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 mem_mask);
+typedef void    (*write8_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask);
+typedef UINT16  (*read16_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void    (*write16_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32  (*read32_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void    (*write32_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64  (*read64_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void    (*write64_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+
+
+
 // ======================> devcb_resolved_objects
 
 // resolving a devcb may produce one of the following object types

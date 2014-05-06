@@ -236,21 +236,6 @@ UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 
 static MACHINE_CONFIG_START( murogem, murogem_state )
 	/* basic machine hardware */
@@ -271,8 +256,9 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 
-
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 750000, mc6845_intf) /* ? MHz */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 750000) /* ? MHz */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

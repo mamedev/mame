@@ -523,20 +523,6 @@ WRITE8_MEMBER(mz_state::mz800_z80pio_port_a_w)
 	m_centronics->write_strobe(BIT(data, 7));
 }
 
-const z80pio_interface mz800_z80pio_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mz_state,mz800_z80pio_irq),
-	DEVCB_DRIVER_MEMBER(mz_state,mz800_z80pio_port_a_r),
-	DEVCB_DRIVER_MEMBER(mz_state,mz800_z80pio_port_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-};
-
-
-
-
 /* port CE */
 READ8_MEMBER(mz_state::mz800_crtc_r)
 {

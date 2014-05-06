@@ -162,15 +162,14 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
  * BBC circuits controlled by 6845 Outputs
  ************************************************************************/
 
-static MC6845_UPDATE_ROW( vid_update_row )
+MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	if (state->m_videoULA_teletext_normal_select)
+	if (m_videoULA_teletext_normal_select)
 	{
-		state->m_trom->lose_w(1);
-		state->m_trom->lose_w(0);
+		m_trom->lose_w(1);
+		m_trom->lose_w(0);
 
 		for(int x_pos=0; x_pos<x_count; x_pos++)
 		{
@@ -180,22 +179,24 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 			if (((ma>>13)&1)==0)
 			{
-				state->m_Teletext_Latch=0;
-			} else {
-				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[state->calculate_video_address(ma+x_pos,ra)]);
+				m_Teletext_Latch=0;
+			} 
+			else 
+			{
+				m_Teletext_Latch=(m_BBC_Video_RAM[calculate_video_address(ma+x_pos,ra)]);
 			}
 
-			state->m_trom->write((state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
+			m_trom->write((m_Teletext_Latch&0x3f)|(m_Teletext_Latch&0x40));
 
-			state->m_trom->f1_w(1);
-			state->m_trom->f1_w(0);
+			m_trom->f1_w(1);
+			m_trom->f1_w(0);
 
 			for(int pixelno=0;pixelno<6;pixelno++)
 			{
-				state->m_trom->tr6_w(1);
-				state->m_trom->tr6_w(0);
+				m_trom->tr6_w(1);
+				m_trom->tr6_w(0);
 
-				int col=state->m_trom->get_rgb() ^ ((x_pos==cursor_x) ? 7 : 0);
+				int col=m_trom->get_rgb() ^ ((x_pos==cursor_x) ? 7 : 0);
 
 				int r = BIT(col, 0) * 0xff;
 				int g = BIT(col, 1) * 0xff;
@@ -203,14 +204,14 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 				rgb_t rgb = rgb_t(r, g, b);
 
-				bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno) = rgb;
+				bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = rgb;
 			}
 		}
 
 		if (ra == 18)
 		{
-			state->m_trom->lose_w(1);
-			state->m_trom->lose_w(0);
+			m_trom->lose_w(1);
+			m_trom->lose_w(0);
 		}
 	}
 	else
@@ -222,13 +223,13 @@ static MC6845_UPDATE_ROW( vid_update_row )
 		{
 			for(int x_pos=0; x_pos<x_count; x_pos++)
 			{
-				int vmem=state->calculate_video_address(ma+x_pos,ra);
-				unsigned char i=state->m_BBC_Video_RAM[vmem];
+				int vmem=calculate_video_address(ma+x_pos,ra);
+				unsigned char i=m_BBC_Video_RAM[vmem];
 
-				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
+				for(int pixelno=0;pixelno<m_pixels_per_byte;pixelno++)
 				{
-					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]] ^ ((x_pos==cursor_x) ? 7 : 0);
-					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[col];
+					int col=m_videoULA_pallet_lookup[m_pixel_bits[i]] ^ ((x_pos==cursor_x) ? 7 : 0);
+					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno)=palette[col];
 					i=(i<<1)|1;
 				}
 			}
@@ -237,9 +238,9 @@ static MC6845_UPDATE_ROW( vid_update_row )
 		{
 			for(int x_pos=0; x_pos<x_count; x_pos++)
 			{
-				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
+				for(int pixelno=0;pixelno<m_pixels_per_byte;pixelno++)
 				{
-					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[7];
+					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno)=palette[7];
 				}
 			}
 		}
@@ -250,25 +251,6 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 {
 	m_trom->dew_w(state);
 }
-
-
-MC6845_INTERFACE( bbc_mc6845_intf )
-{
-	false,                          /* show border area */
-	0,0,0,0,                        /* visarea adjustment */
-	8,                              /* numbers of pixels per video memory address */
-	NULL,                           /* begin_update */
-	vid_update_row,                 /* update_row */
-	NULL,                           /* end_update */
-	DEVCB_NULL,                     /* on_de_changed */
-	DEVCB_NULL,                     /* on_cur_changed */
-	DEVCB_NULL,                     /* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_vsync),          /* on_vsync_changed */
-	NULL
-};
-
-
-
 
 /************************************************************************
  * memory interface to BBC's 6845

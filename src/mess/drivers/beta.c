@@ -215,15 +215,6 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_old_data = data;
 }
 
-static const riot6532_interface beta_riot_interface =
-{
-	DEVCB_DRIVER_MEMBER(beta_state, riot_pa_r),
-	DEVCB_DRIVER_MEMBER(beta_state, riot_pb_r),
-	DEVCB_DRIVER_MEMBER(beta_state, riot_pa_w),
-	DEVCB_DRIVER_MEMBER(beta_state, riot_pb_w),
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_IRQ_LINE)
-};
-
 /* Quickload */
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
@@ -265,7 +256,12 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_RIOT6532_ADD(M6532_TAG, XTAL_4MHz/4, beta_riot_interface)
+	MCFG_DEVICE_ADD(M6532_TAG, RIOT6532, XTAL_4MHz/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(beta_state, riot_pa_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(beta_state, riot_pb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(beta_state, riot_pb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
 	MCFG_CARTSLOT_ADD(EPROM_TAG)

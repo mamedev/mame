@@ -253,7 +253,7 @@ void es5503_device::device_start()
 	}
 
 	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
-	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, NULL);
 	m_timer->adjust(attotime::from_hz(output_rate), 0, attotime::from_hz(output_rate));

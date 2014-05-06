@@ -13,112 +13,73 @@
 #include "emu.h"
 
 
-#define MC6845_INTERFACE(name) \
-	const mc6845_interface (name) =
-
-#define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock, _config) \
+#define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, _variant, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
-#define MCFG_MOS8563_ADD(_tag, _screen_tag, _clock, _config, _map) \
+#define MCFG_MOS8563_ADD(_tag, _screen_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, MOS8563, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(60) \
-	MCFG_SCREEN_SIZE(640, 200) \
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8563_device, screen_update)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
-#define MCFG_MOS8568_ADD(_tag, _screen_tag, _clock, _config, _map) \
+#define MCFG_MOS8568_ADD(_tag, _screen_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, MOS8568, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(60) \
-	MCFG_SCREEN_SIZE(640, 200) \
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8568_device, screen_update)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
 
-class mc6845_device;
+#define MCFG_MC6845_SHOW_BORDER_AREA(_show) \
+	mc6845_device::set_show_border_area(*device, _show);
+
+#define MCFG_MC6845_VISAREA_ADJUST(_minx, _maxx, _miny, _maxy) \
+	mc6845_device::set_visarea_adjust(*device, _minx, _maxx, _miny, _maxy);
+
+#define MCFG_MC6845_CHAR_WIDTH(_pixels) \
+	mc6845_device::set_char_width(*device, _pixels);
+
+#define MCFG_MC6845_BEGIN_UPDATE_CB(_class, _method) \
+	mc6845_device::set_begin_update_callback(*device, mc6845_begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_MC6845_UPDATE_ROW_CB(_class, _method) \
+	mc6845_device::set_update_row_callback(*device, mc6845_update_row_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_MC6845_END_UPDATE_CB(_class, _method) \
+	mc6845_device::set_end_update_callback(*device, mc6845_end_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_MC6845_ADDR_CHANGED_CB(_class, _method) \
+	mc6845_device::set_on_update_addr_change_callback(*device, mc6845_on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_MC6845_OUT_DE_CB(_write) \
+	devcb = &mc6845_device::set_out_de_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC6845_OUT_CUR_CB(_write) \
+	devcb = &mc6845_device::set_out_cur_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC6845_OUT_HSYNC_CB(_write) \
+	devcb = &mc6845_device::set_out_hsync_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC6845_OUT_VSYNC_CB(_write) \
+	devcb = &mc6845_device::set_out_vsync_callback(*device, DEVCB2_##_write);
+
 
 /* callback definitions */
-typedef void * (*mc6845_begin_update_func)(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-#define MC6845_BEGIN_UPDATE(name)   void *name(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> mc6845_begin_update_delegate;
+#define MC6845_BEGIN_UPDATE(name)  void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
+typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra,
+							  UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp)> mc6845_update_row_delegate;
+#define MC6845_UPDATE_ROW(name)     void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, \
+												UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp)
 
-typedef void (*mc6845_update_row_func)(mc6845_device *device, bitmap_rgb32 &bitmap,
-										const rectangle &cliprect, UINT16 ma, UINT8 ra,
-										UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
+typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> mc6845_end_update_delegate;
+#define MC6845_END_UPDATE(name)     void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
-
-#define MC6845_UPDATE_ROW(name)     void name(mc6845_device *device, bitmap_rgb32 &bitmap,  \
-												const rectangle &cliprect, UINT16 ma, UINT8 ra, \
-												UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
-
-
-typedef void (*mc6845_end_update_func)(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
-#define MC6845_END_UPDATE(name)     void name(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param)
-
-
-typedef void (*mc6845_on_update_addr_changed_func)(mc6845_device *device, int address, int strobe);
-#define MC6845_ON_UPDATE_ADDR_CHANGED(name) void name(mc6845_device *device, int address, int strobe)
-
-
-/* interface */
-struct mc6845_interface
-{
-	bool m_show_border_area;        /* visible screen area (false) active display (true) active display + blanking */
-
-	/* visible screen area adjustment */
-	int m_visarea_adjust_min_x;
-	int m_visarea_adjust_max_x;
-	int m_visarea_adjust_min_y;
-	int m_visarea_adjust_max_y;
-
-	int m_hpixels_per_column;       /* number of pixels per video memory address */
-
-	/* if specified, this gets called before any pixel update,
-	   optionally return a pointer that will be passed to the
-	   update and tear down callbacks */
-	mc6845_begin_update_func        m_begin_update;
-
-	/* this gets called for every row, the driver must output
-	   x_count * hpixels_per_column pixels.
-	   cursor_x indicates the character position where the cursor is, or -1
-	   if there is no cursor on this row */
-	mc6845_update_row_func          m_update_row;
-
-	/* if specified, this gets called after all row updating is complete */
-	mc6845_end_update_func          m_end_update;
-
-	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
-	devcb_write_line            m_out_de_func;
-
-	/* if specified, this gets called for every change of the cursor pin (pin 19) */
-	devcb_write_line            m_out_cur_func;
-
-	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
-	devcb_write_line            m_out_hsync_func;
-
-	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
-	devcb_write_line            m_out_vsync_func;
-
-	/* Called whenever the update address changes
-	 * For vblank/hblank timing strobe indicates the physical update.
-	 * vblank/hblank timing not supported yet! */
-
-	mc6845_on_update_addr_changed_func  m_on_update_addr_changed;
-};
+typedef device_delegate<void (int address, int strobe)> mc6845_on_update_addr_changed_delegate;
+#define MC6845_ON_UPDATE_ADDR_CHANGED(name) void name(int address, int strobe)
 
 
 class mc6845_device :   public device_t,
-						public device_video_interface,
-						public mc6845_interface
+						public device_video_interface
 {
 	friend class mc6845_1_device;
 	friend class r6545_1_device;
@@ -135,6 +96,27 @@ public:
 	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
+	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y) 
+	{
+		mc6845_device &dev = downcast<mc6845_device &>(device);
+		dev.m_visarea_adjust_min_x = min_x;
+		dev.m_visarea_adjust_max_x = max_x;
+		dev.m_visarea_adjust_min_y = min_y;
+		dev.m_visarea_adjust_max_y = max_y;
+	}
+	static void set_char_width(device_t &device, int pixels) { downcast<mc6845_device &>(device).m_hpixels_per_column = pixels; }
+
+	static void set_begin_update_callback(device_t &device, mc6845_begin_update_delegate callback) { downcast<mc6845_device &>(device).m_begin_update_cb = callback; }
+	static void set_update_row_callback(device_t &device, mc6845_update_row_delegate callback) { downcast<mc6845_device &>(device).m_update_row_cb = callback; }
+	static void set_end_update_callback(device_t &device, mc6845_end_update_delegate callback) { downcast<mc6845_device &>(device).m_end_update_cb = callback; }
+	static void set_on_update_addr_change_callback(device_t &device, mc6845_on_update_addr_changed_delegate callback) { downcast<mc6845_device &>(device).m_on_update_addr_changed_cb = callback; }
+
+	template<class _Object> static devcb2_base &set_out_de_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_de_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_cur_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_cur_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_hsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_hsync_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_vsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(object); }
+	
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
 
@@ -181,7 +163,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
@@ -193,11 +174,6 @@ protected:
 	bool m_supports_status_reg_d6;
 	bool m_supports_status_reg_d7;
 	bool m_supports_transparent;
-
-	devcb_resolved_write_line   m_res_out_de_func;
-	devcb_resolved_write_line   m_res_out_cur_func;
-	devcb_resolved_write_line   m_res_out_hsync_func;
-	devcb_resolved_write_line   m_res_out_vsync_func;
 
 	/* register file */
 	UINT8   m_horiz_char_total;     /* 0x00 */
@@ -262,7 +238,7 @@ protected:
 	emu_timer *m_light_pen_latch_timer;
 	emu_timer *m_upd_adr_timer;
 	emu_timer *m_upd_trans_timer;
-
+	
 	/* computed values - do NOT state save these! */
 	/* These computed are used to define the screen parameters for a driver */
 	UINT16  m_horiz_pix_total;
@@ -290,7 +266,52 @@ protected:
 	void set_cur(int state);
 	void handle_line_timer();
 	virtual void update_cursor_state();
-	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
+	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	/************************
+	 interface CRTC - driver
+	 ************************/
+	
+	bool m_show_border_area;        /* visible screen area (false) active display (true) active display + blanking */
+	
+	/* visible screen area adjustment */
+	int m_visarea_adjust_min_x;
+	int m_visarea_adjust_max_x;
+	int m_visarea_adjust_min_y;
+	int m_visarea_adjust_max_y;
+	
+	int m_hpixels_per_column;       /* number of pixels per video memory address */
+
+	/* if specified, this gets called before any pixel update,
+	 optionally return a pointer that will be passed to the
+	 update and tear down callbacks */
+	mc6845_begin_update_delegate m_begin_update_cb;
+	
+	/* this gets called for every row, the driver must output
+	 x_count * hpixels_per_column pixels.
+	 cursor_x indicates the character position where the cursor is, or -1
+	 if there is no cursor on this row */
+	mc6845_update_row_delegate  m_update_row_cb;
+	
+	/* if specified, this gets called after all row updating is complete */
+	mc6845_end_update_delegate  m_end_update_cb;
+	
+	/* Called whenever the update address changes
+	 * For vblank/hblank timing strobe indicates the physical update.
+	 * vblank/hblank timing not supported yet! */
+	mc6845_on_update_addr_changed_delegate m_on_update_addr_changed_cb;
+	
+	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
+	devcb2_write_line            m_out_de_cb;
+	
+	/* if specified, this gets called for every change of the cursor pin (pin 19) */
+	devcb2_write_line            m_out_cur_cb;
+	
+	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
+	devcb2_write_line            m_out_hsync_cb;
+	
+	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
+	devcb2_write_line            m_out_vsync_cb;
 };
 
 
@@ -403,8 +424,7 @@ public:
 	inline UINT8 read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, UINT8 data);
 
-	void update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
-	static MC6845_UPDATE_ROW( vdc_update_row );
+	MC6845_UPDATE_ROW( vdc_update_row );
 
 protected:
 	// device-level overrides
@@ -442,7 +462,7 @@ protected:
 	int m_revision;
 
 	virtual void update_cursor_state();
-	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
+	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	static const device_timer_id TIMER_BLOCK_COPY = 9;
 

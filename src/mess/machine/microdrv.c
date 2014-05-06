@@ -64,18 +64,6 @@ microdrive_image_device::~microdrive_image_device()
 
 void microdrive_image_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const microdrive_interface *intf = reinterpret_cast<const microdrive_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<microdrive_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interface, 0, sizeof(m_interface));
-		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
-	}
-
 	// set brief and instance name
 	update_names();
 }

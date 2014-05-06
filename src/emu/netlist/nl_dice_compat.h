@@ -62,16 +62,22 @@ public:
 	ALIAS(_name.2, _name ## _R.2) \
 	ALIAS(_name.1, _name ## _C.1)
 
-#define CHIP_INPUT(_name)   \
+#define CHIP_INPUT_ACTIVE_LOW(_name)   \
 	SWITCH2(_name ## _SW) \
-	NET_C(_name ## _SW.2, V5) \
-	NET_CSTR(# _name "_SW.1", "GND") \
+	NET_C(_name ## _SW.1, V5) \
+	NET_CSTR(# _name "_SW.2", "GND") \
 	ALIAS(_name.1, _name ## _SW.Q)
+
+#define CHIP_INPUT_ACTIVE_HIGH(_name)   \
+    SWITCH2(_name ## _SW) \
+    NET_C(_name ## _SW.2, V5) \
+    NET_CSTR(# _name "_SW.1", "GND") \
+    ALIAS(_name.1, _name ## _SW.Q)
 
 #define CHIP_LATCH(_name)   \
 	NETDEV_RSFF(_name) \
-	ALIAS(_name.1, _name.S) \
-	ALIAS(_name.2, _name.R) \
+	ALIAS(_name.1, _name.R) \
+	ALIAS(_name.2, _name.S) \
 	ALIAS(_name.3, _name.QQ)
 
 

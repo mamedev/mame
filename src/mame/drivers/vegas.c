@@ -443,19 +443,6 @@
 #define NINT_PCIE           (15)
 
 
-struct legacy_dynamic_address
-{
-	offs_t          start;
-	offs_t          end;
-	read32_space_func   mread;
-	write32_space_func mwrite;
-	read32_device_func  dread;
-	write32_device_func dwrite;
-	device_t *device;
-	const char *    rdname;
-	const char *    wrname;
-};
-
 struct dynamic_address
 {
 	offs_t          start;
@@ -506,9 +493,7 @@ public:
 	device_t *m_voodoo;
 	UINT8 m_dcs_idma_cs;
 	int m_count;
-	int m_legacy_dynamic_count;
 	int m_dynamic_count;
-	legacy_dynamic_address m_legacy_dynamic[MAX_DYNAMIC_ADDRESSES];
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
@@ -531,7 +516,6 @@ public:
 	void update_nile_irqs();
 	void update_sio_irqs();
 	inline void _add_dynamic_address(offs_t start, offs_t end, read32_delegate read, write32_delegate write);
-	inline void _add_legacy_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname);
 
 	DECLARE_WRITE32_MEMBER( cmos_unlock_w );
 	DECLARE_WRITE32_MEMBER(timekeeper_w);
@@ -1556,7 +1540,6 @@ WRITE32_MEMBER( vegas_state::dcs3_fifo_full_w )
 
 #define add_dynamic_address(s,e,r,w)         _add_dynamic_address(s,e,r,w)
 
-#define add_legacy_dynamic_device_address(d,s,e,r,w)    _add_legacy_dynamic_device_address(d,s,e,r,w,#r,#w)
 
 inline void vegas_state::_add_dynamic_address(offs_t start, offs_t end, read32_delegate read, write32_delegate write)
 {
@@ -1568,42 +1551,20 @@ inline void vegas_state::_add_dynamic_address(offs_t start, offs_t end, read32_d
 	m_dynamic_count++;
 }
 
-inline void vegas_state::_add_legacy_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
-{
-	legacy_dynamic_address *l_dynamic = m_legacy_dynamic;
-	l_dynamic[m_legacy_dynamic_count].start = start;
-	l_dynamic[m_legacy_dynamic_count].end = end;
-	l_dynamic[m_legacy_dynamic_count].mread = NULL;
-	l_dynamic[m_legacy_dynamic_count].mwrite = NULL;
-	l_dynamic[m_legacy_dynamic_count].dread = read;
-	l_dynamic[m_legacy_dynamic_count].dwrite = write;
-	l_dynamic[m_legacy_dynamic_count].device = device;
-	l_dynamic[m_legacy_dynamic_count].rdname = rdname;
-	l_dynamic[m_legacy_dynamic_count].wrname = wrname;
-	m_legacy_dynamic_count++;
-}
-
-
-
 void vegas_state::remap_dynamic_addresses()
 {
 	dynamic_address *dynamic = m_dynamic;
-	legacy_dynamic_address *l_dynamic = m_legacy_dynamic;
 	int voodoo_type = voodoo_get_type(m_voodoo);
 	offs_t base;
-	int addr, l_addr;
+	int addr;
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < m_dynamic_count; addr++)
 		m_maincpu->space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
 
-	for (l_addr = 0; l_addr < m_legacy_dynamic_count; l_addr++)
-		m_maincpu->space(AS_PROGRAM).unmap_readwrite(l_dynamic[l_addr].start, l_dynamic[l_addr].end);
-
 	/* the build the list of stuff */
 	m_dynamic_count = 0;
-	m_legacy_dynamic_count = 0;
-
+	
 	/* DCS2 */
 	base = m_nile_regs[NREG_DCS2] & 0x1fffff00;
 	if (base >= m_rambase.bytes())
@@ -1692,24 +1653,24 @@ void vegas_state::remap_dynamic_addresses()
 		if (base >= m_rambase.bytes() && base < 0x20000000)
 		{
 			if (voodoo_type == TYPE_VOODOO_2)
-				add_legacy_dynamic_device_address(m_voodoo, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
+				add_dynamic_address(base + 0x000000, base + 0xffffff, read32_delegate(FUNC(voodoo_device::voodoo_r),(voodoo_device*)m_voodoo), write32_delegate(FUNC(voodoo_device::voodoo_w),(voodoo_device*)m_voodoo));
 			else
-				add_legacy_dynamic_device_address(m_voodoo, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
+				add_dynamic_address(base + 0x000000, base + 0x1ffffff, read32_delegate(FUNC(voodoo_banshee_device::banshee_r),(voodoo_banshee_device*)m_voodoo), write32_delegate(FUNC(voodoo_banshee_device::banshee_w),(voodoo_banshee_device*)m_voodoo));
 		}
 
 		if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 		{
 			base = m_pci_3dfx_regs[0x05] & 0xfffffff0;
 			if (base >= m_rambase.bytes() && base < 0x20000000)
-				add_legacy_dynamic_device_address(m_voodoo, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
+				add_dynamic_address(base + 0x0000000, base + 0x1ffffff, read32_delegate(FUNC(voodoo_banshee_device::banshee_fb_r),(voodoo_banshee_device*)m_voodoo), write32_delegate(FUNC(voodoo_banshee_device::banshee_fb_w),(voodoo_banshee_device*)m_voodoo));
 
 			base = m_pci_3dfx_regs[0x06] & 0xfffffff0;
 			if (base >= m_rambase.bytes() && base < 0x20000000)
-				add_legacy_dynamic_device_address(m_voodoo, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
+				add_dynamic_address(base + 0x0000000, base + 0x00000ff, read32_delegate(FUNC(voodoo_banshee_device::banshee_io_r),(voodoo_banshee_device*)m_voodoo), write32_delegate(FUNC(voodoo_banshee_device::banshee_io_w),(voodoo_banshee_device*)m_voodoo));
 
 			base = m_pci_3dfx_regs[0x0c] & 0xffff0000;
 			if (base >= m_rambase.bytes() && base < 0x20000000)
-				add_legacy_dynamic_device_address(m_voodoo, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
+				add_dynamic_address(base + 0x0000000, base + 0x000ffff, read32_delegate(FUNC(voodoo_banshee_device::banshee_rom_r),(voodoo_banshee_device*)m_voodoo), write32_delegate());
 		}
 	}
 
@@ -1726,19 +1687,6 @@ void vegas_state::remap_dynamic_addresses()
 			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].read);
 		if (!dynamic[addr].write.isnull())
 			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].write);
-	}
-
-	for (l_addr = 0; l_addr < m_legacy_dynamic_count; l_addr++)
-	{
-		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", l_dynamic[l_addr].start, l_dynamic[l_addr].end, l_dynamic[l_addr].rdname, l_dynamic[l_addr].wrname);
-
-		if (l_dynamic[l_addr].mread != NULL)
-			space.install_legacy_read_handler(l_dynamic[l_addr].start, l_dynamic[l_addr].end, 0, 0, l_dynamic[l_addr].mread, l_dynamic[l_addr].rdname);
-		if (l_dynamic[l_addr].mwrite != NULL)
-			space.install_legacy_write_handler(l_dynamic[l_addr].start, l_dynamic[l_addr].end, 0, 0, l_dynamic[l_addr].mwrite, l_dynamic[l_addr].wrname);
-
-		if (l_dynamic[l_addr].dread != NULL || l_dynamic[l_addr].dwrite != NULL)
-			space.install_legacy_readwrite_handler(*l_dynamic[l_addr].device, l_dynamic[l_addr].start, l_dynamic[l_addr].end, 0, 0, l_dynamic[l_addr].dread, l_dynamic[l_addr].rdname, l_dynamic[l_addr].dwrite, l_dynamic[l_addr].wrname);
 	}
 
 	if (LOG_DYNAMIC)

@@ -757,7 +757,7 @@ static __m128i vec_shuf[16];
 static __m128i vec_shuf_inverse[16];
 #endif
 
-static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback)
 {
 	int regIdx = 0;
 	int accumIdx;

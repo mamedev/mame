@@ -373,7 +373,7 @@ MACHINE_START_MEMBER(msx_state,msx)
 MACHINE_START_MEMBER(msx_state,msx2)
 {
 	m_port_c_old = 0xff;
-	m_dsk_stat = 0x7f;
+	m_dsk_stat = 0x3f;
 }
 
 MACHINE_RESET_MEMBER(msx_state,msx)
@@ -689,28 +689,6 @@ WRITE_LINE_MEMBER( msx_state::msx_wd179x_drq_w )
 		m_dsk_stat |= 0x80;
 }
 
-const wd17xx_interface msx_wd17xx_interface =
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(msx_state, msx_wd179x_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(msx_state, msx_wd179x_drq_w),
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-LEGACY_FLOPPY_OPTIONS_START(msx)
-	LEGACY_FLOPPY_OPTION(msx, "dsk", "MSX SS", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(msx, "dsk", "MSX DS", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
 
 /*
 ** The PPI functions
@@ -888,12 +866,6 @@ void msx_state::msx_memory_init()
 				m_all_state[prim][sec][page] = st;
 				page++;
 			}
-			break;
-		case MSX_LAYOUT_KANJI_ENTRY:
-			m_kanji_mem = m_region_maincpu->base() + layout->option;
-			break;
-		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
-			m_ramio_set_bits = (UINT8)layout->option;
 			break;
 		}
 	}
@@ -1122,10 +1094,10 @@ READ8_MEMBER( msx_state::msx_kanji_r )
 {
 	UINT8 result = 0xff;
 
-	if (offset && m_kanji_mem)
+	if (offset && m_region_kanji)
 	{
 		int latch = m_kanji_latch;
-		result = m_kanji_mem[latch++];
+		result = m_region_kanji->u8(latch++);
 
 		m_kanji_latch &= ~0x1f;
 		m_kanji_latch |= latch & 0x1f;

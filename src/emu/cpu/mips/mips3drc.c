@@ -351,7 +351,7 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback)
 {
 	mips3_state *mips3;
 	drc_cache *cache;

@@ -461,7 +461,7 @@ struct tms99xx_state
 	/* interrupt callback */
 	/* note that this callback is used by tms9900_set_irq_line(cpustate) and tms9980a_set_irq_line(cpustate) to
 	retreive the value on IC0-IC3 (non-standard behaviour) */
-	device_irq_acknowledge_callback irq_callback;
+	device_irq_acknowledge_delegate irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	address_space *io;

@@ -115,7 +115,7 @@ void legacy_cpu_device::device_start()
 {
 	// standard init
 	cpu_init_func init = reinterpret_cast<cpu_init_func>(get_legacy_fct(CPUINFO_FCT_INIT));
-	(*init)(this, static_standard_irq_callback);
+	(*init)(this, device_irq_acknowledge_delegate(FUNC(legacy_cpu_device::standard_irq_callback_member), this));
 	m_inited = true;
 
 	// fetch information about the CPU states

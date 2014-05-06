@@ -117,7 +117,7 @@ void exidy440_sound_device::device_start()
 	m_channel_frequency[3] = clock()/2;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock(), this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	/* allocate the sample cache */
 	length = machine().root_device().memregion("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);

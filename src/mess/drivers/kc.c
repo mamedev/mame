@@ -87,34 +87,6 @@ extern SLOT_INTERFACE_START(kc85_exp)
 SLOT_INTERFACE_END
 
 
-Z80PIO_INTERFACE( kc85_pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),                     /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_r),             /* port A read callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_w),             /* port A write callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_ardy_cb),        /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_r),             /* port B read callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_w),             /* port B write callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_brdy_cb)         /* portB ready active callback */
-};
-
-Z80CTC_INTERFACE( kc85_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, ctc_zc0_callback),
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, ctc_zc1_callback),
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, video_toggle_blink_state)
-};
-
-static const cassette_interface kc_cassette_interface =
-{
-	kc_cassette_formats,
-	NULL,
-	CASSETTE_PLAY,
-	"kc_cass",
-	NULL
-};
-
 static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
@@ -123,8 +95,20 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CPU_CONFIG(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_Z80PIO_ADD( "z80pio", KC85_3_CLOCK, kc85_pio_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", KC85_3_CLOCK, kc85_ctc_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, KC85_3_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(kc_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kc_state, pio_porta_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(kc_state, pio_ardy_cb))
+	MCFG_Z80PIO_IN_PB_CB(READ8(kc_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(kc_state, pio_portb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(kc_state, pio_brdy_cb))
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_3_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(kc_state, ctc_zc0_callback))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(kc_state, ctc_zc1_callback))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(kc_state, video_toggle_blink_state))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -149,7 +133,10 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("kc_cass")
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
@@ -192,8 +179,20 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_CPU_CONFIG(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_Z80PIO_ADD( "z80pio", KC85_4_CLOCK, kc85_pio_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", KC85_4_CLOCK, kc85_ctc_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, KC85_4_CLOCK)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(kc_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kc_state, pio_porta_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(kc_state, pio_ardy_cb))
+	MCFG_Z80PIO_IN_PB_CB(READ8(kc_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(kc_state, pio_portb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(kc_state, pio_brdy_cb))
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_4_CLOCK)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(kc_state, ctc_zc0_callback))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(kc_state, ctc_zc1_callback))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(kc_state, video_toggle_blink_state))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,7 +217,10 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("kc_cass")
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)

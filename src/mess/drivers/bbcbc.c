@@ -108,18 +108,6 @@ WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* TODO */
-static Z80PIO_INTERFACE( bbcbc_z80pio_intf )
-{
-	DEVCB_NULL, /* int callback */
-	DEVCB_NULL, /* port a read */
-	DEVCB_NULL, /* port a write */
-	DEVCB_NULL, /* ready a */
-	DEVCB_NULL, /* port b read */
-	DEVCB_NULL, /* port b write */
-	DEVCB_NULL  /* ready b */
-};
-
 static const z80_daisy_config bbcbc_daisy_chain[] =
 {
 	{ "z80pio" },
@@ -166,8 +154,7 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CPU_IO_MAP( bbcbc_io)
 	MCFG_CPU_CONFIG(bbcbc_daisy_chain)
 
-
-	MCFG_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, MAIN_CLOCK/8)
 
 	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)

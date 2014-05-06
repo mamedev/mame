@@ -35,15 +35,7 @@ const device_type SATURN_CART_SLOT = &device_creator<sat_cart_slot_device>;
 //-------------------------------------------------
 
 device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_ext_dram0(NULL),
-		m_ext_dram1(NULL),
-		m_ext_bram(NULL),
-		m_rom_size(0),
-		m_ext_dram0_size(0),
-		m_ext_dram1_size(0),
-		m_ext_bram_size(0)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 
@@ -60,13 +52,10 @@ device_sat_cart_interface::~device_sat_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sat_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
+void device_sat_cart_interface::rom_alloc(UINT32 size)
 {
 	if (m_rom == NULL)
-	{
-		m_rom = auto_alloc_array_clear(machine, UINT32, size/4);
-		m_rom_size = size;
-	}
+		m_rom.resize(size/sizeof(UINT32));
 }
 
 
@@ -134,7 +123,7 @@ bool sat_cart_slot_device::call_load()
 		else
 			len = length();
 
-		m_cart->rom_alloc(machine(), len);
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() != NULL)

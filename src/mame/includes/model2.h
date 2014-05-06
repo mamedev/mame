@@ -219,6 +219,7 @@ public:
 	UINT32 copro_fifoout_pop(address_space &space, UINT32 offset, UINT32 mem_mask);
 	void copro_fifoout_push(device_t *device, UINT32 data,UINT32 offset,UINT32 mem_mask);
 
+	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 };
 
 /*----------- defined in video/model2.c -----------*/

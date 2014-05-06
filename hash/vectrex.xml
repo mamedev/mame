@@ -12,7 +12,8 @@ guys
 -->
 
 <softwarelist name="vectrex" description="GCE Vectrex cartridges">
-	<software name="3dmnstrm">
+
+	<software name="3dminest">
 		<description>3D Mine Storm</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -78,17 +79,6 @@ guys
 		</part>
 	</software>
 
-	<software name="berzerkp" cloneof="berzerk">
-		<description>Berzerk (Debugged Prototype)</description>
-		<year>1982</year>
-		<publisher>GCE</publisher>
-		<part name="cart" interface="vectrex_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="berzerkd.bin" size="32768" crc="2adc4eaa" sha1="88031823ed2af95e8a7a6239cd83b158f9b7c16a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blitz">
 		<description>Blitz!</description>
 		<year>1982</year>
@@ -122,6 +112,17 @@ guys
 		</part>
 	</software>
 
+	<software name="mrboston" cloneof="cleanswp">
+		<description>Mr. Boston Clean Sweep</description>
+		<year>1982</year>
+		<publisher>GCE</publisher>
+		<part name="cart" interface="vectrex_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mrboston.bin" size="8192" crc="bd4da4c2" sha1="299841a116e59399af4e74ccae23ddfc078e007b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cchasm">
 		<description>Cosmic Chasm</description>
 		<year>1982</year>
@@ -145,7 +146,7 @@ guys
 	</software>
 
 	<software name="darktowr">
-		<description>Dark Tower (Proto)</description>
+		<description>Dark Tower (Prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -156,7 +157,7 @@ guys
 	</software>
 
 	<software name="enginean">
-		<description>Engine Analyzer (Proto)</description>
+		<description>Engine Analyzer (Prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -200,7 +201,19 @@ guys
 	</software>
 
 	<software name="mailplan">
-		<description>Mail Plane (Proto)</description>
+		<description>Mail Plane (Prototype)</description>
+		<year>1983</year>
+		<publisher>GCE</publisher>
+		<part name="cart" interface="vectrex_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mail_plane.bin" size="8192" crc="da1ac0db" sha1="05f56e708f752ca801f8013c7da9b0db01508ba5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is an incomplete version (or badly burned on cart). It does not work beyond the initial cargo phase. -->
+	<software name="mailplan1" cloneof="mailplan">
+		<description>Mail Plane (Early Prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -255,7 +268,7 @@ guys
 	</software>
 
 	<software name="ptchduel">
-		<description>Pitcher's Duel (Proto)</description>
+		<description>Pitcher's Duel (Prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -276,8 +289,8 @@ guys
 		</part>
 	</software>
 
-	<software name="polarresb" cloneof="polarres">
-		<description>Polar Rescue (Beta)</description>
+	<software name="polarresp" cloneof="polarres">
+		<description>Polar Rescue (Prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -419,17 +432,6 @@ guys
 		</part>
 	</software>
 
-	<software name="startrekp" cloneof="startrek">
-		<description>Star Trek (Debugged Prototype)</description>
-		<year>1982</year>
-		<publisher>GCE</publisher>
-		<part name="cart" interface="vectrex_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="startrekp.bin" size="4096" crc="563f846b" sha1="21707811e544edae66ca076351bf0743842b46e5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="starhawk">
 		<description>Star Hawk</description>
 		<year>1982</year>
@@ -452,8 +454,8 @@ guys
 		</part>
 	</software>
 
-	<software name="tourdefr">
-		<description>Tour De France (Proto)</description>
+	<software name="tourfrnc">
+		<description>Tour de France (Prototype)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
@@ -484,4 +486,30 @@ guys
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- Are these legit dumps or hacked versions by the guy at ClassicGameCreations.com? -->
+
+	<software name="berzerkd" cloneof="berzerk">
+		<description>Berzerk (Debugged Prototype)</description>
+		<year>1982</year>
+		<publisher>GCE</publisher>
+		<part name="cart" interface="vectrex_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="berzerkd.bin" size="32768" crc="2adc4eaa" sha1="88031823ed2af95e8a7a6239cd83b158f9b7c16a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrekd" cloneof="startrek">
+		<description>Star Trek (Debugged Prototype)</description>
+		<year>1982</year>
+		<publisher>GCE</publisher>
+		<part name="cart" interface="vectrex_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="startrekp.bin" size="4096" crc="563f846b" sha1="21707811e544edae66ca076351bf0743842b46e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

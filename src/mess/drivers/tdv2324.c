@@ -236,45 +236,6 @@ UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  tms9927_interface vtac_intf
-//-------------------------------------------------
-
-static const tms9927_interface vtac_intf =
-{
-	8,
-	NULL
-};
-
-
-//-------------------------------------------------
 //  SLOT_INTERFACE( tdv2324_floppies )
 //-------------------------------------------------
 
@@ -314,7 +275,8 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_TMS9927_ADD(TMS9937NL_TAG, XTAL_25_39836MHz, vtac_intf)
+	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, XTAL_25_39836MHz)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	// devices
 	MCFG_PIC8259_ADD(P8259A_TAG, NULL, VCC, NULL)
@@ -323,7 +285,8 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
 
-	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, sio_intf)
+	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, 0, 0, 0, 0)
+
 	MCFG_FD1797x_ADD(FD1797PL02_TAG, 8000000/4)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)

@@ -79,21 +79,6 @@ static const wd17xx_interface x1_mb8877a_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,          /* show border area*/
-	0,0,0,0,        /* visarea adjustment */
-	8,              /* number of pixels per video memory address */
-	NULL,           /* before pixel update callback */
-	NULL,           /* row update callback */
-	NULL,           /* after pixel update callback */
-	DEVCB_NULL,     /* callback for display state changes */
-	DEVCB_NULL,     /* callback for cursor state changes */
-	DEVCB_NULL,     /* HSYNC callback */
-	DEVCB_NULL,     /* VSYNC callback */
-	NULL            /* update address callback */
-};
-
 /*************************************
  *
  *  Inputs
@@ -410,51 +395,6 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
 GFXDECODE_END
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),        // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),       // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),       // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg2),       // ZC/TO2 callback
-};
-
-#if 0
-static const z80sio_interface sio_intf =
-{
-	DEVCB_NULL,                 /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_NULL,                 /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-
-static Z80DART_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-#endif
-
-
 static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },
@@ -472,14 +412,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static const cassette_interface x1_cassette_interface =
-{
-	x1_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"x1_cass",
-	NULL
-};
 
 static LEGACY_FLOPPY_OPTIONS_START( x1 )
 	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
@@ -492,15 +424,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface x1_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(x1),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 
@@ -512,7 +438,11 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_CPU_CONFIG(x1_daisy)
 
-	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
@@ -549,7 +479,10 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, HUC6260_WPF, 70, 70 + 512 + 32, HUC6260_LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider
+	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
 
@@ -581,7 +514,11 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_l", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_r", 0.10)
 
-	MCFG_CASSETTE_ADD("cassette",x1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("x1_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)

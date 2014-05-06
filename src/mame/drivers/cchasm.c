@@ -155,15 +155,18 @@ static const z80_daisy_config daisy_chain[] =
 static MACHINE_CONFIG_START( cchasm, cchasm_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
+	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
 	MCFG_CPU_PROGRAM_MAP(memmap)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3584229)       /* 3.58  MHz (from schematics) */
+	MCFG_CPU_ADD("audiocpu", Z80, 3584229)       /* 3.58  MHz (from schematics) */
 	MCFG_CPU_CONFIG(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_Z80CTC_ADD("ctc", 3584229 /* same as "audiocpu" */, cchasm_ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 3584229 /* same as "audiocpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(cchasm_state, ctc_timer_1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(cchasm_state, ctc_timer_2_w))
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -173,9 +176,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-
 	/* sound hardware */
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1818182)

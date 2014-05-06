@@ -63,21 +63,17 @@ static const z80_daisy_config kc_d004_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80CTC_INTERFACE( kc_d004_ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, 0),               /* interrupt callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg1),  /* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),  /* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg3)   /* ZC/TO2 callback */
-};
-
 static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
 	MCFG_CPU_IO_MAP(kc_d004_io)
 	MCFG_CPU_CONFIG(kc_d004_daisy_chain)
 
-	MCFG_Z80CTC_ADD( Z80CTC_TAG, XTAL_8MHz/2, kc_d004_ctc_intf )
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, 0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))

@@ -10,9 +10,9 @@
 
 /* High internal area (ffffxxxx) */
 
-WRITE32_HANDLER( sh3_internal_high_w )
+WRITE32_MEMBER( sh3_device::sh3_internal_high_w )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 	COMBINE_DATA(&sh4->m_sh3internal_upper[offset]);
 
 	switch (offset)
@@ -72,9 +72,9 @@ WRITE32_HANDLER( sh3_internal_high_w )
 
 }
 
-READ32_HANDLER( sh3_internal_high_r )
+READ32_MEMBER( sh3_device::sh3_internal_high_r )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 
 	UINT32 ret = 0;
 
@@ -136,9 +136,9 @@ READ32_HANDLER( sh3_internal_high_r )
 }
 
 
-READ32_HANDLER( sh3_internal_r )
+READ32_MEMBER( sh3_device::sh3_internal_r )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 
 	if (offset<0x1000)
 	{
@@ -378,9 +378,9 @@ READ32_HANDLER( sh3_internal_r )
 
 /* Lower internal area */
 
-WRITE32_HANDLER( sh3_internal_w )
+WRITE32_MEMBER( sh3_device::sh3_internal_w )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 
 
 

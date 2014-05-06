@@ -380,18 +380,17 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-static MC6845_UPDATE_ROW( trs80m2_update_row )
+MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 {
-	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
-	const pen_t *pen = state->m_palette->pens();
+	const pen_t *pen = m_palette->pens();
 
 	int x = 0;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
+		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = state->m_char_rom->base()[address];
+		UINT8 data = m_char_rom->base()[address];
 
 		int dcursor = (column == cursor_x);
 		int drevid = BIT(code, 7);
@@ -426,21 +425,6 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 		}
 	}
 }
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	trs80m2_update_row,
-	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, de_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, vsync_w),
-	NULL
-};
 
 void trs80m2_state::video_start()
 {
@@ -512,7 +496,7 @@ WRITE8_MEMBER( trs80m2_state::kbd_w )
 }
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 READ8_MEMBER(trs80m2_state::io_read_byte)
@@ -527,20 +511,8 @@ WRITE8_MEMBER(trs80m2_state::io_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(trs80m2_state, read),
-	DEVCB_DRIVER_MEMBER(trs80m2_state, write),
-	DEVCB_DRIVER_MEMBER(trs80m2_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(trs80m2_state, io_write_byte),
-};
-
-
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  Z80PIO
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( trs80m2_state::write_centronics_busy )
@@ -624,48 +596,8 @@ WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
 	m_centronics->write_strobe(!state);
 }
 
-static Z80PIO_INTERFACE( pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),             // interrupt callback
-	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_r),               // port A read callback
-	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_w),               // port A write callback
-	DEVCB_NULL,                                                 // port A ready callback
-	DEVCB_NULL,                                                 // port B read callback
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // port B write callback
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, strobe_w)           // port B ready callback
-};
-
-
 //-------------------------------------------------
-//  Z80SIO_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
+//  Z80CTC
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
@@ -679,15 +611,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 	m_ctc->trg2(1);
 	m_ctc->trg2(0);
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxca_w),  // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, txca_w),  // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w) // ZC/TO2 callback
-};
-
 
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
@@ -795,7 +718,12 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(trs80m2_state, de_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
@@ -806,11 +734,31 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_8MHz/2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(trs80m2_state, read))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(trs80m2_state, write))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(trs80m2_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(trs80m2_state, io_write_byte))
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(trs80m2_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(trs80m2_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
+
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
@@ -860,7 +808,12 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(trs80m2_state, de_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
@@ -871,11 +824,32 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_8MHz/2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(trs80m2_state, read))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(trs80m2_state, write))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(trs80m2_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(trs80m2_state, io_write_byte))
+
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(trs80m2_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(trs80m2_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
+
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
 	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")

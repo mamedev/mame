@@ -729,30 +729,6 @@ static GFXDECODE_START( pasopia7 )
 	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-static Z80CTC_INTERFACE( z80ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback, beep interface
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
-};
-
-
 READ8_MEMBER( pasopia7_state::mux_r )
 {
 	return m_mux_data;
@@ -786,17 +762,6 @@ WRITE8_MEMBER( pasopia7_state::mux_w )
 {
 	m_mux_data = data;
 }
-
-static Z80PIO_INTERFACE( z80pio_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
-	DEVCB_DRIVER_MEMBER(pasopia7_state, mux_r),
-	DEVCB_DRIVER_MEMBER(pasopia7_state, mux_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pasopia7_state, keyb_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static const z80_daisy_config p7_daisy[] =
 {
@@ -970,8 +935,17 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_Z80CTC_ADD( "z80ctc", XTAL_4MHz, z80ctc_intf )
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))	// beep interface
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(pasopia7_state, mux_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pasopia7_state, unk_r))
@@ -1009,7 +983,9 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_raster)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
 
@@ -1027,7 +1003,10 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 MACHINE_CONFIG_END
 

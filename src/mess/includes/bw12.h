@@ -91,6 +91,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );
 	DECLARE_READ_LINE_MEMBER( ay3600_control_r );
 	DECLARE_WRITE_LINE_MEMBER( ay3600_data_ready_w );
+	MC6845_UPDATE_ROW( crtc_update_row );
 
 	/* memory state */
 	int m_bank;

@@ -584,75 +584,13 @@ WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
 	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_3), state);
 }
 
-static const floppy_interface thomson_floppy_interface_0 =
+static const floppy_interface thomson_floppy_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_0_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
-	NULL,
 	NULL
 };
 
-static const floppy_interface thomson_floppy_interface_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_1_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
-	NULL,
-	NULL
-};
-static const floppy_interface thomson_floppy_interface_2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
-	NULL,
-	NULL
-};
-static const floppy_interface thomson_floppy_interface_3 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_3_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
-	NULL,
-	NULL
-};
-
-
-/********************* devices ************************/
-const cassette_interface to7_cassette_interface =
-{
-	to7_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
-	NULL
-};
-
-const cassette_interface mo5_cassette_interface =
-{
-	mo5_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
-	NULL
-};
 
 /* ------------ driver ------------ */
 
@@ -690,7 +628,9 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* cassette */
-	MCFG_CASSETTE_ADD( "cassette", to7_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(to7_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 /* timer */
 	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
@@ -708,16 +648,22 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
 	MCFG_WD2793_ADD("wd2793", default_wd17xx_interface )
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(thomson_floppy_interface_0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_0_w))
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(thomson_floppy_interface_1)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_1_w))
 	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(thomson_floppy_interface_2)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_2_w))
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(thomson_floppy_interface_3)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface)
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_3_w))
 
 /* network */
-	MCFG_MC6854_ADD( "mc6854", to7_network_iface )
+	MCFG_DEVICE_ADD( "mc6854", MC6854, 0 )
+	MCFG_MC6854_OUT_FRAME_CB(thomson_state, to7_network_got_frame)
+
 
 /* pia */
 	MCFG_DEVICE_ADD(THOM_PIA_SYS, PIA6821, 0)
@@ -1137,7 +1083,8 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo5)
 
-	MCFG_CASSETTE_MODIFY( "cassette", mo5_cassette_interface )
+	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
@@ -2203,7 +2150,8 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo6)
 
-	MCFG_CASSETTE_MODIFY( "cassette", mo5_cassette_interface )
+	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 

@@ -168,7 +168,7 @@ void okim6376_device::device_start()
 	m_ch2_update = 0;
 	m_st_pulses = 0;
 	/* generate the name and create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / m_divisor, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / m_divisor);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)

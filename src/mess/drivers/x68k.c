@@ -1025,7 +1025,7 @@ void x68k_state::set_bus_error(UINT32 address, bool write, UINT16 mem_mask)
 	m_maincpu->mmu_tmp_buserror_address = address; // Hack for x68030
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR); // let rmw cycles complete
+	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 	logerror("%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
@@ -1649,6 +1649,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
 	m_fdc_tc = timer_alloc(TIMER_X68K_FDC_TC);
 	m_adpcm_timer = timer_alloc(TIMER_X68K_ADPCM);
+	m_bus_error_timer = timer_alloc(TIMER_X68K_BUS_ERROR);
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init();

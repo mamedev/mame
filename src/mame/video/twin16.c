@@ -46,15 +46,6 @@ WRITE16_MEMBER(twin16_state::twin16_text_ram_w)
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::twin16_paletteram_word_w)
-{   // identical to tmnt_paletteram_w
-	COMBINE_DATA(m_generic_paletteram_16 + offset);
-	offset &= ~1;
-
-	data = ((m_generic_paletteram_16[offset] & 0xff) << 8) | (m_generic_paletteram_16[offset + 1] & 0xff);
-	m_palette->set_pen_color(offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-}
-
 WRITE16_MEMBER(twin16_state::fround_gfx_bank_w)
 {
 	COMBINE_DATA(&m_gfx_bank);

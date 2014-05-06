@@ -31,7 +31,7 @@ dai_sound_device::dai_sound_device(const machine_config &mconfig, const char *ta
 
 void dai_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
+	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 }
 
 //-------------------------------------------------

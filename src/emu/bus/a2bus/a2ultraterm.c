@@ -61,22 +61,6 @@ const device_type A2BUS_ULTRATERMENH = &device_creator<a2bus_ultratermenh_device
 #define CT2_INVBIT7L (0x02)
 #define CT2_HLBIT7L (0x01)
 
-static MC6845_UPDATE_ROW( ultraterm_update_row );
-
-static MC6845_INTERFACE( mc6845_mda_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	8,                  /* number of pixels per video memory address */
-	NULL,               /* begin_update */
-	ultraterm_update_row,       /* update_row */
-	NULL,               /* end_update */
-	DEVCB_NULL,             /* on_de_changed */
-	DEVCB_NULL,             /* on_cur_changed */
-	DEVCB_NULL,         /* on hsync changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_videx160_device, vsync_changed),   /* on_vsync_changed */
-	NULL
-};
 
 static const rgb_t ultraterm_palette[4] =
 {
@@ -91,7 +75,11 @@ MACHINE_CONFIG_FRAGMENT( a2ultraterm )
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_LOW, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( ULTRATERM_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( ULTRATERM_MC6845_NAME, MC6845, ULTRATERM_SCREEN_NAME, CLOCK_LOW/9, mc6845_mda_intf)
+	MCFG_MC6845_ADD(ULTRATERM_MC6845_NAME, MC6845, ULTRATERM_SCREEN_NAME, CLOCK_LOW/9)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx160_device, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx160_device, vsync_changed))
 MACHINE_CONFIG_END
 
 ROM_START( a2ultraterm )
@@ -319,9 +307,8 @@ void a2bus_videx160_device::write_c800(address_space &space, UINT16 offset, UINT
 	}
 }
 
-static MC6845_UPDATE_ROW( ultraterm_update_row )
+MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 {
-	a2bus_videx160_device    *uterm  = downcast<a2bus_videx160_device *>(device->owner());
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ra;
 	int i;
@@ -329,38 +316,38 @@ static MC6845_UPDATE_ROW( ultraterm_update_row )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ma + i );
-		UINT8 chr = uterm->m_ram[ offset ];
-		UINT8 data = uterm->m_chrrom[ chr_base + (chr * 16) ];
+		UINT8 chr = m_ram[ offset ];
+		UINT8 data = m_chrrom[ chr_base + (chr * 16) ];
 		UINT8 fg = 2;
 		UINT8 bg = 0;
 		UINT8 tmp;
 
 		// apply attributes
-		if (!(uterm->m_ctrl2 & CT2_USEDIPS))
+		if (!(m_ctrl2 & CT2_USEDIPS))
 		{
 			// this set and bit 7 in char, highlight
-			if ((uterm->m_ctrl2 & CT2_HLBIT7H) && (chr & 0x80))
+			if ((m_ctrl2 & CT2_HLBIT7H) && (chr & 0x80))
 			{
 				fg = 3;
 				bg = 0;
 			}
 
 			// this set and NOT bit 7 in char, highlight
-			if ((uterm->m_ctrl2 & CT2_HLBIT7L) && (!(chr & 0x80)))
+			if ((m_ctrl2 & CT2_HLBIT7L) && (!(chr & 0x80)))
 			{
 				fg = 3;
 				bg = 0;
 			}
 
 			// this clear and bit 7 in char, lowlight
-			if (!(uterm->m_ctrl2 & CT2_HLBIT7H) && (chr & 0x80))
+			if (!(m_ctrl2 & CT2_HLBIT7H) && (chr & 0x80))
 			{
 				fg = 1;
 				bg = 0;
 			}
 
 			// this clear and NOT bit 7 in char, lowlight
-			if (!(uterm->m_ctrl2 & CT2_HLBIT7L) && (!(chr & 0x80)))
+			if (!(m_ctrl2 & CT2_HLBIT7L) && (!(chr & 0x80)))
 			{
 				fg = 1;
 				bg = 0;
@@ -368,7 +355,7 @@ static MC6845_UPDATE_ROW( ultraterm_update_row )
 
 			// invert last so invert + hilight/invert + lowlight are possible
 			// invert if char bit 7 is set
-			if ((uterm->m_ctrl2 & CT2_INVBIT7H) && (chr & 0x80))
+			if ((m_ctrl2 & CT2_INVBIT7H) && (chr & 0x80))
 			{
 				tmp = fg;
 				fg = bg;
@@ -376,7 +363,7 @@ static MC6845_UPDATE_ROW( ultraterm_update_row )
 			}
 
 			// invert if char bit 7 is clear
-			if ((uterm->m_ctrl2 & CT2_INVBIT7L) && (!(chr & 0x80)))
+			if ((m_ctrl2 & CT2_INVBIT7L) && (!(chr & 0x80)))
 			{
 				tmp = fg;
 				fg = bg;
@@ -386,7 +373,7 @@ static MC6845_UPDATE_ROW( ultraterm_update_row )
 
 		if ( i == cursor_x )
 		{
-			if ( uterm->m_framecnt & 0x08 )
+			if ( m_framecnt & 0x08 )
 			{
 				data = 0xFF;
 			}

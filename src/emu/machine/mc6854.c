@@ -167,6 +167,10 @@ const device_type MC6854 = &device_creator<mc6854_device>;
 
 mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6854, "MC6854 ADLC", tag, owner, clock, "mc6854", __FILE__),
+	m_out_irq_cb(*this),
+	m_out_txd_cb(*this),
+	m_out_rts_cb(*this),
+	m_out_dtr_cb(*this),
 	m_cr1(0),
 	m_cr2(0),
 	m_cr3(0),
@@ -198,38 +202,16 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6854_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc6854_interface *intf = reinterpret_cast<const mc6854_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<mc6854_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
-		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
-		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void mc6854_device::device_start()
 {
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_txd_func.resolve(m_out_txd_cb, *this);
-	m_out_rts_func.resolve(m_out_rts_cb, *this);
-	m_out_dtr_func.resolve(m_out_dtr_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_out_txd_cb.resolve();
+	m_out_frame_cb.bind_relative_to(*owner());
+	m_out_rts_cb.resolve_safe();
+	m_out_dtr_cb.resolve_safe();
 
 	m_ttimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6854_device::tfifo_cb), this));
 
@@ -310,10 +292,10 @@ void mc6854_device::send_bits( UINT32 data, int len, int zi )
 		m_tones = 0;
 
 	/* send bits */
-	if ( !m_out_txd_func.isnull() )
+	if ( !m_out_txd_cb.isnull() )
 	{
 		for ( i = 0; i < len; i++, data >>= 1 )
-			m_out_txd_func( data & 1 );
+			m_out_txd_cb( data & 1 );
 	}
 
 	/* schedule when to ask the MC6854 for more bits */
@@ -376,8 +358,6 @@ void mc6854_device::tfifo_terminate( )
 /* call-back to refill the bit-stream from the FIFO */
 TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
 {
-	device_t* device = (device_t*) ptr;
-
 	int i, data = m_tfifo[ MC6854_FIFO_SIZE - 1 ];
 
 	if ( ! m_tstate )
@@ -472,8 +452,8 @@ TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
 			m_tstate = 0;
 
 		m_flen = 0;
-		if ( m_out_frame )
-			m_out_frame( device, m_frame, len );
+		if ( !m_out_frame_cb.isnull() )
+			m_out_frame_cb( m_frame, len );
 	}
 }
 
@@ -823,7 +803,7 @@ void mc6854_device::update_sr1( )
 			m_sr1 |= IRQ;
 	}
 
-	m_out_irq_func((m_sr1 & IRQ) ? ASSERT_LINE : CLEAR_LINE);
+	m_out_irq_cb((m_sr1 & IRQ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -923,7 +903,7 @@ WRITE8_MEMBER( mc6854_device::write )
 			if ( TST )
 				logerror( "%s mc6854 test mode not handled (CR3=$%02X)\n", machine().describe_context(), m_cr3 );
 
-			m_out_dtr_func( DTR ? 1 : 0 );
+			m_out_dtr_cb( DTR ? 1 : 0 );
 
 		}
 		else
@@ -956,7 +936,7 @@ WRITE8_MEMBER( mc6854_device::write )
 					m_sr1 |= CTS;
 			}
 
-			m_out_rts_func( RTS ? 1 : 0 );
+			m_out_rts_cb( RTS ? 1 : 0 );
 		}
 		break;
 

@@ -32,6 +32,7 @@ public:
 	DECLARE_READ8_MEMBER(ipds_c0_r);
 	DECLARE_WRITE8_MEMBER(ipds_b1_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -79,12 +80,11 @@ void ipds_state::machine_reset()
 {
 }
 
-static I8275_DISPLAY_PIXELS(ipds_display_pixels)
+I8275_DRAW_CHARACTER_MEMBER( ipds_state::crtc_display_pixels )
 {
 	int i;
-	ipds_state *state = device->machine().driver_data<ipds_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = state->memregion("chargen")->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *charmap = memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
 	if (vsp)
@@ -99,17 +99,6 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 	for(i=0;i<6;i++)
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
-
-const i8275_interface ipds_i8275_interface =
-{
-	6,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	ipds_display_pixels
-};
 
 /* F4 Character Displayer */
 static const gfx_layout ipds_charlayout =
@@ -151,7 +140,10 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_I8275_ADD  ( "i8275", ipds_i8275_interface)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL_19_6608MHz / 4)
+	MCFG_I8275_CHARACTER_WIDTH(6)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
+
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ipds_state, kbd_put))
 MACHINE_CONFIG_END

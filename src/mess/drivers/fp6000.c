@@ -288,27 +288,11 @@ void fp6000_state::machine_reset()
 {
 }
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)
 	MCFG_CPU_IO_MAP(fp6000_io)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -319,7 +303,9 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)

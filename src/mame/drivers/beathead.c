@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(finescroll_w)
 	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x42000000, 0x4201ffff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(hsync_ram_r, hsync_ram_w)
 	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP /* noisy x4 during scanline int */
 	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(vram_latch_w)
@@ -379,6 +379,8 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_MEMBITS(16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

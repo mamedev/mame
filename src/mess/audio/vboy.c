@@ -208,7 +208,7 @@ void vboysnd_device::device_start()
 	int i;
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, AUDIO_FREQ, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, AUDIO_FREQ);
 
 	for (i=0; i<2048; i++)
 		waveFreq2LenTbl[i] = AUDIO_FREQ / (5000000.0/(float)((2048-i) * 32));

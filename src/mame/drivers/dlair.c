@@ -194,15 +194,6 @@ WRITE_LINE_MEMBER(dlair_state::write_speaker)
 }
 
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(dlair_state, write_speaker),         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
-
-
 static const z80sio_interface sio_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(dlair_state, dleuro_interrupt),    /* interrupt handler */
@@ -762,7 +753,10 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_CPU_PROGRAM_MAP(dleuro_map)
 	MCFG_CPU_IO_MAP(dleuro_io_map)
 
-	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
+
 	MCFG_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))

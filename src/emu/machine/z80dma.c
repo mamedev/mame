@@ -146,35 +146,15 @@ const device_type Z80DMA = &device_creator<z80dma_device>;
 
 z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80DMA, "Z8410 DMA", tag, owner, clock, "z80dma", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this),
+		m_out_busreq_cb(*this),
+		m_out_int_cb(*this),
+		m_out_bao_cb(*this),
+		m_in_mreq_cb(*this),
+		m_out_mreq_cb(*this),
+		m_in_iorq_cb(*this),
+		m_out_iorq_cb(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z80dma_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const z80dma_interface *intf = reinterpret_cast<const z80dma_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<z80dma_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_busreq_cb, 0, sizeof(m_out_busreq_cb));
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_bao_cb, 0, sizeof(m_out_bao_cb));
-		memset(&m_in_mreq_cb, 0, sizeof(m_in_mreq_cb));
-		memset(&m_out_mreq_cb, 0, sizeof(m_out_mreq_cb));
-		memset(&m_in_iorq_cb, 0, sizeof(m_in_iorq_cb));
-		memset(&m_out_iorq_cb, 0, sizeof(m_out_iorq_cb));
-	}
 }
 
 
@@ -185,13 +165,13 @@ void z80dma_device::device_config_complete()
 void z80dma_device::device_start()
 {
 	// resolve callbacks
-	m_out_busreq_func.resolve(m_out_busreq_cb, *this);
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_bao_func.resolve(m_out_bao_cb, *this);
-	m_in_mreq_func.resolve(m_in_mreq_cb, *this);
-	m_out_mreq_func.resolve(m_out_mreq_cb, *this);
-	m_in_iorq_func.resolve(m_in_iorq_cb, *this);
-	m_out_iorq_func.resolve(m_out_iorq_cb, *this);
+	m_out_busreq_cb.resolve_safe();
+	m_out_int_cb.resolve_safe();
+	m_out_bao_cb.resolve_safe();
+	m_in_mreq_cb.resolve_safe(0);
+	m_out_mreq_cb.resolve_safe();
+	m_in_iorq_cb.resolve_safe(0);
+	m_out_iorq_cb.resolve_safe();
 
 	// allocate timer
 	m_timer = machine().scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);
@@ -345,7 +325,7 @@ int z80dma_device::is_ready()
 
 void z80dma_device::interrupt_check()
 {
-	m_out_int_func(m_ip ? ASSERT_LINE : CLEAR_LINE);
+	m_out_int_cb(m_ip ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -395,18 +375,18 @@ void z80dma_device::do_read()
 			if (PORTA_IS_SOURCE)
 			{
 				if (PORTA_MEMORY)
-					m_latch = m_in_mreq_func(m_addressA);
+					m_latch = m_in_mreq_cb(m_addressA);
 				else
-					m_latch = m_in_iorq_func(m_addressA);
+					m_latch = m_in_iorq_cb(m_addressA);
 
 				if (DMA_LOG) logerror("Z80DMA '%s' A src: %04x %s -> data: %02x\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
 			}
 			else
 			{
 				if (PORTB_MEMORY)
-					m_latch = m_in_mreq_func(m_addressB);
+					m_latch = m_in_mreq_cb(m_addressB);
 				else
-					m_latch = m_in_iorq_func(m_addressB);
+					m_latch = m_in_iorq_cb(m_addressB);
 
 				if (DMA_LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
 			}
@@ -427,18 +407,18 @@ void z80dma_device::do_transfer_write()
 	if (PORTA_IS_SOURCE)
 	{
 		if (PORTB_MEMORY)
-			m_out_mreq_func(m_addressB, m_latch);
+			m_out_mreq_cb((offs_t)m_addressB, m_latch);
 		else
-			m_out_iorq_func(m_addressB, m_latch);
+			m_out_iorq_cb((offs_t)m_addressB, m_latch);
 
 		if (DMA_LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
 	}
 	else
 	{
 		if (PORTA_MEMORY)
-			m_out_mreq_func(m_addressA, m_latch);
+			m_out_mreq_cb((offs_t)m_addressA, m_latch);
 		else
-			m_out_iorq_func(m_addressA, m_latch);
+			m_out_iorq_cb((offs_t)m_addressA, m_latch);
 
 		if (DMA_LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
 	}
@@ -596,7 +576,7 @@ void z80dma_device::update_status()
 	}
 
 	// set the busreq line
-	m_out_busreq_func(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
+	m_out_busreq_cb(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

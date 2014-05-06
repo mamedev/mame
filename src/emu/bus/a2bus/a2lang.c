@@ -36,12 +36,14 @@ a2bus_lang_device::a2bus_lang_device(const machine_config &mconfig, const char *
 		device_t(mconfig, A2BUS_LANG, "Apple II Language Card", tag, owner, clock, "a2lang", __FILE__),
 		device_a2bus_card_interface(mconfig, *this)
 {
+	last_offset = -1;
 }
 
 a2bus_lang_device::a2bus_lang_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this)
 {
+	last_offset = -1;
 }
 
 //-------------------------------------------------
@@ -52,6 +54,8 @@ void a2bus_lang_device::device_start()
 {
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
+
+	save_item(NAME(last_offset));
 }
 
 void a2bus_lang_device::device_reset()
@@ -100,7 +104,21 @@ void a2bus_lang_device::langcard_touch(offs_t offset)
 
 UINT8 a2bus_lang_device::read_c0nx(address_space &space, UINT8 offset)
 {
+	// enforce "read twice" for c081/3/9/B
+	switch(offset & 0x03)
+	{
+		case 1:
+		case 3:
+			if (offset != last_offset)
+			{
+				last_offset = offset;
+				return 0;
+			}
+			break;
+	}
+
 	langcard_touch(offset);
+	last_offset = offset;
 	return 0;
 }
 
@@ -113,4 +131,5 @@ UINT8 a2bus_lang_device::read_c0nx(address_space &space, UINT8 offset)
 void a2bus_lang_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
 	langcard_touch(offset);
+	last_offset = -1;
 }

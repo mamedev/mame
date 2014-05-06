@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Couriersud
+// copyright-holders:Curt Coder
 /***************************************************************************
 
-    Intel 8257 Programmable DMA Controller emulation
+    Intel 8257 DMA Controller emulation
 
-    Copyright Nicola Salmoria and the MAME Team.
+    Copyright the MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
@@ -40,12 +40,14 @@
 #include "emu.h"
 
 
-#define I8257_NUM_CHANNELS      (4)
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
+
+#define MCFG_I8257_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, I8257, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_I8257_OUT_HRQ_CB(_devcb) \
 	devcb = &i8257_device::set_out_hrq_callback(*device, DEVCB2_##_devcb);
@@ -53,16 +55,11 @@
 #define MCFG_I8257_OUT_TC_CB(_devcb) \
 	devcb = &i8257_device::set_out_tc_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8257_OUT_MARK_CB(_devcb) \
-	devcb = &i8257_device::set_out_mark_callback(*device, DEVCB2_##_devcb);
-
-
 #define MCFG_I8257_IN_MEMR_CB(_devcb) \
 	devcb = &i8257_device::set_in_memr_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_I8257_OUT_MEMW_CB(_devcb) \
 	devcb = &i8257_device::set_out_memw_callback(*device, DEVCB2_##_devcb);
-
 
 #define MCFG_I8257_IN_IOR_0_CB(_devcb) \
 	devcb = &i8257_device::set_in_ior_0_callback(*device, DEVCB2_##_devcb);
@@ -76,7 +73,6 @@
 #define MCFG_I8257_IN_IOR_3_CB(_devcb) \
 	devcb = &i8257_device::set_in_ior_3_callback(*device, DEVCB2_##_devcb);
 
-
 #define MCFG_I8257_OUT_IOW_0_CB(_devcb) \
 	devcb = &i8257_device::set_out_iow_0_callback(*device, DEVCB2_##_devcb);
 
@@ -89,78 +85,105 @@
 #define MCFG_I8257_OUT_IOW_3_CB(_devcb) \
 	devcb = &i8257_device::set_out_iow_3_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_I8257_OUT_DACK_0_CB(_devcb) \
+	devcb = &i8257_device::set_out_dack_0_callback(*device, DEVCB2_##_devcb);
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+#define MCFG_I8257_OUT_DACK_1_CB(_devcb) \
+	devcb = &i8257_device::set_out_dack_1_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_I8257_OUT_DACK_2_CB(_devcb) \
+	devcb = &i8257_device::set_out_dack_2_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_I8257_OUT_DACK_3_CB(_devcb) \
+	devcb = &i8257_device::set_out_dack_3_callback(*device, DEVCB2_##_devcb);
+
+// HACK: the radio86 and alikes require this, is it a bug in the soviet clone or is there something else happening?
+#define MCFG_I8257_REVERSE_RW_MODE(_flag) \
+		i8257_device::static_set_reverse_rw_mode(*device, _flag);
 
 // ======================> i8257_device
 
-class i8257_device :  public device_t
+class i8257_device :  public device_t,
+						public device_execute_interface
 {
 public:
 	// construction/destruction
 	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( hlda_w );
+	DECLARE_WRITE_LINE_MEMBER( ready_w );
+
+	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
+	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
+	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
+	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
+
 	template<class _Object> static devcb2_base &set_out_hrq_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_hrq_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_tc_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_tc_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_mark_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_mark_cb.set_callback(object); }
 
 	template<class _Object> static devcb2_base &set_in_memr_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_memr_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_memw_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_memw_cb.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_in_ior_0_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_0_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_ior_1_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_1_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_ior_2_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_ior_3_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_3_cb.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_out_iow_0_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_0_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_iow_1_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_1_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_iow_2_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_iow_3_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_3_cb.set_callback(object); }
-	
-	/* register access */
-	DECLARE_READ8_MEMBER( i8257_r );
-	DECLARE_WRITE8_MEMBER( i8257_w );
 
-	/* hold acknowledge */
-	WRITE_LINE_MEMBER( i8257_hlda_w ) { }
+	template<class _Object> static devcb2_base &set_out_dack_0_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_0_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_1_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_2_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_3_cb.set_callback(object); }
 
-	/* ready */
-	WRITE_LINE_MEMBER( i8257_ready_w ) { }
-
-	/* data request */
-	WRITE_LINE_MEMBER( i8257_drq0_w ) { i8257_drq_w(0, state); }
-	WRITE_LINE_MEMBER( i8257_drq1_w ) { i8257_drq_w(1, state); }
-	WRITE_LINE_MEMBER( i8257_drq2_w ) { i8257_drq_w(2, state); }
-	WRITE_LINE_MEMBER( i8257_drq3_w ) { i8257_drq_w(3, state); }
-	void i8257_drq_w(int channel, int state);
-
+	static void static_set_reverse_rw_mode(device_t &device, bool flag) { downcast<i8257_device &>(device).m_reverse_rw = flag; }
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void execute_run();
+
+	int m_icount;
 
 private:
-	static const device_timer_id TIMER_OPERATION = 0;
-	static const device_timer_id TIMER_MSBFLIP = 1;
-	static const device_timer_id TIMER_DRQ_SYNC = 2;
+	inline void dma_request(int channel, int state);
+	inline bool is_request_active(int channel);
+	inline void set_hreq(int state);
+	inline void set_dack();
+	inline void dma_read();
+	inline void dma_write();
+	inline void advance();
+	inline void set_tc(int state);
+	bool next_channel();
 
-	int i8257_do_operation(int channel);
-	void i8257_update_status();
-	void i8257_prepare_msb_flip();
+	bool m_reverse_rw;
+	bool m_tc;
+	int m_msb;
+	int m_hreq;
+	int m_hack;
+	int m_ready;
+	int m_state;
+	int m_current_channel;
+	int m_last_channel;
+	UINT8 m_transfer_mode;
+	UINT8 m_status;
+	UINT8 m_request;
+	UINT8 m_temp;
 
 	devcb2_write_line   m_out_hrq_cb;
 	devcb2_write_line   m_out_tc_cb;
-	devcb2_write_line   m_out_mark_cb;
 
 	/* accessors to main memory */
 	devcb2_read8        m_in_memr_cb;
 	devcb2_write8       m_out_memw_cb;
 
-	/* channel accesors */
+	/* channel accessors */
 	devcb2_read8        m_in_ior_0_cb;
 	devcb2_read8        m_in_ior_1_cb;
 	devcb2_read8        m_in_ior_2_cb;
@@ -169,28 +192,23 @@ private:
 	devcb2_write8       m_out_iow_1_cb;
 	devcb2_write8       m_out_iow_2_cb;
 	devcb2_write8       m_out_iow_3_cb;
+	devcb2_write_line   m_out_dack_0_cb;
+	devcb2_write_line   m_out_dack_1_cb;
+	devcb2_write_line   m_out_dack_2_cb;
+	devcb2_write_line   m_out_dack_3_cb;
 
-	emu_timer *m_timer;
-	emu_timer *m_msbflip_timer;
-
-	UINT16 m_registers[I8257_NUM_CHANNELS*2];
-
-	UINT16 m_address[I8257_NUM_CHANNELS];
-	UINT16 m_count[I8257_NUM_CHANNELS];
-	UINT8  m_rwmode[I8257_NUM_CHANNELS];
-
-	UINT8 m_mode;
-	UINT8 m_rr;
-
-	UINT8 m_msb;
-	UINT8 m_drq;
-
-	/* bits  0- 3 :  Terminal count for channels 0-3 */
-	UINT8 m_status;
+	struct
+	{
+		UINT16 m_address;
+		UINT16 m_count;
+		UINT8 m_mode;
+	} m_channel[4];
 };
 
 
 // device type definition
 extern const device_type I8257;
+
+
 
 #endif

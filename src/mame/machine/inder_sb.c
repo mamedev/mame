@@ -115,14 +115,6 @@ WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch3)
 
 
 
-static Z80CTC_INTERFACE( z80ctc_intf ) // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, inder_sb_device, z80ctc_ch0),    // for channel 0
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, inder_sb_device, z80ctc_ch1),    // for channel 1
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, inder_sb_device, z80ctc_ch2),    // for channel 2
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, inder_sb_device, z80ctc_ch3),    // for channel 3
-};
-
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
@@ -269,7 +261,13 @@ static MACHINE_CONFIG_FRAGMENT( inder_sb )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 
-	MCFG_Z80CTC_ADD( "ctc", 4000000, z80ctc_intf ) // unk freq
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000) // unk freq
+	// runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(inder_sb_device, z80ctc_ch0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(inder_sb_device, z80ctc_ch1))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(inder_sb_device, z80ctc_ch2))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(inder_sb_device, z80ctc_ch3))
+	// was this correct?!?
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac0")
@@ -280,8 +278,6 @@ static MACHINE_CONFIG_FRAGMENT( inder_sb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-
 MACHINE_CONFIG_END
 
 machine_config_constructor inder_sb_device::device_mconfig_additions() const

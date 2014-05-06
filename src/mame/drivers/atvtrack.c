@@ -92,8 +92,8 @@ public:
 	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
 	UINT32 m_area1_data[4];
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<sh4_device> m_maincpu;
+	required_device<sh4_device> m_subcpu;
 };
 
 void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)
@@ -354,7 +354,7 @@ void atvtrack_state::machine_reset()
 	// set cpu PC register to 0x0c7f0000
 	m_maincpu->set_pc(0x0c7f0000);
 	// set BCR2 to 1
-	sh4_internal_w(as, 0x3001, 1, 0xffffffff);
+	m_maincpu->sh4_internal_w(as, 0x3001, 1, 0xffffffff);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 

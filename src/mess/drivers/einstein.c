@@ -99,17 +99,16 @@ READ8_MEMBER(einstein_state::einstein_80col_ram_r)
    bit 12       jumper M004, this could be used to select two different character
                 sets.
 */
-static MC6845_UPDATE_ROW( einstein_6845_update_row )
+MC6845_UPDATE_ROW( einstein_state::crtc_update_row )
 {
-	einstein_state *einstein = device->machine().driver_data<einstein_state>();
-	const rgb_t *palette = einstein->m_palette->palette()->entry_list_raw();
-	UINT8 *data = einstein->m_region_gfx1->base();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 *data = m_region_gfx1->base();
 	UINT8 char_code, data_byte;
 	int i, x;
 
 	for (i = 0, x = 0; i < x_count; i++, x += 8)
 	{
-		char_code = einstein->m_crtc_ram[(ma + i) & 0x07ff];
+		char_code = m_crtc_ram[(ma + i) & 0x07ff];
 		data_byte = data[(char_code << 3) + (ra & 0x07) + ((ra & 0x08) << 8)];
 
 		bitmap.pix32(y, x + 0) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 7)];
@@ -666,25 +665,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static Z80CTC_INTERFACE( einstein_ctc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_serial_transmit_clock),
-	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_serial_receive_clock),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
-};
-
-static Z80PIO_INTERFACE( einstein_pio_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),
-	DEVCB_NULL
-};
-
 static const ay8910_interface einstein_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -693,21 +673,6 @@ static const ay8910_interface einstein_ay_interface =
 	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_data_read),
 	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_line_write),
 	DEVCB_NULL
-};
-
-static MC6845_INTERFACE( einstein_crtc6845_interface )
-{
-	false,
-	0,0,0,0,
-	8,
-	NULL,
-	einstein_6845_update_row,
-	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_6845_de_changed),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
 };
 
 /* F4 Character Displayer */
@@ -740,14 +705,19 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_CPU_IO_MAP(einstein_io)
 	MCFG_CPU_CONFIG(einstein_daisy_chain)
 
-
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, einstein_keyboard_timer_callback, attotime::from_hz(50))
 
-	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
+	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PB_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
-	MCFG_Z80CTC_ADD(IC_I058, XTAL_X002 / 2, einstein_ctc_intf)
+	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(einstein_state, einstein_serial_transmit_clock))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(einstein_state, einstein_serial_receive_clock))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(IC_I058, z80ctc_device, trg3))
+
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", einstein_state, einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
 
@@ -820,7 +790,11 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4, einstein_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(einstein_state, crtc_update_row)
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(einstein_state, einstein_6845_de_changed))
 MACHINE_CONFIG_END
 
 

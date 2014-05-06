@@ -305,15 +305,6 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
     IP5: 1MHz
 */
 
-static const es5505_interface es5505_taito_en_config =
-{
-	"ensoniq.0",    /* Bank 0: Unused by F3 games? */
-	"ensoniq.0",    /* Bank 1: All games seem to use this */
-	1,              /* channels */
-	DEVCB_NULL            /* IRQ */
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -334,7 +325,9 @@ MACHINE_CONFIG_FRAGMENT( taito_en_sound )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
-	MCFG_SOUND_CONFIG(es5505_taito_en_config)
+	MCFG_ES5505_REGION0("ensoniq.0")
+	MCFG_ES5505_REGION1("ensoniq.0")
+	MCFG_ES5506_CHANNELS(1)               /* channels */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.08)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
 MACHINE_CONFIG_END

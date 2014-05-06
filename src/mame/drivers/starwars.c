@@ -334,7 +334,12 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK / 8, starwars_riot6532_intf)
+	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
+	MCFG_RIOT6532_IN_PA_CB(READ8(starwars_state, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(starwars_state, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("tms", tms5220_device, status_r))
+	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("tms", tms5220_device, data_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(starwars_state, snd_interrupt))
 
 	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 

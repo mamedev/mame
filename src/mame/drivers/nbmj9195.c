@@ -612,22 +612,6 @@ INTERRUPT_GEN_MEMBER(nbmj9195_state::ctc0_trg1)
 	ctc->trg1(0);
 }
 
-static Z80CTC_INTERFACE( ctc_intf_main )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_NULL,                 /* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	DEVCB_NULL,                 /* ZC/TO1 callback */
-	DEVCB_NULL                  /* ZC/TO2 callback */
-};
-
-static Z80CTC_INTERFACE( ctc_intf_audio )
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER("audio_ctc", z80ctc_device, trg3), /* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	DEVCB_NULL,                 /* ZC/TO1 callback */
-	DEVCB_NULL                  /* ZC/TO2 callback */
-};
-
 void nbmj9195_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -3166,9 +3150,12 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 	MCFG_CPU_PROGRAM_MAP(sailorws_sound_map)
 	MCFG_CPU_IO_MAP(sailorws_sound_io_map)
 
-	MCFG_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "maincpu" */, ctc_intf_main)
-	MCFG_Z80CTC_ADD("audio_ctc", 8000000 /* same as "audiocpu" */, ctc_intf_audio)
+	MCFG_DEVICE_ADD("main_ctc", Z80CTC, 12000000/2 /* same as "maincpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
+	MCFG_DEVICE_ADD("audio_ctc", Z80CTC, 8000000 /* same as "audiocpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("audio_ctc", z80ctc_device, trg3))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -301,17 +301,6 @@ VIDEO_START_MEMBER(tmnt_state,blswhstl)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tmnt_state::tmnt_paletteram_word_w)
-{
-	COMBINE_DATA(m_generic_paletteram_16 + offset);
-	offset &= ~1;
-
-	data = (m_generic_paletteram_16[offset] << 8) | m_generic_paletteram_16[offset + 1];
-	m_palette->set_pen_color(offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-}
-
-
-
 WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 {
 	if (ACCESSING_BITS_0_7)

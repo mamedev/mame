@@ -36,6 +36,10 @@ public:
 
 	WRITE_LINE_MEMBER(pc_cpu_line);
 
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( mda_text_inten_update_row );
+	MC6845_UPDATE_ROW( mda_text_blink_update_row );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -45,7 +49,7 @@ public:
 
 	UINT8   m_mode_control;
 
-	mc6845_update_row_func  m_update_row;
+	int     m_update_row_type;
 	UINT8   *m_chr_gen;
 	UINT8   m_vsync;
 	UINT8   m_hsync;
@@ -64,26 +68,29 @@ class isa8_hercules_device :
 		public isa8_mda_device
 {
 public:
-		// construction/destruction
-		isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
+	// construction/destruction
+	isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const;
 
-		virtual DECLARE_READ8_MEMBER(io_read);
-		virtual DECLARE_WRITE8_MEMBER(io_write);
-		virtual DECLARE_READ8_MEMBER(status_r);
-		virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+	virtual DECLARE_READ8_MEMBER(io_read);
+	virtual DECLARE_WRITE8_MEMBER(io_write);
+	virtual DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( hercules_gfx_update_row );
 
 protected:
-		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
-		// internal state
+	// internal state
 public:
-		UINT8 m_configuration_switch; //hercules
+	UINT8 m_configuration_switch; //hercules
 };
 
 

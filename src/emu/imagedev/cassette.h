@@ -37,21 +37,9 @@ enum cassette_state
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> cassette_interface
-
-struct cassette_interface
-{
-	const struct CassetteFormat*    const *m_formats;
-	const struct CassetteOptions    *m_create_opts;
-	cassette_state                  m_default_state;
-	const char *                    m_interface;
-	device_image_display_info_func  m_device_displayinfo;
-};
-
 // ======================> cassette_image_device
 
 class cassette_image_device :   public device_t,
-								public cassette_interface,
 								public device_image_interface
 {
 public:
@@ -59,12 +47,16 @@ public:
 	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cassette_image_device();
 
+	static void static_set_formats(device_t &device, const struct CassetteFormat*  const *formats) { downcast<cassette_image_device &>(device).m_formats = formats; }
+	static void static_set_create_opts(device_t &device, const struct CassetteOptions  *create_opts) { downcast<cassette_image_device &>(device).m_create_opts = create_opts; }
+	static void static_set_default_state(device_t &device, cassette_state default_state) { downcast<cassette_image_device &>(device).m_default_state = default_state; }
+	static void static_set_interface(device_t &device, const char *_interface) { downcast<cassette_image_device &>(device).m_interface = _interface; }
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();
-	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const { return IO_CASSETTE; }
@@ -112,6 +104,10 @@ private:
 	double          m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
 	int             m_direction; // direction select
 	char            m_extension_list[256];
+	const struct CassetteFormat*    const *m_formats;
+	const struct CassetteOptions    *m_create_opts;
+	cassette_state                  m_default_state;
+	const char *                    m_interface;	
 };
 
 // device type definition
@@ -123,14 +119,22 @@ typedef device_type_iterator<&device_creator<cassette_image_device>, cassette_im
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define MCFG_CASSETTE_ADD(_tag, _config)    \
-	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)          \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_CASSETTE_ADD(_tag)    \
+	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)
 
-#define MCFG_CASSETTE_MODIFY(_tag, _config) \
-	MCFG_DEVICE_MODIFY(_tag)        \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_CASSETTE_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
+	
+#define MCFG_CASSETTE_FORMATS(_formats)	\
+	cassette_image_device::static_set_formats(*device, _formats);
 
-extern const cassette_interface default_cassette_interface;
+#define MCFG_CASSETTE_CREATE_OPTS(_create_opts)	\
+	cassette_image_device::static_set_create_opts(*device, _create_opts);
+
+#define MCFG_CASSETTE_DEFAULT_STATE(_state)	\
+	cassette_image_device::static_set_default_state(*device, (cassette_state) (_state));
+
+#define MCFG_CASSETTE_INTERFACE(_interface)	\
+	cassette_image_device::static_set_interface(*device, _interface);
 
 #endif /* CASSETTE_H */

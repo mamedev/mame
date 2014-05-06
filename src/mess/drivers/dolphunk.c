@@ -238,7 +238,7 @@ static MACHINE_CONFIG_START( dauphin, dauphin_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dauphin_c", dauphin_state, dauphin_c, attotime::from_hz(4000))

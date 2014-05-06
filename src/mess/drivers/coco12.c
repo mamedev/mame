@@ -29,7 +29,7 @@
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
-
+#include "formats/coco_cas.h"
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -299,7 +299,9 @@ static MACHINE_CONFIG_START( coco, coco12_state )
 
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_3_579545MHz, coco12_state::sam6883_config)
 	MCFG_SAM6883_RES_CALLBACK(READ8(coco12_state, sam_read))
-	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "printer")
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(PIA1_TAG, pia6821_device, ca1_w))

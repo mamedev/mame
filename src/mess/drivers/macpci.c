@@ -86,12 +86,6 @@ UINT32 macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-struct cdrom_interface pippin_cdrom =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( pippin, macpci_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
@@ -115,7 +109,7 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MCFG_CDROM_ADD("cdrom",pippin_cdrom)
+	MCFG_CDROM_ADD("cdrom")
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32M")

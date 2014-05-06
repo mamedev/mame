@@ -197,7 +197,7 @@ void exidy_sound_device::common_sh_start()
 	m_sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	sh6840_register_state_globals();
@@ -455,17 +455,6 @@ READ8_MEMBER( exidy_sound_device::r6532_portb_r )
 	}
 	return newdata;
 }
-
-
-static const riot6532_interface r6532_interface =
-{
-	DEVCB_DEVICE_MEMBER("custom", exidy_sound_device, r6532_porta_r),  /* port A read handler */
-	DEVCB_DEVICE_MEMBER("custom", exidy_sound_device, r6532_portb_r),  /* port B read handler */
-	DEVCB_DEVICE_MEMBER("custom", exidy_sound_device, r6532_porta_w),  /* port A write handler */
-	DEVCB_DEVICE_MEMBER("custom", exidy_sound_device, r6532_portb_w),  /* port B write handler */
-	DEVCB_DEVICE_LINE_MEMBER("custom", exidy_sound_device, r6532_irq)          /* IRQ callback */
-};
-
 
 
 /*************************************
@@ -771,7 +760,12 @@ MACHINE_CONFIG_FRAGMENT( venture_audio )
 	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
 
-	MCFG_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, SH6532_CLOCK)
+	MCFG_RIOT6532_IN_PA_CB(DEVREAD8("custom", exidy_sound_device, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(DEVWRITE8("custom", exidy_sound_device, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("custom", exidy_sound_device, r6532_portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("custom", exidy_sound_device, r6532_portb_w))
+	MCFG_RIOT6532_IRQ_CB(DEVWRITELINE("custom", exidy_sound_device, r6532_irq))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia1", pia6821_device, portb_w))
@@ -1028,7 +1022,12 @@ MACHINE_CONFIG_FRAGMENT( victory_audio )
 	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(victory_audio_map)
 
-	MCFG_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
+	MCFG_DEVICE_ADD("riot", RIOT6532, SH6532_CLOCK)
+	MCFG_RIOT6532_IN_PA_CB(DEVREAD8("custom", exidy_sound_device, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(DEVWRITE8("custom", exidy_sound_device, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("custom", exidy_sound_device, r6532_portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("custom", exidy_sound_device, r6532_portb_w))
+	MCFG_RIOT6532_IRQ_CB(DEVWRITELINE("custom", exidy_sound_device, r6532_irq))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("custom", victory_sound_device, irq_clear_w))

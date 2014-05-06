@@ -406,26 +406,6 @@ INTERRUPT_GEN_MEMBER(truco_state::truco_interrupt)
 
 
 /*******************************************
-*              CRTC Interface              *
-*******************************************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	4,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
-/*******************************************
 *              Machine Driver              *
 *******************************************/
 
@@ -458,7 +438,9 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(truco_state, truco)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* Identified as UM6845 */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* Identified as UM6845 */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

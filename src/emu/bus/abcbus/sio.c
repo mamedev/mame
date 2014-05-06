@@ -72,53 +72,12 @@ const rom_entry *abc_sio_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
-//-------------------------------------------------
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  Z80DART_INTERFACE( sio_intf )
-//-------------------------------------------------
-
-static Z80DART_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( abc_sio )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc_sio )
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_4_9152MHz, ctc_intf)
-	MCFG_Z80DART_ADD(Z80SIO_TAG, 0, sio_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_4_9152MHz)
+	MCFG_Z80DART_ADD(Z80SIO_TAG, 0, 0, 0, 0, 0)
 MACHINE_CONFIG_END
 
 

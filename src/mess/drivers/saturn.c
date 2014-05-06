@@ -696,12 +696,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 }
 
 
-struct cdrom_interface saturn_cdrom =
-{
-	"sat_cdrom",
-	NULL
-};
-
 static MACHINE_CONFIG_START( saturn, sat_console_state )
 
 	/* basic machine hardware */
@@ -773,7 +767,8 @@ SLOT_INTERFACE_END
 
 
 MACHINE_CONFIG_DERIVED( saturnus, saturn )
-	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
 
@@ -783,7 +778,8 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturneu, saturn )
-	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
 
@@ -793,7 +789,8 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturnjp, saturn )
-	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
 

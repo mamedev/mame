@@ -95,44 +95,28 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
 	}
 }
 
-MC6845_UPDATE_ROW( dmd64_update_row )
+MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 {
-	decodmd_type3_device *state = downcast<decodmd_type3_device *>(device->owner());
-	UINT8* RAM = state->m_ram->pointer();
-	UINT8 x,dot,intensity;
+	UINT8 *RAM = m_ram->pointer();
+	UINT8 intensity;
 	UINT16 addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
 	addr += ((ra & 0x01) * 24);
 
-	for(x=0;x<192;x+=16)
+	for (int x = 0; x < 192; x += 16)
 	{
-		for(dot=0;dot<8;dot++)
+		for (int dot = 0; dot < 8; dot++)
 		{
-			intensity = ((RAM[addr+1] >> (7-dot) & 0x01) << 1) | (RAM[addr+0x801] >> (7-dot) & 0x01);
-			bitmap.pix32(y,x+dot) = rgb_t(0x3f*intensity,0x2a*intensity,0x00);
+			intensity = ((RAM[addr + 1] >> (7-dot) & 0x01) << 1) | (RAM[addr + 0x801] >> (7-dot) & 0x01);
+			bitmap.pix32(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
-		for(dot=8;dot<16;dot++)
+		for (int dot = 8; dot < 16; dot++)
 		{
-			intensity = ((RAM[addr] >> (15-dot) & 0x01) << 1) | (RAM[addr+0x800] >> (15-dot) & 0x01);
-			bitmap.pix32(y,x+dot) = rgb_t(0x3f*intensity,0x2a*intensity,0x00);
+			intensity = ((RAM[addr] >> (15-dot) & 0x01) << 1) | (RAM[addr + 0x800] >> (15-dot) & 0x01);
+			bitmap.pix32(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
-		addr+=2;
+		addr += 2;
 	}
 }
-
-MC6845_INTERFACE( decodmd3_6845_intf )
-{
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	16,                 /* number of pixels per video memory address */
-	NULL,               /* begin_update */
-	dmd64_update_row,   /* update_row */
-	NULL,               /* end_update */
-	DEVCB_NULL,         /* on_de_changed */
-	DEVCB_NULL,         /* on_cur_changed */
-	DEVCB_NULL,         /* on_hsync_changed */
-	DEVCB_NULL,         /* on_vsync_changed */
-	NULL
-};
 
 static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROMBANK("dmdrom")
@@ -151,7 +135,10 @@ static MACHINE_CONFIG_FRAGMENT( decodmd3 )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer",decodmd_type3_device,dmd_irq,attotime::from_hz(150))
 
-	MCFG_MC6845_ADD("dmd6845",MC6845,NULL,XTAL_12MHz / 4,decodmd3_6845_intf)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, NULL, XTAL_12MHz / 4)  // TODO: confirm clock speed
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type3_device, crtc_update_row)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -163,7 +150,6 @@ static MACHINE_CONFIG_FRAGMENT( decodmd3 )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-
 MACHINE_CONFIG_END
 
 machine_config_constructor decodmd_type3_device::device_mconfig_additions() const

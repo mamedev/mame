@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
 
+	MC6845_UPDATE_ROW( crtc_update_row );
+
 	// memory state
 	int m_boot_rom;
 	int m_bank;

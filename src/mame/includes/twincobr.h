@@ -128,5 +128,3 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
-
-extern const mc6845_interface twincobr_mc6845_intf;

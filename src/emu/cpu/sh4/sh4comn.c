@@ -385,7 +385,7 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 
 
 			vector = 0x600;
-			sh4->irq_callback(sh4->device, INPUT_LINE_NMI);
+			sh4->irq_callback(*sh4->device, INPUT_LINE_NMI);
 			LOG(("SH-4 '%s' nmi exception after [%s]\n", sh4->device->tag(), message));
 		} else {
 	//      if ((sh4->m[ICR] & 0x4000) && (sh4->nmi_line_state == ASSERT_LINE))
@@ -397,9 +397,9 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 			sh4->m[INTEVT] = exception_codes[exception];
 			vector = 0x600;
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				sh4->irq_callback(*sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				sh4->irq_callback(sh4->device, SH4_IRL3+1);
+				sh4->irq_callback(*sh4->device, SH4_IRL3+1);
 			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
 		}
 	}
@@ -424,9 +424,9 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 			vector = 0x600;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				sh4->irq_callback(*sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				sh4->irq_callback(sh4->device, SH4_IRL3+1);
+				sh4->irq_callback(*sh4->device, SH4_IRL3+1);
 
 			if (sh3_intevt2_exception_codes[exception]==-1)
 				fatalerror("sh3_intevt2_exception_codes unpopulated for exception %02x\n", exception);
@@ -666,9 +666,9 @@ void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 }
 
 
-WRITE32_HANDLER( sh4_internal_w )
+WRITE32_MEMBER( sh4_device::sh4_internal_w )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 	int a;
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
@@ -894,9 +894,9 @@ WRITE32_HANDLER( sh4_internal_w )
 	}
 }
 
-READ32_HANDLER( sh4_internal_r )
+READ32_MEMBER( sh4_device::sh4_internal_r )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 
 	if (sh4->cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_internal_r uses sh4->m[] with SH3\n");
@@ -1241,9 +1241,9 @@ UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
 	return address;
 }
 
-READ64_HANDLER( sh4_tlb_r )
+READ64_MEMBER( sh4_device::sh4_tlb_r )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 
 	int offs = offset*8;
 
@@ -1259,9 +1259,9 @@ READ64_HANDLER( sh4_tlb_r )
 	}
 }
 
-WRITE64_HANDLER( sh4_tlb_w )
+WRITE64_MEMBER( sh4_device::sh4_tlb_w )
 {
-	sh4_state *sh4 = get_safe_token(&space.device());
+	sh4_state *sh4 = get_safe_token(this);
 
 	int offs = offset*8;
 

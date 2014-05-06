@@ -67,7 +67,7 @@ static CPU_RESET( dsp56k );
 /***************************************************************************
     Direct Update Handler
 ***************************************************************************/
-DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
+DIRECT_UPDATE_MEMBER( dsp56k_device::dsp56k_direct_handler )
 {
 	if (address <= (0x07ff<<1))
 	{
@@ -238,7 +238,7 @@ static CPU_INIT( dsp56k )
 
 	/* Setup the direct memory handler for this CPU */
 	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
-	cpustate->program->set_direct_update_handler(direct_update_delegate(FUNC(dsp56k_direct_handler), &device->machine()));
+	cpustate->program->set_direct_update_handler(direct_update_delegate(FUNC(dsp56k_device::dsp56k_direct_handler), (dsp56k_device*)device));
 }
 
 

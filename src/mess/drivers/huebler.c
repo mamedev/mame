@@ -251,38 +251,6 @@ WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 	/* cassette transmit/receive clock */
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z0_w),    /* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w),    /* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z2_w) /* ZC/TO2 callback */
-};
-
-/* Z80-PIO Interface */
-
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_NULL,                     /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_NULL,                     /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
-};
-
-static Z80PIO_INTERFACE( pio2_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_NULL,                     /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_NULL,                     /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
-};
-
 /* Z80-SIO Interface */
 
 TIMER_DEVICE_CALLBACK_MEMBER( amu880_state::tape_tick )
@@ -294,29 +262,6 @@ WRITE_LINE_MEMBER(amu880_state::cassette_w)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state, cassette_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* Z80 Daisy Chain */
 
@@ -361,15 +306,6 @@ void amu880_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface amu880_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout amu880_charlayout =
 {
@@ -407,12 +343,25 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)
-	MCFG_Z80PIO_ADD(Z80PIO1_TAG, XTAL_10MHz/4, pio1_intf)
-	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_10MHz/4, pio2_intf)
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_10MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(amu880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(amu880_state, ctc_z2_w))
 
-	MCFG_CASSETTE_ADD("cassette", amu880_cassette_interface)
+	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL_10MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL_10MHz/4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, 0, 0, 0, 0) // U856
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(amu880_state, cassette_w))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */

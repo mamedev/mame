@@ -224,28 +224,6 @@ WRITE_LINE_MEMBER( c80_state::pio1_brdy_w )
 	}
 }
 
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_r),  /* port A read callback */
-	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_w),  /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_DRIVER_MEMBER(c80_state, pio1_pb_w),  /* port B write callback */
-	DEVCB_DRIVER_LINE_MEMBER(c80_state, pio1_brdy_w)            /* portB ready active callback */
-};
-
-static Z80PIO_INTERFACE( pio2_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_NULL,                     /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_NULL,                     /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config c80_daisy_chain[] =
@@ -268,15 +246,6 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_interface c80_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED ),
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( c80, c80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
@@ -288,9 +257,19 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	MCFG_DEFAULT_LAYOUT( layout_c80 )
 
 	/* devices */
-	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
-	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
-	MCFG_CASSETTE_ADD("cassette", c80_cassette_interface)
+	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 2500000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(c80_state, pio1_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(c80_state, pio1_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(c80_state, pio1_pb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(c80_state, pio1_brdy_w))
+
+	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 2500000)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED )
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

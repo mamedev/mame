@@ -154,6 +154,7 @@ public:
 	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
 	DECLARE_DRIVER_INIT(mbc55x);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -201,9 +202,6 @@ extern const wd17xx_interface mbc55x_wd17xx_interface;
 
 
 /*----------- defined in video/mbc55x.c -----------*/
-
-extern const mc6845_interface mb55x_mc6845_intf;
-
 
 #define RED                     0
 #define GREEN                   1

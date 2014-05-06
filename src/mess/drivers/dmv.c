@@ -253,7 +253,7 @@ GFXDECODE_END
 
 
 //------------------------------------------------------------------------------------
-//   I8237_INTERFACE
+//   I8237
 //------------------------------------------------------------------------------------
 
 WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
@@ -275,17 +275,6 @@ WRITE8_MEMBER(dmv_state::memory_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
-
-static I8237_INTERFACE( dmv_dma8237_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(dmv_state, dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(dmv_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(dmv_state, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(dmv_state, fdc_dma_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(dmv_state, fdc_dma_w) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
 
 
 static MACHINE_CONFIG_START( dmv, dmv_state )
@@ -319,7 +308,12 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
 
-	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
+	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_4MHz )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(dmv_state, dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(dmv_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(dmv_state, memory_write_byte))
+	MCFG_I8237_IN_IOR_3_CB(READ8(dmv_state, fdc_dma_r))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(dmv_state, fdc_dma_w))
 	MCFG_UPD765A_ADD( "upd765", true, true )
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)

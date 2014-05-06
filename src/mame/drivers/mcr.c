@@ -822,7 +822,7 @@ static ADDRESS_MAP_START( cpu_91490_map, AS_PROGRAM, 8, mcr_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xe9ff) AM_MIRROR(0x0200) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr_91490_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xf87f) AM_MIRROR(0x0780) AM_WRITE(mcr_91490_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xf87f) AM_MIRROR(0x0780) AM_WRITE(mcr_paletteram9_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -1834,7 +1834,9 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_CPU_IO_MAP(cpu_90009_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
 
-	MCFG_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_OSC_MCR_I/8 /* same as "maincpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 	MCFG_MACHINE_START_OVERRIDE(mcr_state,mcr)
@@ -1951,9 +1953,15 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mcr_state, mcr_ipu_interrupt)
 
-	MCFG_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)
-	MCFG_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
-	MCFG_Z80PIO_ADD("ipu_pio1", 7372800/2, nflfoot_pio_intf)
+	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("ipu_pio0", Z80PIO, 7372800/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+
 	MCFG_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
 MACHINE_CONFIG_END
 

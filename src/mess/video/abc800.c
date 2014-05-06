@@ -231,12 +231,10 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  MC6845_UPDATE_ROW( abc800m_update_row )
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( abc800m_update_row )
+MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 {
-	abc800m_state *state = device->machine().driver_data<abc800m_state>();
-
 	int column;
-	rgb_t fgpen = state->m_palette->pen(1);
+	rgb_t fgpen = m_palette->pen(1);
 
 	y += vbp;
 
@@ -244,8 +242,8 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	{
 		int bit;
 
-		UINT16 address = (state->m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = (state->m_char_rom->base()[address & 0x7ff] & 0x3f);
+		UINT16 address = (m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
+		UINT8 data = (m_char_rom->base()[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
 		{
@@ -267,26 +265,6 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 		}
 	}
 }
-
-
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	ABC800_CHAR_WIDTH,
-	NULL,
-	abc800m_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rib_w),
-	NULL
-};
 
 
 //-------------------------------------------------
@@ -316,7 +294,11 @@ UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc800m_video )
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
+	MCFG_MC6845_UPDATE_ROW_CB(abc800m_state, abc800m_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rib_w))
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)

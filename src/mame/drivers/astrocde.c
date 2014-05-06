@@ -474,15 +474,6 @@ WRITE8_MEMBER(astrocde_state::demndrgn_sound_w)
  *
  *************************************/
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
-
-
 static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1481,7 +1472,8 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 	MCFG_CPU_PROGRAM_MAP(tenpin_sub_map)
 	MCFG_CPU_IO_MAP(tenpin_sub_io_map)
 
-	MCFG_Z80CTC_ADD("ctc", ASTROCADE_CLOCK/4 /* same as "sub" */, ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

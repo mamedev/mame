@@ -97,38 +97,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type2_device::dmd_firq)
 	m_cpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MC6845_UPDATE_ROW( dmd_update_row )
+MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 {
-	decodmd_type2_device *state = downcast<decodmd_type2_device *>(device->owner());
-	UINT8* RAM = state->m_ram->pointer();
-	UINT8 x,dot,intensity;
+	UINT8 *RAM = m_ram->pointer();
+	UINT8 intensity;
 	UINT16 addr = (ma & 0xfc00) + ((ma & 0x100)<<2) + (ra << 4);
 
-	for(x=0;x<128;x+=8)
+	for (int x = 0; x < 128; x += 8)
 	{
-		for(dot=0;dot<8;dot++)
+		for (int dot = 0; dot < 8; dot++)
 		{
-			intensity = ((RAM[addr] >> (7-dot) & 0x01) << 1) | (RAM[addr+0x200] >> (7-dot) & 0x01);
-			bitmap.pix32(y,x+dot) = rgb_t(0x3f*intensity,0x2a*intensity,0x00);
+			intensity = ((RAM[addr] >> (7-dot) & 0x01) << 1) | (RAM[addr + 0x200] >> (7-dot) & 0x01);
+			bitmap.pix32(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		addr++;
 	}
 }
-
-MC6845_INTERFACE( decodmd2_6845_intf )
-{
-	false,          /* show border area */
-	0,0,0,0,        /* visarea adjustment */
-	8,              /* number of pixels per video memory address */
-	NULL,           /* begin_update */
-	dmd_update_row, /* update_row */
-	NULL,           /* end_update */
-	DEVCB_NULL,     /* on_de_changed */
-	DEVCB_NULL,     /* on_cur_changed */
-	DEVCB_NULL,     /* on_hsync_changed */
-	DEVCB_NULL,     /* on_vsync_changed */
-	NULL
-};
 
 static ADDRESS_MAP_START( decodmd2_map, AS_PROGRAM, 8, decodmd_type2_device )
 	AM_RANGE(0x0000, 0x2fff) AM_RAMBANK("dmdram")
@@ -149,7 +133,10 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(80))
 
-	MCFG_MC6845_ADD("dmd6845",MC6845,NULL,XTAL_8MHz / 8,decodmd2_6845_intf)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, NULL, XTAL_8MHz / 8)  // TODO: confirm clock speed
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type2_device, crtc_update_row)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

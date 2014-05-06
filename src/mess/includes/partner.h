@@ -8,8 +8,7 @@
 #define partner_H_
 
 #include "machine/i8255.h"
-#include "machine/8257dma.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/ram.h"
 
 class partner_state : public radio86_state
@@ -29,24 +28,16 @@ public:
 	DECLARE_DRIVER_INIT(partner);
 	DECLARE_MACHINE_START(partner);
 	DECLARE_MACHINE_RESET(partner);
-	DECLARE_WRITE_LINE_MEMBER(partner_wd17xx_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-
-	//to remove trampoline once it use new wd17xx core
-	DECLARE_READ8_MEMBER(partner_fdc_r);
-	DECLARE_WRITE8_MEMBER(partner_fdc_w);
+	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	void partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_iomap_bank(UINT8 *rom);
 	void partner_bank_switch();
 	required_device<ram_device> m_ram;
-	required_device<fd1793_device> m_fdc;
+	required_device<fd1793_t> m_fdc;
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
-
-/*----------- defined in machine/partner.c -----------*/
-
-extern const wd17xx_interface partner_wd17xx_interface;
 
 #endif /* partner_H_ */

@@ -1377,15 +1377,6 @@ static const ay8910_interface demon_ay8910_interface_3 =
 };
 
 
-static Z80CTC_INTERFACE( demon_z80ctc_interface )
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,     /* ZC/TO0 callback */
-	DEVCB_NULL,     /* ZC/TO1 callback */
-	DEVCB_NULL      /* ZC/TO2 callback */
-};
-
-
 SOUND_RESET_MEMBER( cinemat_state, demon )
 {
 	/* generic init */
@@ -1435,7 +1426,8 @@ MACHINE_CONFIG_FRAGMENT( demon_sound )
 	MCFG_CPU_PROGRAM_MAP(demon_sound_map)
 	MCFG_CPU_IO_MAP(demon_sound_ports)
 
-	MCFG_Z80CTC_ADD("ctc", 3579545 /* same as "audiocpu" */, demon_z80ctc_interface)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, demon)
 

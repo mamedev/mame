@@ -11,9 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 #include "machine/i8255.h"
-#include "machine/8257dma.h"
 #include "machine/pit8253.h"
-#include "video/i8275.h"
 #include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
@@ -25,6 +23,7 @@ public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag) { }
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
+	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 };
 
 
@@ -38,7 +37,7 @@ static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
 	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
 	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x07fc) // Timer
 	AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, i8257_w)    // DMA
+	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -140,19 +139,30 @@ static INPUT_PORTS_START( mikrosha )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
-/* Machine driver */
-static const cassette_interface mikrosha_cassette_interface =
-{
-	rkm_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	"mikrosha_cass",
-	NULL
-};
-
-
 WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
+}
+
+I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
+{
+	int i;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	const UINT8 *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
+	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if(linecount == 8)
+		pixels = 0;
+	if (vsp) {
+		pixels = 0;
+	}
+	if (lten) {
+		pixels = 0xff;
+	}
+	if (rvv) {
+		pixels ^= 0xff;
+	}
+	for(i=0;i<6;i++) {
+		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
+	}
 }
 
 /* F4 Character Displayer */
@@ -190,7 +200,10 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, mikrosha_8255_font_page_w))
 
-	MCFG_I8275_ADD("i8275", mikrosha_i8275_interface)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
+	MCFG_I8275_CHARACTER_WIDTH(6)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
@@ -202,7 +215,6 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
@@ -219,8 +231,13 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
+	MCFG_I8257_REVERSE_RW_MODE(1)
 
-	MCFG_CASSETTE_ADD( "cassette", mikrosha_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("mikrosha_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")
 MACHINE_CONFIG_END
 

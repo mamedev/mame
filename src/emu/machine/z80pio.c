@@ -59,35 +59,15 @@ const device_type Z80PIO = &device_creator<z80pio_device>;
 
 z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80PIO, "Z8420 PIO", tag, owner, clock, "z80pio", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this),
+		m_out_int_cb(*this),
+		m_in_pa_cb(*this),
+		m_out_pa_cb(*this),
+		m_out_ardy_cb(*this),
+		m_in_pb_cb(*this),
+		m_out_pb_cb(*this),
+		m_out_brdy_cb(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z80pio_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const z80pio_interface *intf = reinterpret_cast<const z80pio_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<z80pio_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_out_ardy_cb, 0, sizeof(m_out_ardy_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-		memset(&m_out_brdy_cb, 0, sizeof(m_out_brdy_cb));
-	}
 }
 
 
@@ -97,11 +77,17 @@ void z80pio_device::device_config_complete()
 
 void z80pio_device::device_start()
 {
-	m_port[PORT_A].start(this, PORT_A, m_in_pa_cb, m_out_pa_cb, m_out_ardy_cb);
-	m_port[PORT_B].start(this, PORT_B, m_in_pb_cb, m_out_pb_cb, m_out_brdy_cb);
+	m_port[PORT_A].start(this, PORT_A);
+	m_port[PORT_B].start(this, PORT_B);
 
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_int_cb.resolve_safe();
+	m_in_pa_cb.resolve_safe(0);
+	m_out_pa_cb.resolve_safe();
+	m_out_ardy_cb.resolve_safe();
+	m_in_pb_cb.resolve_safe(0);
+	m_out_pb_cb.resolve_safe();
+	m_out_brdy_cb.resolve_safe();
 }
 
 
@@ -285,7 +271,7 @@ void z80pio_device::check_interrupts()
 		if (m_port[index].interrupt_signalled())
 			state = ASSERT_LINE;
 
-	m_out_int_func(state);
+	m_out_int_cb(state);
 }
 
 
@@ -316,9 +302,6 @@ z80pio_device::pio_port::pio_port()
 		m_mask(0),
 		m_match(false)
 {
-	memset(&m_in_p_func, 0, sizeof(m_in_p_func));
-	memset(&m_out_p_func, 0, sizeof(m_out_p_func));
-	memset(&m_out_rdy_func, 0, sizeof(m_out_rdy_func));
 }
 
 
@@ -326,15 +309,10 @@ z80pio_device::pio_port::pio_port()
 //  start - set up a port during device startup
 //-------------------------------------------------
 
-void z80pio_device::pio_port::start(z80pio_device *device, int index, const devcb_read8 &infunc, const devcb_write8 &outfunc, const devcb_write_line &rdyfunc)
+void z80pio_device::pio_port::start(z80pio_device *device, int index)
 {
 	m_device = device;
 	m_index = index;
-
-	// resolve callbacks
-	m_in_p_func.resolve(infunc, *m_device);
-	m_out_p_func.resolve(outfunc, *m_device);
-	m_out_rdy_func.resolve(rdyfunc, *m_device);
 
 	// register for state saving
 	m_device->save_item(NAME(m_mode), m_index);
@@ -444,7 +422,10 @@ void z80pio_device::pio_port::set_rdy(bool state)
 	if (LOG) logerror("Z80PIO '%s' Port %c Ready: %u\n", m_device->tag(), 'A' + m_index, state);
 
 	m_rdy = state;
-	m_out_rdy_func(state);
+	if (m_index == PORT_A)
+		m_device->m_out_ardy_cb(state);
+	else
+		m_device->m_out_brdy_cb(state);
 }
 
 
@@ -460,7 +441,10 @@ void z80pio_device::pio_port::set_mode(int mode)
 	{
 	case MODE_OUTPUT:
 		// enable data output
-		m_out_p_func(0, m_output);
+		if (m_index == PORT_A)
+			m_device->m_out_pa_cb((offs_t)0, m_output);
+		else
+			m_device->m_out_pb_cb((offs_t)0, m_output);
 
 		// assert ready line
 		set_rdy(true);
@@ -525,9 +509,9 @@ void z80pio_device::pio_port::strobe(bool state)
 			if (m_stb && !state) // falling edge
 			{
 				if (m_index == PORT_A)
-					m_out_p_func(0, m_output);
+					m_device->m_out_pa_cb((offs_t)0, m_output);
 				else
-					m_device->m_port[PORT_A].m_input = m_device->m_port[PORT_A].m_in_p_func(0);
+					m_device->m_port[PORT_A].m_input = m_device->m_in_pa_cb(0);
 			}
 			else if (!m_stb && state) // rising edge
 			{
@@ -559,7 +543,10 @@ void z80pio_device::pio_port::strobe(bool state)
 			if (!state)
 			{
 				// input port data
-				m_input = m_in_p_func(0);
+				if (m_index == PORT_A)
+					m_input = m_device->m_in_pa_cb(0);
+				else
+					m_input = m_device->m_in_pb_cb(0);
 			}
 			else if (!m_stb && state) // rising edge
 			{
@@ -735,7 +722,10 @@ UINT8 z80pio_device::pio_port::data_read()
 		if (!m_stb)
 		{
 			// input port data
-			m_input = m_in_p_func(0);
+			if (m_index == PORT_A)
+				m_input = m_device->m_in_pa_cb(0);
+			else
+				m_input = m_device->m_in_pb_cb(0);
 		}
 
 		data = m_input;
@@ -759,7 +749,10 @@ UINT8 z80pio_device::pio_port::data_read()
 
 	case MODE_BIT_CONTROL:
 		// input port data
-		m_input = m_in_p_func(0);
+		if (m_index == PORT_A)
+			m_input = m_device->m_in_pa_cb(0);
+		else
+			m_input = m_device->m_in_pb_cb(0);
 
 		data = (m_input & m_ior) | (m_output & (m_ior ^ 0xff));
 		break;
@@ -785,7 +778,10 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		m_output = data;
 
 		// output data to port
-		m_out_p_func(0, data);
+		if (m_index == PORT_A)
+			m_device->m_out_pa_cb((offs_t)0, m_output);
+		else
+			m_device->m_out_pb_cb((offs_t)0, m_output);
 
 		// assert ready line
 		set_rdy(true);
@@ -806,7 +802,10 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		if (!m_stb)
 		{
 			// output data to port
-			m_out_p_func(0, data);
+			if (m_index == PORT_A)
+				m_device->m_out_pa_cb((offs_t)0, data);
+			else
+				m_device->m_out_pb_cb((offs_t)0, data);
 		}
 
 		// assert ready line
@@ -818,7 +817,10 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		m_output = data;
 
 		// output data to port
-		m_out_p_func(0, m_ior | (m_output & (m_ior ^ 0xff)));
+		if (m_index == PORT_A)
+			m_device->m_out_pa_cb((offs_t)0, m_ior | (m_output & (m_ior ^ 0xff)));
+		else
+			m_device->m_out_pb_cb((offs_t)0, m_ior | (m_output & (m_ior ^ 0xff)));
 		break;
 	}
 }

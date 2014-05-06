@@ -29,7 +29,7 @@ and be connected to a RS422 network.
 //#include "cpu/z80/z80daisy.h"
 //#include "machine/z80ctc.h"
 //#include "machine/z80pio.h"
-//#include "machine/z80sio.h"
+//#include "machine/z80dart.h"
 //#include "machine/z80dma.h"
 #include "machine/terminal.h"
 
@@ -68,171 +68,6 @@ WRITE8_MEMBER( onyx_state::kbd_put )
 	m_term_data = data;
 }
 
-#if 0
-WRITE_LINE_MEMBER( onyx_state::p8k_daisy_interrupt )
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-/* Z80 DMA */
-
-WRITE_LINE_MEMBER( onyx_state::p8k_dma_irq_w )
-{
-	i8272a_device *i8272 = machine().device<i8272a_device>("i8272");
-	i8272->tc_w(state);
-
-	p8k_daisy_interrupt(state);
-}
-
-READ8_MEMBER(onyx_state::memory_read_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
-}
-
-WRITE8_MEMBER(onyx_state::memory_write_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
-}
-
-READ8_MEMBER(onyx_state::io_read_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.read_byte(offset);
-}
-
-WRITE8_MEMBER(onyx_state::io_write_byte)
-{
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
-}
-
-static Z80DMA_INTERFACE( p8k_dma_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_dma_irq_w),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(onyx_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(onyx_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(onyx_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(onyx_state, io_write_byte)
-};
-
-/* Z80 CTC 0 */
-// to implement: callbacks!
-// manual states the callbacks should go to
-// Baud Gen 3, FDC, System-Kanal
-
-static Z80CTC_INTERFACE( p8k_ctc_0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL          /* ZC/TO2 callback */
-};
-
-/* Z80 CTC 1 */
-// to implement: callbacks!
-// manual states the callbacks should go to
-// Baud Gen 0, Baud Gen 1, Baud Gen 2,
-
-static Z80CTC_INTERFACE( p8k_ctc_1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
-	DEVCB_NULL,         /* ZC/TO0 callback */
-	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL,         /* ZC/TO2 callback */
-};
-
-/* Z80 PIO 0 */
-
-static Z80PIO_INTERFACE( p8k_pio_0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 1 */
-
-static Z80PIO_INTERFACE( p8k_pio_1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 2 */
-
-static Z80PIO_INTERFACE( p8k_pio_2_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_INPUT_PORT("DSW"),    /* port a read */
-	DEVCB_NULL, /* port a write */
-	DEVCB_NULL, /* ready a */
-	DEVCB_NULL, /* port b read */
-	DEVCB_NULL, /* port b write */
-	DEVCB_NULL  /* ready b */
-};
-
-/* Z80 SIO 0 */
-
-WRITE16_MEMBER( onyx_state::pk8_sio_0_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_sio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_daisy_interrupt),            /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_sio_0_serial_transmit),   /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 SIO 1 */
-
-WRITE16_MEMBER( onyx_state::pk8_sio_1_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_sio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_daisy_interrupt),            /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_sio_1_serial_transmit),   /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 Daisy Chain */
-
-static const z80_daisy_config p8k_daisy_chain[] =
-{
-	{ "z80dma" },   /* FDC related */
-	{ "z80pio_2" },
-	{ "z80ctc_0" },
-	{ "z80sio_0" },
-	{ "z80sio_1" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80ctc_1" },
-	{ NULL }
-};
-#endif
 
 /* Input ports */
 static INPUT_PORTS_START( c8002 )
@@ -270,121 +105,6 @@ static ADDRESS_MAP_START(subio, AS_IO, 8, onyx_state)
 ADDRESS_MAP_END
 
 
-#if 0
-WRITE_LINE_MEMBER( onyx_state::p8k_16_daisy_interrupt )
-{
-	// this must be studied a little bit more :-)
-}
-
-/* Z80 CTC 0 */
-
-static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt), /* interrupt handler */
-	DEVCB_NULL,             /* ZC/TO0 callback */
-	DEVCB_NULL,             /* ZC/TO1 callback */
-	DEVCB_NULL              /* ZC/TO2 callback */
-};
-
-/* Z80 CTC 1 */
-
-static Z80CTC_INTERFACE( p8k_16_ctc_1_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt), /* interrupt handler */
-	DEVCB_NULL,             /* ZC/TO0 callback */
-	DEVCB_NULL,             /* ZC/TO1 callback */
-	DEVCB_NULL              /* ZC/TO2 callback */
-};
-
-/* Z80 PIO 0 */
-
-static const z80pio_interface p8k_16_pio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 1 */
-
-static const z80pio_interface p8k_16_pio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 PIO 2 */
-
-static const z80pio_interface p8k_16_pio_2_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/* Z80 SIO 0 */
-
-WRITE16_MEMBER( onyx_state::pk8_16_sio_0_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_16_sio_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),         /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_16_sio_0_serial_transmit),    /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 SIO 1 */
-
-WRITE16_MEMBER( onyx_state::pk8_16_sio_1_serial_transmit )
-{
-// send character to terminal
-}
-
-static const z80sio_interface p8k_16_sio_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onyx_state, p8k_16_daisy_interrupt),         /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(onyx_state, pk8_16_sio_1_serial_transmit),    /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-
-/* Z80 Daisy Chain */
-
-static const z80_daisy_config p8k_16_daisy_chain[] =
-{
-	{ "z80ctc_0" },
-	{ "z80ctc_1" },
-	{ "z80sio_0" },
-	{ "z80sio_1" },
-	{ "z80pio_0" },
-	{ "z80pio_1" },
-	{ "z80pio_2" },
-	{ NULL }
-};
-#endif
-
-
 /***************************************************************************
 
     Machine Drivers
@@ -406,13 +126,13 @@ static MACHINE_CONFIG_START( c8002, onyx_state )
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	/* peripheral hardware */
-	//MCFG_Z80CTC_ADD("z80ctc_0", XTAL_4MHz, p8k_16_ctc_0_intf)
-	//MCFG_Z80CTC_ADD("z80ctc_1", XTAL_4MHz, p8k_16_ctc_1_intf)
-	//MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
-	//MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
-	//MCFG_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )
-	//MCFG_Z80PIO_ADD("z80pio_1", XTAL_4MHz, p8k_16_pio_1_intf )
-	//MCFG_Z80PIO_ADD("z80pio_2", XTAL_4MHz, p8k_16_pio_2_intf )
+	//MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)
+	//MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL_4MHz)
+	//MCFG_Z80SIO0_ADD("z80sio_0", 9600, 0, 0, 0, 0)
+	//MCFG_Z80SIO0_ADD("z80sio_1", 9600, 0, 0, 0, 0)
+	//MCFG_DEVICE_ADD("z80pio_0", Z80CTC, XTAL_4MHz)
+	//MCFG_DEVICE_ADD("z80pio_1", Z80CTC, XTAL_4MHz)
+	//MCFG_DEVICE_ADD("z80pio_2", Z80CTC, XTAL_4MHz)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)

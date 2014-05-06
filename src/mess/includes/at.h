@@ -161,10 +161,4 @@ public:
 	UINT32 at_286_a20(bool state);
 };
 
-
-/*----------- defined in machine/at.c -----------*/
-
-extern const am9517a_interface at_dma8237_1_config;
-extern const am9517a_interface at_dma8237_2_config;
-
 #endif /* AT_H_ */

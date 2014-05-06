@@ -344,11 +344,6 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 //  SCREEN DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-	// legacy
-#define SCREEN_UPDATE_NAME(name)        screen_update_##name
-#define SCREEN_UPDATE_IND16(name)       UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE_RGB32(name)       UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
 	MCFG_SCREEN_TYPE(_type)

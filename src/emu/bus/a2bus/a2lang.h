@@ -34,6 +34,8 @@ protected:
 
 private:
 	void langcard_touch(offs_t offset);
+
+	int last_offset;
 };
 
 // device type definition

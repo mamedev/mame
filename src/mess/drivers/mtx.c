@@ -207,7 +207,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    Z80CTC_INTERFACE( ctc_intf )
+    Z80CTC
 -------------------------------------------------*/
 
 TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
@@ -235,44 +235,6 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
 	}
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mtx_state,ctc_trg1_w),
-	DEVCB_DRIVER_LINE_MEMBER(mtx_state,ctc_trg2_w)
-};
-
-/*-------------------------------------------------
-    Z80DART_INTERFACE( dart_intf )
--------------------------------------------------*/
-
-static Z80DART_INTERFACE( dart_intf )
-{
-	0,
-	0,
-	0,
-	0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /*-------------------------------------------------
     z80_daisy_config mtx_daisy_chain
 -------------------------------------------------*/
@@ -294,9 +256,6 @@ static const z80_daisy_config rs128_daisy_chain[] =
 	{ NULL }
 };
 
-/*-------------------------------------------------
-    cassette_interface mtx_cassette_interface
--------------------------------------------------*/
 
 TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 {
@@ -304,15 +263,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 
 	m_z80ctc->trg3(data);
 }
-
-static const cassette_interface mtx_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
-	NULL
-};
 
 /*-------------------------------------------------
     mtx_tms9928a_interface
@@ -355,7 +305,11 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_4MHz, ctc_intf )
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_4MHz)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(mtx_state, ctc_trg1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(mtx_state, ctc_trg2_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL_4MHz/13))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
@@ -367,7 +321,9 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
-	MCFG_CASSETTE_ADD("cassette", mtx_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */
@@ -400,7 +356,8 @@ static MACHINE_CONFIG_DERIVED( rs128, mtx512 )
 	MCFG_CPU_CONFIG(rs128_daisy_chain)
 
 	/* devices */
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_4MHz, dart_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG,  XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -432,6 +389,10 @@ ROM_START( mtx512 )
 
 	ROM_REGION( 0x1000, MC6845_TAG, 0 )
 	ROM_LOAD( "80z.bin", 0x0000, 0x1000, CRC(ea6fe865) SHA1(f84883f79bed34501e5828336894fad929bddbb5) )
+
+	/* Device GAL16V8 converted from PAL14L4 JEDEC map */
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "Memotech-MTX512.bin", 0x0000, 0x0117, CRC(31f88133) SHA1(5bef3ce764121b3510b538824b2768f082b422bb) )
 ROM_END
 
 #define rom_mtx500  rom_mtx512

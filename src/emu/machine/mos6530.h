@@ -38,35 +38,27 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct mos6530_interface
-{
-	devcb_read8             m_in_pa_cb;
-	devcb_write8            m_out_pa_cb;
-
-	devcb_read8             m_in_pb_cb;
-	devcb_write8            m_out_pb_cb;
-};
-
 struct mos6530_port
 {
-	devcb_resolved_read8        in_port_func;
-	devcb_resolved_write8       out_port_func;
-
-	UINT8               in;
-	UINT8               out;
-	UINT8               ddr;
+	UINT8 m_in;
+	UINT8 m_out;
+	UINT8 m_ddr;
 };
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class mos6530_device : public device_t,
-								mos6530_interface
+class mos6530_device : public device_t
 {
 public:
 	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mos6530_device() {}
+
+	template<class _Object> static devcb2_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_in_pa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_out_pa_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_in_pb_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_out_pb_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -79,16 +71,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	// internal state
-
-	//devcb_resolved_write_line   out_irq_func;
-
+	devcb2_read8    m_in_pa_cb;
+	devcb2_write8   m_out_pa_cb;
+	
+	devcb2_read8    m_in_pb_cb;
+	devcb2_write8   m_out_pb_cb;
+	
 	mos6530_port    m_port[2];
 
 	UINT8           m_irqstate;
@@ -115,11 +109,17 @@ private:
 extern const device_type MOS6530;
 
 
-#define MCFG_MOS6530_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), MOS6530, _clock)    \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_MOS6530_IN_PA_CB(_devcb) \
+	devcb = &mos6530_device::set_in_pa_callback(*device, DEVCB2_##_devcb);
 
-#define MOS6530_INTERFACE(name) \
-	const mos6530_interface (name) =
+#define MCFG_MOS6530_OUT_PA_CB(_devcb) \
+	devcb = &mos6530_device::set_out_pa_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6530_IN_PB_CB(_devcb) \
+	devcb = &mos6530_device::set_in_pb_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6530_OUT_PB_CB(_devcb) \
+	devcb = &mos6530_device::set_out_pb_callback(*device, DEVCB2_##_devcb);
+
 
 #endif

@@ -167,11 +167,14 @@ void mcr_state::journey_set_color(int index, int data)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_91490_paletteram_w)
+WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
 {
-	m_generic_paletteram_8[offset] = data;
-	offset &= 0x7f;
-	mcr_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
+	// palette RAM is actually 9 bit (a 93419 SRAM)
+	// however, there is no way for the CPU to read back
+	// the high bit, because D8 of the SRAM is connected
+	// to A0 of the bus rather than to a data line
+	m_paletteram[offset] = data;
+	mcr_set_color(offset / 2, data | ((offset & 1) << 8));
 }
 
 

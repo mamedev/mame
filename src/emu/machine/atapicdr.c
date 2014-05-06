@@ -15,10 +15,9 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_typ
 {
 }
 
-cdrom_interface atapi_cdrom_device::cd_intf = { "cdrom", NULL };
-
 static MACHINE_CONFIG_FRAGMENT( atapicdr )
-	MCFG_CDROM_ADD("image", atapi_cdrom_device::cd_intf)
+	MCFG_CDROM_ADD("image")
+	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 MACHINE_CONFIG_END
 

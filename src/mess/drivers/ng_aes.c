@@ -1461,13 +1461,6 @@ UINT32 ng_aes_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-struct cdrom_interface neocd_cdrom =
-{
-	"neocd_cdrom",
-	NULL
-};
-
-
 static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1493,7 +1486,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state,neocd)
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state,neocd)
 
-	MCFG_CDROM_ADD( "cdrom",neocd_cdrom )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("neocd_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","neocd")
 MACHINE_CONFIG_END
 

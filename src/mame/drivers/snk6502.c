@@ -748,28 +748,6 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
 
 /*************************************
  *
- *  6845 CRTC interface
- *
- *************************************/
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
-
-/*************************************
- *
  *  Machine initialisation
  *
  *************************************/
@@ -837,7 +815,9 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
@@ -911,7 +891,9 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

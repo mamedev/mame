@@ -174,7 +174,7 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  Z80DMA_INTERFACE( dma_intf )
+//  Z80DMA
 //-------------------------------------------------
 
 READ8_MEMBER( luxor_55_21056_device::memory_read_byte )
@@ -197,16 +197,6 @@ WRITE8_MEMBER( luxor_55_21056_device::io_write_byte )
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21056_device, memory_read_byte),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21056_device, memory_write_byte),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21056_device, io_read_byte),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21056_device, io_write_byte),
-};
 
 WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_bsy )
 {
@@ -262,7 +252,13 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
-	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_8MHz/2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(luxor_55_21056_device, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(luxor_55_21056_device, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(luxor_55_21056_device, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(luxor_55_21056_device, io_write_byte))
 
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")

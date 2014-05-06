@@ -959,7 +959,7 @@ void m68000_base_device::init_cpu_common(void)
 
 	//this = device;//deviceparam;
 	program = &space(AS_PROGRAM);
-	int_ack_callback = static_standard_irq_callback;
+	int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68000_base_device::standard_irq_callback_member), this);
 
 	/* disable all MMUs */
 	has_pmmu         = 0;
@@ -2264,7 +2264,7 @@ void m68000_base_device::m68ki_exception_interrupt(m68000_base_device *m68k, UIN
 		return;
 
 	/* Acknowledge the interrupt */
-	vector = (*int_ack_callback)(this, int_level);
+	vector = int_ack_callback(*this, int_level);
 
 	/* Get the interrupt vector */
 	if(vector == M68K_INT_ACK_AUTOVECTOR)
@@ -2411,7 +2411,7 @@ void m68000_base_device::clear_all()
 	cyc_instruction = 0;
 	cyc_exception = 0;
 
-	int_ack_callback = 0;
+	int_ack_callback = device_irq_acknowledge_delegate();
 	program = 0;
 
 	opcode_xor = 0;

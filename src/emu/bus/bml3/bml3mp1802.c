@@ -23,11 +23,6 @@ const device_type BML3BUS_MP1802 = &device_creator<bml3bus_mp1802_device>;
 
 static const floppy_interface bml3_mp1802_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	NULL

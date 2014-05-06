@@ -152,7 +152,7 @@ inline void am9517a_device::set_hreq(int state)
 {
 	if (m_hreq != state)
 	{
-		m_out_hreq_func(state);
+		m_out_hreq_cb(state);
 
 		m_hreq = state;
 	}
@@ -167,13 +167,49 @@ inline void am9517a_device::set_dack()
 {
 	for (int channel = 0; channel < 4; channel++)
 	{
-		if ((channel == m_current_channel) && !COMMAND_MEM_TO_MEM)
+		if (channel == 0)
 		{
-			m_channel[channel].m_out_dack_func(COMMAND_DACK_ACTIVE_HIGH);
+			if ((channel == m_current_channel) && !COMMAND_MEM_TO_MEM)
+			{
+				m_out_dack_0_cb(COMMAND_DACK_ACTIVE_HIGH);
+			}
+			else
+			{
+				m_out_dack_0_cb(!COMMAND_DACK_ACTIVE_HIGH);
+			}
 		}
-		else
+		else if (channel == 1)
 		{
-			m_channel[channel].m_out_dack_func(!COMMAND_DACK_ACTIVE_HIGH);
+			if ((channel == m_current_channel) && !COMMAND_MEM_TO_MEM)
+			{
+				m_out_dack_1_cb(COMMAND_DACK_ACTIVE_HIGH);
+			}
+			else
+			{
+				m_out_dack_1_cb(!COMMAND_DACK_ACTIVE_HIGH);
+			}
+		}
+		else if (channel == 2)
+		{
+			if ((channel == m_current_channel) && !COMMAND_MEM_TO_MEM)
+			{
+				m_out_dack_2_cb(COMMAND_DACK_ACTIVE_HIGH);
+			}
+			else
+			{
+				m_out_dack_2_cb(!COMMAND_DACK_ACTIVE_HIGH);
+			}
+		}
+		else if (channel == 3)
+		{
+			if ((channel == m_current_channel) && !COMMAND_MEM_TO_MEM)
+			{
+				m_out_dack_3_cb(COMMAND_DACK_ACTIVE_HIGH);
+			}
+			else
+			{
+				m_out_dack_3_cb(!COMMAND_DACK_ACTIVE_HIGH);
+			}
 		}
 	}
 }
@@ -187,7 +223,7 @@ inline void am9517a_device::set_eop(int state)
 {
 	if (m_eop != state)
 	{
-		m_out_eop_func(state);
+		m_out_eop_cb(state);
 
 		m_eop = state;
 	}
@@ -223,11 +259,25 @@ inline void am9517a_device::dma_read()
 	{
 	case MODE_TRANSFER_VERIFY:
 	case MODE_TRANSFER_WRITE:
-		m_temp = m_channel[m_current_channel].m_in_ior_func(offset);
+		switch(m_current_channel)
+		{
+			case 0:
+				m_temp = m_in_ior_0_cb(offset);
+				break;
+			case 1:
+				m_temp = m_in_ior_1_cb(offset);
+				break;
+			case 2:
+				m_temp = m_in_ior_2_cb(offset);
+				break;
+			case 3:
+				m_temp = m_in_ior_3_cb(offset);
+				break;
+		}
 		break;
 
 	case MODE_TRANSFER_READ:
-		m_temp = m_in_memr_func(offset);
+		m_temp = m_in_memr_cb(offset);
 		break;
 	}
 }
@@ -244,18 +294,32 @@ inline void am9517a_device::dma_write()
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY: {
-		UINT8 v1 = m_in_memr_func(offset);
+		UINT8 v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
 			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
 		break;
 	}
 
 	case MODE_TRANSFER_WRITE:
-		m_out_memw_func(offset, m_temp);
+		m_out_memw_cb(offset, m_temp);
 		break;
 
 	case MODE_TRANSFER_READ:
-		m_channel[m_current_channel].m_out_iow_func(offset, m_temp);
+		switch(m_current_channel)
+		{
+			case 0:
+				m_out_iow_0_cb(offset, m_temp);
+				break;
+			case 1:
+				m_out_iow_1_cb(offset, m_temp);
+				break;
+			case 2:
+				m_out_iow_2_cb(offset, m_temp);
+				break;
+			case 3:
+				m_out_iow_3_cb(offset, m_temp);
+				break;
+		}
 		break;
 	}
 }
@@ -387,43 +451,27 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock, "am9517a", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
+		m_out_hreq_cb(*this),
+		m_out_eop_cb(*this),
+		m_in_memr_cb(*this),
+		m_out_memw_cb(*this),
+		m_in_ior_0_cb(*this),
+		m_in_ior_1_cb(*this),
+		m_in_ior_2_cb(*this),
+		m_in_ior_3_cb(*this),
+		m_out_iow_0_cb(*this),
+		m_out_iow_1_cb(*this),
+		m_out_iow_2_cb(*this),
+		m_out_iow_3_cb(*this),
+		m_out_dack_0_cb(*this),
+		m_out_dack_1_cb(*this),
+		m_out_dack_2_cb(*this),
+		m_out_dack_3_cb(*this),
 		m_hack(0),
 		m_ready(1),
 		m_command(0)
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void am9517a_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const am9517a_interface *intf = reinterpret_cast<const am9517a_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<am9517a_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_hreq_cb, 0, sizeof(m_out_hreq_cb));
-		memset(&m_out_eop_cb, 0, sizeof(m_out_eop_cb));
-		memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
-		memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
-
-		for (int i = 0; i < 4; i++)
-		{
-			memset(&m_in_ior_cb[i], 0, sizeof(m_in_ior_cb[i]));
-			memset(&m_out_iow_cb[i], 0, sizeof(m_out_iow_cb[i]));
-			memset(&m_out_dack_cb[i], 0, sizeof(m_out_dack_cb[i]));
-		}
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -435,16 +483,25 @@ void am9517a_device::device_start()
 	m_icountptr = &m_icount;
 
 	// resolve callbacks
-	m_out_hreq_func.resolve(m_out_hreq_cb, *this);
-	m_out_eop_func.resolve(m_out_eop_cb, *this);
-	m_in_memr_func.resolve(m_in_memr_cb, *this);
-	m_out_memw_func.resolve(m_out_memw_cb, *this);
+	m_out_hreq_cb.resolve_safe();
+	m_out_eop_cb.resolve_safe();
+	m_in_memr_cb.resolve_safe(0);
+	m_out_memw_cb.resolve_safe();
+	m_in_ior_0_cb.resolve_safe(0);
+	m_in_ior_1_cb.resolve_safe(0);
+	m_in_ior_2_cb.resolve_safe(0);
+	m_in_ior_3_cb.resolve_safe(0);
+	m_out_iow_0_cb.resolve_safe();
+	m_out_iow_1_cb.resolve_safe();
+	m_out_iow_2_cb.resolve_safe();
+	m_out_iow_3_cb.resolve_safe();
+	m_out_dack_0_cb.resolve_safe();
+	m_out_dack_1_cb.resolve_safe();
+	m_out_dack_2_cb.resolve_safe();
+	m_out_dack_3_cb.resolve_safe();
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_channel[i].m_in_ior_func.resolve(m_in_ior_cb[i], *this);
-		m_channel[i].m_out_iow_func.resolve(m_out_iow_cb[i], *this);
-		m_channel[i].m_out_dack_func.resolve(m_out_dack_cb[i], *this);
 		m_channel[i].m_address = 0;
 		m_channel[i].m_count = 0;
 		m_channel[i].m_base_address = 0;

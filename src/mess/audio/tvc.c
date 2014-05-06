@@ -31,7 +31,7 @@ void tvc_sound_device::device_start()
 	// resolve callbacks
 	m_write_sndint.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this );
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 	m_sndint_timer = timer_alloc(TIMER_SNDINT);
 }
 

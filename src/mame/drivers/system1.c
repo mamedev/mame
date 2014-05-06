@@ -2104,25 +2104,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static Z80PIO_INTERFACE( pio_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(system1_state, soundport_w),
-	DEVCB_CPU_INPUT_LINE("soundcpu", INPUT_LINE_NMI),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(system1_state, videomode_w),
-	DEVCB_NULL
-};
-
-
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
 /* original board with 64kbit ROMs and an 8255 PPI for outputs */
 static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
@@ -2153,7 +2134,6 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", system1)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -2181,7 +2161,10 @@ static MACHINE_CONFIG_DERIVED( sys1pio, sys1ppi )
 	MCFG_CPU_IO_MAP(system1_pio_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_Z80PIO_ADD("pio", MASTER_CLOCK, pio_interface)
+	MCFG_DEVICE_ADD("pio", Z80PIO, MASTER_CLOCK)
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(system1_state, soundport_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(system1_state, videomode_w))
 MACHINE_CONFIG_END
 
 /* reduced visible area for scrolling games */

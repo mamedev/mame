@@ -3,16 +3,6 @@
 
 #include "emu.h"
 
-struct upd71071_intf
-{
-	const char* cputag;
-	int m_upd_clock;
-	devcb_write_line    m_out_hreq_cb;
-	devcb_write_line    m_out_eop_cb;
-	devcb_read16        m_dma_read_cb[4];
-	devcb_write16       m_dma_write_cb[4];
-	devcb_write_line    m_out_dack_cb[4];
-};
 
 struct upd71071_reg
 {
@@ -31,12 +21,31 @@ struct upd71071_reg
 	UINT8 mask;
 };
 
-class upd71071_device : public device_t,
-						public upd71071_intf
+class upd71071_device : public device_t
 {
 public:
 	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd71071_device() {}
+	
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<upd71071_device &>(device).m_cpu.set_tag(tag); }
+	static void set_clock(device_t &device, int clock) { downcast<upd71071_device &>(device).m_upd_clock = clock; }
+	template<class _Object> static devcb2_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_hreq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_eop_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_eop_cb.set_callback(object); }
+
+	template<class _Object> static devcb2_base &set_dma_read_0_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_read_0_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_read_1_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_read_1_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_read_2_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_read_2_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_read_3_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_read_3_cb.set_callback(object); }
+
+	template<class _Object> static devcb2_base &set_dma_write_0_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_write_0_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_write_1_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_write_1_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_write_2_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_write_2_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_write_3_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_dma_write_3_cb.set_callback(object); }
+
+	template<class _Object> static devcb2_base &set_out_dack_0_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_0_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_1_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_2_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_3_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -47,7 +56,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
@@ -63,22 +71,74 @@ private:
 	//int m_in_progress[4];
 	//int m_transfer_size[4];
 	int m_base;
-	devcb_resolved_write_line   m_out_hreq_func;
-	devcb_resolved_write_line   m_out_eop_func;
-	devcb_resolved_read16       m_dma_read[4];
-	devcb_resolved_write16      m_dma_write[4];
-	devcb_resolved_write_line   m_out_dack_func[4];
+	int m_upd_clock;
+	devcb2_write_line    m_out_hreq_cb;
+	devcb2_write_line    m_out_eop_cb;
+	devcb2_read16        m_dma_read_0_cb;
+	devcb2_read16        m_dma_read_1_cb;
+	devcb2_read16        m_dma_read_2_cb;
+	devcb2_read16        m_dma_read_3_cb;
+	devcb2_write16       m_dma_write_0_cb;
+	devcb2_write16       m_dma_write_1_cb;
+	devcb2_write16       m_dma_write_2_cb;
+	devcb2_write16       m_dma_write_3_cb;
+	devcb2_write_line   m_out_dack_0_cb;
+	devcb2_write_line   m_out_dack_1_cb;
+	devcb2_write_line   m_out_dack_2_cb;
+	devcb2_write_line   m_out_dack_3_cb;
 	int m_hreq;
 	int m_eop;
-	cpu_device *m_cpu;
+	required_device<cpu_device> m_cpu;
 };
 
 extern const device_type UPD71071;
 
+#define MCFG_UPD71071_CPU(_tag) \
+	upd71071_device::static_set_cpu_tag(*device, "^"_tag);
 
-#define MCFG_UPD71071_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, UPD71071, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_UPD71071_CLOCK(_clk) \
+	upd71071_device::set_clock(*device, _clk);
+	
+#define MCFG_UPD71071_OUT_HREQ_CB(_devcb) \
+	devcb = &upd71071_device::set_out_hreq_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_UPD71071_OUT_EOP_CB(_devcb) \
+	devcb = &upd71071_device::set_out_eop_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_READ_0_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_read_0_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_READ_1_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_read_1_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_READ_2_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_read_2_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_READ_3_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_read_3_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_WRITE_0_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_write_0_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_WRITE_1_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_write_1_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_WRITE_2_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_write_2_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_DMA_WRITE_3_CB(_devcb) \
+	devcb = &upd71071_device::set_dma_write_3_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_OUT_DACK_0_CB(_devcb) \
+	devcb = &upd71071_device::set_out_dack_0_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_OUT_DACK_1_CB(_devcb) \
+	devcb = &upd71071_device::set_out_dack_1_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_OUT_DACK_2_CB(_devcb) \
+	devcb = &upd71071_device::set_out_dack_2_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD71071_OUT_DACK_3_CB(_devcb) \
+	devcb = &upd71071_device::set_out_dack_3_callback(*device, DEVCB2_##_devcb);
 
 #endif /*UPD71071_H_*/

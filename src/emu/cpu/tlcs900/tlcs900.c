@@ -285,6 +285,21 @@ void tlcs900h_device::device_start()
 {
 	m_program = &space( AS_PROGRAM );
 
+	m_pc.d = 0;
+	memset(m_xwa, 0x00, sizeof(m_xwa));
+	memset(m_xbc, 0x00, sizeof(m_xbc));
+	memset(m_xde, 0x00, sizeof(m_xde));
+	memset(m_xhl, 0x00, sizeof(m_xhl));
+	m_xix.d = 0;
+	m_xiy.d = 0;
+	m_xiz.d = 0;
+	m_xnsp.d = 0;
+	m_xssp.d = 0;
+	memset(m_dmas, 0x00, sizeof(m_dmas));
+	memset(m_dmad, 0x00, sizeof(m_dmad));
+	memset(m_dmac, 0x00, sizeof(m_dmac));
+	memset(m_dmam, 0x00, sizeof(m_dmam));
+
 	save_item( NAME(m_xwa) );
 	save_item( NAME(m_xbc) );
 	save_item( NAME(m_xde) );
@@ -430,6 +445,8 @@ void tmp95c061_device::device_reset()
 	m_timer_change[1] = 0;
 	m_timer_change[2] = 0;
 	m_timer_change[3] = 0;
+
+	memset(m_reg, 0x00, sizeof(m_reg));
 
 	m_reg[TMP95C061_P1] = 0x00;
 	m_reg[TMP95C061_P1CR] = 0x00;

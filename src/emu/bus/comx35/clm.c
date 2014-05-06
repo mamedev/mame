@@ -97,54 +97,32 @@ const rom_entry *comx_clm_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  mc6845_interface crtc_intf
+//  mc6845
 //-------------------------------------------------
 
-void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
+MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 {
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
 		UINT8 data = m_char_rom->base()[addr & 0x7ff];
-
+		
 		if (BIT(ra, 3) && column == cursor_x)
 		{
 			data = 0xff;
 		}
-
+		
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-
+			
 			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(BIT(data, 7) && de);
-
+			
 			data <<= 1;
 		}
 	}
 }
-
-static MC6845_UPDATE_ROW( comx_clm_update_row )
-{
-	comx_clm_device *clm = downcast<comx_clm_device *>(device->owner());
-	clm->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,de,hbp,vbp,param);
-}
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	true,
-	0,0,0,0,
-	8,
-	NULL,
-	comx_clm_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
 
 //-------------------------------------------------
 //  GFXDECODE( comx_clm )
@@ -170,7 +148,10 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comx_clm)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL_14_31818MHz/7, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL_14_31818MHz/7)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(comx_clm_device, crtc_update_row)
 MACHINE_CONFIG_END
 
 

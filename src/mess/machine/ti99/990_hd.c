@@ -957,23 +957,17 @@ WRITE16_MEMBER(ti990_hdc_device::write)
 }
 
 
-static const struct harddisk_interface ti990_harddisk_config =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT( ti990_hdc )
-	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", ti990_harddisk_config )
+	MCFG_HARDDISK_ADD( "harddisk1" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", ti990_harddisk_config )
+	MCFG_HARDDISK_ADD( "harddisk2" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_CONFIG_ADD( "harddisk3", ti990_harddisk_config )
+	MCFG_HARDDISK_ADD( "harddisk3" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_CONFIG_ADD( "harddisk4", ti990_harddisk_config )
+	MCFG_HARDDISK_ADD( "harddisk4" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 MACHINE_CONFIG_END

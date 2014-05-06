@@ -776,17 +776,6 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
 	return m_porta_latch;
 }
 
-static Z80PIO_INTERFACE( mz2000_pio1_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mz2000_state, mz2000_pio1_porta_r ),
-	DEVCB_DRIVER_MEMBER(mz2000_state, mz2000_pio1_porta_w ),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mz2000_state, mz2000_pio1_portb_r ),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const wd17xx_interface mz2000_mb8877a_interface =
 {
 	DEVCB_NULL,
@@ -808,23 +797,8 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface mz2000_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
-	NULL
-};
-
-static const cassette_interface mz2000_cassette_interface =
-{
-	mz700_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	"mz_cass",
 	NULL
 };
 
@@ -842,7 +816,10 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(mz2000_state, mz2000_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2000_state, mz2000_portc_w))
 
-	MCFG_Z80PIO_ADD( "z80pio_1", MASTER_CLOCK, mz2000_pio1_intf )
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MASTER_CLOCK)
+	MCFG_Z80PIO_IN_PA_CB(READ8(mz2000_state, mz2000_pio1_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2000_state, mz2000_pio1_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mz2000_state, mz2000_pio1_portb_r))
 
 	/* TODO: clocks aren't known */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -854,7 +831,11 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2000_flop")
 
-	MCFG_CASSETTE_ADD( "cassette", mz2000_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("mz_cass")
+	
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz2000_cass")
 
 	/* video hardware */

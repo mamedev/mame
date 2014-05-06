@@ -395,41 +395,6 @@ static INPUT_PORTS_START( m5 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) /* 1st line, 1st key from right! */
 INPUT_PORTS_END
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  Z80CTC_INTERFACE( ctc_intf )
-//-------------------------------------------------
-
-// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL // EXCLK
-};
-
-
-//-------------------------------------------------
-//  cassette_interface cassette_intf
-//-------------------------------------------------
-
-static const cassette_interface cassette_intf =
-{
-	sordm5_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	NULL,
-	NULL
-};
-
-
 //-------------------------------------------------
 //  TMS9928a_interface vdp_intf
 //-------------------------------------------------
@@ -621,14 +586,19 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_14_31818MHz/4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
+	// ZC2 = EXCLK
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_CASSETTE_ADD("cassette", cassette_intf)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(sordm5_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))

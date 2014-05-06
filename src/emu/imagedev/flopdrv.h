@@ -62,17 +62,9 @@ struct floppy_type_t
 
 struct floppy_interface
 {
-	devcb_write_line out_idx_func;  /* index */
-	devcb_read_line  in_mon_func;   /* motor on */
-	devcb_write_line out_tk00_func; /* track 00 */
-	devcb_write_line out_wpt_func;  /* write protect */
-	devcb_write_line out_rdy_func;  /* ready */
-//  devcb_write_line out_dskchg_func;  /* disk changed */
-
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
 	const char *interface;
-	device_image_display_info_func  device_displayinfo;
 };
 
 struct chrn_id
@@ -90,6 +82,8 @@ struct chrn_id
 /* set if index has just occurred */
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
+#define MCFG_LEGACY_FLOPPY_IDX_CB(_devcb) \
+	devcb = &legacy_floppy_image_device::set_out_idx_func(*device, DEVCB2_##_devcb);
 
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
@@ -100,11 +94,12 @@ public:
 	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~legacy_floppy_image_device();
 
+	template<class _Object> static devcb2_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
+	
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) {   return load_software(swlist, swname, start_entry); }
 	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
-	virtual void call_display_info();
 
 	virtual iodevice_t image_type() const { return IO_FLOPPY; }
 
@@ -132,7 +127,6 @@ public:
 	void floppy_install_load_proc(void (*proc)(device_image_interface &image));
 	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
 	void floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller,device_t *image, int state));
-	void floppy_drive_set_ready_state_change_callback(void (*callback)(device_t *controller,device_t *img, int state));
 	int floppy_drive_get_current_track();
 	UINT64 floppy_drive_get_current_track_size(int head);
 	void floppy_drive_set_rpm(float rpm);
@@ -175,12 +169,7 @@ protected:
 	virtual void device_start();
 
 	/* callbacks */
-	devcb_resolved_write_line m_out_idx_func;
-	devcb_resolved_read_line m_in_mon_func;
-	devcb_resolved_write_line m_out_tk00_func;
-	devcb_resolved_write_line m_out_wpt_func;
-	devcb_resolved_write_line m_out_rdy_func;
-	devcb_resolved_write_line m_out_dskchg_func;
+	devcb2_write_line m_out_idx_func;
 
 	/* state of input lines */
 	int m_drtn; /* direction */
@@ -217,8 +206,6 @@ protected:
 	void    (*m_index_pulse_callback)(device_t *controller,device_t *image, int state);
 	/* rotation per minute => gives index pulse frequency */
 	float m_rpm;
-
-	void    (*m_ready_state_change_callback)(device_t *controller,device_t *img, int state);
 
 	int m_id_index;
 
@@ -258,10 +245,6 @@ int floppy_get_count(running_machine &machine);
 	MCFG_DEVICE_ADD(_tag, LEGACY_FLOPPY, 0)         \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_DRIVE_MODIFY(_tag, _config)  \
-	MCFG_DEVICE_MODIFY(_tag)        \
-	MCFG_DEVICE_CONFIG(_config)
-
 #define MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(_config)    \
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
 	MCFG_DEVICE_CONFIG(_config) \
@@ -272,36 +255,10 @@ int floppy_get_count(running_machine &machine);
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)     \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_4_DRIVES_MODIFY(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_0)        \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_2)        \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_3)        \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_4_DRIVES_REMOVE()    \
-	MCFG_DEVICE_REMOVE(FLOPPY_0)        \
-	MCFG_DEVICE_REMOVE(FLOPPY_1)        \
-	MCFG_DEVICE_REMOVE(FLOPPY_2)        \
-	MCFG_DEVICE_REMOVE(FLOPPY_3)
-
 #define MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(_config)    \
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
 	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_2_DRIVES_MODIFY(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_0)        \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_2_DRIVES_REMOVE()    \
-	MCFG_DEVICE_REMOVE(FLOPPY_0)        \
-	MCFG_DEVICE_REMOVE(FLOPPY_1)
 
 #endif /* __FLOPDRV_H__ */

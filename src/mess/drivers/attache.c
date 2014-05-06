@@ -871,59 +871,6 @@ static const ay8910_interface ay8912_interface =
 	DEVCB_NULL                  /* portB write */
 };
 
-static const z80pio_interface pio_interface =
-{
-	DEVCB_NULL,//DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portA_r),
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portA_w),
-	DEVCB_NULL,  // out_ardy_cb
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portB_r),
-	DEVCB_DRIVER_MEMBER(attache_state,pio_portB_w),
-	DEVCB_NULL   // out_brdy_cb
-};
-
-static Z80SIO_INTERFACE( sio_interface )
-{
-	0, 0, 0, 0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const z80ctc_interface ctc_interface =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,  // zc0_cb
-	DEVCB_NULL,  // zc1_cb
-	DEVCB_NULL   // zc2_cb
-};
-
-static const am9517a_interface dma_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
-	DEVCB_DRIVER_LINE_MEMBER(attache_state,eop_w),  // out_eop_cb
-	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_r),  // in_memr_cb
-	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_w),  // out_memw_cb
-	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // in_ior_cb[4]
-	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // out_iow_cb[4]
-	{DEVCB_NULL,/*DEVCB_DRIVER_LINE_MEMBER(attache_state,fdc_dack_w),*/ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}   // out_dack_cb[4]
-};
-
 // IRQ daisy chain = CTC -> SIO -> Expansion
 static const z80_daisy_config attache_daisy_chain[] =
 {
@@ -931,12 +878,6 @@ static const z80_daisy_config attache_daisy_chain[] =
 	{ "sio" },
 	// expansion
 	{ NULL }
-};
-
-static const tms9927_interface crtc_interface =
-{
-	8,  // guessing for now
-	NULL
 };
 
 static SLOT_INTERFACE_START( attache_floppies )
@@ -1016,11 +957,25 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_MSM5832_ADD("rtc",XTAL_32_768kHz)
 
-	MCFG_Z80PIO_ADD("pio",XTAL_8MHz / 26, pio_interface)
-	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, sio_interface)
-	MCFG_Z80CTC_ADD("ctc",XTAL_8MHz / 4, ctc_interface)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_8MHz/26)
+	MCFG_Z80PIO_IN_PA_CB(READ8(attache_state, pio_portA_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(attache_state, pio_portA_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(attache_state, pio_portB_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(attache_state, pio_portB_w))
 
-	MCFG_AM9517A_ADD("dma",XTAL_8MHz / 4, dma_interface)
+	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, 0, 0, 0, 0)
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("dma", AM9517A, XTAL_8MHz / 4)
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(attache_state, hreq_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(attache_state, eop_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(attache_state, dma_mem_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(attache_state, dma_mem_w))
+	MCFG_AM9517A_IN_IOR_0_CB(READ8(attache_state, fdc_dma_r))
+	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(attache_state, fdc_dma_w))
+	// MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(attache_state, fdc_dack_w))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))
@@ -1028,7 +983,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_TMS9927_ADD("crtc", 12324000, crtc_interface)
+	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

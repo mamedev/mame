@@ -833,33 +833,6 @@ void pasogo_state::select_dma_channel(int channel, bool state)
 	}
 }
 
-
-static I8237_INTERFACE( dma8237_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dma8237_out_eop),
-	DEVCB_DRIVER_MEMBER(pasogo_state, dma_read_byte),
-	DEVCB_DRIVER_MEMBER(pasogo_state, dma_write_byte),
-
-	{ DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_1_dack_r),
-		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_2_dack_r),
-		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_3_dack_r) },
-
-
-	{ DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_0_dack_w),
-		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_1_dack_w),
-		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_2_dack_w),
-		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_3_dack_w) },
-
-	// DACK's
-	{ DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack0_w),
-		DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack1_w),
-		DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack2_w),
-		DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack3_w) }
-};
-
-
 READ8_MEMBER (pasogo_state::ppi_porta_r)
 {
 	int data = 0xFF;
@@ -945,7 +918,22 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, dma8237_config )
+	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pasogo_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(pasogo_state, dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(pasogo_state, dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pasogo_state, dma_write_byte))
+	MCFG_I8237_IN_IOR_1_CB(READ8(pasogo_state, dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(pasogo_state, dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(pasogo_state, dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pasogo_state, dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(pasogo_state, dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pasogo_state, dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(pasogo_state, dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pasogo_state, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pasogo_state, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pasogo_state, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pasogo_state, dack3_w))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pasogo_state, ppi_porta_r))

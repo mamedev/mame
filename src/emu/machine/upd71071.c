@@ -84,27 +84,24 @@
 const device_type UPD71071 = &device_creator<upd71071_device>;
 
 upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock, "upd71071", __FILE__)
+				: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock, "upd71071", __FILE__),
+				m_upd_clock(0),
+				m_out_hreq_cb(*this),
+				m_out_eop_cb(*this),
+				m_dma_read_0_cb(*this),
+				m_dma_read_1_cb(*this),
+				m_dma_read_2_cb(*this),
+				m_dma_read_3_cb(*this),
+				m_dma_write_0_cb(*this),
+				m_dma_write_1_cb(*this),
+				m_dma_write_2_cb(*this),
+				m_dma_write_3_cb(*this),
+				m_out_dack_0_cb(*this),
+				m_out_dack_1_cb(*this),
+				m_out_dack_2_cb(*this),
+				m_out_dack_3_cb(*this),
+				m_cpu(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd71071_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd71071_intf *intf = reinterpret_cast<const upd71071_intf *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd71071_intf *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 //-------------------------------------------------
@@ -113,19 +110,30 @@ void upd71071_device::device_config_complete()
 
 void upd71071_device::device_start()
 {
-	m_cpu = machine().device<cpu_device>(cputag);
-
-	m_out_hreq_func.resolve(m_out_hreq_cb, *this);
-	m_out_eop_func.resolve(m_out_eop_cb, *this);
+	m_out_hreq_cb.resolve_safe();
+	m_out_eop_cb.resolve_safe();
+	m_dma_read_0_cb.resolve_safe(0);
+	m_dma_read_1_cb.resolve_safe(0);
+	m_dma_read_2_cb.resolve_safe(0);
+	m_dma_read_3_cb.resolve_safe(0);
+	m_dma_write_0_cb.resolve_safe();
+	m_dma_write_1_cb.resolve_safe();
+	m_dma_write_2_cb.resolve_safe();
+	m_dma_write_3_cb.resolve_safe();
+	m_out_dack_0_cb.resolve_safe();
+	m_out_dack_1_cb.resolve_safe();
+	m_out_dack_2_cb.resolve_safe();
+	m_out_dack_3_cb.resolve_safe();
 	for (int x = 0; x < 4; x++)
 	{
 		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer),this));
-		m_dma_read[x].resolve(m_dma_read_cb[x], *this);
-		m_dma_write[x].resolve(m_dma_write_cb[x], *this);
-		m_out_dack_func[x].resolve(m_out_dack_cb[x], *this);
 	}
 	m_selected_channel = 0;
 
+	m_reg.device_control = 0;
+	m_reg.mask = 0x0f;  // mask all channels
+	for (int x = 0; x < 4; x++)
+		m_reg.mode_control[x] = 0;
 
 	save_item(NAME(m_reg.initialise));
 	save_item(NAME(m_reg.channel));
@@ -163,8 +171,26 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 		case 0x00:  // Verify
 			break;
 		case 0x04:  // I/O -> memory
-			if (!m_dma_read[channel].isnull())
-				data = m_dma_read[channel](0);
+			switch (channel)
+			{
+				case 0:
+					if (!m_dma_read_0_cb.isnull())
+						data = m_dma_read_0_cb(0);
+					break;
+				case 1:
+					if (!m_dma_read_1_cb.isnull())
+						data = m_dma_read_1_cb(0);
+					break;
+				case 2:
+					if (!m_dma_read_2_cb.isnull())
+						data = m_dma_read_2_cb(0);
+					break;
+				case 3:
+					if (!m_dma_read_3_cb.isnull())
+						data = m_dma_read_3_cb(0);
+					break;
+				break;
+			}
 			space.write_byte(m_reg.address_current[channel], data & 0xff);
 			if (m_reg.mode_control[channel] & 0x20)  // Address direction
 				m_reg.address_current[channel]--;
@@ -184,8 +210,26 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 			break;
 		case 0x08:  // memory -> I/O
 			data = space.read_byte(m_reg.address_current[channel]);
-			if (!m_dma_write[channel].isnull())
-				m_dma_write[channel](0, data);
+			switch (channel)
+			{
+				case 0:
+					if (!m_dma_write_0_cb.isnull())
+						m_dma_write_0_cb((offs_t)0, data);
+					break;
+				case 1:
+					if (!m_dma_write_1_cb.isnull())
+						m_dma_write_1_cb((offs_t)0, data);
+					break;
+				case 2:
+					if (!m_dma_write_2_cb.isnull())
+						m_dma_write_2_cb((offs_t)0, data);
+					break;
+				case 3:
+					if (!m_dma_write_3_cb.isnull())
+						m_dma_write_3_cb((offs_t)0, data);
+					break;
+				break;
+			}
 			if (m_reg.mode_control[channel] & 0x20)  // Address direction
 				m_reg.address_current[channel]--;
 			else
@@ -432,7 +476,7 @@ WRITE_LINE_MEMBER(upd71071_device::set_hreq)
 {
 	if (m_hreq != state)
 	{
-		m_out_hreq_func(state);
+		m_out_hreq_cb(state);
 		m_hreq = state;
 	}
 }
@@ -441,7 +485,7 @@ WRITE_LINE_MEMBER(upd71071_device::set_eop)
 {
 	if (m_eop != state)
 	{
-		m_out_eop_func(state);
+		m_out_eop_cb(state);
 		m_eop = state;
 	}
 }

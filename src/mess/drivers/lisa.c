@@ -103,15 +103,9 @@ static const applefdc_interface lisa210_fdc_interface =
 
 static const floppy_interface lisa_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 /***************************************************************************

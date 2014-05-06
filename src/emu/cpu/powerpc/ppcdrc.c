@@ -542,7 +542,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback)
 {
 	powerpc_state *ppc;
 	drcbe_info beinfo;
@@ -4795,10 +4795,32 @@ CPU_GET_INFO( mpc8240 )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
-DEFINE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
 
-DEFINE_LEGACY_CPU_DEVICE(PPC405GP, ppc405gp);
+ppc403ga_device::ppc403ga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc403ga))
+{
+}
+
+const device_type PPC403GA = &legacy_device_creator<ppc403ga_device>;
+
+ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc403gcx))
+{
+}
+
+const device_type PPC403GCX = &legacy_device_creator<ppc403gcx_device>;
+
+ppc405gp_device::ppc405gp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc405gp))
+{
+}
+
+const device_type PPC405GP = &legacy_device_creator<ppc405gp_device>;
+
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info)
+	: legacy_cpu_device(mconfig, type, tag, owner, clock, info)
+{
+}
 
 DEFINE_LEGACY_CPU_DEVICE(PPC601, ppc601);
 DEFINE_LEGACY_CPU_DEVICE(PPC602, ppc602);

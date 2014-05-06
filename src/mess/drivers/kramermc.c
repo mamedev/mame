@@ -110,7 +110,10 @@ static MACHINE_CONFIG_START( kramermc, kramermc_state )
 	MCFG_CPU_PROGRAM_MAP(kramermc_mem)
 	MCFG_CPU_IO_MAP(kramermc_io)
 
-	MCFG_Z80PIO_ADD( "z80pio", 1500000, kramermc_z80pio_intf )
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, 1500000)
+	MCFG_Z80PIO_IN_PA_CB(READ8(kramermc_state, kramermc_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kramermc_state, kramermc_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(kramermc_state, kramermc_port_b_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

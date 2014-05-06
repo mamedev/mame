@@ -77,6 +77,3 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 };
-
-/*----------- defined in audio/starwars.c -----------*/
-extern const riot6532_interface starwars_riot6532_intf;

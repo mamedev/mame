@@ -55,9 +55,9 @@ void wave_device::device_start()
 	speaker_device_iterator spkiter(machine().root_device());
 	int speakers = spkiter.count();
 	if (speakers > 1)
-		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
+		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	else
-		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 }
 
 //-------------------------------------------------

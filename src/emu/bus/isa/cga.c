@@ -95,10 +95,25 @@ TODO:
 		if(VERBOSE_CGA>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
+
+enum
+{
+	CGA_TEXT_INTEN = 0,
+	CGA_TEXT_INTEN_ALT,
+	CGA_TEXT_INTEN_CG,
+	CGA_TEXT_BLINK,
+	CGA_TEXT_BLINK_ALT,
+	CGA_TEXT_BLINK_SI,
+	CGA_GFX_1BPP,
+	CGA_GFX_2BPP,
+	CGA_GFX_4BPPL,
+	CGA_GFX_4BPPH,
+	PC1512_GFX_4BPP
+};
 
 /***************************************************************************
 
@@ -161,30 +176,63 @@ INPUT_PORTS_END
 #define CGA_CHIPSET_ATI         0x60    /* ATI (supports Plantronics) */
 #define CGA_CHIPSET_PARADISE    0x80    /* Paradise (used in PC1640) */
 
-static MC6845_UPDATE_ROW( cga_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::crtc_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	if ( cga->m_update_row )
+	if (m_update_row_type == -1)
+		return;
+	
+	switch (m_update_row_type)
 	{
-		cga->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param );
+		case CGA_TEXT_INTEN:
+			cga_text_inten_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_ALT:
+			cga_text_inten_alt_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_CG:
+			cga_text_inten_comp_grey_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK:
+			cga_text_blink_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_ALT:
+			cga_text_blink_alt_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_SI:
+			cga_text_blink_update_row_si(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_1BPP:
+			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_2BPP:
+			cga_gfx_2bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPL:
+			cga_gfx_4bppl_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPH:
+			cga_gfx_4bpph_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
 	}
 }
 
 
-static MC6845_INTERFACE( mc6845_cga_intf )
+MC6845_UPDATE_ROW( isa8_cga_pc1512_device::crtc_update_row )
 {
-	false,              /* show border area */
-	0,0,0,0,            /* visarea adjustment */
-	8,                  /* numbers of pixels per video memory address */
-	NULL,               /* begin_update */
-	cga_update_row,     /* update_row */
-	NULL,               /* end_update */
-	DEVCB_NULL,         /* on_de_changed */
-	DEVCB_NULL,         /* on_cur_changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, hsync_changed),    /* on_hsync_changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, vsync_changed),    /* on_vsync_changed */
-	NULL
-};
+	if (m_update_row_type == -1)
+		return;
+	
+	switch (m_update_row_type)
+	{
+		case PC1512_GFX_4BPP:
+			pc1512_gfx_4bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		default:
+			isa8_cga_device::crtc_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+	}
+}
+
 
 #define CGA_HCLK (XTAL_14_31818MHz/8)
 #define CGA_LCLK (XTAL_14_31818MHz/16)
@@ -197,7 +245,12 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 
 	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
 
-	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_cga_intf)
+	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_14_31818MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(isa8_cga_device, crtc_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_cga_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_cga_device, vsync_changed))
 MACHINE_CONFIG_END
 
 
@@ -247,6 +300,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"),
+		m_update_row_type(-1),
 		m_vram_size( 0x4000 ),
 		m_palette(*this, "palette")
 {
@@ -261,6 +315,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"),
+		m_update_row_type(-1),
 		m_vram_size( 0x4000 ),
 		m_palette(*this, "palette")
 {
@@ -283,7 +338,6 @@ void isa8_cga_device::device_start()
 
 	set_isa_device();
 	m_vram.resize(m_vram_size);
-	m_update_row = NULL;
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
 	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
 
@@ -320,7 +374,6 @@ void isa8_cga_device::device_start()
 
 void isa8_cga_device::device_reset()
 {
-	m_update_row = NULL;
 	m_framecnt = 0;
 	m_mode_control = 0;
 	m_vsync = 0;
@@ -414,14 +467,12 @@ isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &m
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_inten_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -429,11 +480,11 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
+		UINT8 data = m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = attr >> 4;
 
-		if ( i == cursor_x && ( cga->m_framecnt & 0x08 ) )
+		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
 		{
 			data = 0xFF;
 		}
@@ -455,14 +506,12 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
   The character cell size is 16x8. Composite monitor, greyscale.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_comp_grey_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -470,11 +519,11 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
+		UINT8 data = m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = 0x10 + ( attr & 0x0F );
 		UINT16 bg = 0x10 + ( ( attr >> 4 ) & 0x07 );
 
-		if ( i == cursor_x && ( cga->m_framecnt & 0x08 ) )
+		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
 		{
 			data = 0xFF;
 		}
@@ -495,14 +544,12 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_alt_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -510,10 +557,10 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
+		UINT8 data = m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 
-		if ( i == cursor_x && ( cga->m_framecnt & 0x08 ) )
+		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
 		{
 			data = 0xFF;
 		}
@@ -535,14 +582,12 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_blink_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -550,20 +595,20 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
+		UINT8 data = m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = (attr >> 4) & 0x07;
 
 		if ( i == cursor_x )
 		{
-			if ( cga->m_framecnt & 0x08 )
+			if ( m_framecnt & 0x08 )
 			{
 				data = 0xFF;
 			}
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( cga->m_framecnt & 0x10 ) )
+			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
 			{
 				data = 0x00;
 			}
@@ -580,14 +625,12 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 	}
 }
 
-static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row_si )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -595,21 +638,21 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
+		UINT8 data = m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
 		UINT16 bg = (attr >> 4) & 0x07;
 		UINT8 xi;
 
 		if ( i == cursor_x )
 		{
-			if ( cga->m_framecnt & 0x08 )
+			if ( m_framecnt & 0x08 )
 			{
 				data = 0xFF;
 			}
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( cga->m_framecnt & 0x10 ) )
+			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
 			{
 				data = 0x00;
 			}
@@ -633,14 +676,12 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
   The character cell size is 16x8
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_alt_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -648,20 +689,20 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		UINT8 chr = videoram[ offset ];
 		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
+		UINT8 data = m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x07;
 		UINT16 bg = 0;
 
 		if ( i == cursor_x )
 		{
-			if ( cga->m_framecnt & 0x08 )
+			if ( m_framecnt & 0x08 )
 			{
 				data = 0xFF;
 			}
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( cga->m_framecnt & 0x10 ) )
+			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
 			{
 				data = 0x00;
 				bg = ( attr >> 4 ) & 0x07;
@@ -682,14 +723,12 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 
 /* The lo-res (320x200) graphics mode on a colour composite monitor */
 
-static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bppl_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -743,14 +782,12 @@ static const UINT8 yc_lut[16][8] =
 };
 #endif
 
-static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bpph_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
 
@@ -788,14 +825,12 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
   cga fetches 2 byte per mc6845 access.
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_2bpp_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -803,17 +838,17 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
-		*p = palette[cga->m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
-		*p = palette[cga->m_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
-		*p = palette[cga->m_palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
-		*p = palette[cga->m_palette_lut_2bpp[   data        & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[   data        & 0x03 ]]; p++;
 
 		data = videoram[ offset+1 ];
 
-		*p = palette[cga->m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
-		*p = palette[cga->m_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
-		*p = palette[cga->m_palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
-		*p = palette[cga->m_palette_lut_2bpp[   data        & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
+		*p = palette[m_palette_lut_2bpp[   data        & 0x03 ]]; p++;
 	}
 }
 
@@ -825,15 +860,13 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
+MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 {
-	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
-	UINT8   fg = cga->m_color_select & 0x0F;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8   fg = m_color_select & 0x0F;
 	int i;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -952,53 +985,53 @@ void isa8_cga_device::mode_control_w(UINT8 data)
 			if ( m_mode_control & 0x04 )
 			{
 				/* Composite greyscale */
-				m_update_row = cga_text_inten_comp_grey_update_row;
+				m_update_row_type = CGA_TEXT_INTEN_CG;
 			}
 			else
 			{
 				/* Composite colour */
-				m_update_row = cga_text_inten_update_row;
+				m_update_row_type = CGA_TEXT_INTEN;
 			}
 		}
 		else
 		{
 			/* RGB colour */
-			m_update_row = cga_text_inten_update_row;
+			m_update_row_type = CGA_TEXT_INTEN;
 		}
 		break;
 	case 0x0A: case 0x0B: case 0x2A: case 0x2B:
 		mc6845->set_hpixels_per_column( 8 );
 		if ( monitor == CGA_MONITOR_COMPOSITE )
 		{
-			m_update_row = cga_gfx_4bppl_update_row;
+			m_update_row_type = CGA_GFX_4BPPL;
 		}
 		else
 		{
-			m_update_row = cga_gfx_2bpp_update_row;
+			m_update_row_type = CGA_GFX_2BPP;
 		}
 		break;
 	case 0x0E: case 0x0F: case 0x2E: case 0x2F:
 		mc6845->set_hpixels_per_column( 8 );
-		m_update_row = cga_gfx_2bpp_update_row;
+		m_update_row_type = CGA_GFX_2BPP;
 		break;
 	case 0x18: case 0x19: case 0x1C: case 0x1D:
 		mc6845->set_hpixels_per_column( 8 );
-		m_update_row = cga_text_inten_alt_update_row;
+		m_update_row_type = CGA_TEXT_INTEN_ALT;
 		break;
 	case 0x1A: case 0x1B: case 0x3A: case 0x3B:
 		mc6845->set_hpixels_per_column( 16 );
 		if ( monitor == CGA_MONITOR_COMPOSITE )
 		{
-			m_update_row = cga_gfx_4bpph_update_row;
+			m_update_row_type = CGA_GFX_4BPPH;
 		}
 		else
 		{
-			m_update_row = cga_gfx_1bpp_update_row;
+			m_update_row_type = CGA_GFX_1BPP;
 		}
 		break;
 	case 0x1E: case 0x1F: case 0x3E: case 0x3F:
 		mc6845->set_hpixels_per_column( 16 );
-		m_update_row = cga_gfx_1bpp_update_row;
+		m_update_row_type = CGA_GFX_1BPP;
 		break;
 	case 0x28: case 0x29: case 0x2C: case 0x2D:
 		mc6845->set_hpixels_per_column( 8 );
@@ -1007,26 +1040,26 @@ void isa8_cga_device::mode_control_w(UINT8 data)
 			if ( m_mode_control & 0x04 )
 			{
 				/* Composite greyscale */
-				m_update_row = m_superimpose ? cga_text_blink_update_row_si : cga_text_blink_update_row;
+				m_update_row_type = m_superimpose ? CGA_TEXT_BLINK_SI : CGA_TEXT_BLINK;
 			}
 			else
 			{
 				/* Composite colour */
-				m_update_row = m_superimpose ? cga_text_blink_update_row_si : cga_text_blink_update_row;
+				m_update_row_type = m_superimpose ? CGA_TEXT_BLINK_SI : CGA_TEXT_BLINK;
 			}
 		}
 		else
 		{
 			/* RGB colour */
-			m_update_row = m_superimpose ? cga_text_blink_update_row_si : cga_text_blink_update_row;
+			m_update_row_type = m_superimpose ? CGA_TEXT_BLINK_SI : CGA_TEXT_BLINK;
 		}
 		break;
 	case 0x38: case 0x39: case 0x3C: case 0x3D:
 		mc6845->set_hpixels_per_column( 8 );
-		m_update_row = cga_text_blink_alt_update_row;
+		m_update_row_type = CGA_TEXT_BLINK_ALT;
 		break;
 	default:
-		m_update_row = NULL;
+		m_update_row_type = -1;
 		break;
 	}
 
@@ -1295,24 +1328,22 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 //}
 
 
-static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
+MC6845_UPDATE_ROW( isa8_cga_pc1512_device::pc1512_gfx_4bpp_update_row )
 {
-	isa8_cga_pc1512_device *cga  = downcast<isa8_cga_pc1512_device *>(device->owner());
-	UINT8 *videoram = &cga->m_vram[cga->m_start_offset];
+	UINT8 *videoram = &m_vram[m_start_offset];
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT16  offset_base = ra << 13;
 	int j;
-	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
 	for ( j = 0; j < x_count; j++ )
 	{
 		UINT16 offset = offset_base | ( ( ma + j ) & 0x1FFF );
-		UINT16 i = ( cga->m_color_select & 8 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[3] | offset ] << 3 : 0;
-		UINT16 r = ( cga->m_color_select & 4 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[2] | offset ] << 2 : 0;
-		UINT16 g = ( cga->m_color_select & 2 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[1] | offset ] << 1 : 0;
-		UINT16 b = ( cga->m_color_select & 1 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[0] | offset ]      : 0;
+		UINT16 i = ( m_color_select & 8 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[3] | offset ] << 3 : 0;
+		UINT16 r = ( m_color_select & 4 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[2] | offset ] << 2 : 0;
+		UINT16 g = ( m_color_select & 2 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[1] | offset ] << 1 : 0;
+		UINT16 b = ( m_color_select & 1 ) ? videoram[ isa8_cga_pc1512_device::vram_offset[0] | offset ]      : 0;
 
 		*p = palette[( ( i & 0x400 ) | ( r & 0x200 ) | ( g & 0x100 ) | ( b & 0x80 ) ) >> 7]; p++;
 		*p = palette[( ( i & 0x200 ) | ( r & 0x100 ) | ( g & 0x080 ) | ( b & 0x40 ) ) >> 6]; p++;
@@ -1364,45 +1395,45 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 		{
 		case 0x08: case 0x09: case 0x0C: case 0x0D:
 			mc6845->set_hpixels_per_column( 8 );
-			m_update_row = cga_text_inten_update_row;
+			m_update_row_type = CGA_TEXT_INTEN;
 			break;
 		case 0x0A: case 0x0B: case 0x2A: case 0x2B:
 			mc6845->set_hpixels_per_column( 8 );
 			if ( ( CGA_MONITOR ) == CGA_MONITOR_COMPOSITE )
 			{
-				m_update_row = cga_gfx_4bppl_update_row;
+				m_update_row_type = CGA_GFX_4BPPL;
 			}
 			else
 			{
-				m_update_row = cga_gfx_2bpp_update_row;
+				m_update_row_type = CGA_GFX_2BPP;
 			}
 			break;
 		case 0x0E: case 0x0F: case 0x2E: case 0x2F:
 			mc6845->set_hpixels_per_column( 8 );
-			m_update_row = cga_gfx_2bpp_update_row;
+			m_update_row_type = CGA_GFX_2BPP;
 			break;
 		case 0x18: case 0x19: case 0x1C: case 0x1D:
 			mc6845->set_hpixels_per_column( 8 );
-			m_update_row = cga_text_inten_alt_update_row;
+			m_update_row_type = CGA_TEXT_INTEN_ALT;
 			break;
 		case 0x1A: case 0x1B: case 0x3A: case 0x3B:
 			mc6845->set_hpixels_per_column( 8 );
-			m_update_row = pc1512_gfx_4bpp_update_row;
+			m_update_row_type = PC1512_GFX_4BPP;
 			break;
 		case 0x1E: case 0x1F: case 0x3E: case 0x3F:
 			mc6845->set_hpixels_per_column( 16 );
-			m_update_row = cga_gfx_1bpp_update_row;
+			m_update_row_type = CGA_GFX_1BPP;
 			break;
 		case 0x28: case 0x29: case 0x2C: case 0x2D:
 			mc6845->set_hpixels_per_column( 8 );
-			m_update_row = cga_text_blink_update_row;
+			m_update_row_type = CGA_TEXT_BLINK;
 			break;
 		case 0x38: case 0x39: case 0x3C: case 0x3D:
 			mc6845->set_hpixels_per_column( 8 );
-			m_update_row = cga_text_blink_alt_update_row;
+			m_update_row_type = CGA_TEXT_BLINK_ALT;
 			break;
 		default:
-			m_update_row = NULL;
+			m_update_row_type = -1;
 			break;
 		}
 		break;

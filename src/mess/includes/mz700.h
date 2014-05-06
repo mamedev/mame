@@ -117,9 +117,4 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-
-/*----------- defined in machine/mz700.c -----------*/
-
-extern const z80pio_interface mz800_z80pio_config;
-
 #endif /* MZ700_H_ */

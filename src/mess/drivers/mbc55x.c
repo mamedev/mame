@@ -32,15 +32,9 @@ const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 
 static const floppy_interface mbc55x_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD_35,
 	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 static ADDRESS_MAP_START(mbc55x_mem, AS_PROGRAM, 8, mbc55x_state)
@@ -277,7 +271,12 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(mbc55x_state, mbc55x_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mbc55x_state, mbc55x_ppi_portc_w))
 
-	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, XTAL_14_31818MHz/8, mb55x_mc6845_intf)
+	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, XTAL_14_31818MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbc55x_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbc55x_state, vid_hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
 	MCFG_FD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )

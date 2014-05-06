@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

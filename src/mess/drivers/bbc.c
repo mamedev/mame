@@ -578,15 +578,6 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_vsync)
 //};
 
 
-static const cassette_interface bbc_cassette_interface =
-{
-	bbc_cassette_formats,
-	NULL,
-	(cassette_state)(CASSETTE_PLAY),
-	"bbc_cass",
-	NULL
-};
-
 
 WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 {
@@ -612,24 +603,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface bbc_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(bbc),
-	"floppy_5_25",
-	NULL
-};
-
-static const mc6854_interface adlc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_w),
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	"floppy_5_25"
 };
 
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
@@ -697,7 +673,12 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
+
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbca)
 
 	MCFG_DEFAULT_LAYOUT(layout_bbc)
@@ -708,7 +689,10 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", bbc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("bbc_cass")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_a", "bbca_cass")
@@ -918,7 +902,12 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
+
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcm)
 
 	/* sound hardware */
@@ -936,7 +925,10 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", bbc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("bbc_cass")
 
 	/* cartridges */
 	MCFG_CARTSLOT_ADD("cart1")
@@ -999,7 +991,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* econet */
-	MCFG_MC6854_ADD("mc6854", adlc_intf)
+	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
+	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))

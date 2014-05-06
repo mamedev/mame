@@ -305,7 +305,7 @@ struct PPC_REGS {
 
 	UINT64 tb;          /* 56-bit timebase register */
 
-	device_irq_acknowledge_callback irq_callback;
+	device_irq_acknowledge_delegate irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 
@@ -2165,10 +2165,31 @@ CPU_GET_INFO( ppc604 )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
-DEFINE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
+ppc403ga_device::ppc403ga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc403ga))
+{
+}
 
-DEFINE_LEGACY_CPU_DEVICE(PPC405GP, ppc405gp);
+const device_type PPC403GA = &legacy_device_creator<ppc403ga_device>;
+
+ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc403gcx))
+{
+}
+
+const device_type PPC403GCX = &legacy_device_creator<ppc403gcx_device>;
+
+ppc405gp_device::ppc405gp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: ppc4xx_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(ppc405gp))
+{
+}
+
+const device_type PPC405GP = &legacy_device_creator<ppc405gp_device>;
+
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info)
+	: legacy_cpu_device(mconfig, type, tag, owner, clock, info)
+{
+}
 
 DEFINE_LEGACY_CPU_DEVICE(PPC601, ppc601);
 DEFINE_LEGACY_CPU_DEVICE(PPC602, ppc602);

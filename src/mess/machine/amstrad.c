@@ -1079,37 +1079,6 @@ UINT32 amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind16 
 }
 
 
-MC6845_INTERFACE( amstrad_mc6845_intf )
-{
-	false,                                  /* show border area */
-	0,0,0,0,                                /* visarea adjustment */
-	16,                                     /* number of pixels per video memory address */
-	NULL,                                   /* begin_update */
-	NULL,                                   /* update_row */
-	NULL,                                   /* end_update */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_de_changed),         /* on_de_changed */
-	DEVCB_NULL,                             /* on_cur_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_hsync_changed),      /* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_vsync_changed),      /* on_vsync_changed */
-	NULL
-};
-
-
-MC6845_INTERFACE( amstrad_plus_mc6845_intf )
-{
-	false,                                      /* show border area */
-	0,0,0,0,                                    /* visarea adjustment */
-	16,                                         /* number of pixels per video memory address */
-	NULL,                                       /* begin_update */
-	NULL,                                       /* update_row */
-	NULL,                                       /* end_update */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_de_changed),        /* on_de_changed */
-	DEVCB_NULL,                                 /* on_cur_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_hsync_changed),     /* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_vsync_changed),     /* on_vsync_changed */
-	NULL
-};
-
 /* traverses the daisy-chain of expansion devices, looking for the specified device */
 static device_t* get_expansion_device(running_machine &machine, const char* tag)
 {

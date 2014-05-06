@@ -244,6 +244,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 	UINT8 vram_read();
+	MC6845_UPDATE_ROW(crtc_update_row);
 	void vram_write(UINT8 data);
 
 protected:
@@ -964,7 +965,7 @@ void vk100_state::video_start()
 	m_ras_erase = memregion("ras_erase")->base();
 }
 
-static MC6845_UPDATE_ROW( vk100_update_row )
+MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 {
 	static const UINT32 colorTable[16] = {
 	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
@@ -977,37 +978,21 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 	 * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
 	 * crtc input                  MA11 MA10 MA9 MA8 MA7 MA6 RA1 RA0 MA5 MA4 MA3 MA2 MA1 MA0
 	 */
-	vk100_state *state = device->machine().driver_data<vk100_state>();
 	UINT16 EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
 	// display the 64 different 12-bit-wide chunks
 	for (int i = 0; i < 64; i++)
 	{
-		UINT16 block = state->m_vram[(EA<<1)+(2*i)+1] | (state->m_vram[(EA<<1)+(2*i)]<<8);
-		UINT32 fgColor = (state->m_vgSOPS&0x08)?colorTable[(block&0xF000)>>12]:colorTable2[(block&0xF000)>>12];
-		UINT32 bgColor = (state->m_vgSOPS&0x08)?colorTable[(state->m_vgSOPS&0xF0)>>4]:colorTable2[(state->m_vgSOPS&0xF0)>>4];
+		UINT16 block = m_vram[(EA<<1)+(2*i)+1] | (m_vram[(EA<<1)+(2*i)]<<8);
+		UINT32 fgColor = (m_vgSOPS&0x08)?colorTable[(block&0xF000)>>12]:colorTable2[(block&0xF000)>>12];
+		UINT32 bgColor = (m_vgSOPS&0x08)?colorTable[(m_vgSOPS&0xF0)>>4]:colorTable2[(m_vgSOPS&0xF0)>>4];
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
-			bitmap.pix32(y, (12*i)+j) = (((block&(0x0001<<j))?1:0)^(state->m_vgSOPS&1))?fgColor:bgColor;
+			bitmap.pix32(y, (12*i)+j) = (((block&(0x0001<<j))?1:0)^(m_vgSOPS&1))?fgColor:bgColor;
 		}
 	}
 }
 
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,
-	0,0,0,0,
-	12,
-	NULL,
-	vk100_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(vk100_state, crtc_vsync),
-	NULL
-};
 
 static MACHINE_CONFIG_START( vk100, vk100_state )
 	/* basic machine hardware */
@@ -1015,12 +1000,16 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
 	MCFG_CPU_IO_MAP(vk100_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
-	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192Mhz/3/12, mc6845_intf)
+
+	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192Mhz/3/12)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(12)
+	MCFG_MC6845_UPDATE_ROW_CB(vk100_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(vk100_state, crtc_vsync))
 
 	/* i8251 uart */
 	MCFG_DEVICE_ADD("i8251", I8251, 0)

@@ -8,7 +8,7 @@
 #define radio86_H_
 
 #include "machine/i8255.h"
-#include "machine/8257dma.h"
+#include "machine/i8257.h"
 #include "video/i8275.h"
 #include "imagedev/cassette.h"
 
@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mikrosha_8255_font_page_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	required_device<cpu_device> m_maincpu;
 
 protected:
@@ -117,23 +118,5 @@ public:
 
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
-
-
-/*----------- defined in machine/radio86.c -----------*/
-
-extern const i8275_interface radio86_i8275_interface;
-extern const i8275_interface partner_i8275_interface;
-extern const i8275_interface mikrosha_i8275_interface;
-extern const i8275_interface apogee_i8275_interface;
-
-extern void radio86_init_keyboard(running_machine &machine);
-
-
-/*----------- defined in video/radio86.c -----------*/
-
-extern I8275_DISPLAY_PIXELS(radio86_display_pixels);
-extern I8275_DISPLAY_PIXELS(partner_display_pixels);
-extern I8275_DISPLAY_PIXELS(mikrosha_display_pixels);
-extern I8275_DISPLAY_PIXELS(apogee_display_pixels);
 
 #endif /* radio86_H_ */

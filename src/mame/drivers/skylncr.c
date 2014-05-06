@@ -171,8 +171,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
-	required_shared_ptr<UINT8> m_generic_paletteram2_8;	
+	optional_shared_ptr<UINT8> m_generic_paletteram_8;
+	optional_shared_ptr<UINT8> m_generic_paletteram2_8;	
 };
 
 
@@ -325,6 +325,8 @@ WRITE8_MEMBER(skylncr_state::reeltileshigh_4_w)
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
+// FIXME: this is a VGA-style RAMDAC, so use one
+// instead of this custom implementation
 
 WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
 {
@@ -609,7 +611,7 @@ GFXDECODE_END
 static GFXDECODE_START( sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
 

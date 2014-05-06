@@ -27,6 +27,7 @@ public:
 		m_ipu(*this, "ipu"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
+		m_paletteram(*this, "paletteram"),
 		m_ssio(*this, "ssio"),
 		m_chip_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
@@ -36,9 +37,7 @@ public:
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram")
-	{ }
+		m_palette(*this, "palette") { }
 
 	// these should be required but can't because mcr68 shares with us
 	// once the sound boards are properly device-ified, fix this
@@ -46,6 +45,7 @@ public:
 	optional_device<cpu_device> m_ipu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_paletteram;
 
 	optional_device<midway_ssio_device> m_ssio;
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
@@ -57,13 +57,12 @@ public:
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
 	DECLARE_READ8_MEMBER(mcr_ipu_watchdog_r);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_watchdog_w);
-	DECLARE_WRITE8_MEMBER(mcr_91490_paletteram_w);
+	DECLARE_WRITE8_MEMBER(mcr_paletteram9_w);
 	DECLARE_WRITE8_MEMBER(mcr_90009_videoram_w);
 	DECLARE_WRITE8_MEMBER(mcr_90010_videoram_w);
 	DECLARE_READ8_MEMBER(twotiger_videoram_r);
@@ -133,9 +132,6 @@ public:
 
 extern const z80_daisy_config mcr_daisy_chain[];
 extern const z80_daisy_config mcr_ipu_daisy_chain[];
-extern const z80ctc_interface mcr_ctc_intf;
-extern const z80ctc_interface nflfoot_ctc_intf;
-extern const z80pio_interface nflfoot_pio_intf;
 extern const z80sio_interface nflfoot_sio_intf;
 extern UINT8 mcr_cocktail_flip;
 

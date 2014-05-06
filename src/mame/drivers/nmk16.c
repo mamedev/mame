@@ -1102,7 +1102,7 @@ static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)
+	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */

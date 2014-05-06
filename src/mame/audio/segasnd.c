@@ -296,7 +296,7 @@ void usb_sound_device::device_start()
 	m_work_ram = auto_alloc_array(machine(), UINT8, 0x400);
 
 	/* create a sound stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
 
 	/* initialize state */
 	m_noise_shift = 0x15555;

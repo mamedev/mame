@@ -8,7 +8,7 @@ OSC: 12.000MHz 16.000MHz 7.15909MHz
 
 
 ToDo:
- Inputs are imperfect (missing dips)
+ Clean up inputs (some missing dips)
  Some sprite flickers on attract mode
  totmejan: Are the "dots" behind the girls in attract mode correct?
 
@@ -46,6 +46,22 @@ Notes:
       M6295 clock - 1.000MHz [16/16], Pin 7 HIGH
       VSync - 60Hz
       HSync - 15.38kHz
+
+
+Diagnostic Menu:
+	Press and keep P1 Start and Reset
+	You'll see cross hatch test screen, then press P1 Start again.
+
+
+Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's a hack):
+	Mame internal debugger:
+	PC=ECFFD ; 'SECRET MENU'
+	Keys: BACKSPC, ENTER, Z, P1 START
+
+	PC=E2EE2; 'TODAY: DATA' screen
+	Keys: Z
+
+	PC=ECC72; 'HMODE' screen
 
 
 *******************************************************************************************/
@@ -480,104 +496,61 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
+/*	These games seems have 2 DIP Switches, DIPSW-A and DIPSW-B
+	Game reads these switches at port C000h (16 bit) with two calls (subroutine 0EF522h [totmejan])
+        Needs to be rearranged and cleaned up (DSW1 current holds all dips and DSW2 appears to be additional inputs) */
+
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, "0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Cross Hatch Test" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "DSWA:1" )
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) )            PORT_DIPLOCATION("DSWA:2,3,4,5")
+	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x0012, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Credit(s) to Start" )          PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPSETTING(      0x0020, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Cross Hatch Test" )            PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "DSWA:8" )
+
+        PORT_DIPNAME( 0x0300, 0x0100, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
+	PORT_DIPSETTING(      0x0300, "1500" )
+	PORT_DIPSETTING(      0x0200, "2000" )
+	PORT_DIPSETTING(      0x0100, "1000" )
+	PORT_DIPSETTING(      0x0000, "3000" )
+
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "DSWB:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DSWB:4" )
+/*	[totmejan] Game definitely uses these, reads these 2 bits and stores at address 01A28h as 0-1st bit;
+	Sub-routine at E7C19h does some arithmetic operations depending on these.
+	I cound't understand whats going on. Call performs just before dealing tiles. */
+
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )        PORT_DIPLOCATION("DSWB:5") 
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Explicit Scenes" )             PORT_DIPLOCATION("DSWB:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DSWB:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSWB:8" )
+
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, "1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+        PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+        PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
 INPUT_PORTS_END
 
 

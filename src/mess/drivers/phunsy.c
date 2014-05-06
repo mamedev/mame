@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	/* Devices */
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(phunsy_state, kbd_put))
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", phunsy_state, phunsy, "bin", 2)

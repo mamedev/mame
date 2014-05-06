@@ -71,7 +71,7 @@ void amiga_sound_device::device_start()
 	}
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, clock() / CLOCK_DIVIDER, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 4, clock() / CLOCK_DIVIDER);
 }
 
 

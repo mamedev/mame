@@ -199,15 +199,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/8257dma.h,MACHINES += I8257
-#-------------------------------------------------
-
-ifneq ($(filter I8257,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/8257dma.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/machine/8530scc.h,MACHINES += 8530SCC
 #-------------------------------------------------
 
@@ -589,6 +580,16 @@ endif
 ifneq ($(filter I8251,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/i8251.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/i8257.h,MACHINES += I8257
+#-------------------------------------------------
+
+ifneq ($(filter I8257,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/i8257.o
+endif
+
 
 #-------------------------------------------------
 #

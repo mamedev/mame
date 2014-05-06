@@ -2,7 +2,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/com8116.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/snapquik.h"
@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kaypro_interrupt);
 	DECLARE_READ8_MEMBER(kaypro_sio_r);
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
+	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
 	const UINT8 *m_p_chargen;
 	UINT8 m_mc6845_cursor[16];
@@ -90,8 +91,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
-	required_device<z80sio_device> m_sio;
-	optional_device<z80sio_device> m_sio2x;
+	required_device<z80sio0_device> m_sio;
+	optional_device<z80sio0_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -110,15 +111,3 @@ UINT8 kay_kbd_d_r( running_machine &machine );
 void kay_kbd_d_w( running_machine &machine, UINT8 data );
 
 INPUT_PORTS_EXTERN( kay_kbd );
-
-
-/*----------- defined in machine/kaypro.c -----------*/
-
-extern const z80pio_interface kayproii_pio_g_intf;
-extern const z80pio_interface kayproii_pio_s_intf;
-extern const z80pio_interface kaypro4_pio_s_intf;
-extern const z80sio_interface kaypro_sio_intf;
-
-/*----------- defined in video/kaypro.c -----------*/
-
-MC6845_UPDATE_ROW( kaypro2x_update_row );

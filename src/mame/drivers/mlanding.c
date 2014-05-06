@@ -918,22 +918,6 @@ static INPUT_PORTS_START( mlanding )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Device configuration
- *
- *************************************/
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_NULL, // Interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(mlanding_state, z80ctc_to0), // ZC/TO0 callback
-	DEVCB_NULL, // ZC/TO1 callback
-	DEVCB_NULL  // ZC/TO2 callback
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -963,7 +947,8 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_DATA_MAP(dsp_map_data)
 	MCFG_CPU_IO_MAP(dsp_map_io)
 
-	MCFG_Z80CTC_ADD("ctc", 4000000, ctc_intf)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(mlanding_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")

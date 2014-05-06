@@ -230,6 +230,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, ARM, "ARM", tag, owner, clock, "arm", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_endian(ENDIANNESS_LITTLE)
+	, m_copro_type(ARM_COPRO_TYPE_UNKNOWN_CP15)
 {
 	memset(m_sArmRegister, 0x00, sizeof(m_sArmRegister));
 }
@@ -239,6 +240,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", endianness, 32, 26, 0)
 	, m_endian(endianness)
+	, m_copro_type(ARM_COPRO_TYPE_UNKNOWN_CP15)
 {
 	memset(m_sArmRegister, 0x00, sizeof(m_sArmRegister));
 }
@@ -311,20 +313,6 @@ void arm_cpu_device::SetModeRegister( int mode, int rIndex, UINT32 value )
 
 
 /***************************************************************************/
-
-void arm_cpu_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const arm_interface *intf = reinterpret_cast<const arm_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<arm_interface *>(this) = *intf;
-
-	// or set default if none provided
-	else
-	{
-		coprotype = ARM_COPRO_TYPE_UNKNOWN_CP15;
-	}
-}
 
 void arm_cpu_device::device_reset()
 {
@@ -430,7 +418,7 @@ void arm_cpu_device::execute_run()
 		}
 		else if ((insn & 0x0f000000u) == 0x0e000000u)   /* Coprocessor */
 		{
-			if(coprotype == 1)
+			if (m_copro_type == ARM_COPRO_TYPE_VL86C020)
 				HandleCoProVL86C020(insn);
 			else
 				HandleCoPro(insn);

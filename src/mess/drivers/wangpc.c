@@ -618,7 +618,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8237_INTERFACE( dmac_intf )
+//  I8237
 //-------------------------------------------------
 
 void wangpc_state::update_fdc_tc()
@@ -706,27 +706,6 @@ WRITE_LINE_MEMBER( wangpc_state::dack3_w )
 {
 	if (!state) m_dack = 3;
 }
-
-static AM9517A_INTERFACE( dmac_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, hrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, eop_w),
-	DEVCB_DRIVER_MEMBER(wangpc_state, memr_r),
-	DEVCB_DRIVER_MEMBER(wangpc_state, memw_w),
-	{ DEVCB_NULL,
-		DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack1_r),
-		DEVCB_DRIVER_MEMBER(wangpc_state, ior2_r),
-		DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack3_r) },
-	{ DEVCB_NULL,
-		DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack1_w),
-		DEVCB_DRIVER_MEMBER(wangpc_state, iow2_w),
-		DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack3_w) },
-	{ DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack0_w),
-		DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack1_w),
-		DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack2_w),
-		DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack3_w) }
-};
-
 
 //-------------------------------------------------
 //  pic8259_interface pic_intf
@@ -1099,7 +1078,21 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
 
 	// devices
-	MCFG_AM9517A_ADD(AM9517A_TAG, 4000000, dmac_intf)
+	MCFG_DEVICE_ADD(AM9517A_TAG, AM9517A, 4000000)
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(wangpc_state, hrq_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(wangpc_state, eop_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(wangpc_state, memr_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(wangpc_state, memw_w))
+	MCFG_AM9517A_IN_IOR_1_CB(DEVREAD8(WANGPC_BUS_TAG, wangpcbus_device, dack1_r))
+	MCFG_AM9517A_IN_IOR_2_CB(READ8(wangpc_state, ior2_r))
+	MCFG_AM9517A_IN_IOR_3_CB(DEVREAD8(WANGPC_BUS_TAG, wangpcbus_device, dack3_r))
+	MCFG_AM9517A_OUT_IOW_1_CB(DEVWRITE8(WANGPC_BUS_TAG, wangpcbus_device, dack1_w))
+	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(wangpc_state, iow2_w))
+	MCFG_AM9517A_OUT_IOW_3_CB(DEVWRITE8(WANGPC_BUS_TAG, wangpcbus_device, dack3_w))
+	MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(wangpc_state, dack0_w))
+	MCFG_AM9517A_OUT_DACK_1_CB(WRITELINE(wangpc_state, dack1_w))
+	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(wangpc_state, dack2_w))
+	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(wangpc_state, dack3_w))
 
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 

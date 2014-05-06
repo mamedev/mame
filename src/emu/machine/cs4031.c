@@ -93,61 +93,38 @@ const float cs4031_device::m_dma_clock_divider[] =
 //  machine configurations
 //-------------------------------------------------
 
-I8237_INTERFACE( dma1_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER("dma2", am9517a_device, dreq0_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_eop_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma_read_byte),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma_write_byte),
-	{
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_ior0_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_ior1_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_ior2_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_ior3_r)
-	},
-	{
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_iow0_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_iow1_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_iow2_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_iow3_w)
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_dack0_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_dack1_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_dack2_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma1_dack3_w)
-	}
-};
-
-I8237_INTERFACE( dma2_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_hreq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma_read_word),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma_write_word),
-	{
-		DEVCB_NULL,
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_ior1_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_ior2_r),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_ior3_r)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_iow1_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_iow2_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_iow3_w)
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_dack0_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_dack1_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_dack2_w),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, dma2_dack3_w)
-	}
-};
-
 static MACHINE_CONFIG_FRAGMENT( cs4031 )
-	MCFG_I8237_ADD("dma1", 0, dma1_config)
-	MCFG_I8237_ADD("dma2", 0, dma2_config)
+	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
+	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(cs4031_device, dma1_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(cs4031_device, dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(cs4031_device, dma_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(cs4031_device, dma1_ior0_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(cs4031_device, dma1_ior1_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(cs4031_device, dma1_ior2_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(cs4031_device, dma1_ior3_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(cs4031_device, dma1_iow0_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(cs4031_device, dma1_iow1_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(cs4031_device, dma1_iow2_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(cs4031_device, dma1_iow3_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(cs4031_device, dma1_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(cs4031_device, dma1_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma1_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma1_dack3_w))
+	MCFG_DEVICE_ADD("dma2", AM9517A, 0)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(cs4031_device, dma2_hreq_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(cs4031_device, dma_read_word))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(cs4031_device, dma_write_word))
+	MCFG_I8237_IN_IOR_1_CB(READ8(cs4031_device, dma2_ior1_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(cs4031_device, dma2_ior2_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(cs4031_device, dma2_ior3_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(cs4031_device, dma2_iow1_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(cs4031_device, dma2_iow2_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(cs4031_device, dma2_iow3_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(cs4031_device, dma2_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(cs4031_device, dma2_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma2_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma2_dack3_w))
 	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
 	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
 

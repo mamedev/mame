@@ -289,7 +289,7 @@ void sn76477_device::device_config_complete()
 
 void sn76477_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 
 	if (clock() > 0)
 	{

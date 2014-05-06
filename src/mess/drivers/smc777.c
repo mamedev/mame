@@ -1003,21 +1003,6 @@ void smc777_state::machine_reset()
 }
 
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	true,       /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 /* set-up SMC-70 mode colors */
 PALETTE_INIT_MEMBER(smc777_state, smc777)
 {
@@ -1055,15 +1040,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface smc777_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(smc777),
-	"floppy_5_25",
-	NULL
+	"floppy_5_25"
 };
 
 INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
@@ -1096,7 +1075,9 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_MB8876_ADD("fdc",smc777_mb8876_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)

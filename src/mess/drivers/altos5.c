@@ -245,17 +245,6 @@ WRITE_LINE_MEMBER( altos5_state::busreq_w )
 	setup_banks(state); // adjust banking for dma or cpu
 }
 
-static Z80DMA_INTERFACE( dma_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(altos5_state, busreq_w),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // BAO, not used
-	DEVCB_DRIVER_MEMBER(altos5_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(altos5_state, memory_write_byte),
-	DEVCB_DRIVER_MEMBER(altos5_state, io_read_byte),
-	DEVCB_DRIVER_MEMBER(altos5_state, io_write_byte)
-};
-
 // baud rate generator and RTC. All inputs are 2MHz.
 TIMER_DEVICE_CALLBACK_MEMBER(altos5_state::ctc_tick)
 {
@@ -276,26 +265,6 @@ WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
 	m_sio->rxca_w(state);
 	m_sio->txca_w(state);
 }
-
-static Z80CTC_INTERFACE( ctc_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rxtxcb_w),         /* ZC/TO0 callback - SIO Ch B */
-	DEVCB_DRIVER_LINE_MEMBER(altos5_state, ctc_z1_w),         /* ZC/TO1 callback - Z80DART Ch A, SIO Ch A */
-	DEVCB_DEVICE_LINE_MEMBER("z80dart", z80dart_device, rxtxcb_w),         /* ZC/TO2 callback - Z80DART Ch B */
-};
-
-// system functions
-static Z80PIO_INTERFACE( pio0_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DRIVER_MEMBER(altos5_state, port08_r),         /* read port A */
-	DEVCB_DRIVER_MEMBER(altos5_state, port08_w),         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(altos5_state, port09_r),         /* read port B */
-	DEVCB_DRIVER_MEMBER(altos5_state, port09_w),         /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
 
 /*
 d0: L = a HD is present
@@ -357,70 +326,6 @@ WRITE8_MEMBER( altos5_state::port09_w )
 	setup_banks(2);
 }
 
-// parallel port
-static Z80PIO_INTERFACE( pio1_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* read port A */
-	DEVCB_NULL,         /* write port A */
-	DEVCB_NULL,         /* portA ready active callback */
-	DEVCB_NULL,         /* read port B */
-	DEVCB_NULL,         /* write port B */
-	DEVCB_NULL          /* portB ready active callback */
-};
-
-// serial printer and console#3
-static Z80DART_INTERFACE( dart_intf )
-{
-	0, 0, 0, 0,
-
-	// console#3
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	// printer
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// consoles#1 and 2
-static Z80SIO_INTERFACE( sio_intf )
-{
-	0, 0, 0, 0,
-
-	// console#2
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY    connects to (altos5_state, fdc_intrq_w),
-	DEVCB_NULL, // SYNC
-
-	// console#1
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // unused DRQ pins
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( altos5_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -478,13 +383,45 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_CPU_IO_MAP(altos5_io)
 	MCFG_CPU_CONFIG(daisy_chain_intf)
 
-	/* Devices */
-	MCFG_Z80DMA_ADD( "z80dma",   XTAL_8MHz / 2, dma_intf)
-	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_8MHz / 2, pio0_intf )
-	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_8MHz / 2, pio1_intf )
-	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_8MHz / 2, ctc_intf )
-	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
-	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
+	/* devices */
+	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_8MHz / 2)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(altos5_state, busreq_w))
+	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	// BAO, not used
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(altos5_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(altos5_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(altos5_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(altos5_state, io_write_byte))
+
+	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL_8MHz / 2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(altos5_state, port08_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(altos5_state, port08_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(altos5_state, port09_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(altos5_state, port09_w))
+
+	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_8MHz / 2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_Z80DART_ADD("z80dart", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	// Channel A - console #3
+	// Channel B - printer
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_Z80SIO0_ADD("z80sio", XTAL_8MHz / 2, 0, 0, 0, 0 )
+	// Channel A - console #2
+	// WRDY connects to (altos5_state, fdc_intrq_w)
+	// Channel B - console #1
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80sio", z80dart_device, rxtxcb_w))	// SIO Ch B
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(altos5_state, ctc_z1_w))		// Z80DART Ch A, SIO Ch A
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80dart", z80dart_device, rxtxcb_w))		// Z80DART Ch B
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rxb_w))

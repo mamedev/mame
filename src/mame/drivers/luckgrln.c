@@ -975,21 +975,6 @@ static GFXDECODE_START( luckgrln )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
 
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
-};
-
 INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 {
 	if(m_nmi_enable)
@@ -1002,7 +987,9 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1014,7 +1001,6 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckgrln)
 	MCFG_PALETTE_ADD("palette", 0x8000)
-
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

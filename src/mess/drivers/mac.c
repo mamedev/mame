@@ -841,11 +841,6 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const struct macpds_interface macpds_intf =
-{
-	0
-};
-
 static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
 	SLOT_INTERFACE("48gc", NUBUS_48GC)      /* Apple 4*8 Graphics Card */
@@ -884,15 +879,9 @@ SLOT_INTERFACE_END
 
 static const floppy_interface mac_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5",
-	NULL
+	"floppy_3_5"
 };
 
 static MACHINE_CONFIG_START( mac512ke, mac_state )
@@ -1001,7 +990,7 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 
 	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 
-	MCFG_MACPDS_BUS_ADD("sepds", "maincpu", macpds_intf)
+	MCFG_MACPDS_BUS_ADD("sepds", "maincpu")
 	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, NULL)
 MACHINE_CONFIG_END
 

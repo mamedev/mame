@@ -1891,12 +1891,6 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-struct cdrom_interface jagcd_cdrom =
-{
-	"jag_cdrom",
-	NULL
-};
-
 static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
@@ -1909,7 +1903,8 @@ static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
 	MCFG_CPU_PROGRAM_MAP(jagcd_dsp_map)
 
-	MCFG_CDROM_ADD( "cdrom",jagcd_cdrom )
+	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_INTERFACE("jag_cdrom")
 MACHINE_CONFIG_END
 
 /*************************************

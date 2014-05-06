@@ -357,10 +357,9 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-MC6845_UPDATE_ROW( super80v_update_row )
+MC6845_UPDATE_ROW( super80_state::crtc_update_row )
 {
-	super80_state *state = device->machine().driver_data<super80_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -370,21 +369,21 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0xfff;
-		chr = state->m_p_videoram[mem];
+		chr = m_p_videoram[mem];
 
 		/* get colour or b&w */
 		fg = 5;                     /* green */
-		if ((state->m_s_options & 0x60) == 0x60) fg = 15;       /* b&w */
+		if ((m_s_options & 0x60) == 0x60) fg = 15;       /* b&w */
 
-		if (~state->m_s_options & 0x40)
+		if (~m_s_options & 0x40)
 		{
-			col = state->m_p_colorram[mem];                 /* byte of colour to display */
-			fg = state->m_palette_index + (col & 0x0f);
-			bg = state->m_palette_index + (col >> 4);
+			col = m_p_colorram[mem];                 /* byte of colour to display */
+			fg = m_palette_index + (col & 0x0f);
+			bg = m_palette_index + (col >> 4);
 		}
 
 		/* if inverse mode, replace any pcgram chrs with inverse chrs */
-		if ((!BIT(state->m_portf0, 4)) && (chr & 0x80))          // is it a high chr in inverse mode
+		if ((!BIT(m_portf0, 4)) && (chr & 0x80))          // is it a high chr in inverse mode
 		{
 			inv ^= 0xff;                        // invert the chr
 			chr &= 0x7f;                        // and drop bit 7
@@ -392,10 +391,10 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 		/* process cursor */
 		if (x == cursor_x)
-			inv ^= state->m_mc6845_cursor[ra];
+			inv ^= m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_pcgram[(chr<<4) | ra] ^ inv;
+		gfx = m_p_pcgram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7) ? fg : bg];

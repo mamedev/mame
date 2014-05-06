@@ -19,7 +19,6 @@ public:
 			m_jsa(*this, "jsa"),
 			m_nvram(*this, "nvram"),
 			m_videoram(*this, "videoram"),
-			m_paletteram(*this, "paletteram"),
 			m_vram_bulk_latch(*this, "vram_bulk_latch"),
 			m_palette_select(*this, "palette_select"),
 			m_ram_base(*this, "ram_base"),
@@ -37,7 +36,6 @@ public:
 	required_shared_ptr<UINT32> m_nvram;
 
 	required_shared_ptr<UINT32> m_videoram;
-	required_shared_ptr<UINT32> m_paletteram;
 
 	required_shared_ptr<UINT32> m_vram_bulk_latch;
 	required_shared_ptr<UINT32> m_palette_select;
@@ -83,7 +81,6 @@ public:
 	DECLARE_WRITE32_MEMBER( vram_latch_w );
 	DECLARE_WRITE32_MEMBER( vram_copy_w );
 	DECLARE_WRITE32_MEMBER( finescroll_w );
-	DECLARE_WRITE32_MEMBER( palette_w );
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
 	DECLARE_DRIVER_INIT(beathead);

@@ -97,7 +97,6 @@ public:
 	optional_device<coco_vhd_image_device> m_vhd_1;
 
 	static const cococart_interface cartridge_config;
-	static const cassette_interface coco_cassette_interface;
 
 	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);

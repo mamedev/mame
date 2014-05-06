@@ -14,17 +14,18 @@ public:
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_paletteram;
 	optional_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
 
 	UINT8 m_oldpos[4];
@@ -96,5 +97,4 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
 };

@@ -438,20 +438,6 @@ WRITE_LINE_MEMBER( gottlieb_sound_r1_device::votrax_request )
 
 
 //-------------------------------------------------
-//  RIOT interface
-//-------------------------------------------------
-
-static const riot6532_interface gottlieb_riot6532_intf =
-{
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("SB1"),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, gottlieb_sound_r1_device, r6532_portb_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gottlieb_sound_r1_device, snd_interrupt)
-};
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -477,7 +463,10 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1 )
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
 
 	// I/O configuration
-	MCFG_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
+	MCFG_DEVICE_ADD("riot", RIOT6532, SOUND1_CLOCK/4)
+	MCFG_RIOT6532_IN_PB_CB(IOPORT("SB1"))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gottlieb_sound_r1_device, r6532_portb_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(gottlieb_sound_r1_device, snd_interrupt))
 
 	// sound devices
 	MCFG_DAC_ADD("dac")
