@@ -731,7 +731,7 @@ void ay8910_device::device_start()
 		m_streams = 3;
 
 
-	if (chip_type == AY8910 || chip_type == AY8914 || chip_type == AY8930)
+	if (chip_type == AY8910 || chip_type == AY8912 || chip_type == AY8913 || chip_type == AY8914 || chip_type == AY8930)
 	{
 		m_step = 2;
 		m_par = &ay8910_param;
