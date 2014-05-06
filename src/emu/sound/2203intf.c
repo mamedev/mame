@@ -187,9 +187,7 @@ WRITE8_MEMBER( ym2203_device::write_port_w )
 const device_type YM2203 = &device_creator<ym2203_device>;
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ay8910_device(mconfig, YM2203, "YM2203", tag, owner, clock, "ym2203", __FILE__),
+	: ay8910_device(mconfig, YM2203, "YM2203", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2203", __FILE__),
 		m_irq_handler(*this)
 {
-	m_flags = AY8910_LEGACY_OUTPUT;
-	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }

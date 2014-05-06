@@ -205,19 +205,15 @@ WRITE8_MEMBER( ym2610_device::write )
 const device_type YM2610 = &device_creator<ym2610_device>;
 
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, "ym2610", __FILE__),
+	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ym2610", __FILE__),
 		m_irq_handler(*this)
 {
-	m_flags = AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT;
-	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: ay8910_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source),
 		m_irq_handler(*this)
 {
-	m_flags = AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT;
-	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
 const device_type YM2610B = &device_creator<ym2610b_device>;
@@ -225,6 +221,4 @@ const device_type YM2610B = &device_creator<ym2610b_device>;
 ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ym2610_device(mconfig, YM2610B, "YM2610B", tag, owner, clock, "ym2610b", __FILE__)
 {
-	m_flags = AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT;
-	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }

@@ -133,9 +133,7 @@ void ym2608_device::device_start()
 	void *pcmbufa;
 	int  pcmsizea;
 
-
 	m_irq_handler.resolve();
-	/* FIXME: Force to use single output */
 
 	/* Timer Handler set */
 	m_timer[0] = timer_alloc(0);
@@ -186,11 +184,9 @@ WRITE8_MEMBER( ym2608_device::write )
 const device_type YM2608 = &device_creator<ym2608_device>;
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, "ym2608", __FILE__),
+	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, PSG_TYPE_YM, 1, 2, "ym2608", __FILE__),
 		m_irq_handler(*this)
 {
-	m_flags = AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT;
-	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
 ROM_START( ym2608 )

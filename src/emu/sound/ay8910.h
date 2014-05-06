@@ -91,9 +91,18 @@ class ay8910_device : public device_t,
 									public device_sound_interface
 {
 public:
-	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	enum psg_type_t
+	{
+		PSG_TYPE_AY,
+		PSG_TYPE_YM
+	};
 
+	// construction/destruction
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner,
+				  UINT32 clock, psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source);
+
+	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }
 	static void set_resistors_load(device_t &device, int res_load0, int res_load1, int res_load2) { downcast<ay8910_device &>(device).m_res_load[0] = res_load0; downcast<ay8910_device &>(device).m_res_load[1] = res_load1; downcast<ay8910_device &>(device).m_res_load[2] = res_load2; } 
 	template<class _Object> static devcb2_base &set_port_a_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_read_cb.set_callback(object); }
@@ -134,17 +143,19 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	// internal helpers
 	inline UINT16 mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
 	void ay8910_statesave();
-	
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
 	int m_streams;
+	int m_ioports;
 	int m_ready;
 	sound_stream *m_channel;
 	INT32 m_register_latch;
@@ -219,12 +230,11 @@ class ym2149_device : public ay8910_device
 {
 public:
 	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ym2149_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 };
 
 extern const device_type YM2149;
 
-class ym3439_device : public ym2149_device
+class ym3439_device : public ay8910_device
 {
 public:
 	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -232,7 +242,7 @@ public:
 
 extern const device_type YM3439;
 
-class ymz284_device : public ym2149_device
+class ymz284_device : public ay8910_device
 {
 public:
 	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -240,7 +250,7 @@ public:
 
 extern const device_type YMZ284;
 
-class ymz294_device : public ym2149_device
+class ymz294_device : public ay8910_device
 {
 public:
 	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
