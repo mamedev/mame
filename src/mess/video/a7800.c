@@ -4,6 +4,9 @@
 
   Routines to control the Atari 7800 video hardware
 
+    2014-05-06 Mike Saarna Added interrupts to DMA cycle eating. Updates to 
+			   	LL, OL, and spin accounting for HALT behavior.
+
     2014-03-24 Mike Saarna Fixed DMA regarding startup, shutdown and
                             cycle stealing.
 
@@ -126,10 +129,17 @@ void a7800_state::maria_draw_scanline()
 	int x, d, c, i, pixel_cell, cells;
 	int maria_cycles;
 
-		if ( m_maria_offset == 0 )
-			maria_cycles = 5+21; // DMA startup + last line shutdown
-		else
-			maria_cycles = 5+16; // DMA startup + other line shutdown
+	if ( m_maria_offset == 0 )
+	{
+		if(READ_MEM(m_maria_dll+3) & 0x80)
+			maria_cycles=40; // DMA + maria interrupt overhead
+ 		else
+			maria_cycles=19; // DMA
+	 }
+	 else
+	 {
+	        maria_cycles = 16; // DMA
+       	 }
 
 	cells = 0;
 
@@ -202,9 +212,12 @@ void a7800_state::maria_draw_scanline()
 			}
 		}
 	}
-			// spin the CPU for Maria DMA, if it's not already spinning for WSYNC
-		if ( ! m_maria_wsync )
-				m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(maria_cycles/4)); // Maria clock rate is 4 times that of the CPU
+	// Spin the CPU for Maria DMA, if it's not already spinning for WSYNC.
+	// MARIA generates the 6502 clock by dividing its own clock by 4. It needs to HALT and unHALT
+	// the 6502 on ths same clock phase, so MARIA will wait until its clock divides evenly by 4.
+	// To spin until an even divisor, we just round-up any would-be truncations by adding 3.  
+	if ( ! m_maria_wsync )
+		m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime((maria_cycles+3)/4));
 
 	// draw line buffer to screen
 	m_active_buffer = !m_active_buffer; // switch buffers
