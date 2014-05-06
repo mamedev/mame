@@ -738,18 +738,6 @@ static INPUT_PORTS_START( enduror )
 INPUT_PORTS_END
 
 
-
-//**************************************************************************
-//  SOUND CONFIGURATIONS
-//**************************************************************************
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 //**************************************************************************
 //  GRAPHICS DECODING
 //**************************************************************************
@@ -842,7 +830,6 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK_8MHz/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segahang_state, sound_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)
@@ -871,7 +858,6 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 
 	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segahang_state, sound_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)

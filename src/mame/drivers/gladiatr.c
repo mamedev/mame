@@ -616,27 +616,6 @@ READ8_MEMBER(gladiatr_state::f1_r)
 	return machine().rand();
 }
 
-static const ay8910_interface ppking_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
-	DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW3"),               /* port B read */
-	DEVCB_DRIVER_MEMBER(gladiatr_state,gladiator_int_control_w), /* port A write */
-	DEVCB_NULL,
-};
-
-
 static MACHINE_CONFIG_START( ppking, gladiatr_state )
 
 	/* basic machine hardware */
@@ -676,7 +655,8 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_YM2203_AY8910_INTF(&ppking_ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(gladiatr_state, f1_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(gladiatr_state, f1_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
@@ -731,7 +711,8 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state, gladiator_ym_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)

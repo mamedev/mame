@@ -1089,17 +1089,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const ay8910_interface equites_8910intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(equites_state,equites_8910porta_w),
-	DEVCB_DRIVER_MEMBER(equites_state,equites_8910portb_w)
-};
-
-
 static const char *const alphamc07_sample_names[] =
 {
 	"*equites",
@@ -1144,7 +1133,8 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_SOUND_ROUTE(10,"mono", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(equites_8910intf)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(equites_state, equites_8910porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(equites_state, equites_8910portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_DAC_ADD("dac1")

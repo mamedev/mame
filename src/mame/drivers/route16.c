@@ -553,18 +553,6 @@ static INPUT_PORTS_START( ttmahjng )
 INPUT_PORTS_END
 
 
-
-static const ay8910_interface stratvox_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(route16_state,stratvox_sn76477_w),  /* SN76477 commands (not used in Route 16?) */
-	DEVCB_NULL
-};
-
-
 static const sn76477_interface sn76477_intf =
 {
 	RES_K(47),      /*  4  noise_res                    */
@@ -642,7 +630,7 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8910")
-	MCFG_SOUND_CONFIG(stratvox_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SOUND_CONFIG(sn76477_intf)

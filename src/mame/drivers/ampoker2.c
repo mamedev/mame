@@ -1146,19 +1146,6 @@ static GFXDECODE_START( sigma2k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, s2k_charlayout, 0, 16 )
 GFXDECODE_END
 
-
-/*******************
-* AY8910 Interfase *
-*******************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL  /* no ports used */
-};
-
-
 /*************************
 *     Machine Driver     *
 *************************/
@@ -1192,7 +1179,6 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910,MASTER_CLOCK/4)  /* 1.5 MHz, measured */
-	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

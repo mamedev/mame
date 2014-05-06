@@ -459,18 +459,6 @@ WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 	m_bmc_input=data;
 }
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(bmcbowl_state,dips1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bmcbowl_state,input_mux_w)
-};
-
-
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
@@ -495,7 +483,8 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz / 2)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(bmcbowl_state, dips1_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bmcbowl_state, input_mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

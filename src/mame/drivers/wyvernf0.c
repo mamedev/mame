@@ -594,26 +594,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static const ay8910_interface wyvernf0_ay8910_intf_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface wyvernf0_ay8910_intf_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 {
 	UINT8 *ROM = memregion("rombank")->base();
@@ -682,12 +662,10 @@ static MACHINE_CONFIG_START( wyvernf0, wyvernf0_state )
 
 	// coin, fire, lift-off
 	MCFG_SOUND_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_CONFIG(wyvernf0_ay8910_intf_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	// lift-off, explosion (saucers), boss alarm
 	MCFG_SOUND_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_CONFIG(wyvernf0_ay8910_intf_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	// music

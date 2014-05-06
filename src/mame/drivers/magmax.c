@@ -330,17 +330,6 @@ static GFXDECODE_START( magmax )
 GFXDECODE_END
 
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(magmax_state,ay8910_portA_0_w), /*write port A*/
-	DEVCB_DRIVER_MEMBER(magmax_state,ay8910_portB_0_w)  /*write port B*/
-};
-
-
 static MACHINE_CONFIG_START( magmax, magmax_state )
 
 	/* basic machine hardware */
@@ -372,7 +361,8 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_20MHz/16) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(magmax_state, ay8910_portA_0_w))  /*write port A*/
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(magmax_state, ay8910_portB_0_w))  /*write port B*/
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_20MHz/16) /* verified on pcb */

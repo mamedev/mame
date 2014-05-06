@@ -257,16 +257,6 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface psg_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(lola8a_state, lola8a_port_a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(lola8a_state, lola8a_port_b_w)
-};
-
 static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_4_9152MHz)
@@ -277,7 +267,8 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_4_9152MHz / 4)
-	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(lola8a_state, lola8a_port_a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lola8a_state, lola8a_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 
 	/* video hardware */

@@ -471,17 +471,6 @@ PALETTE_INIT_MEMBER(cgenie_state,cgenienz)
 		palette.set_pen_indirect(i, cgenie_palette[i]);
 }
 
-static const ay8910_interface cgenie_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(cgenie_state, cgenie_psg_port_a_r),
-	DEVCB_DRIVER_MEMBER(cgenie_state, cgenie_psg_port_b_r),
-	DEVCB_DRIVER_MEMBER(cgenie_state, cgenie_psg_port_a_w),
-	DEVCB_DRIVER_MEMBER(cgenie_state, cgenie_psg_port_b_w)
-};
-
-
 // This is currently broken
 static LEGACY_FLOPPY_OPTIONS_START(cgenie )
 	LEGACY_FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
@@ -529,7 +518,10 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz/8)
-	MCFG_SOUND_CONFIG(cgenie_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(cgenie_state, cgenie_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(cgenie_state, cgenie_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cgenie_state, cgenie_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(cgenie_state, cgenie_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD( "cassette" )

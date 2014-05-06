@@ -168,25 +168,6 @@ static ADDRESS_MAP_START( locomotn_sound_map, AS_PROGRAM, 8, driver_device )
 ADDRESS_MAP_END
 
 
-
-/*************************************
- *
- *  Sound chip interfaces
- *
- *************************************/
-
-static const ay8910_interface timeplt_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DEVICE_MEMBER("timeplt_audio", timeplt_audio_device, portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -205,7 +186,8 @@ MACHINE_CONFIG_FRAGMENT( timeplt_sound )
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_SOUND_CONFIG(timeplt_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)

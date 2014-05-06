@@ -577,16 +577,6 @@ WRITE8_MEMBER( tiki100_state::video_scroll_w )
 	m_scroll = data;
 }
 
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_SINGLE_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tiki100_state, video_scroll_w),
-	DEVCB_NULL
-};
-
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config tiki100_daisy_chain[] =
@@ -713,7 +703,8 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8912_TAG, AY8912, XTAL_8MHz/4)
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tiki100_state, video_scroll_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */

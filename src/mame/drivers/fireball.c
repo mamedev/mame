@@ -459,21 +459,6 @@ void fireball_state::machine_reset()
 	output_set_value("RV", 0);
 }
 
-
-/******************************
-*   AY 3-8910				  *
-******************************/
-
-static const ay8910_interface ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /*************************
 *   INT callback         *
 *************************/
@@ -515,7 +500,6 @@ static MACHINE_CONFIG_START( fireball, fireball_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)
-	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	
 	/* Video */

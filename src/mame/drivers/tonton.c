@@ -230,30 +230,6 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 	logerror("AY8910: Port B out: %02X\n", data);
 }
 
-
-/*************************************************
-*                Sound Interfaces                *
-*************************************************/
-
-static const ay8910_interface ay8910_intf =
-{
-/*
-  AY8910: Port A out: FF
-  AY8910: Port B out: FF
-  AY8910: Port A out: FF
-  AY8910: Port B out: FF
-  AY8910: Port A out: 00
-  AY8910: Port B out: 00
-*/
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                 /* Seems unused */
-	DEVCB_NULL,                 /* Seems unused */
-	DEVCB_DRIVER_MEMBER(tonton_state,ay_aout_w),    /* Write all bits twice, and then reset them at boot */
-	DEVCB_DRIVER_MEMBER(tonton_state,ay_bout_w)     /* Write all bits twice, and then reset them at boot */
-};
-
-
 /*************************************************
 *                 Machine Driver                 *
 *************************************************/
@@ -288,7 +264,16 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	/*
+	  AY8910: Port A out: FF
+	  AY8910: Port B out: FF
+	  AY8910: Port A out: FF
+	  AY8910: Port B out: FF
+	  AY8910: Port A out: 00
+	  AY8910: Port B out: 00
+	*/
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tonton_state, ay_aout_w))    /* Write all bits twice, and then reset them at boot */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tonton_state, ay_bout_w))     /* Write all bits twice, and then reset them at boot */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

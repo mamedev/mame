@@ -204,15 +204,6 @@ static GFXDECODE_START( microtan )
 	GFXDECODE_ENTRY( "gfx2", 0, chunky_layout, 0, 1 )
 GFXDECODE_END
 
-static const ay8910_interface microtan_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( microtan, microtan_state )
 	/* basic machine hardware */
@@ -241,10 +232,8 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910.1", AY8910, 1000000)
-	MCFG_SOUND_CONFIG(microtan_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("ay8910.2", AY8910, 1000000)
-	MCFG_SOUND_CONFIG(microtan_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot/quickload */

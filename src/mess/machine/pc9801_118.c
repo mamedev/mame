@@ -43,21 +43,14 @@ WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_porta_r),
-	DEVCB_NULL,//(pc9801_state,opn_portb_r),
-	DEVCB_NULL,//(pc9801_state,opn_porta_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_portb_w),
-};
-
 static MACHINE_CONFIG_FRAGMENT( pc9801_118_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn3", YM2608, MAIN_CLOCK_X1*4) // actually YMF288, unknown clock / divider
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_118_device, pc9801_sound_irq))
-	MCFG_YM2608_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(pc9801_118_device, opn_porta_r))
+	//MCFG_AY8910_PORT_B_READ_CB(READ8(pc9801_state, opn_portb_r))
+	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(pc9801_state, opn_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_118_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

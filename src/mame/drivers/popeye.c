@@ -444,27 +444,6 @@ WRITE8_MEMBER(popeye_state::popeye_portB_w)
 	m_dswbit = (data & 0x0e) >> 1;
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW0"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(popeye_state,popeye_portB_w)
-};
-
-/* Does Sky Skipper have the same filtering? */
-static const ay8910_interface ay8910_nl_config =
-{
-	AY8910_RESISTOR_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW0"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(popeye_state,popeye_portB_w)
-};
-
 static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
@@ -489,7 +468,8 @@ static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(popeye_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -500,7 +480,9 @@ static MACHINE_CONFIG_DERIVED( popeye, skyskipr )
 
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_CONFIG(ay8910_nl_config)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT) /* Does Sky Skipper have the same filtering? */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(popeye_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)

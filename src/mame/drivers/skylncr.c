@@ -902,21 +902,6 @@ static INPUT_PORTS_START( sstar97 )
 INPUT_PORTS_END
 
 
-/**********************************
-*       AY-3-8910 Interface       *
-**********************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW3"),
-	DEVCB_INPUT_PORT("DSW4"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
@@ -964,7 +949,8 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

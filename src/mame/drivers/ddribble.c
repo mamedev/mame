@@ -219,17 +219,6 @@ static GFXDECODE_START( ddribble )
 	GFXDECODE_ENTRY( "gfx2", 0x40000, spritelayout,  64, 16 )   /* colors  0-15 but using lookup table */
 GFXDECODE_END
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ddribble_state,ddribble_vlm5030_busy_r),
-	DEVCB_DRIVER_MEMBER(ddribble_state,ddribble_vlm5030_ctrl_w),
-	DEVCB_NULL
-};
-
-
 
 void ddribble_state::machine_start()
 {
@@ -296,7 +285,8 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(ddribble_state, ddribble_vlm5030_busy_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ddribble_state, ddribble_vlm5030_ctrl_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
 	MCFG_SOUND_ROUTE(1, "filter2", 0.25)
 	MCFG_SOUND_ROUTE(2, "filter3", 0.25)

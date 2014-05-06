@@ -325,16 +325,6 @@ READ8_MEMBER(wink_state::sound_r)
 	return m_sound_flag;
 }
 
-static const ay8910_interface ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(wink_state,sound_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 //AY portA is fed by an input clock at 15625 Hz
 INTERRUPT_GEN_MEMBER(wink_state::wink_sound)
 {
@@ -377,7 +367,7 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(wink_state, sound_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

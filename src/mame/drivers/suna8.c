@@ -1802,16 +1802,6 @@ WRITE_LINE_MEMBER(suna8_state::soundirq)
 
 /* 1 x 24 MHz crystal */
 
-static const ay8910_interface hardhead_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(suna8_state, suna8_play_samples_w),
-	DEVCB_DRIVER_MEMBER(suna8_state, suna8_samples_number_w)
-};
-
 static const samples_interface suna8_samples_interface =
 {
 	1,
@@ -1856,7 +1846,8 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    /* verified on pcb */
-	MCFG_SOUND_CONFIG(hardhead_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
@@ -1872,16 +1863,6 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /* 1 x 24 MHz crystal */
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(suna8_state, rranger_play_samples_w),
-	DEVCB_DRIVER_MEMBER(suna8_state, suna8_samples_number_w),
-};
 
 /* 2203 + 8910 */
 static MACHINE_CONFIG_START( rranger, suna8_state )
@@ -1916,7 +1897,8 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 6)
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, rranger_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
@@ -2042,16 +2024,6 @@ MACHINE_CONFIG_END
                                 Star Fighter
 ***************************************************************************/
 
-static const ay8910_interface starfigh_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(suna8_state, suna8_play_samples_w),
-	DEVCB_DRIVER_MEMBER(suna8_state, suna8_samples_number_w)
-};
-
 static MACHINE_CONFIG_START( starfigh, suna8_state )
 
 	/* basic machine hardware */
@@ -2089,7 +2061,8 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_SOUND_CONFIG(starfigh_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
@@ -2139,7 +2112,8 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_SOUND_CONFIG(hardhead_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 

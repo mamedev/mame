@@ -384,30 +384,6 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", space.device().safe_pc(), data, m_screen->vpos(), m_screen->hpos());*/
 }
 
-
-static const ay8910_interface ay8910_37_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(nyny_state,nyny_ay8910_37_port_a_w),
-	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8)
-};
-
-
-static const ay8910_interface ay8910_64_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("SW2"),
-	DEVCB_INPUT_PORT("SW1"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 /*************************************
  *
  *  Audio system - CPU 2
@@ -666,11 +642,13 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
-	MCFG_SOUND_CONFIG(ay8910_37_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nyny_state, nyny_ay8910_37_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
-	MCFG_SOUND_CONFIG(ay8910_64_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)

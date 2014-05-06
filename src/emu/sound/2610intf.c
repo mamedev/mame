@@ -216,23 +216,6 @@ ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ym2610_device::device_config_complete()
-{
-	static const ay8910_interface generic_ay8910 =
-	{
-		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	};
-	device_t::static_set_static_config(*this, &(generic_ay8910));
-}
-
 const device_type YM2610B = &device_creator<ym2610b_device>;
 
 ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

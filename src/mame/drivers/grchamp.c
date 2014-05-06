@@ -428,35 +428,6 @@ WRITE8_MEMBER(grchamp_state::grchamp_portB_2_w)
 }
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portA_0_w),
-	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portB_0_w)
-};
-
-static const ay8910_interface ay8910_interface_3 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portA_2_w),
-	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portB_2_w)
-};
-
-
-
 /*************************************
  *
  *  Graphics Layouts
@@ -694,14 +665,16 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, grchamp_portA_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, grchamp_portB_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, grchamp_portA_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, grchamp_portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

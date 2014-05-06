@@ -52,8 +52,11 @@ public:
 	DECLARE_WRITE8_MEMBER( pia2_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
+	
+	/* psg */
+	DECLARE_READ8_MEMBER( psg_porta_read );
+	DECLARE_WRITE8_MEMBER( psg_porta_write );
 
-	static const ay8910_interface ay8912_interface;
 	static const wd17xx_interface fdc_interface;
 
 protected:
@@ -70,10 +73,6 @@ protected:
 
 private:
 	UINT8 m_just_reset;
-
-	/* psg */
-	DECLARE_READ8_MEMBER( psg_porta_read );
-	DECLARE_WRITE8_MEMBER( psg_porta_write );
 
 	/* fdc */
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );

@@ -517,16 +517,6 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_RESISTOR_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	/* basic machine hardware */
@@ -558,12 +548,14 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
+	
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
 	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
+	
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)

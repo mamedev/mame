@@ -3662,21 +3662,6 @@ static DISCRETE_SOUND_START( pottnpkr )
 DISCRETE_SOUND_END
 
 
-/*******************************************
-*          Other Sound Interfaces          *
-*******************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /******************************************
 *          Machine Start & Reset          *
 ******************************************/
@@ -3805,7 +3790,6 @@ static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -3883,7 +3867,6 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

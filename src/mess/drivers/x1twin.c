@@ -402,17 +402,6 @@ static const z80_daisy_config x1_daisy[] =
 	{ NULL }
 };
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static LEGACY_FLOPPY_OPTIONS_START( x1 )
 	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -505,7 +494,8 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
 	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "x1_l",  0.25)
 	MCFG_SOUND_ROUTE(0, "x1_r", 0.25)
 	MCFG_SOUND_ROUTE(1, "x1_l",  0.5)

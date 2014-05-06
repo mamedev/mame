@@ -153,12 +153,6 @@ static MACHINE_CONFIG_DERIVED( orion128ms, orion128 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
-static const ay8910_interface orionz80_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
@@ -202,7 +196,6 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
-	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -278,7 +271,6 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
-	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( "cassette" )

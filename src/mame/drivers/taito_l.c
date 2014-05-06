@@ -1750,36 +1750,6 @@ WRITE8_MEMBER(taitol_state::portA_w)
 	}
 }
 
-static const ay8910_interface triple_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
-	DEVCB_NULL,
-};
-
-static const ay8910_interface champwr_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
-	DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
-};
-
-static const ay8910_interface single_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(taitol_state,portA_r),
-	DEVCB_DRIVER_MEMBER(taitol_state,portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 static MACHINE_CONFIG_START( fhawk, taitol_state )
 
@@ -1822,7 +1792,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
-	MCFG_YM2203_AY8910_INTF(&triple_ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_state, portA_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1851,7 +1821,8 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
-	MCFG_YM2203_AY8910_INTF(&champwr_ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_state, portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitol_state, champwr_msm5205_volume_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(taitol_state, champwr_msm5205_vck)) /* VCK function */
@@ -1878,6 +1849,7 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitol_state, irqhandler))
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -1967,7 +1939,8 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4) /* verified on pcb */
-	MCFG_YM2203_AY8910_INTF(&single_ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(taitol_state, portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(taitol_state, portB_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)

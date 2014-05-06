@@ -222,16 +222,6 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_colbank_w)
 	}
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bogeyman_state,bogeyman_colbank_w),
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 
 	// basic machine hardware
@@ -259,7 +249,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)  /* Verified */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bogeyman_state, bogeyman_colbank_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)  /* Verified */

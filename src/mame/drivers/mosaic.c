@@ -230,20 +230,6 @@ static GFXDECODE_START( mosaic )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 void mosaic_state::machine_start()
 {
 	save_item(NAME(m_prot_val));
@@ -281,7 +267,7 @@ static MACHINE_CONFIG_START( mosaic, mosaic_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

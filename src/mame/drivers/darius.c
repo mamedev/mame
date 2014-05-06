@@ -759,27 +759,6 @@ WRITE_LINE_MEMBER(darius_state::irqhandler) /* assumes Z80 sandwiched between 68
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                 /* portA read */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA0),  /* portA write */
-	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB0),  /* portB write */
-};
-
-static const ay8910_interface ay8910_config_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                 /* portA read */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA1),  /* portA write */
-	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB1)       /* portB write */
-};
-
-
 /***********************************************************
                        MACHINE DRIVERS
 ***********************************************************/
@@ -898,7 +877,8 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(darius_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA0))  /* portA write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB0))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)
 	MCFG_SOUND_ROUTE(0, "filter0.0r", 0.08)
 	MCFG_SOUND_ROUTE(1, "filter0.1l", 0.08)
@@ -909,7 +889,8 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SOUND_ROUTE(3, "filter0.3r", 0.60)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
-	MCFG_YM2203_AY8910_INTF(&ay8910_config_2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA1))  /* portA write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB1))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter1.0l", 0.08)
 	MCFG_SOUND_ROUTE(0, "filter1.0r", 0.08)
 	MCFG_SOUND_ROUTE(1, "filter1.1l", 0.08)

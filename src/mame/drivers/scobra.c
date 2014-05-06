@@ -92,17 +92,6 @@ static GFXDECODE_START( scobra )
 GFXDECODE_END
 
 
-
-static const ay8910_interface hustler_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DRIVER_MEMBER(scramble_state, hustler_portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 READ8_MEMBER(scobra_state::scobra_type2_ppi8255_0_r){ return m_ppi8255_0->read(space, offset >> 2); }
 READ8_MEMBER(scobra_state::scobra_type2_ppi8255_1_r){ return m_ppi8255_1->read(space, offset >> 2); }
 WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_0_w){ m_ppi8255_0->write(space, offset >> 2, data); }
@@ -713,17 +702,6 @@ static INPUT_PORTS_START( mimonsco )
 INPUT_PORTS_END
 
 
-static const ay8910_interface scobra_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( type1, scobra_state )
 
 	/* basic machine hardware */
@@ -777,7 +755,8 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318000/8)
-	MCFG_SOUND_CONFIG(scobra_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
@@ -914,7 +893,8 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_SOUND_CONFIG(hustler_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, hustler_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

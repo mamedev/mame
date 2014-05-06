@@ -867,17 +867,6 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(nightgal_state,input_1p_r),
-	DEVCB_DRIVER_MEMBER(nightgal_state,input_2p_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 void nightgal_state::machine_start()
 {
 	save_item(NAME(m_nsc_latch));
@@ -933,7 +922,8 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(nightgal_state, input_1p_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(nightgal_state, input_2p_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -952,7 +942,8 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 	MCFG_DEVICE_REMOVE("aysnd")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(nightgal_state, input_1p_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(nightgal_state, input_2p_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

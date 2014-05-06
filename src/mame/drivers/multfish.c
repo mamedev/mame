@@ -1031,17 +1031,6 @@ void igrosoft_gamble_state::machine_reset()
 	m_hopper = 0;
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 MACHINE_CONFIG_START( igrosoft_gamble, igrosoft_gamble_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
@@ -1065,7 +1054,6 @@ MACHINE_CONFIG_START( igrosoft_gamble, igrosoft_gamble_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 6000000/4)
-	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_M48T35_ADD( "m48t35" )

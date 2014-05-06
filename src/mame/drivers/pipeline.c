@@ -321,13 +321,6 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ NULL }
 };
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 {
 	int r,g,b,i,c;
@@ -395,7 +388,6 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 7372800/4)
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 MACHINE_CONFIG_END

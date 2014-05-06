@@ -867,16 +867,6 @@ MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
 	MACHINE_RESET_CALL_MEMBER(cntsteer);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	/* basic machine hardware */
@@ -916,7 +906,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)

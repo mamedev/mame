@@ -144,13 +144,6 @@ static INPUT_PORTS_START( galaxyp )
 	PORT_INCLUDE( galaxy_common )
 INPUT_PORTS_END
 
-static const ay8910_interface galaxy_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 #define XTAL 6144000
 
 /* F4 Character Displayer */
@@ -242,7 +235,6 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL/4)
-	MCFG_SOUND_CONFIG(galaxy_ay_interface)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

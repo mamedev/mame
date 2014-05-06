@@ -368,18 +368,6 @@ static INPUT_PORTS_START( junofrst )
 INPUT_PORTS_END
 
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(junofrst_state,junofrst_portA_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(junofrst_state,junofrst_portB_w)
-};
-
-
 MACHINE_START_MEMBER(junofrst_state,junofrst)
 {
 	m_filter_0_0 = machine().device("filter.0.0");
@@ -444,7 +432,8 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, junofrst_portA_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(junofrst_state, junofrst_portB_w))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)

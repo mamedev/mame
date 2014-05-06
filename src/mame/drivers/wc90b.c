@@ -329,13 +329,6 @@ WRITE_LINE_MEMBER(wc90b_state::irqhandler)
 	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 {
 	m_toggle ^= 1;
@@ -383,7 +376,6 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, YM2203_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(wc90b_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)

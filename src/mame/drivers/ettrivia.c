@@ -273,27 +273,6 @@ UINT32 ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static const ay8910_interface ay8912_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN1"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8912_interface_3 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN0"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 {
 	if( ioport("COIN")->read() & 0x01 )
@@ -330,11 +309,11 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8912_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8912_interface_3)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -429,16 +429,6 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_interrupt)
 {
 	if(m_main_nmi_enable)
@@ -542,7 +532,7 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/6)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/6)

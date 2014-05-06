@@ -847,44 +847,6 @@ static INPUT_PORTS_START( rjammer )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portA_0_w), /* write port A */
-	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portB_0_w)  /* write port B */
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portA_1_w), /* write port A */
-	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portB_1_w)  /* write port B */
-};
-
-static const ay8910_interface ay8910_interface_3 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portA_2_w), /* write port A */
-	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portB_2_w)  /* write port B */
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -932,15 +894,18 @@ static MACHINE_CONFIG_START( tubep, tubep_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_0_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_0_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_1_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_1_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_2_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_2_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -993,15 +958,18 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_0_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_0_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_1_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_1_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_2_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_2_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)

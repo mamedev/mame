@@ -1692,14 +1692,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const ay8910_interface centipdb_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(centiped_state,caterplr_rand_r)
-};
-
-
 static const pokey_interface milliped_pokey_interface_1 =
 {
 	{ DEVCB_NULL },
@@ -1796,7 +1788,7 @@ static MACHINE_CONFIG_DERIVED( centipdb, centiped )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
-	MCFG_SOUND_CONFIG(centipdb_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_rand_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -1812,7 +1804,7 @@ static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("pokey", AY8910, 12096000/8)
-	MCFG_SOUND_CONFIG(centipdb_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_rand_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 MACHINE_CONFIG_END

@@ -510,15 +510,6 @@ WRITE_LINE_MEMBER(chinagat_state::chinagat_irq_handler)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
-/* This is only on the second bootleg board */
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-
 MACHINE_START_MEMBER(chinagat_state,chinagat)
 {
 	/* configure banks */
@@ -682,7 +673,6 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chinagat_state, chinagat_irq_handler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

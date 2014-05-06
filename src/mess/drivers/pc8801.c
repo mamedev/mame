@@ -2559,28 +2559,7 @@ READ8_MEMBER(pc8801_state::opn_porta_r)
 }
 READ8_MEMBER(pc8801_state::opn_portb_r){ return ioport("OPN_PB")->read(); }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(pc8801_state,opn_porta_r),
-	DEVCB_DRIVER_MEMBER(pc8801_state,opn_portb_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface single_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(pc8801_state,opn_porta_r),
-	DEVCB_DRIVER_MEMBER(pc8801_state,opn_portb_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Cassette Configuration */
-
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 {
 	//m_cass->output( (state) ? 0.8 : -0.8);
@@ -2656,12 +2635,15 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pc8801_state, pc8801_sound_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(pc8801_state, opn_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(pc8801_state, opn_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK*2)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc8801_state, pc8801_sound_irq))
-	MCFG_YM2608_AY8910_INTF(&single_ay8910_config)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(pc8801_state, opn_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(pc8801_state, opn_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)

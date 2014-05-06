@@ -372,13 +372,6 @@ WRITE_LINE_MEMBER(sshangha_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 {
 	return (bank >> 4) * 0x1000;
@@ -440,7 +433,6 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sshangha_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 

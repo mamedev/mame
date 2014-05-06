@@ -4056,17 +4056,6 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
                                 Hana no Mai
 ***************************************************************************/
 
-static const ay8910_interface hanamai_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),           /* Port A Read: DSW */
-	DEVCB_INPUT_PORT("DSW0"),           /* Port B Read: DSW */
-	DEVCB_NULL,                         /* Port A Write */
-	DEVCB_NULL,                         /* Port B Write */
-};
-
-
 static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	/* basic machine hardware */
@@ -4102,7 +4091,8 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
-	MCFG_YM2203_AY8910_INTF(&hanamai_ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -4119,13 +4109,6 @@ MACHINE_CONFIG_END
 /***************************************************************************
                                 Hana Oriduru
 ***************************************************************************/
-
-static const ay8910_interface hnoridur_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW0")        /* Port A Read: DSW */
-};
 
 static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
@@ -4157,7 +4140,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
-	MCFG_SOUND_CONFIG(hnoridur_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
@@ -4204,7 +4187,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
-	MCFG_SOUND_CONFIG(hnoridur_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )
@@ -4220,16 +4203,6 @@ MACHINE_CONFIG_END
 /***************************************************************************
                                 Sports Match
 ***************************************************************************/
-
-static const ay8910_interface sprtmtch_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW0"),   /* Port A Read: DSW */
-	DEVCB_INPUT_PORT("DSW1"),   /* Port B Read: DSW */
-	DEVCB_NULL,                 /* Port A Write */
-	DEVCB_NULL,                 /* Port B Write */
-};
 
 static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 
@@ -4263,7 +4236,8 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
-	MCFG_YM2203_AY8910_INTF(&sprtmtch_ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -4390,13 +4364,6 @@ MACHINE_CONFIG_END
 
 // dual monitor, 2 CPU's, 2 blitters
 
-static const ay8910_interface jantouki_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 MACHINE_START_MEMBER(dynax_state,jantouki)
 {
 	UINT8 *MAIN = memregion("maincpu")->base();
@@ -4461,7 +4428,6 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, jantouki_sound_callback))
-	MCFG_YM2203_AY8910_INTF(&jantouki_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -4594,15 +4560,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::tenkai_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
 }
 
-static const ay8910_interface tenkai_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A                // B
-	DEVCB_DRIVER_MEMBER(dynax_state,tenkai_dsw_r),  DEVCB_NULL,                     // Read
-	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(dynax_state,tenkai_dswsel_w)    // Write
-};
-
 MACHINE_START_MEMBER(dynax_state,tenkai)
 {
 	MACHINE_START_CALL_MEMBER(dynax);
@@ -4646,7 +4603,8 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
-	MCFG_SOUND_CONFIG(tenkai_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(dynax_state, tenkai_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(dynax_state, tenkai_dswsel_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
@@ -4716,7 +4674,8 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz / 16)    // ?
-	MCFG_SOUND_CONFIG(tenkai_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(dynax_state, tenkai_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(dynax_state, tenkai_dswsel_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_24MHz / 8) // ?

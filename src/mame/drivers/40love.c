@@ -953,16 +953,6 @@ static GFXDECODE_START( 40love )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0, 64 )
 GFXDECODE_END
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(fortyl_state,sound_control_2_w),
-	DEVCB_DRIVER_MEMBER(fortyl_state,sound_control_3_w)
-};
-
 /*******************************************************************************/
 
 MACHINE_START_MEMBER(fortyl_state,40love)
@@ -1077,7 +1067,8 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortyl_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
@@ -1133,7 +1124,8 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortyl_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)

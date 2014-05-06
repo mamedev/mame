@@ -1222,17 +1222,6 @@ void videopkr_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	/* no ports used */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /************************
 *    Machine Drivers    *
 ************************/
@@ -1322,8 +1311,7 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

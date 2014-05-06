@@ -596,17 +596,6 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 	}
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  MACHINE_DRIVER( sun_5b )
 //-------------------------------------------------
@@ -626,7 +615,6 @@ static MACHINE_CONFIG_FRAGMENT( sun_5b )
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
 	MCFG_SOUND_ADD("ay", YM2149, SUN5_NTSC_CLOCK/2) // divide by 2 for the internal divider
-	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 

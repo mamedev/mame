@@ -344,18 +344,6 @@ WRITE8_MEMBER( sv8000_state::ay_port_b_w )
 	//logerror("ay_port_b_w: %02X\n", data);
 }
 
-
-static const ay8910_interface sv8000_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(sv8000_state, ay_port_a_r),
-	DEVCB_DRIVER_MEMBER(sv8000_state, ay_port_b_r),
-	DEVCB_DRIVER_MEMBER(sv8000_state, ay_port_a_w),
-	DEVCB_DRIVER_MEMBER(sv8000_state, ay_port_b_w)
-};
-
-
 READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 {
 	if (offset == ~0) return 0xff;
@@ -427,7 +415,10 @@ static MACHINE_CONFIG_START( sv8000, sv8000_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_10_738635MHz/3/2)  /* Exact model and clock not verified */
-	MCFG_SOUND_CONFIG(sv8000_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(sv8000_state, ay_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(sv8000_state, ay_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(sv8000_state, ay_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(sv8000_state, ay_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */

@@ -157,17 +157,6 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(madalien_state,madalien_portA_w),
-	DEVCB_DRIVER_MEMBER(madalien_state,madalien_portB_w)
-};
-
-
 static MACHINE_CONFIG_START( madalien, madalien_state )
 
 	/* main CPU */
@@ -185,7 +174,8 @@ static MACHINE_CONFIG_START( madalien, madalien_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK / 4)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(madalien_state, madalien_portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(madalien_state, madalien_portB_w))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)

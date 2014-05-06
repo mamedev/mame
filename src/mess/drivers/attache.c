@@ -861,16 +861,6 @@ static INPUT_PORTS_START(attache)
 
 INPUT_PORTS_END
 
-static const ay8910_interface ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,                 /* portA write */
-	DEVCB_NULL                  /* portB write */
-};
-
 // IRQ daisy chain = CTC -> SIO -> Expansion
 static const z80_daisy_config attache_daisy_chain[] =
 {
@@ -952,7 +942,6 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("psg", AY8912, XTAL_8MHz / 4)
-	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_MSM5832_ADD("rtc",XTAL_32_768kHz)

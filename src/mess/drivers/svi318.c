@@ -250,16 +250,6 @@ static INPUT_PORTS_START( svi328 )
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD)
 INPUT_PORTS_END
 
-static const ay8910_interface svi318_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(svi318_state, svi318_psg_port_a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(svi318_state, svi318_psg_port_b_w)
-};
-
 WRITE_LINE_MEMBER(svi318_state::vdp_interrupt)
 {
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
@@ -316,7 +306,8 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, 1789773)
-	MCFG_SOUND_CONFIG(svi318_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(svi318_state, svi318_psg_port_a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi318_state, svi318_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
@@ -447,7 +438,8 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, 1789773)
-	MCFG_SOUND_CONFIG(svi318_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(svi318_state, svi318_psg_port_a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi318_state, svi318_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */

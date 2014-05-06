@@ -612,17 +612,6 @@ WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 	m_last_port0b = data;
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,//ay8910_port0a_w,
-	DEVCB_NULL
-};
-
-
 INTERRUPT_GEN_MEMBER(laserbat_state::laserbat_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
@@ -779,7 +768,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 3580000/2) // ?

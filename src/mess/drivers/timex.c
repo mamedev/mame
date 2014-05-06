@@ -179,13 +179,6 @@ const timex_cart_t *timex_cart_data(void)
 	return &timex_cart;
 }
 
-static const ay8910_interface spectrum_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 /****************************************************************************************************/
 /* TS2048 specific functions */
 
@@ -740,7 +733,6 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 
 	/* sound */
 	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14_112MHz/8)        /* From Schematic; 1.764 MHz */
-	MCFG_SOUND_CONFIG(spectrum_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */

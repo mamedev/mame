@@ -159,13 +159,6 @@ resulting mess can be seen in the F4 viewer display.
 #include "formats/tzx_cas.h"
 #include "machine/ram.h"
 
-static const ay8910_interface spectrum_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
@@ -310,7 +303,6 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
-	MCFG_SOUND_CONFIG(spectrum_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */

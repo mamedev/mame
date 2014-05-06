@@ -84,18 +84,6 @@ static INPUT_PORTS_START(vectrex)
 
 INPUT_PORTS_END
 
-
-
-static const ay8910_interface vectrex_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("BUTTONS"),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vectrex_state, vectrex_psg_port_w),
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
@@ -115,7 +103,8 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1500000)
-	MCFG_SOUND_CONFIG(vectrex_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vectrex_state, vectrex_psg_port_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* via */

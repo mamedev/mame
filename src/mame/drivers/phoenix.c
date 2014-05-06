@@ -411,18 +411,6 @@ static GFXDECODE_START( pleiads )
 GFXDECODE_END
 
 
-static const ay8910_interface survival_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(phoenix_state, survival_protection_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
@@ -528,7 +516,7 @@ static MACHINE_CONFIG_START( survival, phoenix_state )
 
 	/* FIXME: check clock */
 	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_SOUND_CONFIG(survival_ay8910_interface)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(phoenix_state, survival_protection_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

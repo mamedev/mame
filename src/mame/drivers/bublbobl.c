@@ -701,15 +701,6 @@ WRITE_LINE_MEMBER(bublbobl_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -781,7 +772,6 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(bublbobl_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 	MCFG_SOUND_ROUTE(2, "mono", 0.08)
@@ -864,7 +854,6 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(bublbobl_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)

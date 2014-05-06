@@ -87,7 +87,6 @@ Dip locations verified from manual for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "includes/kaneko16.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
@@ -219,6 +218,15 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
 	}
 }
 
+READ8_MEMBER(kaneko16_state::eeprom_r)
+{
+	return m_eeprom->do_read();
+}
+
+WRITE8_MEMBER(kaneko16_state::eeprom_w)
+{
+	m_eeprom->cs_write(data);
+}
 
 /***************************************************************************
 
@@ -1654,27 +1662,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static const ay8910_interface ay8910_intf_dsw =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
-static const ay8910_interface ay8910_intf_eeprom =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DEVICE_LINE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read),    /* inputs  A:  0,EEPROM bit read */
-	DEVCB_NULL,                     /* inputs  B */
-	DEVCB_NULL,                     /* outputs A */
-	DEVCB_DEVICE_LINE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write) /* outputs B:  0,EEPROM reset */
-};
-
-
 /***************************************************************************
                                 The Berlin Wall
 ***************************************************************************/
@@ -1728,7 +1715,8 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ay1", YM2149, 1000000)
-	MCFG_SOUND_CONFIG(ay8910_intf_dsw)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_SOUND_ADD("ay2", YM2149, 1000000)
@@ -1794,7 +1782,8 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ay2", YM2149, XTAL_12MHz/6) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ay8910_intf_eeprom)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
@@ -2051,7 +2040,8 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ay2", YM2149, XTAL_12MHz/6) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ay8910_intf_eeprom)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */

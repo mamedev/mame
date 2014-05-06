@@ -751,21 +751,6 @@ static INPUT_PORTS_START( kas89 )
 INPUT_PORTS_END
 
 
-/**********************************
-*       AY-3-8910 Interface       *
-**********************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,     // Nothing connected here.
-	DEVCB_NULL,     // Nothing connected here.
-	DEVCB_NULL,     // Nothing connected here.
-	DEVCB_NULL      // Nothing connected here.
-};
-
-
 /**************************************
 *           Machine Driver            *
 **************************************/
@@ -802,7 +787,6 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
-	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

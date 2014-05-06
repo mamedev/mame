@@ -745,19 +745,6 @@ static INPUT_PORTS_START( aleste )
 INPUT_PORTS_END
 
 
-/* --------------------
-   - ay8910_interface -
-   --------------------*/
-static const ay8910_interface ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read), /* portA read */
-	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read), /* portB read */
-	DEVCB_NULL,                 /* portA write */
-	DEVCB_NULL                  /* portB write */
-};
-
 #if 0
 
 static const gfx_layout asic_sprite_layout =
@@ -880,7 +867,8 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
-	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
@@ -975,7 +963,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
-	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
@@ -1051,7 +1040,8 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
-	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
@@ -1067,7 +1057,8 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
 	MCFG_SOUND_REPLACE("ay", AY8912, XTAL_16MHz / 16)
-	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_PALETTE_MODIFY("palette")

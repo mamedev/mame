@@ -325,28 +325,6 @@ WRITE8_MEMBER(buggychl_state::port_b_1_w)
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
 
-
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(buggychl_state,port_a_0_w),
-	DEVCB_DRIVER_MEMBER(buggychl_state,port_b_0_w)
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(buggychl_state,port_a_1_w),
-	DEVCB_DRIVER_MEMBER(buggychl_state,port_b_1_w)
-};
-
-
 void buggychl_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -413,11 +391,13 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 8000000/4)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)

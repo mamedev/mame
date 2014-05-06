@@ -87,17 +87,6 @@ WRITE8_MEMBER(forte2_state::forte2_ay8910_set_input_mask)
 	m_input_mask = data;
 }
 
-static const ay8910_interface forte2_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(forte2_state,forte2_ay8910_read_input),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(forte2_state,forte2_ay8910_set_input_mask)
-};
-
-
 WRITE_LINE_MEMBER(forte2_state::vdp_interrupt)
 {
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
@@ -132,7 +121,8 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, (float)XTAL_3_579545MHz/2)
-	MCFG_SOUND_CONFIG(forte2_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(forte2_state, forte2_ay8910_read_input))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(forte2_state, forte2_ay8910_set_input_mask))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

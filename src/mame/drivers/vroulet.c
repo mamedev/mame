@@ -250,18 +250,6 @@ static GFXDECODE_START( vroulet )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0, 32 )
 GFXDECODE_END
 
-/* Sound Interface */
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSWA"),
-	DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* PPI8255 Interface */
 
 WRITE8_MEMBER(vroulet_state::ppi8255_a_w){}// watchdog ?
@@ -305,7 +293,8 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))	
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END

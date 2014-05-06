@@ -301,16 +301,6 @@ static GFXDECODE_START( tankbust )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout2,        0x60, 16  ) /* txt tilemap characters*/
 GFXDECODE_END
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(tankbust_state,tankbust_soundlatch_r),
-	DEVCB_DRIVER_MEMBER(tankbust_state,tankbust_soundtimer_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 void tankbust_state::machine_reset()
 {
 	m_variable_data = 0x11;
@@ -356,7 +346,8 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/16)  /* Verified on PCB */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(tankbust_state, tankbust_soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(tankbust_state, tankbust_soundtimer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/16)  /* Verified on PCB */

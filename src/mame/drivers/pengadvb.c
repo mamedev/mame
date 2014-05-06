@@ -148,16 +148,6 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_psg_port_b_w)
 	// leftover from msx ver?
 }
 
-static const ay8910_interface pengadvb_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN0"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_psg_port_b_w)
-};
-
 /**************************************************************************/
 
 // I8255
@@ -263,7 +253,8 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10_738635MHz/6)
-	MCFG_SOUND_CONFIG(pengadvb_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pengadvb_state, pengadvb_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -795,17 +795,6 @@ READ8_MEMBER(vega_state::randomizer )
 	return (ioport("IN1")->read()&7)|(machine().rand()&(~7));
 }
 
-
-static const ay8910_interface ay8910_inf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(vega_state, ay8910_pa_r),
-	DEVCB_DRIVER_MEMBER(vega_state, ay8910_pb_r),
-	DEVCB_DRIVER_MEMBER(vega_state, ay8910_pa_w),
-	DEVCB_DRIVER_MEMBER(vega_state, ay8910_pb_w)
-};
-
 void vega_state::machine_start()
 {
 }
@@ -852,7 +841,10 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay8910", AY8910, 1500000 )
-	MCFG_SOUND_CONFIG(ay8910_inf)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(vega_state, ay8910_pa_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(vega_state, ay8910_pb_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vega_state, ay8910_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(vega_state, ay8910_pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END

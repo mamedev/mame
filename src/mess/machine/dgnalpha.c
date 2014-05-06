@@ -331,25 +331,6 @@ WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
 	}
 }
 
-
-
-//-------------------------------------------------
-//  ay8912_interface - AY-8912 for Dragon Alpha, the
-//  AY-8912 simply an AY-8910 with only one io port.
-//-------------------------------------------------
-
-const ay8910_interface dragon_alpha_state::ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(dragon_alpha_state, psg_porta_read),    /* portA read */
-	DEVCB_NULL,                                                 /* portB read */
-	DEVCB_DRIVER_MEMBER(dragon_alpha_state, psg_porta_write),   /* portA write */
-	DEVCB_NULL                                                  /* portB write */
-};
-
-
-
 /***************************************************************************
   FDC
 ***************************************************************************/

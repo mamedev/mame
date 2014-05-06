@@ -435,13 +435,6 @@ static GFXDECODE_START( rk )
 	GFXDECODE_ENTRY( "gfx4", 0x00000, rk_bglayout,       0, 32 )    /* bg tiles */
 GFXDECODE_END
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r)
-};
-
 INTERRUPT_GEN_MEMBER(kingofb_state::kingofb_interrupt)
 {
 	if (m_nmi_enable)
@@ -502,7 +495,7 @@ static MACHINE_CONFIG_START( kingofb, kingofb_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")
@@ -553,7 +546,7 @@ static MACHINE_CONFIG_START( ringking, kingofb_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")

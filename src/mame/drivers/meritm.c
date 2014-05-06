@@ -854,16 +854,6 @@ WRITE8_MEMBER(meritm_state::meritm_ay8930_port_b_w)
 	// lamps
 };
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW"), /* Port A read */
-	DEVCB_NULL, /* Port B read */
-	DEVCB_NULL, /* Port A write */
-	DEVCB_DRIVER_MEMBER(meritm_state,meritm_ay8930_port_b_w)  /* Port B write */
-};
-
 /*************************************
  *
  *  PIOs
@@ -1115,7 +1105,8 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -334,16 +334,6 @@ WRITE8_MEMBER( fc100_state::ay_port_a_w )
 }
 #endif
 
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("JOY0"),
-	DEVCB_INPUT_PORT("JOY1"),
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(fc100_state, ay_port_a_w),
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(fc100_state, ay_port_b_w)
-};
-
 //******************** VIDEO **********************************
 
 READ8_MEMBER( fc100_state::mc6847_videoram_r )
@@ -547,7 +537,10 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("psg", AY8910, XTAL_7_15909MHz/3/2)  /* AY-3-8910 - clock not verified */
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
+	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fc100_state, ay_port_a_w))
+	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fc100_state, ay_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */

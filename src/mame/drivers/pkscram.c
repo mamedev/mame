@@ -281,13 +281,6 @@ WRITE_LINE_MEMBER(pkscram_state::irqhandler)
 		m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 void pkscram_state::machine_start()
 {
 	save_item(NAME(m_out));
@@ -332,7 +325,6 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pkscram_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

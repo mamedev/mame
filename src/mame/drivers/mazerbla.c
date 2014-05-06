@@ -1346,27 +1346,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-/* only Great Guns */
-static const ay8910_interface ay8912_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mazerbla_state,soundcommand_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8912_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mazerbla_state,gg_led_ctrl_w)
-};
-
 IRQ_CALLBACK_MEMBER(mazerbla_state::irq_callback)
 {
 	/* all data lines are tied to +5V via 10K resistors */
@@ -1547,11 +1526,11 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK / 8)
-	MCFG_SOUND_CONFIG(ay8912_interface_1)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(mazerbla_state, soundcommand_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK / 8)
-	MCFG_SOUND_CONFIG(ay8912_interface_2)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mazerbla_state, gg_led_ctrl_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

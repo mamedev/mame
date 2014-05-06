@@ -453,14 +453,14 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				((m_last_enable & 0x40) != (m_regs[AY_ENABLE] & 0x40)))
 			{
 				/* write out 0xff if port set to input */
-				m_portAwrite(0, (m_regs[AY_ENABLE] & 0x40) ? m_regs[AY_PORTA] : 0xff);
+				m_port_a_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x40) ? m_regs[AY_PORTA] : 0xff);
 			}
 
 			if ((m_last_enable == -1) ||
 				((m_last_enable & 0x80) != (m_regs[AY_ENABLE] & 0x80)))
 			{
 				/* write out 0xff if port set to input */
-				m_portBwrite(0, (m_regs[AY_ENABLE] & 0x80) ? m_regs[AY_PORTB] : 0xff);
+				m_port_b_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x80) ? m_regs[AY_PORTB] : 0xff);
 			}
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
@@ -488,8 +488,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 		case AY_PORTA:
 			if (m_regs[AY_ENABLE] & 0x40)
 			{
-				if (!m_portAwrite.isnull())
-					m_portAwrite(0, m_regs[AY_PORTA]);
+				if (!m_port_a_write_cb.isnull())
+					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
 					logerror("warning - write %02x to 8910 '%s' Port A\n",m_regs[AY_PORTA],tag());
 			}
@@ -501,8 +501,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 		case AY_PORTB:
 			if (m_regs[AY_ENABLE] & 0x80)
 			{
-				if (!m_portBwrite.isnull())
-					m_portBwrite(0, m_regs[AY_PORTB]);
+				if (!m_port_b_write_cb.isnull())
+					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
 					logerror("warning - write %02x to 8910 '%s' Port B\n",m_regs[AY_PORTB],tag());
 			}
@@ -656,13 +656,13 @@ void ay8910_device::build_mixer_table()
 	int normalize = 0;
 	int chan;
 
-	if ((m_intf->flags & AY8910_LEGACY_OUTPUT) != 0)
+	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
 		logerror("AY-3-8910/YM2149 using legacy output levels!\n");
 		normalize = 1;
 	}
 
-	if ((m_intf->flags & AY8910_RESISTOR_OUTPUT) != 0)
+	if ((m_flags & AY8910_RESISTOR_OUTPUT) != 0)
 	{
 		for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
 		{
@@ -674,15 +674,15 @@ void ay8910_device::build_mixer_table()
 	{
 		for (chan=0; chan < AY8910_NUM_CHANNELS; chan++)
 		{
-			build_single_table(m_intf->res_load[chan], m_par, normalize, m_vol_table[chan], m_zero_is_off);
-			build_single_table(m_intf->res_load[chan], m_par_env, normalize, m_env_table[chan], 0);
+			build_single_table(m_res_load[chan], m_par, normalize, m_vol_table[chan], m_zero_is_off);
+			build_single_table(m_res_load[chan], m_par_env, normalize, m_env_table[chan], 0);
 		}
 	}
 	/*
 	 * The previous implementation added all three channels up instead of averaging them.
 	 * The factor of 3 will force the same levels if normalizing is used.
 	 */
-	build_3D_table(m_intf->res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table);
+	build_3D_table(m_res_load[0], m_par, m_par_env, normalize, 3, m_zero_is_off, m_vol3d_table);
 }
 
 void ay8910_device::ay8910_statesave()
@@ -717,24 +717,12 @@ void ay8910_device::device_start()
 	device_type chip_type = type();
 	int master_clock = clock();
 
-	m_intf = (const ay8910_interface *) static_config();
+	m_port_a_read_cb.resolve_safe(0);
+	m_port_b_read_cb.resolve_safe(0);
+	m_port_a_write_cb.resolve_safe();
+	m_port_b_write_cb.resolve_safe();
 
-	static const ay8910_interface default_ay8910_config =
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	};
-
-	if (m_intf==NULL)
-		m_intf = &default_ay8910_config;
-
-	m_portAread.resolve(m_intf->portAread, *this);
-	m_portBread.resolve(m_intf->portBread, *this);
-	m_portAwrite.resolve(m_intf->portAwrite, *this);
-	m_portBwrite.resolve(m_intf->portBwrite, *this);
-
-	if ((m_intf->flags & AY8910_SINGLE_OUTPUT) != 0)
+	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
 		logerror("AY-3-8910/YM2149 using single output!\n");
 		m_streams = 1;
@@ -760,7 +748,7 @@ void ay8910_device::device_start()
 		m_env_step_mask = 0x1F;
 
 		/* YM2149 master clock divider? */
-		if (m_intf->flags & YM2149_PIN26_LOW)
+		if (m_flags & YM2149_PIN26_LOW)
 			master_clock /= 2;
 	}
 
@@ -867,16 +855,16 @@ int ay8910_device::ay8910_read_ym()
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
 		 */
-		if (!m_portAread.isnull())
-			m_regs[AY_PORTA] = m_portAread(0);
+		if (!m_port_a_read_cb.isnull())
+			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
 			logerror("%s: warning - read 8910 '%s' Port A\n",machine().describe_context(),tag());
 		break;
 	case AY_PORTB:
 		if ((m_regs[AY_ENABLE] & 0x80) != 0)
 			logerror("warning: read from 8910 '%s' Port B set as output\n",tag());
-		if (!m_portBread.isnull())
-			m_regs[AY_PORTB] = m_portBread(0);
+		if (!m_port_b_read_cb.isnull())
+			m_regs[AY_PORTB] = m_port_b_read_cb(0);
 		else
 			logerror("%s: warning - read 8910 '%s' Port B\n",machine().describe_context(),tag());
 		break;
@@ -985,7 +973,6 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_streams(0),
 		m_ready(0),
 		m_channel(NULL),
-		m_intf(NULL),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1002,7 +989,12 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_step(0),
 		m_zero_is_off(0),
 		m_par(NULL),
-		m_par_env(NULL)
+		m_par_env(NULL),
+		m_flags(AY8910_LEGACY_OUTPUT),
+		m_port_a_read_cb(*this),
+		m_port_b_read_cb(*this),
+		m_port_a_write_cb(*this),
+		m_port_b_write_cb(*this)
 {
 	memset(&m_regs,0,sizeof(m_regs));
 	memset(&m_count,0,sizeof(m_count));
@@ -1011,6 +1003,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 	memset(&m_vol_table,0,sizeof(m_vol_table));
 	memset(&m_env_table,0,sizeof(m_env_table));
 	memset(&m_vol3d_table,0,sizeof(m_vol3d_table));
+	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -1019,7 +1012,6 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_streams(0),
 		m_ready(0),
 		m_channel(NULL),
-		m_intf(NULL),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1036,7 +1028,12 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_step(0),
 		m_zero_is_off(0),
 		m_par(NULL),
-		m_par_env(NULL)
+		m_par_env(NULL),
+		m_flags(AY8910_LEGACY_OUTPUT),
+		m_port_a_read_cb(*this),
+		m_port_b_read_cb(*this),
+		m_port_a_write_cb(*this),
+		m_port_b_write_cb(*this)
 {
 	memset(&m_regs,0,sizeof(m_regs));
 	memset(&m_count,0,sizeof(m_count));
@@ -1045,18 +1042,8 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 	memset(&m_vol_table,0,sizeof(m_vol_table));
 	memset(&m_env_table,0,sizeof(m_env_table));
 	memset(&m_vol3d_table,0,sizeof(m_vol3d_table));
+	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ay8910_device::device_config_complete()
-{
-}
-
 
 const device_type AY8912 = &device_creator<ay8912_device>;
 

@@ -1437,18 +1437,6 @@ UINT32 coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind1
 }
 
 
-
-static const ay8910_interface ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
@@ -1486,7 +1474,7 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)
-	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

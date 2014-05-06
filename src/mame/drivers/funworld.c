@@ -2843,30 +2843,6 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 	return 0x00;
 }
 
-/************************
-*    Sound Interface    *
-************************/
-
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                         /* portA in  */
-	DEVCB_NULL,                         /* portB in  */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),  /* portA out */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)   /* portB out */
-};
-
-static const ay8910_interface funquiz_ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_a_r), /* portA in  */
-	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_b_r), /* portB in  */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),  /* portA out */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)   /* portB out */
-};
-
 /********************************
 *     Machine Start & Reset     *
 ********************************/
@@ -2930,7 +2906,8 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(funworld_state, funworld_lamp_a_w))  /* portA out */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(funworld_state, funworld_lamp_b_w))  /* portB out */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
@@ -2950,7 +2927,10 @@ static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_SOUND_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
-	MCFG_SOUND_CONFIG(funquiz_ay8910_intf)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(funworld_state, funquiz_ay8910_a_r)) /* portA in  */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(funworld_state, funquiz_ay8910_b_r)) /* portB in  */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(funworld_state, funworld_lamp_a_w))  /* portA out */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(funworld_state, funworld_lamp_b_w))  /* portB out */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 
@@ -2968,7 +2948,8 @@ static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 	MCFG_MC6845_CHAR_WIDTH(4)
 
 	MCFG_SOUND_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(funworld_state, funworld_lamp_a_w))  /* portA out */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(funworld_state, funworld_lamp_b_w))  /* portB out */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 

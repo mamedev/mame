@@ -580,16 +580,6 @@ WRITE_LINE_MEMBER(pipedrm_state::irqhandler)
 	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -679,6 +669,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -720,7 +711,7 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
-	MCFG_YM2608_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

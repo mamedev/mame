@@ -214,13 +214,6 @@ WRITE_LINE_MEMBER(goal92_state::irqhandler)
 	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
 	m_msm->data_w(m_msm5205next);
@@ -327,7 +320,6 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, 2500000/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(goal92_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 2500000/2)

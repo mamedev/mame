@@ -171,17 +171,6 @@ static GFXDECODE_START( hanaawas )
 GFXDECODE_END
 
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(hanaawas_state, hanaawas_portB_w)
-};
-
-
 void hanaawas_state::machine_start()
 {
 	save_item(NAME(m_mux));
@@ -219,7 +208,8 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(hanaawas_state, hanaawas_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

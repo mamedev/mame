@@ -555,13 +555,6 @@ WRITE_LINE_MEMBER(xain_state::irqhandler)
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 void xain_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
@@ -604,7 +597,6 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, MCU_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(xain_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

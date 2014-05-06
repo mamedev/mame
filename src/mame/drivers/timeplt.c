@@ -105,16 +105,6 @@ WRITE8_MEMBER(timeplt_state::chkun_sound_w)
 		m_tc8830f->reset();
 }
 
-static const ay8910_interface chkun_ay2_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(timeplt_state,chkun_sound_w),
-	DEVCB_NULL
-};
-
 CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
 {
 	// temp workaround, needs hopper
@@ -510,8 +500,8 @@ static MACHINE_CONFIG_DERIVED( chkun, bikkuric )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay2")
-	MCFG_SOUND_CONFIG(chkun_ay2_interface)
-
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(timeplt_state, chkun_sound_w))
+	
 	MCFG_TC8830F_ADD("tc8830f", XTAL_512kHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END

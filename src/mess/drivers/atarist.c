@@ -1764,17 +1764,6 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	m_centronics->write_strobe(BIT(data, 5));
 }
 
-static const ay8910_interface psg_intf =
-{
-	AY8910_SINGLE_OUTPUT,
-	{ RES_K(1) },
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(st_state, psg_pa_w),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-};
-
-
 //-------------------------------------------------
 //  ay8910_interface stbook_psg_intf
 //-------------------------------------------------
@@ -1821,19 +1810,6 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	// density select
 	m_fdc->dden_w(BIT(data, 7));
 }
-
-#if 0
-static const ay8910_interface stbook_psg_intf =
-{
-	AY8910_SINGLE_OUTPUT,
-	{ RES_K(1) },
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(stbook_state, psg_pa_w),
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
-};
-#endif
-
 
 WRITE_LINE_MEMBER( st_state::ikbd_tx_w )
 {
@@ -2107,7 +2083,10 @@ static MACHINE_CONFIG_START( st, st_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
-	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(st_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
@@ -2194,7 +2173,10 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
-	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(st_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
@@ -2283,7 +2265,10 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
-	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(st_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 /*
@@ -2394,7 +2379,10 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(YM3439_TAG, YM3439, U517/8)
-	MCFG_SOUND_CONFIG(stbook_psg_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(stbook_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)

@@ -1584,24 +1584,6 @@ static INPUT_PORTS_START( gpgolf )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
-};
-
 /*************************************
  *
  *  TMS34061 interfacing
@@ -1674,7 +1656,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(itech8_state, ym2203_portb_out))
 	MCFG_SOUND_ROUTE(0, "mono", 0.07)
 	MCFG_SOUND_ROUTE(1, "mono", 0.07)
 	MCFG_SOUND_ROUTE(2, "mono", 0.07)
@@ -1694,7 +1676,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
-	MCFG_YM2608_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(itech8_state, ym2203_portb_out))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

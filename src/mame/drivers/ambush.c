@@ -195,33 +195,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interfaces
- *
- *************************************/
-
-static const ay8910_interface ay8912_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("SYSTEM"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8912_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("INPUTS"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -251,11 +224,11 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
-	MCFG_SOUND_CONFIG(ay8912_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("ay2", AY8912, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
-	MCFG_SOUND_CONFIG(ay8912_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

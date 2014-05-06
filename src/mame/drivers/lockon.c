@@ -429,17 +429,6 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 	set_led_status(machine(), 1, !(data & 0x10));
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("YM2203"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(lockon_state,ym2203_out_b),
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -520,7 +509,8 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lockon_state, ym2203_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lockon_state, ym2203_out_b))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "f2203.1l", 1.0)

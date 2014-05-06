@@ -287,16 +287,6 @@ READ8_MEMBER( spc1000_state::porta_r )
 	return data;
 }
 
-static const ay8910_interface spc1000_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(spc1000_state, porta_r),  //portA_r
-	DEVCB_NULL,  // portB_r
-	DEVCB_NULL,  // portA_w
-	DEVCB_NULL   // portB_w
-};
-
 // irq is inverted in emulation, so we need this trampoline
 WRITE_LINE_MEMBER( spc1000_state::irq_w )
 {
@@ -333,7 +323,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
-	MCFG_SOUND_CONFIG(spc1000_ay_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1000_state, porta_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -49,19 +49,6 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("rmnkbd", RMNIMBUS_KEYBOARD)
 SLOT_INTERFACE_END
 
-/* Null port handlers for now, I believe that the IO ports are used for */
-/* the nimbus rompacks */
-
-static const ay8910_interface nimbus_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                     /* portA read */
-	DEVCB_NULL,                     /* portB read */
-	DEVCB_DRIVER_MEMBER(rmnimbus_state, nimbus_sound_ay8910_porta_w),   /* portA write */
-	DEVCB_DRIVER_MEMBER(rmnimbus_state, nimbus_sound_ay8910_portb_w)    /* portB write */
-};
-
 static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
 	AM_RANGE( 0x00000, 0x1FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
 	AM_RANGE( 0x20000, 0x3FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
@@ -234,7 +221,8 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 2000000)
-	MCFG_SOUND_CONFIG(nimbus_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(rmnimbus_state, nimbus_sound_ay8910_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(rmnimbus_state, nimbus_sound_ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,MONO_TAG, 0.75)
 
 	MCFG_SOUND_ADD(MSM5205_TAG, MSM5205, 384000)

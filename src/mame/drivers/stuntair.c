@@ -471,28 +471,6 @@ WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
 	logerror("ay8910_portb_w: %02x\n", data);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(stuntair_state, ay8910_portb_w)
-};
-
-static const ay8910_interface ay8910_2_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 /***************************************************************************
 
   Machine Config
@@ -552,11 +530,11 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(stuntair_state, ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)
-	MCFG_SOUND_CONFIG(ay8910_2_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

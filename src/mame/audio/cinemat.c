@@ -1349,33 +1349,10 @@ WRITE8_MEMBER(cinemat_state::sound_portb_w)
 	m_last_portb_write = data;
 }
 
-
 WRITE8_MEMBER(cinemat_state::sound_output_w)
 {
 	logerror("sound_output = %02X\n", data);
 }
-
-
-static const ay8910_interface demon_ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(cinemat_state,sound_porta_r),
-	DEVCB_DRIVER_MEMBER(cinemat_state,sound_portb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cinemat_state,sound_portb_w)
-};
-
-static const ay8910_interface demon_ay8910_interface_3 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cinemat_state,sound_output_w)
-};
-
 
 SOUND_RESET_MEMBER( cinemat_state, demon )
 {
@@ -1435,14 +1412,18 @@ MACHINE_CONFIG_FRAGMENT( demon_sound )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 3579545)
-	MCFG_SOUND_CONFIG(demon_ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(cinemat_state, sound_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(cinemat_state, sound_portb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(cinemat_state, sound_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, 3579545)
-	MCFG_SOUND_CONFIG(demon_ay8910_interface_3)
+	
+	
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(cinemat_state, sound_output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

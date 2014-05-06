@@ -1121,14 +1121,6 @@ static INPUT_PORTS_START( couplep )
 INPUT_PORTS_END
 
 
-static const ay8910_interface merit_ay8912_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(merit_state,led2_w), DEVCB_NULL
-};
-
 void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
@@ -1176,7 +1168,7 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
-	MCFG_SOUND_CONFIG(merit_ay8912_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(merit_state, led2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
