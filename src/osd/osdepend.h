@@ -104,6 +104,7 @@ public:
 	const char *sound() const { return value(OSDOPTION_SOUND); }
 	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
 
+	void add_osd_options();
 private:
 	static const options_entry s_option_entries[];
 };

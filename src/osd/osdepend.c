@@ -93,9 +93,13 @@ const options_entry osd_options::s_option_entries[] =
 
 osd_options::osd_options()
 {
-	add_entries(s_option_entries);
 }
 
+
+void osd_options::add_osd_options()
+{
+	add_entries(s_option_entries);
+}
 
 //-------------------------------------------------
 //  osd_interface - constructor

@@ -185,6 +185,7 @@ const options_entry emu_options::s_option_entries[] =
 emu_options::emu_options()
 {
 	add_entries(s_option_entries);
+	add_osd_options();
 }
 
 
