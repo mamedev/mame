@@ -1062,7 +1062,6 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(psikyo_state, sound_irq))
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1109,7 +1108,6 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(psikyo_state, sound_irq))
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

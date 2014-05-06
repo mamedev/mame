@@ -189,6 +189,8 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, "ym2608", __FILE__),
 		m_irq_handler(*this)
 {
+	m_flags = AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT;
+	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
 ROM_START( ym2608 )

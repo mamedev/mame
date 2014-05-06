@@ -246,7 +246,6 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(tail2nos_state, irqhandler))
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tail2nos_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

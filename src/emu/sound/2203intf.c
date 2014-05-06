@@ -190,4 +190,6 @@ ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, dev
 	: ay8910_device(mconfig, YM2203, "YM2203", tag, owner, clock, "ym2203", __FILE__),
 		m_irq_handler(*this)
 {
+	m_flags = AY8910_LEGACY_OUTPUT;
+	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
