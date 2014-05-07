@@ -143,6 +143,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_dtr_1);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_1);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_keyboard_callback);
+	INPUT_CHANGED_MEMBER(power);
 
 	void trigger_fdc_int();
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
