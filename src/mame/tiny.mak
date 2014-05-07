@@ -61,7 +61,7 @@ SOUNDS += OKIM6295
 SOUNDS += HC55516
 SOUNDS += YM3812
 SOUNDS += CEM3394
-
+SOUNDS += VOTRAX
 
 #-------------------------------------------------
 # specify available video cores
