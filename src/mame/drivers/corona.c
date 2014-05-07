@@ -347,8 +347,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	DECLARE_WRITE8_MEMBER(wc_meters_w);
 	void blitter_execute(int x, int y, int color, int width, int flag);
-	DECLARE_WRITE8_MEMBER(ay_port_a_out);
-	DECLARE_WRITE8_MEMBER(ay_port_b_out);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(corona);
 	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -572,16 +570,6 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
 	coin_counter_w(machine(), 2, (data ^ 0xff) & 0x04); /* Credits Out */
 
 //  popmessage("meters: %02x", (data ^ 0xff));
-}
-
-WRITE8_MEMBER(corona_state::ay_port_a_out)
-{
-	logerror("AY port A write: %02X\n", data);
-}
-
-WRITE8_MEMBER(corona_state::ay_port_b_out)
-{
-	logerror("AY port B write: %02X\n", data);
 }
 
 
@@ -1374,8 +1362,6 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(corona_state, ay_port_a_out)) /* Port A write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(corona_state, ay_port_b_out)) /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
