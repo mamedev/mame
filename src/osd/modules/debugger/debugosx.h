@@ -364,6 +364,21 @@ typedef float CGFloat;
 
 @end
 
+class debugger_osx : public osd_debugger_interface
+{
+public:
+	// construction/destruction
+	debugger_osx(const osd_interface &osd);
+	virtual ~debugger_osx() { }
+	
+	virtual void init_debugger();
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
+	virtual void debugger_exit();
+};
+
+extern const osd_debugger_type OSD_DEBUGGER_OSX;
+
 #endif // __OBJC__
 
 #endif // __SDL_DEBUGOSX__

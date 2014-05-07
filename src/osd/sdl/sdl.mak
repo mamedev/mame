@@ -86,9 +86,9 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-#ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
-#endif
+endif
 
 ifndef SDL_LIBVER
 SDL_LIBVER = sdl
@@ -268,7 +268,7 @@ LIBS += -framework CoreAudio -framework CoreMIDI
 endif
 
 ifdef NO_USE_QTDEBUG
-DEBUGOBJS = $(SDLOBJ)/debugosx.o
+DEBUGOBJS = $(OSDOBJ)/modules/debugger/debugosx.o
 endif
 
 SYNC_IMPLEMENTATION = ntc
@@ -373,9 +373,6 @@ endif
 
 SDLSRC = $(SRC)/osd/$(OSD)
 SDLOBJ = $(OBJ)/osd/$(OSD)
-
-OSDSRC = $(SRC)/osd
-OSDOBJ = $(OBJ)/osd
 
 OBJDIRS += $(SDLOBJ)
 
@@ -663,8 +660,6 @@ endif
 
 ifeq ($(NO_DEBUGGER),1)
 DEFS += -DNO_DEBUGGER
-# debugwin compiles into a stub ...
-OSDOBJS += $(SDLOBJ)/debugwin.o
 else
 OSDOBJS += $(DEBUGOBJS)
 endif # NO_DEBUGGER
