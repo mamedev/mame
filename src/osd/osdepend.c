@@ -242,8 +242,8 @@ void osd_interface::init_debugger()
 	osd_debugger_type debugger = m_debugger_options.find(machine().options().debugger());
 	if (debugger==NULL) 
 	{
-		osd_printf_warning("debugger_init: option %s not found swithing debugger off\n",machine().options().debugger());
-		debugger = m_debugger_options.find("none");
+		osd_printf_warning("debugger_init: option %s not found switching to auto\n",machine().options().debugger());
+		debugger = m_debugger_options.find("auto");
 	}
 	m_debugger = (*debugger)(*this);
 	
@@ -412,8 +412,8 @@ bool osd_interface::sound_init()
 	osd_sound_type sound = m_sound_options.find(machine().options().sound());
 	if (sound==NULL) 
 	{
-		osd_printf_warning("sound_init: option %s not found swithing sound off\n",machine().options().sound());
-		sound = m_sound_options.find("none");
+		osd_printf_warning("sound_init: option %s not found switching to auto\n",machine().options().sound());
+		sound = m_sound_options.find("auto");
 	}
 	m_sound = (*sound)(*this);
 	return true;
