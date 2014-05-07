@@ -304,10 +304,10 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				}
 				else
 				{
-					m_out_dtr_cb(m_regs.mcr & 1);
-					m_out_rts_cb(m_regs.mcr & 2);
-					m_out_out1_cb(m_regs.mcr & 4);
-					m_out_out2_cb(m_regs.mcr & 8);
+					m_out_dtr_cb((m_regs.mcr & 1) ? 1 : 0);
+					m_out_rts_cb((m_regs.mcr & 2) ? 1 : 0);
+					m_out_out1_cb((m_regs.mcr & 4) ? 1 : 0);
+					m_out_out2_cb((m_regs.mcr & 8) ? 1 : 0);
 				}
 			}
 			break;
