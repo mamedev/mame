@@ -710,18 +710,6 @@ WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
 	trigger_interrupt(INT_EXTERNAL);
 }
 
-static const ins8250_interface i8250_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
-	DEVCB_DRIVER_LINE_MEMBER(portfolio_state, i8250_intrpt_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 //**************************************************************************
 //  IMAGE LOADING
 //**************************************************************************
@@ -866,7 +854,11 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_OUTPUT_LATCH_BIT2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_init))
 	MCFG_OUTPUT_LATCH_BIT3_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_select_in))
 
-	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf, XTAL_1_8432MHz) // should be MCFG_INS8250A_ADD
+	MCFG_DEVICE_ADD(M82C50A_TAG, INS8250, XTAL_1_8432MHz) // should be INS8250A
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(portfolio_state, i8250_intrpt_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 

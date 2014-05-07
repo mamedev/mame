@@ -253,23 +253,6 @@ public:
 #define UART_CLK    XTAL_1_8432MHz // standard 8250 clock
 
 
-
-/*************************************
- *
- *  Microtouch <-> pc16550 interface
- *
- *************************************/
-
-static const ins8250_interface meritm_ns16550_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /*************************************
  *
  *  Microtouch touch coordinate transformation
@@ -1121,7 +1104,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questi
 	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
 
-	MCFG_NS16550_ADD("ns16550", meritm_ns16550_interface, UART_CLK)
+	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
 	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
@@ -1138,7 +1122,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
-	MCFG_NS16550_ADD("ns16550", meritm_ns16550_interface, UART_CLK)
+	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
 	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END

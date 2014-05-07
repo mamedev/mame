@@ -547,15 +547,6 @@ static GFXDECODE_START( pcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
-const ins8250_interface pcjr_com_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pcjr_state)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
@@ -621,7 +612,11 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(pcjr_state, pcjr_ppi_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(pcjr_state, pcjr_ppi_portc_r))
 
-	MCFG_INS8250_ADD( "ins8250", pcjr_com_interface, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 
 	MCFG_RS232_PORT_ADD( "serport", pcjr_com, NULL )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, rx_w))

@@ -119,11 +119,6 @@ protected:
 
 /*----------- defined in machine/bebox.c -----------*/
 
-extern const ins8250_interface bebox_uart_inteface_0;
-extern const ins8250_interface bebox_uart_inteface_1;
-extern const ins8250_interface bebox_uart_inteface_2;
-extern const ins8250_interface bebox_uart_inteface_3;
-
 UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
 void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 

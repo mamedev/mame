@@ -921,26 +921,6 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 	pcw16_refresh_ints();
 }
 
-static const ins8250_interface pcw16_com_interface[2]=
-{
-	{
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_1),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_2),
-		DEVCB_NULL,
-		DEVCB_NULL
-	}
-};
-
 FLOPPY_FORMATS_MEMBER( pcw16_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
@@ -1032,7 +1012,11 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_DEVICE_ADD( "ns16550_1", NS16550, XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport1", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport1", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(pcw16_state, pcw16_com_interrupt_1))
 	MCFG_RS232_PORT_ADD( "serport1", pcw16_com, "msystems_mouse" )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
@@ -1040,7 +1024,11 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, cts_w))
 
-	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_DEVICE_ADD( "ns16550_2", NS16550, XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport2", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport2", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport2", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(pcw16_state, pcw16_com_interrupt_2))
 	MCFG_RS232_PORT_ADD( "serport2", pcw16_com, NULL )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dcd_w))

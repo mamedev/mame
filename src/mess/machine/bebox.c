@@ -333,54 +333,6 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 		bebox_update_interrupts();
 }
 
-
-/*************************************
- *
- *  COM ports
- *
- *************************************/
-
-const ins8250_interface bebox_uart_inteface_0 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-const ins8250_interface bebox_uart_inteface_1 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-const ins8250_interface bebox_uart_inteface_2 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-const ins8250_interface bebox_uart_inteface_3 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /*************************************
  *
  *  Floppy Disk Controller
