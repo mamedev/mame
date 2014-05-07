@@ -116,8 +116,9 @@ WRITE8_MEMBER(_88games_state::k052109_051960_w)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("banked_rom") /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")     /* banked ROM + palette RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank0000") /* banked ROM */
+	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bank1000") /* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
@@ -255,34 +256,15 @@ INPUT_PORTS_END
 static KONAMI_SETLINES_CALLBACK( k88games_banking )
 {
 	_88games_state *state = device->machine().driver_data<_88games_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	int offs;
 
 	logerror("%04x: bank select %02x\n", device->safe_pc(), lines);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */
-	/* bit 4: when 0, 051316 RAM at 3800-3fff; when 1, work RAM at 2000-3fff (NVRAM 3370-37ff) */
-	offs = 0x10000 + (lines & 0x07) * 0x2000;
-	memcpy(state->m_banked_rom, &RAM[offs], 0x1000);
-	if (lines & 0x08)
-	{
-		if (state->m_generic_paletteram_8 != state->m_paletteram_1000)
-		{
-			memcpy(state->m_paletteram_1000, state->m_generic_paletteram_8, 0x1000);
-			state->m_generic_paletteram_8.set_target(state->m_paletteram_1000, 0x1000);
-		}
-	}
-	else
-	{
-		if (state->m_generic_paletteram_8 != &RAM[0x20000])
-		{
-			memcpy(&RAM[0x20000], state->m_generic_paletteram_8, 0x1000);
-			state->m_generic_paletteram_8.set_target(&RAM[0x20000], 0x01000);
-		}
-		memcpy(state->m_paletteram_1000, &RAM[offs+0x1000], 0x1000);
-	}
-
+	/* bit 4: when 0, 051316 RAM at 3800-3fff; when 1, work RAM at 2000-3fff (NVRAM 3700-37ff) */
+	int rombank = lines & 0x07;
+	state->m_bank0000->set_entry(rombank);
+	state->m_bank1000->set_entry((lines & 0x08) ? 8 : rombank);
 	state->m_videobank = lines & 0x10;
 
 	/* bit 5 = enable char ROM reading through the video RAM */
@@ -296,6 +278,12 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 
 void _88games_state::machine_start()
 {
+	UINT8 *ROM = memregion("maincpu")->base() + 0x10000;
+
+	m_bank0000->configure_entries(0, 8, &ROM[0x0000], 0x2000);
+	m_bank1000->configure_entries(0, 8, &ROM[0x1000], 0x2000);
+	m_bank1000->configure_entry(8, memshare("palette")->ptr());
+
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_zoomreadroms));
 	save_item(NAME(m_speech_chip));
@@ -308,7 +296,6 @@ void _88games_state::machine_start()
 void _88games_state::machine_reset()
 {
 	konami_configure_set_lines(m_maincpu, k88games_banking);
-	m_generic_paletteram_8.set_target(&memregion("maincpu")->base()[0x20000], 0x1000);
 
 	m_videobank = 0;
 	m_zoomreadroms = 0;
@@ -363,7 +350,7 @@ static MACHINE_CONFIG_START( 88games, _88games_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(_88games_state, screen_update_88games)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -406,14 +393,14 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( 88games )
-	ROM_REGION( 0x21000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "861m01.k18", 0x08000, 0x08000, CRC(4a4e2959) SHA1(95572686bef48b5c1ce1dedf0afc891d92aff00d) )
 	ROM_LOAD( "861m02.k16", 0x10000, 0x10000, CRC(e19f15f6) SHA1(6c801b274e87eaff7f40148381ade5b38120cc12) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics */
 	ROM_LOAD16_BYTE( "861a08.a", 0x000000, 0x10000, CRC(77a00dd6) SHA1(e3667839f8ae3699236da3e312c20d571db38670) )  /* characters */
 	ROM_LOAD16_BYTE( "861a08.c", 0x000001, 0x10000, CRC(b422edfc) SHA1(b3842c8dc60975cc71812df098f29b4571b18120) )
 	ROM_LOAD16_BYTE( "861a08.b", 0x020000, 0x10000, CRC(28a8304f) SHA1(6b4037eff6d209fec29d05f1071ed3bf9c2bd098) )
@@ -423,7 +410,7 @@ ROM_START( 88games )
 	ROM_LOAD16_BYTE( "861a09.b", 0x060000, 0x10000, CRC(4917158d) SHA1(b53da3f29c9aeb59933dc3a8214cc1314e21000b) )
 	ROM_LOAD16_BYTE( "861a09.d", 0x060001, 0x10000, CRC(2bb3282c) SHA1(6ca54948a02c91543b7e595641b0edc2564f83ff) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
 	ROM_LOAD16_BYTE( "861a05.a", 0x000000, 0x10000, CRC(cedc19d0) SHA1(6eb2a292d574dee06e214e61c0e08fa233ac68e8) )  /* sprites */
 	ROM_LOAD16_BYTE( "861a05.e", 0x000001, 0x10000, CRC(725af3fc) SHA1(98ac364db4b2c5682a299f4d2a288ebc8a303b1f) )
 	ROM_LOAD16_BYTE( "861a05.b", 0x020000, 0x10000, CRC(db2a8808) SHA1(dad6b127761889aac198014139cc524a4cea32e7) )
@@ -441,7 +428,7 @@ ROM_START( 88games )
 	ROM_LOAD16_BYTE( "861a06.d", 0x0e0000, 0x10000, CRC(bc70ab39) SHA1(a6fa0502ceb6862e7b1e4815326e268fd6511881) )
 	ROM_LOAD16_BYTE( "861a06.h", 0x0e0001, 0x10000, CRC(d906b79b) SHA1(905814ce708d80fd4d1a398f60faa0bc680fccaf) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x040000, "gfx3", 0 ) /* graphics */
 	ROM_LOAD( "861a04.a", 0x000000, 0x10000, CRC(092a8b15) SHA1(d98a81bfa4bba73805f0236f8a80da130fcb378d) ) /* zoom/rotate */
 	ROM_LOAD( "861a04.b", 0x010000, 0x10000, CRC(75744b56) SHA1(5133d8f6622796ed6b9e6a0d0f1df28f00331fc7) )
 	ROM_LOAD( "861a04.c", 0x020000, 0x10000, CRC(a00021c5) SHA1(f73f88af33387d73b4262e8652507e699926fabe) )
@@ -460,14 +447,14 @@ ROM_START( 88games )
 ROM_END
 
 ROM_START( konami88 )
-	ROM_REGION( 0x21000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "861.e03", 0x08000, 0x08000, CRC(55979bd9) SHA1(d683cc514e2b41fc4033d5dc107ca22ba8981ada) )
 	ROM_LOAD( "861.e02", 0x10000, 0x10000, CRC(5b7e98a6) SHA1(39b6e93221d14a4695c79fb39c4eea54ec5ffb0c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
-	ROM_REGION(  0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION(  0x080000, "gfx1", 0 ) /* graphics */
 	ROM_LOAD16_BYTE( "861a08.a", 0x000000, 0x10000, CRC(77a00dd6) SHA1(e3667839f8ae3699236da3e312c20d571db38670) )  /* characters */
 	ROM_LOAD16_BYTE( "861a08.c", 0x000001, 0x10000, CRC(b422edfc) SHA1(b3842c8dc60975cc71812df098f29b4571b18120) )
 	ROM_LOAD16_BYTE( "861a08.b", 0x020000, 0x10000, CRC(28a8304f) SHA1(6b4037eff6d209fec29d05f1071ed3bf9c2bd098) )
@@ -477,7 +464,7 @@ ROM_START( konami88 )
 	ROM_LOAD16_BYTE( "861a09.b", 0x060000, 0x10000, CRC(4917158d) SHA1(b53da3f29c9aeb59933dc3a8214cc1314e21000b) )
 	ROM_LOAD16_BYTE( "861a09.d", 0x060001, 0x10000, CRC(2bb3282c) SHA1(6ca54948a02c91543b7e595641b0edc2564f83ff) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
 	ROM_LOAD16_BYTE( "861a05.a", 0x000000, 0x10000, CRC(cedc19d0) SHA1(6eb2a292d574dee06e214e61c0e08fa233ac68e8) )  /* sprites */
 	ROM_LOAD16_BYTE( "861a05.e", 0x000001, 0x10000, CRC(725af3fc) SHA1(98ac364db4b2c5682a299f4d2a288ebc8a303b1f) )
 	ROM_LOAD16_BYTE( "861a05.b", 0x020000, 0x10000, CRC(db2a8808) SHA1(dad6b127761889aac198014139cc524a4cea32e7) )
@@ -495,7 +482,7 @@ ROM_START( konami88 )
 	ROM_LOAD16_BYTE( "861a06.d", 0x0e0000, 0x10000, CRC(bc70ab39) SHA1(a6fa0502ceb6862e7b1e4815326e268fd6511881) )
 	ROM_LOAD16_BYTE( "861a06.h", 0x0e0001, 0x10000, CRC(d906b79b) SHA1(905814ce708d80fd4d1a398f60faa0bc680fccaf) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x040000, "gfx3", 0 ) /* graphics */
 	ROM_LOAD( "861a04.a", 0x000000, 0x10000, CRC(092a8b15) SHA1(d98a81bfa4bba73805f0236f8a80da130fcb378d) ) /* zoom/rotate */
 	ROM_LOAD( "861a04.b", 0x010000, 0x10000, CRC(75744b56) SHA1(5133d8f6622796ed6b9e6a0d0f1df28f00331fc7) )
 	ROM_LOAD( "861a04.c", 0x020000, 0x10000, CRC(a00021c5) SHA1(f73f88af33387d73b4262e8652507e699926fabe) )
@@ -514,14 +501,14 @@ ROM_START( konami88 )
 ROM_END
 
 ROM_START( hypsptsp )
-	ROM_REGION( 0x21000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "861f03.k18", 0x08000, 0x08000, CRC(8c61aebd) SHA1(de720acfe07fd70fe467f9c73122e0fbeab2b8c8) )
 	ROM_LOAD( "861f02.k16", 0x10000, 0x10000, CRC(d2460c28) SHA1(936220aa3983ffa2330843f683347768772561af) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
-	ROM_REGION(  0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION(  0x080000, "gfx1", 0 ) /* graphics */
 	ROM_LOAD16_BYTE( "861a08.a", 0x000000, 0x10000, CRC(77a00dd6) SHA1(e3667839f8ae3699236da3e312c20d571db38670) )  /* characters */
 	ROM_LOAD16_BYTE( "861a08.c", 0x000001, 0x10000, CRC(b422edfc) SHA1(b3842c8dc60975cc71812df098f29b4571b18120) )
 	ROM_LOAD16_BYTE( "861a08.b", 0x020000, 0x10000, CRC(28a8304f) SHA1(6b4037eff6d209fec29d05f1071ed3bf9c2bd098) )
@@ -531,7 +518,7 @@ ROM_START( hypsptsp )
 	ROM_LOAD16_BYTE( "861a09.b", 0x060000, 0x10000, CRC(4917158d) SHA1(b53da3f29c9aeb59933dc3a8214cc1314e21000b) )
 	ROM_LOAD16_BYTE( "861a09.d", 0x060001, 0x10000, CRC(2bb3282c) SHA1(6ca54948a02c91543b7e595641b0edc2564f83ff) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
 	ROM_LOAD16_BYTE( "861a05.a", 0x000000, 0x10000, CRC(cedc19d0) SHA1(6eb2a292d574dee06e214e61c0e08fa233ac68e8) )  /* sprites */
 	ROM_LOAD16_BYTE( "861a05.e", 0x000001, 0x10000, CRC(725af3fc) SHA1(98ac364db4b2c5682a299f4d2a288ebc8a303b1f) )
 	ROM_LOAD16_BYTE( "861a05.b", 0x020000, 0x10000, CRC(db2a8808) SHA1(dad6b127761889aac198014139cc524a4cea32e7) )
@@ -549,7 +536,7 @@ ROM_START( hypsptsp )
 	ROM_LOAD16_BYTE( "861a06.d", 0x0e0000, 0x10000, CRC(bc70ab39) SHA1(a6fa0502ceb6862e7b1e4815326e268fd6511881) )
 	ROM_LOAD16_BYTE( "861a06.h", 0x0e0001, 0x10000, CRC(d906b79b) SHA1(905814ce708d80fd4d1a398f60faa0bc680fccaf) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x040000, "gfx3", 0 ) /* graphics */
 	ROM_LOAD( "861a04.a", 0x000000, 0x10000, CRC(092a8b15) SHA1(d98a81bfa4bba73805f0236f8a80da130fcb378d) ) /* zoom/rotate */
 	ROM_LOAD( "861a04.b", 0x010000, 0x10000, CRC(75744b56) SHA1(5133d8f6622796ed6b9e6a0d0f1df28f00331fc7) )
 	ROM_LOAD( "861a04.c", 0x020000, 0x10000, CRC(a00021c5) SHA1(f73f88af33387d73b4262e8652507e699926fabe) )
