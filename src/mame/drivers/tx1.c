@@ -594,68 +594,6 @@ static ADDRESS_MAP_START( buggyboy_sound_io, AS_IO, 8, tx1_state )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-
-/*************************************
- *
- *  Sound Hardware
- *
- *************************************/
-
-static const ay8910_interface tx1_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("tx1", tx1_sound_device, ay8910_a_w),
-	DEVCB_DEVICE_MEMBER("tx1", tx1_sound_device, ay8910_b_w),
-};
-
-
-static const ay8910_interface buggyboy_ym2149_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym1_a_w),
-	DEVCB_NULL,
-};
-
-static const ay8910_interface buggyboy_ym2149_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_a_w),
-	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_b_w),
-};
-
-
-/* YM2149 IC19 */
-static const ay8910_interface buggybjr_ym2149_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("YM2149_IC19_A"),
-	DEVCB_INPUT_PORT("YM2149_IC19_B"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
-/* YM2149 IC24 */
-static const ay8910_interface buggybjr_ym2149_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_a_w),
-	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_b_w),
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -712,7 +650,8 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 
 
 	MCFG_SOUND_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
-	MCFG_SOUND_CONFIG(tx1_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("tx1", tx1_sound_device, ay8910_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("tx1", tx1_sound_device, ay8910_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
 
@@ -770,11 +709,12 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 //  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_SOUND_CONFIG(buggyboy_ym2149_interface_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym1_a_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
 	MCFG_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_SOUND_CONFIG(buggyboy_ym2149_interface_2)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
 	MCFG_SOUND_ADD("buggyboy", BUGGYBOY, 0)
@@ -812,12 +752,14 @@ static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
 //  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
-	MCFG_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_SOUND_CONFIG(buggybjr_ym2149_interface_1)
+	MCFG_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM2149_IC19_B"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_SOUND_CONFIG(buggybjr_ym2149_interface_2)
+	MCFG_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
 	MCFG_SOUND_ADD("buggyboy", BUGGYBOY, 0)

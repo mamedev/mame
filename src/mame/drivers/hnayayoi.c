@@ -504,18 +504,6 @@ WRITE_LINE_MEMBER(hnayayoi_state::irqhandler)
 //  m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
-
 void hnayayoi_state::machine_start()
 {
 	save_item(NAME(m_palbank));
@@ -566,7 +554,8 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 20000000/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(hnayayoi_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)

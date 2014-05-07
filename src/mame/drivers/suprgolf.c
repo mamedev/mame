@@ -429,16 +429,6 @@ WRITE_LINE_MEMBER(suprgolf_state::irqhandler)
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW0"),
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeA),
-	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeB),
-};
-
 WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 {
 	m_msm->reset_w(0);
@@ -513,7 +503,10 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(suprgolf_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suprgolf_state, suprgolf_writeA))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suprgolf_state, suprgolf_writeB))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* guess */

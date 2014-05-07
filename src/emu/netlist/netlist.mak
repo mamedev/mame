@@ -50,6 +50,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_7490.o \
 	$(NETLISTOBJ)/devices/nld_7493.o \
 	$(NETLISTOBJ)/devices/nld_74107.o \
+	$(NETLISTOBJ)/devices/nld_74123.o \
 	$(NETLISTOBJ)/devices/nld_74153.o \
 	$(NETLISTOBJ)/devices/nld_74ls629.o \
 	$(NETLISTOBJ)/devices/nld_9316.o \

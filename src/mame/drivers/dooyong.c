@@ -789,20 +789,6 @@ WRITE_LINE_MEMBER(dooyong_state::irqhandler_2203_2)
 	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_config_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 /***************************************************************************
 
     Machine driver(s)
@@ -815,12 +801,12 @@ static MACHINE_CONFIG_FRAGMENT( sound_2203 )
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_state,irqhandler_2203_1))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_state, unk_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_state, irqhandler_2203_2))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_state, unk_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -885,12 +871,12 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_state,irqhandler_2203_1))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_state, unk_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_state, irqhandler_2203_2))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_state, unk_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 MACHINE_CONFIG_END

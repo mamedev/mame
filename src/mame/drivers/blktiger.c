@@ -264,13 +264,6 @@ WRITE_LINE_MEMBER(blktiger_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-};
-
 void blktiger_state::machine_start()
 {
 	/* configure bankswitching */
@@ -341,7 +334,6 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(blktiger_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */

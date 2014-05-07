@@ -4933,86 +4933,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const ay8910_interface frogger_ay8910_interface =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DRIVER_MEMBER(galaxian_state,frogger_sound_timer_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface konami_ay8910_interface_1 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_timer_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface konami_ay8910_interface_2 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface explorer_ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(galaxian_state,explorer_sound_latch_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface explorer_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_timer_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface sfx_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_w),
-	DEVCB_DRIVER_MEMBER(galaxian_state,sfx_sample_control_w)
-};
-
-static const ay8910_interface scorpion_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("digitalker", digitalker_device, digitalker_data_w),
-	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_digitalker_control_w)
-};
-
-static const ay8910_interface checkmaj_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const discrete_mixer_desc konami_sound_mixer_desc =
 	{DISC_MIXER_IS_OP_AMP,
 		{RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -5123,7 +5043,10 @@ static MACHINE_CONFIG_FRAGMENT( konami_sound_1x_ay8910 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(frogger_ay8910_interface)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, frogger_sound_timer_r))
 	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
@@ -5143,13 +5066,17 @@ static MACHINE_CONFIG_FRAGMENT( konami_sound_2x_ay8910 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(konami_ay8910_interface_1)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
 	MCFG_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(konami_ay8910_interface_2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
 	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
@@ -5203,7 +5130,6 @@ static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
-
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -5314,7 +5240,7 @@ static MACHINE_CONFIG_DERIVED( checkmaj, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, 1620000)
-	MCFG_SOUND_CONFIG(checkmaj_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
 MACHINE_CONFIG_END
 
@@ -5444,11 +5370,11 @@ static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(explorer_ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(explorer_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -5472,7 +5398,8 @@ static MACHINE_CONFIG_DERIVED( scorpion, theend )
 
 	/* extra AY8910 with I/O ports */
 	MCFG_SOUND_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(scorpion_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("digitalker", digitalker_device, digitalker_data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(galaxian_state, scorpion_digitalker_control_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DIGITALKER_ADD("digitalker", 4000000)
@@ -5511,7 +5438,8 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 
 	/* port on 2nd 8910 is used for communication */
 	MCFG_SOUND_MODIFY("8910.1")
-	MCFG_SOUND_CONFIG(sfx_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(driver_device, soundlatch2_byte_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(galaxian_state, sfx_sample_control_w))
 
 	/* DAC for the sample player */
 	MCFG_DAC_ADD("dac")

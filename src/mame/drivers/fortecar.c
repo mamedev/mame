@@ -514,18 +514,6 @@ Seems to work properly, but must be checked closely...
 //  logerror("AY port B write %02x\n",data);
 }
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(fortecar_state,ayporta_w),
-	DEVCB_DRIVER_MEMBER(fortecar_state,ayportb_w)
-};
-
-
 static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -690,7 +678,8 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortecar_state, ayporta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortecar_state, ayportb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

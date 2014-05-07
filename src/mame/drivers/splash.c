@@ -518,14 +518,6 @@ static MACHINE_CONFIG_START( splash, splash_state )
 MACHINE_CONFIG_END
 
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL
-};
-
 INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 {
 	m_vblank_irq = 1;
@@ -565,7 +557,6 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(splash_state, ym_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)

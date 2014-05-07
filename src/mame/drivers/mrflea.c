@@ -299,28 +299,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interfaces
- *
- *************************************/
-
-static const ay8910_interface mrflea_ay8910_interface_0 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN1"),
-	DEVCB_INPUT_PORT("IN0")
-};
-
-static const ay8910_interface mrflea_ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_INPUT_PORT("DSW1")
-};
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -377,11 +355,13 @@ static MACHINE_CONFIG_START( mrflea, mrflea_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
-	MCFG_SOUND_CONFIG(mrflea_ay8910_interface_0)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
-	MCFG_SOUND_CONFIG(mrflea_ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, 2000000)

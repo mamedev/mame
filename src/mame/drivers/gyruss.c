@@ -344,57 +344,6 @@ static GFXDECODE_START( gyruss )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   16*16, 16 )
 GFXDECODE_END
 
-
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(gyruss_state,gyruss_filter0_w)
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(gyruss_state,gyruss_filter1_w)
-};
-
-static const ay8910_interface ay8910_interface_3 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	DEVCB_DRIVER_MEMBER(gyruss_state,gyruss_portA_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_interface_4 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_interface_5 =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const discrete_mixer_desc konami_right_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 	{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
@@ -543,31 +492,39 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(gyruss_state, gyruss_filter0_w))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(gyruss_state, gyruss_filter1_w))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
 
 	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(gyruss_state, gyruss_portA_r))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 6)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 7)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 8)
 
 	MCFG_SOUND_ADD("ay4", AY8910, SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_4)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 9)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 10)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 11)
 
 	MCFG_SOUND_ADD("ay5", AY8910, SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_5)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 12)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 13)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 14)

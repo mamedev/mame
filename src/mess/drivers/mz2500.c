@@ -1998,16 +1998,6 @@ WRITE8_MEMBER(mz2500_state::opn_porta_w)
 	m_ym_porta = data;
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_r),  // read A
-	DEVCB_INPUT_PORT("DSW1"),   // read B
-	DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_w),  // write A
-	DEVCB_NULL                  // write B
-};
-
 PALETTE_INIT_MEMBER(mz2500_state, mz2500)
 {
 	int i;
@@ -2113,7 +2103,9 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(mz2500_state, opn_porta_r))  // read A
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))   // read B
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mz2500_state, opn_porta_w))  // write A
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

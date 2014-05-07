@@ -1342,20 +1342,6 @@ INPUT_PORTS_END
 
 
 /*******************************************
-*             Sound Interface              *
-*******************************************/
-static const ay8910_interface aysnd_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                     /* Port A read */
-	DEVCB_NULL,                     /* Port B read */
-	DEVCB_DRIVER_MEMBER(corona_state,ay_port_a_out),    /* Port A write */
-	DEVCB_DRIVER_MEMBER(corona_state,ay_port_b_out) /* Port B write */
-};
-
-
-/*******************************************
 *             Machine Drivers              *
 *******************************************/
 
@@ -1388,7 +1374,8 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
-	MCFG_SOUND_CONFIG(aysnd_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(corona_state, ay_port_a_out)) /* Port A write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(corona_state, ay_port_b_out)) /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

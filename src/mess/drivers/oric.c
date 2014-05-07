@@ -767,17 +767,6 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-static const ay8910_interface oric_ay_interface =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{ 4700, 4700, 4700},
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(oric_state, psg_a_w),
-	DEVCB_NULL,
-};
-
-
 static MACHINE_CONFIG_START( oric, oric_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
@@ -798,7 +787,9 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_12MHz/12)
-	MCFG_SOUND_CONFIG(oric_ay_interface)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(oric_state, psg_a_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */

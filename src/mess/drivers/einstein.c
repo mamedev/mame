@@ -665,16 +665,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const ay8910_interface einstein_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_data_read),
-	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_line_write),
-	DEVCB_NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout einstei2_charlayout =
 {
@@ -736,7 +726,8 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(IC_I030, AY8910, XTAL_X002 / 4)
-	MCFG_SOUND_CONFIG(einstein_ay_interface)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(einstein_state, einstein_keyboard_data_read))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(einstein_state, einstein_keyboard_line_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* printer */

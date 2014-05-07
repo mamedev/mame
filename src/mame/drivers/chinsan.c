@@ -150,17 +150,6 @@ WRITE8_MEMBER(chinsan_state::ym_port_w2)
 	logerror("ym_write port 2 %02x\n", data);
 }
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w1),
-	DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w2)
-};
-
 WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 {
 	m_port_select = data;
@@ -618,7 +607,10 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* ? Mhz */
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chinsan_state, ym_port_w1))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chinsan_state, ym_port_w2))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

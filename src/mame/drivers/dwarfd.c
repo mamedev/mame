@@ -999,17 +999,6 @@ PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 	palette.set_pen_color(6, rgb_t(255, 0, 0));
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN2"),
-	DEVCB_INPUT_PORT("IN1"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 void dwarfd_state::machine_start()
 {
 	save_item(NAME(m_bank));
@@ -1077,7 +1066,8 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

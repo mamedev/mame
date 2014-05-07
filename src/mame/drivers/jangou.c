@@ -890,22 +890,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound HW Config
- *
- *************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(jangou_state,input_mux_r),
-	DEVCB_DRIVER_MEMBER(jangou_state,input_system_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -1001,7 +985,8 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(jangou_state, input_mux_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(jangou_state, input_system_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)

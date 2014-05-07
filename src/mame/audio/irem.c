@@ -226,26 +226,6 @@ void irem_audio_device::adpcm_int(int st)
  * it does not take cross-chip mixing effects into account.
  */
 
-static const ay8910_interface irem_ay8910_interface_1 =
-{
-	AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT,
-	{470, 0, 0},
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("irem_audio", irem_audio_device, ay8910_0_portb_w)
-};
-
-static const ay8910_interface irem_ay8910_interface_2 =
-{
-	AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT,
-	{470, 0, 0},
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("irem_audio", irem_audio_device, ay8910_1_porta_w),
-	DEVCB_NULL
-};
-
 
 /*
  * http://newsgroups.derkeiler.com/Archive/Rec/rec.games.video.arcade.collecting/2006-06/msg03108.html
@@ -393,11 +373,16 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	MCFG_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_ay8910_interface_1)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(470, 0, 0)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_0_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_ay8910_interface_2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(470, 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_1_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
@@ -423,11 +408,16 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 	MCFG_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_ay8910_interface_1)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(470, 0, 0)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_0_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_ay8910_interface_2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(470, 0, 0)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("irem_audio", irem_audio_device, ay8910_1_porta_w))
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */

@@ -359,17 +359,6 @@ static GFXDECODE_START( pickin )
 GFXDECODE_END
 
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
 READ8_MEMBER(bagman_state::dial_input_p1_r)
@@ -411,26 +400,6 @@ READ8_MEMBER(bagman_state::dial_input_p2_r)
 
 	return (ioport("P2")->read() & 0x9f) | (m_p2_res);
 }
-
-static const ay8910_interface ay8910_dial_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(bagman_state,dial_input_p1_r),
-	DEVCB_DRIVER_MEMBER(bagman_state,dial_input_p2_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
 {
@@ -479,7 +448,8 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("tms", TMS5110A, 640000)
@@ -514,12 +484,12 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* maybe */
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -567,17 +537,19 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( squaitsa, botanic )
 	MCFG_SOUND_MODIFY("aysnd")
-	MCFG_SOUND_CONFIG(ay8910_dial_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(bagman_state, dial_input_p1_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(bagman_state, dial_input_p2_r))
+
 MACHINE_CONFIG_END
 
 

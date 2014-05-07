@@ -239,23 +239,6 @@ WRITE_LINE_MEMBER(shootout_state::shootout_snd2_irq)
 	m_maincpu->set_input_line(0, state);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_config2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
-	DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
-};
-
 static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	/* basic machine hardware */
@@ -283,7 +266,6 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(shootout_state, shootout_snd_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -312,7 +294,8 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(shootout_state, shootout_snd2_irq))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, shootout_bankswitch_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, shootout_flipscreen_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

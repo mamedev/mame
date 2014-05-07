@@ -544,16 +544,6 @@ GFXDECODE_END
 *************************/
 
 
-static const ay8910_interface goldngam_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, //r
-	DEVCB_NULL, //r
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 
 	/* basic machine hardware */
@@ -579,7 +569,6 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(goldngam_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

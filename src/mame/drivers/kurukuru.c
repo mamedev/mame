@@ -534,22 +534,6 @@ void kurukuru_state::machine_reset()
 	update_sound_irq(0);
 }
 
-
-/*************************************************
-*                Sound Interfaces                *
-*************************************************/
-
-static const ay8910_interface ym2149_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_UNMAPPED,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_aout_w),
-	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_bout_w)
-};
-
-
 /*************************************************
 *                 Machine Driver                 *
 *************************************************/
@@ -586,7 +570,9 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
-	MCFG_SOUND_CONFIG(ym2149_intf)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kurukuru_state, ym2149_bout_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)

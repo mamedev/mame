@@ -299,23 +299,6 @@ static INPUT_PORTS_START( capbowl )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, read),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write),  /* Also a status LED. See memory map above */
-};
-
 /*************************************
  *
  *  TMS34061 interfacing
@@ -383,7 +366,8 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(capbowl_state, firqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ticket", ticket_dispenser_device, read))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("ticket", ticket_dispenser_device, write))  /* Also a status LED. See memory map above */
 	MCFG_SOUND_ROUTE(0, "mono", 0.07)
 	MCFG_SOUND_ROUTE(1, "mono", 0.07)
 	MCFG_SOUND_ROUTE(2, "mono", 0.07)

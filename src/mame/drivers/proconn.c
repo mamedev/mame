@@ -311,16 +311,6 @@ WRITE8_MEMBER(proconn_state::meter_w)
 	}
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(proconn_state,meter_w),
-};
-
-
 static const z80_daisy_config z80_daisy_chain[] =
 {
 	{ "z80ctc" },
@@ -396,7 +386,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_DEFAULT_LAYOUT(layout_proconn)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(proconn_state, meter_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 MACHINE_CONFIG_END
 

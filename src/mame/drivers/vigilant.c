@@ -459,15 +459,6 @@ static GFXDECODE_START( kikcubic )
 GFXDECODE_END
 
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( vigilant, vigilant_state )
 
 	/* basic machine hardware */
@@ -542,7 +533,6 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, 18432000/6)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.35)

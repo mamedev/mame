@@ -915,66 +915,6 @@ static const samples_interface pbillian_samples_interface =
 	pbillian_sh_start
 };
 
-static const ay8910_interface pbillian_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(superqix_state,pbillian_ay_port_a_r),   /* port Aread */
-	DEVCB_INPUT_PORT("SYSTEM"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface hotsmash_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(superqix_state,hotsmash_ay_port_a_r),   /* port Aread */
-	DEVCB_INPUT_PORT("SYSTEM"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface sqix_ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_DRIVER_MEMBER(superqix_state,in4_mcu_r),      /* port Bread */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface sqix_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_DRIVER_MEMBER(superqix_state,sqix_from_mcu_r),    /* port Bread */
-	DEVCB_NULL,                     /* port Awrite */
-	DEVCB_DRIVER_MEMBER(superqix_state,sqix_z80_mcu_w)  /* port Bwrite */
-};
-
-static const ay8910_interface bootleg_ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface bootleg_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_DRIVER_MEMBER(superqix_state,bootleg_in0_r),  /* port Bread */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 INTERRUPT_GEN_MEMBER(superqix_state::vblank_irq)
 {
 	if(m_nmi_mask)
@@ -1015,7 +955,8 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(pbillian_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(superqix_state, pbillian_ay_port_a_r))   /* port Aread */
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SAMPLES_ADD("samples", pbillian_samples_interface)
@@ -1051,7 +992,8 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(hotsmash_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(superqix_state, hotsmash_ay_port_a_r))   /* port Aread */
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SAMPLES_ADD("samples", pbillian_samples_interface)
@@ -1092,11 +1034,14 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(sqix_ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, in4_mcu_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(sqix_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, sqix_from_mcu_r)) /* port Bread */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(superqix_state,sqix_z80_mcu_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1137,11 +1082,13 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(bootleg_ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(bootleg_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, bootleg_in0_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

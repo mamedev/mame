@@ -327,27 +327,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-static const ay8910_interface icecold_ay8910_0_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW4"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(icecold_state, ay8910_0_b_w)
-};
-
-static const ay8910_interface icecold_ay8910_1_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(icecold_state, ay8910_1_a_w),
-	DEVCB_DRIVER_MEMBER(icecold_state, ay8910_1_b_w)
-};
-
-
 static MACHINE_CONFIG_START( icecold, icecold_state )
 
 	/* basic machine hardware */
@@ -389,11 +368,13 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay0", AY8910, XTAL_6MHz/4)
-	MCFG_SOUND_CONFIG(icecold_ay8910_0_intf)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(icecold_state, ay8910_0_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
-	MCFG_SOUND_CONFIG(icecold_ay8910_1_intf)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(icecold_state, ay8910_1_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(icecold_state, ay8910_1_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

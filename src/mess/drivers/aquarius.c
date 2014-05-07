@@ -337,16 +337,6 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const ay8910_interface aquarius_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("RIGHT"),
-	DEVCB_INPUT_PORT("LEFT"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
@@ -374,7 +364,8 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
-	MCFG_SOUND_CONFIG(aquarius_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */

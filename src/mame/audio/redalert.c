@@ -110,18 +110,6 @@ WRITE8_MEMBER(redalert_state::redalert_ay8910_latch_2_w)
 	m_ay8910_latch_2 = data;
 }
 
-
-static const ay8910_interface redalert_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,     /* port A/B read */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(redalert_state,redalert_analog_w)   /* port A/B write */
-};
-
-
 static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, redalert_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
@@ -191,7 +179,8 @@ static MACHINE_CONFIG_FRAGMENT( redalert_audio_m37b )
 	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, REDALERT_AY8910_CLOCK)
-	MCFG_SOUND_CONFIG(redalert_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(redalert_state, redalert_analog_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	/* channel C is used a noise source and is not connected to a speaker */
@@ -324,18 +313,6 @@ static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, redalert_state )
 ADDRESS_MAP_END
 
 
-static const ay8910_interface demoneye_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL, /* port A/B read */
-	DEVCB_NULL,
-	DEVCB_NULL              /* port A/B write */
-};
-
-
-
 /*************************************
  *
  *  Demoneye-X audio start
@@ -375,6 +352,6 @@ MACHINE_CONFIG_FRAGMENT( demoneye_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, DEMONEYE_AY8910_CLOCK)
-	MCFG_SOUND_CONFIG(demoneye_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

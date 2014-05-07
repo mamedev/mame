@@ -214,16 +214,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const ay8910_interface battlex_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 void battlex_state::machine_start()
 {
 	/* register for save states */
@@ -265,7 +255,6 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)   // ?
-	MCFG_SOUND_CONFIG(battlex_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

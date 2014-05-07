@@ -479,13 +479,6 @@ WRITE_LINE_MEMBER(lkage_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 void lkage_state::machine_start()
 {
 	save_item(NAME(m_bg_tile_bank));
@@ -573,7 +566,6 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lkage_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -619,7 +611,6 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lkage_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

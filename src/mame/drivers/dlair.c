@@ -687,23 +687,6 @@ static GFXDECODE_START( dlair )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound chip definitions
- *
- *************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_INPUT_PORT("DSW2")
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -724,7 +707,8 @@ static MACHINE_CONFIG_START( dlair_base, dlair_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 MACHINE_CONFIG_END
 

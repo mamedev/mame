@@ -241,17 +241,6 @@ READ8_MEMBER( sbc6510_state::psg_b_r )
 	return 0x7f;
 }
 
-// Ports A and B connect to the IDE socket
-static const ay8910_interface sbc6510_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,   // flags
-	AY8910_DEFAULT_LOADS,   // channel load in ohms
-	DEVCB_DRIVER_MEMBER(sbc6510_state, psg_a_r),        // port A read
-	DEVCB_DRIVER_MEMBER(sbc6510_state, psg_b_r),        // port B read
-	DEVCB_NULL,     // port A write
-	DEVCB_NULL      // port B write
-};
-
 READ8_MEMBER( sbc6510_state::key_r )
 {
 	UINT8 data=0;
@@ -313,7 +302,9 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_1MHz)
-	MCFG_SOUND_CONFIG(sbc6510_ay_interface)
+	// Ports A and B connect to the IDE socket
+	MCFG_AY8910_PORT_A_READ_CB(READ8(sbc6510_state, psg_a_r))        // port A read
+	MCFG_AY8910_PORT_B_READ_CB(READ8(sbc6510_state, psg_b_r))        // port B read
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("cia6526", MOS6526, XTAL_1MHz)

@@ -339,18 +339,6 @@ void phc25_state::video_start()
 	m_port40 = 0;
 }
 
-/* AY-3-8910 Interface */
-
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("JOY0"),
-	DEVCB_INPUT_PORT("JOY1"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( phc25, phc25_state )
@@ -362,7 +350,8 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 1996750)
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

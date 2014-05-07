@@ -1548,26 +1548,6 @@ static GFXDECODE_START(aristmk4)
 	GFXDECODE_ENTRY("tile_gfx",0x0,layout8x8x6, 0, 8 )
 GFXDECODE_END
 
-static const ay8910_interface ay8910_config1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(aristmk4_state,zn434_w) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
-};
-
-static const ay8910_interface ay8910_config2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, // Port A read
-	DEVCB_NULL, // Port B read
-	DEVCB_DRIVER_MEMBER(aristmk4_state,pblp_out),   // Port A write - goes to lamps on the buttons x8
-	DEVCB_DRIVER_MEMBER(aristmk4_state,pbltlp_out)  // Port B write - goes to lamps on the buttons x4 and light tower x4
-};
-
 /* read m/c number */
 
 READ8_MEMBER(aristmk4_state::pa1_r)
@@ -1718,11 +1698,13 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 
 	// the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
 	MCFG_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config1)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, zn434_w)) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(aristmk4_state, pblp_out))   // Port A write - goes to lamps on the buttons x8
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, pbltlp_out))  // Port B write - goes to lamps on the buttons x4 and light tower x4
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SAMPLES_ADD("samples", meter_samples_interface)

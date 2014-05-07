@@ -460,23 +460,6 @@ PALETTE_INIT_MEMBER(jongkyo_state, jongkyo)
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(jongkyo_state,input_1p_r),
-	DEVCB_DRIVER_MEMBER(jongkyo_state,input_2p_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -519,7 +502,8 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(jongkyo_state, input_1p_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(jongkyo_state, input_2p_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

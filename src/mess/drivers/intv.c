@@ -117,26 +117,6 @@ PALETTE_INIT_MEMBER(intv_state, intv)
 	}
 }
 
-static const ay8910_interface intv_ay8914_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(intv_state, intv_right_control_r),
-	DEVCB_DRIVER_MEMBER(intv_state, intv_left_control_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface intv_ay8914_ecs_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_porta_r),
-	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_portb_r),
-	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_porta_w),
-	DEVCB_NULL
-};
-
 /* graphics output */
 
 static const gfx_layout intvkbd_charlayout =
@@ -814,7 +794,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8914.1", AY8914, XTAL_3_579545MHz/2)
-	MCFG_SOUND_CONFIG(intv_ay8914_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(intv_state, intv_right_control_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(intv_state, intv_left_control_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -841,7 +822,9 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ecs","intvecs")
 
 	MCFG_SOUND_ADD("ay8914.2", AY8914, XTAL_3_579545MHz/2)
-	MCFG_SOUND_CONFIG(intv_ay8914_ecs_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(intv_state, intv_ecs_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(intv_state, intv_ecs_portb_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(intv_state, intv_ecs_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* cassette */

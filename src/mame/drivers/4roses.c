@@ -343,21 +343,6 @@ static GFXDECODE_START( 4roses )
 GFXDECODE_END
 
 
-/************************
-*    Sound Interface    *
-************************/
-
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,             /* portA in  */
-	DEVCB_NULL,             /* portB in  */
-	DEVCB_NULL,             /* portA out */
-	DEVCB_NULL              /* portB out */
-};
-
-
 /**************************
 *     Machine Drivers     *
 **************************/
@@ -392,7 +377,6 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 

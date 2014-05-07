@@ -460,28 +460,6 @@ void _4enlinea_state::machine_reset()
 {
 }
 
-
-/**********************************
-*         CRTC Interface          *
-**********************************/
-
-
-
-/***********************************
-*         Sound Interface          *
-***********************************/
-
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN-P2"),
-	DEVCB_INPUT_PORT("IN-P1"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /***********************************
 *         Machine Drivers          *
 ***********************************/
@@ -540,7 +518,8 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, SND_AY_CLOCK)
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN-P2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN-P1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

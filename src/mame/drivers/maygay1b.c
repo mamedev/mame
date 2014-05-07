@@ -454,15 +454,6 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_meter_w),
-	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_lockout_w),
-};
 
 /*************************************
  *
@@ -538,8 +529,9 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 
 	MCFG_S16LF01_ADD("vfd",0)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd",YM2149, M1_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ADD("aysnd", YM2149, M1_MASTER_CLOCK)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(maygay1b_state, m1_meter_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(maygay1b_state, m1_lockout_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)

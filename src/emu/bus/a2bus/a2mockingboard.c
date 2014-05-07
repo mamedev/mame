@@ -31,13 +31,6 @@ const device_type A2BUS_MOCKINGBOARD = &device_creator<a2bus_mockingboard_device
 const device_type A2BUS_PHASOR = &device_creator<a2bus_phasor_device>;
 const device_type A2BUS_ECHOPLUS = &device_creator<a2bus_echoplus_device>;
 
-static const ay8910_interface mockingboard_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 MACHINE_CONFIG_FRAGMENT( mockingboard )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
@@ -51,10 +44,8 @@ MACHINE_CONFIG_FRAGMENT( mockingboard )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -72,16 +63,12 @@ MACHINE_CONFIG_FRAGMENT( phasor )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
 	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker2", 1.0)
 	MCFG_SOUND_ADD(AY3_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_SOUND_ADD(AY4_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
@@ -98,10 +85,8 @@ MACHINE_CONFIG_FRAGMENT( echoplus )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
-	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SPEAKER_STANDARD_MONO("echosp")

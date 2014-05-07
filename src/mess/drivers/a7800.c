@@ -82,6 +82,9 @@
                                 regarding the potentiometer.
 
     2014/03/25 Mike Saarna  Fixed Riot Timer
+
+    2014/05/06 Mike Saarna/Robert Tuccitto Brought initial Maria cycle counts 
++	        inline from measurements taken with logic analyzer and tests.
 ***************************************************************************/
 
 #include "emu.h"
@@ -1139,7 +1142,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 7159090, 456, 0, 320, 263, 27, 27 + 192 + 32 )
+	MCFG_SCREEN_RAW_PARAMS( 7159090, 454, 0, 320, 263, 27, 27 + 192 + 32 )
 	MCFG_SCREEN_UPDATE_DRIVER(a7800_state, screen_update_a7800)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1181,7 +1184,7 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 //  MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY( "screen" )
-		MCFG_SCREEN_RAW_PARAMS( 7093788, 456, 0, 320, 313, 35, 35 + 228 + 32 )
+		MCFG_SCREEN_RAW_PARAMS( 7093788, 454, 0, 320, 313, 35, 35 + 228 + 32 )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800p )

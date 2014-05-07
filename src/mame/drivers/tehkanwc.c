@@ -614,28 +614,6 @@ static GFXDECODE_START( tehkanwc )
 GFXDECODE_END
 
 
-
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portA_w),
-	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portB_w)
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portA_r),
-	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 
 	/* basic machine hardware */
@@ -672,11 +650,13 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, tehkanwc_portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, tehkanwc_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, tehkanwc_portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, tehkanwc_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)

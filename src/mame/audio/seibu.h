@@ -91,8 +91,6 @@ protected:
 
 extern const device_type SEIBU_SOUND;
 
-extern const ay8910_interface seibu_ay8910_config;
-
 
 // Seibu ADPCM device
 
@@ -247,7 +245,6 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 																	\
 	MCFG_SOUND_ADD("ym1", YM2203, freq)                             \
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, ym2203_irqhandler)) \
-	MCFG_YM2203_AY8910_INTF(&seibu_ay8910_config)                   \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)                     \
 																	\
 	MCFG_SOUND_ADD("ym2", YM2203, freq)                             \

@@ -328,13 +328,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_state::meijinsn_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r)
-};
-
 void meijinsn_state::machine_start()
 {
 	save_item(NAME(m_deposits1));
@@ -379,7 +372,7 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 MACHINE_CONFIG_END

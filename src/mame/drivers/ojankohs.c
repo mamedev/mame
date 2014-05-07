@@ -750,32 +750,6 @@ static GFXDECODE_START( ojankohs )
 	GFXDECODE_ENTRY( "gfx1", 0, ojankohs_bglayout,   0, 64 )
 GFXDECODE_END
 
-
-static const ay8910_interface ojankohs_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_0_r),    /* read port #0 */
-	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_1_r) /* read port #1 */
-};
-
-static const ay8910_interface ojankoy_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),       /* read port #0 */
-	DEVCB_INPUT_PORT("DSW2"),       /* read port #1 */
-};
-
-static const ay8910_interface ojankoc_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),       /* read port #0 */
-	DEVCB_INPUT_PORT("DSW2"),       /* read port #1 */
-};
-
-
 MACHINE_START_MEMBER(ojankohs_state,common)
 {
 	save_item(NAME(m_gfxreg));
@@ -862,7 +836,8 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6)
-	MCFG_SOUND_CONFIG(ojankohs_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(ojankohs_state, ojankohs_ay8910_0_r))    /* read port #0 */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(ojankohs_state, ojankohs_ay8910_1_r)) /* read port #1 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -901,7 +876,8 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(ojankoy_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -939,7 +915,8 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(ojankoy_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -976,7 +953,8 @@ static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
-	MCFG_SOUND_CONFIG(ojankoc_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 8000000/22)

@@ -11,6 +11,7 @@
 #include "video/kan_pand.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
+#include "machine/eepromser.h"
 #include "machine/kaneko_calc3.h"
 #include "machine/kaneko_toybox.h"
 #include "sound/okim6295.h"
@@ -32,7 +33,8 @@ public:
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_pandora(*this, "pandora"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_eeprom(*this, "eeprom")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -47,6 +49,7 @@ public:
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
 	optional_device<kaneko_pandora_device> m_pandora;
 	required_device<palette_device> m_palette;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	UINT16 m_disp_enable;
 
@@ -65,6 +68,9 @@ public:
 	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
 	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_sw);
+	
+	DECLARE_READ8_MEMBER(eeprom_r);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	DECLARE_DRIVER_INIT(kaneko16);
 	DECLARE_DRIVER_INIT(samplebank);

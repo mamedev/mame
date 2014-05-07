@@ -180,17 +180,6 @@ WRITE_LINE_MEMBER(tail2nos_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tail2nos_state,sound_bankswitch_w)
-};
-
-
 static const k051316_interface tail2nos_k051316_intf =
 {
 	"gfx3", 2,
@@ -257,7 +246,7 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(tail2nos_state, irqhandler))
-	MCFG_YM2608_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tail2nos_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

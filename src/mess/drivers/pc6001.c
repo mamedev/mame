@@ -1908,18 +1908,6 @@ READ8_MEMBER(pc6001_state::pc6001_8255_portc_r)
 	return 0x88;
 }
 
-
-
-static const ay8910_interface pc6001_ay_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("P1"),
-	DEVCB_INPUT_PORT("P2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 UINT8 pc6001_state::check_keyboard_press()
 {
 	ioport_port *ports[3] = { m_io_key1, m_io_key2, m_io_key3 };
@@ -2343,7 +2331,8 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
-	MCFG_SOUND_CONFIG(pc6001_ay_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 //  MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

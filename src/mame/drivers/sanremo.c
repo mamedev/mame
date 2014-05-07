@@ -332,20 +332,6 @@ static GFXDECODE_START( sanremo )
 	GFXDECODE_ENTRY( "gfx",  0,   tilelayout, 0, 1 )
 GFXDECODE_END
 
-/********************************************
-*             Sound Interface               *
-********************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /*********************************************
 *              Machine Drivers               *
@@ -385,7 +371,7 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

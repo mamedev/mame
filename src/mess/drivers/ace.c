@@ -531,21 +531,6 @@ UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 //**************************************************************************
 
 //-------------------------------------------------
-//  ay8910_interface psg_intf
-//-------------------------------------------------
-
-static const ay8910_interface psg_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  I8255A interface
 //-------------------------------------------------
 
@@ -704,7 +689,6 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_6_5MHz/2)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL_3MHz)

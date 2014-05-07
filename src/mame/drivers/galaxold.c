@@ -2317,17 +2317,6 @@ static GFXDECODE_START( _4in1 )
 GFXDECODE_END
 
 
-static const ay8910_interface bongo_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 
 	/* basic machine hardware */
@@ -2579,7 +2568,7 @@ static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_CONFIG(bongo_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

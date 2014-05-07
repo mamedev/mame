@@ -340,17 +340,6 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
-	DEVCB_NULL
-};
-
-
 void ironhors_state::machine_start()
 {
 	save_item(NAME(m_palettebank));
@@ -395,7 +384,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 18432000/6)
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ironhors_state, ironhors_filter_w))
 
 	MCFG_SOUND_ROUTE_EX(0, "disc_ih", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "disc_ih", 1.0, 1)
@@ -429,18 +418,6 @@ READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 	return soundlatch_byte_r(m_soundcpu->space(AS_PROGRAM), 0);
 }
 
-static const ay8910_interface farwest_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ironhors_state,farwest_soundlatch_r),
-	DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
-	DEVCB_NULL
-};
-
-
-
 static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -458,7 +435,8 @@ static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 
 	MCFG_SOUND_MODIFY("ym2203")
-	MCFG_YM2203_AY8910_INTF(&farwest_ay8910_config)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(ironhors_state, farwest_soundlatch_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ironhors_state, ironhors_filter_w))
 MACHINE_CONFIG_END
 
 

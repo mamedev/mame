@@ -403,27 +403,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const ay8910_interface ay8910_config_1 =
-{
-	AY8910_LEGACY_OUTPUT,                   /* Flags */
-	AY8910_DEFAULT_LOADS,                   /* Load on channel in ohms */
-	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_soundlatch_r),  /* Port A read */
-	DEVCB_NULL,                             /* Port B read */
-	DEVCB_NULL,                             /* Port A write */
-	DEVCB_NULL                              /* Port B write */
-};
-
-static const ay8910_interface ay8910_config_2 =
-{
-	AY8910_LEGACY_OUTPUT,                   /* Flags */
-	AY8910_DEFAULT_LOADS,                   /* Load on channel in ohms */
-	DEVCB_NULL,                             /* Port A read */
-	DEVCB_NULL,                             /* Port B read */
-	DEVCB_NULL,                             /* Port A write */
-	DEVCB_NULL                              /* Port B write */
-};
-
-
 static const gfx_layout tilelayout =
 {
 	8, 8,
@@ -490,11 +469,10 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(flipjack_state, flipjack_soundlatch_r))  /* Port A read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
-	MCFG_SOUND_CONFIG(ay8910_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

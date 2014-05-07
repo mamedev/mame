@@ -272,27 +272,6 @@ WRITE8_MEMBER( scramble_state::ad2083_tms5110_ctrl_w )
 	m_tmsprom->enable_w(1);
 }
 
-
-static const ay8910_interface ad2083_ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ad2083_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(scramble_state, hotshock_soundlatch_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static ADDRESS_MAP_START( ad2083_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -330,11 +309,11 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)
-	MCFG_SOUND_CONFIG(ad2083_ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318000/8)
-	MCFG_SOUND_CONFIG(ad2083_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)

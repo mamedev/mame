@@ -1451,22 +1451,6 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 	return;
 }
 
-
-/*****************************
-*      Sound Interfaces      *
-*****************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("IN3"),
-	DEVCB_NULL, /* a sort of status byte */
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(lucky74_state,ym2149_portb_w)
-};
-
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -1529,7 +1513,9 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN3"))
+	/* port b read is a sort of status byte */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lucky74_state, ym2149_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
 
 	MCFG_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */

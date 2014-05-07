@@ -161,27 +161,6 @@ static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank1")                                                        // bitmap plane 1-4
 ADDRESS_MAP_END
 
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSWA"),       // DSW A
-	DEVCB_INPUT_PORT("DSWB"),       // DSW B
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(chaknpop_state,unknown_port_1_w),   // ??
-	DEVCB_DRIVER_MEMBER(chaknpop_state,unknown_port_2_w)    // ??
-};
-
-
 /***************************************************************************
 
   Input Port(s)
@@ -394,11 +373,13 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz / 12)  /* Verified on PCB */
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18MHz / 12)  /* Verified on PCB */
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chaknpop_state, unknown_port_1_w))   // ??
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chaknpop_state, unknown_port_2_w))    // ??
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 

@@ -29,13 +29,6 @@
 
 const device_type A2BUS_ARCADEBOARD = &device_creator<a2bus_arcboard_device>;
 
-static const ay8910_interface arcadeboard_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 MACHINE_CONFIG_FRAGMENT( arcadeboard )
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
@@ -45,7 +38,6 @@ MACHINE_CONFIG_FRAGMENT( arcadeboard )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY_TAG, AY8910, 1022727)
-	MCFG_SOUND_CONFIG(arcadeboard_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

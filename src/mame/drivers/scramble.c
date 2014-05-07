@@ -1345,47 +1345,6 @@ static GFXDECODE_START( ad2083 )
 GFXDECODE_END
 
 
-static const ay8910_interface scramble_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface hotshock_ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(scramble_state, hotshock_soundlatch_r),
-	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface triplep_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const ay8910_interface harem_ay8910_interface_3 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                     // Port A read
-	DEVCB_NULL,                     // Port B read
-	DEVCB_DRIVER_MEMBER(scramble_state, harem_portA_w),   // Port A write
-	DEVCB_DRIVER_MEMBER(scramble_state, harem_portB_w),   // Port B write
-};
-
-
 /**************************************************************************/
 
 static MACHINE_CONFIG_START( scramble, scramble_state )
@@ -1442,7 +1401,8 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
 	MCFG_SOUND_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_SOUND_CONFIG(scramble_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
@@ -1564,7 +1524,8 @@ static MACHINE_CONFIG_DERIVED( hotshock, scramble )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_MODIFY("8910.2")
-	MCFG_SOUND_CONFIG(hotshock_ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -1610,7 +1571,8 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("8910.1")
 	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
-	MCFG_SOUND_CONFIG(triplep_ay8910_interface)
+	
+	
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1719,7 +1681,8 @@ static MACHINE_CONFIG_DERIVED( harem, scramble )
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.3", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_SOUND_CONFIG(harem_ay8910_interface_3)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(scramble_state, harem_portA_w))   // Port A write
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(scramble_state, harem_portB_w))   // Port B write
 MACHINE_CONFIG_END
 
 /***************************************************************************

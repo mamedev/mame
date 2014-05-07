@@ -214,18 +214,6 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 	m_column = data;
 }
 
-
-static const ay8910_interface myvision_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_a_r),
-	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_b_r),
-	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_a_w),
-	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_b_w)
-};
-
-
 static MACHINE_CONFIG_START( myvision, myvision_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
@@ -242,7 +230,10 @@ static MACHINE_CONFIG_START( myvision, myvision_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_10_738635MHz/3/2)  /* Exact model and clock not verified */
-	MCFG_SOUND_CONFIG(myvision_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(myvision_state, ay_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(myvision_state, ay_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(myvision_state, ay_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(myvision_state, ay_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */

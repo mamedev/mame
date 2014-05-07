@@ -235,16 +235,6 @@ WRITE8_MEMBER( votrpss_state::ppi_pc_w )
 	m_portc = data;
 }
 
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,   // flags
-	AY8910_DEFAULT_LOADS,   // channel load in ohms
-	DEVCB_NULL,        // port A read
-	DEVCB_INPUT_PORT("DSW1"),        // port B read
-	DEVCB_DEVICE_MEMBER("votrax", votrax_sc01_device, write),     // port A write
-	DEVCB_NULL      // port B write
-};
-
 WRITE8_MEMBER( votrpss_state::kbd_put )
 {
 	m_term_data = data;
@@ -273,7 +263,8 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* 2.000 MHz, verified */
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("votrax", votrax_sc01_device, write))     // port A write
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

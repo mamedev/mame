@@ -469,17 +469,6 @@ WRITE_LINE_MEMBER(sandscrp_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"), /* Port A Read */
-	DEVCB_INPUT_PORT("DSW2"), /* Port B Read */
-	DEVCB_NULL, /* Port A Write */
-	DEVCB_NULL, /* Port B Write */
-};
-
-
 static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	/* basic machine hardware */
@@ -528,7 +517,8 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sandscrp_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END

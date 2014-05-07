@@ -48,7 +48,7 @@ void adsp21062_device::pm_write32(UINT32 address, UINT32 data)
 
 UINT64 adsp21062_device::pm_read48(UINT32 address)
 {
-	if ((address >= 0 && address < 0x8000) || (address >= 0x20000 && address < 0x28000))
+	if ((address >= 0x20000 && address < 0x28000))
 	{
 		UINT32 addr = (address & 0x7fff) * 3;
 
@@ -66,7 +66,7 @@ UINT64 adsp21062_device::pm_read48(UINT32 address)
 				((UINT64)(m_internal_ram_block1[addr + 2]) << 0);
 	}
 	else {
-		//fatalerror("SHARC: PM Bus Read48 %08X at %08X\n", address, m_pc);
+		fatalerror("SHARC: PM Bus Read48 %08X at %08X\n", address, m_pc);
 	}
 
 	return 0;
@@ -74,7 +74,7 @@ UINT64 adsp21062_device::pm_read48(UINT32 address)
 
 void adsp21062_device::pm_write48(UINT32 address, UINT64 data)
 {
-	if ((address >= 0 && address < 0x8000) || (address >= 0x20000 && address < 0x28000))
+	if ((address >= 0x20000 && address < 0x28000))
 	{
 		UINT32 addr = (address & 0x7fff) * 3;
 
@@ -94,7 +94,7 @@ void adsp21062_device::pm_write48(UINT32 address, UINT64 data)
 		return;
 	}
 	else {
-		//fatalerror("SHARC: PM Bus Write48 %08X, %04X%08X at %08X\n", address, (UINT16)(data >> 32),(UINT32)data, m_pc);
+		fatalerror("SHARC: PM Bus Write48 %08X, %04X%08X at %08X\n", address, (UINT16)(data >> 32),(UINT32)data, m_pc);
 	}
 }
 

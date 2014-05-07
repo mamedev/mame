@@ -447,17 +447,6 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static const ay8910_interface lcay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW0"),
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu",Z80, 18432000/6) // 3.072 MHz ?
@@ -484,7 +473,8 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_SOUND_CONFIG(lcay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

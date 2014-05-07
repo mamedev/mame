@@ -252,18 +252,6 @@ static INPUT_PORTS_START( aces1 )
 INPUT_PORTS_END
 
 
-// 0xadf0 - Dips, Sound
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSWA"),
-	DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( aces1, aces1_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
@@ -293,8 +281,10 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	// 0xadf0 - Dips, Sound
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* ?? MHz */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

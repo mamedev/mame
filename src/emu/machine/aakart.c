@@ -144,7 +144,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                 m_out_tx_cb(ASSERT_LINE);
                 break;
             default:
-                printf("%02x %02x %02x\n",m_tx_latch,m_rx_latch,m_keyb_enable);
+                //printf("%02x %02x %02x\n",m_tx_latch,m_rx_latch,m_keyb_enable);
                 break;
         }
 

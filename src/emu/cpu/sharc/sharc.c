@@ -281,17 +281,22 @@ void adsp21062_device::external_iop_write(UINT32 address, UINT32 data)
 
 void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
 {
+	/*
+	All addresses in the 17-bit index registers are offset by 0x0002 0000, the
+	first internal RAM location, before they are used by the DMA controller.
+	*/
+
 	switch ((m_dma[6].control >> 6) & 0x3)
 	{
 		case 2:         // 16/48 packing
 		{
 			int shift = address % 3;
-			UINT64 r = pm_read48(m_dma[6].int_index);
+			UINT64 r = pm_read48((m_dma[6].int_index & 0x1ffff) | 0x20000);
 
 			r &= ~((UINT64)(0xffff) << (shift*16));
 			r |= (data & 0xffff) << (shift*16);
 
-			pm_write48(m_dma[6].int_index, r);
+			pm_write48((m_dma[6].int_index & 0x1ffff) | 0x20000, r);
 
 			if (shift == 2)
 			{

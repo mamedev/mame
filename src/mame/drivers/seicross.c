@@ -362,17 +362,6 @@ static GFXDECODE_START( seicross )
 GFXDECODE_END
 
 
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(seicross_state,friskyt_portB_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(seicross_state,friskyt_portB_w)
-};
-
 INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 {
 	if(m_irq_mask)
@@ -412,7 +401,8 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1536000)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, friskyt_portB_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, friskyt_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")

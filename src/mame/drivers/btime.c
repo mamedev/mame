@@ -1151,20 +1151,6 @@ GFXDECODE_END
 
  ****************************************************************************/
 
-static const ay8910_interface ay1_intf =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{RES_K(5), RES_K(5), RES_K(5)},
-	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(btime_state,ay_audio_nmi_enable_w), DEVCB_NULL
-};
-
-static const ay8910_interface ay2_intf =
-{
-	AY8910_DISCRETE_OUTPUT,
-	{RES_K(1), RES_K(5), RES_K(5)},
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
 static const discrete_mixer_desc btime_sound_mixer_desc =
 	{DISC_MIXER_IS_OP_AMP,
 		{RES_K(100), RES_K(100)},
@@ -1328,13 +1314,16 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
-	MCFG_SOUND_CONFIG(ay1_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
-	MCFG_SOUND_CONFIG(ay2_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
@@ -1447,7 +1436,9 @@ static MACHINE_CONFIG_DERIVED( zoar, btime )
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-	MCFG_SOUND_CONFIG(ay1_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
 
 	MCFG_SOUND_REPLACE("ay2", AY8910, HCLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)

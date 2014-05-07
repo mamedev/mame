@@ -864,26 +864,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_r),
-	DEVCB_NULL, /* discrete read? */
-	DEVCB_NULL,
-	DEVCB_NULL /* discrete write? */
-};
-
-static const ay8910_interface cowrace_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_r),                                    // read A
-	DEVCB_DEVICE_MEMBER("oki", okim6295_device, read),          // read B
-	DEVCB_NULL,                                                 // write A
-	DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)          // write B
-};
-
 PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
@@ -993,7 +973,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1032,7 +1012,9 @@ static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_REPLACE("aysnd", YM2203, 3000000)
-	MCFG_YM2203_AY8910_INTF(&cowrace_ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("oki", okim6295_device, read))   // read B
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("oki", okim6295_device, write))   // write B
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

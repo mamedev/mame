@@ -502,26 +502,6 @@ static GFXDECODE_START( gluck2 )
 	GFXDECODE_ENTRY( "gfx", 0x3800, tilelayout, 0, 16 )
 GFXDECODE_END
 
-
-/*************************************************
-*                Sound Interfaces                *
-*************************************************/
-
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("SW3"),
-	DEVCB_INPUT_PORT("SW2"),
-
-/*  Output ports have a minimal activity during init.
-    They seems unused (at least for Good Luck II)
-*/
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /*********************************************
 *              Machine Drivers               *
 *********************************************/
@@ -560,7 +540,11 @@ static MACHINE_CONFIG_START( gluck2, gluck2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW2"))
+/*  Output ports have a minimal activity during init.
+    They seems unused (at least for Good Luck II)
+*/
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, SND_CLOCK)

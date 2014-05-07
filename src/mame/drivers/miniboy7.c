@@ -390,22 +390,6 @@ static GFXDECODE_START( miniboy7 )
 
 GFXDECODE_END
 
-
-/***********************************
-*         Sound Interface          *
-***********************************/
-
-static const ay8910_interface miniboy7_ay8910_intf =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /***********************************
 *         Machine Drivers          *
 ***********************************/
@@ -441,7 +425,6 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
-	MCFG_SOUND_CONFIG(miniboy7_ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 MACHINE_CONFIG_END

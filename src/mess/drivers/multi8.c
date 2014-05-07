@@ -609,17 +609,6 @@ WRITE8_MEMBER( multi8_state::ym2203_porta_w )
 	m_beeper->set_state((data & 0x08));
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(multi8_state, ym2203_porta_w ),
-	DEVCB_NULL
-};
-
-
 void multi8_state::machine_start()
 {
 	m_p_vram = memregion("vram")->base();
@@ -656,7 +645,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(multi8_state, ym2203_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

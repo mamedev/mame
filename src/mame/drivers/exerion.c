@@ -335,25 +335,6 @@ static GFXDECODE_START( exerion )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(exerion_state,exerion_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(exerion_state,exerion_portb_w)
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -413,7 +394,8 @@ static MACHINE_CONFIG_START( exerion, exerion_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(exerion_state, exerion_porta_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(exerion_state, exerion_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

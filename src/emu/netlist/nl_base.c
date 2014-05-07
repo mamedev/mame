@@ -614,8 +614,14 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 	if (othernet == NULL)
 		return; // Nothing to do
 
+    if (othernet == this)
+    {
+        netlist().warning("Connecting %s to itself. This may be right, though\n", this->name().cstr());
+        return; // Nothing to do
+    }
+
 	if (this->isRailNet() && othernet->isRailNet())
-		netlist().error("Trying to merge to rail nets\n");
+		netlist().error("Trying to merge two rail nets: %s and %s\n", this->name().cstr(), othernet->name().cstr());
 
 	if (othernet->isRailNet())
 	{

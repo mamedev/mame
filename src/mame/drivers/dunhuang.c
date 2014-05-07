@@ -761,17 +761,6 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static const ay8910_interface dunhuang_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	//  A                   B
-	DEVCB_NULL,                         DEVCB_DRIVER_MEMBER(dunhuang_state,dunhuang_dsw_r), // R
-	DEVCB_DRIVER_MEMBER(dunhuang_state, dunhuang_input_w),  DEVCB_NULL                      // W
-};
-
-
-
 void dunhuang_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -850,7 +839,8 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("ay8910", AY8910, 12000000/8)
-	MCFG_SOUND_CONFIG(dunhuang_ay8910_interface)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(dunhuang_state, dunhuang_dsw_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(dunhuang_state, dunhuang_input_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_HIGH)

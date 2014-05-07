@@ -4182,15 +4182,6 @@ ADDRESS_MAP_END
                            Hanafuda Hana Tengoku
 ***************************************************************************/
 
-static const ay8910_interface htengoku_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A            B
-	DEVCB_DRIVER_MEMBER(ddenlovr_state,htengoku_dsw_r),    DEVCB_NULL,                         // R
-	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,htengoku_dsw_w)     // W
-};
-
 static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
@@ -4231,7 +4222,8 @@ static MACHINE_CONFIG_START( htengoku, ddenlovr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 20000000 / 16)
-	MCFG_SOUND_CONFIG(htengoku_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, htengoku_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, htengoku_dsw_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
@@ -9475,16 +9467,6 @@ static MACHINE_CONFIG_DERIVED( akamaru, ddenlovr )
 	MCFG_CPU_PROGRAM_MAP(akamaru_map)
 MACHINE_CONFIG_END
 
-
-static const ay8910_interface quiz365_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A                            B
-	DEVCB_DRIVER_MEMBER(ddenlovr_state,quiz365_input_r), DEVCB_NULL,                         // R
-	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)    // W
-};
-
 static MACHINE_CONFIG_DERIVED( quiz365, ddenlovr )
 
 	/* basic machine hardware */
@@ -9492,7 +9474,8 @@ static MACHINE_CONFIG_DERIVED( quiz365, ddenlovr )
 	MCFG_CPU_PROGRAM_MAP(quiz365_map)
 
 	MCFG_SOUND_MODIFY("aysnd")
-	MCFG_SOUND_CONFIG(quiz365_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, quiz365_input_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nettoqc, ddenlovr )
@@ -9902,15 +9885,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddenlovr_state::mjmyster_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
-static const ay8910_interface mjmyster_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A            B
-	DEVCB_NULL,     DEVCB_NULL,                         // R
-	DEVCB_NULL,     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)    // W
-};
-
 WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_rtc_irq)
 {
 	/* I haven't found a irq ack register, so I need this kludge to
@@ -9939,7 +9913,7 @@ static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
-	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -9965,15 +9939,6 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::hginga_irq)
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
-
-static const ay8910_interface hginga_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A                            B
-	DEVCB_DRIVER_MEMBER(ddenlovr_state,hginga_dsw_r),    DEVCB_NULL,                             // R
-	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)        // W
-};
 
 WRITE_LINE_MEMBER(ddenlovr_state::hginga_rtc_irq)
 {
@@ -10001,7 +9966,8 @@ static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
-	MCFG_SOUND_CONFIG(hginga_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, hginga_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -10019,7 +9985,8 @@ static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
-	MCFG_SOUND_CONFIG(hginga_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, hginga_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -10055,7 +10022,7 @@ static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjmyster_rtc_irq))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
-	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -10075,7 +10042,7 @@ static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjmyster_rtc_irq))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
-	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -10277,15 +10244,6 @@ MACHINE_CONFIG_END
                              Return Of Sel Jan II
 ***************************************************************************/
 
-static const ay8910_interface seljan2_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A                            B
-	DEVCB_DRIVER_MEMBER(ddenlovr_state,seljan2_dsw_r),   DEVCB_NULL,                             // R
-	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)        // W
-};
-
 MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -10332,7 +10290,8 @@ static MACHINE_CONFIG_START( seljan2, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
-	MCFG_SOUND_CONFIG(seljan2_ay8910_interface)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, seljan2_dsw_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH) // ?

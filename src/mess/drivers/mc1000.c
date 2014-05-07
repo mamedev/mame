@@ -316,16 +316,6 @@ READ8_MEMBER( mc1000_state::keydata_r )
 	return data;
 }
 
-static const ay8910_interface ay8910_intf =
-{
-	AY8910_SINGLE_OUTPUT,
-	{ RES_K(2.2), 0, 0 },
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc1000_state, keydata_r),
-	DEVCB_DRIVER_MEMBER(mc1000_state, keylatch_w),
-	DEVCB_NULL
-};
-
 /* Machine Initialization */
 
 void mc1000_state::machine_start()
@@ -454,7 +444,10 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 3579545/2)
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(mc1000_state, keydata_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mc1000_state, keylatch_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */

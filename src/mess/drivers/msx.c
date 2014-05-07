@@ -1045,16 +1045,6 @@ static INPUT_PORTS_START( msx2kr )
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
-static const ay8910_interface msx_ay8910_interface =
-{
-	AY8910_SINGLE_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_a_r),
-	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_b_r),
-	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_a_w),
-	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_b_w)
-};
-
 #define MSX_XBORDER_PIXELS      15
 #define MSX_YBORDER_PIXELS      27
 #define MSX_TOTAL_XRES_PIXELS       256 + (MSX_XBORDER_PIXELS * 2)
@@ -1196,7 +1186,11 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_10_738635MHz/3/2)
-	MCFG_SOUND_CONFIG(msx_ay8910_interface)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_ADD("k051649", K051649, XTAL_10_738635MHz/3/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -1288,7 +1282,11 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_21_4772MHz/6/2)
-	MCFG_SOUND_CONFIG(msx_ay8910_interface)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_ADD("k051649", K051649, XTAL_21_4772MHz/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -1356,7 +1354,11 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_21_4772MHz/6/2)
-	MCFG_SOUND_CONFIG(msx_ay8910_interface)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_ADD("k051649", K051649, XTAL_21_4772MHz/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

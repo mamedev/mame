@@ -289,28 +289,6 @@ static GFXDECODE_START( taxidriv )
 	GFXDECODE_ENTRY( "gfx5", 0, charlayout2, 0, 1 )
 GFXDECODE_END
 
-
-
-static const ay8910_interface ay8910_interface_1 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p8910_0a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p8910_0b_w)
-};
-
-static const ay8910_interface ay8910_interface_2 =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p8910_1a_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
@@ -399,11 +377,12 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1250000)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(taxidriv_state, p8910_0a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taxidriv_state, p8910_0b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1250000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(taxidriv_state, p8910_1a_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

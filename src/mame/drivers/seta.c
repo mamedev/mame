@@ -7534,17 +7534,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
                                 Thundercade
 ***************************************************************************/
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(seta_state,dsw1_r),     /* input A: DSW 1 */
-	DEVCB_DRIVER_MEMBER(seta_state,dsw2_r),     /* input B: DSW 2 */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 {
 	int scanline = param;
@@ -7589,7 +7578,8 @@ static MACHINE_CONFIG_START( tndrcade, seta_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(seta_state, dsw1_r))     /* input A: DSW 1 */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(seta_state, dsw2_r))     /* input B: DSW 2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 

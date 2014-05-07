@@ -956,14 +956,6 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 	// ?
 }
 
-static const ay8910_interface bestbest_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,                                 DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(suna16_state,bestbest_ay8910_port_a_w), DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( bestbest, suna16_state )
 
 	/* basic machine hardware */
@@ -999,7 +991,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/16)  /* 1.5MHz */
-	MCFG_SOUND_CONFIG(bestbest_ay8910_interface)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna16_state, bestbest_ay8910_port_a_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -317,6 +317,4 @@ MACHINE_CONFIG_EXTERN( mpu4_common2 );
 
 MACHINE_CONFIG_EXTERN( mod2     );
 
-extern const ay8910_interface ay8910_config;
-
 INPUT_PORTS_EXTERN( mpu4 );

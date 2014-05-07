@@ -529,22 +529,6 @@ void slotcarn_state::machine_start()
 	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
 }
 
-
-/*************************************
-*          AY8910 Interface          *
-*************************************/
-
-static const ay8910_interface scarn_ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /***********************************
 *          Machine Driver          *
 ***********************************/
@@ -588,7 +572,7 @@ static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
-	MCFG_SOUND_CONFIG(scarn_ay8910_config)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

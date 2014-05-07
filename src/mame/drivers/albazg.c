@@ -200,16 +200,6 @@ WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 	flip_screen_set(~data & 0x20);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_DRIVER_MEMBER(albazg_state,yumefuda_output_w),
-	DEVCB_NULL
-};
-
 /***************************************************************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
@@ -392,7 +382,9 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(albazg_state, yumefuda_output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

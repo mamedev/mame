@@ -33,7 +33,7 @@ static output_delegate output_cb[OSD_OUTPUT_CHANNEL_COUNT] =
 	output_delegate(FUNC(osd_file_output_callback), stderr),   // OSD_OUTPUT_CHANNEL_ERROR
 	output_delegate(FUNC(osd_file_output_callback), stderr),   // OSD_OUTPUT_CHANNEL_WARNING
 	output_delegate(FUNC(osd_file_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_INFO
-#ifdef osd_DEBUG
+#ifdef MAME_DEBUG
 	output_delegate(FUNC(osd_file_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_DEBUG
 #else
 	output_delegate(FUNC(osd_null_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_DEBUG

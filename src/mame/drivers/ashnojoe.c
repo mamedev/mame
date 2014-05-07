@@ -289,16 +289,6 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
 	membank("bank4")->set_entry(data & 0x0f);
 }
 
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_a),
-	DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_b),
-};
-
 WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
@@ -359,7 +349,8 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ashnojoe_state, ym2203_irq_handler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_a))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_b))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
