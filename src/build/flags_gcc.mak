@@ -11,6 +11,10 @@ ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
 	CCOMFLAGS += -Wno-unused-variable -Wno-array-bounds -Wno-strict-overflow
 endif
 
+ifeq ($(findstring 4.9.,$(TEST_GCC)),4.9.)
+	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs
+endif
+
 ifeq ($(findstring arm,$(UNAME)),arm)
 	CCOMFLAGS += -Wno-cast-align
 endif
