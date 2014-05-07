@@ -278,7 +278,7 @@ WRITE8_MEMBER(pve500_state::io_expander_w)
 					for (int j=0; j<8; j++){
 						if (io_SC & (1<<j)){
 							output_set_digit_value(8*i + j, BITSWAP8(io_LD & 0x7F, 7, 0, 1, 2, 3, 4, 5, 6));
-							printf("io_expander_w PORTE data=%02X\n", data);
+							//printf("io_expander_w PORTE data=%02X\n", data);
 						}
 					}
 				}
