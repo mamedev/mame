@@ -63,6 +63,11 @@
 # set this to the minimum DirectInput version to support (7 or 8)
 # DIRECTINPUT = 8
 
+# uncomment next line to use SDL library for sound and video output
+# USE_SDL = 1
+
+# uncomment next line to use QT debugger
+# USE_QTDEBUG = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -81,13 +86,21 @@ OSDOBJ = $(OBJ)/osd
 
 OBJDIRS += $(WINOBJ)
 
-#ifdef USE_QTDEBUG
+ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
-#endif
+DEFS += -DUSE_QTDEBUG=1
+else
+DEFS += -DUSE_QTDEBUG=0
+endif
 
+ifdef USE_SDL
 DEFS += -DSDLMAME_SDL2=0
 DEFS += -DUSE_XINPUT=0
 DEFS += -DUSE_OPENGL=0
+DEFS += -DUSE_SDL=1
+else
+DEFS += -DUSE_SDL=0
+endif
 
 #-------------------------------------------------
 # configure the resource compiler
@@ -294,7 +307,10 @@ endif
 
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
+
+ifdef USE_SDL
 LIBS += -lSDL.dll
+endif
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8
@@ -340,12 +356,15 @@ OSDOBJS = \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
 	$(OSDOBJ)/modules/sound/direct_sound.o \
-	$(OSDOBJ)/modules/sound/sdl_sound.o  \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o
 
+ifdef USE_SDL
+OSDOBJS += \
+	$(OSDOBJ)/modules/sound/sdl_sound.o
+endif
 
 ifdef USE_NETWORK
 OSDOBJS += \
@@ -359,11 +378,9 @@ CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 $(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.inc
 $(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.inc
 
-#ifndef USE_QTDEBUG
 # add debug-specific files
 OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/debugwin.o
-#endif
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
@@ -371,7 +388,7 @@ RESFILE = $(WINOBJ)/mame.res
 #-------------------------------------------------
 # QT Debug library
 #-------------------------------------------------
-#ifdef USE_QTDEBUG
+ifdef USE_QTDEBUG
 QT_INSTALL_HEADERS := $(shell qmake -query QT_INSTALL_HEADERS)
 QT_LIBS := -L$(shell qmake -query QT_INSTALL_LIBS)
 LIBS += $(QT_LIBS) -lqtmain -lQtGui4 -lQtCore4
@@ -398,7 +415,7 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o
-#endif
+endif
 
 #-------------------------------------------------
 # rules for building the libaries
