@@ -428,6 +428,7 @@ int main(int argc, char *argv[])
 	{
 		windows_options options;
 		windows_osd_interface osd;
+		osd.register_options(options);
 		cli_frontend frontend(options, osd);
 		result = frontend.execute(argc, argv);
 	}
@@ -532,14 +533,26 @@ windows_osd_interface::~windows_osd_interface()
 
 
 //============================================================
+//  video_register
+//============================================================
+
+void windows_osd_interface::video_register()
+{
+	video_options_add("gdi", NULL);
+	video_options_add("ddraw", NULL);
+	video_options_add("d3d", NULL);
+	//video_options_add("auto", NULL); // making d3d video default one
+}
+
+//============================================================
 //  sound_register
 //============================================================
 
 void windows_osd_interface::sound_register()
 {
-	m_sound_options.add("auto", OSD_SOUND_DIRECT_SOUND, false); // making Direct Sound audio default one
-	m_sound_options.add("dsound", OSD_SOUND_DIRECT_SOUND, false);
-	m_sound_options.add("sdl", OSD_SOUND_SDL, false);
+	sound_options_add("dsound", OSD_SOUND_DIRECT_SOUND);
+	sound_options_add("sdl", OSD_SOUND_SDL);
+	sound_options_add("auto", OSD_SOUND_DIRECT_SOUND); // making Direct Sound audio default one
 }
 
 
@@ -549,9 +562,9 @@ void windows_osd_interface::sound_register()
 
 void windows_osd_interface::debugger_register()
 {
-	m_debugger_options.add("auto", OSD_DEBUGGER_WINDOWS, false); // making windows debugger default one
-	m_debugger_options.add("windows", OSD_DEBUGGER_WINDOWS, false);	
-	m_debugger_options.add("qt", OSD_DEBUGGER_QT, false);	
+	debugger_options_add("windows", OSD_DEBUGGER_WINDOWS);	
+	debugger_options_add("qt", OSD_DEBUGGER_QT);	
+	debugger_options_add("auto", OSD_DEBUGGER_WINDOWS); // making windows debugger default one
 }
 
 //============================================================

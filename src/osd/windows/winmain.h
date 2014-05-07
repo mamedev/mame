@@ -256,6 +256,7 @@ public:
 	virtual void font_close(osd_font font);
 	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
+	virtual void video_register();
 	virtual void sound_register();
 	virtual void debugger_register();
 	

@@ -136,6 +136,8 @@ public:
 	osd_interface();
 	virtual ~osd_interface();
 
+	void register_options(osd_options &options);
+	
 	// getters
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -166,7 +168,9 @@ public:
 	virtual void *get_slider_list();
 
 	void init_subsystems();	
+	
 	virtual bool video_init();
+	virtual void video_register();
 	
 	bool sound_init();
 	virtual void sound_register();
@@ -187,17 +191,27 @@ public:
 	virtual void midi_exit();
 
 	virtual void osd_exit();
+	
+	void video_options_add(const char *name, void *type);
+	void sound_options_add(const char *name, osd_sound_type type);
+	void debugger_options_add(const char *name, osd_debugger_type type);
 
 private:
 	// internal state
 	running_machine *   m_machine;	
-
+	
+	void update_option(osd_options &options, const char * key, dynamic_array<const char *> &values);
+	
 protected:	
 	osd_sound_interface* m_sound;
 	osd_debugger_interface* m_debugger;
-	
+private:	
+	//tagmap_t<osd_video_type>  m_video_options;  
+	dynamic_array<const char *> m_video_names;
 	tagmap_t<osd_sound_type>  m_sound_options;  
+	dynamic_array<const char *> m_sound_names;
 	tagmap_t<osd_debugger_type>  m_debugger_options;  
+	dynamic_array<const char *> m_debugger_names;
 };
 
 class osd_sound_interface

@@ -25,19 +25,19 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_LOG,                          "0",        OPTION_BOOLEAN,    "generate an error.log file" },
 	{ OSDOPTION_VERBOSE ";v",                 "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
 	{ OSDOPTION_DEBUG ";d",                   "0",        OPTION_BOOLEAN,    "enable/disable debugger" },
-	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,      OPTION_STRING,    "debugger used" },
+	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,      OPTION_STRING,    "debugger used : " },
 	{ OSDOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",        OPTION_INTEGER,    "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
+	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD PERFORMANCE OPTIONS" },
 	{ OSDOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 	{ OSDOPTION_NUMPROCESSORS ";np",          OSDOPTVAL_AUTO,      OPTION_STRING,     "number of processors; this overrides the number the system reports" },
 	{ OSDOPTION_BENCH,                        "0",        OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 	// video options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
-	{ OSDOPTION_VIDEO,                   	  OSDOPTVAL_AUTO,  	  OPTION_STRING,     "video output method: soft or opengl" },
+	{ OSDOPTION_VIDEO,                   	  OSDOPTVAL_AUTO,  	  OPTION_STRING,     "video output method: " },
 	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",        OPTION_INTEGER,    "number of screens to create; usually, you want just one" },
 	{ OSDOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ OSDOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
@@ -79,7 +79,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	// sound options
 	{ NULL,                                   NULL,  OPTION_HEADER,     "OSD SOUND OPTIONS" },
-	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO, OPTION_STRING,     "sound output method: none or sdl" },	
+	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO, OPTION_STRING,     "sound output method: " },	
 	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// End of list
@@ -108,7 +108,46 @@ osd_interface::osd_interface()
 	: m_machine(NULL),
 	  m_sound(NULL),
 	  m_debugger(NULL)
+
 {
+}
+
+void osd_interface::update_option(osd_options &options, const char * key, dynamic_array<const char *> &values)
+{
+	astring current_value(options.description(key));	
+	astring new_option_value("");
+	for (int index = 0; index < values.count(); index++)
+	{
+		astring t(values[index]);
+		if (new_option_value.len() > 0) 
+		{
+			if( index != (values.count()-1))
+				new_option_value.cat(", ");
+			else
+				new_option_value.cat(" or ");		
+		}
+		new_option_value.cat(t);		
+	}
+	options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));	
+}
+	
+void osd_interface::register_options(osd_options &options)
+{
+	// Register video options and update options
+	video_options_add("none", NULL);	
+	video_register();
+	update_option(options, OSDOPTION_VIDEO, m_video_names);
+	
+	// Register sound options and update options
+	sound_options_add("none", OSD_SOUND_NONE);	
+	sound_register();
+	update_option(options, OSDOPTION_SOUND, m_sound_names);
+	
+	// Register debugger options and update options
+	debugger_options_add("none", OSD_DEBUGGER_NONE);	
+	debugger_options_add("internal", OSD_DEBUGGER_INTERNAL);	
+	debugger_register();
+	update_option(options, OSDOPTION_DEBUGGER, m_debugger_names);
 }
 
 
@@ -118,6 +157,8 @@ osd_interface::osd_interface()
 
 osd_interface::~osd_interface()
 {
+	m_debugger_options.reset();
+	m_sound_options.reset();
 }
 
 
@@ -164,13 +205,6 @@ void osd_interface::init(running_machine &machine)
 	if (options.verbose())
 		g_print_verbose = true;
 		
-	m_sound_options.add("none", OSD_SOUND_NONE, false);	
-	sound_register();
-	
-	m_debugger_options.add("none", OSD_DEBUGGER_NONE, false);	
-	m_debugger_options.add("internal", OSD_DEBUGGER_INTERNAL, false);	
-	debugger_register();
-
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_interface::osd_exit), this));
 }
@@ -385,6 +419,10 @@ bool osd_interface::sound_init()
 	return true;
 }
 
+void osd_interface::video_register()
+{
+}
+
 void osd_interface::sound_register()
 {
 }
@@ -469,11 +507,25 @@ void osd_interface::midi_exit()
 void osd_interface::osd_exit()
 {
 	exit_subsystems();
-	m_debugger_options.reset();
-	m_sound_options.reset();
 }
 
+void osd_interface::video_options_add(const char *name, void *type)
+{
+	//m_video_options.add(name, type, false);
+	m_video_names.append(core_strdup(name));
+}
 
+void osd_interface::sound_options_add(const char *name, osd_sound_type type)
+{
+	m_sound_options.add(name, type, false);
+	m_sound_names.append(core_strdup(name));
+}
+
+void osd_interface::debugger_options_add(const char *name, osd_debugger_type type)
+{
+	m_debugger_options.add(name, type, false);
+	m_debugger_names.append(core_strdup(name));
+}
 //-------------------------------------------------
 //  osd_sound_interface - constructor
 //-------------------------------------------------

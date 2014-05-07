@@ -94,6 +94,7 @@ public:
 		// setters
 		void set_value(const char *newvalue, int priority);
 		void set_default_value(const char *defvalue);
+		void set_description(const char *description);
 		void set_flag(UINT32 mask, UINT32 flag);
 		void revert(int priority);
 
@@ -134,6 +135,7 @@ public:
 	void add_entry(const options_entry &data, bool override_existing = false) { add_entry(data.name, data.description, data.flags, data.defvalue, override_existing); }
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
 	void set_default_value(const char *name, const char *defvalue);
+	void set_description(const char *name, const char *description);
 	void remove_entry(entry &delentry);
 
 	// parsing/input
@@ -149,6 +151,7 @@ public:
 
 	// reading
 	const char *value(const char *option) const;
+	const char *description(const char *option) const;
 	int priority(const char *option) const;
 	bool bool_value(const char *name) const { return (atoi(value(name)) != 0); }
 	int int_value(const char *name) const { return atoi(value(name)); }
