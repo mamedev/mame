@@ -174,6 +174,7 @@ public:
 	
 	bool sound_init();
 	virtual void sound_register();
+	bool no_sound();
 	
 	virtual bool input_init();
 	virtual void input_pause();

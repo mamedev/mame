@@ -419,6 +419,11 @@ bool osd_interface::sound_init()
 	return true;
 }
 
+bool osd_interface::no_sound()
+{
+	return (strcmp(machine().options().sound(),"none")==0) ? true : false;
+}
+
 void osd_interface::video_register()
 {
 }
