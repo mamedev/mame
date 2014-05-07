@@ -975,7 +975,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_rng(0),
 		m_env_step_mask(0x0f),
 		m_step(2),
-		m_zero_is_off(0), // FIXME: Remove after verification that off=vol(0)
+		m_zero_is_off(0),
 		m_par(&ay8910_param),
 		m_par_env(&ay8910_param),
 		m_flags(AY8910_LEGACY_OUTPUT),
@@ -1016,7 +1016,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_rng(0),
 		m_env_step_mask(psg_type == PSG_TYPE_AY ? 0x0f : 0x1f),
 		m_step(         psg_type == PSG_TYPE_AY ? 2 : 1),
-		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 0 : 0), // FIXME: Remove after verification that off=vol(0)
+		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 1 : 0),
 		m_par(          psg_type == PSG_TYPE_AY ? &ay8910_param : &ym2149_param),
 		m_par_env(      psg_type == PSG_TYPE_AY ? &ay8910_param : &ym2149_param_env),
 		m_flags(AY8910_LEGACY_OUTPUT),
