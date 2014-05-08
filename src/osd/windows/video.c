@@ -370,6 +370,8 @@ static void extract_video_config(running_machine &machine)
 	stemp = options.video();
 	if (strcmp(stemp, "d3d") == 0)
 		video_config.mode = VIDEO_MODE_D3D;
+	else if (strcmp(stemp, "auto") == 0)
+		video_config.mode = VIDEO_MODE_D3D;
 	else if (strcmp(stemp, "ddraw") == 0)
 		video_config.mode = VIDEO_MODE_DDRAW;
 	else if (strcmp(stemp, "gdi") == 0)
