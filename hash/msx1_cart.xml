@@ -6531,7 +6531,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="harryfox msx special (japan).rom" size="131072" crc="96b7faca" sha1="a3de07612da7986387a4f5c41bbbc7e3b244e077" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>

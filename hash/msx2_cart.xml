@@ -73,7 +73,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="pony canyon 8929e" size="131072" crc="c956e1df" sha1="5fd07ed5b7c0492d42ed91a54a0fe80ce6e4e40d" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@ LZ93A13 (32 pin) - 8KB banks
 				<rom name="lh531073" size="131072" crc="a987a0d8" sha1="10c38f91d8f5db2438414ea58f26dcac78352088" offset="0" />
 				<rom size="131072" offset="0x20000" loadflag="reload" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>
@@ -1055,7 +1055,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="2abb1ec4" sha1="81143d2a8ef7cc593a604f3cc890312b42bdff01" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>
@@ -1331,7 +1331,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="262144">
 				<rom name="lh532097" size="262144" crc="8df9945a" sha1="d1cc2a77fb17608d542c50e2a1404cf5b4231521" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>
@@ -2249,7 +2249,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="jansei (japan).rom" size="131072" crc="00b8e82e" sha1="0eb3a48a8ab90826726f0c06daadf4bf13390758" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>
@@ -2265,7 +2265,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="jansei (japan) (alt 1).rom" size="131072" crc="2c2924ed" sha1="d78293133b075f48c9dc5c4cf0c4a985ae964b08" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="2048" >
 			</dataarea>
 		</part>
 	</software>
