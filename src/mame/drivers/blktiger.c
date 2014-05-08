@@ -562,9 +562,61 @@ ROM_START( blkdrgonb )
 ROM_END
 
 
+ROM_START( blktigerb3 )
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for code + banked ROMs images */ // == same as blktigerb2 maincpu
+	ROM_LOAD( "1.5e",  0x00000, 0x08000, CRC(47e2b21e) SHA1(3f03543ace435239978a95f569ac89f6762253c0) )   /* CODE */
+	ROM_LOAD( "2.6e",  0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )   /* 0+1 */
+	ROM_LOAD( "3.8e",  0x20000, 0x10000, CRC(52c56ed1) SHA1(b6ea61869dcfcedb8cfc14c613440e3f4649866f) )   /* 2+3 */
+	ROM_LOAD( "4.9e",    0x30000, 0x10000, CRC(ed6af6ec) SHA1(bed303c51bcddf233ad0701306d557a60ce9f5a5) )   /* 4+5 */
+	ROM_LOAD( "5.10e",   0x40000, 0x10000, CRC(ae59b72e) SHA1(6e72214b71f2f337af236c8be891a18570cb6fbb) )   /* 6+7 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // == same as other sets but with an address swap
+	ROM_LOAD( "6.1l",  0x0000, 0x8000, CRC(6dfab115) SHA1(05f10bdfa4dff50ccc7707a7dbd8eab1680e09b9) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 ) // == same as blkdrgon
+	ROM_LOAD( "15.2n",  0x00000, 0x08000, CRC(3821ab29) SHA1(576f1839f63b0cad6b851d6e6a3e9dec21ac811d) ) /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) // == same as other sets
+	ROM_LOAD( "12.5b",  0x00000, 0x10000, CRC(c4524993) SHA1(9aa6c58004ca1117e5ac44ba8fc51e9128b921b8) ) /* tiles */
+	ROM_LOAD( "11.4b",  0x10000, 0x10000, CRC(7932c86f) SHA1(b3b1bc1e2b0db5c2eb8772f8a2c35129cc80d511) )
+	ROM_LOAD( "14.9b",  0x20000, 0x10000, CRC(dc49593a) SHA1(e4ef42ba9f238fd43c8217657c92896f31d3912c) )
+	ROM_LOAD( "13.8b",  0x30000, 0x10000, CRC(7ed7a122) SHA1(3acc6d4c9731db0609c2e26e3bd255847149ca33) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) // == same as other sets
+	ROM_LOAD( "8.5a",   0x00000, 0x10000, CRC(e2f17438) SHA1(3e5fdae07d40febedc59c7c7c4d9c6f0d72b58b5) )    /* sprites */
+	ROM_LOAD( "7.4a",   0x10000, 0x10000, CRC(5fccbd27) SHA1(33c55aa9c12b3121ca5c3b4c39a9b152b6946461) )
+	ROM_LOAD( "10.9a",  0x20000, 0x10000, CRC(fc33ccc6) SHA1(d492626a88565c2626f98ecb1d74535f1ad68e4c) )
+	ROM_LOAD( "9.8a",   0x30000, 0x10000, CRC(f449de01) SHA1(f6b40e9eb2471b89c42ab84f4214295d284db0c3) )
+
+	ROM_REGION( 0x0400, "proms", 0 )    /* PROMs (function unknown) */ // misisng in this dump
+	ROM_LOAD( "bd01.8j",   0x0000, 0x0100, CRC(29b459e5) SHA1(0034734a533df3dea16b7b48e072485d7f26f850) )
+	ROM_LOAD( "bd02.9j",   0x0100, 0x0100, CRC(8b741e66) SHA1(6c1fda59936a7217b05949f5c54b1f91f4b49dbe) )
+	ROM_LOAD( "bd03.11k",  0x0200, 0x0100, CRC(27201c75) SHA1(c54d87f06bfe0b0908389c005014d97156e272c2) )
+	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
+ROM_END
+
+DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
+{
+	UINT8 *src = memregion("audiocpu")->base();
+	int len = 0x8000;
+	dynamic_buffer buffer(len);
+	
+	for (int i = 0; i < len; i++)
+	{
+		int addr;
+		
+		addr = BITSWAP16(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
+		buffer[i] = src[addr];
+
+	}
+
+	memcpy(src, buffer, len);
+}
 GAME( 1987, blktiger,   0,        blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
 GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger (older)",         GAME_SUPPORTS_SAVE )
 GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        GAME_SUPPORTS_SAVE )
 GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      GAME_SUPPORTS_SAVE )
+// this board has Capcom markings (boards 87118-A-X1 / 87118-B-X1, but no MCU, a mix of bootleg Black Tiger and Black Dragon roms, and an address swapped sound rom? is the latter an alternative security measure?
+GAME( 1987, blktigerb3, blktiger, blktigerbl, blktiger, blktiger_state, blktigerb3, ROT0, "bootleg", "Black Tiger / Black Dragon (mixed bootleg?)", GAME_SUPPORTS_SAVE )
