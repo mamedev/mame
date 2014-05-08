@@ -4191,7 +4191,7 @@ ROM_START( peip0111 ) /* Normal board : Joker Poker - French (IP0111) */
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
- PI105B     1    1   2   3    4   5  20  50 100 200 500   1000
+  ????      1    1   2   3    4   5  20  50 100 200 500   1000
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.3%
      Programs Available: IP0074
 */
