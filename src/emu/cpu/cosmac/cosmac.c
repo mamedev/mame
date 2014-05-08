@@ -401,6 +401,7 @@ void cosmac_device::device_reset()
 	m_ie = 0;
 	m_q = 0;
 	m_df = 0;
+	m_p = 0;
 	rand_memory(m_r, sizeof(m_r));
 }
 
