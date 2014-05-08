@@ -623,6 +623,14 @@ static void extract_video_config(running_machine &machine)
 
 	// d3d options: extract the data
 	stemp = options.video();
+	if (strcmp(stemp, "auto") == 0) 
+	{
+#ifdef SDLMAME_MACOSX
+		stemp = "opengl";
+#else
+		stemp = "soft";
+#endif		
+	}
 	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
 	else if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
