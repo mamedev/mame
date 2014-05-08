@@ -16,7 +16,7 @@
 
     Hardware:
 
-    CPU =  INTEL 83c02       ; I8052 compatible
+    CPU =  INTEL 80C32       ; I8052 compatible
     VIDEO = ROCKWELL 6545    ; CRTC6845 compatible
     SND =  AY-3-8912         ; AY8910 compatible
 
