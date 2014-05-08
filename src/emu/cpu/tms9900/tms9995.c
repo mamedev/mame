@@ -375,8 +375,8 @@ void tms9995_device::state_export(const device_state_entry &entry)
 void tms9995_device::state_string_export(const device_state_entry &entry, astring &string)
 {
 	static const char *statestr = "LAECOPX-----IIII";
-	char flags[16];
-	memset(flags, 0x00, 16);
+	char flags[17];
+	memset(flags, 0x00, ARRAY_LENGTH(flags));
 	UINT16 val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{
