@@ -90,7 +90,7 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 {
 	// create a console window
 	if (main_console == nil)
-		console_create_window(machine());
+		console_create_window(m_osd.machine());
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = YES;
