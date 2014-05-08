@@ -13894,6 +13894,8 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="game master ii (japan).rom" size="131072" crc="084c5803" sha1="5c00f9e3a48411e08fac89b1dfdd2a6e95853919" offset="0" />
 			</dataarea>
+			<dataarea name="sram" size="8192" >
+			</dataarea>
 		</part>
 	</software>
 
@@ -13908,6 +13910,8 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="GMASTER2" />
 			<dataarea name="rom" size="131072">
 				<rom name="game master ii (japan) (alt 1).rom" size="131072" crc="2d93f9cc" sha1="fe74b4df9698a61dffd3ac88f47619675514ba1c" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="8192" >
 			</dataarea>
 		</part>
 	</software>
