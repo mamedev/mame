@@ -4014,10 +4014,10 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
   ????      1    1    3    6    7  10  25 100 250    800
   % Range: 88.0-90.0%  Optimum: 92.0%  Hit Frequency: 45.6%
-     Programs Available: IP0120
+     Programs Available: IP0058
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ip00588_ipp023.u68",   0x00000, 0x8000, CRC(db2aae6c) SHA1(398a52a73d4a0f71c09dfc4c7cf0c0a5c65ee941) )
+	ROM_LOAD( "ip0058_ipp023.u68",   0x00000, 0x8000, CRC(db2aae6c) SHA1(398a52a73d4a0f71c09dfc4c7cf0c0a5c65ee941) )
 	ROM_RELOAD(                      0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -4193,7 +4193,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
   ????      1    1   2   3    4   5  20  50 100 200 500   1000
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.3%
-     Programs Available: IP0074
+     Programs Available: IP0111
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0111_ipp023.u68",   0x00000, 0x8000, CRC(783461de) SHA1(ea60853481af04dadc81e1be36587c41da0f9c4f) )
