@@ -181,7 +181,7 @@ public:
 		}
 	~DView()
 	{
-		this->target->debug_free(*this->container);
+		//this->target->debug_free(*this->container);
 		machine().debug_view().free_view(*this->view);
 	}
 
@@ -270,7 +270,7 @@ static DView *dview_alloc(render_target *target, running_machine &machine, debug
 {
 	DView *dv;
 
-	dv = auto_alloc(machine, DView(target, machine, type, flags));
+	dv = global_alloc(DView(target, machine, type, flags));
 
 	/* add to list */
 
@@ -282,7 +282,7 @@ static DView *dview_alloc(render_target *target, running_machine &machine, debug
 static void dview_free(DView *dv)
 {
 	LIST_REMOVE(list, dv, DView);
-	auto_free(dv->machine(), dv);
+	global_free(dv);
 }
 
 static void dview_get_rect(DView *dv, int type, rectangle &rect)
@@ -854,7 +854,8 @@ void debugger_internal::debugger_exit()
 		m_osd.machine().render().font_free(debug_font);
 		debug_font = NULL;
 	}
-
+	if (menu)
+		global_free(menu);
 }
 
 void debugger_internal::init_debugger()
@@ -1131,8 +1132,8 @@ static void CreateMainMenu(running_machine &machine)
 	astring title;
 
 	if (menu)
-		auto_free(machine, menu);
-	menu = auto_alloc_clear(machine, ui_menu_debug(machine, &machine.render().ui_container()));
+		global_free( menu);
+	menu = global_alloc_clear(ui_menu_debug(machine, &machine.render().ui_container()));
 
 	switch (focus_view->type)
 	{
@@ -1323,7 +1324,7 @@ static void handle_menus(running_machine &machine)
 		event = menu->process(0);
 		if (event != NULL && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_RIGHT)))
 		{
-			//auto_free(machine, menu);
+			//global_free(menu);
 			//menu = NULL;
 			((void (*)(DView *, const ui_menu_event *)) event->itemref)(focus_view, event);
 			//ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)event->itemref, NULL));
@@ -1331,7 +1332,7 @@ static void handle_menus(running_machine &machine)
 		}
 		else if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
 		{
-			auto_free(machine, menu);
+			global_free(menu);
 			menu = NULL;
 		}
 	}
