@@ -364,6 +364,8 @@ typedef float CGFloat;
 
 @end
 
+#endif // __OBJC__
+
 class debugger_osx : public osd_debugger_interface
 {
 public:
@@ -379,6 +381,5 @@ public:
 
 extern const osd_debugger_type OSD_DEBUGGER_OSX;
 
-#endif // __OBJC__
 
 #endif // __SDL_DEBUGOSX__
