@@ -159,7 +159,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 
 	// fetch core options
 	if (options().debug())
-		debug_flags = (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) | (options().debug_internal() ? 0 : DEBUG_FLAG_OSD_ENABLED);
+		debug_flags = (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) | (DEBUG_FLAG_OSD_ENABLED);
 }
 
 

@@ -489,3 +489,11 @@ void MainWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
 	m_windowState = QByteArray::fromPercentEncoding(state);
 	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
 }
+
+DasmDockWidget::~DasmDockWidget()
+{
+}
+
+ProcessorDockWidget::~ProcessorDockWidget()
+{
+}

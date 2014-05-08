@@ -49,7 +49,14 @@
 #include "input.h"
 #include "osdsdl.h"
 #include "sdlos.h"
-
+#include "modules/sound/sdl_sound.h"
+#if !defined(NO_DEBUGGER)
+#include "modules/debugger/debugqt.h"
+#endif
+#include "modules/debugger/none.h"
+#if defined(SDLMAME_MACOSX)
+#include "modules/debugger/debugosx.h"
+#endif
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
 
@@ -91,36 +98,14 @@ const options_entry sdl_options::s_option_entries[] =
 {
 	{ SDLOPTION_INIPATH,                     INI_PATH,    OPTION_STRING,     "path to ini files" },
 
-	// debugging options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
-	{ SDLOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-	{ SDLOPTION_WATCHDOG ";wdog",             "0",        OPTION_INTEGER,    "force the program to terminate if no updates within specified number of seconds" },
-
 	// performance options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
-	{ SDLOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
-	{ SDLOPTION_NUMPROCESSORS ";np",         "auto",      OPTION_STRING,     "number of processors; this overrides the number the system reports" },
+	{ NULL,                                   NULL,       OPTION_HEADER,     "SDL PERFORMANCE OPTIONS" },
 	{ SDLOPTION_SDLVIDEOFPS,                  "0",        OPTION_BOOLEAN,    "show sdl video performance" },
-	{ SDLOPTION_BENCH,                        "0",        OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 	// video options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
+	{ NULL,                                   NULL,       OPTION_HEADER,     "SDL VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
-#ifdef SDLMAME_MACOSX
-	{ SDLOPTION_VIDEO,                   SDLOPTVAL_OPENGL,  OPTION_STRING,   "video output method: soft or opengl" },
-#else
-	{ SDLOPTION_VIDEO,                   SDLOPTVAL_SOFT,  OPTION_STRING,     "video output method: soft or opengl" },
-#endif
-	{ SDLOPTION_NUMSCREENS,                   "1",        OPTION_INTEGER,    "number of screens to create; SDLMAME only supports 1 at this time" },
-	{ SDLOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
-	{ SDLOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
-	{ SDLOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
-	{ SDLOPTION_UNEVENSTRETCH ";ues",         "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
-	#if (SDL_VERSION_ATLEAST(1,2,10))
-	{ SDLOPTION_WAITVSYNC ";vs",              "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
-	{ SDLOPTION_SYNCREFRESH ";srf",           "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
-	#endif
 #if (SDLMAME_SDL2)
 	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #else
@@ -159,43 +144,11 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_SHADER_SCREEN "9",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
 #endif
 
-	// per-window options
-	{ NULL,                                   NULL,             OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
-	{ SDLOPTION_SCREEN,                   SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT ";screen_aspect",  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION ";r",          SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW,                     SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for all screens" },
-
-	{ SDLOPTION_SCREEN "0",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT "0",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION "0;r0",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW "0",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the first screen" },
-
-	{ SDLOPTION_SCREEN "1",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT "1",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION "1;r1",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW "1",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the second screen" },
-
-	{ SDLOPTION_SCREEN "2",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT "2",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION "2;r2",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW "2",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the third screen" },
-
-	{ SDLOPTION_SCREEN "3",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT "3",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION "3;r3",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW "3",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the fourth screen" },
-
 	// full screen options
-	{ NULL,                                   NULL,  OPTION_HEADER,     "FULL SCREEN OPTIONS" },
-	{ SDLOPTION_SWITCHRES,                    "0",   OPTION_BOOLEAN,    "enable resolution switching" },
 	#ifdef SDLMAME_X11
+	{ NULL,                                   NULL,  OPTION_HEADER,     "SDL FULL SCREEN OPTIONS" },
 	{ SDLOPTION_USEALLHEADS,                 "0",     OPTION_BOOLEAN,    "split full screen image across monitors" },
 	#endif
-
-	// sound options
-	{ NULL,                                   NULL,  OPTION_HEADER,     "SOUND OPTIONS" },
-	{ SDLOPTION_AUDIO_LATENCY,                "2",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// keyboard mapping
 	{ NULL,                                   NULL,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
@@ -371,6 +324,7 @@ int main(int argc, char *argv[])
 	{
 		sdl_osd_interface osd;
 		sdl_options options;
+		osd.register_options(options);
 		cli_frontend frontend(options, osd);
 		res = frontend.execute(argc, argv);
 	}
@@ -441,13 +395,13 @@ sdl_osd_interface::~sdl_osd_interface()
 void sdl_osd_interface::osd_exit()
 {
 
-	osd_interface::exit_subsystems();
+	osd_interface::osd_exit();
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 		/* FixMe: Bug in SDL2.0, Quitting joystick will cause SIGSEGV */
 #if SDLMAME_SDL2
-		SDL_QuitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
+		SDL_QuitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
 #else
 		SDL_Quit();
 #endif
@@ -569,6 +523,46 @@ static void osd_sdl_info(void)
 
 
 //============================================================
+//  video_register
+//============================================================
+
+void sdl_osd_interface::video_register()
+{
+	video_options_add("soft", NULL);
+	video_options_add("opengl", NULL);
+	//video_options_add("auto", NULL); // making d3d video default one
+}
+
+//============================================================
+//  sound_register
+//============================================================
+
+void sdl_osd_interface::sound_register()
+{
+	sound_options_add("sdl", OSD_SOUND_SDL);
+	sound_options_add("auto", OSD_SOUND_SDL); // making SDL audio default one
+}
+
+//============================================================
+//  debugger_register
+//============================================================
+
+void sdl_osd_interface::debugger_register()
+{
+#if defined(NO_DEBUGGER)
+	debugger_options_add("auto", OSD_DEBUGGER_NONE);
+#else
+#if defined(SDLMAME_MACOSX)
+	debugger_options_add("osx", OSD_DEBUGGER_OSX);
+	debugger_options_add("auto", OSD_DEBUGGER_OSX); // making OSX debugger default one
+#else
+	debugger_options_add("qt", OSD_DEBUGGER_QT);
+	debugger_options_add("auto", OSD_DEBUGGER_QT); // making QT debugger default one
+#endif // SDLMAME_MACOSX
+#endif // NO_DEBUGGER
+}
+
+//============================================================
 //  init
 //============================================================
 
@@ -587,7 +581,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	{
 		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
 		options.set_value(OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(SDLOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
 		assert(!error_string);
 	}
@@ -651,9 +645,9 @@ void sdl_osd_interface::init(running_machine &machine)
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 #if (SDLMAME_SDL2)
-		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		if (SDL_InitSubSystem(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #else
-		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #endif
 			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 			exit(-1);

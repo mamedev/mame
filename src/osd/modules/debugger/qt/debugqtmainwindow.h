@@ -90,7 +90,7 @@ public:
 	}
 
 
-	virtual ~DasmDockWidget() {}
+	virtual ~DasmDockWidget();
 
 
 	DebuggerView* view() { return m_dasmView; }
@@ -140,7 +140,7 @@ public:
 	}
 
 
-	virtual ~ProcessorDockWidget() {}
+	virtual ~ProcessorDockWidget();
 
 
 	DebuggerView* view() { return m_processorView; }

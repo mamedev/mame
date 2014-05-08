@@ -17,7 +17,6 @@
 #include "express.h"
 #include "debugvw.h"
 #include "debugger.h"
-#include "debugint/debugint.h"
 #include "uiinput.h"
 #include "xmlfile.h"
 #include <ctype.h>
@@ -1936,8 +1935,6 @@ void device_debug::instruction_hook(offs_t curpc)
 			global->memory_modified = false;
 			if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 				machine.osd().wait_for_debugger(m_device, firststop);
-			else if (machine.debug_flags & DEBUG_FLAG_ENABLED)
-				debugint_wait_for_debugger(m_device, firststop);
 			firststop = false;
 
 			// if something modified memory, update the screen

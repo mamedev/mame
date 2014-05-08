@@ -25,7 +25,6 @@ OBJDIRS += \
 	$(EMUOBJ)/cpu \
 	$(EMUOBJ)/sound \
 	$(EMUOBJ)/debug \
-	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/bus \
 	$(EMUOBJ)/drivers \
@@ -39,7 +38,10 @@ OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
 OBJDIRS += \
-	$(OSDOBJ)
+	$(OSDOBJ) \
+	$(OSDOBJ)/modules \
+	$(OSDOBJ)/modules/sound \
+	$(OSDOBJ)/modules/debugger \
 
 
 #-------------------------------------------------
@@ -141,12 +143,14 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/dvtext.o \
 	$(EMUOBJ)/debug/express.o \
 	$(EMUOBJ)/debug/textbuf.o \
-	$(EMUOBJ)/debugint/debugint.o \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
 	$(OSDOBJ)/osdcore.o \
 	$(OSDOBJ)/osdepend.o \
-	$(OSDOBJ)/osdnet.o
+	$(OSDOBJ)/osdnet.o \
+	$(OSDOBJ)/modules/sound/none.o \
+	$(OSDOBJ)/modules/debugger/none.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
 
 EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/filter.o \

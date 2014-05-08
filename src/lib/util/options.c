@@ -124,6 +124,17 @@ void core_options::entry::set_default_value(const char *defvalue)
 }
 
 
+//-------------------------------------------------
+//  set_description - set the description of
+//  an option
+//-------------------------------------------------
+
+void core_options::entry::set_description(const char *description)
+{
+	m_description = description;
+}
+
+
 void core_options::entry::set_flag(UINT32 mask, UINT32 flag)
 {
 	m_flags = ( m_flags & mask ) | flag;
@@ -295,6 +306,23 @@ void core_options::set_default_value(const char *name, const char *defvalue)
 
 	// update the data and default data
 	curentry->set_default_value(defvalue);
+}
+
+
+//-------------------------------------------------
+//  set_description - change the description
+//  of an option
+//-------------------------------------------------
+
+void core_options::set_description(const char *name, const char *description)
+{
+	// find the entry and bail if we can't
+	entry *curentry = m_entrymap.find(name);
+	if (curentry == NULL)
+		return;
+
+	// update the data and default data
+	curentry->set_description(description);
 }
 
 
@@ -539,6 +567,17 @@ const char *core_options::value(const char *name) const
 {
 	entry *curentry = m_entrymap.find(name);
 	return (curentry != NULL) ? curentry->value() : "";
+}
+
+
+//-------------------------------------------------
+//  description - return description of option
+//-------------------------------------------------
+
+const char *core_options::description(const char *name) const
+{
+	entry *curentry = m_entrymap.find(name);
+	return (curentry != NULL) ? curentry->description() : "";
 }
 
 

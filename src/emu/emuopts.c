@@ -113,7 +113,6 @@ const options_entry emu_options::s_option_entries[] =
 
 	// sound options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE SOUND OPTIONS" },
-	{ OPTION_SOUND,                                      "1",         OPTION_BOOLEAN,    "enable sound output" },
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     OPTION_INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ OPTION_VOLUME ";vol",                              "0",         OPTION_INTEGER,    "sound volume in decibels (-32 min, 0 max)" },
@@ -150,12 +149,8 @@ const options_entry emu_options::s_option_entries[] =
 
 	// debugging options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
-	{ OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
-	{ OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
-	{ OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_DEBUGSCRIPT,                                NULL,        OPTION_STRING,     "script for debugger" },
-	{ OPTION_DEBUG_INTERNAL ";di",                       "0",         OPTION_BOOLEAN,    "use the internal debugger for debugging" },
 
 	// misc options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE MISC OPTIONS" },
@@ -190,6 +185,7 @@ const options_entry emu_options::s_option_entries[] =
 emu_options::emu_options()
 {
 	add_entries(s_option_entries);
+	add_osd_options();
 }
 
 

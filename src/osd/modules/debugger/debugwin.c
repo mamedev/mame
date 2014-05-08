@@ -32,13 +32,13 @@
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
-#include "video.h"
-#include "input.h"
-#include "config.h"
+#include "../../windows/input.h"
 #include "strconv.h"
 #include "winutf8.h"
 
+#include "debugwin.h"
 
+const osd_debugger_type OSD_DEBUGGER_WINDOWS = &osd_debugger_creator<debugger_windows>;
 
 //============================================================
 //  PARAMETERS
@@ -238,17 +238,26 @@ static void smart_show_all(BOOL show);
 
 static void image_update_menu(debugwin_info *info);
 
+
+//-------------------------------------------------
+//  debugger_windows - constructor
+//-------------------------------------------------
+debugger_windows::debugger_windows(const osd_interface &osd)
+	: osd_debugger_interface(osd)
+{
+}
+
 //============================================================
 //  wait_for_debugger
 //============================================================
 
-void windows_osd_interface::wait_for_debugger(device_t &device, bool firststop)
+void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 {
 	MSG message;
 
 	// create a console window
 	if (main_console == NULL)
-		console_create_window(machine());
+		console_create_window(m_osd.machine());
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
@@ -267,7 +276,7 @@ void windows_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	smart_show_all(TRUE);
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll(machine());
+	wininput_poll(m_osd.machine());
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
@@ -285,7 +294,7 @@ void windows_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 
 		// process everything else
 		default:
-			winwindow_dispatch_message(machine(), &message);
+			winwindow_dispatch_message(m_osd.machine(), &message);
 			break;
 	}
 
@@ -359,7 +368,7 @@ static int debugwin_seq_pressed(running_machine &machine)
 //  debugwin_init_windows
 //============================================================
 
-void windows_osd_interface::init_debugger()
+void debugger_windows::init_debugger()
 {
 	static int class_registered;
 
@@ -405,7 +414,7 @@ void windows_osd_interface::init_debugger()
 
 		if (temp_dc != NULL)
 		{
-			windows_options &options = downcast<windows_options &>(machine().options());
+			windows_options &options = downcast<windows_options &>(m_osd.machine().options());
 			int size = options.debugger_font_size();
 			TCHAR *t_face;
 
@@ -443,7 +452,7 @@ void windows_osd_interface::init_debugger()
 //  debugwin_destroy_windows
 //============================================================
 
-void windows_osd_interface::debugger_exit()
+void debugger_windows::debugger_exit()
 {
 	// loop over windows and free them
 	while (window_list != NULL)
@@ -462,18 +471,18 @@ void windows_osd_interface::debugger_exit()
 //  debugger_update
 //============================================================
 
-void windows_osd_interface::debugger_update()
+void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine()) && machine().phase() == MACHINE_PHASE_RUNNING)
+	if (!winwindow_has_focus() && !debug_cpu_is_stopped(m_osd.machine()) && m_osd.machine().phase() == MACHINE_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
-		if (debugwin_seq_pressed(machine()))
+		if (debugwin_seq_pressed(m_osd.machine()))
 		{
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_get_visible_cpu(machine())->debug()->halt_on_next_instruction("User-initiated break\n");
+			debug_cpu_get_visible_cpu(m_osd.machine())->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info != NULL; info = info->next)

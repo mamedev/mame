@@ -9,8 +9,6 @@
 //
 //============================================================
 
-#if !defined(NO_DEBUGGER)
-
 #define NO_MEM_TRACKING
 
 #include <vector>
@@ -19,21 +17,22 @@
 #include <QtGui/QApplication>
 
 #include "emu.h"
-#if defined(WIN32) && !defined(SDLMAME_WIN32)
-#include "winmain.h"
-#define xxx_osd_interface windows_osd_interface
-#else
-#include "osdsdl.h"
-#define xxx_osd_interface sdl_osd_interface
-#endif
 #include "config.h"
 #include "debugger.h"
 
-#include "debugqtlogwindow.h"
-#include "debugqtmainwindow.h"
-#include "debugqtdasmwindow.h"
-#include "debugqtmemorywindow.h"
-#include "debugqtbreakpointswindow.h"
+#include "qt/debugqtlogwindow.h"
+#include "qt/debugqtmainwindow.h"
+#include "qt/debugqtdasmwindow.h"
+#include "qt/debugqtmemorywindow.h"
+#include "qt/debugqtbreakpointswindow.h"
+#include "debugqt.h"
+
+
+osd_debugger_interface *qt_osd_debugger_creator(const osd_interface &osd)
+{
+	return new debugger_qt(osd);
+}
+const osd_debugger_type OSD_DEBUGGER_QT = &qt_osd_debugger_creator;
 
 //============================================================
 //  "Global" variables to make QT happy
@@ -43,8 +42,19 @@ int qtArgc = 0;
 char** qtArgv = NULL;
 
 bool oneShot = true;
-MainWindow* mainQtWindow = NULL;
+static MainWindow* mainQtWindow = NULL;
 
+//-------------------------------------------------
+//  debugger_qt - constructor
+//-------------------------------------------------
+debugger_qt::debugger_qt(const osd_interface &osd)
+	: osd_debugger_interface(osd)
+{
+}
+
+debugger_qt::~debugger_qt()
+{
+}
 
 //============================================================
 //  XML configuration save/load
@@ -205,7 +215,7 @@ static void bring_main_window_to_front()
 bool winwindow_qt_filter(void *message);
 #endif
 
-void xxx_osd_interface::init_debugger()
+void debugger_qt::init_debugger()
 {
 	if (qApp == NULL)
 	{
@@ -228,10 +238,10 @@ void xxx_osd_interface::init_debugger()
 	}
 
 	// Setup the configuration XML saving and loading
-	config_register(machine(),
+	config_register(m_osd.machine(),
 					"debugger",
-					config_saveload_delegate(FUNC(xml_configuration_load), &machine()),
-					config_saveload_delegate(FUNC(xml_configuration_save), &machine()));
+					config_saveload_delegate(FUNC(xml_configuration_load), &m_osd.machine()),
+					config_saveload_delegate(FUNC(xml_configuration_save), &m_osd.machine()));
 }
 
 
@@ -245,7 +255,7 @@ extern int sdl_entered_debugger;
 void winwindow_update_cursor_state(running_machine &machine);
 #endif
 
-void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
+void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 {
 #if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 	sdl_entered_debugger = 1;
@@ -254,9 +264,9 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	// Dialog initialization
 	if (oneShot)
 	{
-		mainQtWindow = new MainWindow(&machine());
+		mainQtWindow = new MainWindow(&m_osd.machine());
 		load_and_clear_main_window_config(xmlConfigurations);
-		setup_additional_startup_windows(machine(), xmlConfigurations);
+		setup_additional_startup_windows(m_osd.machine(), xmlConfigurations);
 		mainQtWindow->show();
 		oneShot = false;
 	}
@@ -274,7 +284,7 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	mainQtWindow->setProcessor(&device);
 
 	// Run our own QT event loop
-	while (debug_cpu_is_stopped(machine()))
+	while (debug_cpu_is_stopped(m_osd.machine()))
 	{
 		osd_sleep(50000);
 		qApp->processEvents(QEventLoop::AllEvents, 1);
@@ -301,7 +311,7 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 		}
 
 		// Exit if the machine has been instructed to do so (scheduled event == exit || hard_reset)
-		if (machine().scheduled_event_pending())
+		if (m_osd.machine().scheduled_event_pending())
 		{
 			// Keep a list of windows we want to save.
 			// We need to do this here because by the time xml_configuration_save gets called
@@ -310,7 +320,7 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 			break;
 		}
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
-		winwindow_update_cursor_state(machine()); // make sure the cursor isn't hidden while in debugger
+		winwindow_update_cursor_state(m_osd.machine()); // make sure the cursor isn't hidden while in debugger
 #endif
 	}
 }
@@ -320,40 +330,12 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 //  Available for video.*
 //============================================================
 
-void xxx_osd_interface::debugger_update()
+void debugger_qt::debugger_update()
 {
 	qApp->processEvents(QEventLoop::AllEvents, 1);
 }
 
-void xxx_osd_interface::debugger_exit()
+void debugger_qt::debugger_exit()
 {
 }
 
-
-#else
-
-
-
-#include "sdlinc.h"
-
-#include "emu.h"
-#include "osdepend.h"
-#include "osdsdl.h"
-
-void sdl_osd_interface::init_debugger()
-{
-}
-
-void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
-{
-}
-
-void sdl_osd_interface::debugger_update()
-{
-}
-
-void sdl_osd_interface::debugger_exit()
-{
-}
-
-#endif

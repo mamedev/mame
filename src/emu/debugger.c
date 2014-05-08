@@ -17,7 +17,6 @@
 #include "debug/debugcon.h"
 #include "debug/express.h"
 #include "debug/debugvw.h"
-#include "debugint/debugint.h"
 #include <ctype.h>
 
 
@@ -71,9 +70,6 @@ void debugger_init(running_machine &machine)
 		debug_cpu_init(machine);
 		debug_command_init(machine);
 		debug_console_init(machine);
-
-		/* always initialize the internal render debugger */
-		debugint_init(machine);
 
 		/* allocate a new entry for our global list */
 		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugger_exit), &machine));

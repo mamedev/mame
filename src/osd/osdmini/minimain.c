@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
 	// create a derivative of cli_options and add our own
 	cli_options options;
 	mini_osd_interface osd;
+	osd.register_options(options);
 	cli_frontend frontend(options, osd);
 	return frontend.execute(argc, argv);
 }

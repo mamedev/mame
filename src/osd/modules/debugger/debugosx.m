@@ -64,20 +64,29 @@ static void debugwin_view_update(debug_view &view, void *osdprivate);
 
 static void console_create_window(running_machine &machine);
 
+const osd_debugger_type OSD_DEBUGGER_OSX = &osd_debugger_creator<debugger_osx>;
 
-//============================================================
-//  sdl_osd_interface::init_debugger
-//============================================================
-
-void sdl_osd_interface::init_debugger()
+//-------------------------------------------------
+//  debugger_osx - constructor
+//-------------------------------------------------
+debugger_osx::debugger_osx(const osd_interface &osd)
+	: osd_debugger_interface(osd)
 {
 }
 
 //============================================================
-//  sdl_osd_interface::wait_for_debugger
+//  debugger_osx::init_debugger
 //============================================================
 
-void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
+void debugger_osx::init_debugger()
+{
+}
+
+//============================================================
+//  debugger_osx::wait_for_debugger
+//============================================================
+
+void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 {
 	// create a console window
 	if (main_console == nil)
@@ -113,7 +122,7 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 //  debugger_update
 //============================================================
 
-void sdl_osd_interface::debugger_update()
+void debugger_osx::debugger_update()
 {
 }
 
@@ -121,7 +130,7 @@ void sdl_osd_interface::debugger_update()
 //  debugger_exit
 //============================================================
 
-void sdl_osd_interface::debugger_exit()
+void debugger_osx::debugger_exit()
 {
 }
 
