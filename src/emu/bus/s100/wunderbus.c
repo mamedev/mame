@@ -60,52 +60,6 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::pic_int_w )
 	m_bus->irq_w(state);
 }
 
-
-//-------------------------------------------------
-//  ins8250_interface ace1_intf
-//-------------------------------------------------
-
-static ins8250_interface ace1_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir3_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  ins8250_interface ace2_intf
-//-------------------------------------------------
-
-static ins8250_interface ace2_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  ins8250_interface ace3_intf
-//-------------------------------------------------
-
-static ins8250_interface ace3_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_C_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_C_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_C_TAG, rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir5_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_110 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_110 )
@@ -136,9 +90,21 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 
 static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NULL)
-	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
-	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
-	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)
+	MCFG_DEVICE_ADD(INS8250_1_TAG, INS8250, XTAL_18_432MHz/10)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir3_w))
+	MCFG_DEVICE_ADD(INS8250_2_TAG, INS8250, XTAL_18_432MHz/10)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	MCFG_DEVICE_ADD(INS8250_3_TAG, INS8250, XTAL_18_432MHz/10)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir5_w))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, rx_w))

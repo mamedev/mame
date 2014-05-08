@@ -262,7 +262,7 @@ BUILD_MIDILIB = 1
 # uncomment next line to enable networking
 # USE_NETWORK = 1
 
-# uncomment to enable SSE2 optimized code and SSE2 code generation
+# uncomment to enable SSE2 optimized code and SSE2 code generation (implicitly enabled by 64-bit compilers)
 # SSE2 = 1
 
 # specify optimization level or leave commented to use the default

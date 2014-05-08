@@ -537,8 +537,6 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 			pcw16_keyboard_signal_byte_received(data);
 		}
 	}
-	// TODO: fix
-	m_uart2->ri_w((m_io_extra->read() & 0x040) ? 0 : 1);
 }
 
 
@@ -921,25 +919,10 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 	pcw16_refresh_ints();
 }
 
-static const ins8250_interface pcw16_com_interface[2]=
+INPUT_CHANGED_MEMBER(pcw16_state::power)
 {
-	{
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_1),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_2),
-		DEVCB_NULL,
-		DEVCB_NULL
-	}
-};
+	m_uart2->ri_w((newval & 0x040) ? 0 : 1);
+}
 
 FLOPPY_FORMATS_MEMBER( pcw16_state::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -1013,7 +996,7 @@ static INPUT_PORTS_START(pcw16)
 	/* vblank */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 	/* power switch - default is on */
-	PORT_DIPNAME(0x40, 0x40, "Power Switch/Suspend")
+	PORT_DIPNAME(0x40, 0x40, "Power Switch/Suspend") PORT_CHANGED_MEMBER(DEVICE_SELF, pcw16_state, power, 0)
 	PORT_DIPSETTING(0x0, DEF_STR( Off) )
 	PORT_DIPSETTING(0x40, DEF_STR( On) )
 
@@ -1032,7 +1015,11 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_DEVICE_ADD( "ns16550_1", NS16550, XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport1", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport1", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(pcw16_state, pcw16_com_interrupt_1))
 	MCFG_RS232_PORT_ADD( "serport1", pcw16_com, "msystems_mouse" )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
@@ -1040,12 +1027,15 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, cts_w))
 
-	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_DEVICE_ADD( "ns16550_2", NS16550, XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport2", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport2", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport2", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(pcw16_state, pcw16_com_interrupt_2))
 	MCFG_RS232_PORT_ADD( "serport2", pcw16_com, NULL )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, cts_w))
 
 	/* video hardware */

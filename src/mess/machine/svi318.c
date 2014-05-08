@@ -39,26 +39,6 @@ static INS8250_REFRESH_CONNECT( svi318_com_refresh_connected )
 	ins8250_handshake_in(device, UART8250_HANDSHAKE_IN_CTS|UART8250_HANDSHAKE_IN_DSR|UART8250_INPUTS_RING_INDICATOR|UART8250_INPUTS_DATA_CARRIER_DETECT);
 }
 #endif
-const ins8250_interface svi318_ins8250_interface[2]=
-{
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(svi318_state,svi318_ins8250_interrupt),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(svi318_state,svi318_ins8250_interrupt),
-		DEVCB_NULL,
-		DEVCB_NULL
-	}
-};
-
 
 /* Cartridge */
 

@@ -351,6 +351,7 @@ Xyzolog - Electric Software
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="nc81820-g30 japan 8649" size="131072" crc="a27787af" sha1="0733cd627467a866846e15caf1770a5594eaf4cc" offset="0" />
@@ -367,6 +368,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="アニマルランド殺人事件" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh231077" size="131072" crc="15a0f98a" sha1="495876c504bdc4de24860ea15b25dda8f3b06c49" offset="0" />
@@ -382,6 +384,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" /> <!-- 42 pin -->
 			<feature name="sram" value="LH5164L-15" /> <!-- battery backed -->
 			<feature name="other" value="HD74LS138P" />
@@ -401,6 +404,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ザ・ブラックオニキスII" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh231013" size="131072" crc="67bf8337" sha1="2588b9ade775b93f03fd4b17fd3f78ba70b556d6" offset="0" />
@@ -415,6 +419,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ボルフェスと5人の悪魔" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh231066" size="131072" crc="e040e8a1" sha1="16c3ced0fb2e360bc7c43d372a0a30eb6bd3963d" offset="0" />
@@ -430,6 +435,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ディーヴァ アスラの血流" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532020" size="262144" crc="99198ed9" sha1="2418c0302abbce8b0f8556b63169c60a849f60ee" offset="0" />
@@ -444,6 +450,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="デジタルデビル物語 女神転生" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh231089" size="131072" crc="25fc11fa" sha1="7dc7f7e3966943280f34836656a7d1bd3ace67cd" offset="0" />
@@ -459,6 +466,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ドラゴンクエスト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="cxk381000" size="131072" crc="49f5478b" sha1="7b94a728a5945a53d518c18994e1e09a09ec3c1b" offset="0" />
@@ -474,6 +482,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532060" size="262144" crc="8076fec6" sha1="3df7c19f739d74d6efdfd8151343e5a55d4ac842" offset="0" />
@@ -489,6 +498,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ドラゴンスレイヤーIV" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh5320z5" size="262144" crc="87dcd309" sha1="f100a76117e95ab0335e89a901e47d844bbc0ab6" offset="0" />
@@ -503,6 +513,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ダンジョンハンター" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M016S" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="LZ93A13-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="rp231026d" size="131072" crc="2526e568" sha1="d1fbdbdf2e830139584d7dc796806aa3327720dd" offset="0" />
@@ -518,6 +529,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ファンタジーゾーン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh531057" size="131072" crc="3e96d005" sha1="048737f995eecb1dd8dd341d750efd005267796f" offset="0" />
@@ -533,6 +545,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ファイナル・ゾーン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="fzr-2001" size="131072" crc="14e2efcc" sha1="a553c3f204c105c23b227a1e5aeb290671ccdbeb" offset="0" />
@@ -548,6 +561,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="Flight Simulator 魚雷攻撃" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="NEOS MR6401" />   <!-- MR6401 -->
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="a6165bd4" sha1="453eac7568d5d04c8cf7da86f2e8dc79777343da" offset="0" />
@@ -563,6 +577,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ガルフォース カオスの攻防" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh31434" size="131072" crc="99ef860e" sha1="e8ab46785e75e19dac497c4a82ac2f5b37ac0580" offset="0" />
@@ -577,6 +592,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-8KB" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="NEOS MR6401" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh53210a game arts" size="262144" crc="91955bcd" sha1="89073c052b0fe29b6de077c8bdf5373474081edf" offset="0" />
@@ -591,6 +607,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="迷宮への扉 ~ Meikyuu e no Tobira (Box)" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="MR6401" />    <!-- NEOS MR6401 -->
 			<dataarea name="rom" size="131072">
 				<rom name="dempa labyrinth rp231024d" size="131072" crc="2c2020a0" sha1="0cb11c766bd357d203879bd6bee041a4690cc3df" offset="0" />
@@ -606,6 +623,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="魔王ゴルベリアス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="compile ia-8701" size="131072" crc="5eac55df" sha1="7a4126934f9e68c34bf00dd3d9a9e753c05ee73f" offset="0" />
@@ -621,6 +639,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="覇邪の封印" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="1mrom" size="131072" crc="6a603b8c" sha1="44b23a175d04ca21236a5fef18600b01b12aaf4d" offset="0" />
@@ -636,6 +655,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ハイドライドII" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621M" />
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<feature name="sram" value="HM6116LP-3" />
 			<dataarea name="rom" size="131072">
@@ -654,6 +674,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ハイドライド3" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M008M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="524288">
 				<rom name="hydlide3 4m-rom" size="524288" crc="00c5d5b5" sha1="74e9ea381e2fed07d989d1056002de5737125aaf" offset="0" />
@@ -670,6 +691,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ジャガー5 ~ Jagur 5 (Box?)" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="d6465702" sha1="6fefbe448674b6ea846d0c6b9c8a0d57a11aa410" offset="0" />
@@ -685,6 +707,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="日本語MSX-Write" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX WRITE 900178B" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="524288">
 				<rom name="225 aa 8716 zoo" size="524288" crc="ef02e4f3" sha1="4180544158a57c99162269e33e4f2c77c9fce84e" offset="0" />
@@ -700,6 +723,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="軽井沢誘拐案内" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh231024" size="131072" crc="6a30c707" sha1="1c462c3629d43297a006ba9055b39a2dccba9f6c" offset="0" />
@@ -714,6 +738,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="キングスナイト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="643103" size="131072" crc="a0481321" sha1="122f659250a0ae10ce0be0dde626dd3e384affa7" offset="0" />
@@ -729,6 +754,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="メルヘン・ヴェール I" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="cxk381000" size="131072" crc="44aa5422" sha1="f7dd6841d280cbffa9f0f2da7af3549f23270ddb" offset="0" />
@@ -744,6 +770,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="未来" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="72eb9d0e" sha1="7abf89652396a648a84ae06e6dabc09735a75798" offset="0" />
@@ -758,6 +785,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="MSX英和辞典" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh230927" size="131072" crc="1b10cf79" sha1="473bc0ea85ed1b218974796d819416e711ac193f" offset="0" />
@@ -773,6 +801,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="MSXプログラムコレクション ファンダムライブラリ1" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532046" size="262144" crc="519be53e" sha1="8557dcdb4cf1e15180d17acc8e6d515bf7bf7e7c" offset="0" />
@@ -788,6 +817,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="MSXプログラムコレクション ファンダムライブラリ2" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532061" size="262144" crc="53c25b6b" sha1="7752b6624fb80d9499aaad28dd5776ec74565576" offset="0" />
@@ -804,6 +834,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="MSXプログラムコレクション ファンダムライブラリ3" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532075" size="262144" crc="790d5335" sha1="c2f4df1bd91f7dee1536774b9d7089086b9bf835" offset="0" />
@@ -818,6 +849,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="夢幻戦士ヴァリス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="831000-440 20 bk z86" size="131072" crc="309d996c" sha1="2b10234debd2a6a9a02e0750ba6563768bc4a2f3" offset="0" />
@@ -832,6 +864,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="信長の野望 全国版" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<feature name="sram" value="LH5164L-15" />
 			<dataarea name="rom" size="262144">
@@ -850,6 +883,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="レリクス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="cxk381000" size="131072" crc="b612d79a" sha1="74ae85d44cb8ef1bae428c90200cb74be6d56d3a" offset="0" />
@@ -865,6 +899,7 @@ Xyzolog - Electric Software
 		<info name="alt_title" value="ロマンシア" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="BS6101-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="831000-20" size="131072" crc="387c1de7" sha1="2f0db48fbcf3444f52b9c7c76ba9c4bd38bc2a15" offset="0" />
@@ -886,6 +921,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="IM-04" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-004" />
+			<feature name="slot" value="rtype" />
 			<feature name="mapper" value="IREM TAM-S1" />
 			<dataarea name="rom" size="524288">
 				<rom name="lh532163" size="262144" crc="c4c12176" sha1="07fb300ce49b2d50a99ea0a2a25148900d2035ea" offset="0" />
@@ -901,6 +937,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-04" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="rtype" />
 			<feature name="mapper" value="IREM TAM-S1" />
 			<dataarea name="rom" size="524288">
 				<rom name="r-type (japan) (alt 2).rom" size="524288" crc="827919e4" sha1="9c886fff02779267041efe45dadefc5fd7f4b9a2" offset="0" />
@@ -917,6 +954,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="三國志" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532033" size="262144" crc="10621440" sha1="14ff6fe464362c6b7dbb47b2ecda3a8c5f05ef79" offset="0" />
@@ -933,6 +971,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="三國志" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-2M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<!-- Rom labels are likely to be wrong -->
@@ -949,6 +988,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="戦場の狼" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh231073" size="131072" crc="427b3f14" sha1="2b255c3e5615b2f5e2365419a35e4115a060e93c" offset="0" />
@@ -965,6 +1005,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="将軍" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-621-64K" />
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23100y" size="131072" crc="0e691c47" sha1="16351e6a7d7fc38c23b54ee15ac6f0275621ba96" offset="0" />
@@ -982,6 +1023,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="スーパーレイドック" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532072" size="262144" crc="5dc45624" sha1="2dfbca8f5cc3a9e9d151382ebe0da410f5393eaf" offset="0" />
@@ -997,6 +1039,7 @@ kept for now until finding out what those bytes affect...
         <info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TA6228" />
+			<feature name="slot" value="ascii8" />
             <feature name="mapper" value="M60002-0125SP" />
             <dataarea name="rom" size="262144">
                 <rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
@@ -1013,6 +1056,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="スーパーピエロ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="MR6401" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23106j" size="131072" crc="f00b4bbc" sha1="0d2f86dbb70f4b4a4e4dc1bc95df232f48856037" offset="0" />
@@ -1028,6 +1072,7 @@ kept for now until finding out what those bytes affect...
         <info name="alt_title" value="シンセサウルス" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TAS-1M-008S" />
+			<feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="131072">
                 <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
@@ -1044,6 +1089,7 @@ kept for now until finding out what those bytes affect...
         <info name="alt_title" value="シンセサウルス" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TAS-2M008-E2M" />
+			<feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="262144">
                 <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
@@ -1061,6 +1107,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="詰碁120" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="b9b69a43" sha1="bfe8046f8ccc6d6016d7752c04f0654420ef81e7" offset="0" />
@@ -1076,6 +1123,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ヴァクソル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="fea70207" sha1="4340a2580c949d498d2c8e71699fff860214e9ea" offset="0" />
@@ -1090,6 +1138,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ウイングマン2 キータクラーの復活" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="enix wing2 rp231024d 0408" size="131072" crc="5c9d8f62" sha1="818d91505ad39bba2eaf7f4857c7d41e95fcb233" offset="0" />
@@ -1105,6 +1154,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ザナドゥ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532051" size="262144" crc="d640deaf" sha1="6c1814c70d69a50ec60e39ef281f0b8cd7bf8598" offset="0" />
@@ -1122,6 +1172,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ヤングシャーロック・ドイルの遺産" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="BS6101" />
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="bdf332f2" sha1="97e173dac64dbde7d6a60de7606cba0c860813db" offset="0" />
@@ -1167,6 +1218,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="1942 (japan) (alt 1).rom" size="131072" crc="e54ee601" sha1="da397e783d677d1a78fff222d9d6cb48b915dada" offset="0" />
@@ -1179,6 +1231,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="1942 (zemina).rom" size="131072" crc="10d97b9e" sha1="ba07b1b585386f887d4c7e457210b3fce819709a" offset="0" />
@@ -1251,6 +1304,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pixel</publisher>
 		<info name="alt_title" value="生命惑星Ｍ３６生きていたマザーブレイン" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="m36 - a life planet (japan).rom" size="131072" crc="fa8f9bbc" sha1="6bde4e6761286a2909858ecef04155e17072996e" offset="0" />
@@ -1289,6 +1343,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Panasoft</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="a1 spirit - the way to formula-1 (japan).rom" size="131072" crc="2608c959" sha1="937464eb371c68add2236bcef91d24a8ce7c4ed1" offset="0" />
@@ -1466,6 +1521,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Square</publisher>
 		<info name="alt_title" value="エイリアン２" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="aliens - alien 2 (japan).rom" size="131072" crc="c6fc7bd7" sha1="5380e913d8dac23470446844cab21f6921101af8" offset="0" />
@@ -1479,6 +1535,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Square</publisher>
 		<info name="alt_title" value="エイリアン２" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="aliens - alien 2 (japan) (alt 1).rom" size="131072" crc="a6e924ab" sha1="2639792df6f7c7cfaffc2616b0e1849f18897ace" offset="0" />
@@ -1492,6 +1549,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Square</publisher>
 		<info name="alt_title" value="エイリアン２" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="aliens - alien 2 (japan) (alt 2).rom" size="131072" crc="3ddcb524" sha1="0d9c472cf7687b86f3fe2e5af6545a26a0efd5fc" offset="0" />
@@ -1780,6 +1838,7 @@ kept for now until finding out what those bytes affect...
 		<year>1989</year>
 		<publisher>Dinamic Software?</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="astro marine corps (1989)(dinamic software)(es).rom" size="131072" crc="60f99d30" sha1="72815a7213f899a454bcf76733834ba499d35cd8" offset="0x0000" />
@@ -2109,6 +2168,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="バットマン" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="65536">
 				<rom name="batman (japan).rom" size="65536" crc="637f0494" sha1="709fb35338f21897e275237cc4c5615d0a5c2753" offset="0" />
@@ -2494,6 +2554,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="XR-1043" />
 		<info name="alt_title" value="ボンバーキング" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="bomber king (japan).rom" size="131072" crc="8cf0e6c0" sha1="482cd650220e6931f85ee8532c61dac561365e30" offset="0" />
@@ -3935,6 +3996,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="HRK-22" />
 		<info name="alt_title" value="クレイズ" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="craze (japan).rom" size="131072" crc="d83966d0" sha1="9e0312e72f30a20f556b64fe37dbbfe0d4471823" offset="0" />
@@ -4015,6 +4077,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="MS1-G2113-L1" />
 		<info name="alt_title" value="クロスブレイム" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="cross_blaim" />
 			<feature name="mapper" value="CROSS-BLAIM" />
 			<dataarea name="rom" size="65536">
 				<rom name="cross blaim (japan).rom" size="65536" crc="47273220" sha1="bb902e82a2bdda61101a9b3646462adecdd18c8d" offset="0" />
@@ -4069,6 +4132,7 @@ kept for now until finding out what those bytes affect...
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="cyborg z (zemina, 1991).rom" size="131072" crc="77efe84a" sha1="c2e661e9b68a78e5a5fae5ae297b5d964d82491e" offset="0x0000" />
@@ -4280,6 +4344,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>ScapTrust</publisher>
 		<info name="alt_title" value="ディープダンジョン魔洞戦記 ~ Deep Dungeon Madou Senki (Box)" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="deep dungeon (japan).rom" size="131072" crc="27fd8f9a" sha1="e6419519c2d3247ea395e4feaa494a2e23e469ce" offset="0" />
@@ -4295,6 +4360,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>ScapTrust</publisher>
 		<info name="alt_title" value="ディープダンジョン勇士の紋章" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="deep dungeon ii (japan).rom" size="131072" crc="101db19c" sha1="d82135a5e28b750c44995af116db890a15f6428a" offset="0" />
@@ -4323,6 +4389,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>Microids</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="65536">
 				<rom name="demonia i (europe).rom" size="65536" crc="bcc4dd7a" sha1="d5b164797bc969b55c1a6f4006a4535c3fb03cf0" offset="0" />
@@ -4377,6 +4444,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="デジタルデビル物語 女神転生" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="digital devil monogatari megami tensei (japan) (alt 1).rom" size="131072" crc="367d385e" sha1="03b42b77b1a7412f1d7bd0998cf8f2f003f77d0a" offset="0" />
@@ -4501,6 +4569,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="E-G206" />
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="dragon quest ii (japan) (alt 1).rom" size="262144" crc="d44165a3" sha1="d7b46aece68c924e09f07e3df45711f337d35d6a" offset="0" />
@@ -4608,6 +4677,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="dustin (1987)(dinamic software)(es).rom" size="65536" crc="4d310554" sha1="2799d221d5486d48226bbbd3941207e1fc7c985e" offset="0x0000" />
@@ -4621,6 +4691,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Toshiba EMI</publisher>
 		<info name="serial" value="PS-2023G" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="dynamite bowl (japan).rom" size="131072" crc="47ec57da" sha1="d7109cf20a22558f923c833ff0b4e2311340acb1" offset="0" />
@@ -4898,6 +4969,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC752" />
 		<info name="alt_title" value="Ｆ-１スピリット" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="f-1 spirit - the way to formula-1 (japan).rom" size="131072" crc="12bfd3a9" sha1="ff72a1788d47f9876d9fabd720f6a289fb409090" offset="0" />
@@ -4912,6 +4984,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC752" />
 		<info name="alt_title" value="Ｆ-１スピリット" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="f-1 spirit - the way to formula-1 (japan) (alt 1).rom" size="131072" crc="64d2df7c" sha1="42fbb18722df3e34e5b0f935a2dc0ce0d85099e9" offset="0" />
@@ -4924,6 +4997,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="f-1 spirit - the way to formula 1 (1987)(zemina)[rc-752].rom" size="131072" crc="f5a3b765" sha1="6e5acdfb1c1610257a7aabf3d5aa858866dbcf2e" offset="0x0000" />
@@ -4976,6 +5050,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="fairy land story, the (japan).rom" size="131072" crc="26e34f05" sha1="e11afc03db4e1d03976d02796b29da9c65d4ff3d" offset="0" />
@@ -4989,6 +5064,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="fairy land story, the (japan) (alt 1).rom" size="131072" crc="c032376b" sha1="2bb837a9051277ba574d8351a9f91f9e57033074" offset="0" />
@@ -5001,6 +5077,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="fantasy zone (1987)(zemina).rom" size="131072" crc="c73d4d25" sha1="442a39b196f19a22fc7fb8f14bf17386a292b60e" offset="0x0000" />
@@ -5084,6 +5161,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="final zone wolf (1986)(zemina).rom" size="131072" crc="06310fb1" sha1="90ea059c57f011a4fb33a558e868ee639882fe5e" offset="0x0000" />
@@ -5543,6 +5621,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="HBS-G053C" />
 		<info name="alt_title" value="ガルフォース カオスの攻防" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="gall force - defense of chaos (japan) (alt 1).rom" size="131072" crc="f65b5271" sha1="3425eea336140da03d7d7f09a94fd928d70e2212" offset="0" />
@@ -5557,6 +5636,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="HBS-G053C" />
 		<info name="alt_title" value="ガルフォース カオスの攻防" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="gall force - defense of chaos (japan) (alt 2).rom" size="131072" crc="ec036e37" sha1="abe52920e895c148851649ecb9c029fdc41a275f" offset="0" />
@@ -5584,6 +5664,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_126in1" />
 			<feature name="mapper" value="126IN1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="126 in 1.rom" size="2097152" crc="2ee35c23" sha1="3f0a7b0cbaa3d4c3c6ce744708c68c89eff82289" offset="0" />
@@ -5596,6 +5677,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="2097152">
 				<rom name="game world - 126 games (korea) (unl).rom" size="2097152" crc="c13004c5" sha1="b2cca92b7a51a43c310e58e011f3ede1e7125a96" offset="0" />
@@ -5608,6 +5690,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_80in1" />
 			<feature name="mapper" value="80IN1" />
 			<dataarea name="rom" size="524288">
 				<rom name="30games.rom" size="524288" crc="8d452fa1" sha1="2de7891988a868f89f0c02fc84f762597d542d6f" offset="0x0000" />
@@ -5620,6 +5703,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_80in1" />
 			<feature name="mapper" value="80IN1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game world 64 (zemina).rom" size="1048576" crc="e50bab84" sha1="5f912637565932c2bd7c0d7b9be6ad3dc971f96f" offset="0x0000" />
@@ -5632,6 +5716,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_80in1" />
 			<feature name="mapper" value="80IN1" />
 			<dataarea name="rom" size="524288">
 				<rom name="80games.rom" size="524288" crc="d9aa0055" sha1="a4a75ed32c2af3c5f009661bb76be4f65e2e9a1f" offset="0x0000" />
@@ -5644,6 +5729,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="524288">
 				<rom name="games_80_game_collection_pack.rom" size="524288" crc="0808be76" sha1="922eccd546f7a7074bd5741eac2bde4a0075b8c0" offset="0x0000" />
@@ -5656,6 +5742,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_90in1" />
 			<feature name="mapper" value="90IN1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game world 90 (original).rom" size="1048576" crc="123be4e7" sha1="edd109e4b518c41eb30a2b6f2a492598c9a08008" offset="0x0000" />
@@ -5668,6 +5755,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="korean_90in1" />
 			<feature name="mapper" value="90IN1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game world 90 (zemina).rom" size="1048576" crc="57f16710" sha1="517e2771e65fb6f2aebb3beb97bf501b61dbd1fa" offset="0x0000" />
@@ -6218,6 +6306,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Ocean Software?</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="head over heels (1987)(ocean software).rom" size="65536" crc="73b6f599" sha1="26a7b0118d158e9bd3ea947fbe68f57b54e0b847" offset="0x0000" />
@@ -6437,6 +6526,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="44780" />
 		<info name="alt_title" value="は～りぃふぉっくすＭＳＸスペシャル" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16_sram" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="harryfox msx special (japan).rom" size="131072" crc="96b7faca" sha1="a3de07612da7986387a4f5c41bbbc7e3b244e077" offset="0" />
@@ -6452,6 +6542,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>MicroCabin</publisher>
 		<info name="alt_title" value="は～りぃふぉっくす雪の魔王編" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="harryfox yki no maoh (japan).rom" size="65536" crc="c7fe3ee1" sha1="3626b5dd3188ec2a16e102d05c79f8f242fbd892" offset="0" />
@@ -6506,6 +6597,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="TEX-70" />
 		<info name="alt_title" value="ハイドライドII" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="hydlide ii - shine of darkness (japan) (alt 1).rom" size="131072" crc="b886d7f5" sha1="a3537934a4d9dfbf27aca5aaf42e0f18e4975366" offset="0" />
@@ -6521,6 +6613,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="524288">
 				<rom name="hydlide iii - the space memories (1987)(zemina).rom" size="524288" crc="41c82156" sha1="5d2062ecc7176ca2b100724c2a17f877878d721d" offset="0x0000" />
@@ -6855,6 +6948,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="XR-1040" />
 		<info name="alt_title" value="ジャガー5 ~ Jagur 5 (Box?)" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="jagur (japan) (alt 1).rom" size="131072" crc="dbf2f244" sha1="1aeae1180471e9a6e8e866993031b881a341f921" offset="0" />
@@ -7199,6 +7293,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Square</publisher>
 		<info name="alt_title" value="キングスナイト" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="king knight (japan) (alt 1).rom" size="131072" crc="4d884352" sha1="a2ca7e6e216f8b450eb8db10a4120f0353275b6b" offset="0" />
@@ -7212,6 +7307,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Square</publisher>
 		<info name="alt_title" value="キングスナイト" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="king knight (japan) (alt 2).rom" size="131072" crc="ab6cd62c" sha1="46062d3393c49884f84c2dc437ff27854e9d2e49" offset="0" />
@@ -7296,6 +7392,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC760" />
 		<info name="alt_title" value="エルギーザの封印" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="king's valley ii (japan, europe).rom" size="131072" crc="e82a8e8e" sha1="cfd872d005b7bd4cdd6e06c4c0162191f0b0415d" offset="0" />
@@ -7396,6 +7493,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC749" />
 		<info name="alt_title" value="ガリウスの迷宮 ~ Galious no Meikyuu (Box?)" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="knightmare ii - the maze of galious (japan).rom" size="131072" crc="fe23d253" sha1="4d51d3c5036311392b173a576bc7d91dc9fed6cb" offset="0" />
@@ -7408,6 +7506,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="knightmare ii - the maze of galious (1987)(zemina)[rc-749].rom" size="131072" crc="d7f35938" sha1="7a786959d8fc0b518b35341422f096dd6019468d" offset="0x0000" />
@@ -7422,6 +7521,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC754" />
 		<info name="alt_title" value="シャロム" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="262144">
 				<rom name="knightmare iii - shalom (japan).rom" size="262144" crc="cf60fa7d" sha1="25f5adeca8a2ddb754d25eb18cff0d84e5b003bc" offset="0" />
@@ -7435,6 +7535,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Dempa</publisher>
 		<info name="alt_title" value="ナイザースペシャル" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="knither special (japan).rom" size="131072" crc="a3b2fe71" sha1="63d4e39c59f24f880809caa534d7a46ae83f4c9f" offset="0" />
@@ -7940,6 +8041,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Topia</publisher>
 		<info name="alt_title" value="대마성" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="legendly knight (korea).rom" size="131072" crc="8e0f0638" sha1="6a98d5787dd0e76f04283ce0aec55d45ba81565d" offset="0" />
@@ -7953,6 +8055,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Topia</publisher>
 		<info name="alt_title" value="대마성" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="legendly knight (korea) (alt 1).rom" size="131072" crc="d6635d68" sha1="2cea9cdd501d77f2b6bd78ae2ae9a63aba64cfed" offset="0" />
@@ -7979,6 +8082,7 @@ kept for now until finding out what those bytes affect...
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="light corridor, the (europe).rom" size="65536" crc="a330b549" sha1="0442dd29ea0f7b78c9cd5849ec7ef5bb21ec0bf5" offset="0" />
@@ -8201,6 +8305,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="PS-2024G" />
 		<info name="alt_title" value="マグナム危機一髪 - エンパイア シティ 1931" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="magnum prohibition 1931 (japan).rom" size="131072" crc="d446ba1e" sha1="3243a5cc562451de527917e9ca85657286b2852f" offset="0" />
@@ -8215,6 +8320,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="PS-2024G" />
 		<info name="alt_title" value="マグナム危機一髪 - エンパイア シティ 1931" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="magnum prohibition 1931 (japan) (alt 1).rom" size="131072" crc="2a8bbb4d" sha1="9c5c1c40ec30c34b1b436cf8cc494c0b509e81fc" offset="0" />
@@ -8407,6 +8513,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="HM-023" />
 		<info name="alt_title" value="迷宮神話" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="meikyuu shinwa (japan).rom" size="131072" crc="2f8065eb" sha1="98b7a6ac44b82ccfc45eb51595e2905adabac1c7" offset="0" />
@@ -8421,6 +8528,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="HM-023" />
 		<info name="alt_title" value="迷宮神話" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="meikyuu shinwa (japan) (alt 1).rom" size="131072" crc="1d1ec602" sha1="e92baa5fdfb2715e68700024d964098ef35704d9" offset="0" />
@@ -8530,6 +8638,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="NP-003" />
 		<info name="alt_title" value="三つ目がとおる" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="mitsumega toohru - three-eyed one comes here, the (japan).rom" size="131072" crc="4faccae0" sha1="176ec8e65a9fdbf59edc245b9e8388cc94195db9" offset="0" />
@@ -9163,6 +9272,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC742" />
 		<info name="alt_title" value="グラディウス" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis (japan, europe).rom" size="131072" crc="4d44255f" sha1="e31ac6520e912c27ce96431a1dfb112bf71cb7b9" offset="0" />
@@ -9177,6 +9287,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC742" />
 		<info name="alt_title" value="グラディウス" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis (japan, europe) (alt 1).rom" size="131072" crc="4dfcc009" sha1="f0e4168ea18188fca2581526c2503223b9a28581" offset="0" />
@@ -9191,6 +9302,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC751" />
 		<info name="alt_title" value="グラディウス2" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis 2 (japan, europe).rom" size="131072" crc="db847b2b" sha1="d63e20369f98487767810a0c57603bef6a2a07e5" offset="0" />
@@ -9205,6 +9317,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC751" />
 		<info name="alt_title" value="グラディウス2" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis 2 (japan, europe) (alt 1).rom" size="131072" crc="32aba4e3" sha1="ab30cdeaacbdf14e6366d43d881338178fc665cb" offset="0" />
@@ -9218,6 +9331,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="グラディウス2" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis 2 (japan, europe) (beta).rom" size="131072" crc="dfa8c827" sha1="4c2f015685a17db7a8c3893e868e0a84a8dbf1e5" offset="0" />
@@ -9231,6 +9345,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="グラディウス2" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis 2 (japan) (demo).rom" size="131072" crc="c8fac21a" sha1="6844758ff5c2c410115d4d7cf12498c42e931732" offset="0" />
@@ -9245,6 +9360,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC764" />
 		<info name="alt_title" value="ゴーファーの野望 EPISODE II" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="262144">
 				<rom name="nemesis 3 - the eve of destruction (japan, europe).rom" size="262144" crc="4b61ae91" sha1="7393f677e0fae5fc83071c6b74756117b7d75e2d" offset="0" />
@@ -9259,6 +9375,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC764" />
 		<info name="alt_title" value="ゴーファーの野望 EPISODE II" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="262144">
 				<rom name="nemesis 3 - the eve of destruction (japan, europe) (alt 1).rom" size="262144" crc="0db7132f" sha1="0413bb3aeacb0c28429b8c85b42796dbe48bef6d" offset="0" />
@@ -9273,6 +9390,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC764" />
 		<info name="alt_title" value="ゴーファーの野望 EPISODE II" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="262144">
 				<rom name="nemesis 3 - the eve of destruction (japan, europe) (alt 2).rom" size="262144" crc="329987bc" sha1="5692e41b3a4c5e767cf290fd6c24942d0fd7b2e3" offset="0" />
@@ -9737,6 +9855,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC759" />
 		<info name="alt_title" value="パロディウス～タコは地球を救う～" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="parodius (japan).rom" size="131072" crc="9bb308f5" sha1="2220363ae56ef707ab2471fcdb36f4816ad1d32c" offset="0" />
@@ -9751,6 +9870,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC759" />
 		<info name="alt_title" value="パロディウス～タコは地球を救う～" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="parodius (japan) (alt 1).rom" size="131072" crc="ca21cde4" sha1="75d3b72d9ceeaa55c76223d935629a30ae4124d6" offset="0" />
@@ -9850,6 +9970,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC743" />
 		<info name="alt_title" value="夢大陸アドベンチャー" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="penguin adventure (japan, europe).rom" size="131072" crc="0f6418d3" sha1="d53e0c8bcd98820afe820f756af35cc97911bfe4" offset="0" />
@@ -9862,6 +9983,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="yume tairiku adventure. penguin adventure (1987)(zemina)[rc-743].rom" size="131072" crc="80814e55" sha1="d3d411c8b7891aef9c59cbc20bb4fa3ff0ca03ea" offset="0x0000" />
@@ -9874,6 +9996,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Screen Software</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="yume tairiku adventure. penguin adventure (1986)(konami)[cr screen][rc-743].rom" size="131072" crc="38c35d99" sha1="898bda19f882c6d1dffdb2173db84a97dc21f7d6" offset="0x0000" />
@@ -9980,6 +10103,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Eurosoft</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="pinball blaster (europe).rom" size="65536" crc="68fe9580" sha1="c95f8edb24edca9f5d38c26d0e8a34c6b61efb0c" offset="0" />
@@ -10282,6 +10406,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>Level 9 Computing</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="price of magik, the (europe).rom" size="65536" crc="b43e7881" sha1="ac109dac24df4dae813ca5d9f0938cc48a162bb1" offset="0" />
@@ -10337,6 +10462,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="サイキックウォー" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="psychic war - cosmic soldier 2 (japan).rom" size="262144" crc="b8fc19a4" sha1="16c692a2c9babfdadd8408d2f0f8fae3a8d96fd5" offset="0" />
@@ -10721,6 +10847,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Micronet</publisher>
 		<info name="alt_title" value="ロボレス２００１年 ~ Robo Wres 2001 (Box?)" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="robo wres 2001 (japan).rom" size="131072" crc="788637d5" sha1="46c98a3143f5a80b2090311a770f9b73000881c0" offset="0" />
@@ -10838,6 +10965,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC758" />
 		<info name="alt_title" value="沙羅曼蛇" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="salamander (japan).rom" size="131072" crc="c36f559d" sha1="0d459788b6c464b50cbc2436e67a2cef248e0c4a" offset="0" />
@@ -10850,6 +10978,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="131072">
 				<rom name="salamander - operation x (1988)(zemina)[rc-758].rom" size="131072" crc="40d19bf6" sha1="d30c17109fa1c4a81e39dca57b79464b0aa0b7c2" offset="0x0000" />
@@ -10865,6 +10994,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="MXKN11008" />
 		<info name="alt_title" value="三國志" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="sangokushi (japan) (alt 1).rom" size="262144" crc="803cc690" sha1="3f741ba2ab08c5e9fb658882b36b8e3d01682f58" offset="0" />
@@ -11228,6 +11358,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Dempa</publisher>
 		<info name="alt_title" value="ソフィア" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="65536">
 				<rom name="sofia (japan).rom" size="65536" crc="14811951" sha1="5a12439f74ca5d1c2664f01ff6a8302d3ce907a8" offset="0" />
@@ -11694,6 +11825,7 @@ kept for now until finding out what those bytes affect...
 		<year>1992</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="street master.rom" size="131072" crc="7269c520" sha1="65da0e5c5de057a1ed836ec19b1f07e10f4b738f" offset="0x0000" />
@@ -11732,6 +11864,7 @@ kept for now until finding out what those bytes affect...
 		<year>199?</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="65536">
 				<rom name="super bioman 4 (korea) (unl).rom" size="65536" crc="112abf34" sha1="dacc9ed6a80fb15c3e82c4081c07211e033ba820" offset="0" />
@@ -11745,6 +11878,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="수퍼보이 III" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="super boy 3 (korea) (unl).rom" size="131072" crc="9195c34c" sha1="5d65a308bb9ec8c4b4ce334b18d699b1f53227ef" offset="0" />
@@ -11758,6 +11892,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="수퍼보이 III" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="super boy iii (1991)(zemina).rom" size="131072" crc="f422ad79" sha1="9bafce699964f4aabc6b60c71a71c9ff5b0cc82d" offset="0x0000" />
@@ -12520,6 +12655,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Domark?</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="toobin (europe).rom" size="65536" crc="704ec575" sha1="d147f2cac0600527ce49bfffc865c54eb783e5e5" offset="0" />
@@ -13004,6 +13140,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="원시인"/>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
 				<rom name="wonsiin (kr).rom" size="131072" crc="a05258f5" sha1="f98f9c0fd32b2392b57b14105a9b730c8957d9b9" offset="0x0000" />
@@ -13043,6 +13180,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="262144">
 				<rom name="dragon slayer 2 - xanadu (1987)(zemina).rom" size="262144" crc="119b7ba8" sha1="fcdbc5e15dd6b973e0f1112f4599dad985f48042" offset="0x0000" />
@@ -13588,6 +13726,7 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Panasoft</publisher>
 		<part name="rom1" interface="msx_cart">
+			<feature name="slot" value="fmpac" />
 			<feature name="mapper" value="FM-PAC" />
 			<dataarea name="rom" size="65536">
 				<rom name="fmpac.rom" size="65536" crc="0e84505d" sha1="9d789166e3caf28e4742fe933d962e99618c633d" offset="0x0000" />
@@ -13750,6 +13889,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC755" />
 		<info name="alt_title" value="コナミの新１０倍カートリッジ" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gamemaster2" />
 			<feature name="mapper" value="GMASTER2" />
 			<dataarea name="rom" size="131072">
 				<rom name="game master ii (japan).rom" size="131072" crc="084c5803" sha1="5c00f9e3a48411e08fac89b1dfdd2a6e95853919" offset="0" />
@@ -13764,6 +13904,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC755" />
 		<info name="alt_title" value="コナミの新１０倍カートリッジ" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gamemaster2" />
 			<feature name="mapper" value="GMASTER2" />
 			<dataarea name="rom" size="131072">
 				<rom name="game master ii (japan) (alt 1).rom" size="131072" crc="2d93f9cc" sha1="fe74b4df9698a61dffd3ac88f47619675514ba1c" offset="0" />
@@ -13905,6 +14046,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="alt_title" value="ニューキャルシリーズニューホライズン 1" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="new horizon - english course 1 (japan) (program).rom" size="131072" crc="85d47f39" sha1="ec1bb5c36952b12e6c0805e9a8d5bf31c20a68c4" offset="0" />
@@ -14897,6 +15039,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="E086" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="examine your information 3 (al alamiah, 1988).rom" size="131072" crc="4bba7482" sha1="1257d2004e625e1ca60ef78a43cd59c7fa2df29c" offset="0x0000" />
@@ -15037,6 +15180,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R052" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />  <!-- WRONG MAPPER (but in this way no crash of the emulator) -->
 			<dataarea name="rom" size="1048576">
 				<rom name="holyquran.rom" size="1048576" crc="83f28ad3" sha1="0dbc7defd96b71c1fe2d63cbc725f5e58aea2db0" offset="0x0000" />
@@ -15246,6 +15390,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="P058" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="65536">
 				<rom name="a_lets1.rom" size="65536" crc="76e5363a" sha1="08eb5001bd95ffb7232cdbdffbec7634eb110ad8" offset="0" />
@@ -15442,6 +15587,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="E071" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="a_athar.rom" size="131072" crc="c3b051e6" sha1="0a7bed652592ed6325acd037f1f5bbbd1d31b239" offset="0" />
@@ -15596,6 +15742,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="L042" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="pictures &amp; words (al alamiah, 1989).rom" size="131072" crc="ea5c9f48" sha1="5b25d93259a358f2064adc44f6382c91c9394861" offset="0x0000" />
@@ -15680,6 +15827,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="C026" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="a_sakhr.rom" size="131072" crc="6488cc19" sha1="9ee1559df309a5d833808908a0aac3b811c45312" offset="0" />
@@ -15694,6 +15842,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="F063" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="a_qs.rom" size="131072" crc="22528d5c" sha1="64c49fdabbdd5e13c4310b03a183ea1a018154a4" offset="0" />
@@ -15708,6 +15857,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="B051" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="sahkr files (al alamiah, 19xx).rom" size="131072" crc="b872ec39" sha1="09b100f109c03e60ab7f777c508bf240f6acd79d" offset="0x0000" />
@@ -15722,6 +15872,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="C050" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="a_logo-a.rom" size="65536" crc="25bd7869" sha1="a2901318f8216ccd2f4d08b0f272e1bf90ab197a" offset="0" />
@@ -16042,6 +16193,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="P076" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="a_artist.rom" size="131072" crc="25013264" sha1="e19cfcbe92ec3682bee869dfad5f6b4058b1f2ce" offset="0" />
@@ -16056,6 +16208,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="P098" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="65536">
 				<rom name="a_smallserch.rom" size="65536" crc="e5479952" sha1="e4f7a94d0cb43f56f73d54c22364e91434363945" offset="0" />
@@ -16070,6 +16223,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="F062" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="the zoo (al alamiah, 1989).rom" size="131072" crc="eb40e36f" sha1="ad3d8fc2201a245e352875918e421b42764e4148" offset="0x0000" />
@@ -16853,6 +17007,7 @@ kept for now until finding out what those bytes affect...
 	<year>1987</year>
 	<publisher>Matsushita</publisher>
 	<part name="cart" interface="msx_cart">
+		<feature name="slot" value="disk_rom" />
 		<feature name="mapper" value="DISK_ROM" />
 		<dataarea name="rom" size="0x4000">
 		<rom name="disk basic v1.0 for fs-fd1 (1987)(matsushita electric industrial)(jp).rom" size="0x4000" crc="4c9b8214" sha1="8e3f6f08309f082a82be8298a66c9b90f2d34ad4" offset="0" />

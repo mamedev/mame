@@ -70,7 +70,8 @@ private:
 
 	devcb2_write_line        m_out_tx_cb;
 	devcb2_write_line        m_out_rx_cb;
-	UINT8 m_tx_latch, m_rx_latch;
+	UINT8 m_tx_latch;
+	//UINT8 m_rx_latch;
 	UINT8 m_rx;
 	UINT8 m_new_command;
 	UINT8 m_status;

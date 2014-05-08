@@ -5751,6 +5751,11 @@ voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, cons
 {
 }
 
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: voodoo_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -5764,7 +5769,7 @@ void voodoo_banshee_device::device_start()
 const device_type VOODOO_3 = &device_creator<voodoo_3_device>;
 
 voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: voodoo_device(mconfig, VOODOO_3, "3dfx Voodoo 3", tag, owner, clock, "voodoo_3", __FILE__)
+	: voodoo_banshee_device(mconfig, VOODOO_3, "3dfx Voodoo 3", tag, owner, clock, "voodoo_3", __FILE__)
 {
 }
 

@@ -109,16 +109,6 @@ public:
 	virtual void machine_start();
 };
 
-static const ins8250_interface pcat_nit_com0_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir4_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /*************************************
  *
  *  ROM banking
@@ -238,7 +228,9 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -255,7 +247,9 @@ static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

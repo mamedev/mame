@@ -21,22 +21,20 @@
 
     The decryption can logically be split in two parts. The first part consists
     of a series of conditional XORs and bitswaps, controlled by the decryption
-    key, which will be described in the next paragraph. The second part does a
-    couple more XORs which don't depend on the key, followed by the replacement
+    key, which will be described in the next paragraph. The second part does a replacement
     of several values with FFFF. This last step is done to prevent usage of any
     PC-relative opcode, which would easily allow an intruder to dump decrypted
     values from program space. The FFFF replacement may affect either ~300 values
     or ~5000, depending on the decryption key.
 
-    The main part of the decryption can itself be subdivided in four consecutive
+    The main part of the decryption can itself be subdivided in five consecutive
     steps. The first one is executed only if bit 15 of the encrypted value is 1;
     the second one only if bit 14 of the _current_ value is 1; the third one only
-    if bit 13 of the current value is 1; the fourth one is always executed. The
-    first three steps consist of a few conditional XORs and a final conditional
-    bitswap; the fourth one consists of a fixed XOR and a few conditional
-    bitswaps. There is, however, a special case: if bits 15, 14 and 13 of the
-    encrypted value are all 0, none of the above steps are executed, replaced by
-    a single fixed bitswap.
+    if bit 13 of the current value is 1; the fourth one is executed whenever one
+    of the first three has been executed; the fifth one is always executed. Every
+    step can be thought as consisting of a serie of operations, with some steps
+    avoiding some of them: a uncondicional bitswap, some conditional XORs,
+    a unconditional XOR and some condicional bitswaps.
 
     In the end, the decryption of a value at a given address is controlled by 32
     boolean variables; 8 of them change at every address (repeating after 0x2000
@@ -880,67 +878,74 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 	UINT8 key_7a = BIT(mainkey,7) ^ BIT(gkey2,4);
 
 
-	if ((val & 0xe000) == 0x0000)
-		val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-	else
+    if (val & 0x8000)           // block invariant: val & 0x8000 != 0
+    {
+        val = BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
+        
+        if (!global_xor1)   if (~val & 0x0800)  val ^= 0x3002;                                      // 1,12,13
+                            if (~val & 0x0020)  val ^= 0x0044;                                      // 2,6
+        if (!key_1b)        if (~val & 0x0400)  val ^= 0x0890;                                      // 4,7,11
+        if (!global_swap2)  if (!key_0c)        val ^= 0x0308;                                      // 3,8,9
+                                                val ^= 0x6561;
+        
+        if (!key_2b)        val = BITSWAP16(val,15,10,13,12,11,14,9,8,7,6,0,4,3,2,1,5);             // 0-5, 10-14
+    }
+    
+    if (val & 0x4000)           // block invariant: val & 0x4000 != 0
+    {
+        val = BITSWAP16(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
+        
+        if (!global_xor0)   if (val & 0x0010)   val ^= 0x0468;                                      // 3,5,6,10
+        if (!key_3a)        if (val & 0x0100)   val ^= 0x0081;                                      // 0,7
+        if (!key_6a)        if (val & 0x0004)   val ^= 0x0100;                                      // 8
+        if (!key_5b)        if (!key_0b)        val ^= 0x3012;                                      // 1,4,12,13
+                                                val ^= 0x3523;
+                                                
+        if (!global_swap0b) val = BITSWAP16(val, 2,14,13,12, 9,10,11, 8, 7, 6, 5, 4, 3,15, 1, 0);   // 2-15, 9-11
+    }
+    
+    if (val & 0x2000)           // block invariant: val & 0x2000 != 0
+    {
+        val = BITSWAP16(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
+        
+        if (!key_4a)        if (val & 0x0800)   val ^= 0x010c;                                      // 2,3,8
+        if (!key_1a)        if (val & 0x0080)   val ^= 0x1000;                                      // 12
+        if (!key_7a)        if (val & 0x0400)   val ^= 0x0a21;                                      // 0,5,9,11
+        if (!key_4b)        if (!key_0a)        val ^= 0x0080;                                      // 7
+        if (!global_swap0a) if (!key_6b)        val ^= 0xc000;                                      // 14,15
+                                                val ^= 0x99a5;
+                                                
+        if (!key_5b)        val = BITSWAP16(val,15,14,13,12,11, 1, 9, 8, 7,10, 5, 6, 3, 2, 4, 0);   // 1,4,6,10
+    }
+
+	if (val & 0xe000)           // block invariant: val & 0xe000 != 0
 	{
-		if (val & 0x8000)
-		{
-			if (!global_xor1)   if (~val & 0x0008)  val ^= 0x2410;                                      // 13,10,4
-								if (~val & 0x0004)  val ^= 0x0022;                                      // 5,1
-			if (!key_1b)        if (~val & 0x1000)  val ^= 0x0848;                                      // 11,6,3
-			if (!global_swap2)  if (!key_0c)        val ^= 0x4101;                                      // 14,8,0
-			if (!key_2b)        val = BITSWAP16(val, 15,14,13, 9,11,10,12, 8, 2, 6, 5, 4, 3, 7, 1, 0);  // 12,9,7,2
-
-			val = 0x6561 ^ BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
-		}
-		if (val & 0x4000)
-		{
-			if (!global_xor0)   if (val & 0x0800)   val ^= 0x9048;                                      // 15,12,6,3
-			if (!key_3a)        if (val & 0x0004)   val ^= 0x0202;                                      // 9,1
-			if (!key_6a)        if (val & 0x0400)   val ^= 0x0004;                                      // 2
-			if (!key_5b)        if (!key_0b)        val ^= 0x08a1;                                      // 11,7,5,0
-			if (!global_swap0b) val = BITSWAP16(val, 15,14,10,12,11,13, 9, 4, 7, 6, 5, 8, 3, 2, 1, 0);  // 13,10,8,4
-
-			val = 0x3523 ^ BITSWAP16(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
-		}
-		if (val & 0x2000)
-		{
-			if (!key_4a)        if (val & 0x0100)   val ^= 0x4210;                                      // 14,9,4
-			if (!key_1a)        if (val & 0x0040)   val ^= 0x0080;                                      // 7
-			if (!key_7a)        if (val & 0x0001)   val ^= 0x110a;                                      // 12,8,3,1
-			if (!key_4b)        if (!key_0a)        val ^= 0x0040;                                      // 6
-			if (!global_swap0a) if (!key_6b)        val ^= 0x0404;                                      // 10,2
-			if (!key_5b)        val = BITSWAP16(val,  0,14,13,12,15,10, 9, 8, 7, 6,11, 4, 3, 2, 1, 5);  // 15,11,5,0
-
-			val = 0x99a5 ^ BITSWAP16(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
-		}
-
-		val = 0x87ff ^ BITSWAP16(val,  5,15,13,14, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
-
-		if (!global_swap4)  val = BITSWAP16(val,  6,14,13,12,11,10, 9, 5, 7,15, 8, 4, 3, 2, 1, 0);  // 15-6, 8-5
-		if (!global_swap3)  val = BITSWAP16(val, 15,12,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 12-13-14
+        val = BITSWAP16(val,15,13,14, 5, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
+        
+        val ^= 0x17ff;
+        
+		if (!global_swap4)  val = BITSWAP16(val, 15,14,13, 6,11,10, 9, 5, 7,12, 8, 4, 3, 2, 1, 0);  // 5-8, 6-12
+		if (!global_swap3)  val = BITSWAP16(val, 13,15,14,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 15-14-13
 		if (!global_swap2)  val = BITSWAP16(val, 15,14,13,12,11, 2, 9, 8,10, 6, 5, 4, 3, 0, 1, 7);  // 10-2-0-7
 		if (!key_3b)        val = BITSWAP16(val, 15,14,13,12,11,10, 4, 8, 7, 6, 5, 9, 1, 2, 3, 0);  // 9-4, 3-1
-
-		if (!key_2a)        val = BITSWAP16(val, 15,12,13,14,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 14-12
+        if (!key_2a)        val = BITSWAP16(val, 13,14,15,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 13-15
+        
 		if (!global_swap1)  val = BITSWAP16(val, 15,14,13,12, 9, 8,11,10, 7, 6, 5, 4, 3, 2, 1, 0);  // 11...8
 		if (!key_5a)        val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 4, 5, 7, 6, 3, 2, 1, 0);  // 7...4
 		if (!global_swap0a) val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 0, 3, 2, 1);  // 3...0
 	}
+    
+    val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
-	// final "obfuscation": invert bits 7 and 14 following a fixed pattern
-	UINT16 dec = val;
-	if ((val & 0xf080) == 0x8000) dec ^= 0x0080;
-	if ((val & 0xf080) == 0xc080) dec ^= 0x0080;
-	if ((val & 0xb080) == 0x8000) dec ^= 0x4000;
-	if ((val & 0xb100) == 0x0000) dec ^= 0x4000;
+    if ((val & 0xb080) == 0x8000) val ^= 0x4000;
+    if ((val & 0xf000) == 0xc000) val ^= 0x0080;
+    if ((val & 0xb100) == 0x0000) val ^= 0x4000;
 
 	// mask out opcodes doing PC-relative addressing, replace them with FFFF
-	if ((m_masked_opcodes_lookup[key_F][dec >> 4] >> ((dec >> 1) & 7)) & 1)
-		dec = 0xffff;
+	if ((m_masked_opcodes_lookup[key_F][val >> 4] >> ((val >> 1) & 7)) & 1)
+		val = 0xffff;
 
-	return dec;
+	return val;
 }
 
 

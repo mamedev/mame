@@ -759,17 +759,6 @@ WRITE8_MEMBER(calomega_state::pia1_bout_w)
 }
 
 
-WRITE8_MEMBER(calomega_state::ay_aout_w)
-{
-	logerror("AY8910: Port A out: %02X\n", data);
-}
-
-WRITE8_MEMBER(calomega_state::ay_bout_w)
-{
-	logerror("AY8910: Port B out: %02X\n", data);
-}
-
-
 /********  Lamps debug  ********
 
     PIA0-B  PIA1-A
@@ -2683,8 +2672,6 @@ static MACHINE_CONFIG_DERIVED( sys906, sys903 )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8912")
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))    /* From PCB pic. Value is stored at $0539 */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(calomega_state, ay_aout_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(calomega_state, ay_bout_w))
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 

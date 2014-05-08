@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch2_byte_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zaccaria_state, ay8910_port0a_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

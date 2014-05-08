@@ -183,10 +183,10 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_PIC8259_ADD( "pic8259_2", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NULL )
 
-	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0, 0 )   /* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1, 0 )   /* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2, 0 )   /* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3, 0 )   /* TODO: Verify model */
+	MCFG_DEVICE_ADD( "ns16550_0", NS16550, 0 )   /* TODO: Verify model */
+	MCFG_DEVICE_ADD( "ns16550_1", NS16550, 0 )   /* TODO: Verify model */
+	MCFG_DEVICE_ADD( "ns16550_2", NS16550, 0 )   /* TODO: Verify model */
+	MCFG_DEVICE_ADD( "ns16550_3", NS16550, 0 )   /* TODO: Verify model */
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )

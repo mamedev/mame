@@ -50,7 +50,9 @@
 #include "osdsdl.h"
 #include "sdlos.h"
 #include "modules/sound/sdl_sound.h"
+#if !defined(NO_DEBUGGER)
 #include "modules/debugger/debugqt.h"
+#endif
 #include "modules/debugger/none.h"
 #if defined(SDLMAME_MACOSX)
 #include "modules/debugger/debugosx.h"

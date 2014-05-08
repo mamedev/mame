@@ -11,42 +11,6 @@
 #include "bus/rs232/null_modem.h"
 #include "machine/ins8250.h"
 
-static const ins8250_interface genpc_com_interface[2]=
-{
-	{
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_txd),
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_dtr),
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_rts),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_1),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
-		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_2),
-		DEVCB_NULL,
-		DEVCB_NULL
-	}/*,
-    {
-        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
-        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
-        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
-        DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_1),
-        DEVCB_NULL,
-        DEVCB_NULL
-    },
-    {
-        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_txd),
-        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_dtr),
-        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_rts),
-        DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_2),
-        DEVCB_NULL,
-        DEVCB_NULL
-    }*/
-};
-
 static SLOT_INTERFACE_START(isa_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
 	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
@@ -55,10 +19,26 @@ static SLOT_INTERFACE_START(isa_com)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( com_config )
-	MCFG_INS8250_ADD( "uart_0", genpc_com_interface[0], XTAL_1_8432MHz )
-	MCFG_INS8250_ADD( "uart_1", genpc_com_interface[1], XTAL_1_8432MHz )
-	//MCFG_INS8250_ADD( "uart_2", genpc_com_interface[2], XTAL_1_8432MHz )
-	//MCFG_INS8250_ADD( "uart_3", genpc_com_interface[3], XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "uart_0", INS8250, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport0", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_1))
+	MCFG_DEVICE_ADD( "uart_1", INS8250, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport1", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport1", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_2))
+	/*MCFG_DEVICE_ADD( "uart_2", INS8250, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport2", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport2", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport2", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_1))
+	MCFG_DEVICE_ADD( "uart_3", INS8250, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport3", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport3", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport3", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_2))*/
 
 	MCFG_RS232_PORT_ADD( "serport0", isa_com, "microsoft_mouse" )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
@@ -148,10 +128,26 @@ void isa8_com_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( com_at_config )
-	MCFG_NS16450_ADD( "uart_0", genpc_com_interface[0], XTAL_1_8432MHz ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
-	MCFG_NS16450_ADD( "uart_1", genpc_com_interface[1], XTAL_1_8432MHz )
-//  MCFG_NS16450_ADD( "uart_2", genpc_com_interface[2], XTAL_1_8432MHz )
-//  MCFG_NS16450_ADD( "uart_3", genpc_com_interface[3], XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL_1_8432MHz ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport0", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_1))
+	MCFG_DEVICE_ADD( "uart_1", NS16450, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport1", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport1", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_2))
+	/*MCFG_DEVICE_ADD( "uart_2", NS16450, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport2", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport2", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport2", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_1))
+	MCFG_DEVICE_ADD( "uart_3", NS16450, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport3", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport3", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport3", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(isa8_com_device, pc_com_interrupt_2))*/
 	MCFG_RS232_PORT_ADD( "serport0", isa_com, "microsoft_mouse" )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dcd_w))

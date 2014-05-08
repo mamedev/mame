@@ -91,7 +91,13 @@ const device_type PC16552D = &device_creator<pc16552_device>;
 
 ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-			device_serial_interface(mconfig, *this)
+			device_serial_interface(mconfig, *this),
+			m_out_tx_cb(*this),
+			m_out_dtr_cb(*this),
+			m_out_rts_cb(*this),
+			m_out_int_cb(*this),
+			m_out_out1_cb(*this),
+			m_out_out2_cb(*this)
 {
 }
 
@@ -172,7 +178,7 @@ void ins8250_uart_device::update_interrupt()
 	}
 
 	/* set or clear the int */
-	m_out_int_func(state);
+	m_out_int_cb(state);
 }
 
 /* set pending bit and trigger int */
@@ -298,10 +304,10 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				}
 				else
 				{
-					m_out_dtr_func(m_regs.mcr & 1);
-					m_out_rts_func(m_regs.mcr & 2);
-					m_out_out1_func(m_regs.mcr & 4);
-					m_out_out2_func(m_regs.mcr & 8);
+					m_out_dtr_cb((m_regs.mcr & 1) ? 1 : 0);
+					m_out_rts_cb((m_regs.mcr & 2) ? 1 : 0);
+					m_out_out1_cb((m_regs.mcr & 4) ? 1 : 0);
+					m_out_out2_cb((m_regs.mcr & 8) ? 1 : 0);
 				}
 			}
 			break;
@@ -476,7 +482,7 @@ void ins8250_uart_device::tra_complete()
 
 void ins8250_uart_device::tra_callback()
 {
-	m_out_tx_func(transmit_register_get_data_bit());
+	m_out_tx_cb(transmit_register_get_data_bit());
 }
 
 void ins8250_uart_device::update_msr(int bit, UINT8 state)
@@ -511,12 +517,12 @@ WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
 
 void ins8250_uart_device::device_start()
 {
-	m_out_tx_func.resolve(m_out_tx_cb, *this);
-	m_out_dtr_func.resolve(m_out_dtr_cb, *this);
-	m_out_rts_func.resolve(m_out_rts_cb, *this);
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_out1_func.resolve(m_out_out1_cb, *this);
-	m_out_out2_func.resolve(m_out_out2_cb, *this);
+	m_out_tx_cb.resolve_safe();
+	m_out_dtr_cb.resolve_safe();
+	m_out_rts_cb.resolve_safe();
+	m_out_int_cb.resolve_safe();
+	m_out_out1_cb.resolve_safe();
+	m_out_out2_cb.resolve_safe();
 	set_tra_rate(0);
 	set_rcv_rate(0);
 	memset(&m_regs, 0x00, sizeof(m_regs));
@@ -533,29 +539,11 @@ void ins8250_uart_device::device_reset()
 	m_int_pending = 0;
 	receive_register_reset();
 	transmit_register_reset();
-	m_out_rts_func(0);
-	m_out_dtr_func(0);
-	m_out_out1_func(0);
-	m_out_out2_func(0);
-	m_out_tx_func(1);
-}
-
-void ins8250_uart_device::device_config_complete()
-{
-	const ins8250_interface *intf = reinterpret_cast<const ins8250_interface *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<ins8250_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
-		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
-		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_out1_cb, 0, sizeof(m_out_out1_cb));
-		memset(&m_out_out2_cb, 0, sizeof(m_out_out2_cb));
-	}
+	m_out_rts_cb(0);
+	m_out_dtr_cb(0);
+	m_out_out1_cb(0);
+	m_out_out2_cb(0);
+	m_out_tx_cb(1);
 }
 
 void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

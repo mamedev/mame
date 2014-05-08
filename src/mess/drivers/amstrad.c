@@ -868,7 +868,6 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
@@ -964,7 +963,6 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
@@ -1041,7 +1039,6 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
@@ -1058,7 +1055,6 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 
 	MCFG_SOUND_REPLACE("ay", AY8912, XTAL_16MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portB read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_PALETTE_MODIFY("palette")

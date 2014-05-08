@@ -18,7 +18,7 @@
     SSE TABLES
 ***************************************************************************/
 
-#if (defined(__SSE2__) && defined(PTR64))
+#if !defined(MAME_DEBUG) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
 const struct _rgbsse_statics rgbsse_statics =
 {
 	{ 0 },

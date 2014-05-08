@@ -361,17 +361,6 @@ WRITE_LINE_MEMBER(h19_state::h19_ace_irq)
 	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static const ins8250_interface h19_ace_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(h19_state, h19_ace_irq), // interrupt
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /* F4 Character Displayer */
 static const gfx_layout h19_charlayout =
 {
@@ -419,7 +408,8 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
-	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(h19_state, h19_ace_irq)) // interrupt
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(h19_state, h19_kbd_put))

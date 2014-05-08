@@ -128,6 +128,7 @@ class voodoo_banshee_device : public voodoo_device
 {
 public:
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ32_MEMBER( banshee_r );
 	DECLARE_WRITE32_MEMBER( banshee_w );
@@ -148,7 +149,7 @@ protected:
 
 extern const device_type VOODOO_BANSHEE;
 
-class voodoo_3_device : public voodoo_device
+class voodoo_3_device : public voodoo_banshee_device
 {
 public:
 	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

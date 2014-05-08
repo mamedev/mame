@@ -216,16 +216,6 @@ WRITE_LINE_MEMBER( avigo_state::com_interrupt )
 	refresh_ints();
 }
 
-static const ins8250_interface avigo_com_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_rts),
-	DEVCB_DRIVER_LINE_MEMBER(avigo_state, com_interrupt),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 void avigo_state::machine_reset()
 {
 	/* if is a cold start initialize flash contents */
@@ -871,7 +861,11 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_CPU_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(avigo_state, com_interrupt))
 
 	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, NULL )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))

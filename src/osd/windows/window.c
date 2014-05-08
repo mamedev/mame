@@ -1896,6 +1896,7 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	adjust_window_position_after_major_change(window);
 }
 
+#ifdef USE_QTDEBUG
 bool winwindow_qt_filter(void *message)
 {
 	MSG *msg = (MSG *)message;
@@ -1913,3 +1914,4 @@ bool winwindow_qt_filter(void *message)
 	}
 	return false;
 }
+#endif
