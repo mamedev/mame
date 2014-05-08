@@ -6304,7 +6304,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 
 	j = 0;
 
-	for (i = 0x40; i < (0x40 + _countof(rcdino4_keys40));)
+	for (i = 0x40; i < (0x40 + ARRAY_LENGTH(rcdino4_keys40));)
 	{
 		UINT8 key;
 
@@ -6337,7 +6337,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 
 	j = 1;
 
-	for (i = 0x81; i < (0x81 + _countof(rcdino4_keys80));)
+	for (i = 0x81; i < (0x81 + ARRAY_LENGTH(rcdino4_keys80));)
 	{
 		UINT8 key;
 
