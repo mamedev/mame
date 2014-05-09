@@ -3909,7 +3909,15 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "capx2312.u43", 0x0000, 0x0200, CRC(66971da6) SHA1(6984a68bc2f01009ad6a7a0705c00e715c29bb65) )
 ROM_END
 
-ROM_START( peip0028 ) /* Normal board :  Joker Poker - French (IP0028) - Payout 90.2% */
+ROM_START( peip0028 ) /* Normal board :  Joker Poker - French (IP0028) */
+/*
+                                            w/J     w/oJ
+PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    1   2   3    5   6  20  50 100 200 500   1000
+  % Range: 88.2-89.2%  Optimum: 90.2%  Hit Frequency: ??.?%
+     Programs Available: IP0028
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0028_ipp023.u68",   0x00000, 0x8000, CRC(011ddb51) SHA1(8734ddd1f06986efdb0bd83b2bc0a2303273dba9) )
 	ROM_RELOAD(                      0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
@@ -3924,7 +3932,15 @@ ROM_START( peip0028 ) /* Normal board :  Joker Poker - French (IP0028) - Payout 
 	ROM_LOAD( "cap656.u50", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( peip0029 ) /* Normal board : Joker Poker - French (IP0029) - Payout 93.3% */
+ROM_START( peip0029 ) /* Normal board : Joker Poker - French (IP0029) */
+/*
+                                            w/J     w/oJ
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    1   2   3    4   5  20  40 100 200 500    800
+  % Range: 89.3-91.3%  Optimum: 93.3%  Hit Frequency: ??.?%
+     Programs Available: IP0029
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0029_ipp023.u68",   0x00000, 0x8000, CRC(b79f91b0) SHA1(b6bed855497153121cb11d84836a737743124635) )
 	ROM_RELOAD(                      0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
@@ -3993,7 +4009,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
  PI106A     1    1   2   3    5   6  20  50 100 200 500    800
   % Range: 89.0-91.0%  Optimum: 93.0%  Hit Frequency: 39.2%
-     Programs Available: IP0051
+     Programs Available: IP0051, X002319P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0051_ip101-il101.u68",   0x00000, 0x10000, CRC(25149a28) SHA1(211772751263ad30f073a23de0a81ef6ab72a85f) ) /* Game Version: IP101, Library Version: IL101 */
@@ -4037,7 +4053,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
  PI105A     1    1   2   3    4   5  20  40 100 200 500    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.3%
-     Programs Available: IP0062
+     Programs Available: IP0062, X002318P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0062_ip105-il105.u68",   0x00000, 0x10000, CRC(bda6ae80) SHA1(8287306cd85fbe13f92fed24f0ca1c92dc19ed35) ) /* Game Version: IP105, Library Version: IL105 */
@@ -4059,7 +4075,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
  PI106B     1    1   2   3    5   6  20  50 100 200 500   1000
   % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 39.2%
-     Programs Available: IP0074
+     Programs Available: IP0074, X002320P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0074_ip105-il105.u68",   0x00000, 0x10000, CRC(3f3400ea) SHA1(27ae0a353afdf5a1707cfeeca1a3c9f31999d832) ) /* Game Version: IP105, Library Version: IL105 */
@@ -7908,6 +7924,7 @@ Known Wingboard compatible program roms:
    XMP00013 - Spanish
    XMP00014 (not dumped)
    XMP00017
+   XMP00022 - Spanish (not dumped)
    XMP00026 - Spanish
    XMP00030
 
@@ -7951,6 +7968,7 @@ Known Wingboard compatible program roms:
    XMP00013 - Spanish
    XMP00014 (not dumped)
    XMP00017
+   XMP00022 - Spanish (not dumped)
    XMP00026 - Spanish
    XMP00030
 
