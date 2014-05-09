@@ -61,14 +61,14 @@ static void mystwarr_tile_callback(running_machine &machine, int layer, int *cod
 	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 	if (layer==1) {if ((*code&0xff00)+(*color)==0x4101) state->m_cbparam++; else state->m_cbparam--;} //* water hack (TEMPORARY)
 
-	*color = state->m_layer_colorbase[layer] | (*color>>1 & 0x1f);
+	*color = state->m_layer_colorbase[layer] | (*color>>1 & 0x1e);
 }
 
 // for games with 5bpp tile data
 static void game5bpp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
 {
 	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	*color = state->m_layer_colorbase[layer] | (*color>>1 & 0x1f);
+	*color = state->m_layer_colorbase[layer] | (*color>>1 & 0x1e);
 }
 
 // for games with 4bpp tile data
