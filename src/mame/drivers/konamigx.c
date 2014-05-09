@@ -1013,7 +1013,6 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xda2000, 0xda3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
 #if GX_DEBUG
 	AM_RANGE(0xd40000, 0xd4003f) AM_DEVREAD("k056832", k056832_device, long_r)
-	AM_RANGE(0xd50000, 0xd500ff) AM_DEVREAD("k055555", k055555_device, k055555_long_r)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVREAD("k055673", k055673_device, k053247_reg_long_r)
 #endif
 ADDRESS_MAP_END

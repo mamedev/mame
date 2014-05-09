@@ -147,8 +147,8 @@ void k054338_device::fill_backcolor( bitmap_rgb32 &bitmap, int mode ) // (see p.
 	}
 	else
 	{
-		BGC_CBLK = m_k055555->k055555_read_register(m_k055555, 0);
-		BGC_SET  = m_k055555->k055555_read_register(m_k055555, 1);
+		BGC_CBLK = m_k055555->K055555_read_register(0);
+		BGC_SET  = m_k055555->K055555_read_register(1);
 
 		pal_ptr += BGC_CBLK << 9;
 

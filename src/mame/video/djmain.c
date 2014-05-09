@@ -16,7 +16,7 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
-	m_gfxdecode->gfx(0)->set_colorbase(m_k055555->k055555_read_register(m_k055555, K55_PALBASE_SUB2) * 0x400);
+	m_gfxdecode->gfx(0)->set_colorbase(m_k055555->K055555_read_register(K55_PALBASE_SUB2) * 0x400);
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;
@@ -140,14 +140,14 @@ void djmain_state::video_start()
 
 UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int enables = m_k055555->k055555_read_register(m_k055555, K55_INPUT_ENABLES);
+	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];
 	int order[NUM_LAYERS + 1];
 	int i, j;
 
 	for (i = 0; i < NUM_LAYERS; i++)
-		pri[i] = m_k055555->k055555_read_register(m_k055555, K55_PRIINP_0 + i * 3);
-	pri[i] = m_k055555->k055555_read_register(m_k055555, K55_PRIINP_10);
+		pri[i] = m_k055555->K055555_read_register(K55_PRIINP_0 + i * 3);
+	pri[i] = m_k055555->K055555_read_register(K55_PRIINP_10);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 		order[i] = i;

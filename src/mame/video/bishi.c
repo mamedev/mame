@@ -54,7 +54,7 @@ UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bit
 	for (i = 0; i < 4; i++)
 	{
 		layers[i] = i;
-		layerpri[i] = m_k055555->k055555_read_register(m_k055555, pris[i]);
+		layerpri[i] = m_k055555->K055555_read_register(pris[i]);
 	}
 
 	konami_sortlayers4(layers, layerpri);
@@ -63,7 +63,7 @@ UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bit
 
 	for (i = 0; i < 4; i++)
 	{
-		if (m_k055555->k055555_read_register(m_k055555, K55_INPUT_ENABLES) & enables[layers[i]])
+		if (m_k055555->K055555_read_register(K55_INPUT_ENABLES) & enables[layers[i]])
 		{
 			m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[i], 0, 1 << i);
 		}

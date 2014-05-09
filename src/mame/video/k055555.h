@@ -81,26 +81,11 @@ public:
 	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k055555_device() { }
 
-	void k055555_write_reg(UINT8 regnum, UINT8 regdat);
-
-
-	/**  Konami 055555  **/
-
-	DECLARE_WRITE16_MEMBER( k055555_word_w );
-	DECLARE_WRITE32_MEMBER( k055555_long_w );
-	int k055555_read_register(device_t *device, int regnum);
-	int k055555_get_palette_index(device_t *device, int idx);
-
-	// debug handlers
-	DECLARE_READ16_MEMBER( k055555_word_r );        // PCU2
-	DECLARE_READ32_MEMBER( k055555_long_r );        // PCU2
-
-
-
-	/* alt implementation to merge */
 	void K055555_write_reg(UINT8 regnum, UINT8 regdat);
+
 	DECLARE_WRITE16_MEMBER( K055555_word_w );
 	DECLARE_WRITE32_MEMBER( K055555_long_w );
+
 	int K055555_read_register(int regnum);
 	int K055555_get_palette_index(int idx);
 
@@ -110,10 +95,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	UINT8   m_regs[128];
-
 private:
-
+	UINT8   m_regs[128];
 };
 
 extern const device_type K055555;

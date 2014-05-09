@@ -1477,7 +1477,7 @@ printf("\nend\n");
 }
 */
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? m_k055555->k055555_get_palette_index(m_k055555, layer) : 0;
+	new_colorbase = (m_k055555 != NULL) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
 	for (r = 0; r < rowspan; r++)
 	{
@@ -1782,7 +1782,7 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 		sdat_adv = -sdat_adv;
 
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? m_k055555->k055555_get_palette_index(m_k055555, layer) : 0;
+	new_colorbase = (m_k055555 != NULL) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
 	for (r = 0; r <= rowspan; r++)
 	{

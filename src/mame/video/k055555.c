@@ -137,88 +137,6 @@ int k055555_device::K055555_get_palette_index(int idx)
 
 
 
-
-/***************************************************************************/
-/*                                                                         */
-/*                                 055555                                  */
-/*                                                                         */
-/***************************************************************************/
-
-/* K055555 5-bit-per-pixel priority encoder */
-/* This device has 48 8-bit-wide registers */
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-void k055555_device::k055555_write_reg( UINT8 regnum, UINT8 regdat )
-{
-	static const char *const rnames[46] =
-	{
-		"BGC CBLK", "BGC SET", "COLSET0", "COLSET1", "COLSET2", "COLSET3", "COLCHG ON",
-		"A PRI 0", "A PRI 1", "A COLPRI", "B PRI 0", "B PRI 1", "B COLPRI", "C PRI", "D PRI",
-		"OBJ PRI", "SUB1 PRI", "SUB2 PRI", "SUB3 PRI", "OBJ INPRI ON", "S1 INPRI ON", "S2 INPRI ON",
-		"S3 INPRI ON", "A PAL", "B PAL", "C PAL", "D PAL", "OBJ PAL", "SUB1 PAL", "SUB2 PAL", "SUB3 PAL",
-		"SUB2 PAL ON", "SUB3 PAL ON", "V INMIX", "V INMIX ON", "OS INMIX", "OS INMIX ON", "SHD PRI 1",
-		"SHD PRI 2", "SHD PRI 3", "SHD ON", "SHD PRI SEL", "V BRI", "OS INBRI", "OS INBRI ON", "ENABLE"
-	};
-
-	if (regdat != m_regs[regnum])
-	{
-		LOG(("5^5: %x to reg %x (%s)\n", regdat, regnum, rnames[regnum]));
-	}
-
-	m_regs[regnum] = regdat;
-}
-
-WRITE32_MEMBER( k055555_device::k055555_long_w )
-{
-	UINT8 regnum, regdat;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		regnum = offset << 1;
-		regdat = data >> 24;
-	}
-	else
-	{
-		if (ACCESSING_BITS_8_15)
-		{
-			regnum = (offset << 1) + 1;
-			regdat = data >> 8;
-		}
-		else
-		{
-			// logerror("5^5: unknown mem_mask %08x\n", mem_mask);
-			return;
-		}
-	}
-
-	k055555_write_reg(regnum, regdat);
-}
-
-WRITE16_MEMBER( k055555_device::k055555_word_w )
-{
-	if (mem_mask == 0x00ff)
-	{
-		k055555_write_reg(offset, data & 0xff);
-	}
-	else
-	{
-		k055555_write_reg(offset, data >> 8);
-	}
-}
-
-int k055555_device::k055555_read_register( device_t *device, int regnum )
-{
-	return m_regs[regnum];
-}
-
-int k055555_device::k055555_get_palette_index( device_t *device, int idx )
-{
-	return m_regs[K55_PALBASE_A + idx];
-}
-
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
@@ -259,18 +177,4 @@ void k055555_device::device_start()
 void k055555_device::device_reset()
 {
 	memset(m_regs, 0, 64 * sizeof(UINT8));
-}
-
-
-READ16_MEMBER( k055555_device::k055555_word_r )
-{
-	return(m_regs[offset] << 8);
-}   // PCU2
-
-
-
-READ32_MEMBER( k055555_device::k055555_long_r )
-{
-	offset <<= 1;
-	return (k055555_word_r(space, offset + 1, 0xffff) | k055555_word_r(space, offset, 0xffff) << 16);
 }

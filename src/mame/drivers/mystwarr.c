@@ -320,7 +320,6 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x680000, 0x683fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 #if MW_DEBUG
-	AM_RANGE(0x480000, 0x4800ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x482010, 0x48201f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
 	AM_RANGE(0x484000, 0x484007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_DEVREAD("k054338", k054338_device, word_r)
@@ -364,7 +363,6 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x240000, 0x240007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
 	AM_RANGE(0x254000, 0x25401f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x258000, 0x2580ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x26C000, 0x26C007) AM_DEVREAD("k056832", k056832_device, b_word_r)
 	AM_RANGE(0x270000, 0x27003f) AM_DEVREAD("k056832", k056832_device, word_r)
 #endif
@@ -407,7 +405,6 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x240000, 0x240007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
 	AM_RANGE(0x254000, 0x25401f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x258000, 0x2580ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x26C000, 0x26C007) AM_DEVREAD("k056832", k056832_device, b_word_r)
 	AM_RANGE(0x270000, 0x27003f) AM_DEVREAD("k056832", k056832_device, word_r)
 #endif
@@ -494,7 +491,6 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x682000, 0x683fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x700000, 0x703fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)          // tile ROM readback
 #if MW_DEBUG
-	AM_RANGE(0x400000, 0x4000ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x402010, 0x40201f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
 	AM_RANGE(0x404000, 0x404007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 	AM_RANGE(0x40a000, 0x40a01f) AM_DEVREAD("k054338", k054338_device, word_r)
@@ -542,7 +538,6 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x450010, 0x45001f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
 	AM_RANGE(0x480000, 0x48003f) AM_DEVREAD("k056832", k056832_device, word_r)
 	AM_RANGE(0x482000, 0x482007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x488000, 0x4880ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x48c000, 0x48c01f) AM_DEVREAD("k054338", k054338_device, word_r)
 #endif
 ADDRESS_MAP_END
@@ -589,7 +584,6 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x450010, 0x45001f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
 	AM_RANGE(0x480000, 0x48003f) AM_DEVREAD("k056832", k056832_device, word_r)
 	AM_RANGE(0x482000, 0x482007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x488000, 0x4880ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x48c000, 0x48c01f) AM_DEVREAD("k054338", k054338_device, word_r)
 #endif
 ADDRESS_MAP_END
