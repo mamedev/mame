@@ -196,34 +196,36 @@ WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
 {
 	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(0, code, 0, TILE_FLIPYX( 0 ));
+	int pal = (code & 0x8000) >> 15;
+	SET_TILE_INFO_MEMBER(0, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
-	UINT8 bank = 1;
 	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
-//  if (code > 0x200)
-//      bank = 2;
-	SET_TILE_INFO_MEMBER(bank, code, 0, TILE_FLIPYX( 0 ));
+	int pal = (code & 0x8000) >> 15;		
+	SET_TILE_INFO_MEMBER(1, code&0x7fff, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
 {
 	UINT16 code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	int pal = (code & 0x8000) >> 15;
+	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_3_tile_info)
 {
 	UINT16 code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	int pal = (code & 0x8000) >> 15;
+	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 {
 	UINT16 code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	int pal = (code & 0x8000) >> 15;
+	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 
@@ -401,7 +403,7 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 
 WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 {
-	coin_counter_w( machine(), 0, data & 0x04 );
+	coin_counter_w(machine(), 0, data & 0x04);
 }
 
 READ8_MEMBER(skylncr_state::ret_ff)
