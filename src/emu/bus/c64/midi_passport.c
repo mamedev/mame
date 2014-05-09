@@ -42,15 +42,6 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::ptm_irq_w )
 	m_slot->irq_w(m_ptm_irq || m_acia_irq);
 }
 
-static const ptm6840_interface ptm_intf =
-{
-	1021800.0f,
-	{ 1021800.0f, 1021800.0f, 1021800.0f },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, ptm_irq_w)
-};
-
-
 WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::acia_irq_w )
 {
 	m_acia_irq = state;
@@ -74,7 +65,10 @@ static MACHINE_CONFIG_FRAGMENT( c64_passport_midi )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, acia_irq_w))
 
-	MCFG_PTM6840_ADD(MC6840_TAG, ptm_intf)
+	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(1021800.0f)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(c64_passport_midi_cartridge_device, ptm_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxd))

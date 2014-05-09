@@ -24,16 +24,11 @@ const device_type A2BUS_MIDI = &device_creator<a2bus_midi_device>;
 #define MIDI_PTM_TAG     "midi_ptm"
 #define MIDI_ACIA_TAG    "midi_acia"
 
-static struct ptm6840_interface ptm_interface =
-{
-	1021800.0f,
-	{ 1021800.0f, 1021800.0f, 1021800.0f },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, ptm_irq_w)
-};
-
 MACHINE_CONFIG_FRAGMENT( midi )
-	MCFG_PTM6840_ADD(MIDI_PTM_TAG, ptm_interface)
+	MCFG_DEVICE_ADD(MIDI_PTM_TAG, PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(1021800.0f)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(a2bus_midi_device, ptm_irq_w))
 
 	MCFG_DEVICE_ADD(MIDI_ACIA_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))

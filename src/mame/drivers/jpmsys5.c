@@ -538,15 +538,6 @@ WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
 }
 
 
-static const ptm6840_interface ptm_intf =
-{
-	1000000,
-	{ 0, 0, 0 },
-	{ DEVCB_DRIVER_MEMBER(jpmsys5_state,u26_o1_callback), DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,ptm_irq)
-};
-
-
 /*************************************
  *
  *  6850 ACIAs
@@ -667,7 +658,11 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 MACHINE_CONFIG_END
 
 READ16_MEMBER(jpmsys5_state::mux_awp_r)
@@ -873,7 +868,11 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 MACHINE_CONFIG_END
 
@@ -919,7 +918,11 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 MACHINE_CONFIG_END
 

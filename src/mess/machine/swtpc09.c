@@ -25,14 +25,6 @@
 
 
 /******* MC6840 PTM on MPID Board *******/
-/* 6840 PTM interface */
-const ptm6840_interface swtpc09_6840_intf =
-{
-	2000000,
-	{ 50, 0, 50 },
-	{ DEVCB_DRIVER_MEMBER(swtpc09_state, ptm_o1_callback), DEVCB_NULL, DEVCB_DRIVER_MEMBER(swtpc09_state, ptm_o3_callback) },
-	DEVCB_DRIVER_LINE_MEMBER(swtpc09_state, ptm_irq)
-};
 
 /* 6840 PTM handlers */
 WRITE8_MEMBER( swtpc09_state::ptm_o1_callback )

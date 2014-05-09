@@ -71,14 +71,6 @@ WRITE_LINE_MEMBER(cchasm_state::cchasm_6840_irq)
 	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ptm6840_interface cchasm_6840_intf =
-{
-	CCHASM_68K_CLOCK/10,
-	{ 0, CCHASM_68K_CLOCK / 10, 0 },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,cchasm_6840_irq)
-};
-
 /*************************************
  *
  *  Port definitions
@@ -192,7 +184,10 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", cchasm_6840_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(CCHASM_68K_CLOCK/10)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, CCHASM_68K_CLOCK / 10, 0)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(cchasm_state, cchasm_6840_irq))
 MACHINE_CONFIG_END
 
 

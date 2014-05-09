@@ -120,15 +120,6 @@ WRITE_LINE_MEMBER(guab_state::ptm_irq)
 	m_maincpu->set_input_line(INT_6840PTM, state);
 }
 
-static const ptm6840_interface ptm_intf =
-{
-	1000000,
-	{ 0, 0, 0 },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DRIVER_LINE_MEMBER(guab_state,ptm_irq)
-};
-
-
 /*************************************
  *
  *  Video hardware
@@ -814,7 +805,10 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(guab_state, ptm_irq))
 MACHINE_CONFIG_END
 
 

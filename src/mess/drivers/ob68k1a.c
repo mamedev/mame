@@ -150,20 +150,6 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  ptm6840_interface ptm_intf
-//-------------------------------------------------
-
-static const ptm6840_interface ptm_intf =
-{
-	XTAL_10MHz/10,
-	{ 0, 0, 0 },
-	{ DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL },
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  COM8116_INTERFACE( dbrg_intf )
@@ -238,7 +224,9 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	// devices
 	MCFG_DEVICE_ADD(MC6821_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821_1_TAG, PIA6821, 0)
-	MCFG_PTM6840_ADD(MC6840_TAG, ptm_intf)
+	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_10MHz/10)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))

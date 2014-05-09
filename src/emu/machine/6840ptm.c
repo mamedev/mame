@@ -68,23 +68,15 @@ const device_type PTM6840 = &device_creator<ptm6840_device>;
 //-------------------------------------------------
 
 ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock, "ptm6840", __FILE__)
+	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock, "ptm6840", __FILE__),
+		m_internal_clock(0.0),
+		m_out0_cb(*this),
+		m_out1_cb(*this),
+		m_out2_cb(*this),
+		m_irq_cb(*this)
 {
-	memset(static_cast<ptm6840_interface *>(this), 0, sizeof(ptm6840_interface));
+	m_external_clock[0] = m_external_clock[1] = m_external_clock[2] = 0.0;
 }
-
-
-//-------------------------------------------------
-//  static_set_interface - set the interface
-//  struct
-//-------------------------------------------------
-
-void ptm6840_device::static_set_interface(device_t &device, const ptm6840_interface &interface)
-{
-	ptm6840_device &ptm = downcast<ptm6840_device &>(device);
-	static_cast<ptm6840_interface &>(ptm) = interface;
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -92,26 +84,18 @@ void ptm6840_device::static_set_interface(device_t &device, const ptm6840_interf
 
 void ptm6840_device::device_start()
 {
-	m_internal_clock = m_internal_clock;
 	// resolve callbacks
+	m_out0_cb.resolve_safe();
+	m_out1_cb.resolve_safe();
+	m_out2_cb.resolve_safe();
+	m_irq_cb.resolve_safe();
+	
 	for (int i = 0; i < 3; i++)
 	{
-		m_out_func[i].resolve(m_out_cb[i], *this);
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		if ( m_external_clock[i] )
-		{
-			m_external_clock[i] = m_external_clock[i];
-		}
-		else
-		{
+		if ( m_external_clock[i] == 0 )
 			m_external_clock[i] = 1;
-		}
 	}
-
-
+		
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
 	m_timer[2] = timer_alloc(2);
@@ -120,8 +104,6 @@ void ptm6840_device::device_start()
 	{
 		m_timer[i]->enable(false);
 	}
-
-	m_irq_func.resolve(m_irq_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_lsb_buffer));
@@ -312,7 +294,7 @@ void ptm6840_device::update_interrupts()
 			m_status_reg &= ~0x80;
 		}
 
-		m_irq_func(m_IRQ);
+		m_irq_cb(m_IRQ);
 	}
 }
 
@@ -400,9 +382,17 @@ void ptm6840_device::reload_count(int idx)
 	if ((m_mode[idx] == 4) || (m_mode[idx] == 6))
 	{
 		m_output[idx] = 1;
-		if (!m_out_func[idx].isnull())
+		switch (idx)
 		{
-			m_out_func[idx](0, m_output[idx]);
+			case 0:
+				m_out0_cb((offs_t)0, m_output[0]);
+				break;
+			case 1:
+				m_out1_cb((offs_t)0, m_output[1]);
+				break;
+			case 2:
+				m_out2_cb((offs_t)0, m_output[2]);
+				break;
 		}
 	}
 
@@ -526,7 +516,18 @@ WRITE8_MEMBER( ptm6840_device::write )
 			if (!(m_control_reg[idx] & 0x80 ))
 			{
 				// Output cleared
-				m_out_func[idx](0, 0);
+				switch (idx)
+				{
+					case 0:
+						m_out0_cb((offs_t)0, 0);
+						break;
+					case 1:
+						m_out1_cb((offs_t)0, 0);
+						break;
+					case 2:
+						m_out2_cb((offs_t)0, 0);
+						break;
+				}
 			}
 			// Reset?
 			if (idx == 0 && (diffs & 0x01))
@@ -615,7 +616,18 @@ void ptm6840_device::timeout(int idx)
 			m_output[idx] = m_output[idx] ? 0 : 1;
 			PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx, m_output[idx]));
 
-			m_out_func[idx](0, m_output[idx]);
+			switch (idx)
+			{
+				case 0:
+					m_out0_cb((offs_t)0, m_output[0]);
+					break;
+				case 1:
+					m_out1_cb((offs_t)0, m_output[1]);
+					break;
+				case 2:
+					m_out2_cb((offs_t)0, m_output[2]);
+					break;
+			}
 		}
 		if ((m_mode[idx] == 4)||(m_mode[idx] == 6))
 		{
@@ -624,7 +636,18 @@ void ptm6840_device::timeout(int idx)
 				m_output[idx] = 1;
 				PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx, m_output[idx]));
 
-				m_out_func[idx](0, m_output[idx]);
+				switch (idx)
+				{
+					case 0:
+						m_out0_cb((offs_t)0, m_output[0]);
+						break;
+					case 1:
+						m_out1_cb((offs_t)0, m_output[1]);
+						break;
+					case 2:
+						m_out2_cb((offs_t)0, m_output[2]);
+						break;
+				}
 
 				// No changes in output until reinit
 				m_fired[idx] = 1;

@@ -665,12 +665,6 @@ WRITE_LINE_MEMBER(apollo_state::apollo_ptm_irq_function)
 //  Timer 3's input is a 62.5-kHz (16-microsecond period) signal.
 //  The Timer 3 input may be prescaled to make the effective input signal have a 128-microsecond period.
 
-static const ptm6840_interface apollo_ptm_config = {
-		0,
-		{ 250000, 125000, 62500 },
-		{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-		DEVCB_DRIVER_LINE_MEMBER(apollo_state, apollo_ptm_irq_function)
-};
 
 //##########################################################################
 // machine/apollo_rtc.c - APOLLO DS3500 RTC MC146818
@@ -802,7 +796,10 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, WRITELINE(apollo_state,apollo_pic8259_master_set_int_line), VCC, READ8(apollo_state, apollo_pic8259_get_slave_ack))
 	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), GND, NULL)
 
-	MCFG_PTM6840_ADD(APOLLO_PTM_TAG, apollo_ptm_config)
+	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(0)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(apollo_state, apollo_ptm_irq_function))
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(apollo_state, apollo_ptm_timer_tick))
 

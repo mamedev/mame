@@ -568,18 +568,6 @@ WRITE8_MEMBER(mpu4_state::ic2_o3_callback)
 	m_6840ptm->set_c1(data);
 }
 
-
-static const ptm6840_interface ptm_ic2_intf =
-{
-	MPU4_MASTER_CLOCK / 4,
-	{ 0, 0, 0 },
-	{ DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o1_callback),
-		DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o2_callback),
-		DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o3_callback) },
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)
-};
-
-
 /* 6821 PIA handlers */
 /* IC3, lamp data lines + alpha numeric display */
 WRITE8_MEMBER(mpu4_state::pia_ic3_porta_w)
@@ -1485,17 +1473,6 @@ WRITE8_MEMBER(mpu4_state::ic3ss_w)
 		m_msm6376->set_frequency(freq);
 	}
 }
-
-
-static const ptm6840_interface ptm_ic3ss_intf =
-{
-	MPU4_MASTER_CLOCK / 4,
-	{ 0, 0, 0 },
-	{ DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o1_callback),
-		DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o2_callback),
-		DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o3_callback) },
-	DEVCB_NULL//LINE(cpu1_ptm_irq)
-};
 
 /* input ports for MPU4 board */
 INPUT_PORTS_START( mpu4 )
@@ -2616,8 +2593,14 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common )
 
 	MCFG_MSC1937_ADD("vfd",0)
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
-
+	MCFG_DEVICE_ADD("ptm_ic2", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(MPU4_MASTER_CLOCK / 4)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4_state, ic2_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4_state, ic2_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4_state, ic2_o3_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4_state, cpu0_irq))
+	
 	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mpu4_state, pia_ic3_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mpu4_state, pia_ic3_portb_w))
@@ -2672,7 +2655,13 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( mpu4_common2 )
-	MCFG_PTM6840_ADD("ptm_ic3ss", ptm_ic3ss_intf)
+	MCFG_DEVICE_ADD("ptm_ic3ss", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(MPU4_MASTER_CLOCK / 4)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4_state, ic3ss_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4_state, ic3ss_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4_state, ic3ss_o3_callback))
+	//MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4_state, cpu1_ptm_irq))
 
 	MCFG_DEVICE_ADD("pia_ic4ss", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(mpu4_state, pia_gb_portb_r))

@@ -219,13 +219,6 @@ static GFXDECODE_START( ginganin )
 GFXDECODE_END
 
 
-
-
-
-
-
-
-
 void ginganin_state::machine_start()
 {
 	save_item(NAME(m_layers_ctrl));
@@ -238,19 +231,11 @@ void ginganin_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-
 WRITE8_MEMBER(ginganin_state::ptm_irq)
 {
 	m_audiocpu->set_input_line(0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ptm6840_interface ptm_intf =
-{
-	SOUND_CLOCK/2,
-	{ 0, 0, 0 },
-	{ DEVCB_DRIVER_MEMBER(ginganin_state,ptm_irq), DEVCB_NULL, DEVCB_NULL },
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( ginganin, ginganin_state )
 
@@ -263,7 +248,10 @@ static MACHINE_CONFIG_START( ginganin, ginganin_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(SOUND_CLOCK/2)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(ginganin_state, ptm_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

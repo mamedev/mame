@@ -283,17 +283,6 @@ WRITE8_MEMBER( tavernie_state::pa_ivg_w )
 // bits 0-3 are attribute bits
 }
 
-// all i/o lines connect to the 40-pin expansion connector
-static const ptm6840_interface mc6840_intf =
-{
-	XTAL_4MHz / 4,
-	{ 0, 0, 0 },
-	{ DEVCB_NULL,
-		DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-		DEVCB_NULL },
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
-
 WRITE8_MEMBER( tavernie_state::kbd_put )
 {
 	m_term_data = data;
@@ -329,7 +318,12 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_PTM6840_ADD("ptm", mc6840_intf)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	// all i/o lines connect to the 40-pin expansion connector
+	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_4MHz / 4)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT1_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

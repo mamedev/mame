@@ -374,18 +374,6 @@ WRITE8_MEMBER(mpu4vid_state::vid_o3_callback)
 }
 
 
-static const ptm6840_interface ptm_vid_intf =
-{
-	VIDEO_MASTER_CLOCK / 10, /* 68k E clock */
-	{ 0, 0, 0 },
-	{ DEVCB_DRIVER_MEMBER(mpu4vid_state,vid_o1_callback),
-		DEVCB_DRIVER_MEMBER(mpu4vid_state,vid_o2_callback),
-		DEVCB_DRIVER_MEMBER(mpu4vid_state,vid_o3_callback) },
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, cpu1_ptm_irq)
-};
-
-
-
 static const gfx_layout mpu4_vid_char_8x8_layout =
 {
 	8,8,
@@ -1439,7 +1427,13 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
+	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SAA1099_ADD("saa", 8000000)

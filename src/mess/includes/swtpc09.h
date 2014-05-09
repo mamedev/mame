@@ -140,6 +140,5 @@ public:
 /*----------- defined in machine/swtpc09.c -----------*/
 
 extern const wd17xx_interface swtpc09_wd17xx_interface;
-extern const ptm6840_interface swtpc09_6840_intf;
 
 #endif /* swtpc09_H_ */

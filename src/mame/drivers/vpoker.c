@@ -651,14 +651,6 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ptm6840_interface ptm_intf =
-{
-	XTAL_4MHz,
-	{ 0, 0, 0 },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DRIVER_LINE_MEMBER(vpoker_state,ptm_irq)
-};
-
 static MACHINE_CONFIG_START( vpoker, vpoker_state )
 
 	/* basic machine hardware */
@@ -681,7 +673,10 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_PALETTE_INIT_OWNER(vpoker_state, vpoker)
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_4MHz)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(vpoker_state, ptm_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

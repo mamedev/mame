@@ -80,8 +80,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(speaker_en_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -276,26 +276,16 @@ WRITE8_MEMBER( v6809_state::pa_w )
 
 // this should output 1 to enable sound, then output 0 after a short time
 // however it continuously outputs 1
-WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
+WRITE8_MEMBER( v6809_state::speaker_en_w )
 {
-	m_speaker_en = state;
+	m_speaker_en = data;
 }
 
-WRITE_LINE_MEMBER( v6809_state::speaker_w )
+WRITE8_MEMBER( v6809_state::speaker_w )
 {
 //  if (m_speaker_en)
-//      m_speaker->level_w(state);
+//      m_speaker->level_w(data);
 }
-
-static const ptm6840_interface mc6840_intf =
-{
-	XTAL_16MHz / 4,
-	{ 4000000/14, 4000000/14, 4000000/14/8 },
-	{ DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(v6809_state, speaker_w),
-		DEVCB_DRIVER_LINE_MEMBER(v6809_state, speaker_en_w) },
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
 
 static SLOT_INTERFACE_START( v6809_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -349,7 +339,12 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 
-	MCFG_PTM6840_ADD("ptm", mc6840_intf)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_16MHz / 4)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
+	MCFG_PTM6840_OUT1_CB(WRITE8(v6809_state, speaker_w))
+	MCFG_PTM6840_OUT2_CB(WRITE8(v6809_state, speaker_en_w))
+	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
 

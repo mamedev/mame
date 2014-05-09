@@ -44,15 +44,6 @@ WRITE_LINE_MEMBER(esripsys_state::ptm_irq)
 	m_soundcpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ptm6840_interface ptm_intf =
-{
-	XTAL_8MHz / 4,
-	{ 0, 0, 0 },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_DRIVER_LINE_MEMBER(esripsys_state,ptm_irq)
-};
-
-
 /*************************************
  *
  *  i8251A UART
@@ -716,7 +707,10 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_8MHz / 4)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(esripsys_state, ptm_irq))
 MACHINE_CONFIG_END
 
 

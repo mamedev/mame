@@ -52,6 +52,8 @@ public:
 		m_pia0(*this, "pia0"),
 		m_pia1(*this, "pia1"),
 		m_acia(*this, "acia"),
+		m_ptm(*this, "ptm"),
+		m_speaker(*this, "speaker"),
 		m_videoram(*this, "videoram")
 	{
 	}
@@ -60,6 +62,8 @@ public:
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	DECLARE_WRITE8_MEMBER( ptm_o2_callback );
+	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
 
 protected:
 	virtual void machine_reset();
@@ -69,6 +73,8 @@ private:
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_device<acia6850_device> m_acia;
+	required_device<ptm6840_device> m_ptm;
+	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_term_data;
 };
@@ -92,7 +98,7 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	// AM_RANGE(0xe070,0xe070) Select Map 2
 	AM_RANGE(0xe800,0xebbf) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xebc0,0xebff) AM_RAM
-	AM_RANGE(0xec00,0xefbf) AM_RAM // screen 2 AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0xec00,0xefbf) AM_RAM // screen 2 AM_SHARE("videoram")
 	AM_RANGE(0xefc0,0xefff) AM_RAM
 	AM_RANGE(0xf000,0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -115,17 +121,6 @@ READ8_MEMBER( poly_state::pia1_b_in )
 	return data;
 }
 
-
-static const ptm6840_interface poly_ptm_intf =
-{
-	XTAL_12MHz / 3,
-	{ 0, 0, 0 },
-	{ DEVCB_NULL,
-		DEVCB_DEVICE_LINE_MEMBER("ptm", ptm6840_device, set_c1),
-		DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) },
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
-
 READ8_MEMBER( poly_state::videoram_r )
 {
 	return m_videoram[offset];
@@ -143,6 +138,16 @@ WRITE_LINE_MEMBER( poly_state::write_acia_clock )
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);
+}
+
+WRITE8_MEMBER( poly_state::ptm_o2_callback )
+{
+	m_ptm->set_c1(data);
+}
+
+WRITE8_MEMBER( poly_state::ptm_o3_callback )
+{
+	m_speaker->level_w(data);
 }
 
 static MACHINE_CONFIG_START( poly, poly_state )
@@ -178,7 +183,12 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_12MHz / 3)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT1_CB(WRITE8(poly_state, ptm_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITE8(poly_state, ptm_o3_callback))
+	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

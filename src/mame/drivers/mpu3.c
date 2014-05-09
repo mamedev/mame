@@ -288,17 +288,6 @@ WRITE8_MEMBER(mpu3_state::ic2_o3_callback)
 {
 }
 
-
-static const ptm6840_interface ptm_ic2_intf =
-{
-	MPU3_MASTER_CLOCK,///4,
-	{ 0, 0, 0 },
-	{ DEVCB_DRIVER_MEMBER(mpu3_state,ic2_o1_callback),
-		DEVCB_DRIVER_MEMBER(mpu3_state,ic2_o2_callback),
-		DEVCB_DRIVER_MEMBER(mpu3_state,ic2_o3_callback) },
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq)
-};
-
 /*
 IC23 emulation
 
@@ -845,7 +834,13 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
+	MCFG_DEVICE_ADD("ptm_ic2", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(MPU3_MASTER_CLOCK)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_OUT0_CB(WRITE8(mpu3_state, ic2_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITE8(mpu3_state, ic2_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITE8(mpu3_state, ic2_o3_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu3_state, cpu0_irq))
 
 	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(mpu3_state, pia_ic3_porta_r))
