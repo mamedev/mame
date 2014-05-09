@@ -101,118 +101,50 @@ void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device 
 }
 
 // k054338 BG color fill
-void k054338_device::fill_solid_bg( bitmap_rgb32 &bitmap )
+void k054338_device::fill_solid_bg( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	UINT32 bgcolor;
-	UINT32 *pLine;
-	int x, y;
-
-	bgcolor = (register_r(K338_REG_BGC_R) & 0xff) << 16;
+	UINT32 bgcolor = (register_r(K338_REG_BGC_R) & 0xff) << 16;
 	bgcolor |= register_r(K338_REG_BGC_GB);
 
-	/* and fill the screen with it */
-	for (y = 0; y < bitmap.height(); y++)
-	{
-		pLine = &bitmap.pix32(y);
-		for (x = 0; x < bitmap.width(); x++)
-			*pLine++ = bgcolor;
-	}
+	bitmap.fill(bgcolor, cliprect);
 }
 
-// Unified k054338/K055555 BG color fill
-void k054338_device::fill_backcolor( bitmap_rgb32 &bitmap, int mode ) // (see p.67)
+// Unified k054338/K055555 BG color fill (see p.67)
+void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode)
 {
-	int clipx, clipy, clipw, cliph, i, dst_pitch;
-	int BGC_CBLK, BGC_SET;
-	UINT32 *dst_ptr, *pal_ptr;
-	int bgcolor;
-	const rectangle &visarea = m_screen->visible_area();
-
-	clipx = visarea.min_x & ~3;
-	clipy = visarea.min_y;
-	clipw = (visarea.max_x - clipx + 4) & ~3;
-	cliph = visarea.max_y - clipy + 1;
-
-	dst_ptr = &bitmap.pix32(clipy);
-	dst_pitch = bitmap.rowpixels();
-	dst_ptr += clipx;
-
-	BGC_SET = 0;
-	pal_ptr = m_generic_paletteram_32;
-
-	if (!mode || m_k055555 == NULL)
+	if ((mode & 0x02) == 0)	// solid fill
 	{
-		// single color output from CLTC
-		bgcolor = (int)(m_regs[K338_REG_BGC_R] & 0xff) << 16 | (int)m_regs[K338_REG_BGC_GB];
+		bitmap.fill(*pal_ptr, cliprect);
 	}
 	else
 	{
-		BGC_CBLK = m_k055555->K055555_read_register(0);
-		BGC_SET  = m_k055555->K055555_read_register(1);
+		UINT32 *dst_ptr = &bitmap.pix32(cliprect.min_y);
+		int dst_pitch = bitmap.rowpixels();
 
-		pal_ptr += BGC_CBLK << 9;
-
-		// single color output from PCU2
-		if (!(BGC_SET & 2))
+		if ((mode & 0x01) == 0)	// vertical gradient fill
 		{
-			bgcolor = *pal_ptr;
-			mode = 0;
-		}
-		else bgcolor = 0;
-	}
-
-	if (!mode)
-	{
-		// single color fill
-		dst_ptr += clipw;
-		i = clipw = -clipw;
-		do
-		{
-			do
+			pal_ptr += cliprect.min_y;
+			for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				dst_ptr[i] = dst_ptr[i+1] = dst_ptr[i+2] = dst_ptr[i+3] = bgcolor;
-			}
-			while (i += 4);
-
-			dst_ptr += dst_pitch;
-			i = clipw;
-		}
-		while (--cliph);
-	}
-	else
-	{
-		if (!(BGC_SET & 1))
-		{
-			// vertical gradient fill
-			pal_ptr += clipy;
-			dst_ptr += clipw;
-			bgcolor = *pal_ptr++;
-			i = clipw = -clipw;
-			do
-			{
-				do
+				for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				{
-					dst_ptr[i] = dst_ptr[i+1] = dst_ptr[i+2] = dst_ptr[i+3] = bgcolor;
+					dst_ptr[x] = *pal_ptr;
 				}
-				while (i += 4);
 
+				pal_ptr++;
 				dst_ptr += dst_pitch;
-				bgcolor = *pal_ptr++;
-				i = clipw;
 			}
-			while (--cliph);
 		}
-		else
+		else	// horizontal gradient fill
 		{
-			// horizontal gradient fill
-			pal_ptr += clipx;
-			clipw <<= 2;
-			do
+			int width = cliprect.width() * sizeof(UINT32);
+			pal_ptr += cliprect.min_x;
+			dst_ptr += cliprect.min_x;
+			for(int y = cliprect.min_y; y<= cliprect.max_y; y++)
 			{
-				memcpy(dst_ptr, pal_ptr, clipw);
+				memcpy(dst_ptr, pal_ptr, width);
 				dst_ptr += dst_pitch;
 			}
-			while (--cliph);
 		}
 	}
 }

@@ -75,7 +75,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 	konami_sortlayers4(layer, m_layerpri);
 
 	m_k054338->update_all_shadows(0, m_palette);
-	m_k054338->fill_backcolor(bitmap, 0);
+	m_k054338->fill_solid_bg(bitmap, cliprect);
 
 	screen.priority().fill(0, cliprect);
 
