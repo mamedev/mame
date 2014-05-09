@@ -133,13 +133,6 @@ int cli_frontend::execute(int argc, char **argv)
 		astring option_errors;
 		m_options.parse_command_line(argc, argv, option_errors);
 
-		// We need to preprocess the config files once to determine the web server's configuration
-		// and file locations
-		if (m_options.read_config())
-		{
-			m_options.revert(OPTION_PRIORITY_INI);
-			m_options.parse_standard_inis(option_errors);
-		}
 		if (*(m_options.software_name()) != 0)
 		{
 			const game_driver *system = m_options.system();
@@ -228,6 +221,16 @@ int cli_frontend::execute(int argc, char **argv)
 		// otherwise, check for a valid system
 		else
 		{
+			// We need to preprocess the config files once to determine the web server's configuration
+			// and file locations
+			if (m_options.read_config())
+			{
+				m_options.revert(OPTION_PRIORITY_INI);
+				m_options.parse_standard_inis(option_errors);
+			}
+			if (option_errors)
+				osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().cstr());
+		
 			// if we can't find it, give an appropriate error
 			const game_driver *system = m_options.system();
 			if (system == NULL && *(m_options.system_name()) != 0)
@@ -1585,7 +1588,7 @@ void cli_frontend::execute_commands(const char *exename)
 	astring option_errors;
 	m_options.parse_standard_inis(option_errors);
 	if (option_errors)
-		printf("%s\n", option_errors.cstr());
+		osd_printf_error("%s\n", option_errors.cstr());
 
 	// createconfig?
 	if (strcmp(m_options.command(), CLICOMMAND_CREATECONFIG) == 0)
