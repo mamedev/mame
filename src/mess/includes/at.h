@@ -22,6 +22,7 @@
 #include "bus/pci/i82439tx.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
+#include "machine/wd7600.h"
 
 #include "machine/idectrl.h"
 #include "machine/at_keybc.h"
@@ -159,6 +160,30 @@ public:
 	void pc_set_dma_channel(int channel, int state);
 	void init_at_common();
 	UINT32 at_286_a20(bool state);
+};
+
+class megapc_state : public driver_device
+{
+public:
+	megapc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_wd7600(*this, "wd7600"),
+		m_isabus(*this, "isabus"),
+		m_speaker(*this, "speaker")
+		{ }
+
+public:
+	required_device<cpu_device> m_maincpu;
+	required_device<wd7600_device> m_wd7600;
+	required_device<isa16_device> m_isabus;
+	required_device<speaker_sound_device> m_speaker;
+
+	DECLARE_READ16_MEMBER( wd7600_ior );
+	DECLARE_WRITE16_MEMBER( wd7600_iow );
+	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
+	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
+	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
 };
 
 #endif /* AT_H_ */

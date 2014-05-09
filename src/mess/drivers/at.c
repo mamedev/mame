@@ -13,7 +13,6 @@
 #include "includes/at.h"
 #include "bus/pc_kbd/keyboards.h"
 
-
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
@@ -195,30 +194,43 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
+READ16_MEMBER( megapc_state::wd7600_ior )
+{
+	if (offset < 4)
+		return m_isabus->dack_r(offset);
+	else
+		return m_isabus->dack16_r(offset);
+}
+
+WRITE16_MEMBER( megapc_state::wd7600_iow )
+{
+	if (offset < 4)
+		m_isabus->dack_w(offset, data);
+	else
+		m_isabus->dack16_w(offset, data);
+}
+
+WRITE_LINE_MEMBER( megapc_state::wd7600_hold )
+{
+	// halt cpu
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// and acknowledge hold
+	m_wd7600->hlda_w(state);
+}
+
+static ADDRESS_MAP_START( megapc_map, AS_PROGRAM, 16, at_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megapcpl_map, AS_PROGRAM, 32, at_state )
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( megapc_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff) // TODO: is this the correct type?
-	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megapcpl_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff) // TODO: is this the correct type?
-	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 ADDRESS_MAP_END
 
 
@@ -726,21 +738,92 @@ static MACHINE_CONFIG_DERIVED( ct386sx, neat )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( megapc, atvga )
-	MCFG_CPU_REPLACE("maincpu", I386SX, XTAL_50MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(at16_map)
+static MACHINE_CONFIG_START( megapc, megapc_state )
+	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
+
+	MCFG_WD7600_ADD("wd7600",XTAL_50MHz / 2, ":maincpu", ":isa", ":bios", ":keybc")
+	MCFG_WD7600_HOLD(WRITELINE(megapc_state, wd7600_hold));
+	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
+	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
+	MCFG_WD7600_CPURESET(INPUTLINE("maincpu", INPUT_LINE_RESET));
+	MCFG_WD7600_A20M(INPUTLINE("maincpu", INPUT_LINE_A20));
+	// isa dma
+	MCFG_WD7600_IOR(READ16(megapc_state, wd7600_ior))
+	MCFG_WD7600_IOW(WRITE16(megapc_state, wd7600_iow))
+	MCFG_WD7600_TC(WRITE8(megapc_state, wd7600_tc))
+	// speaker
+	MCFG_WD7600_SPKR(WRITELINE(megapc_state, wd7600_spkr))
+
+	// on board devices
+	MCFG_DEVICE_ADD("isabus", ISA16, 0)
+	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA_BUS_IOCHCK(DEVWRITELINE("wd7600", wd7600_device, iochck_w))
+	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("wd7600", wd7600_device, irq09_w))
+	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("wd7600", wd7600_device, irq03_w))
+	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("wd7600", wd7600_device, irq04_w))
+	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("wd7600", wd7600_device, irq05_w))
+	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("wd7600", wd7600_device, irq06_w))
+	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("wd7600", wd7600_device, irq07_w))
+	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE("wd7600", wd7600_device, irq10_w))
+	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE("wd7600", wd7600_device, irq11_w))
+	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE("wd7600", wd7600_device, irq12_w))
+	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE("wd7600", wd7600_device, irq14_w))
+	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE("wd7600", wd7600_device, irq15_w))
+	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("wd7600", wd7600_device, dreq0_w))
+	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("wd7600", wd7600_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("wd7600", wd7600_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("wd7600", wd7600_device, dreq3_w))
+	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("wd7600", wd7600_device, dreq5_w))
+	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("wd7600", wd7600_device, dreq6_w))
+	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("wd7600", wd7600_device, dreq7_w))
+	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa16_cards, "fdcsmc", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "ide", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board5", pc_isa16_cards, "vga", true)
+	// ISA cards
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, NULL, false)
+
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("wd7600", wd7600_device, kbrst_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(DEVWRITELINE("wd7600", wd7600_device, gatea20_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("wd7600", wd7600_device, irq01_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
+	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,15M,16M")
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	// video hardware
+	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
 
 	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_REPLACE("maincpu", I486, 66000000 / 2)
-	MCFG_CPU_PROGRAM_MAP(at386_map)
+	MCFG_CPU_PROGRAM_MAP(megapcpl_map)
 	MCFG_CPU_IO_MAP(megapcpl_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
 
@@ -1403,13 +1486,15 @@ ROM_START( aprfte )
 ROM_END
 
 ROM_START( megapc )
-	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
+	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD16_BYTE( "41651-bios lo.u18",  0xe0000, 0x10000, CRC(1e9bd3b7) SHA1(14fd39ec12df7fae99ccdb0484ee097d93bf8d95))
 	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0xe0001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
 ROM_END
 
 ROM_START( megapcpl )
-	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
+	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD16_BYTE( "41652.u18",  0xe0000, 0x10000, CRC(6f5b9a1c) SHA1(cae981a35a01234fcec99a96cb38075d7bf23474))
 	ROM_LOAD16_BYTE( "486slc.u19", 0xe0001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))
 ROM_END
@@ -1464,8 +1549,8 @@ COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, at586_state,   at586,
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, at586_state,   at586,  "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atvga, at_state,      atvga,  "<generic>",  "NEAT (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
-COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga, at_state,      atvga,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
-COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga, at_state,      atvga,  "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
+COMP ( 1993, megapc,   0,       0,       megapc,    0,     driver_device,     0,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
+COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,     driver_device,     0,  "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
 COMP ( 1989, pc2386,   ibm5170, 0,       at386,     atvga, at_state,      atvga,  "Amstrad plc", "Amstrad PC2386", GAME_NOT_WORKING )
 COMP ( 1991, aprfte,   ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", GAME_NOT_WORKING )
 COMP ( 1991, ftsserv,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot FTs (Scorpion)", GAME_NOT_WORKING )
