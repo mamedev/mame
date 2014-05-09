@@ -1326,7 +1326,9 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
 	MCFG_CPU_PROGRAM_MAP(bnstars_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)	
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bnstars_sound_map)
