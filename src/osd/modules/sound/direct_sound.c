@@ -39,7 +39,25 @@
 //  LOCAL VARIABLES
 //============================================================
 
+// DirectSound objects
+static LPDIRECTSOUND        dsound;
+static DSCAPS               dsound_caps;
 
+// sound buffers
+static LPDIRECTSOUNDBUFFER  primary_buffer;
+static LPDIRECTSOUNDBUFFER  stream_buffer;
+static UINT32               stream_buffer_size;
+static UINT32               stream_buffer_in;
+
+// descriptors and formats
+static DSBUFFERDESC         primary_desc;
+static DSBUFFERDESC         stream_desc;
+static WAVEFORMATEX         primary_format;
+static WAVEFORMATEX         stream_format;
+
+// buffer over/underflow counts
+static int                  buffer_underflows;
+static int                  buffer_overflows;
 //============================================================
 //  PROTOTYPES
 //============================================================

@@ -38,25 +38,6 @@ public:
 	void         dsound_destroy_buffers();
 	void 		 copy_sample_data(const INT16 *data, int bytes_to_copy);
 private:	
-	// DirectSound objects
-	LPDIRECTSOUND        dsound;
-	DSCAPS               dsound_caps;
-
-	// sound buffers
-	LPDIRECTSOUNDBUFFER  primary_buffer;
-	LPDIRECTSOUNDBUFFER  stream_buffer;
-	UINT32               stream_buffer_size;
-	UINT32               stream_buffer_in;
-
-	// descriptors and formats
-	DSBUFFERDESC         primary_desc;
-	DSBUFFERDESC         stream_desc;
-	WAVEFORMATEX         primary_format;
-	WAVEFORMATEX         stream_format;
-
-	// buffer over/underflow counts
-	int                  buffer_underflows;
-	int                  buffer_overflows;
 };
 
 extern const osd_sound_type OSD_SOUND_DIRECT_SOUND;
