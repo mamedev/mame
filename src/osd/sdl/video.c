@@ -447,7 +447,7 @@ static void init_monitors(void)
 			// allocate a new monitor info
 			monitor = global_alloc_clear(sdl_monitor_info);
 
-			snprintf(monitor->monitor_device, sizeof(monitor->monitor_device)-1, "%s%d", SDLOPTION_SCREEN,i);
+			snprintf(monitor->monitor_device, sizeof(monitor->monitor_device)-1, "%s%d", OSDOPTION_SCREEN,i);
 
 			SDL_GetDesktopDisplayMode(i, &dmode);
 			monitor->monitor_width = dmode.w;
