@@ -152,7 +152,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	// FDC reset
 	if (!BIT(data, 5))
 	{
-		m_fdc->reset();
+		m_fdc->soft_reset();
 	}
 
 	// timer 0 enable
