@@ -120,7 +120,6 @@ enum
 #define OPTION_FLICKER              "flicker"
 
 // core sound options
-#define OPTION_SOUND                "sound"
 #define OPTION_SAMPLERATE           "samplerate"
 #define OPTION_SAMPLES              "samples"
 #define OPTION_VOLUME               "volume"
@@ -281,7 +280,6 @@ public:
 	float flicker() const { return float_value(OPTION_FLICKER); }
 
 	// core sound options
-	const char *sound() const { return value(OPTION_SOUND); }
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
 	bool samples() const { return bool_value(OPTION_SAMPLES); }
 	int volume() const { return int_value(OPTION_VOLUME); }
