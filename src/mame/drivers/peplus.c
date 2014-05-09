@@ -3914,9 +3914,12 @@ ROM_START( peip0028 ) /* Normal board :  Joker Poker - French (IP0028) */
                                             w/J     w/oJ
 PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
-  ????      1    1   2   3    5   6  20  50 100 200 500   1000
-  % Range: 88.2-89.2%  Optimum: 90.2%  Hit Frequency: ??.?%
+ PI106B     1    1   2   3    5   6  20  50 100 200 500   1000
+  % Range: 89.5-91.5%  Optimum: 93.5%  Hit Frequency: 39.2%
      Programs Available: IP0028
+
+NOTE: Program states Theoretical Percentage (Pourcentage Theorique) of 90.2% but it's really 93.5%
+      This program is superseded by IP0074
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0028_ipp023.u68",   0x00000, 0x8000, CRC(011ddb51) SHA1(8734ddd1f06986efdb0bd83b2bc0a2303273dba9) )
@@ -3937,9 +3940,12 @@ ROM_START( peip0029 ) /* Normal board : Joker Poker - French (IP0029) */
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
-  ????      1    1   2   3    4   5  20  40 100 200 500    800
-  % Range: 89.3-91.3%  Optimum: 93.3%  Hit Frequency: ??.?%
+ PI105A     1    1   2   3    4   5  20  40 100 200 500    800
+  % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.3%
      Programs Available: IP0029
+
+NOTE: Program states Theoretical Percentage (Pourcentage Theorique) of 93.3% but it's really 95.0%
+      This program is superseded by IP0062
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0029_ipp023.u68",   0x00000, 0x8000, CRC(b79f91b0) SHA1(b6bed855497153121cb11d84836a737743124635) )
@@ -4049,7 +4055,7 @@ ROM_END
 ROM_START( peip0062 ) /* Normal board : Joker Poker - French (IP0062) */
 /*
                                             w/J     w/oJ
-PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
  PI105A     1    1   2   3    4   5  20  40 100 200 500    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.3%
@@ -4139,7 +4145,7 @@ ROM_START( peip0103 ) /* Normal board : Joker Poker - French (IP0103) */
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
-  ????      1    1   2   3    4   5  20  50 100 200 500   1000
+  ????      1    1   2   3    4   5  20  40 100 200 500   1000
   % Range: 91.5-93.5%  Optimum: 95.5%  Hit Frequency: 45.3%
      Programs Available: IP0103
 */
