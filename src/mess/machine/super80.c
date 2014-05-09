@@ -132,7 +132,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 
 READ8_MEMBER( super80_state::port3e_r )
 {
-	return 0xF8 | m_fdc->intrq_r() | (m_fdc->drq_r() << 1) | 4;
+	return 0xF8 | (m_fdc->intrq_r() << 0) | (m_fdc->drq_r() << 1) | 4;
 }
 
 // UFDC board can support 4 drives; we support 2
