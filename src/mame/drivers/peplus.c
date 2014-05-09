@@ -7923,6 +7923,23 @@ ROM_START( pexm009p ) /* Superboard : Multi-Poker (XM00009P) - Aces & Faces, Bon
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END
 
+ROM_START( pexm013p ) /* Superboard : Multi-Poker (XM00013P) - Bonus Poker, Dbl Dbl Bonus Poker, Deuces Wild Poker, Jacks or Better & Joker Poker  */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xmp00025.u67",   0x00000, 0x10000, CRC(5d39ff71) SHA1(0a5f67e61ae0e8a08cc551ab4271ffc97c343ae3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "xm00013p.u66",   0x00000, 0x10000, CRC(4fde73f9) SHA1(f8eb6fb0585e8df9a7eb2ddc65bb20b120753d7a) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2296.u77",  0x00000, 0x8000, CRC(d0d92665) SHA1(2c686ee28b69ff975951ccafd8e5030fde640773) )
+	ROM_LOAD( "mgo-cg2296.u78",  0x08000, 0x8000, CRC(d05fd16e) SHA1(f66b5ba8b4cf4f97ed46ec44cef43fed29bdd492) )
+	ROM_LOAD( "mbo-cg2296.u79",  0x10000, 0x8000, CRC(6db6a435) SHA1(7ea0d6df1f7e0c4fe389437bf04d1f5a798c68ef) )
+	ROM_LOAD( "mxo-cg2296.u80",  0x18000, 0x8000, CRC(4faeb79e) SHA1(f69277b729ba88860efc6b9a3d4956f245cc2943) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
+ROM_END
+
 ROM_START( pexmp013 ) /* Superboard : 5-in-1 Wingboard (XMP00013) Program in Spanish, Requires Spanish Wingboard CG rom set */
 /*
 
@@ -8464,6 +8481,7 @@ GAMEL(1995, pexm006p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, 
 GAMEL(1995, pexm007p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00007P+XMP00006) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm008p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs CG2228 graphics roms for correct MENU game banners */
 GAMEL(1995, pexm009p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00009P+XMP00002) Multi-Poker",        GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs unknown CG2??? graphics roms for correct MENU game banners */
+GAMEL(1995, pexm013p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00013P+XMP00025) Multi-Poker",        0, layout_pe_poker )
 
 /* Superboard : Multi-Poker (Wingboard) */
 GAMEL(1995, pexmp013,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00013) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
