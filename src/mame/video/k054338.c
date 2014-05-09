@@ -22,8 +22,7 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K054338, "K054338 Mixer Device", tag, owner, clock, "k054338", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
-	m_k055555_tag(NULL),
-	m_generic_paletteram_32(*this, "^paletteram")
+	m_k055555_tag(NULL)
 {
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_shd_rgb, 0, sizeof(m_shd_rgb));
