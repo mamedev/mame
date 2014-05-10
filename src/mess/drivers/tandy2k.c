@@ -23,6 +23,7 @@
 */
 
 #include "includes/tandy2k.h"
+#include "machine/pckeybrd.h"
 
 #define LOG 1
 
@@ -134,6 +135,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 
 	// keyboard enable
 	m_kb->power_w(BIT(data, 0));
+	machine().device<pc_keyboard_device>("pc_keyboard")->enable(BIT(data, 0));
 
 	// external baud rate clock
 	m_extclk = BIT(data, 1);
@@ -205,6 +207,8 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 	{
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
+
+		return machine().device<pc_keyboard_device>("pc_keyboard")->read(space, 0);
 	}
 
 	return 0xff;
@@ -341,6 +345,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tandy2k )
 	// defined in machine/tandy2kb.c
+	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 // Video
@@ -743,6 +748,11 @@ void tandy2k_state::machine_start()
 	save_item(NAME(m_spkrdata));
 }
 
+void tandy2k_state::device_reset_after_children()
+{
+	machine().device<pc_keyboard_device>("pc_keyboard")->enable(0);
+}
+
 // Machine Driver
 
 static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
@@ -846,6 +856,10 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_DEVICE_ADD(TANDY2K_KEYBOARD_TAG, TANDY2K_KEYBOARD, 0)
 	MCFG_TANDY2000_KEYBOARD_CLOCK_CALLBACK(WRITELINE(tandy2k_state, kbdclk_w))
 	MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(WRITELINE(tandy2k_state, kbddat_w))
+
+	// temporary until the tandy keyboard has a rom dump
+	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))
+
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")
