@@ -1137,68 +1137,86 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			CLK(POP_R16);
 			break;
 
-
+// 8086 'invalid opcodes', as documented at http://www.os2museum.com/wp/?p=2147
+//      0x60 - 0x6f are an alias to 0x70 - 0x7f.
+// 		These instructions are used in the boot sector for some versions of 
+//		MS-DOS 2.01	(e.g. the DEC Rainbow version).
+		case 0x60:
 		case 0x70: // i_jo
 			JMP( OF);
 			break;
 
+		case 0x61:
 		case 0x71: // i_jno
 			JMP(!OF);
 			break;
 
+		case 0x62:
 		case 0x72: // i_jc
 			JMP( CF);
 			break;
 
+		case 0x63:
 		case 0x73: // i_jnc
 			JMP(!CF);
 			break;
 
+		case 0x64:
 		case 0x74: // i_jz
 			JMP( ZF);
 			break;
 
+		case 0x65:
 		case 0x75: // i_jnz
 			JMP(!ZF);
 			break;
 
+		case 0x66:
 		case 0x76: // i_jce
 			JMP(CF || ZF);
 			break;
 
+		case 0x67:
 		case 0x77: // i_jnce
 			JMP(!(CF || ZF));
 			break;
 
+		case 0x68:
 		case 0x78: // i_js
 			JMP( SF);
 			break;
 
+		case 0x69:
 		case 0x79: // i_jns
 			JMP(!SF);
 			break;
 
+		case 0x6a:
 		case 0x7a: // i_jp
 			JMP( PF);
 			break;
 
+		case 0x6b:
 		case 0x7b: // i_jnp
 			JMP(!PF);
 			break;
 
+		case 0x6c:
 		case 0x7c: // i_jl
 			JMP((SF!=OF)&&(!ZF));
 			break;
 
+		case 0x6d:
 		case 0x7d: // i_jnl
 			JMP((ZF)||(SF==OF));
 			break;
 
+		case 0x6e:
 		case 0x7e: // i_jle
 			JMP((ZF)||(SF!=OF));
 			break;
 
-
+		case 0x6f:
 		case 0x7f: // i_jnle
 			JMP((SF==OF)&&(!ZF));
 			break;
