@@ -194,6 +194,20 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
+DRIVER_INIT_MEMBER(megapc_state, megapc)
+{
+	UINT8* ROM = memregion("bios")->base();
+	ROM[0xf9145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
+	ROM[0xffea0] = 0x20;  // to correct checksum
+}
+
+DRIVER_INIT_MEMBER(megapc_state, megapcpl)
+{
+	UINT8* ROM = memregion("bios")->base();
+	ROM[0xf87b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
+	ROM[0xffea0] = 0x20;  // to correct checksum
+}
+
 READ16_MEMBER( megapc_state::wd7600_ior )
 {
 	if (offset < 4)
@@ -1549,8 +1563,8 @@ COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, at586_state,   at586,
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, at586_state,   at586,  "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atvga, at_state,      atvga,  "<generic>",  "NEAT (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
-COMP ( 1993, megapc,   0,       0,       megapc,    0,     driver_device,     0,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
-COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,     driver_device,     0,  "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
+COMP ( 1993, megapc,   0,       0,       megapc,    0,     megapc_state, megapc,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
+COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,     megapc_state, megapcpl,"Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
 COMP ( 1989, pc2386,   ibm5170, 0,       at386,     atvga, at_state,      atvga,  "Amstrad plc", "Amstrad PC2386", GAME_NOT_WORKING )
 COMP ( 1991, aprfte,   ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", GAME_NOT_WORKING )
 COMP ( 1991, ftsserv,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot FTs (Scorpion)", GAME_NOT_WORKING )

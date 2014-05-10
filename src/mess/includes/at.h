@@ -179,11 +179,15 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
+	DECLARE_DRIVER_INIT(megapc);
+	DECLARE_DRIVER_INIT(megapcpl);
+
 	DECLARE_READ16_MEMBER( wd7600_ior );
 	DECLARE_WRITE16_MEMBER( wd7600_iow );
 	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
 	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
 };
+
 
 #endif /* AT_H_ */
