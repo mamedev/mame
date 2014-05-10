@@ -1013,6 +1013,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xda2000, 0xda3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
 #if GX_DEBUG
 	AM_RANGE(0xd40000, 0xd4003f) AM_DEVREAD("k056832", k056832_device, long_r)
+	AM_RANGE(0xd50000, 0xd500ff) AM_DEVREAD("k055555", k055555_device, k055555_long_r)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVREAD("k055673", k055673_device, k053247_reg_long_r)
 #endif
 ADDRESS_MAP_END
@@ -2437,6 +2438,39 @@ ROM_START( winspikej )
 	ROM_LOAD( "705a22.9g", 0x000000, 4*1024*1024, CRC(1a9246f6) SHA1(a40ff43310d035f7b88c4e397a4ee75151578c17) )
 ROM_END
 
+/* Crazy Cross */
+ROM_START( crzcross )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "315eaa02.31b", 0x200002, 512*1024, CRC(9c0faa4b) SHA1(b6ebe712e791678a4ce16767d2d80872963c6507) )
+	ROM_LOAD32_WORD_SWAP( "315eaa04.27b", 0x200000, 512*1024, CRC(c89dd3e5) SHA1(933d1b1e3bf7ac7a7cda4b1968a02f3f0769c86b) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("315a06.9c", 0x000000, 128*1024, CRC(06580a9f) SHA1(75e13aa13e3c1060cdd630c101d6644b3904317f) )
+	ROM_LOAD16_BYTE("315a07.7c", 0x000001, 128*1024, CRC(431c58f3) SHA1(4888e305875d56cca5e1d792bdf27e57b3e42b03) )
+
+	/* tiles */
+	ROM_REGION( 0xa00000, "gfx1", ROMREGION_ERASE00 )
+	TILE_WORD_ROM_LOAD( "315a14.17h", 0x000000, 512*1024, CRC(0ab731e0) SHA1(1f7d6ce40e689e1dddfee656bb46bd044012c2d6) )
+	TILE_BYTE_ROM_LOAD( "315a12.13g", 0x000004, 2*1024*1024, CRC(3047b8d2) SHA1(99fa4d20ee5aae89b9093ceb581f187bc9acc0ae) )
+
+	/* sprites */
+	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "315a11.25g", 0x000000, 2*1024*1024, CRC(b8a99c29) SHA1(60086f663aa6cbfc3fb378caeb2509c65637564e) )
+	ROM_LOAD32_WORD( "315a10.28g", 0x000002, 2*1024*1024, CRC(77d175dc) SHA1(73506df30db5ce38a9a21a1dce3e8b4cc1dfa7be) )
+	ROM_LOAD( "315a09.30g", 0x400000, 1*1024*1024, CRC(82580329) SHA1(99749a67f1843dfd0fe93cc6bbcbc126b7bb7fb4) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "315a17.9g", 0x000000, 2*1024*1024, CRC(ea763d61) SHA1(2a7dcb2a2a23c9fea62fb82ffc18949bf15b9f6f) )
+	ROM_LOAD( "315a18.7g", 0x200000, 2*1024*1024, CRC(6e416cee) SHA1(145a766ad2fa2b692692053dd36e0caf51d67a56) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "crzcross.nv", 0x0000, 0x080, CRC(446f178c) SHA1(84b02192c26459c1b798f07b96768e1013b57666) )
+ROM_END
+
 /* Taisen Puzzle-dama */
 ROM_START( puzldama )
 	/* main program */
@@ -3734,7 +3768,8 @@ GAME( 1994, fantjour, konamigx, konamigx, gokuparo, konamigx_state, konamigx, RO
 GAME( 1994, fantjoura,fantjour, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gokuparo, fantjour, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1994, puzldama, konamigx, konamigx, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, crzcross, konamigx, konamigx, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Crazy Cross (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, puzldama, crzcross, konamigx, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1995, tbyahhoo, konamigx, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 

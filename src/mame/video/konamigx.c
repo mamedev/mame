@@ -1230,7 +1230,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 		gx_tilemode = 1;
 	} else
 
-	if (!strcmp(machine().system().name,"puzldama"))
+	if (!strcmp(machine().system().name,"crzcross") || !strcmp(machine().system().name,"puzldama"))
 	{
 		m_k055673->k053247_set_sprite_offs(-46, -23);
 		konamigx_mixer_primode(5);
