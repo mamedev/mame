@@ -5724,6 +5724,25 @@ ROM_START( pokasuka )
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
 ROM_END
 
+ROM_START( rhytngk )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	// real encrypted ROM dump
+	ROM_LOAD( "fpr-24423.ic8",  0x00000000, 0x4000000, CRC(c85513ce) SHA1(88490fe64c0866059492b0c1c714b50f3f270676) ) 
+	// decrypted version of IC8
+	ROM_LOAD( "fpr-24423.ic8d", 0x00000000, 0x4000000, CRC(209a991c) SHA1(d76228a215c50ff3085708182b8e47fd2ebc6a47) )
+	ROM_LOAD( "fpr-24424.ic9",  0x04000000, 0x4000000, CRC(7bba2402) SHA1(94d637969c58d5dfa3ee64bc3cfb9495dbb97511) ) 
+	ROM_LOAD( "fpr-24425.ic10", 0x08000000, 0x4000000, CRC(6223ebac) SHA1(64c0ec61c108acbb557e7d3837f578deba832cb6) ) 
+	ROM_LOAD( "fpr-24426.ic11", 0x0c000000, 0x4000000, CRC(c78b0981) SHA1(f889acf9065566e11ff985a3b6c4824e364d57ae) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "rhytngk-key.bin", 0x000000, 0x000004, CRC(e2560d28) SHA1(46fb9b47a0df3035f92db2b0c63a6e4e0745ad29) ) 
+
+	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+ROM_END
+
 /*
 
 SYSTEMID: NAOMI
@@ -8810,7 +8829,7 @@ ROM_END
 /* 0170 */ GAME( 2007, manicpnc, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Manic Panic Ghosts!", GAME_FLAGS )
 /* 0170 */ GAME( 2007, pokasuka, manicpnc, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Pokasuka Ghost", GAME_FLAGS )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Asian Dynamite", GAME_FLAGS )
-// 0177 Rythm Tengoku (Japan)
+/* 0177 */ GAME( 2007, rhytngk,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega/Nintendo", "Rhythm Tengoku", GAME_FLAGS ) 
 // 00xx Mayjinsen (Formation Battle in May) - prototype, never released
 
 /* Cartridge prototypes of games released on GD-ROM */
