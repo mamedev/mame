@@ -192,7 +192,9 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 		// copy the X and Y offsets into our temporary arrays
 		extxoffs.resize(glcopy.width * xscale);
 		extyoffs.resize(glcopy.height * yscale);
+		assert(glcopy.extxoffs != NULL || glcopy.width <= MAX_GFX_SIZE);
 		memcpy(&extxoffs[0], (glcopy.extxoffs != NULL) ? glcopy.extxoffs : glcopy.xoffset, glcopy.width * sizeof(UINT32));
+		assert(glcopy.extyoffs != NULL || glcopy.height <= MAX_GFX_SIZE);
 		memcpy(&extyoffs[0], (glcopy.extyoffs != NULL) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(UINT32));
 
 		// always use the extended offsets here
