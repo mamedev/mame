@@ -291,7 +291,6 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)
 	MCFG_CPU_IO_MAP(ad2083_sound_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
 	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
