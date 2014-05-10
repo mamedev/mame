@@ -1356,6 +1356,7 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
 	MCFG_CPU_IO_MAP(scramble_sound_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))

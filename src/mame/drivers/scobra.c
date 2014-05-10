@@ -711,6 +711,7 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(scobra_sound_map)
 	MCFG_CPU_IO_MAP(scobra_sound_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,scramble_sh_7474_q_callback))
@@ -852,6 +853,7 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_CPU_ADD("audiocpu",Z80,14318000/8) /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(hustler_sound_map)
 	MCFG_CPU_IO_MAP(hustler_sound_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,scramble_sh_7474_q_callback))

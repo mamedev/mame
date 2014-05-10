@@ -1745,9 +1745,9 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL_19_6608MHz)
 	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)  // in all memory maps, pgmd to 31250baud
 	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL_24MHz)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch0_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(firebeat_state, midi_uart_ch0_irq_callback))
 	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL_24MHz)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(firebeat_state, midi_uart_ch1_irq_callback))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( firebeat2, firebeat_state )
@@ -1807,9 +1807,9 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL_19_6608MHz)
 	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)
 	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL_24MHz)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch0_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(firebeat_state, midi_uart_ch0_irq_callback))
 	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL_24MHz)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(firebeat_state, midi_uart_ch1_irq_callback))
 	MCFG_MIDI_KBD_ADD("kbd0", DEVWRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
 	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
