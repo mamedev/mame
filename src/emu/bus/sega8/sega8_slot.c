@@ -520,7 +520,7 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		LOG(("Mapper test: _0002 = %d, _8000 = %d, _a000 = %d, _ffff = %d\n", _0002, _8000, _a000, _ffff));
 
 		// 2 is a security measure, although tests on existing ROM showed it was not needed
-		if (_0002 > _ffff + 2 || (_0002 > 0 && _ffff == 0))
+		if (len >= 0x10000 && (_0002 > _ffff + 2 || (_0002 > 0 && _ffff == 0)))
 		{
 			type = SEGA8_ZEMINA;
 
