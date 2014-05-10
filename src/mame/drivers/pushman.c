@@ -660,8 +660,42 @@ ROM_START( bballs )
 	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) N82S129 BPROM */
 ROM_END
 
+ROM_START( bballsa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "12.ic212", 0x000000, 0x10000, CRC(8917aedd) SHA1(ded983ba753699c97b02e991eb7195c0122b4065) )
+	ROM_LOAD16_BYTE( "11.ic197", 0x000001, 0x10000, CRC(430fca1b) SHA1(70ed70396f5346a3120f7a046a111fa114c997bc) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "13.ic216", 0x00000, 0x08000, CRC(1ef78175) SHA1(2e7dcbab3a572c2a6bb67a36ba283a5faeb14a88) )
+
+	ROM_REGION( 0x01000, "cpu2", 0 )
+	ROM_LOAD( "68705.uc",  0x00000, 0x01000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "1.ic130",  0x00000, 0x08000, CRC(67672444) SHA1(f1d4681999d44e8d3cbf26b8a9c05f50573e0df6) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "4.ic58", 0x00000, 0x10000, CRC(144ca816) SHA1(c166e3f42f12c14df977adad363575e786b2be51) )
+	ROM_LOAD( "5.ic59", 0x10000, 0x10000, CRC(486c8385) SHA1(4421160573a2435bb0f330a04fef486d14a1293b) )
+	ROM_LOAD( "2.ic56", 0x20000, 0x10000, CRC(1d464915) SHA1(3396e919da7e3d08a1a9c76db5d0d214ddf7adcd) )
+	ROM_LOAD( "3.ic57", 0x30000, 0x10000, CRC(595439ec) SHA1(6e1a79e5583960f700fd8a63cd48c7e222a315dc) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "6.ic131", 0x00000, 0x10000, CRC(15d4975b) SHA1(71dbb63e70a52ec12fdfc20047a48beb73fac8a0) )
+	ROM_LOAD( "8.ic148", 0x10000, 0x10000, CRC(c1a21c75) SHA1(34b877ac85274e50b2ce65945b9761e70e80b852) )
+	ROM_LOAD( "7.ic132", 0x20000, 0x10000, CRC(2289393a) SHA1(e1370925a92f7d9f96c9431cf1b8dd262c41017e) )
+	ROM_LOAD( "9.ic149", 0x30000, 0x10000, CRC(1fe3d172) SHA1(f7415e8633507a507ec1cd68de224722a726a473) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 )    /* bg tilemaps */
+	ROM_LOAD( "10.ic189", 0x00000, 0x08000, CRC(52e4ab27) SHA1(c9ae15f970b4bf120a4bbee9adcf0e5e4de001e7) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
+	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) N82S129 BPROM */
+ROM_END
+
 GAME( 1990, pushman,  0,       pushman, pushman, driver_device, 0, ROT0, "Comad", "Pushman (Korea, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pushmana, pushman, pushman, pushman, driver_device, 0, ROT0, "Comad", "Pushman (Korea, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pushmans, pushman, pushman, pushman, driver_device, 0, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pushmant, pushman, pushman, pushman, driver_device, 0, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", GAME_SUPPORTS_SAVE )
 GAME( 1991, bballs,   0,       bballs,  bballs, driver_device,  0, ROT0, "Comad", "Bouncing Balls", GAME_SUPPORTS_SAVE )
+GAME( 1991, bballsa,  bballs,  bballs,  bballs, driver_device,  0, ROT0, "Comad", "Bouncing Balls (Adult)", GAME_SUPPORTS_SAVE )
