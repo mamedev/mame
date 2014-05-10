@@ -97,8 +97,8 @@ public:
 	DECLARE_READ8_MEMBER( a20_reset_r );
 	DECLARE_READ8_MEMBER( portb_r );
 	DECLARE_WRITE8_MEMBER( portb_w );
-	DECLARE_WRITE8_MEMBER( dma_page_w ) { m_dma_page[offset] = data; }
-	DECLARE_READ8_MEMBER( dma_page_r ) { return m_dma_page[offset]; }
+	DECLARE_WRITE8_MEMBER( dma_page_w ) { m_dma_page[offset & 0x0f] = data; }
+	DECLARE_READ8_MEMBER( dma_page_r ) { return m_dma_page[offset & 0x0f]; }
 	DECLARE_READ8_MEMBER( dma_read_byte );
 	DECLARE_WRITE8_MEMBER( dma_write_byte );
 	DECLARE_READ8_MEMBER( dma_read_word );
