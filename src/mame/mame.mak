@@ -2211,6 +2211,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/chicago.o \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
+	$(DRIVERS)/cocoloco.o \
 	$(DRIVERS)/coinmstr.o \
 	$(DRIVERS)/coinmvga.o \
 	$(DRIVERS)/comebaby.o \
