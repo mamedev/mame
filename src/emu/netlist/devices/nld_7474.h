@@ -27,7 +27,7 @@
  *          |  1  |  1  |  0  | X || Q0| Q0Q |
  *          +-----+-----+-----+---++---+-----+
  *
- *  (*) his configuration is nonstable that is it will not persist
+ *  (*) This configuration is not stable, i.e. it will not persist
  *  when either the preset and or clear inputs return to their inactive (high) level
  *
  *  Q0 The output logic level of Q before the indicated input conditions were established
