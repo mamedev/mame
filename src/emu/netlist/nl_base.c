@@ -334,14 +334,11 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
-: netlist_object_t(DEVICE, afamily), m_family_desc(NULL)
+ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily, const netlist_logic_family_desc_t *family_desc)
+: netlist_object_t(DEVICE, afamily), m_family_desc(family_desc)
 {
-}
-
-ATTR_COLD netlist_core_device_t::netlist_core_device_t(const netlist_logic_family_desc_t *family_desc)
-: netlist_object_t(DEVICE, GENERIC), m_family_desc(family_desc)
-{
+    assert(afamily == GENERIC && family_desc != NULL);
+    assert(afamily != GENERIC && family_desc == NULL);
 }
 
 ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstring &name)
@@ -378,13 +375,13 @@ ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(
 // ----------------------------------------------------------------------------------------
 
 netlist_device_t::netlist_device_t()
-	: netlist_core_device_t(&netlist_family_ttl),
+	: netlist_core_device_t(GENERIC, &netlist_family_ttl),
 		m_terminals(20)
 {
 }
 
 netlist_device_t::netlist_device_t(const family_t afamily)
-	: netlist_core_device_t(afamily),
+	: netlist_core_device_t(afamily, NULL),
 		m_terminals(20)
 {
 }

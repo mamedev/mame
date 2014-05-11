@@ -300,9 +300,9 @@ public:
 		DIODE     = 6,   // Diode
 		BJT_SWITCH = 7,  // BJT(Switch)
 		VCVS       = 8,  // Voltage controlled voltage source
-		VCCS       = 9,  // Voltage controlled voltage source
+		VCCS       = 9,  // Voltage controlled current source
 		BJT_EB     = 10, // BJT(Ebers-Moll)
-		GND        = 11, // BJT(Ebers-Moll)
+		GND        = 11, // GND device
 	};
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -855,9 +855,7 @@ public:
 
 	typedef netlist_list_t<netlist_core_device_t *> list_t;
 
-	//ATTR_COLD netlist_core_device_t();
-	ATTR_COLD netlist_core_device_t(const family_t afamily);
-	ATTR_COLD netlist_core_device_t(const netlist_logic_family_desc_t *family_desc);
+	ATTR_COLD netlist_core_device_t(const family_t afamily, const netlist_logic_family_desc_t *family_desc);
 
 	ATTR_COLD virtual ~netlist_core_device_t();
 
