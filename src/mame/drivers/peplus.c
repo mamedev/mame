@@ -1473,6 +1473,15 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0009 ) /* Normal board : Standard Draw Poker (PP0009) */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+   GA       1    2    3    4    5   6  25  50 250    800
+  % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
+     Programs Available: PP0009
+
+This program set is superseded by PP0060
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0009_554-544.u68",   0x00000, 0x8000, CRC(2e3e45f7) SHA1(035994b20d3975bb2287f12b4a42d5fdae68b13b) ) /* Game Version: 554, Library Version: 544 */
 	ROM_RELOAD(                       0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
@@ -1552,6 +1561,13 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0023 ) /* Normal board : Tens or Better (PP0023) */
+/*
+PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????     1     2    3    4    5   6  25  50 250    800
+  % Range: 93.3-95.3%  Optimum: 97.3%  Hit Frequency: 45.4%
+     Programs Available: PP0023
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0023_520-516.u68",   0x00000, 0x8000, CRC(883ff93e) SHA1(e355933ee6a316b5672e5a887e09c691ab242873) ) /* Game Version: 520, Library Version: 516, Video Lib Ver: 516 */
 	ROM_RELOAD(                       0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
@@ -2244,7 +2260,7 @@ ROM_START( pepp0159 ) /* Normal board : Standard Draw Poker (PP0159) - Multi Reg
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-  ????      1    2    3    4    5   7  25  50 250   1000
+  P11B      1    2    3    4    5   7  25  50 250   1000
   % Range: 92.5-94.5%  Optimum: 96.5%  Hit Frequency: 45.5%
      Programs Available: PP0159
 */
@@ -3373,6 +3389,8 @@ ROM_START( pepp0509 ) /* Normal board : Standard Draw Poker (No Double-up) (PP05
 PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 --------------------------------------------------------
   ????      1    2   3    4   6  10  25  50 250    800
+  % Range: 95.3-97.3%  Optimum: 99.3%  Hit Frequency: 45.4%
+     Programs Available: PP0509
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0509_783-779.u68",   0x00000, 0x10000, CRC(a7c9b166) SHA1(3565070b9beba9aa50662253cafafa00f4f5abfa) ) /* Game Version: 782, Library Version: 779 */
@@ -3392,6 +3410,8 @@ ROM_START( pepp0510 ) /* Normal board : Standard Draw Poker (PP0510) */
 PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 --------------------------------------------------------
   ????      1    2   3    4   7   9  25  50 250    800
+  % Range: 95.3-97.3%  Optimum: 99.3%  Hit Frequency: 45.4%
+     Programs Available: PP0510
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0510_782-779.u68",   0x00000, 0x10000, CRC(40ce3464) SHA1(230725ac3dd6eb6f891d4abfbcb4c41592531d4e) ) /* Game Version: 782, Library Version: 779 */
@@ -3919,7 +3939,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: IP0028
 
 NOTE: Program states Theoretical Percentage (Pourcentage Theorique) of 90.2% but it's really 93.5%
-      This program is superseded by IP0074
+      This program set is superseded by IP0074
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0028_ipp023.u68",   0x00000, 0x8000, CRC(011ddb51) SHA1(8734ddd1f06986efdb0bd83b2bc0a2303273dba9) )
@@ -3945,7 +3965,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: IP0029
 
 NOTE: Program states Theoretical Percentage (Pourcentage Theorique) of 93.3% but it's really 95.0%
-      This program is superseded by IP0062
+      This program set is superseded by IP0062
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ip0029_ipp023.u68",   0x00000, 0x8000, CRC(b79f91b0) SHA1(b6bed855497153121cb11d84836a737743124635) )
@@ -3965,7 +3985,7 @@ ROM_START( peip0031 ) /* Normal board : Standard Draw Poker - French (IP0031) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-  ????      1    2    3    4    5   6  25  50 250    ???
+  PI34G     1    2    3    4    5   6  25  50 250    ???
   % Range: 88.2-90.2%  Optimum: 92.2%  Hit Frequency: 45.5%
      Programs Available: IP0031
 */
@@ -4257,7 +4277,7 @@ ROM_START( peip0114 ) /* Normal board : Standard Draw Poker - French (IP0114) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-  ????      1    2    3    4    5   8  25  50 250    800
+  PI34A     1    2    3    4    5   8  25  50 250    800
   % Range: 91.1-93.1%  Optimum: 96.3%  Hit Frequency: 45.6%
      Programs Available: IP0114
 */
@@ -4302,7 +4322,7 @@ ROM_START( peip0116 ) /* Normal board : Standard Draw Poker - French (IP0116) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-  ????      1    2    3    4    5   6  25  50 250   1000
+  PI34B     1    2    3    4    5   6  25  50 250   1000
   % Range: 90.4-92.4%  Optimum: 94.4%  Hit Frequency: 45.6%
      Programs Available: IP0116
 */
