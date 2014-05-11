@@ -125,7 +125,7 @@ public:
 
 	virtual void update()
 	{
-		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 
 		// FIXME: this check is needed because update is called during startup as well
 		if (UNEXPECTED(USE_DEACTIVE_DEVICE && m_active == 0))
@@ -141,11 +141,11 @@ public:
 				for (int j = i + 1; j < _numdev; j++)
 					this->m_i[j].inactivate();
 
-				OUTLOGIC(this->m_Q, _check ^ (1 ^ _invert), times[_check]);// ? 15000 : 22000);
+				OUTLOGIC(this->m_Q, _check ^ (1 ^ _invert), times[_check ^ (1 ^ _invert)]);// ? 15000 : 22000);
 				return;
 			}
 		}
-		OUTLOGIC(this->m_Q,_check ^ (_invert), times[1-_check]);// ? 22000 : 15000);
+		OUTLOGIC(this->m_Q,_check ^ (_invert), times[_check ^ (_invert)]);// ? 22000 : 15000);
 	}
 
 public:
