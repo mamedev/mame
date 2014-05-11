@@ -683,7 +683,7 @@ bool ipf_format::generate_block(track_info *t, UINT32 idx, UINT32 ipos, UINT32 *
 		return false;
 	if(!generate_block_data(data + r32(thead+28), data_end, track+dpos, track+gpos, context))
 		return false;
-	if(!generate_block_gap(r32(thead+20), gap_cells, r32(thead+24), spos, ipos-gpos, data + r32(thead+8), data_end, track+gpos, context))
+	if(!generate_block_gap(r32(thead+20), gap_cells, r32(thead+24), spos, ipos > gpos ? ipos-gpos : 0, data + r32(thead+8), data_end, track+gpos, context))
 		return false;
 	spos += gpos;
 
