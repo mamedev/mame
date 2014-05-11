@@ -87,9 +87,12 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_common_w);
 	DECLARE_READ8_MEMBER(tlcs_sound_r);
 	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
+	DECLARE_WRITE16_MEMBER(tlcs_unk_w);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_DRIVER_INIT(optiger);
 };
 
 void taitopjc_state::video_start()
@@ -365,6 +368,15 @@ WRITE8_MEMBER(taitopjc_state::tlcs_sound_w)
 //  printf("tlcs_sound_w: %08X, %02X\n", offset, data);
 }
 
+WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
+{
+	if (offset == 0xc/2)
+	{
+		int reset = (data & 0x4) ? ASSERT_LINE : CLEAR_LINE;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, reset);
+	}
+}
+
 // TLCS900 interrupt vectors
 // 0xfc0100: reset
 // 0xfc00ea: INT0 (dummy)
@@ -386,6 +398,7 @@ static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE8(tlcs_sound_r, tlcs_sound_w, 0xffff)
 	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
+	AM_RANGE(0x06c000, 0x06c00f) AM_WRITE(tlcs_unk_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
@@ -402,6 +415,8 @@ void taitopjc_state::machine_reset()
 {
 	// halt sound CPU since we don't emulate this yet
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -435,6 +450,16 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitopjc_state, screen_update_taitopjc)
 
 MACHINE_CONFIG_END
+
+
+DRIVER_INIT_MEMBER(taitopjc_state, optiger)
+{
+	UINT8 *rom = (UINT8*)memregion("io_cpu")->base();
+	
+	// skip sound check
+	rom[0x217] = 0x00;
+	rom[0x218] = 0x00;
+}
 
 
 ROM_START( optiger )
@@ -479,4 +504,4 @@ ROM_START( optiger )
 	// TODO: There are 6 PALs in total on the main PCB.
 ROM_END
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, driver_device, 0, ROT0, "Taito", "Operation Tiger", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger", GAME_NOT_WORKING | GAME_NO_SOUND )
