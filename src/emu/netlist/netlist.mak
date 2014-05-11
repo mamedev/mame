@@ -37,11 +37,15 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_7400.o \
 	$(NETLISTOBJ)/devices/nld_7402.o \
 	$(NETLISTOBJ)/devices/nld_7404.o \
+	$(NETLISTOBJ)/devices/nld_7408.o \
 	$(NETLISTOBJ)/devices/nld_7410.o \
+	$(NETLISTOBJ)/devices/nld_7411.o \
 	$(NETLISTOBJ)/devices/nld_7420.o \
 	$(NETLISTOBJ)/devices/nld_7425.o \
 	$(NETLISTOBJ)/devices/nld_7427.o \
 	$(NETLISTOBJ)/devices/nld_7430.o \
+	$(NETLISTOBJ)/devices/nld_7432.o \
+	$(NETLISTOBJ)/devices/nld_7437.o \
 	$(NETLISTOBJ)/devices/nld_7448.o \
 	$(NETLISTOBJ)/devices/nld_7450.o \
 	$(NETLISTOBJ)/devices/nld_7474.o \
