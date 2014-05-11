@@ -59,6 +59,10 @@ ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, dev
 	m_write_data_ready(*this),
 	m_write_ako(*this)
 {
+	for (int i = 0; i < 9; i++)
+	{
+		m_x_mask[i] = 0;
+	}
 }
 
 //-------------------------------------------------
@@ -86,10 +90,12 @@ void ay3600_device::device_start()
 	m_scan_timer = timer_alloc();
 	m_scan_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 
+	m_ako = 0;
+
 	// state saving
 	save_item(NAME(m_b));
 	save_item(NAME(m_ako));
-	save_item(NAME(m_keys_down));
+	save_item(NAME(m_x_mask));
 }
 
 
@@ -99,11 +105,6 @@ void ay3600_device::device_start()
 
 void ay3600_device::device_reset()
 {
-	m_ako = 0;
-	for (int i = 0; i < MAX_KEYS_DOWN; i++)
-	{
-		m_keys_down[i] = -1;
-	}
 }
 
 //-------------------------------------------------
@@ -146,21 +147,11 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 			if (BIT(data, y))
 			{
-				bool found = false;
-
-				// is this key already down?
-				for (int k = 0; k < MAX_KEYS_DOWN; k++)
-				{
-					if (b == m_keys_down[k])
-					{
-						found = true;
-						break;
-					}
-				}
-
-				if (!found)
+				if (!(m_x_mask[x] & (1 << y)))
 				{
 					ako = 1;
+
+					m_x_mask[x] |= (1 << y);
 
 					if (m_b != b)
 					{
@@ -169,27 +160,11 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 						m_write_data_ready(1);
 						return;
 					}
-
-					// add to the keys down list
-					for (int k = 0; k < MAX_KEYS_DOWN; k++)
-					{
-						if (m_keys_down[k] == -1)
-						{
-							m_keys_down[k] = b;
-							break;
-						}
-					}
 				}
 			}
-			else    // key released, unmark it from the keys_down table
+			else    // key released, unmark it from the "down" info
 			{
-				for (int k = 0; k < MAX_KEYS_DOWN; k++)
-				{
-					if (b == m_keys_down[k])
-					{
-						m_keys_down[k] = -1;
-					}
-				}
+				m_x_mask[x] &= ~(1 << y);
 			}
 		}
 	}
