@@ -372,7 +372,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 			if (layout.width > MAX_GFX_SIZE && layout.extxoffs == NULL)
 				osd_printf_error("gfx[%d] width > %d but missing extended xoffset info\n", gfxnum, MAX_GFX_SIZE);
 			if (layout.height > MAX_GFX_SIZE && layout.extyoffs == NULL)
-				osd_printf_error("gfx[%d] width > %d but missing extended yoffset info\n", gfxnum, MAX_GFX_SIZE);
+				osd_printf_error("gfx[%d] height > %d but missing extended yoffset info\n", gfxnum, MAX_GFX_SIZE);
 		}
 	}
 }
