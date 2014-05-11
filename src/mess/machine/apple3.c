@@ -412,6 +412,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
 	m_via_1->write_cb1(machine().first_screen()->vblank());
 	m_via_1->write_cb2(machine().first_screen()->vblank());
+
+	// check reset
+	if (m_kbspecial->read() & 0x80)	// reset is pressed
+	{
+		// control-reset?
+		if (m_kbspecial->read() & 0x08)
+		{
+			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+		else	// plain reset is an NMI, if it's allowed
+		{
+			if (m_via_0_a & ENV_NMIENABLE)
+			{
+				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); 
+				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
+		}
+	}
 }
 
 UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
