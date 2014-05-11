@@ -189,32 +189,6 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 		// copy the layout into our temporary variable
 		memcpy(&glcopy, gfx.gfxlayout, sizeof(gfx_layout));
 
-		// copy the X and Y offsets into our temporary arrays
-		extxoffs.resize(glcopy.width * xscale);
-		extyoffs.resize(glcopy.height * yscale);
-		assert(glcopy.extxoffs != NULL || glcopy.width <= MAX_GFX_SIZE);
-		memcpy(&extxoffs[0], (glcopy.extxoffs != NULL) ? glcopy.extxoffs : glcopy.xoffset, glcopy.width * sizeof(UINT32));
-		assert(glcopy.extyoffs != NULL || glcopy.height <= MAX_GFX_SIZE);
-		memcpy(&extyoffs[0], (glcopy.extyoffs != NULL) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(UINT32));
-
-		// always use the extended offsets here
-		glcopy.extxoffs = extxoffs;
-		glcopy.extyoffs = extyoffs;
-
-		// expand X and Y by the scale factors
-		if (xscale > 1)
-		{
-			glcopy.width *= xscale;
-			for (int j = glcopy.width - 1; j >= 0; j--)
-				extxoffs[j] = extxoffs[j / xscale];
-		}
-		if (yscale > 1)
-		{
-			glcopy.height *= yscale;
-			for (int j = glcopy.height - 1; j >= 0; j--)
-				extyoffs[j] = extyoffs[j / yscale];
-		}
-
 		// if the character count is a region fraction, compute the effective total
 		if (IS_FRAC(glcopy.total))
 		{
@@ -225,6 +199,30 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 		// for non-raw graphics, decode the X and Y offsets
 		if (glcopy.planeoffset[0] != GFX_RAW)
 		{
+			// copy the X and Y offsets into our temporary arrays
+			extxoffs.resize(glcopy.width * xscale);
+			extyoffs.resize(glcopy.height * yscale);
+			memcpy(&extxoffs[0], (glcopy.extxoffs != NULL) ? glcopy.extxoffs : glcopy.xoffset, glcopy.width * sizeof(UINT32));
+			memcpy(&extyoffs[0], (glcopy.extyoffs != NULL) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(UINT32));
+
+			// always use the extended offsets here
+			glcopy.extxoffs = extxoffs;
+			glcopy.extyoffs = extyoffs;
+
+			// expand X and Y by the scale factors
+			if (xscale > 1)
+			{
+				glcopy.width *= xscale;
+				for (int j = glcopy.width - 1; j >= 0; j--)
+					extxoffs[j] = extxoffs[j / xscale];
+			}
+			if (yscale > 1)
+			{
+				glcopy.height *= yscale;
+				for (int j = glcopy.height - 1; j >= 0; j--)
+					extyoffs[j] = extyoffs[j / yscale];
+			}
+
 			// loop over all the planes, converting fractions
 			for (int j = 0; j < glcopy.planes; j++)
 			{
@@ -360,16 +358,21 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		if (layout.planeoffset[0] == GFX_RAW)
 		{
 			if (layout.total != RGN_FRAC(1,1))
-				osd_printf_error("gfx[%d] with unsupported layout total\n", gfxnum);
+				osd_printf_error("gfx[%d] RAW layouts can only be RGN_FRAC(1,1)\n", gfxnum);
 			if (xscale != 1 || yscale != 1)
-				osd_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
+				osd_printf_error("gfx[%d] RAW layouts do not support xscale/yscale\n", gfxnum);
 		}
 
-		// verify traditional decode doesn't have too many planes
+		// verify traditional decode doesn't have too many planes,
+		// and has extended offset arrays if its width and/or height demand them
 		else
 		{
 			if (layout.planes > MAX_GFX_PLANES)
-				osd_printf_error("gfx[%d] with invalid planes\n", gfxnum);
+				osd_printf_error("gfx[%d] planes > %d\n", gfxnum, MAX_GFX_PLANES);
+			if (layout.width > MAX_GFX_SIZE && layout.extxoffs == NULL)
+				osd_printf_error("gfx[%d] width > %d but missing extended xoffset info\n", gfxnum, MAX_GFX_SIZE);
+			if (layout.height > MAX_GFX_SIZE && layout.extyoffs == NULL)
+				osd_printf_error("gfx[%d] width > %d but missing extended yoffset info\n", gfxnum, MAX_GFX_SIZE);
 		}
 	}
 }

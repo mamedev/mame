@@ -40,7 +40,6 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 // When planeoffset[0] is set to GFX_RAW, the gfx data is left as-is, with no conversion.
 // No buffer is allocated for the decoded data, and gfxdata is set to point to the source
 // data.
-// xoffset[0] is an optional displacement (*8) from the beginning of the source data, while
 // yoffset[0] is the line modulo (*8) and charincrement the char modulo (*8). They are *8
 // for consistency with the usual behaviour, but the bottom 3 bits are not used.
 //

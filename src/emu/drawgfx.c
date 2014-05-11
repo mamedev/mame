@@ -183,20 +183,22 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 	m_layout_is_raw = (gl.planeoffset[0] == GFX_RAW);
 	m_layout_planes = gl.planes;
 	m_layout_charincrement = gl.charincrement;
-	m_layout_planeoffset.resize(m_layout_planes);
-	m_layout_xoffset.resize(m_width);
-	m_layout_yoffset.resize(m_height);
 
 	// raw graphics case
 	if (m_layout_is_raw)
 	{
+		// RAW layouts don't need these arrays
+		m_layout_planeoffset.reset();
+		m_layout_xoffset.reset();
+		m_layout_yoffset.reset();
+		m_gfxdata_allocated.reset();
+
 		// modulos are determined for us by the layout
 		m_line_modulo = gl.yoffs(0) / 8;
 		m_char_modulo = gl.charincrement / 8;
 
 		// RAW graphics must have a pointer up front
 		assert(srcdata != NULL);
-		m_gfxdata_allocated.reset();
 		m_gfxdata = const_cast<UINT8 *>(m_srcdata);
 	}
 
@@ -204,6 +206,10 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 	else
 	{
 		// copy offsets
+		m_layout_planeoffset.resize(m_layout_planes);
+		m_layout_xoffset.resize(m_width);
+		m_layout_yoffset.resize(m_height);
+
 		for (int p = 0; p < m_layout_planes; p++)
 			m_layout_planeoffset[p] = gl.planeoffset[p];
 		for (int y = 0; y < m_height; y++)
