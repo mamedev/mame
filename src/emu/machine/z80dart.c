@@ -22,7 +22,6 @@
 
     TODO:
 
-    - devcb2
     - i8274 DMA scheme
     - break detection
     - wr0 reset tx interrupt pending
