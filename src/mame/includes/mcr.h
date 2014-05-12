@@ -10,7 +10,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "audio/midway.h"
 #include "sound/samples.h"
 
@@ -28,6 +28,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
+		m_sio(*this, "ipu_sio"),
 		m_ssio(*this, "ssio"),
 		m_chip_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
@@ -37,7 +38,9 @@ public:
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sio_txda(0),
+		m_sio_txdb(0) { }
 
 	// these should be required but can't because mcr68 shares with us
 	// once the sound boards are properly device-ified, fix this
@@ -47,6 +50,7 @@ public:
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_paletteram;
 
+	optional_device<z80dart_device> m_sio;
 	optional_device<midway_ssio_device> m_ssio;
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
@@ -118,21 +122,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_coin_in_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_ipu_interrupt);
-	DECLARE_WRITE16_MEMBER(mcr_ipu_sio_transmit);
-	DECLARE_WRITE_LINE_MEMBER(ipu_ctc_interrupt);
-	DECLARE_WRITE8_MEMBER(ipu_break_changed);
+	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
 	void mcr_set_color(int index, int data);
 	void journey_set_color(int index, int data);
 	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
+
+	int m_sio_txda;
+	int m_sio_txdb;
 };
 
 /*----------- defined in machine/mcr.c -----------*/
 
 extern const z80_daisy_config mcr_daisy_chain[];
 extern const z80_daisy_config mcr_ipu_daisy_chain[];
-extern const z80sio_interface nflfoot_sio_intf;
 extern UINT8 mcr_cocktail_flip;
 
 extern const gfx_layout mcr_bg_layout;

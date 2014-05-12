@@ -298,14 +298,6 @@ static UINT8 last_op4;
 static UINT8 dpoker_coin_status;
 static UINT8 dpoker_output;
 
-static UINT8 nflfoot_serial_out_active;
-static UINT8 nflfoot_serial_out_bits;
-static UINT8 nflfoot_serial_out_numbits;
-
-static UINT8 nflfoot_serial_in_active;
-static UINT16 nflfoot_serial_in_bits;
-static UINT8 nflfoot_serial_in_numbits;
-
 
 
 WRITE8_MEMBER(mcr_state::mcr_control_port_w)
@@ -647,30 +639,10 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr_state::mcr_ipu_sio_transmit)
-{
-	logerror("ipu_sio_transmit: %02X\n", data);
-
-	/* create a 10-bit value with a '1','0' sequence for the start bit */
-	nflfoot_serial_in_active = TRUE;
-	nflfoot_serial_in_bits = (data << 2) | 1;
-	nflfoot_serial_in_numbits = 10;
-}
-
-
 READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
-	UINT8 val = 0x80;
-
-	/* we only do this if we have active data */
-	if (nflfoot_serial_in_active)
-	{
-		val = (nflfoot_serial_in_bits & 1) ? 0x00 : 0x80;
-		nflfoot_serial_in_bits >>= 1;
-		if (--nflfoot_serial_in_numbits == 0)
-			nflfoot_serial_in_active = FALSE;
-	}
+	UINT8 val = m_sio_txda << 7;
 
 	if (space.device().safe_pc() != 0x107)
 		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);
@@ -680,42 +652,13 @@ READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 
 WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 {
-	z80sio_device *sio = machine().device<z80sio_device>("ipu_sio");
-
-	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	logerror("%04X:op4_w(%d%d%d)\n", space.device().safe_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
 
-	/* look for a non-zero start bit to go active */
-	if (!nflfoot_serial_out_active && (data & 0x80))
-	{
-		nflfoot_serial_out_active = TRUE;
-		nflfoot_serial_out_bits = 0;
-		nflfoot_serial_out_numbits = 0;
-		logerror(" -- serial active\n");
-	}
-
-	/* accumulate bits as they are written */
-	else if (nflfoot_serial_out_active)
-	{
-		/* if we've accumulated less than 8, just add to the pile */
-		if (nflfoot_serial_out_numbits < 8)
-		{
-			nflfoot_serial_out_bits = (nflfoot_serial_out_bits >> 1) | (~data & 0x80);
-			nflfoot_serial_out_numbits++;
-			logerror(" -- accumulated %d bits\n", nflfoot_serial_out_numbits);
-		}
-
-		/* once we have 8, the final bit is a stop bit, feed it to the SIO */
-		else
-		{
-			logerror(" -- stop bit = %d; final value = %02X\n", (data >> 7) & 1, nflfoot_serial_out_bits);
-			nflfoot_serial_out_active = FALSE;
-			sio->receive_data(0, nflfoot_serial_out_bits);
-		}
-	}
+	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
+	m_sio->rxa_w(!((data >> 7) & 1));
 
 	/* bit 6 = J3-3 on IPU board = CTSA on SIO */
-	sio->set_cts(0, (data >> 6) & 1);
+	m_sio->ctsa_w((data >> 6) & 1);
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
@@ -855,7 +798,7 @@ static ADDRESS_MAP_START( ipu_91695_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio0", z80pio_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_sio", z80sio_device, read, write)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_sio", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio1", z80pio_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(mcr_ipu_laserdisk_w)
@@ -1962,7 +1905,10 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
+	MCFG_Z80SIO0_ADD("ipu_sio", 7372800/2, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(mcr_state, sio_txda_w))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(mcr_state, sio_txdb_w))
 MACHINE_CONFIG_END
 
 
@@ -2929,15 +2875,8 @@ DRIVER_INIT_MEMBER(mcr_state,nflfoot)
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),this));
 
-	nflfoot_serial_out_active = FALSE;
-	nflfoot_serial_in_active = FALSE;
-
-	save_item(NAME(nflfoot_serial_out_active));
-	save_item(NAME(nflfoot_serial_out_bits));
-	save_item(NAME(nflfoot_serial_out_numbits));
-	save_item(NAME(nflfoot_serial_in_active));
-	save_item(NAME(nflfoot_serial_in_bits));
-	save_item(NAME(nflfoot_serial_in_numbits));
+	save_item(NAME(m_sio_txda));
+	save_item(NAME(m_sio_txdb));
 }
 
 
