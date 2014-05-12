@@ -426,8 +426,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 		{
 			if (m_via_0_a & ENV_NMIENABLE)
 			{
-				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); 
-				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				m_maincpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE); 
+				m_maincpu->set_input_line(m6502_device::NMI_LINE, CLEAR_LINE);
 			}
 		}
 	}
