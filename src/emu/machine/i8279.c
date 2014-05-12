@@ -316,6 +316,7 @@ void i8279_device::timer_mainloop()
 							for (addr=0; !BIT(m_scanner, addr); addr++);
 
 						rl ^= 0xff;     // inverted
+						assert(addr >= 0 && addr < ARRAY_LENGTH(m_s_ram));
 						if (m_s_ram[addr] != rl)
 						{
 							m_s_ram[addr] = rl;
@@ -377,6 +378,7 @@ READ8_MEMBER( i8279_device::data_r )
 	if (sensor_mode)
 	{
 	// read sensor ram
+		assert(m_s_ram_ptr >= 0 && m_s_ram_ptr < ARRAY_LENGTH(m_s_ram));
 		data = m_s_ram[m_s_ram_ptr];
 		if (m_autoinc)
 			m_s_ram_ptr++;
