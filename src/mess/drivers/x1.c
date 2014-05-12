@@ -1051,7 +1051,6 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 
 static const wd17xx_interface x1_mb8877a_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1062,7 +1061,6 @@ WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 
 static const wd17xx_interface x1turbo_mb8877a_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

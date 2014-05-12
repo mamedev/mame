@@ -23,10 +23,12 @@
 #define MCFG_WD17XX_DRQ_CALLBACK(_write) \
 	devcb = &wd1770_device::set_drq_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_WD17XX_DDEN_CALLBACK(_write) \
+	devcb = &wd1770_device::set_dden_rd_callback(*device, DEVCB2_##_write);
+
 /* Interface */
 struct wd17xx_interface
 {
-	devcb_read_line in_dden_func;
 	const char *floppy_drive_tags[4];
 };
 
@@ -45,6 +47,7 @@ public:
 
 	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_out_intrq_func.set_callback(object); }
 	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_out_drq_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_in_dden_func.set_callback(object); }
 
 	/* the following are not strictly part of the wd179x hardware/emulation
 	but will be put here for now until the flopdrv code has been finalised more */
@@ -109,9 +112,9 @@ protected:
 
 	// internal state
 	/* callbacks */
-	devcb_resolved_read_line m_in_dden_func;
 	devcb2_write_line m_out_intrq_func;
 	devcb2_write_line m_out_drq_func;
+	devcb2_read_line m_in_dden_func;
 
 	/* input lines */
 	int m_mr;            /* master reset */

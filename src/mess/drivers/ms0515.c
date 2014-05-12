@@ -136,7 +136,6 @@ INPUT_PORTS_END
 
 static const wd17xx_interface ms0515_wd17xx_interface =
 {
-	DEVCB_LINE_VCC,
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
@@ -237,6 +236,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
 	MCFG_FD1793_ADD( "vg93", ms0515_wd17xx_interface )
+	MCFG_WD17XX_DDEN_CALLBACK(VCC)
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ms0515_floppy_interface)
 

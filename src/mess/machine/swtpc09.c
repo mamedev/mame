@@ -248,7 +248,6 @@ void swtpc09_state::swtpc09_irq_handler(UINT8 peripheral, UINT8 state)
 /*  wd1791 fdc interface  */
 const wd17xx_interface swtpc09_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
 };
 

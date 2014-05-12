@@ -187,7 +187,6 @@ static const floppy_interface unixpc_floppy_interface =
 
 static const wd17xx_interface unixpc_wd17xx_intf =
 {
-	DEVCB_NULL,
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
 

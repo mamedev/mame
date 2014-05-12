@@ -253,7 +253,6 @@ WRITE_LINE_MEMBER(svi318_state::svi_fdc_drq_w)
 
 const wd17xx_interface svi_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

@@ -282,6 +282,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_FD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(mbc55x_state, mbc55x_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(mbc55x_state, mbc55x_fdc_drq_w))
+	MCFG_WD17XX_DDEN_CALLBACK(GND)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
 
 	/* Software list */

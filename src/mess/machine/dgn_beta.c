@@ -802,7 +802,6 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_drq_w)
 
 const wd17xx_interface dgnbeta_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

@@ -37,7 +37,6 @@ WRITE_LINE_MEMBER( bml3bus_mp1802_device::bml3_wd17xx_intrq_w )
 
 const wd17xx_interface bml3_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1}
 };
 

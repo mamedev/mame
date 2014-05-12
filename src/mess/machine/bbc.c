@@ -1604,7 +1604,6 @@ WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_drq_w)
 
 const wd17xx_interface bbc_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

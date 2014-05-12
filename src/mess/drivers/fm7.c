@@ -1965,7 +1965,6 @@ void fm7_state::machine_reset()
 
 static const wd17xx_interface fm7_mb8877a_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

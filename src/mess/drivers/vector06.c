@@ -137,7 +137,6 @@ static const floppy_interface vector_floppy_interface =
 
 const wd17xx_interface vector06_wd17xx_interface =
 {
-	DEVCB_LINE_VCC,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -183,6 +182,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
+	MCFG_WD17XX_DDEN_CALLBACK(VCC)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 
 	/* cartridge */

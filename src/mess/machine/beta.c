@@ -95,7 +95,6 @@ WRITE_LINE_MEMBER(beta_disk_device::wd179x_drq_w)
 
 static const wd17xx_interface beta_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

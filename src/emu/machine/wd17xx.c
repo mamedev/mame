@@ -288,12 +288,12 @@ static const UINT8 track_SD[][2] = {
 
 const wd17xx_interface default_wd17xx_interface =
 {
-	DEVCB_NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 const wd17xx_interface default_wd17xx_interface_2_drives =
 {
-	DEVCB_NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 
@@ -1974,13 +1974,15 @@ const device_type WD1770 = &device_creator<wd1770_device>;
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WD1770, "WD1770_LEGACY", tag, owner, clock, "wd1770_l", __FILE__),
 	m_out_intrq_func(*this),
-	m_out_drq_func(*this)
+	m_out_drq_func(*this),
+	m_in_dden_func(*this)
 {
 }
 wd1770_device::wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_out_intrq_func(*this),
-	m_out_drq_func(*this)
+	m_out_drq_func(*this),
+	m_in_dden_func(*this)
 {
 }
 
@@ -2014,7 +2016,7 @@ void wd1770_device::device_start()
 	m_timer_ws = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd1770_device::wd17xx_write_sector_callback),this));
 
 	/* resolve callbacks */
-	m_in_dden_func.resolve(m_intf->in_dden_func, *this);
+	m_in_dden_func.resolve();
 	m_out_intrq_func.resolve_safe();
 	m_out_drq_func.resolve_safe();
 

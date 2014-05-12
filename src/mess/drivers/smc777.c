@@ -1023,7 +1023,6 @@ PALETTE_INIT_MEMBER(smc777_state, smc777)
 
 static const wd17xx_interface smc777_mb8876_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

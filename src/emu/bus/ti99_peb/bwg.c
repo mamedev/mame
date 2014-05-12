@@ -1106,7 +1106,6 @@ void snug_bwg_legacy_device::device_reset()
 
 const wd17xx_interface bwgleg_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, PFLOPPY_3 }
 };
 

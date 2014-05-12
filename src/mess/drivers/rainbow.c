@@ -1196,7 +1196,6 @@ GFXDECODE_END
 // Rainbow Z80 polls only, no IRQ/DRQ are connected
 const wd17xx_interface rainbow_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

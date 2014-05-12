@@ -421,17 +421,6 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
 }
 
 
-#if 0
-static const wd17xx_interface osbexec_wd17xx_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER( "pia1", pia6821_device, cb1_w ),
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-#endif
-
-
 /*
  * The Osborne Executive supports the following disc formats: (TODO: Verify)
  * - Osborne single density: 40 tracks, 10 sectors per track, 256-byte sectors (100 KByte)
@@ -607,6 +596,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
 
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
+	MCFG_WD17XX_INTRQ_CALLBACK(DEVWRITELINE("pia1", pia6821_device, cb1_w))
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osbexec_floppy_interface)
 

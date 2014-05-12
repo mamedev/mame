@@ -440,7 +440,6 @@ const device_type TI99_FDC = &device_creator<ti_fdc_device>;
 
 const wd17xx_interface ti_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
 };
 

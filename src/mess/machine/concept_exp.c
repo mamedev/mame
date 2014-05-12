@@ -198,7 +198,6 @@ WRITE_LINE_MEMBER(concept_fdc_device::drq_w)
 
 const wd17xx_interface concept_wd17xx_interface =
 {
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

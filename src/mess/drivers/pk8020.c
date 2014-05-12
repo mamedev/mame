@@ -157,7 +157,6 @@ static const floppy_interface pk8020_floppy_interface =
 
 static const wd17xx_interface pk8020_wd17xx_interface =
 {
-	DEVCB_LINE_VCC,
 	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
 };
 
@@ -226,6 +225,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_DEVICE_ADD("lan", I8251, 0)
 
 	MCFG_FD1793_ADD("wd1793", pk8020_wd17xx_interface)
+	MCFG_WD17XX_DDEN_CALLBACK(VCC)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
