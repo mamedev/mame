@@ -292,6 +292,11 @@ void mb86233_cpu_device::ALU( UINT32 alu)
 			FLAGSI( GETD().u);
 		break;
 
+		case 0x04:  /* D = D ~ A */
+			GETD().u = ~GETA().u;
+			FLAGSI( GETD().u);
+		break;
+
 		case 0x05:  /* CMP D,A */
 			ftmp = GETD().f - GETA().f;
 			FLAGSF( ftmp);
@@ -1230,7 +1235,17 @@ void mb86233_cpu_device::execute_run()
 						GETARAM()[INDIRECT(r2|(6<<6),0)] = val;
 					}
 					break;
+					case 0x14:
+					{
+						UINT32  offset;
 
+						offset = INDIRECT(r1,1);
+
+						val = GETEXTERNAL( 0, offset);
+						ALU(alu);
+						GETARAM()[r2] = val;
+					}
+					break;
 
 					default:
 						fatalerror( "TGP: Unknown TGP move (op=%02x) at PC:%x\n", op, GETPC());
