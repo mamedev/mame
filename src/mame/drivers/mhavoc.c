@@ -476,20 +476,6 @@ static INPUT_PORTS_START( alphaone )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_config =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW1")
-};
-
-
 /*************************************
  *
  *  Machine drivers
@@ -529,20 +515,20 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	 * ==> DISCRETE emulation, below is just an approximation.
 	 */
 
-	MCFG_POKEY_ADD("pokey1", MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_POKEY_ADD("pokey2", MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_POKEY_ADD("pokey3", MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_POKEY_ADD("pokey4", MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -566,10 +552,10 @@ static MACHINE_CONFIG_DERIVED( alphaone, mhavoc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
-	MCFG_POKEY_REPLACE("pokey1", MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_POKEY_REPLACE("pokey2", MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_REMOVE("pokey3")

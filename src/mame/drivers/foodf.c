@@ -327,22 +327,6 @@ READ8_MEMBER(foodf_state::pot_r)
 	return (ioport("DSW")->read() >> offset) << 7;
 }
 
-static const pokey_interface pokey_config =
-{
-	{
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
-		DEVCB_DRIVER_MEMBER(foodf_state,pot_r)
-	}
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -381,14 +365,21 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK/2/10)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
+	MCFG_POKEY_POT0_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT1_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT2_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT3_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT4_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT5_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT6_R_CB(READ8(foodf_state, pot_r))
+	MCFG_POKEY_POT7_R_CB(READ8(foodf_state, pot_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK/2/10)
+	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/2/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_POKEY_ADD("pokey3", MASTER_CLOCK/2/10)
+	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_CLOCK/2/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

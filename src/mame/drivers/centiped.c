@@ -1685,38 +1685,6 @@ static GFXDECODE_START( warlords )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface milliped_pokey_interface_1 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW1")
-};
-
-
-static const pokey_interface milliped_pokey_interface_2 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW2")
-};
-
-
-static const pokey_interface warlords_pokey_interface =
-{
-	{
-		DEVCB_INPUT_PORT("PADDLE0"),
-		DEVCB_INPUT_PORT("PADDLE1"),
-		DEVCB_INPUT_PORT("PADDLE2"),
-		DEVCB_INPUT_PORT("PADDLE3")
-	}
-};
-
-
 /*************************************
  *
  *  Machine drivers
@@ -1758,7 +1726,7 @@ static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey", 12096000/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(3.3), CAP_U(0.01), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -1826,12 +1794,12 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_milliped)
 
 	/* sound hardware */
-	MCFG_POKEY_REPLACE("pokey", 12096000/8)
-	MCFG_POKEY_CONFIG(milliped_pokey_interface_1)
+	MCFG_SOUND_REPLACE("pokey", POKEY, 12096000/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_POKEY_ADD("pokey2", 12096000/8)
-	MCFG_POKEY_CONFIG(milliped_pokey_interface_2)
+	MCFG_DEVICE_ADD("pokey2", POKEY, 12096000/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1864,8 +1832,11 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped )
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_warlords)
 
 	/* sound hardware */
-	MCFG_POKEY_REPLACE("pokey", 12096000/8)
-	MCFG_POKEY_CONFIG(warlords_pokey_interface)
+	MCFG_SOUND_REPLACE("pokey", POKEY, 12096000/8)
+	MCFG_POKEY_POT0_R_CB(IOPORT("PADDLE0"))
+	MCFG_POKEY_POT1_R_CB(IOPORT("PADDLE1"))
+	MCFG_POKEY_POT2_R_CB(IOPORT("PADDLE2"))
+	MCFG_POKEY_POT3_R_CB(IOPORT("PADDLE3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

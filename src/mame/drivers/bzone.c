@@ -523,22 +523,6 @@ static INPUT_PORTS_START( bradley )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-
-static const pokey_interface redbaron_pokey_interface =
-{
-	{ DEVCB_NULL },
-	DEVCB_DRIVER_MEMBER(bzone_state,redbaron_joy_r)
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -596,8 +580,8 @@ static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey", 1500000)
-	MCFG_POKEY_CONFIG(redbaron_pokey_interface)
+	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
+	MCFG_POKEY_ALLPOT_R_CB(READ8(bzone_state, redbaron_joy_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("custom", REDBARON, 0)

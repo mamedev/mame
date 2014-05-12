@@ -383,12 +383,6 @@ static DISCRETE_SOUND_START(bzone)
 
 DISCRETE_SOUND_END
 
-static const pokey_interface bzone_pokey_interface =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("IN3")
-};
-
 WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 {
 	m_discrete->write(space, BZ_INPUT, data);
@@ -402,8 +396,8 @@ MACHINE_CONFIG_FRAGMENT( bzone_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey", BZONE_MASTER_CLOCK / 8)
-	MCFG_POKEY_CONFIG(bzone_pokey_interface)
+	MCFG_SOUND_ADD("pokey", POKEY, BZONE_MASTER_CLOCK / 8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN3"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 

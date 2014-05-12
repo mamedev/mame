@@ -393,21 +393,6 @@ static GFXDECODE_START( cloud9 )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_config =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW"),
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -439,11 +424,11 @@ static MACHINE_CONFIG_START( cloud9, cloud9_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK/8)
+	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK/8)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

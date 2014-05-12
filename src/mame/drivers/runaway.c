@@ -323,27 +323,6 @@ static GFXDECODE_START( qwak )
 GFXDECODE_END
 
 
-static const pokey_interface pokey_interface_1 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("6008")
-};
-
-static const pokey_interface pokey_interface_2 =
-{
-	{
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
-		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r)
-	}
-};
-
-
 static MACHINE_CONFIG_START( runaway, runaway_state )
 
 	/* basic machine hardware */
@@ -368,12 +347,19 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey1", 12096000 / 8)
-	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ADD("pokey1", POKEY, 12096000 / 8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("6008"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_POKEY_ADD("pokey2", 12096000 / 8)
-	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ADD("pokey2", POKEY, 12096000 / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT1_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT2_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT3_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT4_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT5_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT6_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT7_R_CB(READ8(runaway_state, runaway_pot_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

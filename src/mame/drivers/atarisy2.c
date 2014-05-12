@@ -1190,27 +1190,6 @@ static GFXDECODE_START( atarisy2 )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const pokey_interface pokey_interface_1 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW0")
-};
-
-static const pokey_interface pokey_interface_2 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW1")
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -1259,12 +1238,12 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_POKEY_ADD("pokey1", SOUND_CLOCK/8)
-	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ADD("pokey1", POKEY, SOUND_CLOCK/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.35)
 
-	MCFG_POKEY_ADD("pokey2", SOUND_CLOCK/8)
-	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ADD("pokey2", POKEY, SOUND_CLOCK/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.35)
 
 	MCFG_SOUND_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)

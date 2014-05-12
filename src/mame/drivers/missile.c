@@ -1004,21 +1004,6 @@ static INPUT_PORTS_START( suprmatk )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_config =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("R8")
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -1044,8 +1029,8 @@ static MACHINE_CONFIG_START( missile, missile_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey", MASTER_CLOCK/8)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("R8"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.1), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

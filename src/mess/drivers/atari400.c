@@ -2391,24 +2391,6 @@ WRITE8_MEMBER(a400_state::xegs_pia_pb_w)
 		xegs_mmu(data);
 }
 
-static const pokey_interface atari_pokey_interface =
-{
-	{
-		DEVCB_INPUT_PORT("analog_0"),
-		DEVCB_INPUT_PORT("analog_1"),
-		DEVCB_INPUT_PORT("analog_2"),
-		DEVCB_INPUT_PORT("analog_3"),
-		DEVCB_INPUT_PORT("analog_4"),
-		DEVCB_INPUT_PORT("analog_5"),
-		DEVCB_INPUT_PORT("analog_6"),
-		DEVCB_INPUT_PORT("analog_7")
-	},
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("fdc", atari_fdc_device, serin_r),
-	DEVCB_DEVICE_MEMBER("fdc", atari_fdc_device, serout_w)
-};
-
-
 /**************************************************************
  *
  * PIA interface
@@ -2424,24 +2406,6 @@ READ8_MEMBER(a400_state::atari_pia_pb_r)
 {
 	return ioport("djoy_2_3")->read_safe(0);
 }
-
-// FIXME: should there be anything connected where other system have the fdc?
-static const pokey_interface a5200_pokey_interface =
-{
-	{
-		DEVCB_INPUT_PORT("analog_0"),
-		DEVCB_INPUT_PORT("analog_1"),
-		DEVCB_INPUT_PORT("analog_2"),
-		DEVCB_INPUT_PORT("analog_3"),
-		DEVCB_INPUT_PORT("analog_4"),
-		DEVCB_INPUT_PORT("analog_5"),
-		DEVCB_INPUT_PORT("analog_6"),
-		DEVCB_INPUT_PORT("analog_7")
-	},
-	DEVCB_NULL,
-	DEVCB_NULL, // FIXME: is there anything connected here?
-	DEVCB_NULL  // FIXME: is there anything connected here?
-};
 
 /**************************************************************
  *
@@ -2495,8 +2459,17 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)
-	MCFG_POKEY_CONFIG(atari_pokey_interface)
+	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
+	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
+	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
+	MCFG_POKEY_POT3_R_CB(IOPORT("analog_3"))
+	MCFG_POKEY_POT4_R_CB(IOPORT("analog_4"))
+	MCFG_POKEY_POT5_R_CB(IOPORT("analog_5"))
+	MCFG_POKEY_POT6_R_CB(IOPORT("analog_6"))
+	MCFG_POKEY_POT7_R_CB(IOPORT("analog_7"))
+	MCFG_POKEY_SERIN_R_CB(DEVREAD8("fdc", atari_fdc_device, serin_r))
+	MCFG_POKEY_SEROUT_W_CB(DEVWRITE8("fdc", atari_fdc_device, serout_w))
 	MCFG_POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
 
@@ -2691,9 +2664,10 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a5200_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_REMOVE("pokey")
-	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)
-	MCFG_POKEY_CONFIG(a5200_pokey_interface)
+	// FIXME: should there be anything connected where other system have the fdc?
+	MCFG_SOUND_MODIFY("pokey")
+	MCFG_POKEY_SERIN_R_CB(NULL)
+	MCFG_POKEY_SEROUT_W_CB(NULL)
 	MCFG_POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
 

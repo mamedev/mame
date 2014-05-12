@@ -607,21 +607,6 @@ static INPUT_PORTS_START( llander1 )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_config =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW2")
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -675,8 +660,8 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
 	MCFG_SOUND_CONFIG_DISCRETE(astdelux)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_POKEY_ADD("pokey", MASTER_CLOCK/8)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

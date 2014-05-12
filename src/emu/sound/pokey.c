@@ -185,40 +185,24 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
-		pokey_interface(),
 		m_kbd_r(NULL),
 		m_irq_f(NULL),
 		m_output_type(LEGACY_LINEAR),
 		m_icount(0),
-		m_stream(NULL)
+		m_stream(NULL),
+		m_pot0_r_cb(*this),
+		m_pot1_r_cb(*this),
+		m_pot2_r_cb(*this),
+		m_pot3_r_cb(*this),
+		m_pot4_r_cb(*this),
+		m_pot5_r_cb(*this),
+		m_pot6_r_cb(*this),
+		m_pot7_r_cb(*this),
+		m_allpot_r_cb(*this),
+		m_serin_r_cb(*this),
+		m_serout_w_cb(*this)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pokey_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pokey_interface *intf = reinterpret_cast<const pokey_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<pokey_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_allpot_r_cb, 0, sizeof(m_allpot_r_cb));
-		memset(&m_pot_r_cb, 0, sizeof(m_pot_r_cb));
-		memset(&m_serin_r_cb, 0, sizeof(m_serin_r_cb));
-		memset(&m_serout_w_cb, 0, sizeof(m_serout_w_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -288,13 +272,20 @@ void pokey_device::device_start()
 
 	for (i=0; i<8; i++)
 	{
-		m_pot_r[i].resolve(m_pot_r_cb[i], *this);
 		m_POTx[i] = 0;
 	}
-
-	m_allpot_r.resolve(m_allpot_r_cb, *this);
-	m_serin_r.resolve(m_serin_r_cb, *this);
-	m_serout_w.resolve(m_serout_w_cb, *this);
+	
+	m_pot0_r_cb.resolve();
+	m_pot1_r_cb.resolve();
+	m_pot2_r_cb.resolve();
+	m_pot3_r_cb.resolve();
+	m_pot4_r_cb.resolve();
+	m_pot5_r_cb.resolve();
+	m_pot6_r_cb.resolve();
+	m_pot7_r_cb.resolve();
+	m_allpot_r_cb.resolve();
+	m_serin_r_cb.resolve();
+	m_serout_w_cb.resolve_safe();
 
 	m_stream = stream_alloc(0, 1, clock());
 
@@ -844,9 +835,9 @@ UINT8 pokey_device::read(offs_t offset)
 			data = 0;
 			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", tag(), data));
 		}
-		else if( !m_allpot_r.isnull() )
+		else if( !m_allpot_r_cb.isnull() )
 		{
-			data = m_allpot_r(offset);
+			data = m_allpot_r_cb(offset);
 			LOG(("%s: POKEY '%s' ALLPOT callback $%02x\n", machine().describe_context(), tag(), data));
 		}
 		else
@@ -874,8 +865,8 @@ UINT8 pokey_device::read(offs_t offset)
 		break;
 
 	case SERIN_C:
-		if( !m_serin_r.isnull() )
-			m_SERIN = m_serin_r(offset);
+		if( !m_serin_r_cb.isnull() )
+			m_SERIN = m_serin_r_cb(offset);
 		data = m_SERIN;
 		LOG(("POKEY '%s' SERIN  $%02x\n", tag(), data));
 		break;
@@ -1000,7 +991,7 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
 
 	case SEROUT_C:
 		LOG(("POKEY '%s' SEROUT $%02x\n", tag(), data));
-		m_serout_w(offset, data);
+		m_serout_w_cb(offset, data);
 		m_SKSTAT |= SK_SEROUT;
 		/*
 		 * These are arbitrary values, tested with some custom boot
@@ -1100,25 +1091,184 @@ void pokey_device::pokey_potgo(void)
 	for( pot = 0; pot < 8; pot++ )
 	{
 		m_POTx[pot] = 228;
-		if( !m_pot_r[pot].isnull() )
+		switch (pot)
 		{
-			int r = m_pot_r[pot](pot);
+			case 0:
+				if( !m_pot0_r_cb.isnull() )
+				{
+					int r = m_pot0_r_cb(pot);
 
-			LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-			if (r >= 228)
-			{
-				r = 228;
-			}
-			if (r == 0)
-			{
-				/* immediately set the ready - bit of m_ALLPOT
-				 * In this case, most likely no capacitor is connected
-				 */
-				m_ALLPOT |= (1<<pot);
-			}
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
 
-			/* final value */
-			m_POTx[pot] = r;
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 1:
+				if( !m_pot1_r_cb.isnull() )
+				{
+					int r = m_pot1_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 2:
+				if( !m_pot2_r_cb.isnull() )
+				{
+					int r = m_pot2_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 3:
+				if( !m_pot3_r_cb.isnull() )
+				{
+					int r = m_pot3_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 4:
+				if( !m_pot4_r_cb.isnull() )
+				{
+					int r = m_pot4_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 5:
+				if( !m_pot5_r_cb.isnull() )
+				{
+					int r = m_pot5_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 6:
+				if( !m_pot6_r_cb.isnull() )
+				{
+					int r = m_pot6_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
+			case 7:
+				if( !m_pot7_r_cb.isnull() )
+				{
+					int r = m_pot7_r_cb(pot);
+
+					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+					if (r >= 228)
+					{
+						r = 228;
+					}
+					if (r == 0)
+					{
+						/* immediately set the ready - bit of m_ALLPOT
+						 * In this case, most likely no capacitor is connected
+						 */
+						m_ALLPOT |= (1<<pot);
+					}
+
+					/* final value */
+					m_POTx[pot] = r;
+				}
+				break;
 		}
 	}
 }

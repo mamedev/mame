@@ -757,7 +757,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_POKEY_ADD("pokey", ATARI_CLOCK_14MHz/8)
+	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 

@@ -374,12 +374,6 @@ static INPUT_PORTS_START( a600xl )
 INPUT_PORTS_END
 
 
-static const pokey_interface pokey_config = {
-	{ DEVCB_NULL },
-	DEVCB_NULL,
-	DEVCB_NULL,DEVCB_NULL,
-};
-
 READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pa_r)
 {
 	return atari_input_disabled() ? 0xFF : ioport("djoy_0_1")->read_safe(0);
@@ -429,8 +423,7 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.0), 5.0)
 

@@ -577,43 +577,6 @@ static INPUT_PORTS_START( tempest )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_interface_1 =
-{
-	{
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r)
-	}
-};
-
-static const pokey_interface pokey_interface_2 =
-{
-	{
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
-		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r)
-	}
-};
-
-
-
 /*************************************
  *
  *  Machine drivers
@@ -648,14 +611,28 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK / 8)
-	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT1_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT2_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT3_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT4_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT5_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT6_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT7_R_CB(READ8(tempest_state, input_port_1_bit_r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK / 8)
-	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT1_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT2_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT3_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT4_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT5_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT6_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT7_R_CB(READ8(tempest_state, input_port_2_bit_r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

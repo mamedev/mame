@@ -202,41 +202,6 @@ static INPUT_PORTS_START( quantum )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const pokey_interface pokey_interface_1 =
-{
-	{
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r)
-	}
-};
-
-static const pokey_interface pokey_interface_2 =
-{
-	{
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
-		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r)
-	}
-};
-
 /*************************************
  *
  *  Discrete Sound Blocks
@@ -314,13 +279,27 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey1", 600000)
-	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ADD("pokey1", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT1_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT2_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT3_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT4_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT5_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT6_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_POKEY_POT7_R_CB(READ8(quantum_state, input_1_r))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 
-	MCFG_POKEY_ADD("pokey2", 600000)
-	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ADD("pokey2", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT1_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT2_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT3_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT4_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT5_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT6_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_POKEY_POT7_R_CB(READ8(quantum_state, input_2_r))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 1)
 

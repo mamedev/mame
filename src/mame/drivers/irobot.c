@@ -289,21 +289,6 @@ static GFXDECODE_START( irobot )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_config =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW2")
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -340,17 +325,17 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	/* FIXME: I-Robot has all channels of the quad-pokey tied together
 	 *        This needs to be taken into account in the design.
 	 */
-	MCFG_POKEY_ADD("pokey1", MAIN_CLOCK/8)
-	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ADD("pokey1", POKEY, MAIN_CLOCK/8)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_POKEY_ADD("pokey2", MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey2", POKEY, MAIN_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_POKEY_ADD("pokey3", MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey3", POKEY, MAIN_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_POKEY_ADD("pokey4", MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey4", POKEY, MAIN_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

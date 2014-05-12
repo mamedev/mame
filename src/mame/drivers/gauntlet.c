@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
 
-	MCFG_POKEY_ADD("pokey", ATARI_CLOCK_14MHz/8)
+	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.32)
 

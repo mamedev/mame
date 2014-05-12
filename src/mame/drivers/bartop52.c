@@ -100,23 +100,6 @@ static INPUT_PORTS_START(bartop52)
 INPUT_PORTS_END
 
 
-static const pokey_interface atari_pokey_interface =
-{
-	{
-		DEVCB_INPUT_PORT("analog_0"),
-		DEVCB_INPUT_PORT("analog_1"),
-		DEVCB_INPUT_PORT("analog_2"),
-		DEVCB_INPUT_PORT("analog_3"),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-	},
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 static MACHINE_CONFIG_START( a5200, bartop52_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
@@ -138,8 +121,11 @@ static MACHINE_CONFIG_START( a5200, bartop52_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)
-	MCFG_POKEY_CONFIG(atari_pokey_interface)
+	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
+	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
+	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
+	MCFG_POKEY_POT3_R_CB(IOPORT("analog_3"))
 	MCFG_POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
 

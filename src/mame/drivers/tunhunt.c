@@ -258,34 +258,6 @@ static GFXDECODE_START( tunhunt )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_interface_1 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW")
-};
-
-static const pokey_interface pokey_interface_2 =
-{
-	{
-		DEVCB_INPUT_PORT("IN1"),
-		DEVCB_INPUT_PORT("IN2"),
-		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_0r),
-		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_1r),
-		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_2r),
-		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_3r),
-		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_4r)
-	}
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -316,13 +288,19 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_POKEY_ADD("pokey1", XTAL_12_096MHz/10)
-	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ADD("pokey1", POKEY, XTAL_12_096MHz/10)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_POKEY_ADD("pokey2", XTAL_12_096MHz/10)
-	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ADD("pokey2", POKEY, XTAL_12_096MHz/10)
+	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
+	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
+	MCFG_POKEY_POT2_R_CB(READ8(tunhunt_state, dsw2_0r))
+	MCFG_POKEY_POT3_R_CB(READ8(tunhunt_state, dsw2_1r))
+	MCFG_POKEY_POT4_R_CB(READ8(tunhunt_state, dsw2_2r))
+	MCFG_POKEY_POT5_R_CB(READ8(tunhunt_state, dsw2_3r))
+	MCFG_POKEY_POT6_R_CB(READ8(tunhunt_state, dsw2_4r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
