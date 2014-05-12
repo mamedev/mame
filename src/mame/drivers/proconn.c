@@ -26,7 +26,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "sound/ay8910.h"
 #include "video/awpvid.h"
 #include "machine/roc10937.h"
@@ -61,10 +61,10 @@ public:
 	DECLARE_WRITE8_MEMBER( ctc_w2 ) { m_z80ctc->write(space, 2, data); }
 	DECLARE_WRITE8_MEMBER( ctc_w3 ) { m_z80ctc->write(space, 3, data); }
 
-	DECLARE_WRITE8_MEMBER( sio_w0 ) { m_z80sio->write(space, 0, data); }
-	DECLARE_WRITE8_MEMBER( sio_w1 ) { m_z80sio->write(space, 1, data); }
-	DECLARE_WRITE8_MEMBER( sio_w2 ) { m_z80sio->write(space, 2, data); }
-	DECLARE_WRITE8_MEMBER( sio_w3 ) { m_z80sio->write(space, 3, data); }
+	DECLARE_WRITE8_MEMBER( sio_w0 ) { m_z80sio->cd_ba_w(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( sio_w1 ) { m_z80sio->cd_ba_w(space, 1, data); }
+	DECLARE_WRITE8_MEMBER( sio_w2 ) { m_z80sio->cd_ba_w(space, 2, data); }
+	DECLARE_WRITE8_MEMBER( sio_w3 ) { m_z80sio->cd_ba_w(space, 3, data); }
 
 	DECLARE_WRITE8_MEMBER( pio1_w0 ) { m_z80pio_1->write(space, 0, data); }
 	DECLARE_WRITE8_MEMBER( pio1_w1 ) { m_z80pio_1->write(space, 1, data); }
@@ -98,10 +98,10 @@ public:
 	DECLARE_READ8_MEMBER( ctc_r2 ) { return m_z80ctc->read(space, 2); }
 	DECLARE_READ8_MEMBER( ctc_r3 ) { return m_z80ctc->read(space, 3); }
 
-	DECLARE_READ8_MEMBER( sio_r0 ) { return m_z80sio->read(space, 0); }
-	DECLARE_READ8_MEMBER( sio_r1 ) { return m_z80sio->read(space, 1); }
-	DECLARE_READ8_MEMBER( sio_r2 ) { return m_z80sio->read(space, 2); }
-	DECLARE_READ8_MEMBER( sio_r3 ) { return m_z80sio->read(space, 3); }
+	DECLARE_READ8_MEMBER( sio_r0 ) { return m_z80sio->cd_ba_r(space, 0); }
+	DECLARE_READ8_MEMBER( sio_r1 ) { return m_z80sio->cd_ba_r(space, 1); }
+	DECLARE_READ8_MEMBER( sio_r2 ) { return m_z80sio->cd_ba_r(space, 2); }
+	DECLARE_READ8_MEMBER( sio_r3 ) { return m_z80sio->cd_ba_r(space, 3); }
 
 	DECLARE_READ8_MEMBER( pio1_r0 ) { return m_z80pio_1->read(space, 0); }
 	DECLARE_READ8_MEMBER( pio1_r1 ) { return m_z80pio_1->read(space, 1); }
@@ -184,7 +184,7 @@ protected:
 	required_device<z80pio_device> m_z80pio_4;
 	required_device<z80pio_device> m_z80pio_5;
 	required_device<z80ctc_device> m_z80ctc;
-	required_device<z80sio_device> m_z80sio;
+	required_device<z80dart_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
 public:
 	int m_meter;
@@ -263,7 +263,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( proconn )
 INPUT_PORTS_END
 
-
 WRITE16_MEMBER(proconn_state::serial_transmit)
 {
 //Don't like the look of this, should be a clock somewhere
@@ -286,17 +285,6 @@ READ16_MEMBER(proconn_state::serial_receive)
 	logerror("proconn serial receive read %x",offset);
 	return -1;
 }
-
-
-static const z80sio_interface sio_intf =
-{
-	DEVCB_NULL,                 /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(proconn_state,serial_transmit),   /* transmit handler */
-	DEVCB_DRIVER_MEMBER16(proconn_state,serial_receive)     /* receive handler */
-};
 
 WRITE8_MEMBER(proconn_state::meter_w)
 {
@@ -378,7 +366,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO_ADD( "z80sio",   4000000, sio_intf ) /* ?? Mhz */
+	MCFG_Z80SIO0_ADD( "z80sio",   4000000, NULL, NULL, NULL, NULL ) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
