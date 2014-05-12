@@ -57,6 +57,10 @@ public:
 	DECLARE_READ8_MEMBER( psg_porta_read );
 	DECLARE_WRITE8_MEMBER( psg_porta_write );
 
+	/* fdc */
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
 	static const wd17xx_interface fdc_interface;
 
 protected:
@@ -73,10 +77,6 @@ protected:
 
 private:
 	UINT8 m_just_reset;
-
-	/* fdc */
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	/* modem */
 	UINT8 modem_r(offs_t offset);

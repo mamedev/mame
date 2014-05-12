@@ -392,8 +392,6 @@ DISCRETE_SOUND_END
 const wd17xx_interface hector_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,// treatment for intrq line
-	DEVCB_NULL,// treatment for drq line
 	{FLOPPY_0, NULL, NULL, NULL}        // Only one floppy on the minidisc
 };
 

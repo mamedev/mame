@@ -39,8 +39,6 @@ static int instruction_hook(device_t &device, offs_t curpc);
 const wd17xx_interface mbc55x_wd17xx_interface =
 {
 	DEVCB_LINE_GND,
-	DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, mbc55x_fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, mbc55x_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

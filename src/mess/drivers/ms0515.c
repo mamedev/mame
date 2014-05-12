@@ -137,8 +137,6 @@ INPUT_PORTS_END
 static const wd17xx_interface ms0515_wd17xx_interface =
 {
 	DEVCB_LINE_VCC,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
 

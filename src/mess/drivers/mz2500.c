@@ -1202,8 +1202,6 @@ WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 static const wd17xx_interface mz2500_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

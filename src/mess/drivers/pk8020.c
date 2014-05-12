@@ -158,8 +158,6 @@ static const floppy_interface pk8020_floppy_interface =
 static const wd17xx_interface pk8020_wd17xx_interface =
 {
 	DEVCB_LINE_VCC,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
 };
 

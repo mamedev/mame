@@ -194,8 +194,6 @@ static const floppy_interface jupiter_floppy_interface =
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 

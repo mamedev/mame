@@ -138,8 +138,6 @@ static const floppy_interface vector_floppy_interface =
 const wd17xx_interface vector06_wd17xx_interface =
 {
 	DEVCB_LINE_VCC,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

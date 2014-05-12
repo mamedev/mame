@@ -1052,8 +1052,6 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 static const wd17xx_interface x1_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1065,8 +1063,6 @@ WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 static const wd17xx_interface x1turbo_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(x1_state,fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -2545,6 +2541,7 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
 	MCFG_DEVICE_REMOVE("fdc")
 	MCFG_MB8877_ADD("fdc",x1turbo_mb8877a_interface)
+    MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(x1_state,fdc_drq_w))
 
 	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)

@@ -324,6 +324,8 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_CASSETTE_INTERFACE("svi318_cass")
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(svi318_state,svi_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(svi318_state,svi_fdc_drq_w))
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 

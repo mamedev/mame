@@ -40,8 +40,6 @@ WRITE_LINE_MEMBER(nascom1_state::nascom2_fdc_drq_w)
 const wd17xx_interface nascom2_wd17xx_interface =
 {
 	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(nascom1_state,nascom2_fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(nascom1_state,nascom2_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

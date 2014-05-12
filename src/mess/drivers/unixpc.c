@@ -188,8 +188,6 @@ static const floppy_interface unixpc_floppy_interface =
 static const wd17xx_interface unixpc_wd17xx_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(unixpc_state, wd2797_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(unixpc_state, wd2797_drq_w),
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
@@ -216,6 +214,8 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 
 	// floppy
 	MCFG_WD2797_ADD("wd2797", unixpc_wd17xx_intf)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_interface)
 MACHINE_CONFIG_END
 

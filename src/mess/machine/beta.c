@@ -96,8 +96,6 @@ WRITE_LINE_MEMBER(beta_disk_device::wd179x_drq_w)
 static const wd17xx_interface beta_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, beta_disk_device, wd179x_intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, beta_disk_device, wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -201,6 +199,8 @@ static const floppy_interface beta_floppy_interface =
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
 	MCFG_WD2793_ADD("wd179x", beta_wd17xx_interface ) // KR1818VG93 clone of WD1793
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(beta_disk_device, wd179x_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(beta_disk_device, wd179x_drq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)
 MACHINE_CONFIG_END
 

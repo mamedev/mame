@@ -645,8 +645,6 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
 static const wd17xx_interface z207_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

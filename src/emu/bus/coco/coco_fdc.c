@@ -149,13 +149,13 @@ WRITE_LINE_MEMBER( coco_fdc_device::fdc_drq_w )
 static const wd17xx_interface coco_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_fdc_device, fdc_intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_fdc_device, fdc_drq_w),
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 	MCFG_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(coco_fdc_device, fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(coco_fdc_device, fdc_drq_w))
 	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL_32_768kHz)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
 

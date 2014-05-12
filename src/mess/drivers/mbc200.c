@@ -178,8 +178,6 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 static const wd17xx_interface mbc200_mb8876_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 static const floppy_interface mbc200_floppy_interface =

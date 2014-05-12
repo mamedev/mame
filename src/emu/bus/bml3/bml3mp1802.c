@@ -38,8 +38,6 @@ WRITE_LINE_MEMBER( bml3bus_mp1802_device::bml3_wd17xx_intrq_w )
 const wd17xx_interface bml3_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, bml3bus_mp1802_device, bml3_wd17xx_intrq_w),
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1}
 };
 
@@ -54,6 +52,7 @@ ROM_END
 
 MACHINE_CONFIG_FRAGMENT( mp1802 )
 	MCFG_MB8866_ADD("wd17xx", bml3_wd17xx_interface )
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(bml3bus_mp1802_device, bml3_wd17xx_intrq_w))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bml3_mp1802_floppy_interface)
 MACHINE_CONFIG_END
 

@@ -779,8 +779,6 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
 static const wd17xx_interface mz2000_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

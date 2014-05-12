@@ -288,12 +288,12 @@ static const UINT8 track_SD[][2] = {
 
 const wd17xx_interface default_wd17xx_interface =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+	DEVCB_NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 const wd17xx_interface default_wd17xx_interface_2_drives =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL}
+	DEVCB_NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 
@@ -1972,11 +1972,15 @@ wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, dev
 const device_type WD1770 = &device_creator<wd1770_device>;
 
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WD1770, "WD1770_LEGACY", tag, owner, clock, "wd1770_l", __FILE__)
+	: device_t(mconfig, WD1770, "WD1770_LEGACY", tag, owner, clock, "wd1770_l", __FILE__),
+	m_out_intrq_func(*this),
+	m_out_drq_func(*this)
 {
 }
 wd1770_device::wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_out_intrq_func(*this),
+	m_out_drq_func(*this)
 {
 }
 
@@ -2011,8 +2015,8 @@ void wd1770_device::device_start()
 
 	/* resolve callbacks */
 	m_in_dden_func.resolve(m_intf->in_dden_func, *this);
-	m_out_intrq_func.resolve(m_intf->out_intrq_func, *this);
-	m_out_drq_func.resolve(m_intf->out_drq_func, *this);
+	m_out_intrq_func.resolve_safe();
+	m_out_drq_func.resolve_safe();
 
 	/* stepping rate depends on the clock */
 	m_stepping_rate[0] = 6;

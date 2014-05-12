@@ -441,8 +441,6 @@ const device_type TI99_FDC = &device_creator<ti_fdc_device>;
 const wd17xx_interface ti_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_fdc_legacy_device, intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_fdc_legacy_device, drq_w),
 	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
 };
 
@@ -724,6 +722,8 @@ void ti_fdc_legacy_device::device_reset(void)
 
 MACHINE_CONFIG_FRAGMENT( ti_fdc_legacy )
 	MCFG_FD1771_ADD(FDCLEG_TAG, ti_wd17xx_interface )
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(ti_fdc_legacy_device, intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(ti_fdc_legacy_device, drq_w))
 MACHINE_CONFIG_END
 
 ROM_START( ti_fdc_legacy )

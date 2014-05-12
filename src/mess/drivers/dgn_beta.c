@@ -365,6 +365,8 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_b))
 
 	MCFG_WD2797_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(dgn_beta_state,dgnbeta_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(dgn_beta_state,dgnbeta_fdc_drq_w))
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_interface)
 

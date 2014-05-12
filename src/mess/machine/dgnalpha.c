@@ -382,7 +382,5 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_drq_w )
 const wd17xx_interface dragon_alpha_state::fdc_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };

@@ -249,8 +249,6 @@ void swtpc09_state::swtpc09_irq_handler(UINT8 peripheral, UINT8 state)
 const wd17xx_interface swtpc09_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(swtpc09_state, fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(swtpc09_state, fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
 };
 

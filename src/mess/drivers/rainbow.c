@@ -1197,8 +1197,6 @@ GFXDECODE_END
 const wd17xx_interface rainbow_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

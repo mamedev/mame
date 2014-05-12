@@ -433,8 +433,6 @@ WRITE_LINE_MEMBER(cgenie_state::cgenie_fdc_intrq_w)
 const wd17xx_interface cgenie_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(cgenie_state,cgenie_fdc_intrq_w),
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

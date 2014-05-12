@@ -170,6 +170,8 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
 	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
 

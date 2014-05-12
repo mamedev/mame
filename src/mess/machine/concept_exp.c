@@ -199,8 +199,6 @@ WRITE_LINE_MEMBER(concept_fdc_device::drq_w)
 const wd17xx_interface concept_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, concept_fdc_device, intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, concept_fdc_device, drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -324,6 +322,8 @@ static const floppy_interface concept_floppy_interface =
 
 static MACHINE_CONFIG_FRAGMENT( fdc )
 	MCFG_FD1793_ADD("wd179x", concept_wd17xx_interface )
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(concept_fdc_device, intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(concept_fdc_device, drq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(concept_floppy_interface)
 MACHINE_CONFIG_END
 

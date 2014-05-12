@@ -953,8 +953,6 @@ static const floppy_interface ql_floppy_interface =
 wd17xx_interface ql_wd17xx_interface =
 {
 	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_dden_r),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1123,6 +1121,8 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
 
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(ql_state,disk_io_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(ql_state,disk_io_drq_w))
 	MCFG_MICRODRIVE_ADD(MDV_1)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)

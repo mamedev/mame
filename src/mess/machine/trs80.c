@@ -683,8 +683,6 @@ WRITE_LINE_MEMBER(trs80_state::trs80_fdc_intrq_w)
 const wd17xx_interface trs80_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(trs80_state,trs80_fdc_intrq_w),
-	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

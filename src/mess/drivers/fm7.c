@@ -1966,8 +1966,6 @@ void fm7_state::machine_reset()
 static const wd17xx_interface fm7_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(fm7_state,fm7_fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(fm7_state,fm7_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -2018,6 +2016,8 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_drq_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
