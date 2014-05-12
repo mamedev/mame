@@ -250,10 +250,6 @@ WRITE8_MEMBER( luxor_55_21046_device::io_write_byte )
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 FLOPPY_FORMATS_MEMBER( luxor_55_21046_device::floppy_formats )
 	FLOPPY_ABC800_FORMAT
 FLOPPY_FORMATS_END

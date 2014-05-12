@@ -928,10 +928,6 @@ WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
 	m_centronics->write_strobe(!state);
 }
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 static SLOT_INTERFACE_START( bullet_525_floppies )
 	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )

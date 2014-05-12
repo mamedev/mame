@@ -169,11 +169,6 @@ WRITE_LINE_MEMBER( e01_device::clk_en_w )
 	m_clk_en = state;
 }
 
-
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 static SLOT_INTERFACE_START( e01_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // NEC FD1036 A
 SLOT_INTERFACE_END

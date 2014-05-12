@@ -396,10 +396,6 @@ INPUT_PORTS_END
 
 */
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 static SLOT_INTERFACE_START( fp_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Sony OA-D32W (600 rpm)
 SLOT_INTERFACE_END

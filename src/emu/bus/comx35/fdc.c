@@ -83,10 +83,6 @@ const rom_entry *comx_fd_device::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 FLOPPY_FORMATS_MEMBER( comx_fd_device::floppy_formats )
 	FLOPPY_COMX35_FORMAT
 FLOPPY_FORMATS_END

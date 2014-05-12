@@ -296,11 +296,6 @@ static const z80_daisy_config daisy_chain[] =
 	{ NULL }
 };
 
-
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
 	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )

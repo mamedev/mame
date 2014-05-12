@@ -738,11 +738,6 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 	m_nvram->sk_w(clock);
 }
 
-
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 static SLOT_INTERFACE_START( abc1600_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END

@@ -287,11 +287,6 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 	output_set_led_value(LED_ERR, BIT(data, 5));
 }
 
-
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 static SLOT_INTERFACE_START( c8280_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
