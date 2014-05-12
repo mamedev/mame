@@ -10,8 +10,10 @@
 
   Notes:
 
+  - There are at least 3 different PCBs: Rolla, Sky and Cleco.
+
   - Some of the tiles look badly scaled down, and others appear to have columns swapped.
-    This might actually be correct.
+    This might actually be correct due to different gfx encoding for different PCBs.
 
   - Skylncr and madzoo can run with the same program roms, they're basically graphics swaps.
 
@@ -599,6 +601,25 @@ static const gfx_layout layout8x32x8_alt =  /* for sstar97 */
 	8*32*8/2
 };
 
+static const gfx_layout layout8x32x8_alt2 =  /* for neraidov */
+{
+	8,32,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		RGN_FRAC(1,2)+8*1, 8*1,
+		RGN_FRAC(1,2)+8*0, 8*0,
+		RGN_FRAC(1,2)+8*3, 8*3,
+		RGN_FRAC(1,2)+8*2, 8*2 
+	},
+	{
+		STEP16(0,8*4),
+		STEP16(16*8*4,8*4)
+	},
+	8*32*8/2
+};
+
 
 /**************************************
 *           Graphics Decode           *
@@ -608,6 +629,12 @@ static GFXDECODE_START( skylncr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,        0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,       0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,   0, 2 )
+GFXDECODE_END
+
+static GFXDECODE_START( neraidou )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt2,  0, 2 )
+//	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( sstar97 )
@@ -761,6 +788,292 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( leader )
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET) PORT_NAME("Bet/Throttle")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
+	PORT_DIPNAME( 0x11, 0x11, "Butterfly Max Mul" )		PORT_DIPLOCATION("DSW-A:!4,!5")
+	PORT_DIPSETTING(    0x11, "5" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x10, "8" )
+	PORT_DIPSETTING(    0x00, "12" )
+	PORT_DIPNAME( 0x0e, 0x00, "Main Win Rate" )			PORT_DIPLOCATION("DSW-A:!6,!7,!8")
+	PORT_DIPSETTING(    0x0e, "55%" )
+	PORT_DIPSETTING(    0x0c, "60%" )
+	PORT_DIPSETTING(    0x0a, "65%" )
+	PORT_DIPSETTING(    0x08, "70%" )
+	PORT_DIPSETTING(    0x06, "75%" )
+	PORT_DIPSETTING(    0x04, "80%" )
+	PORT_DIPSETTING(    0x02, "85%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )			PORT_DIPLOCATION("DSW-A:!3")
+	PORT_DIPSETTING(    0x20, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )			PORT_DIPLOCATION("DSW-A:!2")
+	PORT_DIPSETTING(    0x40, "24" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x80, 0x00, "Key Out" )				PORT_DIPLOCATION("DSW-A:!1")
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x80, "x100" )
+
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW-B:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW-B:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )				PORT_DIPLOCATION("DSW-B:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x18, 0x18, "Refund Coin Limit" )		PORT_DIPLOCATION("DSW-B:4,5")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x18, "1000" )
+	PORT_DIPSETTING(    0x10, "2000" )
+	PORT_DIPSETTING(    0x08, "5000" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW-B:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Butterfly Win Rate" )	PORT_DIPLOCATION("DSW-B:7,8")
+	PORT_DIPSETTING(    0xc0, "15%" )
+	PORT_DIPSETTING(    0x80, "20%" )
+	PORT_DIPSETTING(    0x40, "25%" )
+	PORT_DIPSETTING(    0x00, "30%" )
+
+	PORT_START("DSW3")  /* AY8910 port A */
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )		PORT_DIPLOCATION("DSW-D:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
+	PORT_DIPNAME( 0x18, 0x00, "Credit Limit" )			PORT_DIPLOCATION("DSW-D:4,5")
+	PORT_DIPSETTING(    0x00, "120000" )
+	PORT_DIPSETTING(    0x08, "100000" )
+	PORT_DIPSETTING(    0x10, "80000" )
+	PORT_DIPSETTING(    0x18, "50000" )
+	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )			PORT_DIPLOCATION("DSW-D:6")
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )			PORT_DIPLOCATION("DSW-D:7,8")
+	PORT_DIPSETTING(    0xc0, "8" )
+	PORT_DIPSETTING(    0x80, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x00, "64" )
+
+	PORT_START("DSW4")  /* AY8910 port B */
+	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )			PORT_DIPLOCATION("DSW-C:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Pulse / 130 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )
+	PORT_DIPNAME( 0x18, 0x18, "High Bet Limit" )			PORT_DIPLOCATION("DSW-C:4,5")
+	PORT_DIPSETTING(    0x18, "32" )
+	PORT_DIPSETTING(    0x10, "50" )
+	PORT_DIPSETTING(    0x08, "72" )
+	PORT_DIPSETTING(    0x00, "96" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW-C:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW-C:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Coin Lock" )					PORT_DIPLOCATION("DSW-C:8")
+	PORT_DIPSETTING(    0x80, "Locked" )
+	PORT_DIPSETTING(    0x00, "Normal" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( neraidou )
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET) PORT_NAME("Bet/Throttle")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
+	PORT_DIPNAME( 0x01, 0x01, "Hardware Type (could be inverted)" )	// leave it off, otherwise the game works bad and resets
+	PORT_DIPSETTING(    0x01, "Rolla" )
+	PORT_DIPSETTING(    0x00, "Sky" )
+	PORT_DIPNAME( 0x0e, 0x0e, "Main Game Percentage" )
+	PORT_DIPSETTING(    0x0e, "91%" )
+	PORT_DIPSETTING(    0x0c, "92%" )
+	PORT_DIPSETTING(    0x0a, "93%" )
+	PORT_DIPSETTING(    0x08, "94%" )
+	PORT_DIPSETTING(    0x06, "95%" )
+	PORT_DIPSETTING(    0x04, "96%" )
+	PORT_DIPSETTING(    0x02, "97%" )
+	PORT_DIPSETTING(    0x00, "98%" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Reels Speed" )
+	PORT_DIPSETTING(    0x20, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Rate" )
+	PORT_DIPSETTING(    0x40, "20" )
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x80, "x100" )
+
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Butterfly Win Rate" )
+	PORT_DIPSETTING(    0xc0, "25%" )
+	PORT_DIPSETTING(    0x80, "30%" )
+	PORT_DIPSETTING(    0x40, "40%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+
+	PORT_START("DSW3")  /* AY8910 port A */
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
+	PORT_DIPNAME( 0x18, 0x18, "Credit Limit" )
+	PORT_DIPSETTING(    0x00, "120000" )
+	PORT_DIPSETTING(    0x08, "100000" )
+	PORT_DIPSETTING(    0x10, "80000" )
+	PORT_DIPSETTING(    0x18, "50000" )
+	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )
+	PORT_DIPSETTING(    0xc0, "8" )
+	PORT_DIPSETTING(    0x80, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x00, "64" )
+
+	PORT_START("DSW4")  /* AY8910 port B */
+	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Pulse / 130 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )
+	PORT_DIPNAME( 0x18, 0x00, "High Bet Limit" )
+	PORT_DIPSETTING(    0x18, "104" )
+	PORT_DIPSETTING(    0x10, "120" )
+	PORT_DIPSETTING(    0x08, "160" )
+	PORT_DIPSETTING(    0x00, "240" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Bonus? (Left Side)" )
+	PORT_DIPSETTING(    0x80, "x3" )
+	PORT_DIPSETTING(    0x00, "No Bonus" )
 INPUT_PORTS_END
 
 
@@ -957,6 +1270,14 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( neraidou, skylncr )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", neraidou)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
 
 	/* basic machine hardware */
@@ -1026,6 +1347,23 @@ ROM_START( butrfly )
 	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )
 ROM_END
 
+ROM_START( mbutrfly )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "magical_butterfy_x4_cleco.bin",  0x00000, 0x10000, CRC(2391778f) SHA1(f82ee9fb571547fda70867e091317779e2fe6e80) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mb.u29", 0x00000, 0x20000, CRC(294b1cc5) SHA1(56f143d7d96b9ace0973d7001a13e7e55967e70a) )
+	ROM_LOAD16_BYTE( "mb.u31", 0x00001, 0x20000, CRC(c6f4e629) SHA1(97334c7dcfea9a405996c06a79cf3c34a360f807) )
+	ROM_LOAD16_BYTE( "mb.u33", 0x40000, 0x20000, CRC(72d22790) SHA1(d7a995e95f17bd4324f02aa16d23bfd78f95b5c5) )
+	ROM_LOAD16_BYTE( "mb.u35", 0x40001, 0x20000, CRC(fdaa2288) SHA1(199323c2bd2af0d9b1d254a330670e2845f21dd9) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "mb.u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )	// identical to butterfly.
+	ROM_LOAD16_BYTE( "mb.u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )	// identical to butterfly.
+	ROM_LOAD16_BYTE( "mb.u56", 0x40000, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )	// this one is straight fixed for reel tiles 6C-DF.
+	ROM_LOAD16_BYTE( "mb.u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )	// identical to butterfly.
+ROM_END
+
 /*
 
 Mad Zoo PCB Layout
@@ -1090,6 +1428,23 @@ ROM_START( leader )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp22", 0x40001, 0x20000, CRC(04cc0118) SHA1(016ccbe7daf8c4676830aadcc906a64e2826d11a) )
 ROM_END
 
+ROM_START( neraidou )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "aepi.prg",  0x00000, 0x10000, CRC(7ac74830) SHA1(1e3322341711e329b40d94ac6ec25fbafb1d4d62) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "ldrbfl4.bin", 0x00000, 0x20000, CRC(9424c24d) SHA1(4fcf66b641db14b5096d0de75a134d2d35c6eb9b) )
+	ROM_LOAD16_BYTE( "ldrbfl2.bin", 0x00001, 0x20000, CRC(467dd56b) SHA1(5c64ee7ff2f4cc127b57342daf63c392c5155344) )
+	ROM_LOAD16_BYTE( "ldrbfl3.bin", 0x40000, 0x20000, CRC(810ac7f5) SHA1(f0e680a1813d01e4ca4da97c3c45e9373361620b) )
+	ROM_LOAD16_BYTE( "ldrbfl1.bin", 0x40001, 0x20000, CRC(c3bd4dc0) SHA1(2696321846e09359122447e6b60db29c5742a36a) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "ldrbfl8.bin", 0x00000, 0x20000, CRC(74992877) SHA1(f10f90f844198bba49fc3c74b1e8f40821cd1b56) )
+	ROM_LOAD16_BYTE( "ldrbfl6.bin", 0x00001, 0x20000, CRC(4b9fb756) SHA1(21d5abbc19a7e3277316d0ac616bdf0819e563b7) )
+	ROM_LOAD16_BYTE( "ldrbfl7.bin", 0x40000, 0x20000, CRC(a1842082) SHA1(0790c1c1c268fe13f2613e594fdf09daae19bbd0) )
+	ROM_LOAD16_BYTE( "ldrbfl5.bin", 0x40001, 0x20000, CRC(aa0a9b4e) SHA1(e09e6d3c5283ace1f1c6999cdc97e7dde9105338) )
+ROM_END
+
 /*
   Super Star '97
   Bordun International.
@@ -1149,9 +1504,11 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY                 FULLNAME                               FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",   0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)", 0 )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",              0 )
-GAME( 1995, leader,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "bootleg",              "Leader",                               GAME_NOT_WORKING )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97, skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star '97 (version V153B)",       GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                       FLAGS  */
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",           0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",         0 )
+GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)", GAME_NOT_WORKING )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                      0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                 0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star '97 (version V153B)",               0 )
