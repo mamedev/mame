@@ -36,9 +36,11 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
 		}
 
 		/* bits 4-5 are coin lockouts */
-
-		coin_lockout_w(machine(), 0, !(data & 0x10));
-		coin_lockout_w(machine(), 1, !(data & 0x20));
+		if (m_has_coinlock)
+		{
+			coin_lockout_w(machine(), 0, !(data & 0x10));
+			coin_lockout_w(machine(), 1, !(data & 0x20));
+		}
 
 		/* bits 6-7 are coin counters */
 
@@ -68,9 +70,6 @@ void tigeroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	UINT16 *source = &m_spriteram->buffer()[m_spriteram->bytes()/2] - 4;
 	UINT16 *finish = m_spriteram->buffer();
-
-	// TODO: The Track Map should probably be drawn on top of the background tilemap...
-	//       Also convert the below into a for loop!
 
 	while (source >= finish)
 	{
@@ -110,7 +109,7 @@ void tigeroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("gfx4")->base();
+	UINT8 *tilerom = memregion("bgmap")->base();
 
 	int data = tilerom[tile_index];
 	int attr = tilerom[tile_index + 1];

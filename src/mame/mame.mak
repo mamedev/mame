@@ -973,6 +973,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/sonson.o $(VIDEO)/sonson.o \
 	$(DRIVERS)/srumbler.o $(VIDEO)/srumbler.o \
 	$(DRIVERS)/tigeroad.o $(VIDEO)/tigeroad.o \
+	$(MACHINE)/tigeroad.o \
 	$(DRIVERS)/vulgus.o $(VIDEO)/vulgus.o \
 	$(MACHINE)/cps2crpt.o \
 	$(MACHINE)/kabuki.o \
@@ -990,7 +991,6 @@ $(MAMEOBJ)/cinemat.a: \
 $(MAMEOBJ)/comad.a: \
 	$(DRIVERS)/funybubl.o $(VIDEO)/funybubl.o \
 	$(DRIVERS)/galspnbl.o $(VIDEO)/galspnbl.o \
-	$(DRIVERS)/pushman.o $(VIDEO)/pushman.o \
 	$(DRIVERS)/zerozone.o $(VIDEO)/zerozone.o \
 
 $(MAMEOBJ)/cvs.a: \
