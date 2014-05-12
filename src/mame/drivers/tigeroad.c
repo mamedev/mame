@@ -31,9 +31,7 @@ With 'Debug Mode' on button 2 advances a level, button 3 goes back.
 
 The microcontroller mainly controls the animation of the enemy robots,
 the communication between the 68000 and MCU is probably not emulated
-100% correct but it works.  Later levels (using the cheat mode) seem
-to have some corrupt tilemaps, I'm not sure if this is a driver bug
-or a game bug from using the cheat mode.
+100% correct but it works. 
 
 Emulation by Bryan McPhail, mish@tendril.co.uk
 
