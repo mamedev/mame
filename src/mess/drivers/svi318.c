@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("svi318_cass")
 
-	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface_2_drives )
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(svi318_state,svi_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(svi318_state,svi_fdc_drq_w))
 
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("svi318_cass")
 
-	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface_2_drives )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 

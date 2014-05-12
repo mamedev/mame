@@ -135,11 +135,6 @@ static const floppy_interface vector_floppy_interface =
 	NULL
 };
 
-const wd17xx_interface vector06_wd17xx_interface =
-{
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
 /* Machine driver */
 static MACHINE_CONFIG_START( vector06, vector06_state )
 	/* basic machine hardware */
@@ -181,7 +176,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
+	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives)
 	MCFG_WD17XX_DDEN_CALLBACK(VCC)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 

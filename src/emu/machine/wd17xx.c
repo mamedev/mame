@@ -296,6 +296,11 @@ const wd17xx_interface default_wd17xx_interface_2_drives =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
+const wd17xx_interface default_wd17xx_interface_1_drive =
+{
+	{ FLOPPY_0, NULL, NULL, NULL}
+};
+
 
 
 /***************************************************************************

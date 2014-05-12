@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 
-	MCFG_FD1793_ADD("wd179x", cgenie_wd17xx_interface ) // TODO confirm type
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface) // TODO confirm type
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(cgenie_state,cgenie_fdc_intrq_w))
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)

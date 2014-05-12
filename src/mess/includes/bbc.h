@@ -418,9 +418,4 @@ public: // HACK FOR MC6845
 	required_device<palette_device> m_palette;
 };
 
-
-/*----------- defined in machine/bbc.c -----------*/
-
-extern const wd17xx_interface bbc_wd17xx_interface;
-
 #endif /* BBC_H_ */

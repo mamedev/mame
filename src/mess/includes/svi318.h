@@ -152,9 +152,4 @@ protected:
 	void svi318_vdp_interrupt(int i);
 };
 
-
-/*----------- defined in machine/svi318.c -----------*/
-
-extern const wd17xx_interface svi_wd17xx_interface;
-
 #endif /* SVI318_H_ */

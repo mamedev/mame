@@ -244,13 +244,6 @@ void swtpc09_state::swtpc09_irq_handler(UINT8 peripheral, UINT8 state)
 	}
 }
 
-/******* WD1791 FDC *******/
-/*  wd1791 fdc interface  */
-const wd17xx_interface swtpc09_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
-};
-
 /* handlers for fdc */
 WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 {

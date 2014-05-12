@@ -186,5 +186,4 @@ public:
 /* Sound function*/
 extern const sn76477_interface hector_sn76477_interface;
 
-extern const wd17xx_interface hector_wd17xx_interface;  // Special for minidisc
 extern const floppy_interface minidisc_floppy_interface;

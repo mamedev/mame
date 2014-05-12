@@ -93,11 +93,6 @@ WRITE_LINE_MEMBER(beta_disk_device::wd179x_drq_w)
 		m_betadisk_status &=~(1<<6);
 }
 
-static const wd17xx_interface beta_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 READ8_MEMBER(beta_disk_device::status_r)
 {
 	if (m_betadisk_active==1) {
@@ -155,7 +150,7 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 		}
 		// bit 3 connected to pin 23 "HRDY" of FDC
 		// TEMP HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
-		legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(beta_wd17xx_interface.floppy_drive_tags[data & 3]);
+		legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(default_wd17xx_interface.floppy_drive_tags[data & 3]);
 		flop->floppy_mon_w(CLEAR_LINE);
 		flop->floppy_drive_set_ready_state(1, 0);
 	}
@@ -197,7 +192,7 @@ static const floppy_interface beta_floppy_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
-	MCFG_WD2793_ADD("wd179x", beta_wd17xx_interface ) // KR1818VG93 clone of WD1793
+	MCFG_WD2793_ADD("wd179x", default_wd17xx_interface ) // KR1818VG93 clone of WD1793
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(beta_disk_device, wd179x_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(beta_disk_device, wd179x_drq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)

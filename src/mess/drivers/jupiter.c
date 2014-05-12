@@ -178,10 +178,6 @@ UINT32 jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
 #if 0
 static const floppy_interface jupiter_floppy_interface =
 {
@@ -190,11 +186,6 @@ static const floppy_interface jupiter_floppy_interface =
 	NULL
 };
 #endif
-
-static const wd17xx_interface fdc_intf =
-{
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -237,7 +228,7 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	MCFG_CPU_IO_MAP(jupiter_m6800_io)
 
 	// devices
-	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
+	MCFG_FD1771_ADD(INS1771N1_TAG, default_wd17xx_interface_2_drives)
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 
 	// internal ram
@@ -269,7 +260,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// devices
-	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
+	MCFG_FD1771_ADD(INS1771N1_TAG, default_wd17xx_interface_2_drives)
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(jupiter3_state, kbd_put))
 

@@ -329,7 +329,7 @@ static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", nascom2)
 
-	MCFG_FD1793_ADD("wd1793", nascom2_wd17xx_interface )
+	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface)
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(nascom1_state,nascom2_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(nascom1_state,nascom2_fdc_drq_w))
 	MCFG_WD17XX_DDEN_CALLBACK(VCC)

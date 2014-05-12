@@ -1602,11 +1602,6 @@ WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_drq_w)
 	bbc_update_fdq_int(state);
 }
 
-const wd17xx_interface bbc_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
 WRITE8_MEMBER(bbc_state::bbc_wd177x_status_w)
 {
 	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");

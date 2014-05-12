@@ -372,14 +372,3 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_drq_w )
 {
 	m_pia_2->cb1_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
-
-
-
-//-------------------------------------------------
-//  fdc_interface
-//-------------------------------------------------
-
-const wd17xx_interface dragon_alpha_state::fdc_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};

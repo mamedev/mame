@@ -221,7 +221,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 
 	// floppy
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
-	MCFG_WD2797_ADD(WD2797_TAG, dragon_alpha_state::fdc_interface)
+	MCFG_WD2797_ADD(WD2797_TAG, default_wd17xx_interface)
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_drq_w))
 

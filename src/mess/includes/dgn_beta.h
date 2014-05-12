@@ -215,9 +215,4 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-
-/*----------- defined in machine/dgn_beta.c -----------*/
-
-extern const wd17xx_interface dgnbeta_wd17xx_interface;
-
 #endif /* DGN_BETA_H_ */

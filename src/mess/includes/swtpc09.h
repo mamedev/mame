@@ -137,8 +137,4 @@ public:
 
 };
 
-/*----------- defined in machine/swtpc09.c -----------*/
-
-extern const wd17xx_interface swtpc09_wd17xx_interface;
-
 #endif /* swtpc09_H_ */

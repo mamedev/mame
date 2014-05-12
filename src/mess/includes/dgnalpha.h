@@ -61,8 +61,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	static const wd17xx_interface fdc_interface;
-
 protected:
 	/* driver overrides */
 	virtual void device_start(void);

@@ -233,12 +233,6 @@ static GFXDECODE_START( myb3k )
 	GFXDECODE_ENTRY( "ipl", 0x0000, myb3k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const wd17xx_interface myb3k_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-
 static const floppy_interface myb3k_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_DSDD_40, //todo
@@ -270,7 +264,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
+	MCFG_MB8877_ADD("fdc", default_wd17xx_interface_2_drives) //unknown type
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
 MACHINE_CONFIG_END
 

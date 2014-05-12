@@ -1193,12 +1193,6 @@ static GFXDECODE_START( rainbow )
 	GFXDECODE_ENTRY( "chargen", 0x0000, rainbow_charlayout, 0, 1 )
 GFXDECODE_END
 
-// Rainbow Z80 polls only, no IRQ/DRQ are connected
-const wd17xx_interface rainbow_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 static const floppy_interface floppy_intf =
 {
 	FLOPPY_STANDARD_5_25_SSDD_80,
@@ -1235,7 +1229,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 
-	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
+	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 

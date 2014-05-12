@@ -145,10 +145,4 @@ public:
 
 };
 
-
-/*----------- defined in machine/cgenie.c -----------*/
-
-
-extern const wd17xx_interface cgenie_wd17xx_interface;
-
 #endif /* CGENIE_H_ */

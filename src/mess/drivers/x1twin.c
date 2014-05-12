@@ -71,11 +71,6 @@ static ADDRESS_MAP_START( pce_io, AS_IO, 8, x1twin_state )
 ADDRESS_MAP_END
 #endif
 
-static const wd17xx_interface x1_mb8877a_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 /*************************************
  *
  *  Inputs
@@ -476,7 +471,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_MB8877_ADD("fdc",x1_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")

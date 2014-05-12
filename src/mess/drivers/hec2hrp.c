@@ -389,11 +389,6 @@ DISCRETE_SOUND_END
 /********* mini disque interface ***************************/
 /***********************************************************/
 
-const wd17xx_interface hector_wd17xx_interface =
-{
-	{FLOPPY_0, NULL, NULL, NULL}        // Only one floppy on the minidisc
-};
-
 const floppy_interface minidisc_floppy_interface =
 {
 	FLOPPY_STANDARD_3_5_DSDD,
@@ -620,7 +615,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* Mini Disc */
-	MCFG_FD1793_ADD("wd179x", hector_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface_1_drive)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, minidisc_floppy_interface)
 
 	/* video hardware */

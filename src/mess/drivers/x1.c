@@ -1049,20 +1049,10 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	}
 }
 
-static const wd17xx_interface x1_mb8877a_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 {
 	m_dma->rdy_w(state ^ 1);
 }
-
-static const wd17xx_interface x1turbo_mb8877a_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
 
 /*************************************
  *
@@ -2485,7 +2475,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
-	MCFG_MB8877_ADD("fdc",x1_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
@@ -2538,7 +2528,7 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(x1_state, io_write_byte))
 
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_MB8877_ADD("fdc",x1turbo_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
     MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(x1_state,fdc_drq_w))
 
 	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board

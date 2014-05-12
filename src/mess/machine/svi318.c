@@ -251,11 +251,6 @@ WRITE_LINE_MEMBER(svi318_state::svi_fdc_drq_w)
 	m_fdc.drq = state;
 }
 
-const wd17xx_interface svi_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
 WRITE8_MEMBER(svi318_state::svi318_fdc_drive_motor_w)
 {
 	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");

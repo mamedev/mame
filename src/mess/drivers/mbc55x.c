@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_FD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
+	MCFG_FD1793_ADD(FDC_TAG, default_wd17xx_interface)
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(mbc55x_state, mbc55x_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(mbc55x_state, mbc55x_fdc_drq_w))
 	MCFG_WD17XX_DDEN_CALLBACK(GND)

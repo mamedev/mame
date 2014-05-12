@@ -37,12 +37,6 @@ WRITE_LINE_MEMBER(nascom1_state::nascom2_fdc_drq_w)
 	m_nascom2_fdc.drq = state;
 }
 
-const wd17xx_interface nascom2_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-
 READ8_MEMBER(nascom1_state::nascom2_fdc_select_r)
 {
 	return m_nascom2_fdc.select | 0xa0;

@@ -1963,11 +1963,6 @@ void fm7_state::machine_reset()
 	memset(m_video_ram, 0, sizeof(UINT8) * 0x18000);
 }
 
-static const wd17xx_interface fm7_mb8877a_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 static const floppy_interface fm7_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_DSHD,
@@ -2014,7 +2009,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_drq_w))
 
@@ -2070,7 +2065,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
@@ -2126,7 +2121,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
@@ -2184,7 +2179,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
@@ -2235,7 +2230,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))

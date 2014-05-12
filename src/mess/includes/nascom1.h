@@ -78,7 +78,4 @@ public:
 };
 
 
-/*----------- defined in machine/nascom1.c -----------*/
-
-extern const wd17xx_interface nascom2_wd17xx_interface;
 #endif /* NASCOM1_H_ */

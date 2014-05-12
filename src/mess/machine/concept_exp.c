@@ -196,11 +196,6 @@ WRITE_LINE_MEMBER(concept_fdc_device::drq_w)
 		m_fdc_local_status &= ~LS_DRQ_mask;
 }
 
-const wd17xx_interface concept_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 READ8_MEMBER(concept_fdc_device::reg_r)
 {
 	switch (offset)
@@ -320,7 +315,7 @@ static const floppy_interface concept_floppy_interface =
 
 
 static MACHINE_CONFIG_FRAGMENT( fdc )
-	MCFG_FD1793_ADD("wd179x", concept_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface )
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(concept_fdc_device, intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(concept_fdc_device, drq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(concept_floppy_interface)

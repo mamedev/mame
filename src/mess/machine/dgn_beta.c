@@ -800,11 +800,6 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_drq_w)
 	cpu1_recalc_firq(state);
 }
 
-const wd17xx_interface dgnbeta_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 READ8_MEMBER(dgn_beta_state::dgnbeta_wd2797_r)
 {
 	int result = 0;

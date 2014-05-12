@@ -133,13 +133,6 @@ void ms0515_state::machine_reset()
 static INPUT_PORTS_START( ms0515 )
 INPUT_PORTS_END
 
-
-static const wd17xx_interface ms0515_wd17xx_interface =
-{
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
-
-
 static LEGACY_FLOPPY_OPTIONS_START(ms0515)
 	LEGACY_FLOPPY_OPTION(ms0515, "dsk", "MS0515 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -235,7 +228,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_T11_INITIAL_MODE(0xf2ff)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
-	MCFG_FD1793_ADD( "vg93", ms0515_wd17xx_interface )
+	MCFG_FD1793_ADD( "vg93", default_wd17xx_interface_1_drive)
 	MCFG_WD17XX_DDEN_CALLBACK(VCC)
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ms0515_floppy_interface)

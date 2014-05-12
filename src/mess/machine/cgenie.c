@@ -430,11 +430,6 @@ WRITE_LINE_MEMBER(cgenie_state::cgenie_fdc_intrq_w)
 	}
 }
 
-const wd17xx_interface cgenie_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 WRITE8_MEMBER( cgenie_state::cgenie_motor_w )
 {
 	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");

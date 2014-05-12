@@ -642,11 +642,6 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
 	m_clr_val = (state & 1) ? 0x00 : 0xff;
 }
 
-static const wd17xx_interface z207_interface =
-{
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
 static LEGACY_FLOPPY_OPTIONS_START( z100 )
 	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -718,7 +713,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_FD1797_ADD("z207_fdc",z207_interface)
+	MCFG_FD1797_ADD("z207_fdc",default_wd17xx_interface_2_drives)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(z100_floppy_interface)
 MACHINE_CONFIG_END
 

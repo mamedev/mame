@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_FD1793_ADD("fdc", default_wd17xx_interface)
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
@@ -208,7 +208,7 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_FD1793_ADD("fdc", default_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
 	MCFG_DEVICE_ADD("piaide", PIA6821, 0)
@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_FD1793_ADD("fdc", default_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)

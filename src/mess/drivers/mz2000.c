@@ -776,11 +776,6 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
 	return m_porta_latch;
 }
 
-static const wd17xx_interface mz2000_mb8877a_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
 #if 0
 static LEGACY_FLOPPY_OPTIONS_START( mz2000 )
 	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
@@ -824,7 +819,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877_ADD("mb8877a",mz2000_mb8877a_interface)
+	MCFG_MB8877_ADD("mb8877a",default_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2000_flop")
 

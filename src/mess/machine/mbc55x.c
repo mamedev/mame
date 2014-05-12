@@ -33,15 +33,6 @@ static int instruction_hook(device_t &device, offs_t curpc);
 //static void fdc_reset(running_machine &machine);
 //static void set_disk_int(running_machine &machine, int state);
 
-
-/* Floppy drives WD2793 */
-
-const wd17xx_interface mbc55x_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-
 /* 8255 Configuration */
 
 READ8_MEMBER( mbc55x_state::ppi8255_r )

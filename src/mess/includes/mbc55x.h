@@ -198,8 +198,6 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 
 #define FDC_PAUSE               10000
 
-extern const wd17xx_interface mbc55x_wd17xx_interface;
-
 
 /*----------- defined in video/mbc55x.c -----------*/
 

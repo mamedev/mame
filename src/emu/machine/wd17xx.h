@@ -34,6 +34,7 @@ struct wd17xx_interface
 
 extern const wd17xx_interface default_wd17xx_interface;
 extern const wd17xx_interface default_wd17xx_interface_2_drives;
+extern const wd17xx_interface default_wd17xx_interface_1_drive;
 
 /***************************************************************************
     MACROS

@@ -595,7 +595,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
-	MCFG_FD1793_ADD("wd179x", trs80_wd17xx_interface ) // should be FD1771 or FD1791 but inverted data lines are too tricky to fix now
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface) // should be FD1771 or FD1791 but inverted data lines are too tricky to fix now
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(trs80_floppy_interface)
 

@@ -175,10 +175,6 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 	m_hs_bit &= ~0x80;
 }
 
-static const wd17xx_interface mbc200_mb8876_interface =
-{
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
 static const floppy_interface mbc200_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_SSDD_40,
@@ -235,7 +231,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
-	MCFG_MB8876_ADD("fdc",mbc200_mb8876_interface) // MB8876A
+	MCFG_MB8876_ADD("fdc",default_wd17xx_interface_2_drives) // MB8876A
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbc200_floppy_interface)
 MACHINE_CONFIG_END
 
