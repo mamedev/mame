@@ -655,14 +655,14 @@ static void cfunc_get_cop0_reg(void *param)
 	{
 		if(dest)
 		{
-			rsp->r[dest] = (rsp->sp_reg_r_func)(reg, 0x00000000);
+			rsp->r[dest] = (rsp->device->sp_reg_r_func)(reg, 0xffffffff);
 		}
 	}
 	else if (reg >= 8 && reg < 16)
 	{
 		if(dest)
 		{
-			rsp->r[dest] = (rsp->dp_reg_r_func)(reg - 8, 0x00000000);
+			rsp->r[dest] = (rsp->device->dp_reg_r_func)(reg - 8, 0xffffffff);
 		}
 	}
 	else
@@ -679,11 +679,11 @@ static void cfunc_set_cop0_reg(void *param)
 
 	if (reg >= 0 && reg < 8)
 	{
-		(rsp->sp_reg_w_func)(reg, data, 0x00000000);
+		(rsp->device->sp_reg_w_func)(reg, data, 0xffffffff);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->dp_reg_w_func)(reg - 8, data, 0x00000000);
+		(rsp->device->dp_reg_w_func)(reg - 8, data, 0xffffffff);
 	}
 	else
 	{
@@ -764,18 +764,11 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 
 	memset(rsp, 0, sizeof(*rsp));
 
-	const rsp_config *config = (const rsp_config *)device->static_config();
-	// resolve callbacks
-	rsp->dp_reg_r_func.resolve(config->dp_reg_r_cb, *device);
-	rsp->dp_reg_w_func.resolve(config->dp_reg_w_cb, *device);
-	rsp->sp_reg_r_func.resolve(config->sp_reg_r_cb, *device);
-	rsp->sp_reg_w_func.resolve(config->sp_reg_w_cb, *device);
-	rsp->sp_set_status_func.resolve(config->sp_set_status_cb, *device);
-
 	rsp->irq_callback = irqcallback;
-	rsp->device = device;
+	rsp->device = downcast<rsp_cpu_device *>(device);
 	rsp->program = &device->space(AS_PROGRAM);
 	rsp->direct = &rsp->program->direct();
+	rsp->device->resolve_cb();
 
 	// Inaccurate.  RSP registers power on to a random state...
 	for(regIdx = 0; regIdx < 32; regIdx++ )
@@ -6679,7 +6672,7 @@ INLINE void cfunc_rsp_vrsqh_scalar(void *param)
 static void cfunc_sp_set_status_cb(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
-	(rsp->sp_set_status_func)(0, rsp->impstate->arg0);
+	(rsp->device->sp_set_status_func)(0, rsp->impstate->arg0, 0xffffffff);
 }
 
 static CPU_EXECUTE( rsp )
@@ -9079,4 +9072,9 @@ CPU_GET_INFO( rsp_drc )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(RSP_DRC, rsp_drc);
+rsp_drc_device::rsp_drc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: rsp_cpu_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(rsp_drc))
+{
+}
+
+const device_type RSP_DRC = &legacy_device_creator<rsp_drc_device>;

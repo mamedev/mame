@@ -826,7 +826,11 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_CPU_PROGRAM_MAP(n64_map)
 
 	MCFG_CPU_ADD("rsp", RSP, 62500000)
-	MCFG_CPU_CONFIG(n64_rsp_config)
+	MCFG_RSP_DP_REG_R_CB(DEVREAD32("rcp",n64_periphs, dp_reg_r))
+	MCFG_RSP_DP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, dp_reg_w))
+	MCFG_RSP_SP_REG_R_CB(DEVREAD32("rcp",n64_periphs, sp_reg_r))
+	MCFG_RSP_SP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, sp_reg_w))
+	MCFG_RSP_SP_SET_STATUS_CB(DEVWRITE32("rcp",n64_periphs, sp_set_status))
 	MCFG_CPU_PROGRAM_MAP(rsp_map)
 
 

@@ -193,11 +193,11 @@ static UINT32 get_cop0_reg(rsp_state *rsp, int reg)
 	reg &= 0xf;
 	if (reg < 8)
 	{
-		return (rsp->sp_reg_r_func)(reg, 0x00000000);
+		return (rsp->device->sp_reg_r_func)(reg, 0xffffffff);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (rsp->dp_reg_r_func)(reg - 8, 0x00000000);
+		return (rsp->device->dp_reg_r_func)(reg - 8, 0xffffffff);
 	}
 
 	return 0;
@@ -208,11 +208,11 @@ static void set_cop0_reg(rsp_state *rsp, int reg, UINT32 data)
 	reg &= 0xf;
 	if (reg < 8)
 	{
-		(rsp->sp_reg_w_func)(reg, data, 0x00000000);
+		(rsp->device->sp_reg_w_func)(reg, data, 0xffffffff);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->dp_reg_w_func)(reg - 8, data, 0x00000000);
+		(rsp->device->dp_reg_w_func)(reg - 8, data, 0xffffffff);
 	}
 }
 
@@ -280,26 +280,29 @@ static const int vector_elements[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },     // 7
 };
 
+void rsp_cpu_device::resolve_cb()
+{
+	dp_reg_r_func.resolve();
+	dp_reg_w_func.resolve();
+	sp_reg_r_func.resolve();
+	sp_reg_w_func.resolve();
+	sp_set_status_func.resolve();
+}
+	
 static CPU_INIT( rsp )
 {
 	rsp_state *rsp = get_safe_token(device);
 	int regIdx;
-	int accumIdx;
-	const rsp_config *config = (const rsp_config *)device->static_config();
-	// resolve callbacks
-	rsp->dp_reg_r_func.resolve(config->dp_reg_r_cb, *device);
-	rsp->dp_reg_w_func.resolve(config->dp_reg_w_cb, *device);
-	rsp->sp_reg_r_func.resolve(config->sp_reg_r_cb, *device);
-	rsp->sp_reg_w_func.resolve(config->sp_reg_w_cb, *device);
-	rsp->sp_set_status_func.resolve(config->sp_set_status_cb, *device);
-
+	int accumIdx;	
+	
 	if (LOG_INSTRUCTION_EXECUTION)
 		rsp->exec_output = fopen("rsp_execute.txt", "wt");
 
 	rsp->irq_callback = irqcallback;
-	rsp->device = device;
+	rsp->device = downcast<rsp_cpu_device *>(device);
 	rsp->program = &device->space(AS_PROGRAM);
 	rsp->direct = &rsp->program->direct();
+	rsp->device->resolve_cb();
 
 #if 1
 	// Inaccurate.  RSP registers power on to a random state...
@@ -2742,7 +2745,7 @@ static CPU_EXECUTE( rsp )
 					case 0x09:  /* JALR */      JUMP_PC_L(RSVAL, RDREG); break;
 					case 0x0d:  /* BREAK */
 					{
-						(rsp->sp_set_status_func)(0, 0x3);
+						(rsp->device->sp_set_status_func)(0, 0x3, 0xffffffff);
 						rsp->icount = MIN(rsp->icount, 1);
 
 						if (LOG_INSTRUCTION_EXECUTION) fprintf(rsp->exec_output, "\n---------- break ----------\n\n");
@@ -3254,6 +3257,21 @@ CPU_GET_INFO( rsp_int )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(RSP_INT, rsp_int);
+rsp_cpu_device::rsp_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info)
+	: legacy_cpu_device(mconfig, type, tag, owner, clock, get_info),
+	  dp_reg_r_func(*this),
+	  dp_reg_w_func(*this),
+	  sp_reg_r_func(*this),
+	  sp_reg_w_func(*this),
+	  sp_set_status_func(*this)
+{
+}
+
+rsp_int_device::rsp_int_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: rsp_cpu_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(rsp_int))
+{
+}
+
+const device_type RSP_INT = &legacy_device_creator<rsp_drc_device>;
 
 const device_type RSP = &legacy_device_creator_drc<rsp_int_device, rsp_drc_device>;

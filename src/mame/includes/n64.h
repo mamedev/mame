@@ -275,8 +275,6 @@ extern const device_type N64PERIPH;
 #define DP_STATUS_FREEZE        0x02
 #define DP_STATUS_FLUSH         0x04
 
-extern const rsp_config n64_rsp_config;
-
 extern UINT32 *n64_sram;
 extern UINT32 *rdram;
 extern UINT32 *rsp_imem;

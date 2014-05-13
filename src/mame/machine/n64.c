@@ -1020,16 +1020,6 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 	}
 }
 
-
-const rsp_config n64_rsp_config =
-{
-	DEVCB_DEVICE_MEMBER32("rcp",n64_periphs, dp_reg_r),
-	DEVCB_DEVICE_MEMBER32("rcp",n64_periphs, dp_reg_w),
-	DEVCB_DEVICE_MEMBER32("rcp",n64_periphs, sp_reg_r),
-	DEVCB_DEVICE_MEMBER32("rcp",n64_periphs, sp_reg_w),
-	DEVCB_DEVICE_MEMBER32("rcp",n64_periphs, sp_set_status)
-};
-
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 {
 	machine().device<n64_periphs>("rcp")->vi_scanline_tick();

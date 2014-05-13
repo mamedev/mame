@@ -71,23 +71,6 @@ enum
 	RSP_V24, RSP_V25, RSP_V26, RSP_V27, RSP_V28, RSP_V29, RSP_V30, RSP_V31
 };
 
-
-
-/***************************************************************************
-    STRUCTURES
-***************************************************************************/
-
-struct rsp_config
-{
-	devcb_read32 dp_reg_r_cb;
-	devcb_write32 dp_reg_w_cb;
-	devcb_read32 sp_reg_r_cb;
-	devcb_write32 sp_reg_w_cb;
-	devcb_write32 sp_set_status_cb;
-};
-
-
-
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
@@ -160,6 +143,44 @@ union ACCUMULATOR_REG
 	INT16 w[4];
 };
 
+#define MCFG_RSP_DP_REG_R_CB(_devcb) \
+	devcb = &rsp_cpu_device::static_set_dp_reg_r_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_RSP_DP_REG_W_CB(_devcb) \
+	devcb = &rsp_cpu_device::static_set_dp_reg_w_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_RSP_SP_REG_R_CB(_devcb) \
+	devcb = &rsp_cpu_device::static_set_sp_reg_r_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_RSP_SP_REG_W_CB(_devcb) \
+	devcb = &rsp_cpu_device::static_set_sp_reg_w_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_RSP_SP_SET_STATUS_CB(_devcb) \
+	devcb = &rsp_cpu_device::static_set_status_callback(*device, DEVCB2_##_devcb);
+
+class rsp_cpu_device : public legacy_cpu_device
+{
+protected:
+	// construction/destruction
+	rsp_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info);
+	
+public:
+	void resolve_cb();
+	template<class _Object> static devcb2_base &static_set_dp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).dp_reg_r_func.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_dp_reg_w_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).dp_reg_w_func.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_sp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).sp_reg_r_func.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_sp_reg_w_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).sp_reg_w_func.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_status_callback(device_t &device, _Object object) { return downcast<rsp_cpu_device &>(device).sp_set_status_func.set_callback(object); }
+	
+
+	devcb2_read32 dp_reg_r_func;
+	devcb2_write32 dp_reg_w_func;
+	devcb2_read32 sp_reg_r_func;
+	devcb2_write32 sp_reg_w_func;
+	devcb2_write32 sp_set_status_func;	
+};
+
+
 struct rspimp_state;
 struct rsp_state
 {
@@ -214,7 +235,7 @@ struct rsp_state
 	UINT32 nextpc;
 
 	device_irq_acknowledge_delegate irq_callback;
-	legacy_cpu_device *device;
+	rsp_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	int icount;
@@ -228,16 +249,27 @@ struct rsp_state
 	UINT8 *imem8;
 
 	rspimp_state* impstate;
-
-	devcb_resolved_read32 dp_reg_r_func;
-	devcb_resolved_write32 dp_reg_w_func;
-	devcb_resolved_read32 sp_reg_r_func;
-	devcb_resolved_write32 sp_reg_w_func;
-	devcb_resolved_write32 sp_set_status_func;
 };
 
-DECLARE_LEGACY_CPU_DEVICE(RSP_INT, rsp_int);
-DECLARE_LEGACY_CPU_DEVICE(RSP_DRC, rsp_drc);
+CPU_GET_INFO( rsp_int );
+
+class rsp_int_device : public rsp_cpu_device
+{
+public:
+	rsp_int_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type RSP_INT;
+
+CPU_GET_INFO( rsp_drc );
+
+class rsp_drc_device : public rsp_cpu_device
+{
+public:
+	rsp_drc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type RSP_DRC;
 
 extern const device_type RSP;
 
