@@ -45,8 +45,6 @@ public:
 	required_device<sam6883_device> m_sam;
 	required_device<mc6847_base_device> m_vdg;
 
-	static const sam6883_interface sam6883_config;
-
 	DECLARE_READ8_MEMBER( sam_read );
 
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );

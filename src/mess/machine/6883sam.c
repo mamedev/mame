@@ -92,11 +92,9 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 
 void sam6883_device::device_start()
 {
-	const sam6883_interface *config = (const sam6883_interface *) static_config();
-
 	// find the CPU
-	m_cpu = machine().device<cpu_device>(config->m_cpu_tag);
-	m_cpu_space = &m_cpu->space(config->m_cpu_space);
+	m_cpu = machine().device<cpu_device>(m_cpu_tag);
+	m_cpu_space = &m_cpu->space(m_cpu_space_ref);
 
 	// resolve callbacks
 	m_read_res.resolve_safe(0);

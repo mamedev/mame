@@ -13,20 +13,12 @@
 
 #include "emu.h"
 
-#define MCFG_SAM6883_ADD(_tag, _clock, _config) \
+#define MCFG_SAM6883_ADD(_tag, _clock, _cputag, _cpuspace) \
 	MCFG_DEVICE_ADD(_tag, SAM6883, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	sam6883_device::configure_cpu(*device, _cputag, _cpuspace);
 
 #define MCFG_SAM6883_RES_CALLBACK(_read) \
 	devcb = &sam6883_device::set_res_rd_callback(*device, DEVCB2_##_read);
-
-/* interface */
-struct sam6883_interface
-{
-	/* the CPU/space from which the SAM reads data */
-	const char *        m_cpu_tag;
-	address_spacenum    m_cpu_space;
-};
 
 
 //**************************************************************************
@@ -96,6 +88,13 @@ public:
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb2_base &set_res_rd_callback(device_t &device, _Object object) { return downcast<sam6883_device &>(device).m_read_res.set_callback(object); }
+
+	static void configure_cpu(device_t &device, const char *tag, address_spacenum space)
+	{
+		sam6883_device &dev = downcast<sam6883_device &>(device);
+		dev.m_cpu_tag = tag;
+		dev.m_cpu_space_ref = space;
+	}
 
 	// called to configure banks
 	void configure_bank(int bank, UINT8 *memory, UINT32 memory_size, bool is_read_only);
@@ -167,6 +166,9 @@ private:
 		address_space &cpu_space() const;
 		void point_specific_bank(const sam_bank *bank, UINT16 offset, UINT16 mask, memory_bank *&memory_bank, INT32 addrstart, INT32 addrend, bool is_write);
 	};
+
+	const char *        m_cpu_tag;
+	address_spacenum    m_cpu_space_ref;
 
 	// incidentals
 	address_space *             m_cpu_space;

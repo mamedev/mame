@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, dragon_state::sam6883_config)
+	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, MAINCPU_TAG, AS_PROGRAM)
 	MCFG_SAM6883_RES_CALLBACK(READ8(dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)

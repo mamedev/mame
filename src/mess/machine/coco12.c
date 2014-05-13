@@ -116,15 +116,3 @@ void coco12_state::update_cart_base(UINT8 *cart_base)
 {
 	m_sam->configure_bank(3, cart_base, 0x4000, true);      // $C000-$FEFF
 }
-
-
-
-//-------------------------------------------------
-//  sam6883_config
-//-------------------------------------------------
-
-const sam6883_interface coco12_state::sam6883_config =
-{
-	MAINCPU_TAG,
-	AS_PROGRAM,
-};
