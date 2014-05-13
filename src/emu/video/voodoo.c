@@ -4867,9 +4867,9 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	int val;
 
 	/* validate configuration */
-	assert(config->screen != NULL);
-	assert(config->cputag != NULL);
-	assert(config->fbmem > 0);
+	assert(m_screen != NULL);
+	assert(m_cputag != NULL);
+	assert(m_fbmem > 0);
 
 	/* store a pointer back to the device */
 	v->device = this;
