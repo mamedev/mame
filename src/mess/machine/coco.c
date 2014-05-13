@@ -1186,19 +1186,6 @@ void coco_state::cart_w(bool state)
 
 
 
-//-------------------------------------------------
-//  cartridge_config
-//-------------------------------------------------
-
-const cococart_interface coco_state::cartridge_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, cart_w),       // coco_cart_w,
-	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_NMI),  // coco_nmi_w,
-	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_HALT)  // coco_halt_w
-};
-
-
-
 /***************************************************************************
   DISASSEMBLY OVERRIDE (OS9 syscalls)
  ***************************************************************************/

@@ -85,33 +85,38 @@ SLOT_INTERFACE_END
 WRITE_LINE_MEMBER(coco_multipak_device::multi_cart_w)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
-	cart->m_cart_callback.writeline(this,state);
+	cart->m_cart_callback(state);
 }
 
 WRITE_LINE_MEMBER(coco_multipak_device::multi_nmi_w)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
-	cart->m_nmi_callback.writeline(this,state);
+	cart->m_nmi_callback(state);
 }
 
 WRITE_LINE_MEMBER(coco_multipak_device::multi_halt_w)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
-	cart->m_halt_callback.writeline(this,state);
+	cart->m_halt_callback(state);
 }
 
-static const cococart_interface multi_cococart_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_multipak_device, multi_cart_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_multipak_device, multi_nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_multipak_device, multi_halt_w)
-};
-
 static MACHINE_CONFIG_FRAGMENT(coco_multi)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT4_TAG, multi_cococart_interface, coco_cart_slot4, "fdcv11")
+	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_halt_w))
+	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_halt_w))
+	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_halt_w))
+	MCFG_COCO_CARTRIDGE_ADD(SLOT4_TAG, coco_cart_slot4, "fdcv11")
+	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, coco_multipak_device, multi_halt_w))
 MACHINE_CONFIG_END
 
 //**************************************************************************

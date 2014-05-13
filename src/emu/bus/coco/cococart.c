@@ -36,7 +36,10 @@ const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
 cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock, "cococart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_cart_callback(*this),
+		m_nmi_callback(*this),
+		m_halt_callback(*this)
 {
 }
 
@@ -60,7 +63,8 @@ void cococart_slot_device::device_start()
 	m_cart_line.value           = COCOCART_LINE_VALUE_CLEAR;
 	m_cart_line.line            = 0;
 	m_cart_line.q_count         = 0;
-	m_cart_line.callback.resolve(m_cart_callback, *this);
+	m_cart_callback.resolve();
+	m_cart_line.callback = &m_cart_callback;
 
 	m_nmi_line.timer_index      = 0;
 	/* 12 allowed one more instruction to finished after the line is pulled */
@@ -68,7 +72,8 @@ void cococart_slot_device::device_start()
 	m_nmi_line.value            = COCOCART_LINE_VALUE_CLEAR;
 	m_nmi_line.line             = 0;
 	m_nmi_line.q_count          = 0;
-	m_nmi_line.callback.resolve(m_nmi_callback, *this);
+	m_nmi_callback.resolve();
+	m_nmi_line.callback = &m_nmi_callback;
 
 	m_halt_line.timer_index     = 0;
 	/* 6 allowed one more instruction to finished after the line is pulled */
@@ -76,7 +81,8 @@ void cococart_slot_device::device_start()
 	m_halt_line.value           = COCOCART_LINE_VALUE_CLEAR;
 	m_halt_line.line            = 0;
 	m_halt_line.q_count         = 0;
-	m_halt_line.callback.resolve(m_halt_callback, *this);
+	m_halt_callback.resolve();
+	m_halt_line.callback = &m_halt_callback;
 
 	m_cart = dynamic_cast<device_cococart_interface *>(get_card_device());
 }
@@ -91,21 +97,6 @@ void cococart_slot_device::device_start()
 
 void cococart_slot_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const cococart_interface *intf = reinterpret_cast<const cococart_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<cococart_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_cart_callback, 0, sizeof(m_cart_callback));
-		memset(&m_nmi_callback,  0, sizeof(m_nmi_callback));
-		memset(&m_halt_callback, 0, sizeof(m_halt_callback));
-	}
-
 	// set brief and instance name
 	update_names();
 }
@@ -221,8 +212,8 @@ void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &
 		}
 
 		/* invoke the callback, if present */
-		if (!line.callback.isnull())
-			line.callback(line.line);
+		if (!(*line.callback).isnull())
+			(*line.callback)(line.line);
 	}
 }
 

@@ -96,8 +96,6 @@ public:
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
 
-	static const cococart_interface cartridge_config;
-
 	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
@@ -133,6 +131,7 @@ public:
 	// floating bus
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
 	
+	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -152,7 +151,6 @@ protected:
 	// miscellaneous
 	virtual void update_keyboard_input(UINT8 value, UINT8 z);
 	virtual void cart_w(bool state);
-	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 	virtual void update_cart_base(UINT8 *cart_base) = 0;
 
 private:

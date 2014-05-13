@@ -46,16 +46,7 @@ struct coco_cartridge_line
 	cococart_line_value         value;
 	int                         line;
 	int                         q_count;
-	devcb_resolved_write_line   callback;
-};
-
-// ======================> cococart_interface
-
-struct cococart_interface
-{
-	devcb_write_line    m_cart_callback;
-	devcb_write_line    m_nmi_callback;
-	devcb_write_line    m_halt_callback;
+	devcb2_write_line   	    *callback;
 };
 
 // ======================> cococart_base_update_delegate
@@ -63,12 +54,20 @@ struct cococart_interface
 // direct region update handler
 typedef delegate<void (UINT8 *)> cococart_base_update_delegate;
 
+#define MCFG_COCO_CARTRIDGE_CART_CB(_devcb) \
+	devcb = &cococart_slot_device::static_set_cart_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_COCO_CARTRIDGE_NMI_CB(_devcb) \
+	devcb = &cococart_slot_device::static_set_nmi_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_COCO_CARTRIDGE_HALT_CB(_devcb) \
+	devcb = &cococart_slot_device::static_set_halt_callback(*device, DEVCB2_##_devcb);
+ 
 
 // ======================> cococart_slot_device
 class device_cococart_interface;
 
 class cococart_slot_device : public device_t,
-								public cococart_interface,
 								public device_slot_interface,
 								public device_image_interface
 {
@@ -76,6 +75,10 @@ public:
 	// construction/destruction
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &static_set_cart_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_nmi_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_halt_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_halt_callback.set_callback(object); }
+	
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
@@ -125,7 +128,11 @@ private:
 	coco_cartridge_line         m_cart_line;
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
-
+public:	
+	devcb2_write_line   	    m_cart_callback;
+	devcb2_write_line    	    m_nmi_callback;
+	devcb2_write_line    		m_halt_callback;
+private:
 	// cartridge
 	device_cococart_interface   *m_cart;
 
@@ -164,9 +171,8 @@ private:
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_COCO_CARTRIDGE_ADD(_tag,_config,_slot_intf,_def_slot) \
+#define MCFG_COCO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
