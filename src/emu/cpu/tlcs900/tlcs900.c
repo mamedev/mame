@@ -2173,6 +2173,18 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		m_level[TLCS900_INT5] = level;
 		break;
 
+	case TLCS900_INT6:
+		if (m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE)
+		{
+			m_reg[TMP95C063_INTE56] |= 0x80;
+		}
+		else if (m_level[TLCS900_INT6] == ASSERT_LINE && level == CLEAR_LINE)
+		{
+			m_reg[TMP95C063_INTE56] &= ~0x80;
+		}
+		m_level[TLCS900_INT6] = level;
+		break;
+
 	case TLCS900_TIO:   /* External timer input for timer 0 */
 		if ( ( m_reg[TMP95C063_T8RUN] & 0x01 ) && ( m_reg[TMP95C063_T01MOD] & 0x03 ) == 0x00 )
 		{
