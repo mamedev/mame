@@ -59,7 +59,6 @@ EMUOBJS = \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \
 	$(EMUOBJ)/devdelegate.o \
-	$(EMUOBJ)/devcb.o \
 	$(EMUOBJ)/devcb2.o \
 	$(EMUOBJ)/devcpu.o \
 	$(EMUOBJ)/devfind.o \
