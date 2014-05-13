@@ -369,7 +369,7 @@ bool sega8_cart_slot_device::call_load()
 			fread(ROM, len);
 		}
 		else
-			memcpy(ROM, get_software_region("rom") + offset, len);
+			memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
 
 		/* check the image */
 		if (verify_cart(ROM, len) == IMAGE_VERIFY_FAIL)
