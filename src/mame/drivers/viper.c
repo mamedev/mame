@@ -2029,17 +2029,6 @@ void viper_state::machine_reset()
 	identify_device[67] = 0x00f0;           /* 67: minimum PIO transfer cycle time without flow control */
 }
 
-static const voodoo_config voodoo_intf =
-{
-	8, //               fbmem;
-	0,//                tmumem0;
-	0,//                tmumem1;
-	"screen",//         screen;
-	"maincpu",//        cputag;
-	DEVCB_DRIVER_LINE_MEMBER(viper_state,voodoo_vblank),//    vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( viper, viper_state )
 
 	/* basic machine hardware */
@@ -2054,7 +2043,11 @@ static MACHINE_CONFIG_START( viper, viper_state )
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
 
-	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
+	MCFG_VOODOO_FBMEM(8)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(viper_state,voodoo_vblank))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

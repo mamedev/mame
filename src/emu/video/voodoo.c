@@ -977,15 +977,15 @@ static TIMER_CALLBACK( vblank_off_callback )
 		{
 			v->reg[intrCtrl].u |= 0x200;        // VSYNC int (falling) active
 
-			if (!v->fbi.vblank_client.isnull())
-				v->fbi.vblank_client(FALSE);
+			if (!v->device->m_vblank.isnull())
+				v->device->m_vblank(FALSE);
 
 		}
 	}
 	else
 	{
-		if (!v->fbi.vblank_client.isnull())
-			v->fbi.vblank_client(FALSE);
+		if (!v->device->m_vblank.isnull())
+			v->device->m_vblank(FALSE);
 	}
 
 	/* go to the end of the next frame */
@@ -1033,14 +1033,14 @@ static TIMER_CALLBACK( vblank_callback )
 		{
 			v->reg[intrCtrl].u |= 0x100;        // VSYNC int (rising) active
 
-			if (!v->fbi.vblank_client.isnull())
-				v->fbi.vblank_client(TRUE);
+			if (!v->device->m_vblank.isnull())
+				v->device->m_vblank(TRUE);
 		}
 	}
 	else
 	{
-		if (!v->fbi.vblank_client.isnull())
-			v->fbi.vblank_client(TRUE);
+		if (!v->device->m_vblank.isnull())
+			v->device->m_vblank(TRUE);
 	}
 }
 
@@ -2148,8 +2148,8 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 		v->pci.stall_state = NOT_STALLED;
 
 		/* either call the callback, or trigger the trigger */
-		if (!v->pci.stall_callback.isnull())
-			v->pci.stall_callback(FALSE);
+		if (!v->device->m_stall.isnull())
+			v->device->m_stall(FALSE);
 		else
 			v->device->machine().scheduler().trigger(v->trigger);
 	}
@@ -2172,8 +2172,8 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 	v->stats.stalls++;
 
 	/* either call the callback, or spin the CPU */
-	if (!v->pci.stall_callback.isnull())
-		v->pci.stall_callback(TRUE);
+	if (!v->device->m_stall.isnull())
+		v->device->m_stall(TRUE);
 	else
 		v->cpu->execute().spin_until_trigger(v->trigger);
 
@@ -2530,8 +2530,8 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			v->reg[intrCtrl].u &= ~0x80000000;
 
 			// TODO: rename vblank_client for less confusion?
-			if (!v->fbi.vblank_client.isnull())
-				v->fbi.vblank_client(TRUE);
+			if (!v->device->m_vblank.isnull())
+				v->device->m_vblank(TRUE);
 			break;
 
 		/* gamma table access -- Voodoo/Voodoo2 only */
@@ -4858,10 +4858,9 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
     device start callback
 -------------------------------------------------*/
 
-static void common_start_voodoo(device_t *device, UINT8 type)
+void voodoo_device::common_start_voodoo(UINT8 type)
 {
-	const voodoo_config *config = (const voodoo_config *)device->static_config();
-	voodoo_state *v = get_safe_token(device);
+	voodoo_state *v = get_safe_token(this);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
 	UINT32 tmumem0;
@@ -4873,17 +4872,17 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	assert(config->fbmem > 0);
 
 	/* store a pointer back to the device */
-	v->device = device;
+	v->device = this;
 	v->type = type;
 
 	/* copy config data */
-	v->freq = device->clock();
-	v->fbi.vblank_client.resolve(config->vblank,*device);
-	v->pci.stall_callback.resolve(config->stall,*device);
+	v->freq = clock();
+	v->device->m_vblank.resolve();
+	v->device->m_stall.resolve();
 
 	/* create a multiprocessor work queue */
-	v->poly = poly_alloc(device->machine(), 64, sizeof(poly_extra_data), 0);
-	v->thread_stats = auto_alloc_array(device->machine(), stats_block, WORK_MAX_THREADS);
+	v->poly = poly_alloc(machine(), 64, sizeof(poly_extra_data), 0);
+	v->thread_stats = auto_alloc_array(machine(), stats_block, WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -4951,18 +4950,18 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	}
 
 	/* set the type, and initialize the chip mask */
-	device_iterator iter(device->machine().root_device());
+	device_iterator iter(machine().root_device());
 	v->index = 0;
 	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
-		if (scan->type() == device->type())
+		if (scan->type() == this->type())
 		{
-			if (scan == device)
+			if (scan == this)
 				break;
 			v->index++;
 		}
-	v->screen = downcast<screen_device *>(device->machine().device(config->screen));
+	v->screen = downcast<screen_device *>(machine().device(m_screen));
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
-	v->cpu = device->machine().device(config->cputag);
+	v->cpu = machine().device(m_cputag);
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
 	v->chipmask = 0x01;
 	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;
@@ -4977,26 +4976,26 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	v->pci.fifo.size = 64*2;
 	v->pci.fifo.in = v->pci.fifo.out = 0;
 	v->pci.stall_state = NOT_STALLED;
-	v->pci.continue_timer = v->device->machine().scheduler().timer_alloc(FUNC(stall_cpu_callback), v);
+	v->pci.continue_timer = machine().scheduler().timer_alloc(FUNC(stall_cpu_callback), v);
 
 	/* allocate memory */
-	tmumem0 = config->tmumem0;
+	tmumem0 = m_tmumem0;
 	if (v->type <= TYPE_VOODOO_2)
 	{
 		/* separate FB/TMU memory */
-		fbmem = auto_alloc_array(device->machine(), UINT8, config->fbmem << 20);
-		tmumem[0] = auto_alloc_array(device->machine(), UINT8, config->tmumem0 << 20);
-		tmumem[1] = (config->tmumem1 != 0) ? auto_alloc_array(device->machine(), UINT8, config->tmumem1 << 20) : NULL;
+		fbmem = auto_alloc_array(machine(), UINT8, m_fbmem << 20);
+		tmumem[0] = auto_alloc_array(machine(), UINT8, m_tmumem0 << 20);
+		tmumem[1] = (m_tmumem1 != 0) ? auto_alloc_array(machine(), UINT8, m_tmumem1 << 20) : NULL;
 	}
 	else
 	{
 		/* shared memory */
-		tmumem[0] = tmumem[1] = fbmem = auto_alloc_array(device->machine(), UINT8, config->fbmem << 20);
-		tmumem0 = config->fbmem;
+		tmumem[0] = tmumem[1] = fbmem = auto_alloc_array(machine(), UINT8, m_fbmem << 20);
+		tmumem0 = m_fbmem;
 	}
 
 	/* set up frame buffer */
-	init_fbi(v, &v->fbi, fbmem, config->fbmem << 20);
+	init_fbi(v, &v->fbi, fbmem, m_fbmem << 20);
 
 	/* build shared TMU tables */
 	init_tmu_shared(&v->tmushare);
@@ -5004,9 +5003,9 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	/* set up the TMUs */
 	init_tmu(v, &v->tmu[0], &v->reg[0x100], tmumem[0], tmumem0 << 20);
 	v->chipmask |= 0x02;
-	if (config->tmumem1 != 0 || v->type == TYPE_VOODOO_3)
+	if (m_tmumem1 != 0 || v->type == TYPE_VOODOO_3)
 	{
-		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], config->tmumem1 << 20);
+		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], m_tmumem1 << 20);
 		v->chipmask |= 0x04;
 	}
 
@@ -5033,7 +5032,7 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	soft_reset(v);
 
 	/* register for save states */
-	init_save_state(device);
+	init_save_state(this);
 }
 
 
@@ -5666,7 +5665,14 @@ static void dump_rasterizer_stats(voodoo_state *v)
 }
 
 voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	  m_fbmem(0),
+	  m_tmumem0(0),
+	  m_tmumem1(0),
+	  m_screen(NULL),
+	  m_cputag(NULL),
+	  m_vblank(*this),
+	  m_stall(*this)
 {
 	m_token = global_alloc_clear(voodoo_state);
 }
@@ -5723,7 +5729,7 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_1_device::device_start()
 {
-	common_start_voodoo(this, TYPE_VOODOO_1);
+	common_start_voodoo(TYPE_VOODOO_1);
 }
 
 
@@ -5740,7 +5746,7 @@ voodoo_2_device::voodoo_2_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_2_device::device_start()
 {
-	common_start_voodoo(this, TYPE_VOODOO_2);
+	common_start_voodoo(TYPE_VOODOO_2);
 }
 
 
@@ -5762,7 +5768,7 @@ voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, devi
 
 void voodoo_banshee_device::device_start()
 {
-	common_start_voodoo(this, TYPE_VOODOO_BANSHEE);
+	common_start_voodoo(TYPE_VOODOO_BANSHEE);
 }
 
 
@@ -5779,7 +5785,7 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_3_device::device_start()
 {
-	common_start_voodoo(this, TYPE_VOODOO_3);
+	common_start_voodoo(TYPE_VOODOO_3);
 }
 
 

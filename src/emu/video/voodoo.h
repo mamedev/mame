@@ -39,13 +39,13 @@ enum
 
 struct voodoo_config
 {
-	UINT8               fbmem;
-	UINT8               tmumem0;
-	UINT8               tmumem1;
-	const char *        screen;
-	const char *        cputag;
-	devcb_write_line    vblank;
-	devcb_write_line    stall;
+	UINT8               l_fbmem;
+	UINT8               l_tmumem0;
+	UINT8               l_tmumem1;
+	const char *        l_screen;
+	const char *        l_cputag;
+	devcb_write_line    l_vblank;
+	devcb_write_line    l_stall;
 };
 
 
@@ -54,21 +54,24 @@ struct voodoo_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_3DFX_VOODOO_1_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, VOODOO_1, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_VOODOO_FBMEM(_value) \
+	voodoo_device::static_set_fbmem(*device, _value); 
 
-#define MCFG_3DFX_VOODOO_2_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, VOODOO_2, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_VOODOO_TMUMEM(_value1, _value2) \
+	voodoo_device::static_set_tmumem(*device, _value1, _value2); 
 
-#define MCFG_3DFX_VOODOO_BANSHEE_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, VOODOO_BANSHEE, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_VOODOO_SCREEN_TAG(_tag) \
+	voodoo_device::static_set_screen_tag(*device, _tag); 
 
-#define MCFG_3DFX_VOODOO_3_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, VOODOO_3, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_VOODOO_CPU_TAG(_tag) \
+	voodoo_device::static_set_cpu_tag(*device, _tag); 
+
+#define MCFG_VOODOO_VBLANK_CB(_devcb) \
+	devcb = &voodoo_device::static_set_vblank_callback(*device, DEVCB2_##_devcb);
+ 
+#define MCFG_VOODOO_STALL_CB(_devcb) \
+	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB2_##_devcb);
+ 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -87,11 +90,29 @@ public:
 	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~voodoo_device();
 
+
+	static void static_set_fbmem(device_t &device, int value) { downcast<voodoo_device &>(device).m_fbmem = value; }
+	static void static_set_tmumem(device_t &device, int value1, int value2) { downcast<voodoo_device &>(device).m_tmumem0 = value1; downcast<voodoo_device &>(device).m_tmumem1 = value2; }
+	static void static_set_screen_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_screen = tag; }
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
+	template<class _Object> static devcb2_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
+	
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
 
 	// access to legacy token
 	struct voodoo_state *token() const { assert(m_token != NULL); return m_token; }
+	void common_start_voodoo(UINT8 type);
+	
+	UINT8               m_fbmem;
+	UINT8               m_tmumem0;
+	UINT8               m_tmumem1;
+	const char *        m_screen;
+	const char *        m_cputag;
+	devcb2_write_line   m_vblank;
+	devcb2_write_line   m_stall;
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

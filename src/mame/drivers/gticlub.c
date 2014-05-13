@@ -1038,28 +1038,6 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static const voodoo_config voodoo_l_intf =
-{
-	2, //               fbmem;
-	2,//                tmumem0;
-	2,//                tmumem1;
-	"lscreen",//        screen;
-	"dsp",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(gticlub_state,voodoo_vblank_0),//  vblank;
-	DEVCB_NULL//             stall;
-};
-
-static const voodoo_config voodoo_r_intf =
-{
-	2, //               fbmem;
-	2,//                tmumem0;
-	2,//                tmumem1;
-	"rscreen",//        screen;
-	"dsp2",//           cputag;
-	DEVCB_DRIVER_LINE_MEMBER(gticlub_state,voodoo_vblank_1),//  vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	/* basic machine hardware */
@@ -1090,8 +1068,19 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)
-	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, voodoo_r_intf)
+	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(2,2)
+	MCFG_VOODOO_SCREEN_TAG("lscreen")
+	MCFG_VOODOO_CPU_TAG("dsp")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(gticlub_state,voodoo_vblank_0))
+	
+	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(2,2)
+	MCFG_VOODOO_SCREEN_TAG("rscreen")
+	MCFG_VOODOO_CPU_TAG("dsp2")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(gticlub_state,voodoo_vblank_1))
 
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo0")

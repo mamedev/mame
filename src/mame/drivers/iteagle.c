@@ -181,17 +181,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const voodoo_config iteagle_voodoo_intf =
-{
-	16, //              fbmem;
-	0,//                tmumem0;
-	0,//                tmumem1;
-	"screen",//     screen;
-	"maincpu",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(iteagle_state,vblank_assert),//    vblank;
-	DEVCB_NULL//             stall;
-};
-
 static const mips3_config r4310_config =
 {
 	16384,              /* code cache size */
@@ -217,7 +206,11 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(iteagle_state, screen_update_iteagle)
 
-	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, iteagle_voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
+	MCFG_VOODOO_FBMEM(16)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(iteagle_state,vblank_assert))
 MACHINE_CONFIG_END
 
 

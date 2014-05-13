@@ -960,17 +960,6 @@ ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 	return (double)(value) / 2047.0;
 }
 
-static const voodoo_config hornet_voodoo_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	0,//                tmumem1;
-	"screen",//         screen;
-	"dsp",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(hornet_state,voodoo_vblank_0),//  vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	/* basic machine hardware */
@@ -990,7 +979,12 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, hornet_voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("dsp")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_0))	
 
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo0")
@@ -1050,28 +1044,6 @@ MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 	}
 }
 
-static const voodoo_config voodoo_l_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	0,//                tmumem1;
-	"lscreen",//        screen;
-	"dsp",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(hornet_state,voodoo_vblank_0),//  vblank;
-	DEVCB_NULL//             stall;
-};
-
-static const voodoo_config voodoo_r_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	0,//                tmumem1;
-	"rscreen",//        screen;
-	"dsp2",//           cputag;
-	DEVCB_DRIVER_LINE_MEMBER(hornet_state,voodoo_vblank_1),//  vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
@@ -1091,8 +1063,20 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_K037122_PALETTE("palette")
 
 	MCFG_DEVICE_REMOVE("voodoo0")
-	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)
-	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, voodoo_r_intf)
+	
+	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("lscreen")
+	MCFG_VOODOO_CPU_TAG("dsp")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_0))	
+	
+	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("rscreen")
+	MCFG_VOODOO_CPU_TAG("dsp2")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))	
 
 	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo1")
@@ -1128,12 +1112,21 @@ static MACHINE_CONFIG_DERIVED( terabrst, hornet_2board )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hornet_2board_v2, hornet_2board )
-
 	MCFG_DEVICE_REMOVE("voodoo0")
-	MCFG_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, voodoo_l_intf)
-
+	MCFG_DEVICE_ADD("voodoo0", VOODOO_2, STD_VOODOO_2_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("lscreen")
+	MCFG_VOODOO_CPU_TAG("dsp")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_0))	
+	
 	MCFG_DEVICE_REMOVE("voodoo1")
-	MCFG_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, voodoo_r_intf)
+	MCFG_DEVICE_ADD("voodoo1", VOODOO_2, STD_VOODOO_2_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("rscreen")
+	MCFG_VOODOO_CPU_TAG("dsp2")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sscope2, hornet_2board_v2)

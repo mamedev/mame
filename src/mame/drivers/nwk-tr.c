@@ -721,17 +721,6 @@ void nwktr_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static const voodoo_config voodoo_intf =
-{
-	2, //               fbmem;
-	2,//                tmumem0;
-	2,//                tmumem1;
-	"screen",//         screen;
-	"dsp",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(nwktr_state,voodoo_vblank_0),//  vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	/* basic machine hardware */
@@ -756,7 +745,12 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_K033906_VOODOO("voodoo0")
 
 	/* video hardware */
-	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(2,2)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("dsp")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state,voodoo_vblank_0))	
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

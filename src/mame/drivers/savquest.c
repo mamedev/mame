@@ -659,17 +659,6 @@ WRITE_LINE_MEMBER(savquest_state::vblank_assert)
 {
 }
 
-static const voodoo_config voodoo_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	4,//                tmumem1;
-	"screen",//     screen;
-	"maincpu",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(savquest_state,vblank_assert),//    vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
@@ -691,7 +680,12 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_s3_vga )
 
-	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,4)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(savquest_state,vblank_assert))	
 MACHINE_CONFIG_END
 
 ROM_START( savquest )

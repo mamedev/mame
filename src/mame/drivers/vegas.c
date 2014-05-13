@@ -2213,17 +2213,6 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK    /* system clock rate */
 };
 
-static const voodoo_config voodoo_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	4,//                tmumem1;
-	"screen",//     screen;
-	"maincpu",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(vegas_state,vblank_assert),//    vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	/* basic machine hardware */
@@ -2240,7 +2229,12 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(vegas_state, ethernet_interrupt))
 
-	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,4)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(vegas_state,vblank_assert))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2267,22 +2261,16 @@ static MACHINE_CONFIG_DERIVED( vegas32m, vegascore )
 MACHINE_CONFIG_END
 
 
-static const voodoo_config vegasban_voodoo_intf =
-{
-	16, //              fbmem;
-	0,//                tmumem0;
-	0,//                tmumem1;
-	"screen",//     screen;
-	"maincpu",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(vegas_state,vblank_assert),//    vblank;
-	DEVCB_NULL//             stall;
-};
 static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, vegasban_voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
+	MCFG_VOODOO_FBMEM(16)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(vegas_state,vblank_assert))	
 MACHINE_CONFIG_END
 
 
@@ -2292,7 +2280,11 @@ static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m )
 	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, vegasban_voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
+	MCFG_VOODOO_FBMEM(16)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(vegas_state,vblank_assert))
 MACHINE_CONFIG_END
 
 
@@ -2302,7 +2294,11 @@ static MACHINE_CONFIG_DERIVED( denver, vegascore )
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, vegasban_voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
+	MCFG_VOODOO_FBMEM(16)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(vegas_state,vblank_assert))
 MACHINE_CONFIG_END
 
 // Per driver configs

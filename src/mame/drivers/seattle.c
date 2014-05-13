@@ -2513,17 +2513,6 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK    /* system clock rate */
 };
 
-static const voodoo_config voodoo_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	0,//                tmumem1;
-	"screen",//         screen;
-	"maincpu",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(seattle_state,vblank_assert),//    vblank;
-	DEVCB_DRIVER_LINE_MEMBER(seattle_state,voodoo_stall)//             stall;
-};
-
 static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	/* basic machine hardware */
@@ -2537,7 +2526,13 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(seattle_state, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(seattle_state,vblank_assert))
+	MCFG_VOODOO_STALL_CB(WRITELINE(seattle_state,voodoo_stall))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2581,17 +2576,6 @@ static MACHINE_CONFIG_DERIVED( seattle200_widget, seattle200 )
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
-static const voodoo_config voodoo_2_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	4,//                tmumem1;
-	"screen",//         screen;
-	"maincpu",//            cputag;
-	DEVCB_DRIVER_LINE_MEMBER(seattle_state,vblank_assert),//    vblank;
-	DEVCB_DRIVER_LINE_MEMBER(seattle_state,voodoo_stall)//             stall;
-};
-
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_CPU_CONFIG(r5000_config)
@@ -2601,7 +2585,13 @@ static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_2_intf)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,4)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(seattle_state,vblank_assert))
+	MCFG_VOODOO_STALL_CB(WRITELINE(seattle_state,voodoo_stall))
 MACHINE_CONFIG_END
 
 // Per game configurations

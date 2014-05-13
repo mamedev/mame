@@ -847,17 +847,6 @@ UINT32 funkball_state::screen_update_funkball(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static const voodoo_config voodoo_intf =
-{
-	2, //               fbmem;
-	4,//                tmumem0;
-	0,//                tmumem1;
-	"screen",//         screen;
-	"maincpu",//        cputag;
-	DEVCB_NULL,//             vblank;
-	DEVCB_NULL//             stall;
-};
-
 static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
@@ -874,7 +863,11 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, voodoo_intf)
+	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
+	MCFG_VOODOO_FBMEM(2)
+	MCFG_VOODOO_TMUMEM(4,0)
+	MCFG_VOODOO_SCREEN_TAG("screen")
+	MCFG_VOODOO_CPU_TAG("maincpu")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
