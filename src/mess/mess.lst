@@ -844,8 +844,9 @@ apxena1 // 1993 Apricot XEN PC (A1 Motherboard)
 apxenp2 // 1993 Apricot XEN PC (P2 Motherboard)
 aprpand
 aprfte
-megapc
-megapcpl
+megapc // 1992 Amstrad plc
+megapcpl 
+megapcpla // AMI BIOS version with Winbond WINBUS chipset
 ec1849
 t2000sx
 k286i   // 1985 Kaypro 286i

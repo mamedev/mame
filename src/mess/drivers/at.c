@@ -208,6 +208,19 @@ DRIVER_INIT_MEMBER(megapc_state, megapcpl)
 	ROM[0xffea0] = 0x20;  // to correct checksum
 }
 
+DRIVER_INIT_MEMBER(at_state, megapcpla)
+{
+	UINT8* ROM = memregion("maincpu")->base();
+
+	init_at_common();
+
+	ROM[0xf3c2a] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
+	ROM[0xfaf37] = 0x45;
+	ROM[0xfcf1b] = 0x54;  // this will allow the keyboard to work during the POST memory test
+	ROM[0xffffe] = 0x1c;
+	ROM[0xfffff] = 0x41;  // to correct checksum
+}
+
 READ16_MEMBER( megapc_state::wd7600_ior )
 {
 	if (offset < 4)
@@ -840,6 +853,40 @@ static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( megapcpla, at_state )
+	MCFG_CPU_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
+	MCFG_CPU_PROGRAM_MAP(at386_map)
+	MCFG_CPU_IO_MAP(at386_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+
+	MCFG_FRAGMENT_ADD( at_motherboard )
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	// on board devices
+	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa16_cards, "fdcsmc", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "ide", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", true)
+	// ISA cards
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "svga_dm", false)  // closest to the CL-GD5420
+	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, NULL, false)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,8M,15M,16M,32M,64M,128M,256M")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
+MACHINE_CONFIG_END
 
 
 #if 0
@@ -1513,6 +1560,13 @@ ROM_START( megapcpl )
 	ROM_LOAD16_BYTE( "486slc.u19", 0xe0001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))
 ROM_END
 
+ROM_START( megapcpla )
+	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "megapc_bios.bin",  0xc0000, 0x10000, CRC(b84938a2) SHA1(cecab72a96993db4f7c648c229b4211a8c53a380))
+	ROM_CONTINUE(0xf0000, 0x10000)
+ROM_END
+
 ROM_START( t2000sx )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD( "014d.ic9", 0xe0000, 0x20000, CRC(e9010b02) SHA1(75688fc8e222640fa22bcc90343c6966fe0da87f))
@@ -1563,8 +1617,9 @@ COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, at586_state,   at586,
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, at586_state,   at586,  "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atvga, at_state,      atvga,  "<generic>",  "NEAT (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
-COMP ( 1993, megapc,   0,       0,       megapc,    0,     megapc_state, megapc,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
-COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,     megapc_state, megapcpl,"Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
+COMP ( 1993, megapc,   0,       0,       megapc,    0,     megapc_state,megapc,   "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
+COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,     megapc_state,megapcpl, "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
+COMP ( 199?, megapcpla, megapc,  0,      megapcpla, 0,     at_state,    megapcpla,"Amstrad plc", "MegaPC Plus (WINBUS chipset)", GAME_NOT_WORKING )
 COMP ( 1989, pc2386,   ibm5170, 0,       at386,     atvga, at_state,      atvga,  "Amstrad plc", "Amstrad PC2386", GAME_NOT_WORKING )
 COMP ( 1991, aprfte,   ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", GAME_NOT_WORKING )
 COMP ( 1991, ftsserv,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot FTs (Scorpion)", GAME_NOT_WORKING )
