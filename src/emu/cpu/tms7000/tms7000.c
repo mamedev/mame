@@ -163,6 +163,7 @@ void tms7000_device::device_start()
 	memset(&m_pc, 0x00, sizeof(m_pc));
 	m_sp = 0;
 	m_sr = 0;
+	m_idle_state = 0;
 
 	/* Save register state */
 	save_item(NAME(pPC));
