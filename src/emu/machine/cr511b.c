@@ -57,7 +57,7 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 	m_scor_handler(*this),
 	m_xaen_handler(*this),
 	m_frame_timer(NULL),
-	m_motor(false),
+	//m_motor(false),
 	m_enabled(-1),
 	m_cmd(-1)
 {

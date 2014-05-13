@@ -89,9 +89,9 @@ class a500_state : public amiga_state
 {
 public:
 	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_side_int2(0),
-	m_side_int6(0)
+	amiga_state(mconfig, type, tag)
+	//m_side_int2(0),
+	//m_side_int6(0)
 	{ }
 
 	DECLARE_DRIVER_INIT( pal );
@@ -101,8 +101,8 @@ protected:
 
 private:
 	// internal state
-	int m_side_int2;
-	int m_side_int6;
+	//int m_side_int2;
+	//int m_side_int6;
 };
 
 class cdtv_state : public amiga_state
@@ -182,9 +182,9 @@ class a500p_state : public amiga_state
 public:
 	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "u9"),
-	m_side_int2(0),
-	m_side_int6(0)
+	m_rtc(*this, "u9")
+	//m_side_int2(0),
+	//m_side_int6(0)
 	{ }
 
 	DECLARE_READ16_MEMBER( clock_r );
@@ -200,8 +200,8 @@ private:
 	required_device<msm6242_device> m_rtc;
 
 	// internal state
-	int m_side_int2;
-	int m_side_int6;
+	//int m_side_int2;
+	//int m_side_int6;
 };
 
 class a600_state : public amiga_state
@@ -236,8 +236,8 @@ class a1200_state : public amiga_state
 {
 public:
 	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_gayle_id_count(0)
+	amiga_state(mconfig, type, tag)
+	//m_gayle_id_count(0)
 	{ }
 
 	DECLARE_READ32_MEMBER( ide_r );
@@ -254,7 +254,7 @@ protected:
 private:
 	static const int GAYLE_ID = 0xd1;
 
-	int m_gayle_id_count;
+	//int m_gayle_id_count;
 	UINT8 m_gayle_reg[4];
 };
 

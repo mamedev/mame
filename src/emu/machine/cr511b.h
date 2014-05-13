@@ -136,14 +136,14 @@ private:
 
 	emu_timer *m_frame_timer;
 
-	bool m_motor;
+	//bool m_motor;
 
 	// state of lines
 	int m_enabled;
 	int m_cmd;
 
 	// data transfer
-	UINT8 m_sector_buffer[CD_MAX_SECTOR_DATA];
+	//UINT8 m_sector_buffer[CD_MAX_SECTOR_DATA];
 };
 
 // device type definition
