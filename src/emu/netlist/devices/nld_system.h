@@ -104,7 +104,7 @@ protected:
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		OUTANALOG(m_Q, 0.0, NLTIME_IMMEDIATE);
+		OUTANALOG(m_Q, 0.0);
 	}
 
 private:
@@ -258,14 +258,7 @@ protected:
 		return m_R.m_N;
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
-	{
-		double R = INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low;
-		double V = INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V;
-		//printf("%f %f\n", R, V);
-		m_R.set_R(R);
-		OUTANALOG(m_Q, V, NLTIME_FROM_NS(0));
-	}
+	ATTR_HOT ATTR_ALIGN void update();
 
 private:
 	netlist_analog_output_t m_Q;

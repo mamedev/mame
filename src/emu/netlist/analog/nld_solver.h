@@ -173,7 +173,7 @@ public:
 		ATTR_COLD ~NETLIB_NAME(solver)();
 
 		ATTR_COLD void post_start();
-        ATTR_COLD void reschedule_all();
+        ATTR_COLD void solve_all();
 
 		ATTR_HOT inline double gmin() { return m_gmin.Value(); }
 );

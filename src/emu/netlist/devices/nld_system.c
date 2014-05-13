@@ -4,6 +4,7 @@
  */
 
 #include "nld_system.h"
+#include "../analog/nld_solver.h"
 
 // ----------------------------------------------------------------------------------------
 // clock
@@ -18,7 +19,6 @@ NETLIB_START(clock)
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
 	connect(m_feedback, m_Q);
-
 }
 
 NETLIB_RESET(clock)
@@ -75,10 +75,20 @@ NETLIB_RESET(analog_input)
 
 NETLIB_UPDATE(analog_input)
 {
-	OUTANALOG(m_Q, m_IN.Value(), NLTIME_IMMEDIATE);
+	OUTANALOG(m_Q, m_IN.Value());
 }
 
 NETLIB_UPDATE_PARAM(analog_input)
 {
 	update();
+}
+
+
+ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
+{
+    double R = INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low;
+    double V = INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V;
+    //printf("%f %f\n", R, V);
+    OUTANALOG(m_Q, V);
+    m_R.set_R(R);
 }

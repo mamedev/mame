@@ -836,6 +836,16 @@ ATTR_COLD void netlist_analog_output_t::initial(const double val)
 	net().m_new_Analog = val * 1.0;
 }
 
+ATTR_HOT void netlist_analog_output_t::set_Q(const double newQ)
+{
+    if (newQ != net().m_new_Analog)
+    {
+        net().m_new_Analog = newQ;
+        net().push_to_queue(NLTIME_FROM_NS(0));
+    }
+}
+
+
 // ----------------------------------------------------------------------------------------
 // netlist_param_t & friends
 // ----------------------------------------------------------------------------------------

@@ -180,13 +180,8 @@ ATTR_HOT bool netlist_matrix_solver_t::solve()
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-#if 1
             owner().netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
 	        m_Q_sync.net().push_to_queue(m_params.m_nt_sync_delay);
-#else
-            owner().netlist().warning("NEWTON_LOOPS exceeded ... reschedule all");
-	        m_owner->reschedule_all();
-#endif
 	        return false;
 		}
 	}
@@ -747,10 +742,12 @@ NETLIB_UPDATE(solver)
         m_Q_step.net().push_to_queue(m_inc);
 }
 
-ATTR_COLD void NETLIB_NAME(solver)::reschedule_all()
+ATTR_COLD void NETLIB_NAME(solver)::solve_all()
 {
     for (int i = 0; i < m_mat_solvers.count(); i++)
-        m_mat_solvers[i]->m_Q_sync.net().push_to_queue(m_mat_solvers[i]->m_params.m_nt_sync_delay);
+        //m_mat_solvers[i]->m_Q_sync.net().push_to_queue(m_mat_solvers[i]->m_params.m_nt_sync_delay);
+        if (m_mat_solvers[i]->solve())
+            m_mat_solvers[i]->update_inputs();
 }
 
 

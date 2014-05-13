@@ -121,15 +121,7 @@ public:
 		}
 	}
 
-	ATTR_HOT ATTR_ALIGN void virtual update()
-	{
-		if (!m_RB.m_P.net().isRailNet())
-			m_RB.m_P.net().schedule_solve();   // Basis
-		else if (!m_RB.m_N.net().isRailNet())
-			m_RB.m_N.net().schedule_solve();   // Emitter
-		else if (!m_RC.m_P.net().isRailNet())
-			m_RC.m_P.net().schedule_solve();   // Collector
-	}
+	ATTR_HOT ATTR_ALIGN void virtual update();
 
 	nld_twoterm m_RB;
 	nld_twoterm m_RC;

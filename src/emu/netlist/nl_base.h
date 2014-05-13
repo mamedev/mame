@@ -721,14 +721,7 @@ public:
 
 	ATTR_COLD void initial(const double val);
 
-	ATTR_HOT inline void set_Q(const double newQ, const netlist_time delay)
-	{
-		if (newQ != net().m_new_Analog)
-		{
-			net().m_new_Analog = newQ;
-			net().push_to_queue(delay);
-		}
-	}
+	ATTR_HOT void set_Q(const double newQ);
 
 };
 
@@ -902,9 +895,9 @@ public:
 
 	ATTR_HOT inline const double TERMANALOG(const netlist_terminal_t &term) const { return term.net().Q_Analog(); }
 
-	ATTR_HOT inline void OUTANALOG(netlist_analog_output_t &out, const double val, const netlist_time delay)
+	ATTR_HOT inline void OUTANALOG(netlist_analog_output_t &out, const double val)
 	{
-		out.set_Q(val, delay);
+		out.set_Q(val);
 	}
 
 	ATTR_HOT virtual void inc_active() {  }

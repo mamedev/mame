@@ -79,12 +79,14 @@ NETLIB_UPDATE(NE555)
 
 	if (!m_last_out && out)
 	{
-		OUTANALOG(m_OUT, TERMANALOG(m_R1.m_P), NLTIME_FROM_NS(100));
+	    // FIXME: Should be delayed by 100ns
+		OUTANALOG(m_OUT, TERMANALOG(m_R1.m_P));
 		m_RDIS.set_R(R_OFF);
 	}
 	else if (m_last_out && !out)
 	{
-		OUTANALOG(m_OUT, TERMANALOG(m_R3.m_N), NLTIME_FROM_NS(100));
+        // FIXME: Should be delayed by 100ns
+		OUTANALOG(m_OUT, TERMANALOG(m_R3.m_N));
 		m_RDIS.set_R(R_ON);
 	}
 	m_last_out = out;
