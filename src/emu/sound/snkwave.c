@@ -29,6 +29,7 @@ snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, d
 		m_counter(0),
 		m_waveform_position(0)
 {
+	memset(m_waveform, 0, sizeof(m_waveform));
 }
 
 //-------------------------------------------------
@@ -37,8 +38,6 @@ snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, d
 
 void snkwave_device::device_start()
 {
-	assert(static_config() == 0);
-
 	/* adjust internal clock */
 	m_external_clock = clock();
 
