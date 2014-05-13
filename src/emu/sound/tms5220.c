@@ -1491,7 +1491,7 @@ void tms5220_device::device_reset()
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
 	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
 #endif
-	m_new_frame_energy_idx = m_current_energy = m_target_energy = 0;
+	m_new_frame_energy_idx = m_current_energy = m_target_energy = m_previous_energy = 0;
 	m_new_frame_pitch_idx = m_current_pitch = m_target_pitch = 0;
 	memset(m_new_frame_k_idx, 0, sizeof(m_new_frame_k_idx));
 	memset(m_current_k, 0, sizeof(m_current_k));
