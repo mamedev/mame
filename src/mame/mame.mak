@@ -177,6 +177,7 @@ SOUNDS += SN76496
 SOUNDS += POKEY
 SOUNDS += TIA
 SOUNDS += NES_APU
+SOUNDS += AMIGA
 SOUNDS += ASTROCADE
 SOUNDS += NAMCO
 SOUNDS += NAMCO_15XX
@@ -338,6 +339,7 @@ VIDEOS += VOODOO
 # specify available machine cores
 #-------------------------------------------------
 
+MACHINES += AKIKO
 MACHINES += NCR53C7XX
 MACHINES += LSI53C810
 MACHINES += 6522VIA
@@ -777,9 +779,9 @@ $(MAMEOBJ)/alpha.a: \
 
 $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/alg.o \
-	$(MACHINE)/amiga.o $(AUDIO)/amiga.o $(VIDEO)/amiga.o $(VIDEO)/amigaaga.o\
+	$(MACHINE)/amiga.o $(VIDEO)/amiga.o $(VIDEO)/amigaaga.o\
 	$(DRIVERS)/arcadia.o \
-	$(DRIVERS)/cd32.o $(MACHINE)/cd32.o \
+	$(DRIVERS)/cubo.o \
 	$(DRIVERS)/mquake.o \
 	$(DRIVERS)/upscope.o \
 

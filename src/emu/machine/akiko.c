@@ -1,31 +1,57 @@
-#include "emu.h"
-#include "cdrom.h"
-#include "coreutil.h"
-#include "sound/cdda.h"
+/***************************************************************************
+
+	Akiko
+
+	ASIC used in the Amiga CD32. Commodore Part number 391563-01.
+
+	- CD-ROM controller
+	- Builtin 1KB NVRAM
+	- Chunky to planar converter
+	- 2x CIA chips
+
+***************************************************************************/
+
+#include "akiko.h"
+#include "includes/amiga.h"
 #include "imagedev/chd_cd.h"
-#include "includes/cd32.h"
+#include "coreutil.h"
 
 
-/*********************************************************************************
-
-    Akiko custom chip emulation
-
-The Akiko chip has:
-- built in 1KB NVRAM
-- chunky to planar converter
-- custom CDROM controller
-
-TODO: Add CDDA support
-
-*********************************************************************************/
+//**************************************************************************
+//  CONSTANTS / MACROS
+//**************************************************************************
 
 #define LOG_AKIKO       0
 #define LOG_AKIKO_CD    0
 
-#define CD_SECTOR_TIME      (1000/((150*1024)/2048))    /* 1X CDROM sector time in msec (300KBps) */
 
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
 const device_type AKIKO = &device_creator<akiko_device>;
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( akiko )
+MACHINE_CONFIG_END
+
+machine_config_constructor akiko_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( akiko );
+}
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  akiko_device - constructor
+//-------------------------------------------------
 
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AKIKO, "CBM AKIKO", tag, owner, clock, "akiko", __FILE__),
@@ -52,8 +78,10 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	m_cdrom_toc(NULL),
 	m_dma_timer(NULL),
 	m_frame_timer(NULL),
-	m_i2cmem(NULL),
-	m_cdrom_is_device(0)
+	m_cdrom_is_device(0),
+	m_scl_w(*this),
+	m_sda_r(*this),
+	m_sda_w(*this)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -68,15 +96,17 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	}
 }
 
+
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  set_cputag - set cpu tag for cpu we working on
 //-------------------------------------------------
 
-void akiko_device::device_config_complete()
+void akiko_device::set_cputag(device_t &device, const char *tag)
 {
+	akiko_device &akiko = downcast<akiko_device &>(device);
+	akiko.m_cputag = tag;
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -84,6 +114,11 @@ void akiko_device::device_config_complete()
 
 void akiko_device::device_start()
 {
+	// resolve callbacks
+	m_scl_w.resolve_safe();
+	m_sda_r.resolve_safe(1);
+	m_sda_w.resolve_safe();
+
 	m_c2p_input_index = 0;
 	m_c2p_output_index = 0;
 
@@ -107,10 +142,12 @@ void akiko_device::device_start()
 	m_cdrom_cmd_end = 0;
 	m_cdrom_cmd_resp = 0;
 
+	device_t *cpu = machine().device(m_cputag);
+	m_space = &cpu->memory().space(AS_PROGRAM);
+
 	m_cdrom_toc = NULL;
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::dma_proc), this));
 	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::frame_proc), this));
-	m_i2cmem = machine().device<i2cmem_device>("i2cmem");
 	m_cdda = machine().device<cdda_device>("cdda");
 }
 
@@ -120,11 +157,9 @@ void akiko_device::device_start()
 
 void akiko_device::device_reset()
 {
-	amiga_state *amiga = machine().driver_data<amiga_state>();
-	m_space = amiga->m_maincpu_program_space;
-
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-	if (cddevice!=NULL)
+
+	if (cddevice != NULL)
 	{
 		// MESS case
 		m_cdrom = cddevice->get_cdrom_file();
@@ -136,7 +171,6 @@ void akiko_device::device_reset()
 		m_cdrom = cdrom_open(get_disk_handle(machine(), ":cdrom"));
 		m_cdrom_is_device = 0;
 	}
-
 
 	/* create the TOC table */
 	if ( m_cdrom != NULL && cdrom_get_last_track(m_cdrom) )
@@ -207,36 +241,26 @@ void akiko_device::device_stop()
 
 void akiko_device::nvram_write(UINT32 data)
 {
-	m_i2c_scl_out = BIT(data,31);
-	m_i2c_sda_out = BIT(data,30);
-	m_i2c_scl_dir = BIT(data,15);
-	m_i2c_sda_dir = BIT(data,14);
+	m_i2c_scl_out = BIT(data, 31);
+	m_i2c_sda_out = BIT(data, 30);
+	m_i2c_scl_dir = BIT(data, 15);
+	m_i2c_sda_dir = BIT(data, 14);
 
-	m_i2cmem->write_scl( m_i2c_scl_out );
-	m_i2cmem->write_sda( m_i2c_sda_out );
+	m_scl_w(m_i2c_scl_out);
+	m_sda_w(m_i2c_sda_out);
 }
 
 UINT32 akiko_device::nvram_read()
 {
-	UINT32  v = 0;
+	UINT32 v = 0;
 
-	if ( m_i2c_scl_dir )
-	{
+	if (m_i2c_scl_dir)
 		v |= m_i2c_scl_out << 31;
-	}
-	else
-	{
-		v |= 0 << 31;
-	}
 
-	if ( m_i2c_sda_dir )
-	{
+	if (m_i2c_sda_dir)
 		v |= m_i2c_sda_out << 30;
-	}
 	else
-	{
-		v |= m_i2cmem->read_sda() << 30;
-	}
+		v |= m_sda_r() << 30;
 
 	v |= m_i2c_scl_dir << 15;
 	v |= m_i2c_sda_dir << 14;
@@ -393,8 +417,10 @@ void akiko_device::set_cd_status(UINT32 status)
 
 	if ( m_cdrom_status[0] & m_cdrom_status[1] )
 	{
-		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
-		amiga->amiga_custom_w(*m_space, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		if (LOG_AKIKO_CD)
+			logerror("Akiko CD IRQ\n");
+
+		amiga->custom_chip_w(REG_INTREQ, INTENA_SETCLR | INTENA_PORTS);
 	}
 }
 

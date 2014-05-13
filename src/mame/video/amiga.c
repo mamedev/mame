@@ -206,7 +206,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[state->m_copper_pending_offset & 0xff], state->m_copper_pending_data);
-		state->amiga_custom_w(*state->m_maincpu_program_space, state->m_copper_pending_offset, state->m_copper_pending_data, 0xffff);
+		state->custom_chip_w(state->m_copper_pending_offset, state->m_copper_pending_data);
 		state->m_copper_pending_offset = 0;
 	}
 
@@ -262,7 +262,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
-				state->amiga_custom_w(*state->m_maincpu_program_space, word0, word1, 0xffff);
+				state->custom_chip_w(word0, word1);
 			}
 			else    // additional 2 cycles needed for non-Agnus registers
 			{
@@ -624,6 +624,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, ham = 0;
+	//int lace = 0;
 	int hstart = 0, hstop = 0;
 	int vstart = 0, vstop = 0;
 	int pf1pri = 0, pf2pri = 0;
@@ -663,7 +664,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 
 	/* loop over the line */
 	next_copper_x = 0;
-	for (x = 0; x < 0xe4*2; x++)
+	for (x = 0; x < 227.5*2; x++)
 	{
 		int sprpix;
 
@@ -682,11 +683,13 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
-//          lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
+			//lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
 
 			/* compute the pixel fetch parameters */
-			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
-			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs) : (17 + defbitoffs));
+			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
+			ddf_start_pixel += hires ? 9 : 17;
+			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
+			ddf_stop_pixel += hires ? (9 + defbitoffs) : (17 + defbitoffs);
 
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
 				ddf_stop_pixel += 8;
@@ -943,24 +946,27 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 	}
 
 #if 0
-	if ( m_screen->frame_number() % 64 == 0 && scanline == 100 )
+	if ( machine.first_screen()->frame_number() % 64 == 0 && scanline == 100 )
 	{
+#if 0
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
 		const char *m_ham = "HAM";
 		const char *m_dualpf = "DUALPF";
-		const char *m_lace = "LACE";
-		const char *m_hilace = "HI-LACE";
+		//const char *m_lace = "LACE";
+		//const char *m_hilace = "HI-LACE";
 		const char *p = m_lores;
 
 		if ( hires ) p = m_hires;
 		if ( ham ) p = m_ham;
 		if ( dualpf ) p = m_dualpf;
-		if ( lace ) p = m_lace;
+		//if ( lace ) p = m_lace;
 
-		if ( hires && lace ) p = m_hilace;
-
-		popmessage("%s(%d pl od=%04x ed=%04x start=%04x stop=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP) );
+		//if ( hires && lace ) p = m_hilace;
+#endif
+		//popmessage("%s(%d pl od=%04x ed=%04x start=%04x stop=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP) );
+		//popmessage("%s(%d pl y=%d vstart=%04x vstop=%04x start=%04x stop=%04x)", p, planes, scanline, vstart, vstop, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP) );
+		popmessage("DDFSTRT=%04x, DDFSTOP=%04x, DIWSTRT=%04x, DIWSTOP=%04x", CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP), CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP));
 	}
 #endif
 
@@ -974,6 +980,9 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 		/* update even planes */
 		for (pl = 1; pl < planes; pl += 2)
 			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
+
+		if (machine.input().code_pressed(KEYCODE_Q))
+			printf("%03d BPL1MOD=%04x BPL2MOD=%04x BPLCON1=%04x\n", scanline, CUSTOM_REG(REG_BPL1MOD), CUSTOM_REG(REG_BPL2MOD), CUSTOM_REG(REG_BPLCON1));
 	}
 
 	/* restore color00 */
@@ -1001,10 +1010,8 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 /* TODO: alg.c requires that this uses RGB32 */
 UINT32 amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
-	/* render each scanline in the visible region */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	// render each scanline in the visible region
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		amiga_render_scanline(machine(), bitmap, y);
 
 	return 0;

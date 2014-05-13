@@ -66,6 +66,15 @@ public:
 	DECLARE_WRITE8_MEMBER( pb_w );
 	DECLARE_WRITE8_MEMBER( pc_w );
 
+	WRITE_LINE_MEMBER( pb0_w ) { port_line_w(m_in_b, 0, state); }
+	WRITE_LINE_MEMBER( pb1_w ) { port_line_w(m_in_b, 1, state); }
+	WRITE_LINE_MEMBER( pb2_w ) { port_line_w(m_in_b, 2, state); }
+	WRITE_LINE_MEMBER( pb3_w ) { port_line_w(m_in_b, 3, state); }
+	WRITE_LINE_MEMBER( pb4_w ) { port_line_w(m_in_b, 4, state); }
+	WRITE_LINE_MEMBER( pb5_w ) { port_line_w(m_in_b, 5, state); }
+	WRITE_LINE_MEMBER( pb6_w ) { port_line_w(m_in_b, 6, state); }
+	WRITE_LINE_MEMBER( pb7_w ) { port_line_w(m_in_b, 7, state); }
+
 	UINT8 get_ddr_a();
 	UINT8 get_ddr_b();
 	UINT8 get_ddr_c();
@@ -104,6 +113,9 @@ private:
 
 	void set_interrupt();
 	void clear_interrupt();
+
+	// helper function to write a single line
+	static void port_line_w(UINT8 &port, int line, int state);
 };
 
 extern const device_type TPI6525;

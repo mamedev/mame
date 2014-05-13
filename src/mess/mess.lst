@@ -699,20 +699,30 @@ c128dcr_de
 c128dcr_se
 c128d81
 
-a1000   // Commodore Amiga 1000
-a1000n  //
-a500    // Commodore Amiga 500
-a500n   //
-a500pl  // Commodore Amiga 500+
-a500pln //
-a600    // Commodore Amiga 600
-a600n   //
-a3000   // Commodore Amiga 3000
-a3000n  //
-a1200   // Commodore Amiga 1200
-a1200n  //
-cdtv    // Commodore CDTV
-cd32    // Commodore Amiga CD32
+a1000   	// Commodore Amiga 1000
+a1000n
+a2000		// Commodore Amiga 2000
+a2000n
+a500    	// Commodore Amiga 500
+a500n
+cdtv		// Commodore CDTV
+cdtvn
+a3000		// Commodore Amiga 3000
+a3000n
+a500p		// Commodore Amiga 500 Plus
+a500pn
+a600		// Commodore Amiga 600
+a600n
+a1200		// Commodore Amiga 1200
+a1200n
+a4000		// Commodore Amiga 4000/040
+a4000n
+a400030		// Commodore Amiga 4000/030
+a400030n
+cd32		// Commodore Amiga CD32
+cd32n
+a4000t		// Commodore Amiga 4000T
+a4000tn
 
 c65    // 1991 C65 / C64DX (Prototype, NTSC)
 c64dx    // 1991 C65 / C64DX (Prototype, German PAL)

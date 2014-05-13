@@ -40,82 +40,28 @@
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
 
+
 class mquake_state : public amiga_state
 {
 public:
 	mquake_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag) { }
+	: amiga_state(mconfig, type, tag),
+	m_es5503(*this, "es5503"),
+	m_es5503_rom(*this, "es5503")
+	{ }
 
 	DECLARE_DRIVER_INIT(mquake);
-	DECLARE_MACHINE_RESET(mquake);
-	DECLARE_WRITE8_MEMBER( mquake_cia_0_porta_w );
-	DECLARE_READ8_MEMBER( mquake_cia_0_portb_r );
-	DECLARE_WRITE8_MEMBER( mquake_cia_0_portb_w );
+
 	DECLARE_READ8_MEMBER( es5503_sample_r );
 	DECLARE_WRITE16_MEMBER( output_w );
 	DECLARE_READ16_MEMBER( coin_chip_r );
 	DECLARE_WRITE16_MEMBER( coin_chip_w );
+
+private:
+	required_device<es5503_device> m_es5503;
+	required_memory_region m_es5503_rom;
 };
 
-/*************************************
- *
- *  CIA-A port A access:
- *
- *  PA7 = game port 1, pin 6 (fire)
- *  PA6 = game port 0, pin 6 (fire)
- *  PA5 = /RDY (disk ready)
- *  PA4 = /TK0 (disk track 00)
- *  PA3 = /WPRO (disk write protect)
- *  PA2 = /CHNG (disk change)
- *  PA1 = /LED (LED, 0=bright / audio filter control)
- *  PA0 = OVL (ROM/RAM overlay bit)
- *
- *************************************/
-
-WRITE8_MEMBER(mquake_state::mquake_cia_0_porta_w)
-{
-	/* switch banks as appropriate */
-	m_bank1->set_entry(data & 1);
-
-	/* swap the write handlers between ROM and bank 1 based on the bit */
-	if ((data & 1) == 0)
-		/* overlay disabled, map RAM on 0x000000 */
-		m_maincpu->space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
-
-	else
-		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		m_maincpu->space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
-}
-
-
-
-/*************************************
- *
- *  CIA-A port B access:
- *
- *  PB7 = parallel data 7
- *  PB6 = parallel data 6
- *  PB5 = parallel data 5
- *  PB4 = parallel data 4
- *  PB3 = parallel data 3
- *  PB2 = parallel data 2
- *  PB1 = parallel data 1
- *  PB0 = parallel data 0
- *
- *************************************/
-
-READ8_MEMBER(mquake_state::mquake_cia_0_portb_r)
-{
-	/* parallel port */
-	logerror("%s:CIA0_portb_r\n", machine().describe_context());
-	return 0xff;
-}
-
-WRITE8_MEMBER(mquake_state::mquake_cia_0_portb_w)
-{
-	/* parallel port */
-	logerror("%s:CIA0_portb_w(%02x)\n", machine().describe_context(), data);
-}
 
 
 
@@ -125,26 +71,23 @@ WRITE8_MEMBER(mquake_state::mquake_cia_0_portb_w)
  *
  *************************************/
 
-READ8_MEMBER(mquake_state::es5503_sample_r)
+READ8_MEMBER( mquake_state::es5503_sample_r )
 {
-	UINT8 *rom = memregion("es5503")->base();
-	es5503_device *es5503 = machine().device<es5503_device>("es5503");
-
-	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
+	return m_es5503_rom->base()[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
 
 static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, mquake_state )
 	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(mquake_state::output_w)
+WRITE16_MEMBER( mquake_state::output_w )
 {
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x:output_w(%x) = %02x\n", space.device().safe_pc(), offset, data);
 }
 
 
-READ16_MEMBER(mquake_state::coin_chip_r)
+READ16_MEMBER( mquake_state::coin_chip_r )
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
@@ -152,7 +95,7 @@ READ16_MEMBER(mquake_state::coin_chip_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(mquake_state::coin_chip_w)
+WRITE16_MEMBER( mquake_state::coin_chip_w )
 {
 	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space.device().safe_pc(), offset, data, mem_mask);
 }
@@ -171,14 +114,27 @@ WRITE16_MEMBER(mquake_state::coin_chip_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mquake_state )
+static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, mquake_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
+	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, mquake_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
+	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
+	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
+	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
+	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mquake_state )
+	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("es5503", es5503_device, read, write, 0x00ff)
 	AM_RANGE(0x282000, 0x282001) AM_READ_PORT("SW.LO")
@@ -203,21 +159,21 @@ static INPUT_PORTS_START( mquake )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)         /* JS0SW */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)         /* JS1SW */
 
-	PORT_START("JOY0DAT")
+	PORT_START("joy_0_dat")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, 0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("JOY1DAT")
+	PORT_START("joy_1_dat")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, 1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("P1JOY")
+	PORT_START("p1_joy")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
-	PORT_START("P2JOY")
+	PORT_START("p2_joy")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -336,16 +292,6 @@ INPUT_PORTS_END
 
 
 
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-MACHINE_RESET_MEMBER(mquake_state,mquake)
-{
-	MACHINE_RESET_CALL_MEMBER(amiga);
-}
 
 /*************************************
  *
@@ -356,11 +302,16 @@ MACHINE_RESET_MEMBER(mquake_state,mquake)
 static MACHINE_CONFIG_START( mquake, mquake_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
+	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(amiga_state, amiga)
-	MCFG_MACHINE_RESET_OVERRIDE(mquake_state,mquake)
+	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -381,30 +332,28 @@ static MACHINE_CONFIG_START( mquake, mquake_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, 3579545)
+	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
-	MCFG_ES5503_ADD("es5503", 7159090)       /* ES5503 is likely mono due to channel strobe used as bank select */
+	MCFG_ES5503_ADD("es5503", amiga_state::CLK_7M_NTSC)       /* ES5503 is likely mono due to channel strobe used as bank select */
 	MCFG_ES5503_OUTPUT_CHANNELS(1)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, mquake_es5503_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(mquake_state,mquake_cia_0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(mquake_state,mquake_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(mquake_state,mquake_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 MACHINE_CONFIG_END
 
@@ -417,9 +366,9 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( mquake )
-	ROM_REGION(0x80000, "user1", 0)
-	ROM_LOAD16_WORD_SWAP( "kick12.rom", 0x000000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88) )
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
+	ROM_REGION(0x80000, "kickstart", 0)
+	ROM_LOAD16_WORD_SWAP("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
+	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
 
 	ROM_REGION(0xc0000, "user2", 0)
 	ROM_LOAD16_BYTE( "rom0l.bin",    0x00000, 0x10000, CRC(60c35ec3) SHA1(84fe88af54903cbd46044ef52bb50e8f94a94dcd) )
@@ -447,29 +396,19 @@ ROM_END
 
 
 
+
 /*************************************
  *
  *  Driver init
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(mquake_state,mquake)
+DRIVER_INIT_MEMBER( mquake_state, mquake )
 {
-	static const amiga_machine_interface mquake_intf =
-	{
-		ANGUS_CHIP_RAM_MASK,
-		NULL, NULL, NULL,
-		NULL,
-		NULL, NULL,
-		NULL,
-		0
-	};
-	amiga_machine_config(machine(), &mquake_intf);
-
-	/* set up memory */
-	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, memregion("user1")->base());
+	m_agnus_id = AGNUS_HR_NTSC;
+	m_denise_id = DENISE;
 }
+
 
 
 

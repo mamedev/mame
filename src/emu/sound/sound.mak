@@ -101,6 +101,17 @@ endif
 
 
 #-------------------------------------------------
+# Amiga audio hardware
+#@src/emu/sound/amiga.h,SOUNDS += AMIGA
+#-------------------------------------------------
+
+ifneq ($(filter AMIGA,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/amiga.o
+endif
+
+
+
+#-------------------------------------------------
 # Bally Astrocade sound system
 #@src/emu/sound/astrocde.h,SOUNDS += ASTROCADE
 #-------------------------------------------------
