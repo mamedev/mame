@@ -74,10 +74,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 
 	UINT8 *m_p_chargen;
-	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
+
+	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
-		fc100_state *state = machine.driver_data<fc100_state>();
-		return state->m_p_chargen[ch*16+line];
+		return m_p_chargen[ch * 16 + line];
 	}
 private:
 	virtual void machine_start();
@@ -367,23 +367,6 @@ READ8_MEMBER( fc100_state::mc6847_videoram_r )
 	return data;
 }
 
-static const mc6847_interface fc100_mc6847_interface =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(fc100_state,mc6847_videoram_r),   // data fetch
-
-	DEVCB_NULL,                 /* AG */
-	DEVCB_NULL,                 /* GM2 */
-	DEVCB_NULL,                 /* GM1 */
-	DEVCB_NULL,                 /* GM0 */
-	DEVCB_NULL,                 /* CSS */
-	DEVCB_NULL,                 /* AS */
-	DEVCB_LINE_VCC,             /* INTEXT */
-	DEVCB_NULL,                 /* INV */
-
-	&fc100_state::get_char_rom
-};
-
 /* F4 Character Displayer */
 static const gfx_layout u53_charlayout =
 {
@@ -527,7 +510,12 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_CPU_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_MC6847_ADD("vdg", M5C6847P1, XTAL_7_15909MHz/3, fc100_mc6847_interface )  // Clock not verified
+	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL_7_15909MHz/3)  // Clock not verified
+	MCFG_MC6847_INPUT_CALLBACK(READ8(fc100_state, mc6847_videoram_r))
+	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_INTEXT)
+	// other lines not connected
+
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
 	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("f4palette")

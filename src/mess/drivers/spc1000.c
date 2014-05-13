@@ -42,13 +42,12 @@ public:
 	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
 	DECLARE_READ8_MEMBER(spc1000_gmode_r);
 	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
+	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
 
-	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
+	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
-		spc1000_state *state = machine.driver_data<spc1000_state>();
-		return state->m_p_videoram[0x1000+(ch&0x7F)*16+line];
+		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
 	required_shared_ptr<UINT8> m_p_videoram;
@@ -258,7 +257,7 @@ void spc1000_state::machine_reset()
 	m_IPLK = 1;
 }
 
-READ8_MEMBER(spc1000_state::spc1000_mc6847_videoram_r)
+READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 {
 	if (offset == ~0) return 0xff;
 
@@ -293,23 +292,6 @@ WRITE_LINE_MEMBER( spc1000_state::irq_w )
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
 
-static const mc6847_interface spc1000_mc6847_intf =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(spc1000_state,spc1000_mc6847_videoram_r),   // data fetch
-
-	DEVCB_NULL,                 /* AG */
-	DEVCB_LINE_VCC,             /* GM2 */
-	DEVCB_NULL,                 /* GM1 */
-	DEVCB_NULL,                 /* GM0 */
-	DEVCB_NULL,                 /* CSS */
-	DEVCB_NULL,                 /* AS */
-	DEVCB_NULL,                 /* INTEXT */
-	DEVCB_NULL,                 /* INV */
-
-	&spc1000_state::get_char_rom
-};
-
 static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -318,8 +300,14 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, spc1000_mc6847_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(spc1000_state, mc6847_videoram_r))
+	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2)
+	// other lines not connected
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)

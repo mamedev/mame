@@ -613,7 +613,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
 }
 
 /*-------------------------------------------------
-    mc6847_interface vdg_intf
+    mc6847 interface
 -------------------------------------------------*/
 
 READ8_MEMBER( atom_state::vdg_videoram_r )
@@ -626,12 +626,6 @@ READ8_MEMBER( atom_state::vdg_videoram_r )
 
 	return m_video_ram[offset];
 }
-
-static const mc6847_interface vdg_intf =
-{
-	SCREEN_TAG,
-	DEVCB_DRIVER_MEMBER(atom_state, vdg_videoram_r)
-};
 
 /***************************************************************************
     MACHINE INITIALIZATION
@@ -780,7 +774,9 @@ static MACHINE_CONFIG_START( atom, atom_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
-	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, vdg_intf)
+
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -872,7 +868,9 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
-	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, vdg_intf)
+
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -120,18 +120,6 @@ void coco12_state::update_cart_base(UINT8 *cart_base)
 
 
 //-------------------------------------------------
-//  mc6847_config
-//-------------------------------------------------
-
-const mc6847_interface coco12_state::mc6847_config =
-{
-	SCREEN_TAG,
-	DEVCB_DEVICE_MEMBER(SAM_TAG, sam6883_device, display_read)
-};
-
-
-
-//-------------------------------------------------
 //  sam6883_config
 //-------------------------------------------------
 

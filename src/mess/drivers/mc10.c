@@ -72,7 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER( mc10_port1_w );
 	DECLARE_READ8_MEMBER( mc10_port2_r );
 	DECLARE_WRITE8_MEMBER( mc10_port2_w );
-	DECLARE_READ8_MEMBER( mc10_mc6847_videoram_r );
+	DECLARE_READ8_MEMBER( mc6847_videoram_r );
 	DECLARE_DRIVER_INIT(mc10);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 };
@@ -214,7 +214,7 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
     VIDEO EMULATION
 ***************************************************************************/
 
-READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
+READ8_MEMBER( mc10_state::mc6847_videoram_r )
 {
 	if (offset == ~0) return 0xff;
 	m_mc6847->inv_w(BIT(m_ram_base[offset], 6));
@@ -477,12 +477,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const mc6847_interface mc10_mc6847_intf =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(mc10_state, mc10_mc6847_videoram_r)
-};
-
 static MACHINE_CONFIG_START( mc10, mc10_state )
 
 	/* basic machine hardware */
@@ -492,7 +486,9 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, mc10_mc6847_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(mc10_state, mc6847_videoram_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

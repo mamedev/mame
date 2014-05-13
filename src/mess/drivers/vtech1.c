@@ -190,7 +190,7 @@ public:
 	DECLARE_DRIVER_INIT(vtech1);
 	DECLARE_READ8_MEMBER(vtech1_printer_r);
 	DECLARE_WRITE8_MEMBER(vtech1_strobe_w);
-	DECLARE_READ8_MEMBER(vtech1_mc6847_videoram_r);
+	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
 	void vtech1_get_track();
 	void vtech1_put_track();
@@ -600,7 +600,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_video_bank_w)
     VIDEO EMULATION
 ***************************************************************************/
 
-READ8_MEMBER(vtech1_state::vtech1_mc6847_videoram_r)
+READ8_MEMBER(vtech1_state::mc6847_videoram_r)
 {
 	if (offset == ~0) return 0xff;
 	m_mc6847->inv_w(BIT(m_videoram[offset], 6));
@@ -887,57 +887,6 @@ static const speaker_interface vtech1_speaker_interface =
 	speaker_levels
 };
 
-static const mc6847_interface vtech1_mc6847_bw_intf =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-
-	DEVCB_NULL,                                 /* AG */
-	DEVCB_LINE_GND,                             /* GM2 */
-	DEVCB_LINE_VCC,                             /* GM1 */
-	DEVCB_LINE_GND,                             /* GM0 */
-	DEVCB_NULL,                                 /* CSS */
-	DEVCB_NULL,                                 /* AS */
-	DEVCB_LINE_GND,                             /* INTEXT */
-	DEVCB_NULL,                                 /* INV */
-
-	NULL,                                       /* m_get_char_rom */
-	true    // monochrome
-};
-
-static const mc6847_interface vtech1_mc6847_intf =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-
-	DEVCB_NULL,                                 /* AG */
-	DEVCB_LINE_GND,                             /* GM2 */
-	DEVCB_LINE_VCC,                             /* GM1 */
-	DEVCB_LINE_GND,                             /* GM0 */
-	DEVCB_NULL,                                 /* CSS */
-	DEVCB_NULL,                                 /* AS */
-	DEVCB_LINE_GND,                             /* INTEXT */
-	DEVCB_NULL,                                 /* INV */
-
-	NULL,                                       /* m_get_char_rom */
-	false   // colour
-};
-
-static const mc6847_interface vtech1_shrg_mc6847_intf =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-
-	DEVCB_NULL,                                 /* AG */
-	DEVCB_NULL,                                 /* GM2 */
-	DEVCB_LINE_VCC,                             /* GM1 */
-	DEVCB_NULL,                                 /* GM0 */
-	DEVCB_NULL,                                 /* CSS */
-	DEVCB_NULL,                                 /* AS */
-	DEVCB_LINE_GND,                             /* INTEXT */
-	DEVCB_NULL,                                 /* INV */
-};
-
 static MACHINE_CONFIG_START( laser110, vtech1_state )
 
 	/* basic machine hardware */
@@ -947,8 +896,14 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_mc6847_bw_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
+	MCFG_MC6847_BW(true)
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	// GM2 = GND, GM0 = GND, INTEXT = GND
+	// other lines not connected
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -985,8 +940,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_mc6847_intf)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	// GM2 = GND, GM0 = GND, INTEXT = GND
+	// other lines not connected
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser210, laser200 )
@@ -1013,9 +972,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vtech1_shrg_io)
+
 	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_shrg_mc6847_intf)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	// INTEXT = GND
+	// other lines not connected
 MACHINE_CONFIG_END
 
 

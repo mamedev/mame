@@ -372,26 +372,6 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	return data;
 }
 
-
-static const mc6847_interface sv8000_mc6847_interface =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(sv8000_state,mc6847_videoram_r),   // data fetch
-
-	DEVCB_NULL,                 /* AG */
-	DEVCB_NULL,                 /* GM2 */
-	DEVCB_NULL,                 /* GM1 */
-	DEVCB_NULL,                 /* GM0 */
-	DEVCB_NULL,                 /* CSS */
-	DEVCB_NULL,                 /* AS */
-	DEVCB_NULL,                 /* INTEXT */
-	DEVCB_NULL,                 /* INV */
-
-	NULL,
-	false
-};
-
-
 static MACHINE_CONFIG_START( sv8000, sv8000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
@@ -409,7 +389,9 @@ static MACHINE_CONFIG_START( sv8000, sv8000_state )
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used
-	MCFG_MC6847_ADD("s68047p", S68047, XTAL_10_738635MHz/3, sv8000_mc6847_interface )  // Clock not verified
+	MCFG_DEVICE_ADD("s68047p", S68047, XTAL_10_738635MHz/3 )  // Clock not verified
+	MCFG_MC6847_INPUT_CALLBACK(READ8(sv8000_state, mc6847_videoram_r))
+
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
 
 	/* sound hardware */

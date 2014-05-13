@@ -1643,8 +1643,6 @@ UINT32 gime_base_device::emit_dummy_samples(const scanline_record *scanline, int
 	return 0;
 }
 
-
-
 //-------------------------------------------------
 //  emit_mc6847_samples
 //-------------------------------------------------
@@ -1657,7 +1655,7 @@ ATTR_FORCE_INLINE UINT32 gime_base_device::emit_mc6847_samples(const scanline_re
 		sample_count,
 		pixels,
 		palette,
-		NULL,
+		super::m_charrom_cb,
 		sample_start,
 		scanline->m_line_in_row);
 }

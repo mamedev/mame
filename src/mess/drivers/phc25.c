@@ -277,11 +277,9 @@ READ8_MEMBER( phc25_state::video_ram_r )
 	}
 }
 
-UINT8 phc25_state::pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
+MC6847_GET_CHARROM_MEMBER(phc25_state::pal_char_rom_r)
 {
-	phc25_state *state = machine.driver_data<phc25_state>();
-
-	return state->m_char_rom[((ch - 2) * 12) + line + 4];
+	return m_char_rom[((ch - 2) * 12) + line + 4];
 }
 
 // irq is inverted in emulation, so we need this trampoline
@@ -290,47 +288,10 @@ WRITE_LINE_MEMBER( phc25_state::irq_w )
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-UINT8 phc25_state::ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line)
+MC6847_GET_CHARROM_MEMBER(phc25_state::ntsc_char_rom_r)
 {
-	phc25_state *state = machine.driver_data<phc25_state>();
-
-	return state->m_char_rom[(ch * 16) + line];
+	return m_char_rom[(ch * 16) + line];
 }
-
-static const mc6847_interface ntsc_vdg_intf =
-{
-	SCREEN_TAG,
-	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
-
-	DEVCB_NULL,                                         /* AG */
-	DEVCB_LINE_VCC,                                     /* GM2 */
-	DEVCB_LINE_VCC,                                     /* GM1 */
-	DEVCB_NULL,                                         /* GM0 */
-	DEVCB_NULL,                                         /* CSS */
-	DEVCB_NULL,                                         /* AS */
-	DEVCB_LINE_VCC,                                     /* INTEXT */
-	DEVCB_NULL,                                         /* INV */
-
-	&phc25_state::ntsc_char_rom_r
-};
-
-static const mc6847_interface pal_vdg_intf =
-{
-	SCREEN_TAG,
-	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
-
-	DEVCB_NULL,                                         /* AG */
-	DEVCB_LINE_VCC,                                     /* GM2 */
-	DEVCB_LINE_VCC,                                     /* GM1 */
-	DEVCB_NULL,                                         /* GM0 */
-	DEVCB_NULL,                                         /* CSS */
-	DEVCB_NULL,                                         /* AS */
-	DEVCB_LINE_VCC,                                     /* INTEXT */
-	DEVCB_NULL,                                         /* INV */
-
-	&phc25_state::pal_char_rom_r
-};
-
 
 void phc25_state::video_start()
 {
@@ -374,15 +335,25 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
-	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, pal_vdg_intf)
+
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
+	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1 | MC6847_MODE_INTEXT)
+	// other lines not connected
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
-	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, ntsc_vdg_intf)
+
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
+	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1 | MC6847_MODE_INTEXT)
+	// other lines not connected
 MACHINE_CONFIG_END
 
 /* ROMs */

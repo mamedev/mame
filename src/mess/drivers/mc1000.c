@@ -414,12 +414,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
-static const mc6847_interface mc1000_mc6847_intf =
-{
-	SCREEN_TAG,
-	DEVCB_DRIVER_MEMBER(mc1000_state, videoram_r)
-};
-
 static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
 	/* basic machine hardware */
@@ -437,9 +431,11 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
-	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, mc1000_mc6847_intf)
+
+	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(mc1000_state, hs_w))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(mc1000_state, fs_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(mc1000_state, videoram_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

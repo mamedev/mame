@@ -164,9 +164,12 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
-	MCFG_MC6847_ADD(VDG_TAG, MC6847_PAL, XTAL_4_433619MHz, dragon_state::mc6847_config)
+
+	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(dragon_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(dragon_state, field_sync))
+	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
+
 	// sound hardware
 	MCFG_FRAGMENT_ADD( coco_sound )
 MACHINE_CONFIG_END

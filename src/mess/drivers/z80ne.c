@@ -407,21 +407,6 @@ static const floppy_interface z80netf_floppy_interface =
 	NULL
 };
 
-static const mc6847_interface z80net_mc6847_intf =
-{
-	"lx388",
-	DEVCB_DRIVER_MEMBER(z80ne_state, lx388_mc6847_videoram_r),
-
-	DEVCB_LINE_GND,             /* AG */
-	DEVCB_LINE_GND,             /* GM2 */
-	DEVCB_LINE_GND,             /* GM1 */
-	DEVCB_LINE_GND,             /* GM0 */
-	DEVCB_LINE_GND,             /* CSS */
-	DEVCB_NULL,                 /* AS */
-	DEVCB_NULL,                 /* INTEXT */
-	DEVCB_NULL,                 /* INV */
-};
-
 static MACHINE_CONFIG_START( z80ne, z80ne_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
@@ -461,7 +446,11 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
+	// other lines not connected
 
 	MCFG_DEFAULT_LAYOUT(layout_z80net)
 
@@ -494,7 +483,11 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
+	// other lines not connected
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netb)
 
@@ -527,7 +520,11 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
+	// other lines not connected
 
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(z80netf_floppy_interface)

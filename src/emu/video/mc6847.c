@@ -567,7 +567,11 @@ const rom_entry *mc6847_base_device::device_rom_region() const
 
 mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source) :
 	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true, shortname, source),
-	m_char_rom(*this, "chargen")
+	m_char_rom(*this, "chargen"),
+	m_input_cb(*this),
+	m_black_and_white(false),
+	m_fixed_mode(0),
+	m_fixed_mode_mask(0)
 {
 	m_palette = s_palette;
 
@@ -580,30 +584,17 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 
 
 //-------------------------------------------------
-//  setup_fixed_mode - sets up a particular video
-//  mode bit with a decb callback
+//  setup_fixed_mode - sets up fixed mode mask
 //-------------------------------------------------
 
-void mc6847_base_device::setup_fixed_mode(struct devcb_read_line callback, UINT8 mode)
+void mc6847_base_device::setup_fixed_mode()
 {
-	if (callback.type == DEVCB_TYPE_NULL)
+	for (int i = 0; i < 8; i++)
 	{
-		// do nothing
-	}
-	else if (callback.type == DEVCB_TYPE_CONSTANT && (callback.index == 0 || callback.index == 1))
-	{
-		// this mode is fixed
-		m_fixed_mode |= (callback.index ? mode : 0x00);
-		m_fixed_mode_mask |= mode;
-	}
-	else
-	{
-		// for reasons of performance, we currently only support DEVCB_NULL,
-		// DEVCB_LINE_GND and DEVCB_LINE_VCC
-		emu_fatalerror("mc6847 does not support this callback type for mode bits\n");
+		if (BIT(m_fixed_mode, i))
+			m_fixed_mode_mask |= (1 << i);
 	}
 }
-
 
 
 //-------------------------------------------------
@@ -612,9 +603,6 @@ void mc6847_base_device::setup_fixed_mode(struct devcb_read_line callback, UINT8
 
 void mc6847_base_device::device_start()
 {
-	const mc6847_interface *config = (const mc6847_interface *) static_config();
-	assert(config);
-
 	/* inherited function */
 	mc6847_friend_device::device_start();
 
@@ -622,20 +610,11 @@ void mc6847_base_device::device_start()
 	memset(m_data, 0, sizeof(m_data));
 
 	/* resolve callbacks */
-	m_res_input_func.resolve(config->m_input_func, *this);
-	m_get_char_rom = config->m_get_char_rom;
+	m_input_cb.resolve_safe(0);
+	m_charrom_cb.bind_relative_to(*owner());
 
 	/* set up fixed mode */
-	m_fixed_mode = 0x00;
-	m_fixed_mode_mask = 0x00;
-	setup_fixed_mode(config->m_in_gm2_func,     MODE_GM2);
-	setup_fixed_mode(config->m_in_gm1_func,     MODE_GM1);
-	setup_fixed_mode(config->m_in_gm0_func,     MODE_GM0);
-	setup_fixed_mode(config->m_in_intext_func,  MODE_INTEXT);
-	setup_fixed_mode(config->m_in_inv_func,     MODE_INV);
-	setup_fixed_mode(config->m_in_as_func,      MODE_AS);
-	setup_fixed_mode(config->m_in_ag_func,      MODE_AG);
-	setup_fixed_mode(config->m_in_css_func,     MODE_CSS);
+	setup_fixed_mode();
 
 	m_dirty = false;
 	m_mode = 0;
@@ -645,7 +624,7 @@ void mc6847_base_device::device_start()
 	save_item(NAME(m_mode));
 
 	/* colors */
-	m_palette = config->m_black_and_white ? m_bw_palette : s_palette;
+	m_palette = m_black_and_white ? m_bw_palette : s_palette;
 }
 
 
@@ -668,7 +647,7 @@ void mc6847_base_device::device_reset()
 
 UINT8 mc6847_base_device::input(UINT16 address)
 {
-	UINT8 data = m_res_input_func(address);
+	UINT8 data = m_input_cb(address);
 	if (LOG_INPUT)
 		logerror("%s: input: address=0x%04X data=0x%02X\n", describe_context(), address, data);
 	return data;
@@ -812,8 +791,8 @@ INT32 mc6847_base_device::scanline_position_from_clock(INT32 clocks_since_hsync)
 void mc6847_base_device::field_sync_changed(bool line)
 {
 	/* when field sync is on, the DA* enter the Hi-Z state */
-	if (line && !m_res_input_func.isnull())
-		m_res_input_func(~0);
+	if (line)
+		m_input_cb(~0);
 }
 
 
@@ -902,7 +881,7 @@ UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 				x2 - x,
 				pixels,
 				m_palette,
-				m_get_char_rom,
+				m_charrom_cb,
 				x,
 				y);
 

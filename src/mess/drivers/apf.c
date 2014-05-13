@@ -538,21 +538,6 @@ static const floppy_interface apfimag_floppy_interface =
 	NULL
 };
 
-static const mc6847_interface apf_mc6847_intf =
-{
-	"screen",
-	DEVCB_DRIVER_MEMBER(apf_state, videoram_r),
-
-	DEVCB_NULL,                 /* AG */
-	DEVCB_LINE_VCC,             /* GM2 */
-	DEVCB_LINE_VCC,             /* GM1 */
-	DEVCB_NULL,                 /* GM0 */
-	DEVCB_NULL,                 /* CSS */
-	DEVCB_NULL,                 /* AS */
-	DEVCB_LINE_GND,             /* INTEXT */
-	DEVCB_NULL,                 /* INV */
-};
-
 static MACHINE_CONFIG_START( apfm1000, apf_state )
 
 	/* basic machine hardware */
@@ -561,8 +546,13 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
-	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, apf_mc6847_intf)
+
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
+	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1)
+	// INTEXT = GND
+	// other lines not connected
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
