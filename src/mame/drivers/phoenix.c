@@ -1125,6 +1125,30 @@ ROM_START( pleiadce )
 	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
 ROM_END
 
+ROM_START( pleiadsi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1 2716.bin",   0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) ) // unique to this set
+	ROM_LOAD( "2 2716.bin",   0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
+	ROM_LOAD( "3 2716.bin",   0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
+	ROM_LOAD( "4 2716.bin",   0x1800, 0x0800, CRC(ca14fe4a) SHA1(fbd60b8f98275193df6633b3589106c4e392fb62) ) // unique to this set
+	ROM_LOAD( "5 2716.bin",   0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
+	ROM_LOAD( "6 2716.bin",   0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7 2716.bin",   0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
+	ROM_LOAD( "8 2716.bin",   0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "11 2716.bin",  0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
+	ROM_LOAD( "12 2716.bin",  0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "9 2716.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10 2716.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same
+	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
+	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+ROM_END
+
 ROM_START( capitol )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cp1.45",       0x0000, 0x0800, CRC(0922905b) SHA1(501342b0162bba43570b1cbefa1ada6302a54017) )
@@ -1211,6 +1235,7 @@ GAME( 1981, pleiads,  0,        pleiads,  pleiads, driver_device,  0,        ROT
 GAME( 1981, pleiadsb2,pleiads,  pleiads,  pleiads, driver_device,  0,        ROT90, "bootleg (ESG)", "Pleiads (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiadbl, driver_device, 0,        ROT90, "bootleg", "Pleiads (bootleg set 1)", GAME_IMPERFECT_COLORS )
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, driver_device, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )
+GAME( 1981, pleiadsi, pleiads,  pleiads,  pleiadce, driver_device, 0,        ROT90, "bootleg? (Irecsa)", "Pleiads (Irecsa)", GAME_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol, driver_device,  0,        ROT90, "bootleg? (Universal Video Spiel)", "Capitol", GAME_IMPERFECT_COLORS )
 
 GAME( 1982, survival, 0,        survival, survival, driver_device, 0,        ROT90, "Rock-Ola", "Survival", GAME_IMPERFECT_COLORS )
