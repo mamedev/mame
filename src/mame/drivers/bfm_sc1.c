@@ -377,7 +377,7 @@ WRITE8_MEMBER(bfm_sc1_state::vfd_w)
 		}
 	}
 */
-	m_vfd0->por(!(data & VFD_RESET));
+	m_vfd0->por(data & VFD_RESET);
 	m_vfd0->data(data & VFD_DATA);
 	m_vfd0->sclk(data & VFD_CLOCK1);
 }
