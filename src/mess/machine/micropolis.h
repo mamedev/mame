@@ -10,7 +10,6 @@
 #ifndef __MICROPOLIS_H__
 #define __MICROPOLIS_H__
 
-#include "devcb.h"
 #include "imagedev/flopdrv.h"
 
 

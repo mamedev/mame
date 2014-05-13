@@ -7,7 +7,6 @@
 #ifndef __KB_KEYTRO_H__
 #define __KB_KEYTRO_H__
 
-#include "devcb.h"
 #include "pc_kbdc.h"
 
 //**************************************************************************
