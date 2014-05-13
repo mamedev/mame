@@ -48,6 +48,9 @@ void amiga_sound_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_channel[i].index = i;
+		m_channel[i].curticks = 0;
+		m_channel[i].manualmode = false;
+		m_channel[i].curlocation = 0;
 		m_channel[i].irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_sound_device::signal_irq), this));
 	}
 
