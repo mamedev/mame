@@ -33,22 +33,6 @@ enum
 #define STD_VOODOO_3_CLOCK          132000000
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct voodoo_config
-{
-	UINT8               l_fbmem;
-	UINT8               l_tmumem0;
-	UINT8               l_tmumem1;
-	const char *        l_screen;
-	const char *        l_cputag;
-	devcb_write_line    l_vblank;
-	devcb_write_line    l_stall;
-};
-
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
