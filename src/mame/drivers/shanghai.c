@@ -91,8 +91,6 @@ UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind1
 			b &= (HD63484_RAM_SIZE - 1);
 			src = m_hd63484->ram_r(space, b, 0xffff);
 			bitmap.pix16(y, x)     = src & 0x00ff;
-			assert(y >= 0 && y < bitmap.height());
-			assert(x >= 0 && x < bitmap.width());
 			bitmap.pix16(y, x + 1) = (src & 0xff00) >> 8;
 			b++;
 		}

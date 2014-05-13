@@ -28,11 +28,8 @@ const device_type HD63484 = &device_creator<hd63484_device>;
 hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
 	m_ram(NULL),
-	//m_reg[256/2],
 	m_fifo_counter(0),
-	//m_fifo[FIFO_LENGTH],
 	m_readfifo(0),
-	//m_pattern[16],
 	m_org(0),
 	m_org_dpd(0),
 	m_rwp(0),
@@ -61,6 +58,8 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_regno(0),
 	m_skattva_hack(0)
 {
+	memset(m_reg, 0x00, sizeof(m_reg));
+	//m_pattern[16],
 }
 
 //-------------------------------------------------
