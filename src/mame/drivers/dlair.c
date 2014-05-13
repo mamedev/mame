@@ -194,17 +194,6 @@ WRITE_LINE_MEMBER(dlair_state::write_speaker)
 }
 
 
-static const z80sio_interface sio_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dlair_state, dleuro_interrupt),    /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(dlair_state,serial_transmit), /* transmit handler */
-	DEVCB_DRIVER_MEMBER16(dlair_state,serial_receive)       /* receive handler */
-};
-
-
 static const z80_daisy_config dleuro_daisy_chain[] =
 {
 	{ "sio" },
@@ -741,7 +730,10 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
 
-	MCFG_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)
+	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
+	MCFG_Z80SIO_INT_CALLBACK(WRITELINE(dlair_state, dleuro_interrupt))
+	MCFG_Z80SIO_TRANSMIT_CALLBACK(WRITE16(dlair_state,serial_transmit))
+	MCFG_Z80SIO_RECEIVE_CALLBACK(READ16(dlair_state,serial_receive))
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 

@@ -1,5 +1,9 @@
 /***************************************************************************
 
+    !!! DEPRECATED DO NOT USE !!!
+
+    WILL BE DELETED WHEN src/mame/drivers/dlair.c USES z80dart.h
+
     Z80 SIO (Z8440) implementation
 
     Copyright Nicola Salmoria and the MAME Team.
@@ -118,7 +122,7 @@ const int SIO_WR5_DTR                       = 0x80;     // D7 = DTR
 //const int SIO_WR5_TX_DATABITS_7             =   0x20;   //  01 = Tx 7 bits/character
 //const int SIO_WR5_TX_DATABITS_6             =   0x40;   //  10 = Tx 6 bits/character
 //const int SIO_WR5_TX_DATABITS_8             =   0x60;   //  11 = Tx 8 bits/character
-const int SIO_WR5_SEND_BREAK                = 0x10;     // D4 = Send break
+//const int SIO_WR5_SEND_BREAK                = 0x10;     // D4 = Send break
 const int SIO_WR5_TX_ENABLE                 = 0x08;     // D3 = Tx Enable
 //const int SIO_WR5_CRC16_SDLC                = 0x04;     // D2 = CRC-16/SDLC
 const int SIO_WR5_RTS                       = 0x02;     // D1 = RTS
@@ -299,25 +303,16 @@ inline attotime z80sio_device::sio_channel::compute_time_per_character()
 
 z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80SIO, "Z80 SIO", tag, owner, clock, "z80sio", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this),
+		m_irq(*this),
+		m_dtr_changed(*this),
+		m_rts_changed(*this),
+		m_break_changed(*this),
+		m_transmit(*this),
+		m_received_poll(*this)
 {
 	for (int i = 0; i < 8; i++)
 		m_int_state[i] = 0;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z80sio_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const z80sio_interface *intf = reinterpret_cast<const z80sio_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<z80sio_interface *>(this) = *intf;
 }
 
 
@@ -327,12 +322,12 @@ void z80sio_device::device_config_complete()
 
 void z80sio_device::device_start()
 {
-	m_irq.resolve(m_irq_cb, *this);
-	m_dtr_changed.resolve(m_dtr_changed_cb, *this);
-	m_rts_changed.resolve(m_rts_changed_cb, *this);
-	m_break_changed.resolve(m_break_changed_cb, *this);
-	m_transmit.resolve(m_transmit_cb, *this);
-	m_received_poll.resolve(m_received_poll_cb, *this);
+	m_irq.resolve_safe();
+	m_dtr_changed.resolve_safe();
+	m_rts_changed.resolve_safe();
+	m_break_changed.resolve_safe();
+	m_transmit.resolve_safe();
+	m_received_poll.resolve_safe(0);
 
 	m_channel[0].start(this, 0);
 	m_channel[1].start(this, 1);
@@ -517,7 +512,7 @@ void z80sio_device::sio_channel::control_write(UINT8 data)
 		VPRINTF(("%s:sio_reg_w(%c,%d) = %02X\n", m_device->machine().describe_context(), 'A' + m_index, regnum, data));
 
 	// write a new value to the selected register
-	UINT8 old = m_regs[regnum];
+	//UINT8 old = m_regs[regnum];
 	m_regs[regnum] = data;
 
 	// clear the register number for the next write
@@ -562,12 +557,14 @@ void z80sio_device::sio_channel::control_write(UINT8 data)
 
 		// SIO write register 5
 		case 5:
+		/*
 			if (((old ^ data) & SIO_WR5_DTR) && !m_device->m_dtr_changed.isnull())
 				m_device->m_dtr_changed(m_index, (data & SIO_WR5_DTR) != 0);
 			if (((old ^ data) & SIO_WR5_SEND_BREAK) && !m_device->m_break_changed.isnull())
 				m_device->m_break_changed(m_index, (data & SIO_WR5_SEND_BREAK) != 0);
 			if (((old ^ data) & SIO_WR5_RTS) && !m_device->m_rts_changed.isnull())
 				m_device->m_rts_changed(m_index, (data & SIO_WR5_RTS) != 0);
+				*/
 			break;
 	}
 }

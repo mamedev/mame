@@ -1,5 +1,9 @@
 /***************************************************************************
 
+    !!! DEPRECATED DO NOT USE !!!
+
+    WILL BE DELETED WHEN src/mame/drivers/dlair.c USES z80dart.h
+    
     Z80 SIO (Z8440) implementation
 
     Copyright Nicola Salmoria and the MAME Team.
@@ -17,9 +21,14 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_Z80SIO_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, Z80SIO, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_Z80SIO_INT_CALLBACK(_write) \
+	devcb = &z80sio_device::set_int_callback(*device, DEVCB2_##_write);
+
+#define MCFG_Z80SIO_TRANSMIT_CALLBACK(_write) \
+	devcb = &z80sio_device::set_transmit_callback(*device, DEVCB2_##_write);
+
+#define MCFG_Z80SIO_RECEIVE_CALLBACK(_read) \
+	devcb = &z80sio_device::set_receive_callback(*device, DEVCB2_##_read);
 
 
 
@@ -27,30 +36,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
-// ======================> z80sio_interface
-
-struct z80sio_interface
-{
-	devcb_write_line m_irq_cb;
-	devcb_write8 m_dtr_changed_cb;
-	devcb_write8 m_rts_changed_cb;
-	devcb_write8 m_break_changed_cb;
-	devcb_write16 m_transmit_cb;
-	devcb_read16 m_received_poll_cb;
-};
-
-
-
 // ======================> z80sio_device
 
 class z80sio_device :   public device_t,
-						public device_z80daisy_interface,
-						public z80sio_interface
+						public device_z80daisy_interface
 {
 public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_int_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_transmit_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_transmit.set_callback(object); }
+	template<class _Object> static devcb2_base &set_receive_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_received_poll.set_callback(object); }
 
 	// control register I/O
 	UINT8 control_read(int ch) { return m_channel[ch].control_read(); }
@@ -77,7 +74,6 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -141,12 +137,12 @@ private:
 	UINT8                       m_int_state[8];         // interrupt states
 
 	// callbacks
-	devcb_resolved_write_line m_irq;
-	devcb_resolved_write8 m_dtr_changed;
-	devcb_resolved_write8 m_rts_changed;
-	devcb_resolved_write8 m_break_changed;
-	devcb_resolved_write16 m_transmit;
-	devcb_resolved_read16 m_received_poll;
+	devcb2_write_line m_irq;
+	devcb2_write8 m_dtr_changed;
+	devcb2_write8 m_rts_changed;
+	devcb2_write8 m_break_changed;
+	devcb2_write16 m_transmit;
+	devcb2_read16 m_received_poll;
 
 	static const UINT8 k_int_priority[];
 };
