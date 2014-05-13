@@ -21,7 +21,11 @@ const device_type AMIGAKBD = &device_creator<amigakbd_device>;
 amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AMIGAKBD, "Amiga Keyboard", tag, owner, clock, "amigakbd", __FILE__),
 	m_write_kclk(*this),
-	m_write_kdat(*this)
+	m_write_kdat(*this),
+	m_buf(NULL),
+	m_buf_pos(0),
+	m_cur_pos(0),
+	m_timer(NULL)
 {
 }
 
@@ -36,8 +40,6 @@ void amigakbd_device::device_start()
 
 	/* allocate a keyboard buffer */
 	m_buf = auto_alloc_array(machine(), UINT8, KEYBOARD_BUFFER_SIZE);
-	m_buf_pos = 0;
-	m_cur_pos = 0;
 	m_timer = timer_alloc(0);
 	m_timer->reset();
 }
@@ -82,45 +84,32 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-INPUT_CHANGED_MEMBER(amigakbd_device::kbd_update)
+INPUT_CHANGED_MEMBER( amigakbd_device::kbd_update )
 {
 	int index = (int)(FPTR)param, i;
 	UINT32  oldvalue = oldval * field.mask(), newvalue = newval * field.mask();
 	UINT32  delta = oldvalue ^ newvalue;
 
-	/* Special case Page UP, which we will use as Action Replay button */
-	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
-	{
-		const amiga_machine_interface *amiga_intf = amiga_get_interface(machine());
+	int key_buf_was_empty = ( m_buf_pos == m_cur_pos ) ? 1 : 0;
 
-		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
+	for( i = 0; i < 32; i++ )
+	{
+		if ( delta & ( 1 << i ) )
 		{
-			(*amiga_intf->nmi_callback)(machine());
+			int down = ( newvalue & ( 1 << i ) ) ? 0 : 1;
+			int scancode = ( ( (index*32)+i ) << 1 ) | down;
+			int amigacode = ~scancode;
+
+			/* add the keycode to the buffer */
+			m_buf[m_buf_pos++] = amigacode & 0xff;
+			m_buf_pos %= KEYBOARD_BUFFER_SIZE;
 		}
 	}
-	else
+
+	/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
+	if ( key_buf_was_empty && ( m_buf_pos != m_cur_pos ) )
 	{
-		int key_buf_was_empty = ( m_buf_pos == m_cur_pos ) ? 1 : 0;
-
-		for( i = 0; i < 32; i++ )
-		{
-			if ( delta & ( 1 << i ) )
-			{
-				int down = ( newvalue & ( 1 << i ) ) ? 0 : 1;
-				int scancode = ( ( (index*32)+i ) << 1 ) | down;
-				int amigacode = ~scancode;
-
-				/* add the keycode to the buffer */
-				m_buf[m_buf_pos++] = amigacode & 0xff;
-				m_buf_pos %= KEYBOARD_BUFFER_SIZE;
-			}
-		}
-
-		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
-		if ( key_buf_was_empty && ( m_buf_pos != m_cur_pos ) )
-		{
-			m_timer->adjust(machine().first_screen()->frame_period() / 4);
-		}
+		m_timer->adjust(machine().first_screen()->frame_period() / 4);
 	}
 }
 
@@ -273,4 +262,18 @@ INPUT_PORTS_END
 ioport_constructor amigakbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( amiga_us_keyboard );
+}
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+ROM_START( keyboard_mpu )
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD("328191-01.ic1", 0x000, 0x800, NO_DUMP)
+ROM_END
+
+const rom_entry *amigakbd_device::device_rom_region() const
+{
+	return ROM_NAME( keyboard_mpu );
 }

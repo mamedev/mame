@@ -30,6 +30,7 @@ public:
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const;
 
 	DECLARE_INPUT_CHANGED_MEMBER( kbd_update );
 

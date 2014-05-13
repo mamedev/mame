@@ -35,19 +35,26 @@ class upscope_state : public amiga_state
 {
 public:
 	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag) { }
+		: amiga_state(mconfig, type, tag),
+	m_prev_cia1_porta(0xff),
+	m_parallel_data(0xff)
+	{ }
 
-	UINT8   m_nvram[0x100];
+	UINT8 m_nvram[0x100];
 	UINT8 m_prev_cia1_porta;
 	UINT8 m_parallel_data;
 	UINT8 m_nvram_address_latch;
 	UINT8 m_nvram_data_latch;
-	DECLARE_WRITE8_MEMBER(upscope_cia_0_porta_w);
-	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);
+
 	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
+	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);
 	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
 	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
+
 	DECLARE_DRIVER_INIT(upscope);
+
+protected:
+	virtual void machine_reset();
 };
 
 
@@ -67,67 +74,21 @@ public:
  *
  *************************************/
 
-static void upscope_reset(running_machine &machine)
+void upscope_state::machine_reset()
 {
-	upscope_state *state = machine.driver_data<upscope_state>();
-	state->m_prev_cia1_porta = 0xff;
+	// reset base machine
+	amiga_state::machine_reset();
+
+	m_prev_cia1_porta = 0xff;
 }
 
 
-
-/*************************************
- *
- *  CIA-A port A access:
- *
- *  PA7 = game port 1, pin 6 (fire)
- *  PA6 = game port 0, pin 6 (fire)
- *  PA5 = /RDY (disk ready)
- *  PA4 = /TK0 (disk track 00)
- *  PA3 = /WPRO (disk write protect)
- *  PA2 = /CHNG (disk change)
- *  PA1 = /LED (LED, 0=bright / audio filter control)
- *  PA0 = OVL (ROM/RAM overlay bit)
- *
- *************************************/
-
-WRITE8_MEMBER(upscope_state::upscope_cia_0_porta_w)
-{
-	/* switch banks as appropriate */
-	m_bank1->set_entry(data & 1);
-
-	/* swap the write handlers between ROM and bank 1 based on the bit */
-	if ((data & 1) == 0)
-		/* overlay disabled, map RAM on 0x000000 */
-		m_maincpu->space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
-
-	else
-		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		m_maincpu->space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
-}
-
-
-
-/*************************************
- *
- *  CIA-A port B access:
- *
- *  PB7 = parallel data 7
- *  PB6 = parallel data 6
- *  PB5 = parallel data 5
- *  PB4 = parallel data 4
- *  PB3 = parallel data 3
- *  PB2 = parallel data 2
- *  PB1 = parallel data 1
- *  PB0 = parallel data 0
- *
- *************************************/
-
-WRITE8_MEMBER(upscope_state::upscope_cia_0_portb_w)
+WRITE8_MEMBER( upscope_state::upscope_cia_0_portb_w )
 {
 	m_parallel_data = data;
 }
 
-READ8_MEMBER(upscope_state::upscope_cia_0_portb_r)
+READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
 {
 	return m_nvram_data_latch;
 }
@@ -149,12 +110,12 @@ READ8_MEMBER(upscope_state::upscope_cia_0_portb_r)
  *
  *************************************/
 
-READ8_MEMBER(upscope_state::upscope_cia_1_porta_r)
+READ8_MEMBER( upscope_state::upscope_cia_1_porta_r )
 {
 	return 0xf8 | (m_prev_cia1_porta & 0x07);
 }
 
-WRITE8_MEMBER(upscope_state::upscope_cia_1_porta_w)
+WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 {
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((m_prev_cia1_porta & 2) && !(data & 2))
@@ -243,14 +204,27 @@ WRITE8_MEMBER(upscope_state::upscope_cia_1_porta_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, upscope_state )
+static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, upscope_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)  AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
+	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, upscope_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
+	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
+	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
+	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
+	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, upscope_state )
+	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
 
@@ -286,11 +260,16 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( upscope, upscope_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
+	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(amiga_state, amiga )
-	MCFG_MACHINE_RESET_OVERRIDE(upscope_state,amiga)
+	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -311,25 +290,25 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, 3579545)
+	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(upscope_state,upscope_cia_0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(upscope_state,upscope_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(upscope_state,upscope_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(upscope_state,upscope_cia_1_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(upscope_state,upscope_cia_1_porta_w))
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_0_portb_w))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_1_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_1_porta_w))
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 MACHINE_CONFIG_END
 
@@ -342,9 +321,9 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( upscope )
-	ROM_REGION(0x80000, "user1", 0)
-	ROM_LOAD16_WORD_SWAP( "kick12.rom", 0x000000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88) )
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
+	ROM_REGION(0x80000, "kickstart", 0)
+	ROM_LOAD16_WORD_SWAP("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
+	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
 
 	ROM_REGION(0x080000, "user2", 0)
 	ROM_LOAD16_BYTE( "upscope.u5",   0x000000, 0x008000, CRC(c109912e) SHA1(dcac9522e3c4818b2a02212b9173540fcf4bd463) )
@@ -371,25 +350,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(upscope_state,upscope)
+DRIVER_INIT_MEMBER(upscope_state, upscope)
 {
-	static const amiga_machine_interface upscope_intf =
-	{
-		ANGUS_CHIP_RAM_MASK,
-		NULL, NULL, NULL,
-		NULL,
-		NULL, upscope_reset,
-		NULL,
-		0
-	};
-	amiga_machine_config(machine(), &upscope_intf);
+	m_agnus_id = AGNUS_HR_NTSC;
+	m_denise_id = DENISE;
 
-	/* allocate NVRAM */
+	// allocate nvram
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
-
-	/* set up memory */
-	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 

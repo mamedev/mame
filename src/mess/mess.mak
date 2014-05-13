@@ -163,6 +163,7 @@ SOUNDS += SN76496
 SOUNDS += POKEY
 SOUNDS += TIA
 SOUNDS += NES_APU
+SOUNDS += AMIGA
 SOUNDS += ASTROCADE
 #SOUNDS += NAMCO
 #SOUNDS += NAMCO_15XX
@@ -324,6 +325,10 @@ VIDEOS += VIC4567
 # specify available machine cores
 #-------------------------------------------------
 
+MACHINES += AKIKO
+MACHINES += AUTOCONFIG
+MACHINES += CR511B
+MACHINES += DMAC
 #MACHINES += NCR53C7XX
 #MACHINES += LSI53C810
 MACHINES += 6522VIA
@@ -610,6 +615,7 @@ BUSES += VIP
 BUSES += WANGPC
 BUSES += X68K
 BUSES += Z88
+BUSES += ZORRO
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -812,8 +818,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/amiga.o       \
 	$(MAME_VIDEO)/amigaaga.o    \
 	$(MAME_MACHINE)/amiga.o     \
-	$(MAME_AUDIO)/amiga.o       \
-	$(MAME_MACHINE)/cd32.o      \
 	$(MAME_VIDEO)/tia.o         \
 	$(MAME_MACHINE)/atari.o     \
 	$(MAME_VIDEO)/atari.o       \
@@ -860,7 +864,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/cdicdic.o   \
 	$(MAME_MACHINE)/cdislave.o  \
 	$(MAME_VIDEO)/mcd212.o      \
-	$(MAME_DRIVERS)/cd32.o      \
 	$(MAME_DRIVERS)/3do.o       \
 	$(MAME_MACHINE)/3do.o       \
 	$(MAME_DRIVERS)/vectrex.o   \
@@ -928,8 +931,6 @@ $(MESSOBJ)/altos.a:             \
 	$(MESS_DRIVERS)/altos5.o    \
 
 $(MESSOBJ)/amiga.a:             \
-	$(MESS_MACHINE)/amigacrt.o  \
-	$(MESS_MACHINE)/amigacd.o   \
 	$(MESS_MACHINE)/amigakbd.o  \
 	$(MESS_DRIVERS)/amiga.o     \
 

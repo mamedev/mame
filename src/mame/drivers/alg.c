@@ -39,30 +39,36 @@ public:
 		: amiga_state(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") { }
 
-
-	required_device<sony_ldp1450_device> m_laserdisc;
-	emu_timer *m_serial_timer;
-	UINT8 m_serial_timer_active;
-	UINT16 m_input_select;
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
-	DECLARE_WRITE8_MEMBER(alg_cia_0_porta_w);
-	DECLARE_READ8_MEMBER(alg_cia_0_porta_r);
-	DECLARE_READ8_MEMBER(alg_cia_0_portb_r);
-	DECLARE_WRITE8_MEMBER(alg_cia_0_portb_w);
-	DECLARE_READ8_MEMBER(alg_cia_1_porta_r);
-	DECLARE_WRITE8_MEMBER(alg_cia_1_porta_w);
+
 	DECLARE_DRIVER_INIT(aplatoon);
 	DECLARE_DRIVER_INIT(palr3);
 	DECLARE_DRIVER_INIT(palr1);
-	DECLARE_DRIVER_INIT(none);
 	DECLARE_DRIVER_INIT(palr6);
-	DECLARE_MACHINE_START(alg);
-	DECLARE_MACHINE_RESET(alg);
+	DECLARE_DRIVER_INIT(ntsc);
+	DECLARE_DRIVER_INIT(pal);
+
 	DECLARE_VIDEO_START(alg);
 	TIMER_CALLBACK_MEMBER(response_timer);
-	void alg_init();
+
+protected:
+	// driver_device overrides
+	virtual void machine_start();
+
+	// amiga_state overrides
+	virtual void vblank();
+	virtual void serdat_w(UINT16 data);
+	virtual void potgo_w(UINT16 data);
+
+private:
+	required_device<sony_ldp1450_device> m_laserdisc;
+
+	emu_timer *m_serial_timer;
+	UINT8 m_serial_timer_active;
+
+	UINT16 m_input_select;
 };
 
 
@@ -116,18 +122,12 @@ VIDEO_START_MEMBER(alg_state,alg)
  *
  *************************************/
 
-MACHINE_START_MEMBER(alg_state,alg)
+void alg_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(amiga);
+	amiga_state::machine_start();
 
 	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alg_state::response_timer),this));
 	m_serial_timer_active = FALSE;
-}
-
-
-MACHINE_RESET_MEMBER(alg_state,alg)
-{
-	MACHINE_RESET_CALL_MEMBER(amiga);
 }
 
 
@@ -146,42 +146,40 @@ TIMER_CALLBACK_MEMBER(alg_state::response_timer)
 		UINT8 data = m_laserdisc->data_r();
 		if (data != 0x0a)
 			osd_printf_debug("Sending serial data = %02X\n", data);
-		amiga_serial_in_w(machine(), data);
+		serial_in_w(data);
 	}
 
 	/* if there's more to come, set another timer */
 	if (m_laserdisc->data_available_r() == ASSERT_LINE)
-		m_serial_timer->adjust(amiga_get_serial_char_period(machine()));
+		m_serial_timer->adjust(serial_char_period());
 	else
 		m_serial_timer_active = FALSE;
 }
 
 
-static void vsync_callback(running_machine &machine)
+void alg_state::vblank()
 {
-	alg_state *state = machine.driver_data<alg_state>();
+	amiga_state::vblank();
 
 	/* if we have data available, set a timer to read it */
-	if (!state->m_serial_timer_active && state->m_laserdisc->data_available_r() == ASSERT_LINE)
+	if (!m_serial_timer_active && m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
-		state->m_serial_timer->adjust(amiga_get_serial_char_period(machine));
-		state->m_serial_timer_active = TRUE;
+		m_serial_timer->adjust(serial_char_period());
+		m_serial_timer_active = TRUE;
 	}
 }
 
 
-static void serial_w(running_machine &machine, UINT16 data)
+void alg_state::serdat_w(UINT16 data)
 {
-	alg_state *state = machine.driver_data<alg_state>();
-
 	/* write to the laserdisc player */
-	state->m_laserdisc->data_w(data & 0xff);
+	m_laserdisc->data_w(data & 0xff);
 
 	/* if we have data available, set a timer to read it */
-	if (!state->m_serial_timer_active && state->m_laserdisc->data_available_r() == ASSERT_LINE)
+	if (!m_serial_timer_active && m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
-		state->m_serial_timer->adjust(amiga_get_serial_char_period(machine));
-		state->m_serial_timer_active = TRUE;
+		m_serial_timer->adjust(serial_char_period());
+		m_serial_timer_active = TRUE;
 	}
 }
 
@@ -193,13 +191,11 @@ static void serial_w(running_machine &machine, UINT16 data)
  *
  *************************************/
 
-static void alg_potgo_w(running_machine &machine, UINT16 data)
+void alg_state::potgo_w(UINT16 data)
 {
-	alg_state *state = machine.driver_data<alg_state>();
-
 	/* bit 15 controls whether pin 9 is input/output */
 	/* bit 14 controls the value, which selects which player's controls to read */
-	state->m_input_select = (data & 0x8000) ? ((data >> 14) & 1) : 0;
+	m_input_select = (data & 0x8000) ? ((data >> 14) & 1) : 0;
 }
 
 
@@ -228,61 +224,6 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 
 
 
-/*************************************
- *
- *  CIA port accesses
- *
- *************************************/
-
-WRITE8_MEMBER(alg_state::alg_cia_0_porta_w)
-{
-	/* switch banks as appropriate */
-	m_bank1->set_entry(data & 1);
-
-	/* swap the write handlers between ROM and bank 1 based on the bit */
-	if ((data & 1) == 0)
-		/* overlay disabled, map RAM on 0x000000 */
-		space.install_write_bank(0x000000, 0x07ffff, "bank1");
-
-	else
-		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		space.unmap_write(0x000000, 0x07ffff);
-}
-
-
-READ8_MEMBER(alg_state::alg_cia_0_porta_r)
-{
-	return ioport("FIRE")->read() | 0x3f;
-}
-
-
-READ8_MEMBER(alg_state::alg_cia_0_portb_r)
-{
-	logerror("%s:alg_cia_0_portb_r\n", machine().describe_context());
-	return 0xff;
-}
-
-
-WRITE8_MEMBER(alg_state::alg_cia_0_portb_w)
-{
-	/* parallel port */
-	logerror("%s:alg_cia_0_portb_w(%02x)\n", machine().describe_context(), data);
-}
-
-
-READ8_MEMBER(alg_state::alg_cia_1_porta_r)
-{
-	logerror("%s:alg_cia_1_porta_r\n", machine().describe_context());
-	return 0xff;
-}
-
-
-WRITE8_MEMBER(alg_state::alg_cia_1_porta_w)
-{
-	logerror("%s:alg_cia_1_porta_w(%02x)\n", machine().describe_context(), data);
-}
-
-
 
 /*************************************
  *
@@ -290,40 +231,39 @@ WRITE8_MEMBER(alg_state::alg_cia_1_porta_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16, alg_state )
+static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, alg_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
+	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, alg_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
+	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
+	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
+	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
+	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16, alg_state )
+	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( main_map_r2, AS_PROGRAM, 16, alg_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
-
+	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( main_map_picmatic, AS_PROGRAM, 16, alg_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
-
+	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -337,15 +277,15 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( alg )
-	PORT_START("JOY0DAT")   /* read by Amiga core */
+	PORT_START("joy_0_dat")   /* read by Amiga core */
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, 0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("JOY1DAT")   /* read by Amiga core */
+	PORT_START("joy_1_dat")   /* read by Amiga core */
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, 1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("POTGO")     /* read by Amiga core */
+	PORT_START("potgo")     /* read by Amiga core */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -359,13 +299,13 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1JOY")     /* referenced by JOY0DAT */
+	PORT_START("p1_joy")     /* referenced by JOY0DAT */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("P2JOY")     /* referenced by JOY1DAT */
+	PORT_START("p2_joy")     /* referenced by JOY1DAT */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -382,14 +322,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( alg_2p )
 	PORT_INCLUDE(alg)
 
-	PORT_MODIFY("POTGO")
+	PORT_MODIFY("potgo")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_trigger_r, NULL)
 
 	PORT_MODIFY("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("P2JOY")
+	PORT_MODIFY("p2_joy")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_holster_r, NULL)
 
 	PORT_START("GUN2X")     /* referenced by lightgun_pos_r */
@@ -416,11 +356,16 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( alg_r1, alg_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
+	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
 	MCFG_CPU_PROGRAM_MAP(main_map_r1)
 
-	MCFG_MACHINE_START_OVERRIDE(alg_state,alg)
-	MCFG_MACHINE_RESET_OVERRIDE(alg_state,alg)
+	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
@@ -442,7 +387,7 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, 3579545)
+	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
@@ -453,19 +398,15 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(alg_state,alg_cia_0_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(alg_state,alg_cia_0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(alg_state,alg_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(alg_state,alg_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(alg_state,alg_cia_1_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(alg_state,alg_cia_1_porta_w))
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("FIRE"))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 MACHINE_CONFIG_END
 
@@ -480,13 +421,22 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( picmatic, alg_r1 )
 
 	/* adjust for PAL specs */
-	MCFG_CPU_REPLACE("maincpu", M68000, AMIGA_68000_PAL_CLOCK)
+	MCFG_CPU_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(main_map_picmatic)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(512*2, 312)
 	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
+
+	MCFG_DEVICE_MODIFY("amiga")
+	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_PAL)
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_PAL)
+	MCFG_DEVICE_MODIFY("cia_1")
+	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_PAL)
+	MCFG_DEVICE_MODIFY("fdc")
+	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_PAL)
 MACHINE_CONFIG_END
 
 
@@ -497,13 +447,11 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
-
 #define ALG_BIOS \
-	ROM_REGION16_BE( 0x80000, "user1", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "Kick1.3", "Kickstart 1.3") \
-	ROM_LOAD16_WORD_BIOS(0, "kick13.rom", 0x000000, 0x40000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785)) \
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
+	ROM_REGION16_BE(0x80000, "kickstart", 0) \
+	ROM_SYSTEM_BIOS(0, "kick13",  "Kickstart 1.3 (34.5)") \
+	ROMX_LOAD("315093-02.u2", 0x00000, 0x40000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD | ROM_BIOS(1)) \
+	ROM_COPY("kickstart", 0x000000, 0x040000, 0x040000)
 
 
 
@@ -672,33 +620,6 @@ ROM_END
 
 
 
-/*************************************
- *
- *  Generic driver init
- *
- *************************************/
-
-void alg_state::alg_init()
-{
-	static const amiga_machine_interface alg_intf =
-	{
-		ANGUS_CHIP_RAM_MASK,
-		NULL, NULL, alg_potgo_w,
-		serial_w,
-
-		vsync_callback,
-		NULL,
-		NULL,
-		0
-	};
-	amiga_machine_config(machine(), &alg_intf);
-
-	/* set up memory */
-	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, memregion("user1")->base());
-}
-
-
 
 /*************************************
  *
@@ -706,8 +627,22 @@ void alg_state::alg_init()
  *
  *************************************/
 
+DRIVER_INIT_MEMBER( alg_state, ntsc )
+{
+	m_agnus_id = AGNUS_HR_NTSC;
+	m_denise_id = DENISE;
+}
+
+DRIVER_INIT_MEMBER( alg_state, pal )
+{
+	m_agnus_id = AGNUS_HR_PAL;
+	m_denise_id = DENISE;
+}
+
 DRIVER_INIT_MEMBER(alg_state,palr1)
 {
+	DRIVER_INIT_CALL(ntsc);
+
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
 	dynamic_buffer original(length);
@@ -721,12 +656,12 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
 		rom[dstaddr] = original[srcaddr];
 	}
-
-	alg_init();
 }
 
 DRIVER_INIT_MEMBER(alg_state,palr3)
 {
+	DRIVER_INIT_CALL(ntsc);
+
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
 	dynamic_buffer original(length);
@@ -739,12 +674,12 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		rom[dstaddr] = original[srcaddr];
 	}
-
-	alg_init();
 }
 
 DRIVER_INIT_MEMBER(alg_state,palr6)
 {
+	DRIVER_INIT_CALL(ntsc);
+
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
 	dynamic_buffer original(length);
@@ -759,12 +694,12 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 		dstaddr ^= 0x20000;
 		rom[dstaddr] = original[srcaddr];
 	}
-
-	alg_init();
 }
 
 DRIVER_INIT_MEMBER(alg_state,aplatoon)
 {
+	DRIVER_INIT_CALL(ntsc);
+
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
 	UINT8 *rom = memregion("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x40000);
@@ -780,13 +715,8 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 		memcpy(decrypted + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
 	memcpy(rom, decrypted, 0x40000);
 	logerror("decrypt done\n ");
-	alg_init();
 }
 
-DRIVER_INIT_MEMBER(alg_state,none)
-{
-	alg_init();
-}
 
 
 
@@ -797,7 +727,7 @@ DRIVER_INIT_MEMBER(alg_state,none)
  *************************************/
 
 /* BIOS */
-GAME( 199?, alg_bios, 0, alg_r1,   alg, alg_state,    none,     ROT0,  "American Laser Games", "American Laser Games BIOS", GAME_IS_BIOS_ROOT )
+GAME( 199?, alg_bios, 0, alg_r1,   alg, alg_state,    ntsc,     ROT0,  "American Laser Games", "American Laser Games BIOS", GAME_IS_BIOS_ROOT )
 
 /* Rev. A board */
 /* PAL R1 */
@@ -829,4 +759,4 @@ GAME( 1995, fastdraw, alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT90, "A
 GAME( 199?, aplatoon, alg_bios, alg_r2,   alg, alg_state,    aplatoon, ROT0,  "Nova?", "Platoon V.?.? US", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Web Picmatic games PAL tv standard, own rom board */
-GAME( 1993, zortonbr, alg_bios, picmatic, alg, alg_state,    none,     ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, zortonbr, alg_bios, picmatic, alg, alg_state,    pal,     ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )

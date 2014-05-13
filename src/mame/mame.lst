@@ -9916,7 +9916,7 @@ mquake          // (c) 1987
 upscope         // (c) 1986 Grand products
 
 // Cubo32 (Commodore CD32-based HW)
-cd32bios        // Base unit
+cubo            // Base unit
 cndypuzl        // (c) 1995
 haremchl        // (c) 1995
 lsrquiz         // (c) 1995

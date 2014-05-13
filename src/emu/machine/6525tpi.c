@@ -535,6 +535,12 @@ WRITE8_MEMBER( tpi6525_device::write )
 	}
 }
 
+void tpi6525_device::port_line_w(UINT8 &port, int line, int state)
+{
+	port &= ~(1 << line);
+	port |= state << line;
+}
+
 /* this should probably be done better, needed for amigacd.c */
 
 UINT8 tpi6525_device::get_ddr_a()

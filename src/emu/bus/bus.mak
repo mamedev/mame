@@ -1082,3 +1082,15 @@ BUSOBJS += $(BUSOBJ)/a1bus/a1cassette.o
 BUSOBJS += $(BUSOBJ)/a1bus/a1cffa.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/zorro/zorro.h,BUSES += ZORRO
+#-------------------------------------------------
+
+ifneq ($(filter ZORRO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/zorro
+BUSOBJS += $(BUSOBJ)/zorro/zorro.o
+BUSOBJS += $(BUSOBJ)/zorro/cards.o
+BUSOBJS += $(BUSOBJ)/zorro/a590.o
+BUSOBJS += $(BUSOBJ)/zorro/action_replay.o
+endif
