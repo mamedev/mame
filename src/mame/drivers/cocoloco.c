@@ -62,7 +62,6 @@
   TODO:
 
   - Find the 25 Pesetas missing coin input.
-  - Verify audio outputs against the real hardware.
   - Verify video timings.
   - PROM verification and real colors.
   - Find the meaning of A005h reads (always discarded).
@@ -360,7 +359,6 @@ static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK) 	/* confirmed */
 	MCFG_CPU_PROGRAM_MAP(cocoloco_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", cocoloco_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -394,16 +392,6 @@ static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
     MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RAMP.1")
     MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0 * 1.5, 0)
 
-#if 0
-//	MCFG_SOUND_ROUTE(0, "mono", 0.75)
-//	MCFG_SOUND_ROUTE(1, "mono", 1.40)
-//	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-
-/*  Extremely high values due to skew bias (negative offset) stream */
-	MCFG_SOUND_ROUTE(0, "mono", 1.50)
-	MCFG_SOUND_ROUTE(1, "mono", 4.50)
-	MCFG_SOUND_ROUTE(2, "mono", 1.50)
-#endif
 MACHINE_CONFIG_END
 
 
