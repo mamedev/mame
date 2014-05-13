@@ -93,6 +93,8 @@ public:
 	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(optiger);
+
+	UINT16 m_dsp_ram[0x1000];
 };
 
 void taitopjc_state::video_start()
@@ -211,20 +213,6 @@ WRITE64_MEMBER(taitopjc_state::video_w)
 	}
 }
 
-/*
-static UINT16 com_ram[256] =
-{
-    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-    0x434F, 0x4D4E, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,     // COMNOK
-    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-    0x574F, 0x524B, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,     // WORKOK
-    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-    0x5355, 0x4E44, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,     // SUNDOK
-    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-};
-*/
-
 READ64_MEMBER(taitopjc_state::ppc_common_r)
 {
 	UINT64 r = 0;
@@ -263,20 +251,19 @@ READ64_MEMBER(taitopjc_state::ppc_common_r)
 	return r;
 }
 
-static UINT32 dsp_value = 0x4f4b0000;
-
-static UINT16 dsp_ram[0x1000];
-
 READ64_MEMBER(taitopjc_state::dsp_r)
 {
 	UINT64 r = 0;
 
-	if (offset == 0x7fe)
+	if (ACCESSING_BITS_48_63)
 	{
-		if (!(mem_mask & U64(0xffffffff00000000)))
-		{
-			r |= (UINT64)(dsp_value) << 32;
-		}
+		int addr = offset * 2;
+		r |= (UINT64)(m_dsp_ram[addr+0]) << 48;
+	}
+	if (ACCESSING_BITS_16_31)
+	{
+		int addr = offset * 2;
+		r |= (UINT64)(m_dsp_ram[addr+1]) << 16;
 	}
 
 	return r;
@@ -284,15 +271,15 @@ READ64_MEMBER(taitopjc_state::dsp_r)
 
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
-	logerror("dsp_w: %08X, %08X%08X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	printf("dsp_w: %08X, %08X%08X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+
+	if (offset != 0x7fe)
+	{
+		logerror("dsp_w: %08X, %08X%08X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	}
 
 	if (offset == 0x7fe)
 	{
-		if (!(mem_mask & U64(0xffffffff00000000)))
-		{
-			dsp_value = data >> 32;
-		}
-
 		#if 0
 		{
 			int i;
@@ -307,15 +294,34 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 		#endif
 	}
 
-	if (!(mem_mask & U64(0xffff000000000000)))
+	if (ACCESSING_BITS_48_63)
 	{
 		int addr = offset * 2;
-		dsp_ram[addr+0] = (data >> 48) & 0xffff;
+		m_dsp_ram[addr+0] = (data >> 48) & 0xffff;
 	}
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_BITS_16_31)
 	{
 		int addr = offset * 2;
-		dsp_ram[addr+1] = (data >> 16) & 0xffff;
+		m_dsp_ram[addr+1] = (data >> 16) & 0xffff;
+	}
+
+
+
+	if (offset == 0x7fe && ACCESSING_BITS_48_63)
+	{
+		UINT16 w = data >> 48;
+		if (w == 0x4450)
+		{
+			m_dsp_ram[0xffc] = 0;
+		}
+		else if (w == 0x4558)
+		{
+			m_dsp_ram[0xffc] = 0;
+		}
+		else if (w == 0x5349)
+		{
+			m_dsp_ram[0xffc] = 0;
+		}
 	}
 }
 
@@ -417,6 +423,8 @@ void taitopjc_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_dsp_ram[0x0ffc] = 0x4f4b;
 }
 
 
