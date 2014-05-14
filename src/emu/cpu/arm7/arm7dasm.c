@@ -976,6 +976,10 @@ static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 										if (rd == 14)
 											dasmflags = DASMFLAG_STEP_OUT;
 										break;
+									case 0x2:
+										rd = ( opcode & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT;
+										pBuf += sprintf( pBuf, "BLX R%d", rd );
+										break;
 									default:
 										sprintf( pBuf, "INVALID %04x", opcode);
 										break;

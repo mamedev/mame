@@ -932,9 +932,27 @@ void arm7_cpu_device::tg04_01_31(UINT32 pc, UINT32 op)
 	R15 = addr;
 }
 
+/* BLX */
 void arm7_cpu_device::tg04_01_32(UINT32 pc, UINT32 op)
 {
-	fatalerror("%08x: G4-3 Undefined Thumb instruction: %04x\n", pc, op);
+	UINT32 addr = GET_REGISTER((op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT);
+	SET_REGISTER(14, (R15 + 2) | 1);
+
+	// are we also switching to ARM mode?
+	if (!(addr & 1))
+	{
+		SET_CPSR(GET_CPSR & ~T_MASK);
+		if (addr & 2)
+		{
+			addr += 2;
+		}
+	}
+	else
+	{
+		addr &= ~1;
+	}
+
+	R15 = addr;
 }
 
 void arm7_cpu_device::tg04_01_33(UINT32 pc, UINT32 op)
