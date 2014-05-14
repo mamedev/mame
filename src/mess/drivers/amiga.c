@@ -159,12 +159,9 @@ class a3000_state : public amiga_state
 {
 public:
 	a3000_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "u190")
+	amiga_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ32_MEMBER( clock_r );
-	DECLARE_WRITE32_MEMBER( clock_w );
 	DECLARE_READ32_MEMBER( scsi_r );
 	DECLARE_WRITE32_MEMBER( scsi_w );
 	DECLARE_READ32_MEMBER( motherboard_r );
@@ -176,7 +173,6 @@ public:
 protected:
 
 private:
-	required_device<rp5c01_device> m_rtc;
 };
 
 class a500p_state : public amiga_state
@@ -255,19 +251,19 @@ class a4000_state : public amiga_state
 public:
 	a4000_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_rtc(*this, "rtc"),
+	m_ata(*this, "ata"),
 	m_ramsey_config(0),
 	m_gary_coldboot(1),
 	m_gary_timeout(0),
-	m_gary_toenb(0)
+	m_gary_toenb(0),
+	m_ide_interrupt(0)
 	{ }
 
 	DECLARE_READ32_MEMBER( scsi_r );
 	DECLARE_WRITE32_MEMBER( scsi_w );
-	DECLARE_READ32_MEMBER( ide_r );
-	DECLARE_WRITE32_MEMBER( ide_w );
-	DECLARE_READ32_MEMBER( clock_r );
-	DECLARE_WRITE32_MEMBER( clock_w );
+	DECLARE_READ16_MEMBER( ide_r );
+	DECLARE_WRITE16_MEMBER( ide_w );
+	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
 	DECLARE_READ32_MEMBER( motherboard_r );
 	DECLARE_WRITE32_MEMBER( motherboard_w );
 
@@ -277,12 +273,13 @@ public:
 protected:
 
 private:
-	required_device<rp5c01_device> m_rtc;
+	required_device<ata_interface_device> m_ata;
 
 	int m_ramsey_config;
 	int m_gary_coldboot;
 	int m_gary_timeout;
 	int m_gary_toenb;
+	int m_ide_interrupt;
 };
 
 class cd32_state : public amiga_state
@@ -343,16 +340,6 @@ WRITE16_MEMBER( a2000_state::clock_w )
 	m_rtc->write(space, offset / 2, data);
 }
 
-READ32_MEMBER( a3000_state::clock_r )
-{
-	return m_rtc->read(space, offset / 4);
-}
-
-WRITE32_MEMBER( a3000_state::clock_w )
-{
-	m_rtc->write(space, offset / 4, data);
-}
-
 READ16_MEMBER( a500p_state::clock_r )
 {
 	return m_rtc->read(space, offset / 2);
@@ -361,16 +348,6 @@ READ16_MEMBER( a500p_state::clock_r )
 WRITE16_MEMBER( a500p_state::clock_w )
 {
 	m_rtc->write(space, offset / 2, data);
-}
-
-READ32_MEMBER( a4000_state::clock_r )
-{
-	return m_rtc->read(space, offset / 4);
-}
-
-WRITE32_MEMBER( a4000_state::clock_w )
-{
-	m_rtc->write(space, offset / 4, data);
 }
 
 
@@ -687,16 +664,49 @@ WRITE32_MEMBER( a4000_state::scsi_w )
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-READ32_MEMBER( a4000_state::ide_r )
+READ16_MEMBER( a4000_state::ide_r )
 {
 	UINT16 data = 0xffff;
-	logerror("ide_r(%06x): %08x & %08x\n", offset, data, mem_mask);
+
+	// ide interrupt register
+	if (offset == 0x1010)
+		return m_ide_interrupt << 15;
+
+	// swap
+	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
+
+	// this very likely doesn't respond to all the addresses, figure out which ones
+	if (BIT(offset, 12))
+		data = m_ata->read_cs1(space, (offset >> 1) & 0x07, mem_mask);
+	else
+		data = m_ata->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
+
+	// swap
+	data = (data << 8) | (data >> 8);
+
 	return data;
 }
 
-WRITE32_MEMBER( a4000_state::ide_w )
+WRITE16_MEMBER( a4000_state::ide_w )
 {
-	logerror("ide_w(%06x): %08x & %08x\n", offset, data, mem_mask);
+	// ide interrupt register, read only
+	if (offset == 0x1010)
+		return;
+
+	// swap
+	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
+	data = (data << 8) | (data >> 8);
+
+	// this very likely doesn't respond to all the addresses, figure out which ones
+	if (BIT(offset, 12))
+		m_ata->write_cs1(space, (offset >> 1) & 0x07, data, mem_mask);
+	else
+		m_ata->write_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
+}
+
+WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
+{
+	m_ide_interrupt = state;
 }
 
 READ32_MEMBER( a4000_state::motherboard_r )
@@ -976,7 +986,7 @@ static ADDRESS_MAP_START( a3000_mem, AS_PROGRAM, 32, a3000_state )
 	AM_RANGE(0x00b80000, 0x00bfffff) AM_READWRITE16(cia_r, cia_w, 0xffffffff)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
 	AM_RANGE(0x00d00000, 0x00dbffff) AM_NOP
-	AM_RANGE(0x00dc0000, 0x00dcffff) AM_READWRITE(clock_r, clock_w)
+	AM_RANGE(0x00dc0000, 0x00dcffff) AM_DEVREADWRITE8("rtc", rp5c01_device, read, write, 0x000000ff)
 	AM_RANGE(0x00dd0000, 0x00ddffff) AM_READWRITE(scsi_r, scsi_w)
 	AM_RANGE(0x00de0000, 0x00deffff) AM_READWRITE(motherboard_r, motherboard_w)
 	AM_RANGE(0x00df0000, 0x00dfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff) AM_SHARE("custom_regs")
@@ -1062,9 +1072,9 @@ static ADDRESS_MAP_START( a4000_mem, AS_PROGRAM, 32, a4000_state )
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
 	AM_RANGE(0x00d00000, 0x00d9ffff) AM_NOP
 	AM_RANGE(0x00da0000, 0x00dbffff) AM_NOP
-	AM_RANGE(0x00dc0000, 0x00dcffff) AM_READWRITE(clock_r, clock_w)
+	AM_RANGE(0x00dc0000, 0x00dcffff) AM_DEVREADWRITE8("rtc", rp5c01_device, read, write, 0x000000ff)
 	AM_RANGE(0x00dd0000, 0x00dd0fff) AM_NOP
-	AM_RANGE(0x00dd1000, 0x00dd3fff) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x00dd1000, 0x00dd3fff) AM_READWRITE16(ide_r, ide_w, 0xffffffff)
 	AM_RANGE(0x00dd4000, 0x00ddffff) AM_NOP
 	AM_RANGE(0x00de0000, 0x00deffff) AM_READWRITE(motherboard_r, motherboard_w)
 	AM_RANGE(0x00df0000, 0x00dfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff) AM_SHARE("custom_regs")
@@ -1633,7 +1643,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000, amiga_base, a4000_state )
 	// real-time clock
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
-	// todo: ide, zorro3
+	// ide
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(a4000_state, ide_interrupt_w))
+
+	// todo: zorro3
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a4000n, a4000, a4000_state )
