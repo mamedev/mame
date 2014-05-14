@@ -128,6 +128,7 @@ void osd_interface::update_option(osd_options &options, const char * key, dynami
 		}
 		new_option_value.cat(t);		
 	}
+	// TODO: core_strdup() is leaked
 	options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));	
 }
 	
@@ -157,8 +158,18 @@ void osd_interface::register_options(osd_options &options)
 
 osd_interface::~osd_interface()
 {
-	m_debugger_options.reset();
+
+	for(int i= 0; i < m_video_names.count(); ++i)
+		osd_free(const_cast<char*>(m_video_names[i]));
+	//m_video_options,reset();
+
+	for(int i= 0; i < m_sound_names.count(); ++i)
+		osd_free(const_cast<char*>(m_sound_names[i]));
 	m_sound_options.reset();
+
+	for(int i= 0; i < m_debugger_names.count(); ++i)
+		osd_free(const_cast<char*>(m_debugger_names[i]));
+	m_debugger_options.reset();
 }
 
 
