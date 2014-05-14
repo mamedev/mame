@@ -152,7 +152,7 @@ void netlist_mame_analog_output_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
+		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Logic Input", tag, owner, clock, "netlist_logic_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_param(0),
 			m_mask(0xffffffff),
@@ -185,7 +185,7 @@ void netlist_mame_logic_input_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_stream_input_t::netlist_mame_stream_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
+		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Stream Input", tag, owner, clock, "netlist_stream_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_channel(0),
 			m_param_name("")
@@ -226,7 +226,7 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist_setup_t &setu
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_stream_output_t::netlist_mame_stream_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
+		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Stream Output", tag, owner, clock, "netlist_stream_output", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_channel(0),
 			m_out_name("")
@@ -472,7 +472,7 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_cpu_device_t::netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist cpu device", tag, owner, clock, "netlist_cpu", __FILE__),
+	: netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist CPU Device", tag, owner, clock, "netlist_cpu", __FILE__),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
 		device_disasm_interface(mconfig, *this),
@@ -574,7 +574,7 @@ ATTR_HOT void netlist_mame_cpu_device_t::execute_run()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_sound_device_t::netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist sound device", tag, owner, clock, "netlist_sound", __FILE__),
+	: netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist Sound Device", tag, owner, clock, "netlist_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }

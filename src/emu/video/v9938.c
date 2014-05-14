@@ -105,7 +105,7 @@ v9938_device::v9938_device(const machine_config &mconfig, const char *tag, devic
 }
 
 v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: v99x8_device(mconfig, V9938, "V9938", "v9938", tag, owner, clock)
+: v99x8_device(mconfig, V9938, "V9958 VDP", "v9958", tag, owner, clock)
 {
 	m_model = MODEL_V9958;
 }
