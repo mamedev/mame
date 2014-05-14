@@ -13731,6 +13731,8 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="65536">
 				<rom name="fmpac.rom" size="65536" crc="0e84505d" sha1="9d789166e3caf28e4742fe933d962e99618c633d" offset="0x0000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -13847,6 +13849,7 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="RC741" />
 		<info name="alt_title" value="新世ＳＩＺＥＲ" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="synthesizer" />
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="konami's synthesizer (japan) (program).rom" size="32768" crc="b9b0999a" sha1="2feff37d593683ce1c7dfac33ed3207895e01a03" offset="0" />
