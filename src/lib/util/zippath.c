@@ -59,6 +59,7 @@ public:
 static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type);
 static int is_zip_file(const char *path);
 static int is_zip_file_separator(char c);
+static int is_7z_file(const char *path);
 
 
 /***************************************************************************
@@ -298,6 +299,11 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 				goto done;
 			}
 		}
+		else if (is_7z_file(mainpath))
+		{
+			filerr = FILERR_INVALID_DATA;
+			goto done;
+		}
 
 		if (subpath.len() == 0)
 			filerr = core_fopen(filename, openflags, &file);
@@ -378,6 +384,18 @@ static int is_root(const char *path)
 
 
 
+/*-------------------------------------------------
+    is_7z_file - tests to see if this file is a
+    7-zip file
+-------------------------------------------------*/
+
+static int is_7z_file(const char *path)
+{
+	const char *s = strrchr(path, '.');
+	return (s != NULL) && !core_stricmp(s, ".7z");
+}
+	
+	
 /*-------------------------------------------------
     is_zip_file - tests to see if this file is a
     ZIP file
