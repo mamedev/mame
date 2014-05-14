@@ -269,7 +269,7 @@ WRITE64_MEMBER(taitopjc_state::ppc_common_w)
 {
 	UINT32 address = offset * 2;
 
-	logerror("ppc_common_w: %08X, %I64X, %I64X\n", offset, data, mem_mask);
+//	logerror("ppc_common_w: %08X, %I64X, %I64X\n", offset, data, mem_mask);
 
 	if (ACCESSING_BITS_48_63)
 	{
