@@ -75,6 +75,8 @@ protected:
 		UINT8                   m_in;
 		UINT8                   m_out;
 		UINT8                   m_ddr;
+		devcb_read8         	*m_in_cb;
+		devcb_write8        	*m_out_cb;
 	};
 
 	// device-level overrides

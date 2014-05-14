@@ -224,10 +224,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 		else
 		{
 			port->m_out = data;
-			if (!BIT(offset, 1))
-				m_out_pa_cb((offs_t)0, data);
-			else
-				m_out_pb_cb((offs_t)0, data);
+			(*port->m_out_cb)((offs_t)0, data);
 		}
 
 		/* writes to port A need to update the PA7 state */
@@ -307,17 +304,17 @@ UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
 		else
 		{
 			/* call the input callback if it exists */
-			if (!BIT(offset, 1))
-				port->m_in = m_in_pa_cb(0);
-			else
-				port->m_in = m_in_pb_cb(0);
-
-			/* changes to port A need to update the PA7 state */
-			if (port == &m_port[0])
+			if (!(*port->m_in_cb).isnull())
 			{
-				if (!debugger_access)
+				port->m_in = (*port->m_in_cb)(0);
+			
+				/* changes to port A need to update the PA7 state */
+				if (port == &m_port[0])
 				{
-					update_pa7_state();
+					if (!debugger_access)
+					{
+						update_pa7_state();
+					}
 				}
 			}
 
@@ -419,10 +416,14 @@ riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag,
 void riot6532_device::device_start()
 {
 	/* resolve callbacks */
-	m_in_pa_cb.resolve_safe(0);
+	m_in_pa_cb.resolve();
+	m_port[0].m_in_cb = &m_in_pa_cb;
 	m_out_pa_cb.resolve_safe();
-	m_in_pb_cb.resolve_safe(0);
+	m_port[0].m_out_cb = &m_out_pa_cb;
+	m_in_pb_cb.resolve();
+	m_port[1].m_in_cb = &m_in_pb_cb;
 	m_out_pb_cb.resolve_safe();
+	m_port[1].m_out_cb = &m_out_pb_cb;
 	m_irq_cb.resolve_safe();
 
 	/* allocate timers */
