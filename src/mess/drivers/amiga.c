@@ -1480,7 +1480,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a3000, amiga_base, a3000_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u190", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	// todo: zorro3 slots, super dmac, scsi
 MACHINE_CONFIG_END
