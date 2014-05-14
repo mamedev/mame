@@ -8,20 +8,18 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class lft_state : public driver_device
 {
 public:
 	lft_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ16_MEMBER(keyin_r);
@@ -43,7 +41,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(lft_io, AS_IO, 16, lft_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00100, 0x00103) AM_READ(status_r)
-	AM_RANGE(0x00104, 0x00105) AM_READ(keyin_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0x00ff)
+	AM_RANGE(0x00104, 0x00105) AM_READ(keyin_r) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -75,12 +73,12 @@ void lft_state::machine_reset()
 
 static MACHINE_CONFIG_START( lft, lft_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 4000000) // no idea
+	MCFG_CPU_ADD("maincpu", I80186, 4000000) // no idea
 	MCFG_CPU_PROGRAM_MAP(lft_mem)
 	MCFG_CPU_IO_MAP(lft_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(lft_state, kbd_put))
 MACHINE_CONFIG_END
 
