@@ -56,6 +56,16 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/gayle.h,MACHINES += GAYLE
+#-------------------------------------------------
+
+ifneq ($(filter GAYLE,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/gayle.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/machine/40105.h,MACHINES += CMOS40105
 #-------------------------------------------------
 

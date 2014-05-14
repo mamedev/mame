@@ -15,6 +15,8 @@
 #include "machine/bankdev.h"
 #include "machine/6525tpi.h"
 #include "machine/6526cia.h"
+#include "machine/gayle.h"
+#include "machine/ataintf.h"
 #include "machine/dmac.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
@@ -209,53 +211,43 @@ class a600_state : public amiga_state
 public:
 	a600_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_gayle_id_count(0)
+	m_gayle_int2(0)
 	{ }
 
-	DECLARE_READ16_MEMBER( ide_r );
-	DECLARE_WRITE16_MEMBER( ide_w );
-	DECLARE_READ16_MEMBER( gayle_r );
-	DECLARE_WRITE16_MEMBER( gayle_w );
-	DECLARE_READ16_MEMBER( gayle_id_r );
-	DECLARE_WRITE16_MEMBER( gayle_id_w );
+	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
 
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
+	static const UINT8 GAYLE_ID = 0xd0;
+
 protected:
-	virtual void machine_reset();
+	virtual void update_irq2();
 
 private:
-	static const int GAYLE_ID = 0xd0;
-
-	int m_gayle_id_count;
-	UINT8 m_gayle_reg[4];
+	int m_gayle_int2;
 };
 
 class a1200_state : public amiga_state
 {
 public:
 	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag)
-	//m_gayle_id_count(0)
+	amiga_state(mconfig, type, tag),
+	m_gayle_int2(0)
 	{ }
 
-	DECLARE_READ32_MEMBER( ide_r );
-	DECLARE_WRITE32_MEMBER( ide_w );
-	DECLARE_READ32_MEMBER( gayle_r );
-	DECLARE_WRITE32_MEMBER( gayle_w );
+	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
 
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
+	static const UINT8 GAYLE_ID = 0xd1;
+
 protected:
-	virtual void machine_reset();
+	virtual void update_irq2();
 
 private:
-	static const int GAYLE_ID = 0xd1;
-
-	//int m_gayle_id_count;
-	UINT8 m_gayle_reg[4];
+	int m_gayle_int2;
 };
 
 class a4000_state : public amiga_state
@@ -659,130 +651,28 @@ WRITE32_MEMBER( a3000_state::motherboard_w )
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-void a600_state::machine_reset()
+void a600_state::update_irq2()
 {
-	// base reset
-	amiga_state::machine_reset();
-
-	m_gayle_reg[0] = 0;
-	m_gayle_reg[1] = 0;
-	m_gayle_reg[2] = 0;
-	m_gayle_reg[3] = 0;
+	int state = (m_cia_0_irq || m_gayle_int2);
+	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
 }
 
-// note: for ide a12 = cs0/cs1, offset >> 2 for reg
-READ16_MEMBER( a600_state::ide_r )
+WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
 {
-	UINT16 data = 0xffff;
-	logerror("ide_r(%06x): %08x & %08x\n", offset, data, mem_mask);
-	return data;
+	m_gayle_int2 = state;
+	update_irq2();
 }
 
-WRITE16_MEMBER( a600_state::ide_w )
+void a1200_state::update_irq2()
 {
-	logerror("ide_w(%06x): %08x & %08x\n", offset, data, mem_mask);
+	int state = (m_cia_0_irq || m_gayle_int2);
+	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
 }
 
-READ16_MEMBER( a600_state::gayle_r )
+WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
 {
-	UINT16 data = 0xffff;
-
-	switch (offset)
-	{
-	case 0x0000: data = m_gayle_reg[0]; break;
-	case 0x1000: data = m_gayle_reg[1]; break;
-	case 0x2000: data = m_gayle_reg[2]; break;
-	case 0x3000: data = m_gayle_reg[3]; break;
-	}
-
-	logerror("gayle_r(%06x): %08x & %08x\n", offset, data, mem_mask);
-	return data;
-}
-
-WRITE16_MEMBER( a600_state::gayle_w )
-{
-	logerror("gayle_w(%06x): %08x & %08x\n", offset, data, mem_mask);
-
-	switch (offset)
-	{
-	case 0x0000:
-		break;
-	case 0x1000:
-		break;
-	case 0x2000:
-		break;
-	case 0x3000:
-		break;
-	}
-}
-
-READ16_MEMBER( a600_state::gayle_id_r )
-{
-	if (ACCESSING_BITS_8_15)
-		return ((GAYLE_ID << m_gayle_id_count++) & 0x80) << 8;
-	else
-		return 0xffff;
-}
-
-WRITE16_MEMBER( a600_state::gayle_id_w )
-{
-	m_gayle_id_count = 0;
-}
-
-void a1200_state::machine_reset()
-{
-	// base reset
-	amiga_state::machine_reset();
-
-	m_gayle_reg[0] = 0;
-	m_gayle_reg[1] = 0;
-	m_gayle_reg[2] = 0;
-	m_gayle_reg[3] = 0;
-}
-
-READ32_MEMBER( a1200_state::ide_r )
-{
-	UINT16 data = 0xffff;
-	logerror("ide_r(%06x): %08x & %08x\n", offset, data, mem_mask);
-	return data;
-}
-
-WRITE32_MEMBER( a1200_state::ide_w )
-{
-	logerror("ide_w(%06x): %08x & %08x\n", offset, data, mem_mask);
-}
-
-READ32_MEMBER( a1200_state::gayle_r )
-{
-	UINT16 data = 0xffff;
-
-	switch (offset)
-	{
-	case 0x0000: data = m_gayle_reg[0]; break;
-	case 0x1000: data = m_gayle_reg[1]; break;
-	case 0x2000: data = m_gayle_reg[2]; break;
-	case 0x3000: data = m_gayle_reg[3]; break;
-	}
-
-	logerror("gayle_r(%06x): %08x & %08x\n", offset, data, mem_mask);
-	return data;
-}
-
-WRITE32_MEMBER( a1200_state::gayle_w )
-{
-	logerror("gayle_w(%06x): %08x & %08x\n", offset, data, mem_mask);
-
-	switch (offset)
-	{
-	case 0x0000:
-		break;
-	case 0x1000:
-		break;
-	case 0x2000:
-		break;
-	case 0x3000:
-		break;
-	}
+	m_gayle_int2 = state;
+	update_irq2();
 }
 
 READ32_MEMBER( a4000_state::scsi_r )
@@ -1123,15 +1013,13 @@ static ADDRESS_MAP_START( a600_mem, AS_PROGRAM, 16, a600_state )
 	AM_RANGE(0xb80000, 0xbeffff) AM_NOP // reserved (cdtv)
 	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE(cia_r, gayle_cia_w)
 	AM_RANGE(0xc00000, 0xd7ffff) AM_NOP // slow mem
-//	AM_RANGE(0xd80000, 0xd8ffff) AM_NOP // spare chip select
-//	AM_RANGE(0xd90000, 0xd9ffff) AM_NOP // arcnet chip select
-	AM_RANGE(0xda0000, 0xda3fff) AM_READWRITE(ide_r, ide_w)
-//	AM_RANGE(0xda4000, 0xda7fff) AM_NOP // ide reserved
-	AM_RANGE(0xda8000, 0xdaffff) AM_READWRITE(gayle_r, gayle_w)
-//	AM_RANGE(0xdb0000, 0xdbffff) AM_NOP // reserved (external ide)
+	AM_RANGE(0xd80000, 0xd8ffff) AM_NOP // spare chip select
+	AM_RANGE(0xd90000, 0xd9ffff) AM_NOP // arcnet chip select
+	AM_RANGE(0xda0000, 0xdaffff) AM_DEVREADWRITE("gayle", gayle_device, gayle_r, gayle_w)
+	AM_RANGE(0xdb0000, 0xdbffff) AM_NOP // reserved (external ide)
 	AM_RANGE(0xdc0000, 0xdcffff) AM_NOP // rtc
-//	AM_RANGE(0xdd0000, 0xddffff) AM_NOP // reserved (dma controller)
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(gayle_id_r, gayle_id_w)
+	AM_RANGE(0xdd0000, 0xddffff) AM_NOP // reserved (dma controller)
+	AM_RANGE(0xde0000, 0xdeffff) AM_DEVREADWRITE("gayle", gayle_device, gayle_id_r, gayle_id_w)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
 	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
@@ -1151,13 +1039,11 @@ static ADDRESS_MAP_START( a1200_mem, AS_PROGRAM, 32, a1200_state )
 	AM_RANGE(0xc00000, 0xd7ffff) AM_NOP // slow mem
 	AM_RANGE(0xd80000, 0xd8ffff) AM_NOP // spare chip select
 	AM_RANGE(0xd90000, 0xd9ffff) AM_NOP // arcnet chip select
-	AM_RANGE(0xda0000, 0xda3fff) AM_READWRITE(ide_r, ide_w)
-	AM_RANGE(0xda4000, 0xda7fff) AM_NOP // ide reserved
-	AM_RANGE(0xda8000, 0xdaffff) AM_READWRITE(gayle_r, gayle_w)
+	AM_RANGE(0xda0000, 0xdaffff) AM_DEVREADWRITE16("gayle", gayle_device, gayle_r, gayle_w, 0xffffffff)
 	AM_RANGE(0xdb0000, 0xdbffff) AM_NOP // reserved (external ide)
 	AM_RANGE(0xdc0000, 0xdcffff) AM_NOP // rtc
 	AM_RANGE(0xdd0000, 0xddffff) AM_NOP // reserved (dma controller)
-	AM_RANGE(0xde0000, 0xdeffff) AM_NOP // reserved (mb resources)
+	AM_RANGE(0xde0000, 0xdeffff) AM_DEVREADWRITE16("gayle", gayle_device, gayle_id_r, gayle_id_w, 0xffffffff)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff) AM_SHARE("custom_regs")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror32_r)
 	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
@@ -1646,7 +1532,17 @@ static MACHINE_CONFIG_DERIVED_CLASS( a600, amiga_base, a600_state )
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
-	// todo: ide, pcmcia
+	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a600_state::GAYLE_ID)
+	MCFG_GAYLE_INT2_HANDLER(WRITELINE(a600_state, gayle_int2_w))
+	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs0))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs0))
+	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
+
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
+
+	// todo: pcmcia
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a600n, a600, a600_state )
@@ -1683,7 +1579,17 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
-	// todo: ide, pcmcia
+	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
+	MCFG_GAYLE_INT2_HANDLER(WRITELINE(a1200_state, gayle_int2_w))
+	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs0))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs0))
+	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
+
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
+
+	// todo: pcmcia
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a1200n, a1200, a1200_state )
