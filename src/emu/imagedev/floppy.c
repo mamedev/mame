@@ -147,7 +147,8 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		device_slot_card_interface(mconfig, *this),
-		image(NULL)
+		image(NULL),
+		fif_list(NULL)
 {
 	extension_list[0] = '\0';
 }
@@ -158,6 +159,12 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 
 floppy_image_device::~floppy_image_device()
 {
+	for(floppy_image_format_t *format = fif_list; format; ) {
+		floppy_image_format_t* tmp_format = format;
+		format = format->next;
+		delete tmp_format;
+	}
+	fif_list = NULL;
 }
 
 void floppy_image_device::setup_load_cb(load_cb cb)
@@ -188,7 +195,7 @@ void floppy_image_device::setup_wpt_cb(wpt_cb cb)
 void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
 	extension_list[0] = '\0';
-	fif_list = 0;
+	fif_list = NULL;
 	for(int cnt=0; formats[cnt]; cnt++)
 	{
 		// allocate a new format
