@@ -2066,6 +2066,8 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_drq_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
@@ -2122,6 +2124,8 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_drq_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
@@ -2180,6 +2184,8 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_drq_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
@@ -2231,6 +2237,8 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(fm7_state,fm7_fdc_drq_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))

@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
 
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
-	MCFG_WD17XX_INTRQ_CALLBACK(DEVWRITELINE("pia1", pia6821_device, cb1_w))
+	//MCFG_WD17XX_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osbexec_floppy_interface)
 
