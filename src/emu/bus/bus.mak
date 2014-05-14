@@ -389,6 +389,38 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/msx_slot/slot.h,BUSES += MSX_SLOT
+#-------------------------------------------------
+
+ifneq ($(filter MSX_SLOT,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/msx_slot
+BUSOBJS += $(BUSOBJ)/msx_slot/bunsetsu.o
+BUSOBJS += $(BUSOBJ)/msx_slot/cartridge.o
+BUSOBJS += $(BUSOBJ)/msx_slot/disk.o
+BUSOBJS += $(BUSOBJ)/msx_slot/fs4600.o
+BUSOBJS += $(BUSOBJ)/msx_slot/music.o
+BUSOBJS += $(BUSOBJ)/msx_slot/panasonic08.o
+BUSOBJS += $(BUSOBJ)/msx_slot/rom.o
+BUSOBJS += $(BUSOBJ)/msx_slot/ram.o
+BUSOBJS += $(BUSOBJ)/msx_slot/ram_mm.o
+BUSOBJS += $(BUSOBJ)/msx_slot/slot.o
+OBJDIRS += $(BUSOBJ)/msx_cart
+BUSOBJS += $(BUSOBJ)/msx_cart/ascii.o
+BUSOBJS += $(BUSOBJ)/msx_cart/cartridge.o
+BUSOBJS += $(BUSOBJ)/msx_cart/crossblaim.o
+BUSOBJS += $(BUSOBJ)/msx_cart/fmpac.o
+BUSOBJS += $(BUSOBJ)/msx_cart/konami.o
+BUSOBJS += $(BUSOBJ)/msx_cart/korean.o
+BUSOBJS += $(BUSOBJ)/msx_cart/majutsushi.o
+BUSOBJS += $(BUSOBJ)/msx_cart/msxdos2.o
+BUSOBJS += $(BUSOBJ)/msx_cart/nomapper.o
+BUSOBJS += $(BUSOBJ)/msx_cart/rtype.o
+BUSOBJS += $(BUSOBJ)/msx_cart/superloderunner.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/kc/kc.h,BUSES += KC
 #-------------------------------------------------
 

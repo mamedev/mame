@@ -589,6 +589,7 @@ BUSES += KC
 BUSES += MACPDS
 BUSES += MIDI
 BUSES += MEGADRIVE
+BUSES += MSX_SLOT
 BUSES += NES
 BUSES += NUBUS
 BUSES += ORICEXT
@@ -1002,7 +1003,9 @@ $(MESSOBJ)/arcadia.a:           \
 $(MESSOBJ)/ascii.a:             \
 	$(MESS_DRIVERS)/msx.o       \
 	$(MESS_MACHINE)/msx.o       \
-	$(MESS_MACHINE)/msx_slot.o  \
+	$(MESS_MACHINE)/msx_switched.o \
+	$(MESS_MACHINE)/msx_matsushita.o \
+	$(MESS_MACHINE)/msx_s1985.o \
 
 $(MESSOBJ)/at.a:                \
 	$(MESS_MACHINE)/at.o        \

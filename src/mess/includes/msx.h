@@ -16,7 +16,6 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
-#include "sound/k051649.h"
 #include "sound/2413intf.h"
 #include "video/v9938.h"
 #include "video/tms9928a.h"
@@ -28,124 +27,155 @@
 #include "formats/msx_dsk.h"
 //#include "osdepend.h"
 #include "hashfile.h"
-#include "includes/msx_slot.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
+#include "bus/msx_slot/slot.h"
+#include "bus/msx_slot/rom.h"
+#include "bus/msx_slot/ram.h"
+#include "bus/msx_slot/cartridge.h"
+#include "bus/msx_slot/ram_mm.h"
+#include "bus/msx_slot/disk.h"
+#include "bus/msx_slot/music.h"
+#include "bus/msx_slot/bunsetsu.h"
+#include "bus/msx_slot/fs4600.h"
+#include "bus/msx_slot/panasonic08.h"
 
-#define MSX_MAX_CARTS   (2)
 
 #define TC8521_TAG  "rtc"
 
-#define MCFG_MSX_LAYOUT(_layout) \
-	msx_state::set_layout(*owner, msx_slot_layout_##_layout);
+#define MCFG_MSX_LAYOUT_ROM(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_ROM_ADD(_tag, _page, _numpages, _region, _offset) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_RAM(_tag, _prim, _sec, _page, _numpages) \
+	MCFG_MSX_SLOT_RAM_ADD(_tag, _page, _numpages) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_CARTRIDGE(_tag, _prim, _sec) \
+	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, 0, 4, device);
+
+#define MCFG_MSX_LAYOUT_RAM_MM(_tag, _prim, _sec, _total_size) \
+	MCFG_MSX_SLOT_RAM_MM_ADD(_tag, _total_size) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, 0, 4, device);
 
 #define MCFG_MSX_RAMIO_SET_BITS(_ramio_set_bits) \
-	msx_state::set_ramio_set_bits(*owner, _ramio_set_bits);
+	MCFG_MSX_SLOT_RAMM_SET_RAMIO_BITS(_ramio_set_bits)
+
+#define MCFG_MSX_LAYOUT_DISK1(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_DISK1_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_DISK2(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_DISK2_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_MUSIC(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_MUSIC_ADD(_tag, _page, _numpages, _region, _offset, "ym2413" ) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_BUNSETSU(_tag, _prim, _sec, _page, _numpages, _region, _offset, _bunsetsu_tag) \
+	MCFG_MSX_SLOT_BUNSETSU_ADD(_tag, _page, _numpages, _region, _offset, _bunsetsu_tag) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_FS4600(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_FS4600_ADD(_tag, _page, _numpages, _region, _offset) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_PANASONIC08(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_PANASONIC08_ADD(_tag, _page, _numpages, _region, _offset) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
 
 class msx_state : public driver_device
 {
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_layout(NULL),
-		m_maincpu(*this, "maincpu"),
-		m_v9938(*this, "v9938"),
-		m_v9958(*this, "v9958"),
-		m_cassette(*this, "cassette"),
-		m_ay8910(*this, "ay8910"),
-		m_ym(*this, "ym2413"),
-		m_k051649(*this, "k051649"),
-		m_dac(*this, "dac"),
-		m_rtc(*this, TC8521_TAG),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
-		m_floppy(NULL),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
-		m_bank5(*this, "bank5"),
-		m_bank6(*this, "bank6"),
-		m_bank7(*this, "bank7"),
-		m_bank8(*this, "bank8"),
-		m_bank9(*this, "bank9"),
-		m_bank10(*this, "bank10"),
-		m_bank11(*this, "bank11"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_kanji(*this, "kanji"),
-		m_io_joy0(*this, "JOY0"),
-		m_io_joy1(*this, "JOY1"),
-		m_io_dsw(*this, "DSW"),
-		m_io_mouse0(*this, "MOUSE0"),
-		m_io_mouse1(*this, "MOUSE1"),
-		m_io_key0(*this, "KEY0"),
-		m_io_key1(*this, "KEY1"),
-		m_io_key2(*this, "KEY2"),
-		m_io_key3(*this, "KEY3"),
-		m_io_key4(*this, "KEY4"),
-		m_io_key5(*this, "KEY5") { }
+		: driver_device(mconfig, type, tag)
+		, m_psg_b(0)
+		, m_rtc_latch(0)
+		, m_kanji_latch(0)
+		, m_primary_slot(0)
+		, m_port_c_old(0)
+		, m_keylatch(0)
+		, m_current_switched_device(0)
+		, m_maincpu(*this, "maincpu")
+		, m_v9938(*this, "v9938")
+		, m_v9958(*this, "v9958")
+		, m_cassette(*this, "cassette")
+		, m_ay8910(*this, "ay8910")
+		, m_dac(*this, "dac")
+		, m_rtc(*this, TC8521_TAG)
+		, m_switched_device_as_config("switched_device", ENDIANNESS_LITTLE, 8, 16, 0, address_map_delegate(FUNC(msx_state::switched_device_map), this))
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_kanji(*this, "kanji")
+		, m_io_joy0(*this, "JOY0")
+		, m_io_joy1(*this, "JOY1")
+		, m_io_dsw(*this, "DSW")
+		, m_io_mouse0(*this, "MOUSE0")
+		, m_io_mouse1(*this, "MOUSE1")
+		, m_io_key0(*this, "KEY0")
+		, m_io_key1(*this, "KEY1")
+		, m_io_key2(*this, "KEY2")
+		, m_io_key3(*this, "KEY3")
+		, m_io_key4(*this, "KEY4")
+		, m_io_key5(*this, "KEY5")
+	{
+		for (int prim = 0; prim < 4; prim++ )
+		{
+			m_slot_expanded[prim] = false;
+			m_secondary_slot[prim] = 0;
+			for (int sec = 0; sec < 4; sec++ )
+			{
+				for (int page = 0; page < 4; page++ )
+				{
+					m_all_slots[prim][sec][page] = NULL;
+				}
+			}
+		}
+		m_mouse[0] = m_mouse[1] = 0;
+		m_mouse_stat[0] = m_mouse_stat[1] = 0;
+	}
 
 	// static configuration helpers
-	static void set_layout(device_t &device, const msx_slot_layout *layout) { downcast<msx_state &>(device).m_layout = layout; }
-	static void set_ramio_set_bits(device_t &device, UINT8 ramio_set_bits) { downcast<msx_state &>(device).m_ramio_set_bits = ramio_set_bits; }
+	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device); 
 
-	DECLARE_WRITE8_MEMBER(msx_page0_w);
-	DECLARE_WRITE8_MEMBER(msx_page0_1_w);
-	DECLARE_WRITE8_MEMBER(msx_page1_w);
-	DECLARE_WRITE8_MEMBER(msx_page1_1_w);
-	DECLARE_WRITE8_MEMBER(msx_page1_2_w);
-	DECLARE_WRITE8_MEMBER(msx_page2_w);
-	DECLARE_WRITE8_MEMBER(msx_page2_1_w);
-	DECLARE_WRITE8_MEMBER(msx_page2_2_w);
-	DECLARE_WRITE8_MEMBER(msx_page2_3_w);
-	DECLARE_WRITE8_MEMBER(msx_page3_w);
-	DECLARE_WRITE8_MEMBER(msx_page3_1_w);
+	DECLARE_ADDRESS_MAP(switched_device_map, 8);
 	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
 	DECLARE_READ8_MEMBER(msx_sec_slot_r);
-	DECLARE_WRITE8_MEMBER(msx_ram_mapper_w);
-	DECLARE_READ8_MEMBER(msx_ram_mapper_r);
 	DECLARE_READ8_MEMBER(msx_kanji_r);
 	DECLARE_WRITE8_MEMBER(msx_kanji_w);
-	DECLARE_WRITE8_MEMBER(msx_90in1_w);
 	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
 	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
-	DECLARE_WRITE8_MEMBER(msx_fmpac_w);
 	DECLARE_READ8_MEMBER(msx_rtc_reg_r);
 	DECLARE_WRITE8_MEMBER(msx_rtc_reg_w);
 	DECLARE_WRITE8_MEMBER(msx_rtc_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(msx_wd179x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(msx_wd179x_drq_w);
+	DECLARE_READ8_MEMBER(msx_mem_read);
+	DECLARE_WRITE8_MEMBER(msx_mem_write);
+	DECLARE_READ8_MEMBER(msx_switched_r);
+	DECLARE_WRITE8_MEMBER(msx_switched_w);
+	DECLARE_WRITE_LINE_MEMBER(turbo_w);
 
 	/* PSG */
 	int m_psg_b;
-	int m_opll_active;
 	/* mouse */
 	UINT16 m_mouse[2];
 	int m_mouse_stat[2];
 	/* rtc */
 	int m_rtc_latch;
-	/* disk */
-	UINT8 m_dsk_stat;
+	/* kanji */
 	int m_kanji_latch;
 	/* memory */
-	const msx_slot_layout *m_layout;
-	slot_state *m_cart_state[MSX_MAX_CARTS];
-	slot_state *m_state[4];
-	const msx_slot *m_slot[4];
-	UINT8 *m_ram_pages[4];
-	UINT8 *m_empty, m_ram_mapper[4];
-	UINT8 m_ramio_set_bits;
-	slot_state *m_all_state[4][4][4];
-	int m_slot_expanded[4];
+	msx_internal_slot_interface m_empty_slot;
+	msx_internal_slot_interface *m_all_slots[4][4][4];
+	msx_internal_slot_interface *m_current_page[4];
+	bool m_slot_expanded[4];
 	UINT8 m_primary_slot;
 	UINT8 m_secondary_slot[4];
-	UINT8 m_superloderunner_bank;
-	UINT8 m_korean90in1_bank;
-	UINT8 *m_top_page;
 	int m_port_c_old;
-	int keylatch;
+	int m_keylatch;
+	UINT8 m_current_switched_device;
 	void msx_memory_map_all ();
 	void msx_memory_map_page (UINT8 page);
 	void msx_ch_reset_core ();
@@ -156,14 +186,8 @@ public:
 	optional_device<v9958_device> m_v9958;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ay8910_device> m_ay8910;
-	required_device<ym2413_device> m_ym;
-	optional_device<k051649_device> m_k051649;
 	required_device<dac_device> m_dac;
 	optional_device<rp5c01_device> m_rtc;
-	optional_device<wd_fdc_analog_t> m_fdc;
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
@@ -180,34 +204,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
 	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
 	void msx_memory_init();
-	void msx_memory_set_carts();
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( msx_cart );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( msx_cart );
 	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 
-	// from msx_slot
-	DECLARE_READ8_MEMBER(konami_scc_bank5);
-	DECLARE_READ8_MEMBER(msx_diskrom_page1_r);
-	DECLARE_READ8_MEMBER(msx_diskrom_page2_r);
-	DECLARE_READ8_MEMBER(msx_diskrom2_page1_r);
-	DECLARE_READ8_MEMBER(msx_diskrom2_page2_r);
-	DECLARE_READ8_MEMBER(soundcartridge_scc);
-	DECLARE_READ8_MEMBER(soundcartridge_sccp);
-
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
-	required_memory_bank m_bank5;
-	required_memory_bank m_bank6;
-	required_memory_bank m_bank7;
-	required_memory_bank m_bank8;
-	required_memory_bank m_bank9;
-	required_memory_bank m_bank10;
-	required_memory_bank m_bank11;
-
 protected:
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : NULL; }
+
+	address_space_config m_switched_device_as_config;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_kanji;
 	required_ioport m_io_joy0;
