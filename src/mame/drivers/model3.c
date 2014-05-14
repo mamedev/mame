@@ -5105,7 +5105,7 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 	ROM_LOAD_VROM( "mpr-22869.41",  0x00000c, 0x400000, CRC(c6d62634) SHA1(72d493653b50fb31333f70c7ee143a8c7531106f) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )   /* 68000 code */
-	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC21  CEHCK SUM: 0994  9/12-'99
+	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC21  CHECK SUM: 0994  9/12-'99
 	ROM_LOAD16_WORD_SWAP( "qq.ic21",  0x080000, 0x080000, BAD_DUMP CRC(d8496bca) SHA1(3fa76e2210f04b75c048979f90055854311e306c) ) /* Check sum: 0994, dated "9/12-'99" */
 
 	ROM_REGION( 0x1000000, "samples", 0 )   /* SCSP samples */
