@@ -35,16 +35,16 @@
 //**************************************************************************
 
 #define MCFG_Z80CTC_INTR_CB(_devcb) \
-	devcb = &z80ctc_device::set_intr_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80ctc_device::set_intr_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80CTC_ZC0_CB(_devcb) \
-	devcb = &z80ctc_device::set_zc0_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80ctc_device::set_zc0_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80CTC_ZC1_CB(_devcb) \
-	devcb = &z80ctc_device::set_zc1_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80ctc_device::set_zc1_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80CTC_ZC2_CB(_devcb) \
-	devcb = &z80ctc_device::set_zc2_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80ctc_device::set_zc2_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -61,10 +61,10 @@ public:
 	// construction/destruction
 	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_intr_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_zc1_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_zc2_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_intr_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(object); }
 	
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -119,11 +119,11 @@ private:
 	};
 
 	// internal state
-	devcb2_write_line   m_intr_cb;              // interrupt callback
-	devcb2_write_line   m_zc0_cb;               // channel 0 zero crossing callbacks
-	devcb2_write_line   m_zc1_cb;               // channel 1 zero crossing callbacks
-	devcb2_write_line   m_zc2_cb;               // channel 2 zero crossing callbacks
-	devcb2_write_line   m_zc3_cb;               // channel 3 zero crossing callbacks = NULL ?
+	devcb_write_line   m_intr_cb;              // interrupt callback
+	devcb_write_line   m_zc0_cb;               // channel 0 zero crossing callbacks
+	devcb_write_line   m_zc1_cb;               // channel 1 zero crossing callbacks
+	devcb_write_line   m_zc2_cb;               // channel 2 zero crossing callbacks
+	devcb_write_line   m_zc3_cb;               // channel 3 zero crossing callbacks = NULL ?
 	
 	UINT8               m_vector;               // interrupt vector
 	attotime            m_period16;             // 16/system clock

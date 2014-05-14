@@ -13,7 +13,7 @@
 
 
 #define MCFG_HD44352_ON_CB(_devcb) \
-	devcb = &hd44352_device::set_on_callback(*device, DEVCB2_##_devcb);
+	devcb = &hd44352_device::set_on_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
 
 	// device interface
 	UINT8 data_read();
@@ -72,7 +72,7 @@ private:
 	UINT8 m_cursor_y;
 	UINT8 m_cursor_lcd;
 
-	devcb2_write_line    m_on_cb;        // ON line callback
+	devcb_write_line    m_on_cb;        // ON line callback
 };
 
 // device type definition

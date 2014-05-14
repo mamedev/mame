@@ -38,10 +38,10 @@
 ///*************************************************************************
 
 #define MCFG_I8214_IRQ_CALLBACK(_write) \
-	devcb = &i8214_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8214_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8214_ENLG_CALLBACK(_write) \
-	devcb = &i8214_device::set_enlg_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8214_device::set_enlg_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -57,8 +57,8 @@ public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_enlg_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_enlg_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );
@@ -76,8 +76,8 @@ private:
 	inline void trigger_interrupt(int level);
 	inline void check_interrupt();
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_enlg;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_enlg;
 
 	int m_inte;                 // interrupt enable
 	int m_int_dis;              // interrupt disable flip-flop

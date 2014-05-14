@@ -23,7 +23,7 @@
 //**************************************************************************
 
 #define MCFG_HD61830_RD_CALLBACK(_read) \
-	devcb = &hd61830_device::set_rd_rd_callback(*device, DEVCB2_##_read);
+	devcb = &hd61830_device::set_rd_rd_callback(*device, DEVCB_##_read);
 
 
 
@@ -41,7 +41,7 @@ public:
 	// construction/destruction
 	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
+	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -89,7 +89,7 @@ private:
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	devcb2_read8 m_read_rd;
+	devcb_read8 m_read_rd;
 
 	emu_timer *m_busy_timer;
 	//address_space *m_data;

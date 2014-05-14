@@ -8,7 +8,7 @@
 	msm5232_device::static_set_capacitors(*device, _a, _b, _c, _d, _e, _f, _g, _h);
 
 #define MCFG_MSM5232_GATE_HANDLER_CB(_devcb) \
-	devcb = &msm5232_device::set_gate_handler_callback(*device, DEVCB2_##_devcb);
+	devcb = &msm5232_device::set_gate_handler_callback(*device, DEVCB_##_devcb);
 
 struct VOICE {
 	UINT8 mode;
@@ -47,7 +47,7 @@ public:
 	~msm5232_device() {}
 
 	static void static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
-	template<class _Object> static devcb2_base &set_gate_handler_callback(device_t &device, _Object object) { return downcast<msm5232_device &>(device).m_gate_handler_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_gate_handler_callback(device_t &device, _Object object) { return downcast<msm5232_device &>(device).m_gate_handler_cb.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	void set_clock(int clock);
@@ -92,7 +92,7 @@ protected:
 	int     m_rate;       /* sample rate in Hz */
 
 	double  m_external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
-	devcb2_write_line m_gate_handler_cb;/* callback called when the GATE output pin changes state */
+	devcb_write_line m_gate_handler_cb;/* callback called when the GATE output pin changes state */
 
 	void init_tables();
 	void init_voice(int i);

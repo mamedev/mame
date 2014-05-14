@@ -24,31 +24,31 @@
 	wd7600_device::static_set_keybctag(*device, _keybctag);
 
 #define MCFG_WD7600_IOR(_ior) \
-	downcast<wd7600_device *>(device)->set_ior_callback(DEVCB2_##_ior);
+	downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
 
 #define MCFG_WD7600_IOW(_iow) \
-	downcast<wd7600_device *>(device)->set_iow_callback(DEVCB2_##_iow);
+	downcast<wd7600_device *>(device)->set_iow_callback(DEVCB_##_iow);
 
 #define MCFG_WD7600_TC(_tc) \
-	downcast<wd7600_device *>(device)->set_tc_callback(DEVCB2_##_tc);
+	downcast<wd7600_device *>(device)->set_tc_callback(DEVCB_##_tc);
 
 #define MCFG_WD7600_HOLD(_hold) \
-	downcast<wd7600_device *>(device)->set_hold_callback(DEVCB2_##_hold);
+	downcast<wd7600_device *>(device)->set_hold_callback(DEVCB_##_hold);
 
 #define MCFG_WD7600_NMI(_nmi) \
-	downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB2_##_nmi);
+	downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_WD7600_INTR(_intr) \
-	downcast<wd7600_device *>(device)->set_intr_callback(DEVCB2_##_intr);
+	downcast<wd7600_device *>(device)->set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_WD7600_CPURESET(_cpureset) \
-	downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB2_##_cpureset);
+	downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
 
 #define MCFG_WD7600_A20M(_a20m) \
-	downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB2_##_a20m);
+	downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
 
 #define MCFG_WD7600_SPKR(_spkr) \
-	downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB2_##_spkr);
+	downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
 
 
 //**************************************************************************
@@ -177,15 +177,15 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_read16 m_read_ior;
-	devcb2_write16 m_write_iow;
-	devcb2_write8 m_write_tc;
-	devcb2_write_line m_write_hold;
-	devcb2_write_line m_write_nmi;
-	devcb2_write_line m_write_intr;
-	devcb2_write_line m_write_cpureset;
-	devcb2_write_line m_write_a20m;
-	devcb2_write_line m_write_spkr;
+	devcb_read16 m_read_ior;
+	devcb_write16 m_write_iow;
+	devcb_write8 m_write_tc;
+	devcb_write_line m_write_hold;
+	devcb_write_line m_write_nmi;
+	devcb_write_line m_write_intr;
+	devcb_write_line m_write_cpureset;
+	devcb_write_line m_write_a20m;
+	devcb_write_line m_write_spkr;
 
 	required_device<am9517a_device> m_dma1;
 	required_device<am9517a_device> m_dma2;

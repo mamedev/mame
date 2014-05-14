@@ -62,23 +62,23 @@
 
 
 #define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &vic10_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic10_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(_write) \
-	devcb = &vic10_expansion_slot_device::set_res_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic10_expansion_slot_device::set_res_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(_write) \
-	devcb = &vic10_expansion_slot_device::set_cnt_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic10_expansion_slot_device::set_cnt_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIC10_EXPANSION_SLOT_SP_CALLBACK(_write) \
-	devcb = &vic10_expansion_slot_device::set_sp_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic10_expansion_slot_device::set_sp_wr_callback(*device, DEVCB_##_write);
 
 
 #define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACKS(_irq, _res) \
-	downcast<vic10_expansion_slot_device *>(device)->set_irq_callbacks(DEVCB2_##_irq, DEVCB2_##_res);
+	downcast<vic10_expansion_slot_device *>(device)->set_irq_callbacks(DEVCB_##_irq, DEVCB_##_res);
 
 #define MCFG_VIC10_EXPANSION_SLOT_SERIAL_CALLBACKS(_cnt, _sp) \
-	downcast<vic10_expansion_slot_device *>(device)->set_serial_callbacks(DEVCB2_##_cnt, DEVCB2_##_sp);
+	downcast<vic10_expansion_slot_device *>(device)->set_serial_callbacks(DEVCB_##_cnt, DEVCB_##_sp);
 
 
 
@@ -98,10 +98,10 @@ public:
 	// construction/destruction
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_res.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_cnt.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_sp.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_res.set_callback(object); }
+	template<class _Object> static devcb_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_sp.set_callback(object); }
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);
@@ -139,10 +139,10 @@ protected:
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_res;
-	devcb2_write_line   m_write_cnt;
-	devcb2_write_line   m_write_sp;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_res;
+	devcb_write_line   m_write_cnt;
+	devcb_write_line   m_write_sp;
 
 	device_vic10_expansion_card_interface *m_card;
 };

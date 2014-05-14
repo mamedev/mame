@@ -184,13 +184,13 @@ enum
 //**************************************************************************
 
 #define MCFG_ADSP21XX_SPORT_RX_CB(_devcb) \
-	devcb = &adsp21xx_device::set_sport_rx_callback(*device, DEVCB2_##_devcb);
+	devcb = &adsp21xx_device::set_sport_rx_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_SPORT_TX_CB(_devcb) \
-	devcb = &adsp21xx_device::set_sport_tx_callback(*device, DEVCB2_##_devcb);
+	devcb = &adsp21xx_device::set_sport_tx_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_TIMER_FIRED_CB(_devcb) \
-	devcb = &adsp21xx_device::set_timer_fired_callback(*device, DEVCB2_##_devcb);
+	devcb = &adsp21xx_device::set_timer_fired_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -217,9 +217,9 @@ protected:
 
 public:
 	// inline configuration helpers
-	template<class _Object> static devcb2_base &set_sport_rx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_rx_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sport_tx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_tx_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_timer_fired_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_timer_fired_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_sport_rx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_rx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_sport_tx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_tx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_timer_fired_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_timer_fired_cb.set_callback(object); }
 
 	// public interfaces
 	void load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
@@ -456,9 +456,9 @@ protected:
 	UINT16              m_mask_table[0x4000];
 	UINT16              m_reverse_table[0x4000];
 
-	devcb2_read32        	m_sport_rx_cb;    // callback for serial receive
-	devcb2_write32        	m_sport_tx_cb;    // callback for serial transmit
-	devcb2_write_line     	m_timer_fired_cb;          // callback for timer fired
+	devcb_read32        	m_sport_rx_cb;    // callback for serial receive
+	devcb_write32        	m_sport_tx_cb;    // callback for serial transmit
+	devcb_write_line     	m_timer_fired_cb;          // callback for timer fired
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS

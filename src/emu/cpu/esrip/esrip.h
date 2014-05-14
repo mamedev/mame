@@ -26,13 +26,13 @@
 #define ESRIP_DRAW(name) int name(int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 
 #define MCFG_ESRIP_FDT_R_CALLBACK(_read) \
-	devcb = &esrip_device::static_set_fdt_r_callback(*device, DEVCB2_##_read);
+	devcb = &esrip_device::static_set_fdt_r_callback(*device, DEVCB_##_read);
 
 #define MCFG_ESRIP_FDT_W_CALLBACK(_write) \
-	devcb = &esrip_device::static_set_fdt_w_callback(*device, DEVCB2_##_write);
+	devcb = &esrip_device::static_set_fdt_w_callback(*device, DEVCB_##_write);
 
 #define MCFG_ESRIP_STATUS_IN_CALLBACK(_read) \
-	devcb = &esrip_device::static_set_status_in_callback(*device, DEVCB2_##_read);
+	devcb = &esrip_device::static_set_status_in_callback(*device, DEVCB_##_read);
 
 #define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
 	esrip_device::static_set_draw_callback(*device, esrip_draw_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -117,9 +117,9 @@ public:
 	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
-	template<class _Object> static devcb2_base &static_set_fdt_r_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_fdt_r.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_fdt_w_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_fdt_w.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_status_in_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_status_in.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_fdt_r_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_fdt_r.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_fdt_w_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_fdt_w.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_status_in_callback(device_t &device, _Object object) { return downcast<esrip_device &>(device).m_status_in.set_callback(object); }
 	static void static_set_draw_callback(device_t &device, esrip_draw_delegate func) { downcast<esrip_device &>(device).m_draw = func; }
 	static void static_lbrm_prom(device_t &device, const char *name) { downcast<esrip_device &>(device).m_lbrm_prom = name; }
 
@@ -208,9 +208,9 @@ protected:
 
 	int     m_icount;
 
-	devcb2_read16  m_fdt_r;
-	devcb2_write16 m_fdt_w;
-	devcb2_read8 m_status_in;
+	devcb_read16  m_fdt_r;
+	devcb_write16 m_fdt_w;
+	devcb_read8 m_status_in;
 	esrip_draw_delegate m_draw;
 	const char *m_lbrm_prom;
 

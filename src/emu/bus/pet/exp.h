@@ -38,7 +38,7 @@
 
 
 #define MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(_read, _write) \
-	downcast<pet_expansion_slot_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<pet_expansion_slot_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 
 
@@ -103,8 +103,8 @@ protected:
 
 	device_pet_expansion_card_interface *m_card;
 
-	devcb2_read8  m_read_dma;
-	devcb2_write8 m_write_dma;
+	devcb_read8  m_read_dma;
+	devcb_write8 m_write_dma;
 };
 
 

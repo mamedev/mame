@@ -33,7 +33,7 @@ enum
 // device stuff
 
 #define MCFG_NCR5380_IRQ_CB(_devcb) \
-	devcb = &ncr5380_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &ncr5380_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 class ncr5380_device : public legacy_scsi_host_adapter
 {
@@ -41,7 +41,7 @@ public:
 	// construction/destruction
 	ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<ncr5380_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ncr5380_device &>(device).m_irq_cb.set_callback(object); }
 
 	// our API
 	UINT8 ncr5380_read_reg(UINT32 offset);
@@ -59,7 +59,7 @@ private:
 	UINT8 m_5380_Command[32];
 	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
 	UINT8 m_5380_Data[512];
-	devcb2_write_line m_irq_cb;  /* irq callback */
+	devcb_write_line m_irq_cb;  /* irq callback */
 };
 
 // device type definition

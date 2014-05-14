@@ -86,7 +86,7 @@ public:
 	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~z88cart_slot_device();
 	
-	template<class _Object> static devcb2_base &set_out_flp_callback(device_t &device, _Object object) { return downcast<z88cart_slot_device &>(device).m_out_flp_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_flp_callback(device_t &device, _Object object) { return downcast<z88cart_slot_device &>(device).m_out_flp_cb.set_callback(object); }
 
 	// device-level overrides
 	virtual void device_start();
@@ -118,7 +118,7 @@ public:
 private:
 	static const device_timer_id TIMER_FLP_CLEAR = 0;
 
-	devcb2_write_line               m_out_flp_cb;
+	devcb_write_line               m_out_flp_cb;
 	device_z88cart_interface*       m_cart;
 	emu_timer *                     m_flp_timer;
 };
@@ -133,6 +133,6 @@ extern const device_type Z88CART_SLOT;
 ***************************************************************************/
 
 #define MCFG_Z88CART_SLOT_OUT_FLP_CB(_devcb) \
-		devcb = &z88cart_slot_device::set_out_flp_callback(*device, DEVCB2_##_devcb);
+		devcb = &z88cart_slot_device::set_out_flp_callback(*device, DEVCB_##_devcb);
 	
 #endif /* __Z88CART_H__ */

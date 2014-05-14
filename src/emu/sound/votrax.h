@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_VOTRAX_SC01_REQUEST_CB(_devcb) \
-	devcb = &votrax_sc01_device::set_request_callback(*device, DEVCB2_##_devcb);
+	devcb = &votrax_sc01_device::set_request_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -37,7 +37,7 @@ public:
 	// construction/destruction
 	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_request_callback(device_t &device, _Object object) { return downcast<votrax_sc01_device &>(device).m_request_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_request_callback(device_t &device, _Object object) { return downcast<votrax_sc01_device &>(device).m_request_cb.set_callback(object); }
 
 	// writers
 	DECLARE_WRITE8_MEMBER( write );
@@ -73,7 +73,7 @@ private:
 	UINT8                       m_phoneme;              // 6-bit phoneme value
 
 	// outputs
-	devcb2_write_line           m_request_cb;           // callback for request
+	devcb_write_line           m_request_cb;           // callback for request
 	UINT8                       m_request_state;        // request as seen to the outside world
 	UINT8                       m_internal_request;     // request managed by stream timing
 

@@ -49,10 +49,10 @@
 
 
 #define MCFG_MB89352A_IRQ_CB(_devcb) \
-	devcb = &mb89352_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &mb89352_device::set_irq_callback(*device, DEVCB_##_devcb);
 	
 #define MCFG_MB89352A_DRQ_CB(_devcb) \
-	devcb = &mb89352_device::set_drq_callback(*device, DEVCB2_##_devcb);
+	devcb = &mb89352_device::set_drq_callback(*device, DEVCB_##_devcb);
 
 class mb89352_device : public legacy_scsi_host_adapter
 {
@@ -60,8 +60,8 @@ public:
 	// construction/destruction
 	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(object); }
 	
 	// any publically accessible interfaces needed for runtime
 	DECLARE_READ8_MEMBER( mb89352_r );
@@ -83,8 +83,8 @@ private:
 	int get_scsi_cmd_len(UINT8 cbyte);
 	//void set_ints(UINT8 flag);
 
-	devcb2_write_line m_irq_cb;  /* irq callback */
-	devcb2_write_line m_drq_cb;  /* drq callback */
+	devcb_write_line m_irq_cb;  /* irq callback */
+	devcb_write_line m_drq_cb;  /* drq callback */
 
 	UINT8 m_phase;  // current SCSI phase
 	UINT8 m_target; // current SCSI target

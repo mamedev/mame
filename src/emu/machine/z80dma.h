@@ -41,25 +41,25 @@
 //**************************************************************************
 
 #define MCFG_Z80DMA_OUT_BUSREQ_CB(_devcb) \
-	devcb = &z80dma_device::set_out_busreq_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_out_busreq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_INT_CB(_devcb) \
-	devcb = &z80dma_device::set_out_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_out_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_BAO_CB(_devcb) \
-	devcb = &z80dma_device::set_out_bao_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_out_bao_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_IN_MREQ_CB(_devcb) \
-	devcb = &z80dma_device::set_in_mreq_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_in_mreq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_MREQ_CB(_devcb) \
-	devcb = &z80dma_device::set_out_mreq_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_out_mreq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_IN_IORQ_CB(_devcb) \
-	devcb = &z80dma_device::set_in_iorq_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_in_iorq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_IORQ_CB(_devcb) \
-	devcb = &z80dma_device::set_out_iorq_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80dma_device::set_out_iorq_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -76,13 +76,13 @@ public:
 	// construction/destruction
 	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_busreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_busreq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_bao_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_bao_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_mreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_in_mreq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_mreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_mreq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_iorq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_in_iorq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_iorq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_iorq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_busreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_busreq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_bao_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_bao_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_mreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_in_mreq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_mreq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_mreq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_iorq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_in_iorq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_iorq_callback(device_t &device, _Object object) { return downcast<z80dma_device &>(device).m_out_iorq_cb.set_callback(object); }
 	
 	UINT8 read();
 	void write(UINT8 data);
@@ -121,13 +121,13 @@ private:
 	void rdy_write_callback(int state);
 
 	// internal state
-	devcb2_write_line   m_out_busreq_cb;
-	devcb2_write_line   m_out_int_cb;
-	devcb2_write_line   m_out_bao_cb;
-	devcb2_read8        m_in_mreq_cb;
-	devcb2_write8       m_out_mreq_cb;
-	devcb2_read8        m_in_iorq_cb;
-	devcb2_write8       m_out_iorq_cb;
+	devcb_write_line   m_out_busreq_cb;
+	devcb_write_line   m_out_int_cb;
+	devcb_write_line   m_out_bao_cb;
+	devcb_read8        m_in_mreq_cb;
+	devcb_write8       m_out_mreq_cb;
+	devcb_read8        m_in_iorq_cb;
+	devcb_write8       m_out_iorq_cb;
 
 	emu_timer *m_timer;
 

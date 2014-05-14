@@ -26,25 +26,25 @@
 	MCFG_DEVICE_ADD(_tag, DMAC, _clock) \
 
 #define MCFG_DMAC_CFGOUT_HANDLER(_devcb) \
-	devcb = &dmac_device::set_cfgout_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_cfgout_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_DMAC_INT_HANDLER(_devcb) \
-	devcb = &dmac_device::set_int_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_int_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_DMAC_XDACK_HANDLER(_devcb) \
-	devcb = &dmac_device::set_xdack_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_xdack_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_DMAC_SCSI_READ_HANDLER(_devcb) \
-	devcb = &dmac_device::set_scsi_read_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_scsi_read_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_DMAC_SCSI_WRITE_HANDLER(_devcb) \
-	devcb = &dmac_device::set_scsi_write_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_scsi_write_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_DMAC_IO_READ_HANDLER(_devcb) \
-	devcb = &dmac_device::set_io_read_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_io_read_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_DMAC_IO_WRITE_HANDLER(_devcb) \
-	devcb = &dmac_device::set_io_write_handler(*device, DEVCB2_##_devcb);
+	devcb = &dmac_device::set_io_write_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -60,25 +60,25 @@ public:
 	dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// callbacks
-	template<class _Object> static devcb2_base &set_cfgout_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_cfgout_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_cfgout_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_int_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_int_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_int_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_xdack_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_xdack_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_xdack_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_scsi_read_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_scsi_read_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_scsi_read_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_scsi_write_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_scsi_write_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_scsi_write_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_io_read_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_io_read_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_io_read_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_io_write_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_io_write_handler(device_t &device, _Object object)
 		{ return downcast<dmac_device &>(device).m_io_write_handler.set_callback(object); }
 
 	void set_address_space(address_space *space) { m_space = space; };
@@ -133,13 +133,13 @@ private:
 	static const int ISTR_INT_MASK = 0x1fc;
 
 	// callbacks
-	devcb2_write_line m_cfgout_handler;
-	devcb2_write_line m_int_handler;
-	devcb2_write_line m_xdack_handler;
-	devcb2_read8 m_scsi_read_handler;
-	devcb2_write8 m_scsi_write_handler;
-	devcb2_read8 m_io_read_handler;
-	devcb2_write8 m_io_write_handler;
+	devcb_write_line m_cfgout_handler;
+	devcb_write_line m_int_handler;
+	devcb_write_line m_xdack_handler;
+	devcb_read8 m_scsi_read_handler;
+	devcb_write8 m_scsi_write_handler;
+	devcb_read8 m_io_read_handler;
+	devcb_write8 m_io_write_handler;
 
 	address_space *m_space;
 	UINT8 *m_rom;

@@ -16,13 +16,13 @@
 #include "emu.h"
 
 #define MCFG_ACIA6850_TXD_HANDLER(_devcb) \
-	devcb = &acia6850_device::set_txd_handler(*device, DEVCB2_##_devcb);
+	devcb = &acia6850_device::set_txd_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ACIA6850_RTS_HANDLER(_devcb) \
-	devcb = &acia6850_device::set_rts_handler(*device, DEVCB2_##_devcb);
+	devcb = &acia6850_device::set_rts_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ACIA6850_IRQ_HANDLER(_devcb) \
-	devcb = &acia6850_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &acia6850_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class acia6850_device :  public device_t
 {
@@ -31,9 +31,9 @@ public:
 	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_txd_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rts_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( status_r );
@@ -94,9 +94,9 @@ private:
 		DCD_IRQ_READ_STATUS,
 	};
 
-	devcb2_write_line m_txd_handler;
-	devcb2_write_line m_rts_handler;
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_txd_handler;
+	devcb_write_line m_rts_handler;
+	devcb_write_line m_irq_handler;
 
 	UINT8 m_status;
 	UINT8 m_tdr;

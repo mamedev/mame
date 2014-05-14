@@ -52,16 +52,16 @@
 
 
 #define MCFG_CBM2_USER_PORT_IRQ_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cbm2_user_port_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_SP_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_sp_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cbm2_user_port_device::set_sp_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_CNT_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_cnt_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cbm2_user_port_device::set_cnt_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_FLAG_CALLBACK(_write) \
-	devcb = &cbm2_user_port_device::set_flag_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cbm2_user_port_device::set_flag_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -111,10 +111,10 @@ public:
 	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cbm2_user_port_device() { }
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_sp.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_cnt.set_callback(object); }
-	template<class _Object> static devcb2_base &set_flag_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_flag.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_sp.set_callback(object); }
+	template<class _Object> static devcb_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb_base &set_flag_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_flag.set_callback(object); }
 
 	// computer interface
 	DECLARE_READ8_MEMBER( d1_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->cbm2_d1_r(space, offset); return data; }
@@ -139,10 +139,10 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_sp;
-	devcb2_write_line   m_write_cnt;
-	devcb2_write_line   m_write_flag;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_sp;
+	devcb_write_line   m_write_cnt;
+	devcb_write_line   m_write_flag;
 
 	device_cbm2_user_port_interface *m_card;
 };

@@ -12,7 +12,7 @@
 #include "imagedev/flopdrv.h"
 
 #define MCFG_MC6843_IRQ_CALLBACK(_write) \
-	devcb = &mc6843_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6843_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 class mc6843_device : public device_t
 {
@@ -20,7 +20,7 @@ public:
 	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mc6843_device() {}
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6843_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6843_device &>(device).m_write_irq.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -41,7 +41,7 @@ private:
 		TIMER_CONT
 	};
 
-	devcb2_write_line m_write_irq;
+	devcb_write_line m_write_irq;
 
 	/* registers */
 	UINT8 m_CTAR;       /* current track */

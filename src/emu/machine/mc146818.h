@@ -22,7 +22,7 @@
 	MCFG_DEVICE_ADD(_tag, MC146818, _xtal)
 
 #define MCFG_MC146818_IRQ_HANDLER(_irq) \
-	downcast<mc146818_device *>(device)->set_irq_callback(DEVCB2_##_irq);
+	downcast<mc146818_device *>(device)->set_irq_callback(DEVCB_##_irq);
 
 // The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
 #define MCFG_MC146818_CENTURY_INDEX(_century_index) \
@@ -162,7 +162,7 @@ private:
 	emu_timer *m_clock_timer;
 	emu_timer *m_periodic_timer;
 
-	devcb2_write_line m_write_irq;
+	devcb_write_line m_write_irq;
 	int m_century_index;
 	bool m_use_utc;
 };

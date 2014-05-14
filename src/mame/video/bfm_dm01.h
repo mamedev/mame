@@ -9,7 +9,7 @@
 #define DM_BYTESPERROW 9
 
 #define MCFG_BF_DM01_BUSY_CB(_devcb) \
-	devcb = &bfmdm01_device::set_busy_callback(*device, DEVCB2_##_devcb);
+	devcb = &bfmdm01_device::set_busy_callback(*device, DEVCB_##_devcb);
 
 class bfmdm01_device : public device_t
 {
@@ -17,7 +17,7 @@ public:
 	bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~bfmdm01_device() {}
 
-	template<class _Object> static devcb2_base &set_busy_callback(device_t &device, _Object object) { return downcast<bfmdm01_device &>(device).m_busy_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_busy_callback(device_t &device, _Object object) { return downcast<bfmdm01_device &>(device).m_busy_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -47,7 +47,7 @@ private:
 	UINT8 m_scanline[DM_BYTESPERROW];
 	UINT8 m_comdata;
 
-	devcb2_write_line m_busy_cb;
+	devcb_write_line m_busy_cb;
 
 	int read_data(void);
 };

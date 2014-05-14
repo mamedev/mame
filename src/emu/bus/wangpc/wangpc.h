@@ -43,34 +43,34 @@
 
 
 #define MCFG_WANGPC_BUS_IRQ2_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_irq2_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_irq2_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ3_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_irq3_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_irq3_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ4_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_irq4_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_irq4_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ5_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_irq5_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_irq5_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ6_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_irq6_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_irq6_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ7_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_irq7_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_irq7_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_DRQ1_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_drq1_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_drq1_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_DRQ2_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_drq2_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_drq2_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_DRQ3_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_drq3_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_drq3_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IOERROR_CALLBACK(_write) \
-	devcb = &wangpcbus_device::set_ioerror_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wangpcbus_device::set_ioerror_wr_callback(*device, DEVCB_##_write);
 
 
 //**************************************************************************
@@ -117,16 +117,16 @@ public:
 	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~wangpcbus_device() { m_device_list.detach_all(); }
 
-	template<class _Object> static devcb2_base &set_irq2_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq2.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq3_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq3.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq4_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq4.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq5_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq5.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq6_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq6.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq7_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq7.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq1_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_drq1.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq2_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_drq2.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq3_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_drq3.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ioerror_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_ioerror.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq2_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq2.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq3_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq3.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq4_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq4.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq5_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq5.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq6_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq6.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq7_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_irq7.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq1_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_drq1.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq2_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_drq2.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq3_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_drq3.set_callback(object); }
+	template<class _Object> static devcb_base &set_ioerror_wr_callback(device_t &device, _Object object) { return downcast<wangpcbus_device &>(device).m_write_ioerror.set_callback(object); }
 
 	void add_card(device_wangpcbus_card_interface *card, int sid);
 
@@ -168,16 +168,16 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_write_line   m_write_irq2;
-	devcb2_write_line   m_write_irq3;
-	devcb2_write_line   m_write_irq4;
-	devcb2_write_line   m_write_irq5;
-	devcb2_write_line   m_write_irq6;
-	devcb2_write_line   m_write_irq7;
-	devcb2_write_line   m_write_drq1;
-	devcb2_write_line   m_write_drq2;
-	devcb2_write_line   m_write_drq3;
-	devcb2_write_line   m_write_ioerror;
+	devcb_write_line   m_write_irq2;
+	devcb_write_line   m_write_irq3;
+	devcb_write_line   m_write_irq4;
+	devcb_write_line   m_write_irq5;
+	devcb_write_line   m_write_irq6;
+	devcb_write_line   m_write_irq7;
+	devcb_write_line   m_write_drq1;
+	devcb_write_line   m_write_drq2;
+	devcb_write_line   m_write_drq3;
+	devcb_write_line   m_write_ioerror;
 
 	simple_list<device_wangpcbus_card_interface> m_device_list;
 };

@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #define MCFG_MB87078_GAIN_CHANGED_CB(_devcb) \
-	devcb = &mb87078_device::set_gain_changed_callback(*device, DEVCB2_##_devcb);
+	devcb = &mb87078_device::set_gain_changed_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -26,7 +26,7 @@ public:
 	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mb87078_device() {}
 
-	template<class _Object> static devcb2_base &set_gain_changed_callback(device_t &device, _Object object) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_gain_changed_callback(device_t &device, _Object object) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(object); }
 
 	void data_w(int data, int dsel);
 	void reset_comp_w(int level);
@@ -58,7 +58,7 @@ private:
 	UINT8        m_latch[2][4];   /* 6bit+3bit 4 data latches */
 	UINT8        m_reset_comp;
 
-	devcb2_write8 m_gain_changed_cb;
+	devcb_write8 m_gain_changed_cb;
 };
 
 extern const device_type MB87078;

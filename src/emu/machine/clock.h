@@ -6,14 +6,14 @@
 #include "emu.h"
 
 #define MCFG_CLOCK_SIGNAL_HANDLER(_devcb) \
-	devcb = &clock_device::set_signal_handler(*device, DEVCB2_##_devcb);
+	devcb = &clock_device::set_signal_handler(*device, DEVCB_##_devcb);
 
 class clock_device : public device_t
 {
 public:
 	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_signal_handler(device_t &device, _Object object) { return downcast<clock_device &>(device).m_signal_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_signal_handler(device_t &device, _Object object) { return downcast<clock_device &>(device).m_signal_handler.set_callback(object); }
 
 protected:
 	virtual void device_start();
@@ -27,7 +27,7 @@ private:
 	int m_signal;
 	emu_timer *m_timer;
 
-	devcb2_write_line m_signal_handler;
+	devcb_write_line m_signal_handler;
 };
 
 extern const device_type CLOCK;

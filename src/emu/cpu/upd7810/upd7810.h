@@ -48,37 +48,37 @@ enum
 
 
 #define MCFG_UPD7810_TO(_devcb) \
-	upd7810_device::set_to_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_to_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_TXD(_devcb) \
-	upd7810_device::set_txd_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_txd_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_RXD(_devcb) \
-	upd7810_device::set_rxd_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_rxd_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN0(_devcb) \
-	upd7810_device::set_an0_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an0_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN1(_devcb) \
-	upd7810_device::set_an1_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an1_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN2(_devcb) \
-	upd7810_device::set_an2_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an2_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN3(_devcb) \
-	upd7810_device::set_an3_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an3_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN4(_devcb) \
-	upd7810_device::set_an4_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an4_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN5(_devcb) \
-	upd7810_device::set_an5_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an5_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN6(_devcb) \
-	upd7810_device::set_an6_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an6_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN7(_devcb) \
-	upd7810_device::set_an7_func(*device, DEVCB2_##_devcb);
+	upd7810_device::set_an7_func(*device, DEVCB_##_devcb);
 
 
 class upd7810_device : public cpu_device
@@ -89,17 +89,17 @@ public:
 	upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_txd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_txd_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rxd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_rxd_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an0_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an1_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an1_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an2_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an2_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an3_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an3_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an4_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an4_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an5_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an5_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an6_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an6_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_an7_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_txd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_txd_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_rxd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_rxd_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an0_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an1_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an1_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an2_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an2_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an3_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an3_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an4_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an4_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an5_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an5_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an6_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an6_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_an7_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -127,17 +127,17 @@ protected:
 	virtual void handle_timers(int cycles);
 	virtual void upd7810_take_irq();
 
-	devcb2_write_line  m_to_func;
-	devcb2_write_line  m_txd_func;
-	devcb2_read_line   m_rxd_func;
-	devcb2_read_line   m_an0_func;
-	devcb2_read_line   m_an1_func;
-	devcb2_read_line   m_an2_func;
-	devcb2_read_line   m_an3_func;
-	devcb2_read_line   m_an4_func;
-	devcb2_read_line   m_an5_func;
-	devcb2_read_line   m_an6_func;
-	devcb2_read_line   m_an7_func;
+	devcb_write_line  m_to_func;
+	devcb_write_line  m_txd_func;
+	devcb_read_line   m_rxd_func;
+	devcb_read_line   m_an0_func;
+	devcb_read_line   m_an1_func;
+	devcb_read_line   m_an2_func;
+	devcb_read_line   m_an3_func;
+	devcb_read_line   m_an4_func;
+	devcb_read_line   m_an5_func;
+	devcb_read_line   m_an6_func;
+	devcb_read_line   m_an7_func;
 
 	typedef void (upd7810_device::*opcode_func)();
 

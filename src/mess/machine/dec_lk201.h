@@ -29,7 +29,7 @@
 //**************************************************************************
 
 #define MCFG_LK201_TX_HANDLER(_cb) \
-	devcb = &lk201_device::set_tx_handler(*device, DEVCB2_##_cb);
+	devcb = &lk201_device::set_tx_handler(*device, DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER( spi_r );
 	DECLARE_WRITE8_MEMBER( spi_w );
 
-	template<class _Object> static devcb2_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
+	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
 
 protected:
 	// device-level overrides
@@ -106,7 +106,7 @@ private:
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
 	void update_interrupts();
 
-	devcb2_write_line m_tx_handler;
+	devcb_write_line m_tx_handler;
 };
 
 // device type definition

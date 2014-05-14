@@ -22,13 +22,13 @@
 //**************************************************************************
 
 #define MCFG_Z80SIO_INT_CALLBACK(_write) \
-	devcb = &z80sio_device::set_int_callback(*device, DEVCB2_##_write);
+	devcb = &z80sio_device::set_int_callback(*device, DEVCB_##_write);
 
 #define MCFG_Z80SIO_TRANSMIT_CALLBACK(_write) \
-	devcb = &z80sio_device::set_transmit_callback(*device, DEVCB2_##_write);
+	devcb = &z80sio_device::set_transmit_callback(*device, DEVCB_##_write);
 
 #define MCFG_Z80SIO_RECEIVE_CALLBACK(_read) \
-	devcb = &z80sio_device::set_receive_callback(*device, DEVCB2_##_read);
+	devcb = &z80sio_device::set_receive_callback(*device, DEVCB_##_read);
 
 
 
@@ -45,9 +45,9 @@ public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_int_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_transmit_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_transmit.set_callback(object); }
-	template<class _Object> static devcb2_base &set_receive_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_received_poll.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_transmit_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_transmit.set_callback(object); }
+	template<class _Object> static devcb_base &set_receive_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_received_poll.set_callback(object); }
 
 	// control register I/O
 	UINT8 control_read(int ch) { return m_channel[ch].control_read(); }
@@ -137,12 +137,12 @@ private:
 	UINT8                       m_int_state[8];         // interrupt states
 
 	// callbacks
-	devcb2_write_line m_irq;
-	devcb2_write8 m_dtr_changed;
-	devcb2_write8 m_rts_changed;
-	devcb2_write8 m_break_changed;
-	devcb2_write16 m_transmit;
-	devcb2_read16 m_received_poll;
+	devcb_write_line m_irq;
+	devcb_write8 m_dtr_changed;
+	devcb_write8 m_rts_changed;
+	devcb_write8 m_break_changed;
+	devcb_write16 m_transmit;
+	devcb_read16 m_received_poll;
 
 	static const UINT8 k_int_priority[];
 };

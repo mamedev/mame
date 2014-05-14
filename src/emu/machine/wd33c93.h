@@ -46,7 +46,7 @@ enum
 #define FIFO_SIZE       12
 
 #define MCFG_WD33C93_IRQ_CB(_devcb) \
-	devcb = &wd33c93_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &wd33c93_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 class wd33c93_device : public legacy_scsi_host_adapter
 {
@@ -54,7 +54,7 @@ public:
 	// construction/destruction
 	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<wd33c93_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<wd33c93_device &>(device).m_irq_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -98,7 +98,7 @@ private:
 	emu_timer   *cmd_timer;
 	emu_timer   *service_req_timer;
 	emu_timer   *deassert_cip_timer;
-	devcb2_write_line m_irq_cb; /* irq callback */
+	devcb_write_line m_irq_cb; /* irq callback */
 };
 
 // device type definition

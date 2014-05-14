@@ -26,29 +26,29 @@
 
 // TODO: REMOVE THESE
 #define MCFG_VIA6522_READPA_HANDLER(_devcb) \
-	devcb = &via6522_device::set_readpa_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_readpa_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VIA6522_READPB_HANDLER(_devcb) \
-	devcb = &via6522_device::set_readpb_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_readpb_handler(*device, DEVCB_##_devcb);
 
 // TODO: CONVERT THESE TO WRITE LINE
 #define MCFG_VIA6522_WRITEPA_HANDLER(_devcb) \
-	devcb = &via6522_device::set_writepa_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_writepa_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VIA6522_WRITEPB_HANDLER(_devcb) \
-	devcb = &via6522_device::set_writepb_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_writepb_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VIA6522_CA2_HANDLER(_devcb) \
-	devcb = &via6522_device::set_ca2_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_ca2_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VIA6522_CB1_HANDLER(_devcb) \
-	devcb = &via6522_device::set_cb1_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_cb1_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VIA6522_CB2_HANDLER(_devcb) \
-	devcb = &via6522_device::set_cb2_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_cb2_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VIA6522_IRQ_HANDLER(_devcb) \
-	devcb = &via6522_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &via6522_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -65,17 +65,17 @@ public:
 	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// TODO: REMOVE THESE
-	template<class _Object> static devcb2_base &set_readpa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_a_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_readpb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_b_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_readpa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_a_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_readpb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_b_handler.set_callback(object); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
-	template<class _Object> static devcb2_base &set_writepa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_a_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_writepb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_b_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_writepa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_a_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_writepb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_b_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_ca2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca2_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cb1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cb2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb2_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ca2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca2_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_cb1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb1_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_cb2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb2_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -152,17 +152,17 @@ private:
 	void output_irq();
 
 	// TODO: REMOVE THESE
-	devcb2_read8 m_in_a_handler;
-	devcb2_read8 m_in_b_handler;
+	devcb_read8 m_in_a_handler;
+	devcb_read8 m_in_b_handler;
 
 	// TODO: CONVERT THESE TO WRITE LINE
-	devcb2_write8 m_out_a_handler;
-	devcb2_write8 m_out_b_handler;
+	devcb_write8 m_out_a_handler;
+	devcb_write8 m_out_b_handler;
 
-	devcb2_write_line m_ca2_handler;
-	devcb2_write_line m_cb1_handler;
-	devcb2_write_line m_cb2_handler;
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_ca2_handler;
+	devcb_write_line m_cb1_handler;
+	devcb_write_line m_cb2_handler;
+	devcb_write_line m_irq_handler;
 
 	UINT8 m_in_a;
 	int m_in_ca1;

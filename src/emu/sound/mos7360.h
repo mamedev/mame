@@ -53,7 +53,7 @@
 	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos7360_device *>(device)->set_callbacks(_cpu_tag, DEVCB2_##_irq, DEVCB2_##_k);
+	downcast<mos7360_device *>(device)->set_callbacks(_cpu_tag, DEVCB_##_irq, DEVCB_##_k);
 
 
 
@@ -154,8 +154,8 @@ protected:
 
 	const address_space_config      m_videoram_space_config;
 
-	devcb2_write_line   m_write_irq;
-	devcb2_read8        m_read_k;
+	devcb_write_line   m_write_irq;
+	devcb_read8        m_read_k;
 
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;

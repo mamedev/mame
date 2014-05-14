@@ -148,19 +148,19 @@
 	sega315_5313_device::set_signal_type(*device, _bool);
 
 #define MCFG_SEGA315_5313_INT_CB(_devcb) \
-	devcb = &sega315_5313_device::set_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5313_device::set_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5313_PAUSE_CB(_devcb) \
-	devcb = &sega315_5313_device::set_pause_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5313_device::set_pause_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5313_SND_IRQ_CALLBACK(_write) \
-	devcb = &sega315_5313_device::set_sndirqline_callback(*device, DEVCB2_##_write);
+	devcb = &sega315_5313_device::set_sndirqline_callback(*device, DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(_write) \
-	devcb = &sega315_5313_device::set_lv6irqline_callback(*device, DEVCB2_##_write);
+	devcb = &sega315_5313_device::set_lv6irqline_callback(*device, DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(_write) \
-	devcb = &sega315_5313_device::set_lv4irqline_callback(*device, DEVCB2_##_write);
+	devcb = &sega315_5313_device::set_lv4irqline_callback(*device, DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_ALT_TIMING(_data) \
 	sega315_5313_device::set_alt_timing(*device, _data);
@@ -192,9 +192,9 @@ class sega315_5313_device : public sega315_5124_device
 public:
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_sndirqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(object); }
-	template<class _Object> static devcb2_base &set_lv6irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(object); }
-	template<class _Object> static devcb2_base &set_lv4irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv4irqline_callback.set_callback(object); }
+	template<class _Object> static devcb_base &set_sndirqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(object); }
+	template<class _Object> static devcb_base &set_lv6irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(object); }
+	template<class _Object> static devcb_base &set_lv4irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv4irqline_callback.set_callback(object); }
 	static void set_alt_timing(device_t &device, int use_alt_timing);
 	static void set_palwrite_base(device_t &device, int palwrite_base);
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -254,9 +254,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
-	devcb2_write_line m_sndirqline_callback;
-	devcb2_write_line m_lv6irqline_callback;
-	devcb2_write_line m_lv4irqline_callback;
+	devcb_write_line m_sndirqline_callback;
+	devcb_write_line m_lv6irqline_callback;
+	devcb_write_line m_lv4irqline_callback;
 
 	md_32x_scanline_delegate m_32x_scanline_func;
 	md_32x_interrupt_delegate m_32x_interrupt_func;

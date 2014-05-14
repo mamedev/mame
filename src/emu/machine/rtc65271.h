@@ -10,7 +10,7 @@
 //**************************************************************************
 
 #define MCFG_RTC65271_INTERRUPT_CB(_devcb) \
-	devcb = &rtc65271_device::set_interrupt_callback(*device, DEVCB2_##_devcb);
+	devcb = &rtc65271_device::set_interrupt_callback(*device, DEVCB_##_devcb);
 
 
 // ======================> rtc65271_device
@@ -30,7 +30,7 @@ protected:
 	virtual void nvram_write(emu_file &file);
 public:
 
-	template<class _Object> static devcb2_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<rtc65271_device &>(device).m_interrupt_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<rtc65271_device &>(device).m_interrupt_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_READ8_MEMBER( xram_r );
@@ -65,7 +65,7 @@ private:
 	UINT8 m_SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */
-	devcb2_write_line    m_interrupt_cb;
+	devcb_write_line    m_interrupt_cb;
 };
 
 // device type definition

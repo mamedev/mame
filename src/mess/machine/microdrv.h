@@ -25,7 +25,7 @@
 	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0)
 
 #define MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(_write) \
-	devcb = &microdrive_image_device::set_comms_out_wr_callback(*device, DEVCB2_##_write);
+	devcb = &microdrive_image_device::set_comms_out_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -43,7 +43,7 @@ public:
 	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~microdrive_image_device();
 
-	template<class _Object> static devcb2_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
+	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
 
 	// image-level overrides
 	virtual bool call_load();
@@ -76,7 +76,7 @@ protected:
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
-	devcb2_write_line m_write_comms_out;
+	devcb_write_line m_write_comms_out;
 
 	int m_clk;
 	int m_comms_in;

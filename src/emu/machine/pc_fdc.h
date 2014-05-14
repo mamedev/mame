@@ -17,17 +17,17 @@
 	MCFG_DEVICE_ADD(_tag, PC_FDC_AT, 0)
 
 #define MCFG_PC_FDC_INTRQ_CALLBACK(_write) \
-	devcb = &pc_fdc_family_device::set_intrq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &pc_fdc_family_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_PC_FDC_DRQ_CALLBACK(_write) \
-	devcb = &pc_fdc_family_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &pc_fdc_family_device::set_drq_wr_callback(*device, DEVCB_##_write);
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
 	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(object); }
 
 	required_device<upd765a_device> fdc;
 
@@ -51,7 +51,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	bool irq, drq, fdc_drq, fdc_irq;
-	devcb2_write_line intrq_cb, drq_cb;
+	devcb_write_line intrq_cb, drq_cb;
 	UINT8 dor;
 
 	floppy_image_device *floppy[4];

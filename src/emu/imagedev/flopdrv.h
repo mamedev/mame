@@ -83,7 +83,7 @@ struct chrn_id
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
 #define MCFG_LEGACY_FLOPPY_IDX_CB(_devcb) \
-	devcb = &legacy_floppy_image_device::set_out_idx_func(*device, DEVCB2_##_devcb);
+	devcb = &legacy_floppy_image_device::set_out_idx_func(*device, DEVCB_##_devcb);
 
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
@@ -94,7 +94,7 @@ public:
 	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~legacy_floppy_image_device();
 
-	template<class _Object> static devcb2_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
 	
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) {   return load_software(swlist, swname, start_entry); }
@@ -169,7 +169,7 @@ protected:
 	virtual void device_start();
 
 	/* callbacks */
-	devcb2_write_line m_out_idx_func;
+	devcb_write_line m_out_idx_func;
 
 	/* state of input lines */
 	int m_drtn; /* direction */

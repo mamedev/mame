@@ -24,7 +24,7 @@
 //**************************************************************************
 
 #define MCFG_MM1_KEYBOARD_KBST_CALLBACK(_write) \
-	devcb = &mm1_keyboard_t::set_kbst_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mm1_keyboard_t::set_kbst_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -40,7 +40,7 @@ public:
 	// construction/destruction
 	mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_kbst_wr_callback(device_t &device, _Object object) { return downcast<mm1_keyboard_t &>(device).m_write_kbst.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbst_wr_callback(device_t &device, _Object object) { return downcast<mm1_keyboard_t &>(device).m_write_kbst.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -57,7 +57,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb2_write_line m_write_kbst;
+	devcb_write_line m_write_kbst;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_rom;

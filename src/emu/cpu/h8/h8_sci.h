@@ -51,10 +51,10 @@
 	downcast<h8_sci_device *>(device)->set_external_clock_period(_period);
 
 #define MCFG_H8_SCI_TX_CALLBACK(_devcb) \
-	devcb = &h8_sci_device::set_tx_cb(*device, DEVCB2_##_devcb);
+	devcb = &h8_sci_device::set_tx_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_H8_SCI_CLK_CALLBACK(_devcb) \
-	devcb = &h8_sci_device::set_clk_cb(*device, DEVCB2_##_devcb);
+	devcb = &h8_sci_device::set_clk_cb(*device, DEVCB_##_devcb);
 
 class h8_sci_device : public device_t {
 public:
@@ -80,8 +80,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rx_w);
 	DECLARE_WRITE_LINE_MEMBER(clk_w);
 
-	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).tx_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_clk_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).clk_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).tx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_clk_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).clk_cb.set_callback(object); }
 
 	UINT64 internal_update(UINT64 current_time);
 
@@ -137,7 +137,7 @@ protected:
 	};
 
 	required_device<h8_device> cpu;
-	devcb2_write_line tx_cb, clk_cb;
+	devcb_write_line tx_cb, clk_cb;
 	h8_intc_device *intc;
 	const char *intc_tag;
 	attotime external_clock_period, cur_sync_time;

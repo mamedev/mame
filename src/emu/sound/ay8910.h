@@ -75,16 +75,16 @@ YMZ294: 0 I/O port
 	ay8910_device::set_resistors_load(*device, _res0, _res1, _res2);
 
 #define MCFG_AY8910_PORT_A_READ_CB(_devcb) \
-	devcb = &ay8910_device::set_port_a_read_callback(*device, DEVCB2_##_devcb);
+	devcb = &ay8910_device::set_port_a_read_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AY8910_PORT_B_READ_CB(_devcb) \
-	devcb = &ay8910_device::set_port_b_read_callback(*device, DEVCB2_##_devcb);
+	devcb = &ay8910_device::set_port_b_read_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AY8910_PORT_A_WRITE_CB(_devcb) \
-	devcb = &ay8910_device::set_port_a_write_callback(*device, DEVCB2_##_devcb);
+	devcb = &ay8910_device::set_port_a_write_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AY8910_PORT_B_WRITE_CB(_devcb) \
-	devcb = &ay8910_device::set_port_b_write_callback(*device, DEVCB2_##_devcb);
+	devcb = &ay8910_device::set_port_b_write_callback(*device, DEVCB_##_devcb);
 
 
 class ay8910_device : public device_t,
@@ -105,10 +105,10 @@ public:
 	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }
 	static void set_resistors_load(device_t &device, int res_load0, int res_load1, int res_load2) { downcast<ay8910_device &>(device).m_res_load[0] = res_load0; downcast<ay8910_device &>(device).m_res_load[1] = res_load1; downcast<ay8910_device &>(device).m_res_load[2] = res_load2; } 
-	template<class _Object> static devcb2_base &set_port_a_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_read_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_b_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_read_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_a_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_write_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_b_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_write_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_a_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_b_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_a_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_write_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_b_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_write_cb.set_callback(object); }
 	
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -182,10 +182,10 @@ private:
 	INT32 m_vol3d_table[8*32*32*32];
 	int m_flags;          /* Flags */
 	int m_res_load[3];    /* Load on channel in ohms */
-	devcb2_read8 m_port_a_read_cb;
-	devcb2_read8 m_port_b_read_cb;
-	devcb2_write8 m_port_a_write_cb;
-	devcb2_write8 m_port_b_write_cb;
+	devcb_read8 m_port_a_read_cb;
+	devcb_read8 m_port_b_read_cb;
+	devcb_write8 m_port_a_write_cb;
+	devcb_write8 m_port_b_write_cb;
 };
 
 extern const device_type AY8910;

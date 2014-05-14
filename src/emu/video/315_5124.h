@@ -62,8 +62,8 @@ public:
 	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source);
 
 	static void set_signal_type(device_t &device, bool is_pal) { downcast<sega315_5124_device &>(device).m_is_pal = is_pal; }
-	template<class _Object> static devcb2_base &set_int_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_int_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pause_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_pause_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pause_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_pause_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
@@ -152,8 +152,8 @@ protected:
 	int              *m_line_buffer;
 	int              m_current_palette[32];
 	bool               m_is_pal;             /* false = NTSC, true = PAL */
-	devcb2_write_line  m_int_cb;       /* Interrupt callback function */
-	devcb2_write_line  m_pause_cb;     /* Pause callback function */
+	devcb_write_line  m_int_cb;       /* Interrupt callback function */
+	devcb_write_line  m_pause_cb;     /* Pause callback function */
 	emu_timer        *m_display_timer;
 	emu_timer        *m_check_hint_timer;
 	emu_timer        *m_check_vint_timer;
@@ -211,10 +211,10 @@ protected:
 	sega315_5124_device::set_signal_type(*device, _bool);
 
 #define MCFG_SEGA315_5124_INT_CB(_devcb) \
-	devcb = &sega315_5124_device::set_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5124_device::set_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5124_PAUSE_CB(_devcb) \
-	devcb = &sega315_5124_device::set_pause_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5124_device::set_pause_callback(*device, DEVCB_##_devcb);
 
 
 #define MCFG_SEGA315_5246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
@@ -223,10 +223,10 @@ protected:
 	sega315_5246_device::set_signal_type(*device, _bool);
 
 #define MCFG_SEGA315_5246_INT_CB(_devcb) \
-	devcb = &sega315_5246_device::set_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5246_device::set_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5246_PAUSE_CB(_devcb) \
-	devcb = &sega315_5246_device::set_pause_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5246_device::set_pause_callback(*device, DEVCB_##_devcb);
 
 
 #define MCFG_SEGA315_5378_SET_SCREEN MCFG_VIDEO_SET_SCREEN
@@ -235,10 +235,10 @@ protected:
 	sega315_5378_device::set_signal_type(*device, _bool);
 
 #define MCFG_SEGA315_5378_INT_CB(_devcb) \
-	devcb = &sega315_5378_device::set_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5378_device::set_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5378_PAUSE_CB(_devcb) \
-	devcb = &sega315_5378_device::set_pause_callback(*device, DEVCB2_##_devcb);
+	devcb = &sega315_5378_device::set_pause_callback(*device, DEVCB_##_devcb);
 
 
 #endif /* __SEGA315_5124_H__ */

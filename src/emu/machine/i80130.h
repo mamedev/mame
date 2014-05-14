@@ -25,22 +25,22 @@
 ///*************************************************************************
 
 #define MCFG_I80130_IRQ_CALLBACK(_write) \
-	devcb = &i80130_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i80130_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I80130_ACK_CALLBACK(_write) \
-	devcb = &i80130_device::set_ack_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i80130_device::set_ack_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I80130_LIR_CALLBACK(_write) \
-	devcb = &i80130_device::set_lir_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i80130_device::set_lir_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I80130_SYSTICK_CALLBACK(_write) \
-	devcb = &i80130_device::set_systick_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i80130_device::set_systick_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I80130_DELAY_CALLBACK(_write) \
-	devcb = &i80130_device::set_delay_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i80130_device::set_delay_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I80130_BAUD_CALLBACK(_write) \
-	devcb = &i80130_device::set_baud_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i80130_device::set_baud_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -56,12 +56,12 @@ public:
 	// construction/destruction
 	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ack_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_ack.set_callback(object); }
-	template<class _Object> static devcb2_base &set_lir_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_lir.set_callback(object); }
-	template<class _Object> static devcb2_base &set_systick_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_systick.set_callback(object); }
-	template<class _Object> static devcb2_base &set_delay_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_delay.set_callback(object); }
-	template<class _Object> static devcb2_base &set_baud_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_baud.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_ack_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_ack.set_callback(object); }
+	template<class _Object> static devcb_base &set_lir_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_lir.set_callback(object); }
+	template<class _Object> static devcb_base &set_systick_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_systick.set_callback(object); }
+	template<class _Object> static devcb_base &set_delay_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_delay.set_callback(object); }
+	template<class _Object> static devcb_base &set_baud_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_baud.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(rom_map, 16);
 	virtual DECLARE_ADDRESS_MAP(io_map, 16);
@@ -97,12 +97,12 @@ protected:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
 
-	devcb2_write_line m_write_irq;
-	devcb2_write_line m_write_ack;
-	devcb2_write_line m_write_lir;
-	devcb2_write_line m_write_systick;
-	devcb2_write_line m_write_delay;
-	devcb2_write_line m_write_baud;
+	devcb_write_line m_write_irq;
+	devcb_write_line m_write_ack;
+	devcb_write_line m_write_lir;
+	devcb_write_line m_write_systick;
+	devcb_write_line m_write_delay;
+	devcb_write_line m_write_baud;
 };
 
 

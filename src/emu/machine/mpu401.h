@@ -11,7 +11,7 @@
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_IRQ_FUNC(_irqf) \
-	downcast<mpu401_device *>(device)->set_irqf(DEVCB2_##_irqf);
+	downcast<mpu401_device *>(device)->set_irqf(DEVCB_##_irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,7 +33,7 @@ public:
 		write_irq.set_callback(wr);
 	}
 
-	devcb2_write_line write_irq;
+	devcb_write_line write_irq;
 
 	DECLARE_READ8_MEMBER(regs_mode2_r);
 	DECLARE_WRITE8_MEMBER(regs_mode2_w);

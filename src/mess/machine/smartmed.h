@@ -8,7 +8,7 @@
 //#define SMARTMEDIA_IMAGE_SAVE
 
 #define MCFG_NAND_RNB_CALLBACK(_write) \
-	devcb = &nand_device::set_rnb_wr_callback(*device, DEVCB2_##_write);
+	devcb = &nand_device::set_rnb_wr_callback(*device, DEVCB_##_write);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -78,7 +78,7 @@ public:
 	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_rnb_wr_callback(device_t &device, _Object object) { return downcast<nand_device &>(device).m_write_rnb.set_callback(object); }
+	template<class _Object> static devcb_base &set_rnb_wr_callback(device_t &device, _Object object) { return downcast<nand_device &>(device).m_write_rnb.set_callback(object); }
 
 	int is_present();
 	int is_protected();
@@ -134,7 +134,7 @@ protected:
 	int m_row_address_cycles;
 	int m_sequential_row_read;
 
-	devcb2_write_line m_write_rnb;
+	devcb_write_line m_write_rnb;
 
 	#ifdef SMARTMEDIA_IMAGE_SAVE
 	int m_image_format;

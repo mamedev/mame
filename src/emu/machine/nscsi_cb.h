@@ -5,31 +5,31 @@
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NSCSICB_RST_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_ATN_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_ACK_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_REQ_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_MSG_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_IO_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_CD_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_cd_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_cd_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_SEL_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_sel_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_sel_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_BSY_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_bsy_callback(DEVCB2_##_line);
+	downcast<nscsi_callback_device *>(device)->set_bsy_callback(DEVCB_##_line);
 
 class nscsi_callback_device : public nscsi_device
 {
@@ -77,15 +77,15 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	devcb2_write_line m_write_rst;
-	devcb2_write_line m_write_atn;
-	devcb2_write_line m_write_ack;
-	devcb2_write_line m_write_req;
-	devcb2_write_line m_write_msg;
-	devcb2_write_line m_write_io;
-	devcb2_write_line m_write_cd;
-	devcb2_write_line m_write_sel;
-	devcb2_write_line m_write_bsy;
+	devcb_write_line m_write_rst;
+	devcb_write_line m_write_atn;
+	devcb_write_line m_write_ack;
+	devcb_write_line m_write_req;
+	devcb_write_line m_write_msg;
+	devcb_write_line m_write_io;
+	devcb_write_line m_write_cd;
+	devcb_write_line m_write_sel;
+	devcb_write_line m_write_bsy;
 
 	UINT32 m_ctrl;
 };

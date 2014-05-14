@@ -40,10 +40,10 @@
 
 
 #define MCFG_ECONET_CLK_CALLBACK(_write) \
-	devcb = &econet_device::set_clk_wr_callback(*device, DEVCB2_##_write);
+	devcb = &econet_device::set_clk_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_ECONET_DATA_CALLBACK(_write) \
-	devcb = &econet_device::set_data_wr_callback(*device, DEVCB2_##_write);
+	devcb = &econet_device::set_data_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -61,8 +61,8 @@ public:
 	// construction/destruction
 	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_clk_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_clk.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_data.set_callback(object); }
+	template<class _Object> static devcb_base &set_clk_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_clk.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_data.set_callback(object); }
 
 	void add_device(device_t *target, int address);
 
@@ -102,8 +102,8 @@ protected:
 	simple_list<daisy_entry> m_device_list;
 
 private:
-	devcb2_write_line   m_write_clk;
-	devcb2_write_line   m_write_data;
+	devcb_write_line   m_write_clk;
+	devcb_write_line   m_write_data;
 
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);

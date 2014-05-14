@@ -51,19 +51,19 @@
 //**************************************************************************
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &cpc_expansion_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+	devcb = &cpc_expansion_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_reset_callback(*device, DEVCB2_##_devcb);
+	devcb = &cpc_expansion_slot_device::set_out_reset_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_romdis_callback(*device, DEVCB2_##_devcb);
+	devcb = &cpc_expansion_slot_device::set_out_romdis_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_ROMEN_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_romen_callback(*device, DEVCB2_##_devcb);
+	devcb = &cpc_expansion_slot_device::set_out_romen_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -94,11 +94,11 @@ public:
 	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cpc_expansion_slot_device();
 	
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_romdis_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_romen_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romen_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_romdis_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_romen_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romen_cb.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -111,11 +111,11 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	devcb2_write_line    m_out_irq_cb;
-	devcb2_write_line    m_out_nmi_cb;
-	devcb2_write_line    m_out_reset_cb;
-	devcb2_write_line    m_out_romdis_cb;
-	devcb2_write_line    m_out_romen_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_reset_cb;
+	devcb_write_line    m_out_romdis_cb;
+	devcb_write_line    m_out_romen_cb;
 
 	device_cpc_expansion_card_interface *m_card;
 };

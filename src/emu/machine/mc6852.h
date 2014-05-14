@@ -45,16 +45,16 @@
 	mc6852_device::set_tx_clock(*device, _clock);
 
 #define MCFG_MC6852_TX_DATA_CALLBACK(_write) \
-	devcb = &mc6852_device::set_tx_data_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6852_device::set_tx_data_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6852_IRQ_CALLBACK(_write) \
-	devcb = &mc6852_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6852_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6852_SM_DTR_CALLBACK(_write) \
-	devcb = &mc6852_device::set_sm_dtr_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6852_device::set_sm_dtr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6852_TUF_CALLBACK(_write) \
-	devcb = &mc6852_device::set_tuf_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6852_device::set_tuf_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -73,10 +73,10 @@ public:
 
 	static void set_rx_clock(device_t &device, int clock) { downcast<mc6852_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<mc6852_device &>(device).m_tx_clock = clock; }
-	template<class _Object> static devcb2_base &set_tx_data_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_tx_data.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sm_dtr_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_sm_dtr.set_callback(object); }
-	template<class _Object> static devcb2_base &set_tuf_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_tuf.set_callback(object); }
+	template<class _Object> static devcb_base &set_tx_data_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_tx_data.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_sm_dtr_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_sm_dtr.set_callback(object); }
+	template<class _Object> static devcb_base &set_tuf_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_tuf.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -102,10 +102,10 @@ protected:
 	virtual void rcv_complete();
 
 private:
-	devcb2_write_line       m_write_tx_data;
-	devcb2_write_line       m_write_irq;
-	devcb2_write_line       m_write_sm_dtr;
-	devcb2_write_line       m_write_tuf;
+	devcb_write_line       m_write_tx_data;
+	devcb_write_line       m_write_irq;
+	devcb_write_line       m_write_sm_dtr;
+	devcb_write_line       m_write_tuf;
 
 	UINT8 m_status;         // status register
 	UINT8 m_cr[3];          // control registers

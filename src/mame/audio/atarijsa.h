@@ -38,22 +38,22 @@ extern const device_type ATARI_JSA_IIIS;
 
 #define MCFG_ATARI_JSA_I_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_I, 0) \
-	devcb = &atari_jsa_i_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
+	devcb = &atari_jsa_i_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_II_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_II, 0) \
-	devcb = &atari_jsa_ii_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
+	devcb = &atari_jsa_ii_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_III_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_III, 0) \
-	devcb = &atari_jsa_iii_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
+	devcb = &atari_jsa_iii_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_IIIS_ADD(_tag, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_JSA_IIIS, 0) \
-	devcb = &atari_jsa_iiis_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
+	devcb = &atari_jsa_iiis_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
 
 #define MCFG_ATARI_JSA_TEST_PORT(_port, _bitnum) \
-	devcb = &atari_jsa_base_device::static_set_test_read_cb(*device, DEVCB2_IOPORT(_port)); \
+	devcb = &atari_jsa_base_device::static_set_test_read_cb(*device, DEVCB_IOPORT(_port)); \
 	MCFG_DEVCB_RSHIFT(_bitnum);
 
 
@@ -84,8 +84,8 @@ protected:
 
 public:
 	// static configuration
-	template<class _Object> static devcb2_base &static_set_test_read_cb(device_t &device, _Object object) { return downcast<atari_jsa_base_device &>(device).m_test_read_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_jsa_base_device &>(device).m_main_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_test_read_cb(device_t &device, _Object object) { return downcast<atari_jsa_base_device &>(device).m_test_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_jsa_base_device &>(device).m_main_int_cb.set_callback(object); }
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
@@ -121,8 +121,8 @@ protected:
 	required_memory_bank m_cpu_bank;
 
 	// configuration state
-	devcb2_read_line    m_test_read_cb;
-	devcb2_write_line   m_main_int_cb;
+	devcb_read_line    m_test_read_cb;
+	devcb_write_line   m_main_int_cb;
 
 	// internal state
 	double              m_ym2151_volume;

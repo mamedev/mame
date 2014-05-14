@@ -13,7 +13,7 @@
 	huc6270_device::set_vram_size(*device, _size);
 
 #define MCFG_HUC6270_IRQ_CHANGED_CB(_devcb) \
-	devcb = &huc6270_device::set_irq_changed_callback(*device, DEVCB2_##_devcb);
+	devcb = &huc6270_device::set_irq_changed_callback(*device, DEVCB_##_devcb);
 
 class huc6270_device :  public device_t
 {
@@ -22,7 +22,7 @@ public:
 	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_vram_size(device_t &device, UINT32 vram_size) { downcast<huc6270_device &>(device).m_vram_size = vram_size; }
-	template<class _Object> static devcb2_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6270_device &>(device).m_irq_changed_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6270_device &>(device).m_irq_changed_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -71,7 +71,7 @@ private:
 	UINT32 m_vram_size;
 
 	/* Callback for when the irq line may have changed (mandatory) */
-	devcb2_write_line    m_irq_changed_cb;
+	devcb_write_line    m_irq_changed_cb;
 
 	UINT8   m_register_index;
 

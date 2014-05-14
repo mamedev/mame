@@ -15,7 +15,7 @@
 	mea8000_device::static_set_dac_tag(*device, "^" _tag);
 
 #define MCFG_MEA8000_REQ_CALLBACK(_write) \
-	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB2_##_write);
+	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB_##_write);
 
 /* table amplitude [-QUANT,QUANT] */
 #define QUANT 512
@@ -59,7 +59,7 @@ public:
 	~mea8000_device() {}
 
 	static void static_set_dac_tag(device_t &device, const char *tag) { downcast<mea8000_device &>(device).m_dac.set_tag(tag); }
-	template<class _Object> static devcb2_base &set_req_wr_callback(device_t &device, _Object object) { return downcast<mea8000_device &>(device).m_write_req.set_callback(object); }
+	template<class _Object> static devcb_base &set_req_wr_callback(device_t &device, _Object object) { return downcast<mea8000_device &>(device).m_write_req.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -96,7 +96,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_expire);
 
-	devcb2_write8 m_write_req;
+	devcb_write8 m_write_req;
 
 	required_device<dac_device> m_dac;
 

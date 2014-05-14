@@ -60,7 +60,7 @@ typedef device_delegate<double ()> adc0808_analog_read_delegate;
 
 
 #define MCFG_ADC0808_OUT_EOC_CB(_devcb) \
-	devcb = &adc0808_device::set_out_eoc_callback(*device, DEVCB2_##_devcb);
+	devcb = &adc0808_device::set_out_eoc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ADC0808_IN_VREF_POS_CB(_class, _method) \
 	adc0808_device::set_in_vref_pos_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -100,7 +100,7 @@ public:
 	// construction/destruction
 	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	template<class _Object> static devcb2_base &set_out_eoc_callback(device_t &device, _Object object) { return downcast<adc0808_device &>(device).m_out_eoc_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_eoc_callback(device_t &device, _Object object) { return downcast<adc0808_device &>(device).m_out_eoc_cb.set_callback(object); }
 	static void set_in_vref_pos_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_vref_pos_cb = callback; }
 	static void set_in_vref_neg_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_vref_neg_cb = callback; }
 	static void set_in_in_0_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_0_cb = callback; }
@@ -123,7 +123,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb2_write_line           m_out_eoc_cb;
+	devcb_write_line           m_out_eoc_cb;
 	adc0808_analog_read_delegate     m_in_vref_pos_cb;
 	adc0808_analog_read_delegate     m_in_vref_neg_cb;
 	adc0808_analog_read_delegate     m_in_in_0_cb;

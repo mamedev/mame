@@ -49,13 +49,13 @@ extern const device_type ATA_SLOT;
 ***************************************************************************/
 
 #define MCFG_ATA_INTERFACE_IRQ_HANDLER(_devcb) \
-	devcb = &ata_interface_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ata_interface_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ATA_INTERFACE_DMARQ_HANDLER(_devcb) \
-	devcb = &ata_interface_device::set_dmarq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ata_interface_device::set_dmarq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
-	devcb = &ata_interface_device::set_dasp_handler(*device, DEVCB2_##_devcb);
+	devcb = &ata_interface_device::set_dasp_handler(*device, DEVCB_##_devcb);
 
 SLOT_INTERFACE_EXTERN(ata_devices);
 
@@ -84,9 +84,9 @@ public:
 	ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dasp_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_dasp_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(object); }
 	UINT16 read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);
@@ -122,9 +122,9 @@ private:
 	int m_dasp[2];
 	int m_pdiag[2];
 
-	devcb2_write_line m_irq_handler;
-	devcb2_write_line m_dmarq_handler;
-	devcb2_write_line m_dasp_handler;
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_dmarq_handler;
+	devcb_write_line m_dasp_handler;
 };
 
 extern const device_type ATA_INTERFACE;

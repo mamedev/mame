@@ -29,13 +29,13 @@ struct player_gfx {
 //**************************************************************************
 
 #define MCFG_TIA_READ_INPUT_PORT_CB(_devcb) \
-	devcb = &tia_video_device::set_read_input_port_callback(*device, DEVCB2_##_devcb);
+	devcb = &tia_video_device::set_read_input_port_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TIA_DATABUS_CONTENTS_CB(_devcb) \
-	devcb = &tia_video_device::set_databus_contents_callback(*device, DEVCB2_##_devcb);
+	devcb = &tia_video_device::set_databus_contents_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TIA_VSYNC_CB(_devcb) \
-	devcb = &tia_video_device::set_vsync_callback(*device, DEVCB2_##_devcb);
+	devcb = &tia_video_device::set_vsync_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -50,9 +50,9 @@ class tia_video_device :    public device_t,
 public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template<class _Object> static devcb2_base &set_read_input_port_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_read_input_port_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_databus_contents_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_databus_contents_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vsync_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_vsync_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_input_port_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_read_input_port_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_databus_contents_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_databus_contents_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_vsync_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_vsync_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -108,9 +108,9 @@ protected:
 
 
 private:
-	devcb2_read16    m_read_input_port_cb;
-	devcb2_read8     m_databus_contents_cb;
-	devcb2_write16   m_vsync_cb;
+	devcb_read16    m_read_input_port_cb;
+	devcb_read8     m_databus_contents_cb;
+	devcb_write16   m_vsync_cb;
 
 	struct player_gfx p0gfx;
 	struct player_gfx p1gfx;

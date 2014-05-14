@@ -16,7 +16,7 @@
 
 
 #define MCFG_MSM6242_OUT_INT_HANDLER(_devcb) \
-	devcb = &msm6242_device::set_out_int_handler(*device, DEVCB2_##_devcb);
+	devcb = &msm6242_device::set_out_int_handler(*device, DEVCB_##_devcb);
 
 
 // ======================> msm6242_device
@@ -29,7 +29,7 @@ public:
 	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
-	template<class _Object> static devcb2_base &set_out_int_handler(device_t &device, _Object object) { return downcast<msm6242_device &>(device).m_out_int_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_int_handler(device_t &device, _Object object) { return downcast<msm6242_device &>(device).m_out_int_handler.set_callback(object); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -61,7 +61,7 @@ private:
 	UINT16                      m_tick;
 
 	// incidentals
-	devcb2_write_line m_out_int_handler;
+	devcb_write_line m_out_int_handler;
 	emu_timer *                 m_timer;
 	UINT64                      m_last_update_time; // last update time, in clock cycles
 

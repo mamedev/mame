@@ -34,13 +34,13 @@
 //**************************************************************************
 
 #define MCFG_MCCS1850_INT_CALLBACK(_write) \
-	devcb = &mccs1850_device::set_int_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mccs1850_device::set_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MCCS1850_PSE_CALLBACK(_write) \
-	devcb = &mccs1850_device::set_pse_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mccs1850_device::set_pse_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MCCS1850_NUC_CALLBACK(_write) \
-	devcb = &mccs1850_device::set_nuc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mccs1850_device::set_nuc_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -58,9 +58,9 @@ public:
 	// construction/destruction
 	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).int_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pse_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_nuc_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pse_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_nuc_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sck_w );
@@ -93,7 +93,7 @@ private:
 
 	static const device_timer_id TIMER_CLOCK = 0;
 
-	devcb2_write_line int_cb, pse_cb, nuc_cb;
+	devcb_write_line int_cb, pse_cb, nuc_cb;
 
 	UINT8 m_ram[0x80];          // RAM
 

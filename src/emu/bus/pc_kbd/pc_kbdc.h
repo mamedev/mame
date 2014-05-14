@@ -20,10 +20,10 @@ set the data line and then set the clock line.
 //**************************************************************************
 
 #define MCFG_PC_KBDC_OUT_CLOCK_CB(_devcb) \
-	devcb = &pc_kbdc_device::set_out_clock_callback(*device, DEVCB2_##_devcb);
+	devcb = &pc_kbdc_device::set_out_clock_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_PC_KBDC_OUT_DATA_CB(_devcb) \
-	devcb = &pc_kbdc_device::set_out_data_callback(*device, DEVCB2_##_devcb);
+	devcb = &pc_kbdc_device::set_out_data_callback(*device, DEVCB_##_devcb);
 	
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
@@ -65,8 +65,8 @@ public:
 	// construction/destruction
 	pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_clock_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_clock_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_data_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_data_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_clock_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_clock_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_data_callback(device_t &device, _Object object) { return downcast<pc_kbdc_device &>(device).m_out_data_cb.set_callback(object); }
 	
 	void set_keyboard(device_pc_kbd_interface *keyboard);
 
@@ -86,8 +86,8 @@ protected:
 	void update_clock_state();
 	void update_data_state();
 
-	devcb2_write_line    m_out_clock_cb;
-	devcb2_write_line    m_out_data_cb;
+	devcb_write_line    m_out_clock_cb;
+	devcb_write_line    m_out_data_cb;
 
 	int                         m_clock_state;
 	int                         m_data_state;

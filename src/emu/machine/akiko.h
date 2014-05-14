@@ -29,13 +29,13 @@
 	akiko_device::set_cputag(*device, _cputag);
 
 #define MCFG_AKIKO_SCL_HANDLER(_devcb) \
-	devcb = &akiko_device::set_scl_handler(*device, DEVCB2_##_devcb);
+	devcb = &akiko_device::set_scl_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_AKIKO_SDA_READ_HANDLER(_devcb) \
-	devcb = &akiko_device::set_sda_read_handler(*device, DEVCB2_##_devcb);
+	devcb = &akiko_device::set_sda_read_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_AKIKO_SDA_WRITE_HANDLER(_devcb) \
-	devcb = &akiko_device::set_sda_write_handler(*device, DEVCB2_##_devcb);
+	devcb = &akiko_device::set_sda_write_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -51,13 +51,13 @@ public:
 	~akiko_device() {}
 
 	// callbacks
-	template<class _Object> static devcb2_base &set_scl_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_scl_handler(device_t &device, _Object object)
 		{ return downcast<akiko_device &>(device).m_scl_w.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_sda_read_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_sda_read_handler(device_t &device, _Object object)
 		{ return downcast<akiko_device &>(device).m_sda_r.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_sda_write_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_sda_write_handler(device_t &device, _Object object)
 		{ return downcast<akiko_device &>(device).m_sda_w.set_callback(object); }
 
 	DECLARE_READ32_MEMBER( read );
@@ -140,9 +140,9 @@ private:
 	void update_cdrom();
 
 	// i2c interface
-	devcb2_write_line m_scl_w;
-	devcb2_read_line m_sda_r;
-	devcb2_write_line m_sda_w;
+	devcb_write_line m_scl_w;
+	devcb_read_line m_sda_r;
+	devcb_write_line m_sda_w;
 
 	const char *m_cputag;
 };

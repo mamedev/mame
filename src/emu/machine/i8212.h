@@ -50,13 +50,13 @@ enum
 ///*************************************************************************
 
 #define MCFG_I8212_IRQ_CALLBACK(_write) \
-	devcb = &i8212_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8212_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8212_DI_CALLBACK(_read) \
-	devcb = &i8212_device::set_di_rd_callback(*device, DEVCB2_##_read);
+	devcb = &i8212_device::set_di_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_I8212_DO_CALLBACK(_write) \
-	devcb = &i8212_device::set_do_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8212_device::set_do_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -72,9 +72,9 @@ public:
 	// construction/destruction
 	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_di_rd_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_read_di.set_callback(object); }
-	template<class _Object> static devcb2_base &set_do_wr_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_write_do.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_di_rd_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_read_di.set_callback(object); }
+	template<class _Object> static devcb_base &set_do_wr_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_write_do.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -88,9 +88,9 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_write_line   m_write_irq;
-	devcb2_read8        m_read_di;
-	devcb2_write8       m_write_do;
+	devcb_write_line   m_write_irq;
+	devcb_read8        m_read_di;
+	devcb_write8       m_write_do;
 
 	int m_md;                   // mode
 	int m_stb;                  // strobe

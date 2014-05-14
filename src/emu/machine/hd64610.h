@@ -35,10 +35,10 @@
 //**************************************************************************
 
 #define MCFG_HD64610_OUT_IRQ_CB(_devcb) \
-	devcb = &hd64610_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &hd64610_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_HD64610_OUT_1HZ_CB(_devcb) \
-	devcb = &hd64610_device::set_out_1hz_callback(*device, DEVCB2_##_devcb);
+	devcb = &hd64610_device::set_out_1hz_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -55,8 +55,8 @@ public:
 	// construction/destruction
 	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_1hz_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_1hz_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -86,8 +86,8 @@ private:
 
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
-	devcb2_write_line        m_out_irq_cb;
-	devcb2_write_line        m_out_1hz_cb;
+	devcb_write_line        m_out_irq_cb;
+	devcb_write_line        m_out_1hz_cb;
 
 	UINT8   m_regs[0x10];       // Internal registers
 	int     m_hline_state;      // H-Start/Stop line

@@ -39,22 +39,22 @@ enum
 //*************************************************************************
 
 #define MCFG_LH5810_PORTA_R_CB(_devcb) \
-	devcb = &lh5810_device::set_porta_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &lh5810_device::set_porta_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTA_W_CB(_devcb) \
-	devcb = &lh5810_device::set_porta_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &lh5810_device::set_porta_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTB_R_CB(_devcb) \
-	devcb = &lh5810_device::set_portb_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &lh5810_device::set_portb_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTB_W_CB(_devcb) \
-	devcb = &lh5810_device::set_portb_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &lh5810_device::set_portb_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTC_W_CB(_devcb) \
-	devcb = &lh5810_device::set_portc_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &lh5810_device::set_portc_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_LH5810_OUT_INT_CB(_devcb) \
-	devcb = &lh5810_device::set_out_int_callback(*device, DEVCB2_##_devcb); //currently unused
+	devcb = &lh5810_device::set_out_int_callback(*device, DEVCB_##_devcb); //currently unused
 
 
 
@@ -70,12 +70,12 @@ public:
 	// construction/destruction
 	lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_porta_r_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_porta_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_porta_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_porta_w_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_portb_r_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portb_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_portb_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portb_w_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_portc_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portc_w_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_porta_r_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_porta_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_porta_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_porta_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_portb_r_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portb_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_portb_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portb_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_portc_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portc_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_out_int_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -87,13 +87,13 @@ protected:
 
 private:
 
-	devcb2_read8         m_porta_r_cb;       //port A read
-	devcb2_write8        m_porta_w_cb;       //port A write
-	devcb2_read8         m_portb_r_cb;       //port B read
-	devcb2_write8        m_portb_w_cb;       //port B write
-	devcb2_write8        m_portc_w_cb;       //port C write
+	devcb_read8         m_porta_r_cb;       //port A read
+	devcb_write8        m_porta_w_cb;       //port A write
+	devcb_read8         m_portb_r_cb;       //port B read
+	devcb_write8        m_portb_w_cb;       //port B write
+	devcb_write8        m_portc_w_cb;       //port C write
 
-	devcb2_write_line    m_out_int_cb;       //IRQ callback
+	devcb_write_line    m_out_int_cb;       //IRQ callback
 
 	UINT8 m_reg[0x10];
 	UINT8 m_irq;

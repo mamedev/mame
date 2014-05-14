@@ -16,22 +16,22 @@
 //**************************************************************************
 
 #define MCFG_SEIBU_COP_IN_BYTE_CB(_devcb) \
-	devcb = &seibu_cop_device::set_in_byte_callback(*device, DEVCB2_##_devcb);
+	devcb = &seibu_cop_device::set_in_byte_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEIBU_COP_IN_WORD_CB(_devcb) \
-	devcb = &seibu_cop_device::set_in_word_callback(*device, DEVCB2_##_devcb);
+	devcb = &seibu_cop_device::set_in_word_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEIBU_COP_IN_DWORD_CB(_devcb) \
-	devcb = &seibu_cop_device::set_in_dword_callback(*device, DEVCB2_##_devcb);
+	devcb = &seibu_cop_device::set_in_dword_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEIBU_COP_OUT_BYTE_CB(_devcb) \
-	devcb = &seibu_cop_device::set_out_byte_callback(*device, DEVCB2_##_devcb);
+	devcb = &seibu_cop_device::set_out_byte_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEIBU_COP_OUT_WORD_CB(_devcb) \
-	devcb = &seibu_cop_device::set_out_word_callback(*device, DEVCB2_##_devcb);
+	devcb = &seibu_cop_device::set_out_word_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEIBU_COP_OUT_DWORD_CB(_devcb) \
-	devcb = &seibu_cop_device::set_out_dword_callback(*device, DEVCB2_##_devcb);
+	devcb = &seibu_cop_device::set_out_dword_callback(*device, DEVCB_##_devcb);
 
 
 
@@ -48,12 +48,12 @@ public:
 	// construction/destruction
 	seibu_cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_in_byte_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_byte_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_word_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_word_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_dword_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_dword_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_byte_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_out_byte_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_word_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_out_word_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_dword_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_out_dword_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_byte_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_byte_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_word_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_word_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_dword_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_dword_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_byte_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_out_byte_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_word_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_out_word_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dword_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_out_dword_cb.set_callback(object); }
 
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );
@@ -79,12 +79,12 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
-	devcb2_read16       m_in_byte_cb;
-	devcb2_read16       m_in_word_cb;
-	devcb2_read16       m_in_dword_cb;
-	devcb2_write16      m_out_byte_cb;
-	devcb2_write16      m_out_word_cb;
-	devcb2_write16      m_out_dword_cb;
+	devcb_read16       m_in_byte_cb;
+	devcb_read16       m_in_word_cb;
+	devcb_read16       m_in_dword_cb;
+	devcb_write16      m_out_byte_cb;
+	devcb_write16      m_out_word_cb;
+	devcb_write16      m_out_dword_cb;
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);
 

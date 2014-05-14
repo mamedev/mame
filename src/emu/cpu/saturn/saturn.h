@@ -75,14 +75,14 @@ enum
 
 
 #define MCFG_SATURN_CONFIG(_out, _in, _reset, _config, _unconfig, _id, _crc, _rsi) \
-	saturn_device::set_out_func(*device, DEVCB2_##_out); \
-	saturn_device::set_in_func(*device, DEVCB2_##_in); \
-	saturn_device::set_reset_func(*device, DEVCB2_##_reset); \
-	saturn_device::set_config_func(*device, DEVCB2_##_config); \
-	saturn_device::set_unconfig_func(*device, DEVCB2_##_unconfig); \
-	saturn_device::set_id_func(*device, DEVCB2_##_id); \
-	saturn_device::set_crc_func(*device, DEVCB2_##_crc); \
-	saturn_device::set_rsi_func(*device, DEVCB2_##_rsi);
+	saturn_device::set_out_func(*device, DEVCB_##_out); \
+	saturn_device::set_in_func(*device, DEVCB_##_in); \
+	saturn_device::set_reset_func(*device, DEVCB_##_reset); \
+	saturn_device::set_config_func(*device, DEVCB_##_config); \
+	saturn_device::set_unconfig_func(*device, DEVCB_##_unconfig); \
+	saturn_device::set_id_func(*device, DEVCB_##_id); \
+	saturn_device::set_crc_func(*device, DEVCB_##_crc); \
+	saturn_device::set_rsi_func(*device, DEVCB_##_rsi);
 
 
 class saturn_device : public cpu_device
@@ -92,14 +92,14 @@ public:
 	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_in_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_reset_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_reset_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_config_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_config_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_unconfig_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_id_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_id_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_crc_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_crc_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rsi_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_in_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_reset_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_reset_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_config_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_config_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_unconfig_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_id_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_id_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_crc_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_crc_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_rsi_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -129,14 +129,14 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	devcb2_write32     m_out_func;
-	devcb2_read32      m_in_func;
-	devcb2_write_line  m_reset_func;
-	devcb2_write32     m_config_func;
-	devcb2_write32     m_unconfig_func;
-	devcb2_read32      m_id_func;
-	devcb2_write32     m_crc_func;
-	devcb2_write_line  m_rsi_func;
+	devcb_write32     m_out_func;
+	devcb_read32      m_in_func;
+	devcb_write_line  m_reset_func;
+	devcb_write32     m_config_func;
+	devcb_write32     m_unconfig_func;
+	devcb_read32      m_id_func;
+	devcb_write32     m_crc_func;
+	devcb_write_line  m_rsi_func;
 
 // 64 bit, unpacked (one nibble per byte)
 typedef UINT8 Saturn64[16];

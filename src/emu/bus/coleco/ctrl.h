@@ -31,7 +31,7 @@
 
 
 #define MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(_write) \
-	devcb = &colecovision_control_port_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &colecovision_control_port_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -74,7 +74,7 @@ public:
 	virtual ~colecovision_control_port_device() { }
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<colecovision_control_port_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<colecovision_control_port_device &>(device).m_write_irq.set_callback(object); }
 
 	// computer interface
 	UINT8 read() { UINT8 data = 0xff; if (exists()) data = m_device->joy_r(); return data; }
@@ -94,7 +94,7 @@ protected:
 	device_colecovision_control_port_interface *m_device;
 
 private:
-	devcb2_write_line m_write_irq;
+	devcb_write_line m_write_irq;
 };
 
 

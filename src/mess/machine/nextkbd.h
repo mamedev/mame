@@ -4,21 +4,21 @@
 #include "emu.h"
 
 #define MCFG_NEXTKBD_INT_CHANGE_CALLBACK(_write) \
-	devcb = &nextkbd_device::set_int_change_wr_callback(*device, DEVCB2_##_write);
+	devcb = &nextkbd_device::set_int_change_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_NEXTKBD_INT_POWER_CALLBACK(_write) \
-	devcb = &nextkbd_device::set_int_power_wr_callback(*device, DEVCB2_##_write);
+	devcb = &nextkbd_device::set_int_power_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_NEXTKBD_INT_NMI_CALLBACK(_write) \
-	devcb = &nextkbd_device::set_int_nmi_wr_callback(*device, DEVCB2_##_write);
+	devcb = &nextkbd_device::set_int_nmi_wr_callback(*device, DEVCB_##_write);
 
 class nextkbd_device : public device_t {
 public:
 	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_int_change_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_change_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int_power_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_power_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int_nmi_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_change_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_change_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_power_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_power_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_nmi_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_nmi_cb.set_callback(object); }
 
 	DECLARE_ADDRESS_MAP(amap, 32);
 
@@ -88,7 +88,7 @@ private:
 
 	enum { FIFO_SIZE = 32 };
 
-	devcb2_write_line int_change_cb, int_power_cb, int_nmi_cb;
+	devcb_write_line int_change_cb, int_power_cb, int_nmi_cb;
 	required_ioport mousex;
 	required_ioport mousey;
 	required_ioport mousebtn;

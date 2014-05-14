@@ -18,12 +18,12 @@ enum
 
 
 #define MCFG_SCMP_CONFIG(_flag_out_devcb, _sout_devcb, _sin_devcb, _sensea_devcb, _senseb_devcb, _halt_devcb) \
-	scmp_device::set_flag_out_cb(*device, DEVCB2_##_flag_out_devcb); \
-	scmp_device::set_sout_cb(*device, DEVCB2_##_sout_devcb); \
-	scmp_device::set_sin_cb(*device, DEVCB2_##_sin_devcb); \
-	scmp_device::set_sensea_cb(*device, DEVCB2_##_sensea_devcb); \
-	scmp_device::set_senseb_cb(*device, DEVCB2_##_senseb_devcb); \
-	scmp_device::set_halt_cb(*device, DEVCB2_##_halt_devcb);
+	scmp_device::set_flag_out_cb(*device, DEVCB_##_flag_out_devcb); \
+	scmp_device::set_sout_cb(*device, DEVCB_##_sout_devcb); \
+	scmp_device::set_sin_cb(*device, DEVCB_##_sin_devcb); \
+	scmp_device::set_sensea_cb(*device, DEVCB_##_sensea_devcb); \
+	scmp_device::set_senseb_cb(*device, DEVCB_##_senseb_devcb); \
+	scmp_device::set_halt_cb(*device, DEVCB_##_halt_devcb);
 
 
 class scmp_device : public cpu_device
@@ -34,12 +34,12 @@ public:
 	scmp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_flag_out_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_flag_out_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sout_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sout_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sin_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sin_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sensea_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sensea_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_senseb_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_senseb_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_halt_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_halt_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_flag_out_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_flag_out_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_sout_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sout_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_sin_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sin_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_sensea_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sensea_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_senseb_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_senseb_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_halt_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_halt_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -78,12 +78,12 @@ private:
 	direct_read_data *m_direct;
 	int                 m_icount;
 
-	devcb2_write8       m_flag_out_func;
-	devcb2_write_line   m_sout_func;
-	devcb2_read_line    m_sin_func;
-	devcb2_read_line    m_sensea_func;
-	devcb2_read_line    m_senseb_func;
-	devcb2_write_line   m_halt_func;
+	devcb_write8       m_flag_out_func;
+	devcb_write_line   m_sout_func;
+	devcb_read_line    m_sin_func;
+	devcb_read_line    m_sensea_func;
+	devcb_read_line    m_senseb_func;
+	devcb_write_line   m_halt_func;
 
 	inline UINT16 ADD12(UINT16 addr, INT8 val);
 	inline UINT8 ROP();

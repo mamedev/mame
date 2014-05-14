@@ -46,28 +46,28 @@
 	mc2661_device::static_set_txc(*device, _clock);
 
 #define MCFG_MC2661_TXD_HANDLER(_write) \
-	devcb = &mc2661_device::set_txd_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_txd_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_RXRDY_HANDLER(_write) \
-	devcb = &mc2661_device::set_rxrdy_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_rxrdy_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_TXRDY_HANDLER(_write) \
-	devcb = &mc2661_device::set_txrdy_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_txrdy_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_RTS_HANDLER(_write) \
-	devcb = &mc2661_device::set_rts_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_rts_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_DTR_HANDLER(_write) \
-	devcb = &mc2661_device::set_dtr_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_dtr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_TXEMT_DSCHG_HANDLER(_write) \
-	devcb = &mc2661_device::set_txemt_dschg_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_txemt_dschg_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_BKDET_HANDLER(_write) \
-	devcb = &mc2661_device::set_bkdet_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_bkdet_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC2661_XSYNC_HANDLER(_write) \
-	devcb = &mc2661_device::set_xsync_callback(*device, DEVCB2_##_write);
+	devcb = &mc2661_device::set_xsync_callback(*device, DEVCB_##_write);
 
 
 
@@ -87,14 +87,14 @@ public:
 	static void static_set_rxc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_rxc = clock; }
 	static void static_set_txc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_txc = clock; }
 
-	template<class _Object> static devcb2_base &set_txd_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txd.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rxrdy_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_rxrdy.set_callback(object); }
-	template<class _Object> static devcb2_base &set_txrdy_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txrdy.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rts_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_rts.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dtr_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_dtr.set_callback(object); }
-	template<class _Object> static devcb2_base &set_txemt_dschg_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txemt_dschg.set_callback(object); }
-	template<class _Object> static devcb2_base &set_bkdet_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_bkdet.set_callback(object); }
-	template<class _Object> static devcb2_base &set_xsync_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_xsync.set_callback(object); }
+	template<class _Object> static devcb_base &set_txd_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txd.set_callback(object); }
+	template<class _Object> static devcb_base &set_rxrdy_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_rxrdy.set_callback(object); }
+	template<class _Object> static devcb_base &set_txrdy_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txrdy.set_callback(object); }
+	template<class _Object> static devcb_base &set_rts_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_rts.set_callback(object); }
+	template<class _Object> static devcb_base &set_dtr_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_dtr.set_callback(object); }
+	template<class _Object> static devcb_base &set_txemt_dschg_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txemt_dschg.set_callback(object); }
+	template<class _Object> static devcb_base &set_bkdet_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_bkdet.set_callback(object); }
+	template<class _Object> static devcb_base &set_xsync_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_xsync.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -120,14 +120,14 @@ protected:
 	virtual void rcv_complete();
 
 private:
-	devcb2_write_line   m_write_txd;
-	devcb2_write_line   m_write_rxrdy;
-	devcb2_write_line   m_write_txrdy;
-	devcb2_write_line   m_write_rts;
-	devcb2_write_line   m_write_dtr;
-	devcb2_write_line   m_write_txemt_dschg;
-	devcb2_write_line   m_write_bkdet;
-	devcb2_write_line   m_write_xsync;
+	devcb_write_line   m_write_txd;
+	devcb_write_line   m_write_rxrdy;
+	devcb_write_line   m_write_txrdy;
+	devcb_write_line   m_write_rts;
+	devcb_write_line   m_write_dtr;
+	devcb_write_line   m_write_txemt_dschg;
+	devcb_write_line   m_write_bkdet;
+	devcb_write_line   m_write_xsync;
 
 	int m_rxc;
 	int m_txc;

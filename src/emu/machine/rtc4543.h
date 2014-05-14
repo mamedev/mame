@@ -22,7 +22,7 @@
 	MCFG_DEVICE_ADD(_tag, RTC4543, _clock)
 
 #define MCFG_RTC4543_DATA_CALLBACK(_devcb) \
-	devcb = &rtc4543_device::set_data_cb(*device, DEVCB2_##_devcb);
+	devcb = &rtc4543_device::set_data_cb(*device, DEVCB_##_devcb);
 
 
 
@@ -45,7 +45,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( data_r );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 
-	template<class _Object> static devcb2_base &set_data_cb(device_t &device, _Object object) { return downcast<rtc4543_device &>(device).data_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<rtc4543_device &>(device).data_cb.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -58,7 +58,7 @@ protected:
 	virtual bool rtc_feature_leap_year() { return true; }
 
 private:
-	devcb2_write_line data_cb;
+	devcb_write_line data_cb;
 
 	int m_ce;
 	int m_clk;

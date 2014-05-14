@@ -86,7 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(sample_bank_w);
 
-	// devcb2 callbacks
+	// devcb callbacks
 	DECLARE_READ8_MEMBER(display_r);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(type2alpha3_display_w);

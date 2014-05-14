@@ -12,7 +12,7 @@
 #define MAX_PACKET_SIZE 0x8000
 
 #define MCFG_UPD1771_ACK_HANDLER(_devcb) \
-	devcb = &upd1771c_device::set_ack_handler(*device, DEVCB2_##_devcb);
+	devcb = &upd1771c_device::set_ack_handler(*device, DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -26,7 +26,7 @@ public:
 	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd1771c_device() {}
 
-	template<class _Object> static devcb2_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -43,7 +43,7 @@ protected:
 private:
 	// internal state
 	sound_stream *m_channel;
-	devcb2_write_line m_ack_handler;
+	devcb_write_line m_ack_handler;
 	emu_timer *m_timer;
 
 	TIMER_CALLBACK_MEMBER(ack_callback);

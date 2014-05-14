@@ -10,7 +10,7 @@
 //**************************************************************************
 
 #define MCFG_SPU_IRQ_HANDLER(_devcb) \
-	devcb = &spu_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &spu_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SPU_ADD(_tag, _clock) \
 	MCFG_DEVICE_MODIFY( "maincpu" ) \
@@ -52,7 +52,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 
 	unsigned char *spu_ram;
 	reverb *rev;
@@ -223,7 +223,7 @@ public:
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<spu_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<spu_device &>(device).m_irq_handler.set_callback(object); }
 
 	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
 	void dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );

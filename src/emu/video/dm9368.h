@@ -34,7 +34,7 @@
 //**************************************************************************
 
 #define MCFG_DM9368_RBO_CALLBACK(_write) \
-	devcb = &dm9368_device::set_rbo_wr_callback(*device, DEVCB2_##_read);
+	devcb = &dm9368_device::set_rbo_wr_callback(*device, DEVCB_##_read);
 
 
 
@@ -61,7 +61,7 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_write_line   m_write_rbo;
+	devcb_write_line   m_write_rbo;
 
 	int m_rbi;
 	int m_rbo;

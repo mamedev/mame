@@ -18,7 +18,7 @@
 	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
 
 #define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
-	devcb = &zsg2_device::set_ext_read_handler(*device, DEVCB2_##_devcb);
+	devcb = &zsg2_device::set_ext_read_handler(*device, DEVCB_##_devcb);
 
 
 // ======================> zsg2_device
@@ -31,7 +31,7 @@ public:
 	~zsg2_device() { }
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<zsg2_device &>(device).m_ext_read_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<zsg2_device &>(device).m_ext_read_handler.set_callback(object); }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -75,7 +75,7 @@ private:
 
 	sound_stream *m_stream;
 
-	devcb2_read32 m_ext_read_handler;
+	devcb_read32 m_ext_read_handler;
 
 	UINT32 read_memory(UINT32 offset);
 	void chan_w(int ch, int reg, UINT16 data);

@@ -36,13 +36,13 @@
 
 
 #define MCFG_DAVE_IRQ_CALLBACK(_write) \
-	devcb = &dave_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &dave_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_DAVE_LH_CALLBACK(_write) \
-	devcb = &dave_device::set_lh_wr_callback(*device, DEVCB2_##_write);
+	devcb = &dave_device::set_lh_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_DAVE_RH_CALLBACK(_write) \
-	devcb = &dave_device::set_rh_wr_callback(*device, DEVCB2_##_write);
+	devcb = &dave_device::set_rh_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -59,9 +59,9 @@ class dave_device : public device_t,
 public:
 	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_lh_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_lh.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rh_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_rh.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_lh_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_lh.set_callback(object); }
+	template<class _Object> static devcb_base &set_rh_wr_callback(device_t &device, _Object object) { return downcast<dave_device &>(device).m_write_rh.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
 	virtual DECLARE_ADDRESS_MAP(z80_io_map, 8);
@@ -112,9 +112,9 @@ private:
 	const address_space_config m_program_space_config;
 	const address_space_config m_io_space_config;
 
-	devcb2_write_line m_write_irq;
-	devcb2_write8 m_write_lh;
-	devcb2_write8 m_write_rh;
+	devcb_write_line m_write_irq;
+	devcb_write8 m_write_lh;
+	devcb_write8 m_write_rh;
 
 	UINT8 m_segment[4];
 

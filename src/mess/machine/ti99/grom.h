@@ -29,7 +29,7 @@ struct ti99grom_config
 	const ti99grom_config(name) =
 
 #define MCFG_GROM_READY_CALLBACK(_write) \
-	devcb = &ti99_grom_device::set_ready_wr_callback(*device, DEVCB2_##_write);
+	devcb = &ti99_grom_device::set_ready_wr_callback(*device, DEVCB_##_write);
 
 extern const device_type GROM;
 
@@ -41,7 +41,7 @@ class ti99_grom_device : public bus8z_device, ti99grom_config
 public:
 	ti99_grom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti99_grom_device &>(device).m_gromready.set_callback(object); }
+	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti99_grom_device &>(device).m_gromready.set_callback(object); }
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -59,7 +59,7 @@ private:
 	int         m_size;
 
 	// Ready callback. This line is usually connected to the READY pin of the CPU.
-	devcb2_write_line   m_gromready;
+	devcb_write_line   m_gromready;
 
 	// Frequency of the incoming GROM clock. In most application cases the
 	// GROM gets its clock from the video display processor (TMS9918)

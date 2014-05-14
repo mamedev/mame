@@ -75,27 +75,27 @@
 	MCFG_DEVICE_ADD(_tag, WPCASIC, 0);
 
 #define MCFG_WPC_IRQ_ACKNOWLEDGE(_irq) \
-	downcast<wpc_device *>(device)->set_irq_callback(DEVCB2_##_irq);
+	downcast<wpc_device *>(device)->set_irq_callback(DEVCB_##_irq);
 
 #define MCFG_WPC_FIRQ_ACKNOWLEDGE(_firq) \
-	downcast<wpc_device *>(device)->set_firq_callback(DEVCB2_##_firq);
+	downcast<wpc_device *>(device)->set_firq_callback(DEVCB_##_firq);
 
 #define MCFG_WPC_SOUND_DATA(_sounddata_r,_sounddata_w) \
-	downcast<wpc_device *>(device)->set_sound_data_read(DEVCB2_##_sounddata_r); \
-	downcast<wpc_device *>(device)->set_sound_data_write(DEVCB2_##_sounddata_w);
+	downcast<wpc_device *>(device)->set_sound_data_read(DEVCB_##_sounddata_r); \
+	downcast<wpc_device *>(device)->set_sound_data_write(DEVCB_##_sounddata_w);
 
 #define MCFG_WPC_SOUND_CTRL(_soundctrl_r,_soundctrl_w) \
-	downcast<wpc_device *>(device)->set_sound_ctrl_read(DEVCB2_##_soundctrl_r); \
-	downcast<wpc_device *>(device)->set_sound_ctrl_write(DEVCB2_##_soundctrl_w);
+	downcast<wpc_device *>(device)->set_sound_ctrl_read(DEVCB_##_soundctrl_r); \
+	downcast<wpc_device *>(device)->set_sound_ctrl_write(DEVCB_##_soundctrl_w);
 
 #define MCFG_WPC_SOUND_S11C(_sounds11_w) \
-	downcast<wpc_device *>(device)->set_sound_s11_write(DEVCB2_##_sounds11_w);
+	downcast<wpc_device *>(device)->set_sound_s11_write(DEVCB_##_sounds11_w);
 
 #define MCFG_WPC_ROMBANK(_bank_w) \
-	downcast<wpc_device *>(device)->set_bank_write(DEVCB2_##_bank_w);
+	downcast<wpc_device *>(device)->set_bank_write(DEVCB_##_bank_w);
 
 #define MCFG_WPC_DMDBANK(_dmdbank_w) \
-	downcast<wpc_device *>(device)->set_dmdbank_write(DEVCB2_##_dmdbank_w);
+	downcast<wpc_device *>(device)->set_dmdbank_write(DEVCB_##_dmdbank_w);
 
 class wpc_device : public device_t
 {
@@ -151,15 +151,15 @@ private:
 	UINT8 m_dmd_irqline;
 	emu_timer* m_zc_timer;
 
-	devcb2_write_line m_irq_cb;
-	devcb2_write_line m_firq_cb;
-	devcb2_read8 m_sounddata_r;
-	devcb2_write8 m_sounddata_w;
-	devcb2_read8 m_soundctrl_r;
-	devcb2_write8 m_soundctrl_w;
-	devcb2_write8 m_sounds11_w;
-	devcb2_write8 m_bank_w;
-	devcb2_write8 m_dmdbank_w;
+	devcb_write_line m_irq_cb;
+	devcb_write_line m_firq_cb;
+	devcb_read8 m_sounddata_r;
+	devcb_write8 m_sounddata_w;
+	devcb_read8 m_soundctrl_r;
+	devcb_write8 m_soundctrl_w;
+	devcb_write8 m_sounds11_w;
+	devcb_write8 m_bank_w;
+	devcb_write8 m_dmdbank_w;
 };
 
 extern const device_type WPCASIC;

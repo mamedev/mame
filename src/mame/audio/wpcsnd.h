@@ -18,7 +18,7 @@
 	wpcsnd_device::static_set_gfxregion(*device, _region);
 
 #define MCFG_WPC_SOUND_REPLY_CALLBACK(_reply) \
-	downcast<wpcsnd_device *>(device)->set_reply_callback(DEVCB2_##_reply);
+	downcast<wpcsnd_device *>(device)->set_reply_callback(DEVCB_##_reply);
 
 class wpcsnd_device : public device_t
 {
@@ -65,7 +65,7 @@ private:
 	bool m_reply_available;
 
 	// callback
-	devcb2_write_line m_reply_cb;
+	devcb_write_line m_reply_cb;
 
 };
 

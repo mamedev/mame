@@ -124,34 +124,34 @@
 
 
 #define MCFG_ABCBUS_SLOT_IRQ_CALLBACK(_irq) \
-	downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB2_##_irq);
+	downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
 
 #define MCFG_ABCBUS_SLOT_NMI_CALLBACK(_nmi) \
-	downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB2_##_nmi);
+	downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_ABCBUS_SLOT_RDY_CALLBACK(_rdy) \
-	downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB2_##_rdy);
+	downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
 
 #define MCFG_ABCBUS_SLOT_RESIN_CALLBACK(_resin) \
-	downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB2_##_resin);
+	downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
 
 #define MCFG_ABCBUS_SLOT_PREN_CALLBACK(_pren) \
-	downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB2_##_pren);
+	downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
 
 #define MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(_trrq) \
-	downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB2_##_trrq);
+	downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
 
 #define MCFG_ABCBUS_SLOT_XINT2_CALLBACK(_xint2) \
-	downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB2_##_xint2);
+	downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
 
 #define MCFG_ABCBUS_SLOT_XINT3_CALLBACK(_xint3) \
-	downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB2_##_xint3);
+	downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
 
 #define MCFG_ABCBUS_SLOT_XINT4_CALLBACK(_xint4) \
-	downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB2_##_xint4);
+	downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
 
 #define MCFG_ABCBUS_SLOT_XINT5_CALLBACK(_xint5) \
-	downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB2_##_xint5);
+	downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
 
 
 
@@ -281,16 +281,16 @@ protected:
 	virtual void device_start();
 	virtual void device_reset() { if (m_card) get_card_device()->reset(); }
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_nmi;
-	devcb2_write_line   m_write_rdy;
-	devcb2_write_line   m_write_resin;
-	devcb2_write_line   m_write_pren;
-	devcb2_write_line   m_write_trrq;
-	devcb2_write_line   m_write_xint2;
-	devcb2_write_line   m_write_xint3;
-	devcb2_write_line   m_write_xint4;
-	devcb2_write_line   m_write_xint5;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_nmi;
+	devcb_write_line   m_write_rdy;
+	devcb_write_line   m_write_resin;
+	devcb_write_line   m_write_pren;
+	devcb_write_line   m_write_trrq;
+	devcb_write_line   m_write_xint2;
+	devcb_write_line   m_write_xint3;
+	devcb_write_line   m_write_xint4;
+	devcb_write_line   m_write_xint5;
 
 	device_abcbus_card_interface *m_card;
 

@@ -61,13 +61,13 @@
 
 
 #define MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(_write) \
-	devcb = &vip_expansion_slot_device::set_int_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vip_expansion_slot_device::set_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(_write) \
-	devcb = &vip_expansion_slot_device::set_dma_out_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vip_expansion_slot_device::set_dma_out_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(_write) \
-	devcb = &vip_expansion_slot_device::set_dma_in_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vip_expansion_slot_device::set_dma_in_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -86,9 +86,9 @@ public:
 	// construction/destruction
 	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_int.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_out.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_in_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_in.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_int.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_out.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_in_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_in.set_callback(object); }
 
 	// computer interface
 	UINT8 program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
@@ -114,9 +114,9 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	devcb2_write_line m_write_int;
-	devcb2_write_line m_write_dma_out;
-	devcb2_write_line m_write_dma_in;
+	devcb_write_line m_write_int;
+	devcb_write_line m_write_dma_out;
+	devcb_write_line m_write_dma_in;
 
 	device_vip_expansion_card_interface *m_card;
 };

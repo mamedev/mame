@@ -10,7 +10,7 @@
 	MCFG_DEVICE_ADD(_tag, KONAMI_573_DIGITAL_IO_BOARD, _clock)
 
 #define MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( _output_cb )  \
-	downcast<k573dio_device *>(device)->set_output_cb(DEVCB2_##_output_cb);
+	downcast<k573dio_device *>(device)->set_output_cb(DEVCB_##_output_cb);
 
 class k573dio_device : public device_t
 {
@@ -69,7 +69,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb2_write8 output_cb;
+	devcb_write8 output_cb;
 
 	UINT16 *ram;
 	UINT32 ram_adr;

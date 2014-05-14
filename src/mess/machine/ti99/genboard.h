@@ -62,13 +62,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
 	UINT8 get_recent_key();
 
-	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
 
 protected:
 	void               device_start();
 	void               device_reset();
 	ioport_constructor device_input_ports() const;
-	devcb2_write_line  m_interrupt;    // Keyboard interrupt to console
+	devcb_write_line  m_interrupt;    // Keyboard interrupt to console
 	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -101,7 +101,7 @@ private:
 };
 
 #define MCFG_GENEVE_KBINT_HANDLER( _intcallb ) \
-	devcb = &geneve_keyboard_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
+	devcb = &geneve_keyboard_device::static_set_int_callback( *device, DEVCB_##_intcallb );
 
 /*****************************************************************************/
 
@@ -128,7 +128,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
-	template<class _Object> static devcb2_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
 
 protected:
 	void    device_start();
@@ -181,7 +181,7 @@ private:
 	int     m_sram_val;
 
 	// Ready line to the CPU
-	devcb2_write_line m_ready;
+	devcb_write_line m_ready;
 
 	// Counter for the wait states.
 	int     m_waitcount;
@@ -201,6 +201,6 @@ private:
 };
 
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \
-	devcb = &geneve_mapper_device::static_set_ready_callback( *device, DEVCB2_##_intcallb );
+	devcb = &geneve_mapper_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
 
 #endif

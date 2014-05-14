@@ -63,26 +63,26 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	template<class _Object> static devcb2_base &static_set_readblock_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_read_block.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_readblock_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_read_block.set_callback(object); }
 
-	template<class _Object> static devcb2_base &static_set_p0_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p0.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p1_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p1.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p2_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p2.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p3_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p3.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p4_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p4.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p5_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p5.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p6_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p6.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p7_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p7.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p8_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p8.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p9_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p9.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p10_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p10.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p11_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p11.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p12_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p12.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p13_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p13.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p14_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p14.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_p15_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p15.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p0_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p0.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p1_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p1.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p2_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p2.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p3_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p3.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p4_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p4.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p5_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p5.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p6_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p6.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p7_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p7.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p8_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p8.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p9_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p9.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p10_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p10.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p11_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p11.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p12_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p12.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p13_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p13.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p14_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p14.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_p15_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p15.set_callback(object); }
 
-	template<class _Object> static devcb2_base &static_set_intlevel_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_interrupt.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_intlevel_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_interrupt.set_callback(object); }
 
 private:
 	static const device_timer_id DECREMENTER = 0;
@@ -138,29 +138,29 @@ private:
 	// =======================================================================
 
 	// Read callback.
-	devcb2_read8        m_read_block;
+	devcb_read8        m_read_block;
 
 	// I/O lines, used for output. When used as inputs, the levels are delivered via the m_read_block
-	devcb2_write_line   m_write_p0;
-	devcb2_write_line   m_write_p1;
-	devcb2_write_line   m_write_p2;
-	devcb2_write_line   m_write_p3;
-	devcb2_write_line   m_write_p4;
-	devcb2_write_line   m_write_p5;
-	devcb2_write_line   m_write_p6;
-	devcb2_write_line   m_write_p7;
-	devcb2_write_line   m_write_p8;
-	devcb2_write_line   m_write_p9;
-	devcb2_write_line   m_write_p10;
-	devcb2_write_line   m_write_p11;
-	devcb2_write_line   m_write_p12;
-	devcb2_write_line   m_write_p13;
-	devcb2_write_line   m_write_p14;
-	devcb2_write_line   m_write_p15;
+	devcb_write_line   m_write_p0;
+	devcb_write_line   m_write_p1;
+	devcb_write_line   m_write_p2;
+	devcb_write_line   m_write_p3;
+	devcb_write_line   m_write_p4;
+	devcb_write_line   m_write_p5;
+	devcb_write_line   m_write_p6;
+	devcb_write_line   m_write_p7;
+	devcb_write_line   m_write_p8;
+	devcb_write_line   m_write_p9;
+	devcb_write_line   m_write_p10;
+	devcb_write_line   m_write_p11;
+	devcb_write_line   m_write_p12;
+	devcb_write_line   m_write_p13;
+	devcb_write_line   m_write_p14;
+	devcb_write_line   m_write_p15;
 
 	// The invocation corresponds to the INTREQ signal (with the level passed as data)
 	// and the address delivers the interrupt level (0-15)
-	devcb2_write8       m_interrupt;
+	devcb_write8       m_interrupt;
 };
 
 /***************************************************************************
@@ -168,57 +168,57 @@ private:
 ***************************************************************************/
 
 #define MCFG_TMS9901_READBLOCK_HANDLER( _read ) \
-	devcb = &tms9901_device::static_set_readblock_callback( *device, DEVCB2_##_read );
+	devcb = &tms9901_device::static_set_readblock_callback( *device, DEVCB_##_read );
 
 #define MCFG_TMS9901_P0_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p0_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p0_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P1_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p1_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p1_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P2_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p2_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p2_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P3_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p3_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p3_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P4_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p4_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p4_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P5_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p5_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p5_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P6_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p6_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p6_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P7_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p7_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p7_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P8_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p8_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p8_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P9_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p9_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p9_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P10_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p10_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p10_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P11_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p11_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p11_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P12_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p12_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p12_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P13_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p13_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p13_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P14_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p14_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p14_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_P15_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p15_callback( *device, DEVCB2_##_write );
+	devcb = &tms9901_device::static_set_p15_callback( *device, DEVCB_##_write );
 
 #define MCFG_TMS9901_INTLEVEL_HANDLER( _intlevel ) \
-	devcb = &tms9901_device::static_set_intlevel_callback( *device, DEVCB2_##_intlevel );
+	devcb = &tms9901_device::static_set_intlevel_callback( *device, DEVCB_##_intlevel );
 
 #endif /* __TMS9901_H__ */

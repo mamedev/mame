@@ -91,34 +91,34 @@
 //**************************************************************************
 
 #define MCFG_COSMAC_WAIT_CALLBACK(_read) \
-	devcb = &cosmac_device::set_wait_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_wait_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_CLEAR_CALLBACK(_read) \
-	devcb = &cosmac_device::set_clear_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_clear_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_EF1_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef1_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_ef1_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_EF2_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef2_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_ef2_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_EF3_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef3_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_ef3_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_EF4_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef4_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_ef4_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_Q_CALLBACK(_write) \
-	devcb = &cosmac_device::set_q_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cosmac_device::set_q_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_COSMAC_DMAR_CALLBACK(_read) \
-	devcb = &cosmac_device::set_dma_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cosmac_device::set_dma_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_COSMAC_DMAW_CALLBACK(_write) \
-	devcb = &cosmac_device::set_dma_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cosmac_device::set_dma_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_COSMAC_SC_CALLBACK(_write) \
-	devcb = &cosmac_device::set_sc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cosmac_device::set_sc_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -195,16 +195,16 @@ public:
 	// construction/destruction
 	cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_wait_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_wait.set_callback(object); }
-	template<class _Object> static devcb2_base &set_clear_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_clear.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ef1_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef1.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ef2_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef2.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ef3_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef3.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ef4_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef4.set_callback(object); }
-	template<class _Object> static devcb2_base &set_q_wr_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_write_q.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_dma.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_write_dma.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sc_wr_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_write_sc.set_callback(object); }
+	template<class _Object> static devcb_base &set_wait_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_wait.set_callback(object); }
+	template<class _Object> static devcb_base &set_clear_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_clear.set_callback(object); }
+	template<class _Object> static devcb_base &set_ef1_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef1.set_callback(object); }
+	template<class _Object> static devcb_base &set_ef2_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef2.set_callback(object); }
+	template<class _Object> static devcb_base &set_ef3_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef3.set_callback(object); }
+	template<class _Object> static devcb_base &set_ef4_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_ef4.set_callback(object); }
+	template<class _Object> static devcb_base &set_q_wr_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_write_q.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_read_dma.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_write_dma.set_callback(object); }
+	template<class _Object> static devcb_base &set_sc_wr_callback(device_t &device, _Object object) { return downcast<cosmac_device &>(device).m_write_sc.set_callback(object); }
 
 	// public interfaces
 	offs_t get_memory_address();
@@ -374,16 +374,16 @@ protected:
 	const address_space_config      m_io_config;
 
 	// device callbacks
-	devcb2_read_line        m_read_wait;
-	devcb2_read_line        m_read_clear;
-	devcb2_read_line        m_read_ef1;
-	devcb2_read_line        m_read_ef2;
-	devcb2_read_line        m_read_ef3;
-	devcb2_read_line        m_read_ef4;
-	devcb2_write_line       m_write_q;
-	devcb2_read8            m_read_dma;
-	devcb2_write8           m_write_dma;
-	devcb2_write8           m_write_sc;
+	devcb_read_line        m_read_wait;
+	devcb_read_line        m_read_clear;
+	devcb_read_line        m_read_ef1;
+	devcb_read_line        m_read_ef2;
+	devcb_read_line        m_read_ef3;
+	devcb_read_line        m_read_ef4;
+	devcb_write_line       m_write_q;
+	devcb_read8            m_read_dma;
+	devcb_write8           m_write_dma;
+	devcb_write8           m_write_sc;
 
 	// control modes
 	enum cosmac_mode

@@ -16,10 +16,10 @@
 // device stuff
 
 #define MCFG_NCR539X_OUT_IRQ_CB(_devcb) \
-	devcb = &ncr539x_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &ncr539x_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 	
 #define MCFG_NCR539X_OUT_DRQ_CB(_devcb) \
-	devcb = &ncr539x_device::set_out_drq_callback(*device, DEVCB2_##_devcb);
+	devcb = &ncr539x_device::set_out_drq_callback(*device, DEVCB_##_devcb);
 	
 class ncr539x_device : public legacy_scsi_host_adapter
 {
@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_drq_cb.set_callback(object); }
 
 	// our API
 	DECLARE_READ8_MEMBER(read);
@@ -79,8 +79,8 @@ private:
 
 	emu_timer *m_operation_timer;
 
-	devcb2_write_line m_out_irq_cb;          /* IRQ line */
-	devcb2_write_line m_out_drq_cb;          /* DRQ line */
+	devcb_write_line m_out_irq_cb;          /* IRQ line */
+	devcb_write_line m_out_drq_cb;          /* DRQ line */
 };
 
 // device type definition

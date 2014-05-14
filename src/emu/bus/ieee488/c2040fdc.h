@@ -27,13 +27,13 @@
 //**************************************************************************
 
 #define MCFG_C2040_SYNC_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_sync_wr_callback(*device, DEVCB2_##_write);
+	devcb = &c2040_fdc_t::set_sync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C2040_READY_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_ready_wr_callback(*device, DEVCB2_##_write);
+	devcb = &c2040_fdc_t::set_ready_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C2040_ERROR_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_error_wr_callback(*device, DEVCB2_##_write);
+	devcb = &c2040_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -50,9 +50,9 @@ public:
 	c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_sync.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_ready.set_callback(object); }
-	template<class _Object> static devcb2_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_error.set_callback(object); }
+	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_sync.set_callback(object); }
+	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_ready.set_callback(object); }
+	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_error.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -120,9 +120,9 @@ protected:
 		int write_position;
 	};
 
-	devcb2_write_line m_write_sync;
-	devcb2_write_line m_write_ready;
-	devcb2_write_line m_write_error;
+	devcb_write_line m_write_sync;
+	devcb_write_line m_write_ready;
+	devcb_write_line m_write_error;
 
 	required_memory_region m_gcr_rom;
 

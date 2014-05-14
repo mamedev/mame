@@ -43,16 +43,16 @@
 	MCFG_SCREEN_VBLANK_TIME(0)
 
 #define MCFG_MC6847_HSYNC_CALLBACK(_write) \
-	devcb = &mc6847_friend_device::set_hsync_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6847_friend_device::set_hsync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6847_FSYNC_CALLBACK(_write) \
-	devcb = &mc6847_friend_device::set_fsync_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mc6847_friend_device::set_fsync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6847_CHARROM_CALLBACK(_class, _method) \
 	mc6847_friend_device::set_get_char_rom(*device, mc6847_get_char_rom_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6847_INPUT_CALLBACK(_read) \
-	devcb = &mc6847_base_device::set_input_callback(*device, DEVCB2_##_read);
+	devcb = &mc6847_base_device::set_input_callback(*device, DEVCB_##_read);
 
 #define MCFG_MC6847_FIXED_MODE(_mode) \
 	mc6847_base_device::set_get_fixed_mode(*device, _mode);
@@ -82,8 +82,8 @@ public:
 	bool hs_r(void)                 { return m_horizontal_sync; }
 	bool fs_r(void)                 { return m_field_sync; }
 
-	template<class _Object> static devcb2_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<mc6847_friend_device &>(device).m_write_hsync.set_callback(object); }
-	template<class _Object> static devcb2_base &set_fsync_wr_callback(device_t &device, _Object object) { return downcast<mc6847_friend_device &>(device).m_write_fsync.set_callback(object); }
+	template<class _Object> static devcb_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<mc6847_friend_device &>(device).m_write_hsync.set_callback(object); }
+	template<class _Object> static devcb_base &set_fsync_wr_callback(device_t &device, _Object object) { return downcast<mc6847_friend_device &>(device).m_write_fsync.set_callback(object); }
 
 	static void set_get_char_rom(device_t &device, mc6847_get_char_rom_delegate callback) { downcast<mc6847_friend_device &>(device).m_charrom_cb = callback; }
 
@@ -267,8 +267,8 @@ protected:
 	};
 
 	// callbacks
-	devcb2_write_line   m_write_hsync;
-	devcb2_write_line   m_write_fsync;
+	devcb_write_line   m_write_hsync;
+	devcb_write_line   m_write_fsync;
 	
 	/* if specified, this reads the external char rom off of the driver state */
 	// moved here from mc6847_base_device so to be useable in GIME
@@ -517,7 +517,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 
-	template<class _Object> static devcb2_base &set_input_callback(device_t &device, _Object object) { return downcast<mc6847_base_device &>(device).m_input_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<mc6847_base_device &>(device).m_input_cb.set_callback(object); }
 
 	static void set_get_fixed_mode(device_t &device, UINT8 mode) { downcast<mc6847_base_device &>(device).m_fixed_mode = mode; }
 	static void set_black_and_white(device_t &device, bool bw) { downcast<mc6847_base_device &>(device).m_black_and_white = bw; }
@@ -575,7 +575,7 @@ private:
 	// callbacks
 	
 	/* if specified, this gets called whenever reading a byte (offs_t ~0 specifies DA* entering the tristate mode) */
-	devcb2_read8 m_input_cb;
+	devcb_read8 m_input_cb;
 
 	/* if true, this is black and white */
 	bool m_black_and_white;

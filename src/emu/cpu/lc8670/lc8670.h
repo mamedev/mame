@@ -65,7 +65,7 @@ typedef UINT32 (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, cons
 	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_RC_CLOCK, _rc_clock); \
 	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_CF_CLOCK, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
-	devcb = &lc8670_cpu_device::static_set_bankswitch_cb(*device, DEVCB2_##_devcb);
+	devcb = &lc8670_cpu_device::static_set_bankswitch_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_LC8670_LCD_UPDATE_CB(_cb) \
 	lc8670_cpu_device::static_set_lcd_update_cb(*device, _cb);
@@ -93,7 +93,7 @@ public:
 	// static configuration helpers
 	static void static_set_cpu_clock(device_t &device, int _source, UINT32 _clock) { downcast<lc8670_cpu_device &>(device).m_clocks[_source] = _clock; }
 	static void static_set_lcd_update_cb(device_t &device, lc8670_lcd_update _cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = _cb; }
-	template<class _Object> static devcb2_base & static_set_bankswitch_cb(device_t &device, _Object object) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(object); }
+	template<class _Object> static devcb_base & static_set_bankswitch_cb(device_t &device, _Object object) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -233,7 +233,7 @@ private:
 
 	// configuration
 	UINT32              m_clocks[3];            // clock sources
-	devcb2_write8       m_bankswitch_func;      // bankswitch CB
+	devcb_write8       m_bankswitch_func;      // bankswitch CB
 	lc8670_lcd_update   m_lcd_update_func;      // LCD update CB
 
 	// interrupts vectors

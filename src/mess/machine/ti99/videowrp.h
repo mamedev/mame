@@ -93,7 +93,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE_LINE_MEMBER( sound_ready );   // connect to console READY
 
-	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti_sound_system_device &>(device).m_console_ready.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti_sound_system_device &>(device).m_console_ready.set_callback(object); }
 
 protected:
 	virtual void device_start(void);
@@ -101,7 +101,7 @@ protected:
 
 private:
 	sn76496_base_device*    m_sound_chip;
-	devcb2_write_line       m_console_ready;
+	devcb_write_line       m_console_ready;
 };
 
 /*
@@ -182,6 +182,6 @@ protected:
 	MCFG_DEVICE_ADD(_tag, TISOUND_76496, 0)
 
 #define MCFG_TI_SOUND_READY_HANDLER( _ready ) \
-	devcb = &ti_sound_system_device::static_set_int_callback( *device, DEVCB2_##_ready );
+	devcb = &ti_sound_system_device::static_set_int_callback( *device, DEVCB_##_ready );
 
 #endif /* __TIVIDEO__ */

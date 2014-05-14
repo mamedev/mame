@@ -53,16 +53,16 @@
 
 
 #define MCFG_ISBX_SLOT_MINTR0_CALLBACK(_mintr0) \
-	downcast<isbx_slot_device *>(device)->set_mintr0_callback(DEVCB2_##_mintr0);
+	downcast<isbx_slot_device *>(device)->set_mintr0_callback(DEVCB_##_mintr0);
 
 #define MCFG_ISBX_SLOT_MINTR1_CALLBACK(_mintr1) \
-	downcast<isbx_slot_device *>(device)->set_mintr1_callback(DEVCB2_##_mintr1);
+	downcast<isbx_slot_device *>(device)->set_mintr1_callback(DEVCB_##_mintr1);
 
 #define MCFG_ISBX_SLOT_MDRQT_CALLBACK(_mdrqt) \
-	downcast<isbx_slot_device *>(device)->set_mdrqt_callback(DEVCB2_##_mdrqt);
+	downcast<isbx_slot_device *>(device)->set_mdrqt_callback(DEVCB_##_mdrqt);
 
 #define MCFG_ISBX_SLOT_MWAIT_CALLBACK(_mwait) \
-	downcast<isbx_slot_device *>(device)->set_mwait_callback(DEVCB2_##_mwait);
+	downcast<isbx_slot_device *>(device)->set_mwait_callback(DEVCB_##_mwait);
 
 
 
@@ -134,10 +134,10 @@ protected:
 	virtual void device_start();
 	virtual void device_reset() { if (m_card) get_card_device()->reset(); }
 
-	devcb2_write_line   m_write_mintr0;
-	devcb2_write_line   m_write_mintr1;
-	devcb2_write_line   m_write_mdrqt;
-	devcb2_write_line   m_write_mwait;
+	devcb_write_line   m_write_mintr0;
+	devcb_write_line   m_write_mintr1;
+	devcb_write_line   m_write_mdrqt;
+	devcb_write_line   m_write_mwait;
 
 	device_isbx_card_interface *m_card;
 };

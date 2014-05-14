@@ -85,7 +85,7 @@ enum
 
 
 #define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	superfx_device::set_out_irq_func(*device, DEVCB2_##_devcb);
+	superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
 
 
 class superfx_device :  public cpu_device
@@ -95,7 +95,7 @@ public:
 	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_out_irq_func(device_t &device, _Object object) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_func(device_t &device, _Object object) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(object); }
 
 	UINT8 mmio_read(UINT32 addr);
 	void mmio_write(UINT32 addr, UINT8 data);
@@ -129,7 +129,7 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	devcb2_write_line   m_out_irq_func;
+	devcb_write_line   m_out_irq_func;
 
 	UINT8  m_pipeline;
 	UINT16 m_ramaddr; // RAM Address

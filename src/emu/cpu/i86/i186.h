@@ -14,10 +14,10 @@ public:
 	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
 
-	template<class _Object> static devcb2_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_read_slave_ack_func.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_chip_select_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_chip_select_func.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_tmrout0_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout0_func.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_tmrout1_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout1_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_read_slave_ack_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_chip_select_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_chip_select_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_tmrout0_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout0_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_tmrout1_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout1_func.set_callback(object); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
@@ -129,10 +129,10 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	devcb2_read8 m_read_slave_ack_func;
-	devcb2_write16 m_out_chip_select_func;
-	devcb2_write_line m_out_tmrout0_func;
-	devcb2_write_line m_out_tmrout1_func;
+	devcb_read8 m_read_slave_ack_func;
+	devcb_write16 m_out_chip_select_func;
+	devcb_write_line m_out_tmrout0_func;
+	devcb_write_line m_out_tmrout1_func;
 };
 
 class i80188_cpu_device : public i80186_cpu_device
@@ -143,15 +143,15 @@ public:
 };
 
 #define MCFG_80186_IRQ_SLAVE_ACK(_devcb) \
-		devcb = &i80186_cpu_device::static_set_read_slave_ack_callback(*device, DEVCB2_##_devcb);
+		devcb = &i80186_cpu_device::static_set_read_slave_ack_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_80186_CHIP_SELECT_CB(_devcb) \
-		devcb = &i80186_cpu_device::static_set_chip_select_callback(*device, DEVCB2_##_devcb);
+		devcb = &i80186_cpu_device::static_set_chip_select_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_80186_TMROUT0_HANDLER(_devcb) \
-		devcb = &i80186_cpu_device::static_set_tmrout0_handler(*device, DEVCB2_##_devcb);
+		devcb = &i80186_cpu_device::static_set_tmrout0_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_80186_TMROUT1_HANDLER(_devcb) \
-		devcb = &i80186_cpu_device::static_set_tmrout1_handler(*device, DEVCB2_##_devcb);
+		devcb = &i80186_cpu_device::static_set_tmrout1_handler(*device, DEVCB_##_devcb);
 
 #endif

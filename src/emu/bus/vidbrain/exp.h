@@ -64,7 +64,7 @@
 
 
 #define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
-	devcb = &videobrain_expansion_slot_device::set_extres_wr_callback(*device, DEVCB2_##_write);
+	devcb = &videobrain_expansion_slot_device::set_extres_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -116,7 +116,7 @@ public:
 	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~videobrain_expansion_slot_device() { }
 
-	template<class _Object> static devcb2_base &set_extres_wr_callback(device_t &device, _Object object) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(object); }
+	template<class _Object> static devcb_base &set_extres_wr_callback(device_t &device, _Object object) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(object); }
 
 	// computer interface
 	UINT8 bo_r(address_space &space, offs_t offset, int cs1, int cs2);
@@ -155,7 +155,7 @@ protected:
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 
-	devcb2_write_line   m_write_extres;
+	devcb_write_line   m_write_extres;
 
 	device_videobrain_expansion_card_interface *m_cart;
 };

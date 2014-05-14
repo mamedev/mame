@@ -46,31 +46,31 @@
 	cs4031_device::static_set_keybctag(*device, _keybctag);
 
 #define MCFG_CS4031_IOR(_ior) \
-	downcast<cs4031_device *>(device)->set_ior_callback(DEVCB2_##_ior);
+	downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
 
 #define MCFG_CS4031_IOW(_iow) \
-	downcast<cs4031_device *>(device)->set_iow_callback(DEVCB2_##_iow);
+	downcast<cs4031_device *>(device)->set_iow_callback(DEVCB_##_iow);
 
 #define MCFG_CS4031_TC(_tc) \
-	downcast<cs4031_device *>(device)->set_tc_callback(DEVCB2_##_tc);
+	downcast<cs4031_device *>(device)->set_tc_callback(DEVCB_##_tc);
 
 #define MCFG_CS4031_HOLD(_hold) \
-	downcast<cs4031_device *>(device)->set_hold_callback(DEVCB2_##_hold);
+	downcast<cs4031_device *>(device)->set_hold_callback(DEVCB_##_hold);
 
 #define MCFG_CS4031_NMI(_nmi) \
-	downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB2_##_nmi);
+	downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_CS4031_INTR(_intr) \
-	downcast<cs4031_device *>(device)->set_intr_callback(DEVCB2_##_intr);
+	downcast<cs4031_device *>(device)->set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_CS4031_CPURESET(_cpureset) \
-	downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB2_##_cpureset);
+	downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
 
 #define MCFG_CS4031_A20M(_a20m) \
-	downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB2_##_a20m);
+	downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
 
 #define MCFG_CS4031_SPKR(_spkr) \
-	downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB2_##_spkr);
+	downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
 
 
 //**************************************************************************
@@ -194,15 +194,15 @@ protected:
 	virtual void device_reset_after_children();
 
 private:
-	devcb2_read16 m_read_ior;
-	devcb2_write16 m_write_iow;
-	devcb2_write8 m_write_tc;
-	devcb2_write_line m_write_hold;
-	devcb2_write_line m_write_nmi;
-	devcb2_write_line m_write_intr;
-	devcb2_write_line m_write_cpureset;
-	devcb2_write_line m_write_a20m;
-	devcb2_write_line m_write_spkr;
+	devcb_read16 m_read_ior;
+	devcb_write16 m_write_iow;
+	devcb_write8 m_write_tc;
+	devcb_write_line m_write_hold;
+	devcb_write_line m_write_nmi;
+	devcb_write_line m_write_intr;
+	devcb_write_line m_write_cpureset;
+	devcb_write_line m_write_a20m;
+	devcb_write_line m_write_spkr;
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);

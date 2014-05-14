@@ -251,7 +251,7 @@ void upd7759_device::device_start()
 		if (romsize >= 0x20000) m_rommask = 0x1ffff;
 		else m_rommask = romsize - 1;
 
-		m_drqcallback.set_callback(DEVCB2_NULL);
+		m_drqcallback.set_callback(DEVCB_NULL);
 	}
 
 	/* assume /RESET and /START are both high */
@@ -324,7 +324,7 @@ void upd7756_device::device_start()
 		if (romsize >= 0x20000) m_rommask = 0x1ffff;
 		else m_rommask = romsize - 1;
 
-		m_drqcallback.set_callback(DEVCB2_NULL);
+		m_drqcallback.set_callback(DEVCB_NULL);
 	}
 
 	/* assume /RESET and /START are both high */

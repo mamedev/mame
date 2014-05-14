@@ -39,9 +39,9 @@ public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &static_set_inta_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_inta.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_intb_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_intb.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<peribox_device &>(device).m_datamux_ready.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_inta_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_inta.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_intb_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_intb.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<peribox_device &>(device).m_datamux_ready.set_callback(object); }
 
 	// Next seven methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz);
@@ -70,9 +70,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// Next three methods call back the console
-	devcb2_write_line m_console_inta;   // INTA line (Box to console)
-	devcb2_write_line m_console_intb;   // INTB line
-	devcb2_write_line m_datamux_ready;  // READY line (to the datamux)
+	devcb_write_line m_console_inta;   // INTA line (Box to console)
+	devcb_write_line m_console_intb;   // INTB line
+	devcb_write_line m_datamux_ready;  // READY line (to the datamux)
 
 	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
 	peribox_slot_device *m_slot[9];     // for the sake of simplicity we donate the first two positions (0,1)
@@ -237,13 +237,13 @@ protected:
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
 
 #define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
-	devcb = &peribox_device::static_set_inta_callback( *device, DEVCB2_##_inta );
+	devcb = &peribox_device::static_set_inta_callback( *device, DEVCB_##_inta );
 
 #define MCFG_PERIBOX_INTB_HANDLER( _intb ) \
-	devcb = &peribox_device::static_set_intb_callback( *device, DEVCB2_##_intb );
+	devcb = &peribox_device::static_set_intb_callback( *device, DEVCB_##_intb );
 
 #define MCFG_PERIBOX_READY_HANDLER( _ready ) \
-	devcb = &peribox_device::static_set_ready_callback( *device, DEVCB2_##_ready );
+	devcb = &peribox_device::static_set_ready_callback( *device, DEVCB_##_ready );
 
 
 /*

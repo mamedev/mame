@@ -36,28 +36,28 @@
 
 
 #define MCFG_IEEE488_EOI_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_DAV_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_dav_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_dav_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_NRFD_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_NDAC_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_IFC_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_SRQ_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_srq_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_ATN_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_atn_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_REN_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB2_##_write);
+	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB_##_write);
 
 
 #define MCFG_IEEE488_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
@@ -176,14 +176,14 @@ protected:
 	simple_list<daisy_entry> m_device_list;
 
 private:
-	devcb2_write_line   m_write_eoi;
-	devcb2_write_line   m_write_dav;
-	devcb2_write_line   m_write_nrfd;
-	devcb2_write_line   m_write_ndac;
-	devcb2_write_line   m_write_ifc;
-	devcb2_write_line   m_write_srq;
-	devcb2_write_line   m_write_atn;
-	devcb2_write_line   m_write_ren;
+	devcb_write_line   m_write_eoi;
+	devcb_write_line   m_write_dav;
+	devcb_write_line   m_write_nrfd;
+	devcb_write_line   m_write_ndac;
+	devcb_write_line   m_write_ifc;
+	devcb_write_line   m_write_srq;
+	devcb_write_line   m_write_atn;
+	devcb_write_line   m_write_ren;
 
 	void set_signal(device_t *device, int signal, int state);
 	int get_signal(int signal);

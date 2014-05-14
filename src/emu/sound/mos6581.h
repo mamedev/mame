@@ -38,10 +38,10 @@
 //**************************************************************************
 
 #define MCFG_MOS6581_POTX_CALLBACK(_read) \
-	devcb = &mos6581_device::set_potx_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos6581_device::set_potx_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_MOS6581_POTY_CALLBACK(_read) \
-	devcb = &mos6581_device::set_poty_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos6581_device::set_poty_rd_callback(*device, DEVCB_##_read);
 
 
 
@@ -61,8 +61,8 @@ public:
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mos6581_device();
 
-	template<class _Object> static devcb2_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6581_device &>(device).m_read_potx.set_callback(object); }
-	template<class _Object> static devcb2_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6581_device &>(device).m_read_poty.set_callback(object); }
+	template<class _Object> static devcb_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6581_device &>(device).m_read_potx.set_callback(object); }
+	template<class _Object> static devcb_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6581_device &>(device).m_read_poty.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -82,8 +82,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-	devcb2_read8  m_read_potx;
-	devcb2_read8  m_read_poty;
+	devcb_read8  m_read_potx;
+	devcb_read8  m_read_poty;
 
 	sound_stream *m_stream;
 

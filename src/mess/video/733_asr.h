@@ -18,11 +18,11 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	template<class _Object> static devcb2_base &static_set_keyint_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_keyint_callback(device_t &device, _Object object)
 	{
 		return downcast<asr733_device &>(device).m_keyint_line.set_callback(object);
 	}
-	template<class _Object> static devcb2_base &static_set_lineint_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_lineint_callback(device_t &device, _Object object)
 	{
 		return downcast<asr733_device &>(device).m_lineint_line.set_callback(object);
 	}
@@ -73,14 +73,14 @@ private:
 
 	required_device<palette_device>     m_palette;
 	required_device<gfxdecode_device>   m_gfxdecode;
-	devcb2_write_line                   m_keyint_line;
-	devcb2_write_line                   m_lineint_line;
+	devcb_write_line                   m_keyint_line;
+	devcb_write_line                   m_lineint_line;
 };
 
 extern const device_type ASR733;
 
 #define MCFG_ASR733_KEYINT_HANDLER( _intcallb ) \
-	devcb = &asr733_device::static_set_keyint_callback( *device, DEVCB2_##_intcallb );
+	devcb = &asr733_device::static_set_keyint_callback( *device, DEVCB_##_intcallb );
 
 #define MCFG_ASR733_LINEINT_HANDLER( _intcallb ) \
-	devcb = &asr733_device::static_set_lineint_callback( *device, DEVCB2_##_intcallb );
+	devcb = &asr733_device::static_set_lineint_callback( *device, DEVCB_##_intcallb );

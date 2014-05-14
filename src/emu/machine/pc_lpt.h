@@ -10,7 +10,7 @@
 #include "bus/centronics/ctronics.h"
 
 #define MCFG_PC_LPT_IRQ_HANDLER(_devcb) \
-	devcb = &pc_lpt_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &pc_lpt_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -22,7 +22,7 @@ public:
 	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -72,7 +72,7 @@ private:
 	int m_irq_enabled;
 	int m_centronics_ack;
 
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 	required_device<input_buffer_device> m_cent_data_in;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<input_buffer_device> m_cent_status_in;

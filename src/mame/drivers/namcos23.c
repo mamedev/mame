@@ -3361,7 +3361,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3429,7 +3429,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3508,7 +3508,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

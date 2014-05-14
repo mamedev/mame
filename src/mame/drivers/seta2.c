@@ -515,7 +515,7 @@ ADDRESS_MAP_END
 	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
 
 #define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
-	devcb = &funcube_touchscreen_device::set_tx_cb(*device, DEVCB2_##_devcb);
+	devcb = &funcube_touchscreen_device::set_tx_cb(*device, DEVCB_##_devcb);
 
 class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
@@ -524,7 +524,7 @@ public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const;
-	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
 
 protected:
 	virtual void device_start();
@@ -535,7 +535,7 @@ protected:
 	virtual void tra_callback();
 
 private:
-	devcb2_write_line m_tx_cb;
+	devcb_write_line m_tx_cb;
 	required_ioport m_x;
 	required_ioport m_y;
 	required_ioport m_btn;

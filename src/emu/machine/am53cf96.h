@@ -11,7 +11,7 @@
 #include "legscsi.h"
 
 #define MCFG_AM53CF96_IRQ_HANDLER(_devcb) \
-	devcb = &am53cf96_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &am53cf96_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 // 53CF96 register set
 enum
@@ -42,7 +42,7 @@ public:
 	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<am53cf96_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<am53cf96_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -65,7 +65,7 @@ private:
 	UINT8 last_id;
 
 	emu_timer* m_transfer_timer;
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 };
 
 // device type definition

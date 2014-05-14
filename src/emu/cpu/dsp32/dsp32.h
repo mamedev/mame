@@ -96,7 +96,7 @@ enum
 //**************************************************************************
 
 #define MCFG_DSP32C_OUTPUT_CALLBACK(_write) \
-	devcb = &dsp32c_device::set_output_pins_callback(*device, DEVCB2_##_write);
+	devcb = &dsp32c_device::set_output_pins_callback(*device, DEVCB_##_write);
 
 // ======================> dsp32c_device
 
@@ -106,7 +106,7 @@ public:
 	// construction/destruction
 	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_output_pins_callback(device_t &device, _Object object) { return downcast<dsp32c_device &>(device).m_output_pins_changed.set_callback(object); }
+	template<class _Object> static devcb_base &set_output_pins_callback(device_t &device, _Object object) { return downcast<dsp32c_device &>(device).m_output_pins_changed.set_callback(object); }
 
 
 	// public interfaces
@@ -433,7 +433,7 @@ protected:
 	address_space * m_program;
 	direct_read_data *m_direct;
 
-	devcb2_write32 m_output_pins_changed;
+	devcb_write32 m_output_pins_changed;
 	// tables
 	static void (dsp32c_device::*const s_dsp32ops[])(UINT32 op);
 	static const UINT32 s_regmap[4][16];

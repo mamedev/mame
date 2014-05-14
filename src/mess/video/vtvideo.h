@@ -23,8 +23,8 @@ public:
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~vt100_video_device() {}
 
-	template<class _Object> static devcb2_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
-	template<class _Object> static devcb2_base &set_clear_video_irq_wr_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(object); }
+	template<class _Object> static devcb_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
+	template<class _Object> static devcb_base &set_clear_video_irq_wr_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(object); }
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom_tag = tag; }
 
@@ -45,8 +45,8 @@ protected:
 	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 
-	devcb2_read8        m_read_ram;
-	devcb2_write8       m_write_clear_video_interrupt;
+	devcb_read8        m_read_ram;
+	devcb_write8       m_write_clear_video_interrupt;
 
 	UINT8 *m_gfx;     /* content of char rom */
 
@@ -100,9 +100,9 @@ extern const device_type RAINBOW_VIDEO;
 	vt100_video_device::set_chargen_tag(*device, _tag);
 
 #define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
-	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB2_##_read);
+	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
-	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB_##_write);
 
 #endif

@@ -14,7 +14,7 @@
 #define TELEPRINTER_SCREEN_TAG "tty_screen"
 
 #define MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(_devcb) \
-	devcb = &generic_terminal_device::set_keyboard_callback(*device, DEVCB2_##_devcb);
+	devcb = &generic_terminal_device::set_keyboard_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES

@@ -38,10 +38,10 @@
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ESQPANEL_TX_CALLBACK(_write) \
-	devcb = &esqpanel_device::set_tx_wr_callback(*device, DEVCB2_##_write);
+	devcb = &esqpanel_device::set_tx_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_ESQPANEL_ANALOG_CALLBACK(_write) \
-	devcb = &esqpanel_device::set_analog_wr_callback(*device, DEVCB2_##_write);
+	devcb = &esqpanel_device::set_analog_wr_callback(*device, DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -55,8 +55,8 @@ public:
 	// construction/destruction
 	esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_tx_wr_callback(device_t &device, _Object object) { return downcast<esqpanel_device &>(device).m_write_tx.set_callback(object); }
-	template<class _Object> static devcb2_base &set_analog_wr_callback(device_t &device, _Object object) { return downcast<esqpanel_device &>(device).m_write_analog.set_callback(object); }
+	template<class _Object> static devcb_base &set_tx_wr_callback(device_t &device, _Object object) { return downcast<esqpanel_device &>(device).m_write_tx.set_callback(object); }
+	template<class _Object> static devcb_base &set_analog_wr_callback(device_t &device, _Object object) { return downcast<esqpanel_device &>(device).m_write_analog.set_callback(object); }
 
 	virtual void send_to_display(UINT8 data) = 0;
 
@@ -82,8 +82,8 @@ private:
 	bool  m_bCalibSecondByte;
 	bool  m_bButtonLightSecondByte;
 
-	devcb2_write_line m_write_tx;
-	devcb2_write16 m_write_analog;
+	devcb_write_line m_write_tx;
+	devcb_write16 m_write_analog;
 	UINT8 m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;

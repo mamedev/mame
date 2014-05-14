@@ -43,7 +43,7 @@
 #include "m6510.h"
 
 #define MCFG_M8502_PORT_CALLBACKS(_read, _write) \
-	downcast<m8502_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<m8502_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 #define MCFG_M8502_PORT_PULLS(_up, _down) \
 	downcast<m8502_device *>(device)->set_pulls(_up, _down);

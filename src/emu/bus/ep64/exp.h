@@ -75,13 +75,13 @@
 	ep64_expansion_bus_slot_device::static_set_dave_tag(*device, "^"_tag);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &ep64_expansion_bus_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &ep64_expansion_bus_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(_write) \
-	devcb = &ep64_expansion_bus_slot_device::set_nmi_wr_callback(*device, DEVCB2_##_write);
+	devcb = &ep64_expansion_bus_slot_device::set_nmi_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(_write) \
-	devcb = &ep64_expansion_bus_slot_device::set_wait_wr_callback(*device, DEVCB2_##_write);
+	devcb = &ep64_expansion_bus_slot_device::set_wait_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -103,9 +103,9 @@ public:
 	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_dave_tag(device_t &device, const char* tag) { downcast<ep64_expansion_bus_slot_device &>(device).m_dave.set_tag(tag); }
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_nmi.set_callback(object); }
-	template<class _Object> static devcb2_base &set_wait_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_wait.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_nmi.set_callback(object); }
+	template<class _Object> static devcb_base &set_wait_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_wait.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
@@ -120,9 +120,9 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_write_line m_write_irq;
-	devcb2_write_line m_write_nmi;
-	devcb2_write_line m_write_wait;
+	devcb_write_line m_write_irq;
+	devcb_write_line m_write_nmi;
+	devcb_write_line m_write_wait;
 
 	required_device<dave_device> m_dave;
 

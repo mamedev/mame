@@ -61,7 +61,7 @@
 
 
 #define MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &comx_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &comx_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -81,7 +81,7 @@ public:
 	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~comx_expansion_slot_device() { }
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<comx_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<comx_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 
 	UINT8 mrd_r(address_space &space, offs_t offset, int *extrom);
 	void mwr_w(address_space &space, offs_t offset, UINT8 data);
@@ -100,7 +100,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	devcb2_write_line   m_write_irq;
+	devcb_write_line   m_write_irq;
 
 	device_comx_expansion_card_interface *m_card;
 };

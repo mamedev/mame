@@ -139,7 +139,7 @@ protected:
 	PAIR16                      m_ea;               // effective address
 
 	// Callbacks
-	devcb2_write_line           m_lic_func;         // LIC pin on the 6809E
+	devcb_write_line           m_lic_func;         // LIC pin on the 6809E
 
 	// eat cycles
 	ATTR_FORCE_INLINE void eat(int cycles)                          { m_icount -= cycles; }
@@ -271,7 +271,7 @@ public:
 // ======================> m6809e_device
 
 #define MCFG_M6809E_LIC_CB(_devcb) \
-	m6809e_device::set_lic_cb(*device, DEVCB2_##_devcb);
+	m6809e_device::set_lic_cb(*device, DEVCB_##_devcb);
 
 
 class m6809e_device : public m6809_base_device
@@ -281,7 +281,7 @@ public:
 	m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_lic_cb(device_t &device, _Object object) { return downcast<m6809e_device &>(device).m_lic_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_lic_cb(device_t &device, _Object object) { return downcast<m6809e_device &>(device).m_lic_func.set_callback(object); }
 };
 
 enum

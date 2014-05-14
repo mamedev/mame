@@ -10,22 +10,22 @@
 //**************************************************************************
 
 #define MCFG_M3745X_ADC14_CALLBACKS(_ad0, _ad1, _ad2, _ad3) \
-	downcast<m3745x_device *>(device)->set_ad14_callbacks(DEVCB2_##_ad0, DEVCB2_##_ad1, DEVCB2_##_ad2, DEVCB2_##_ad3);
+	downcast<m3745x_device *>(device)->set_ad14_callbacks(DEVCB_##_ad0, DEVCB_##_ad1, DEVCB_##_ad2, DEVCB_##_ad3);
 
 #define MCFG_M3745X_ADC58_CALLBACKS(_ad0, _ad1, _ad2, _ad3) \
-	downcast<m3745x_device *>(device)->set_ad58_callbacks(DEVCB2_##_ad0, DEVCB2_##_ad1, DEVCB2_##_ad2, DEVCB2_##_ad3);
+	downcast<m3745x_device *>(device)->set_ad58_callbacks(DEVCB_##_ad0, DEVCB_##_ad1, DEVCB_##_ad2, DEVCB_##_ad3);
 
 #define MCFG_M3745X_PORT3_CALLBACKS(_read, _write) \
-	downcast<m3745x_device *>(device)->set_p3_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<m3745x_device *>(device)->set_p3_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 #define MCFG_M3745X_PORT4_CALLBACKS(_read, _write) \
-	downcast<m3745x_device *>(device)->set_p4_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<m3745x_device *>(device)->set_p4_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 #define MCFG_M3745X_PORT5_CALLBACKS(_read, _write) \
-	downcast<m3745x_device *>(device)->set_p5_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<m3745x_device *>(device)->set_p5_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 #define MCFG_M3745X_PORT6_CALLBACKS(_read, _write) \
-	downcast<m3745x_device *>(device)->set_p6_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<m3745x_device *>(device)->set_p6_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -103,10 +103,10 @@ public:
 		read_ad_7.set_callback(rd4);
 	}
 
-	devcb2_read8  read_p3, read_p4, read_p5, read_p6;
-	devcb2_write8 write_p3, write_p4, write_p5, write_p6;
-	devcb2_read8  read_ad_0, read_ad_1, read_ad_2, read_ad_3;
-	devcb2_read8  read_ad_4, read_ad_5, read_ad_6, read_ad_7;
+	devcb_read8  read_p3, read_p4, read_p5, read_p6;
+	devcb_write8 write_p3, write_p4, write_p5, write_p6;
+	devcb_read8  read_ad_0, read_ad_1, read_ad_2, read_ad_3;
+	devcb_read8  read_ad_4, read_ad_5, read_ad_6, read_ad_7;
 
 	DECLARE_READ8_MEMBER(ports_r);
 	DECLARE_WRITE8_MEMBER(ports_w);

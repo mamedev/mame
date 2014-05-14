@@ -40,7 +40,7 @@
 //**************************************************************************
 
 #define MCFG_SAA5050_D_CALLBACK(_read) \
-	devcb = &saa5050_device::set_d_rd_callback(*device, DEVCB2_##_read);
+	devcb = &saa5050_device::set_d_rd_callback(*device, DEVCB_##_read);
 
 
 #define MCFG_SAA5050_SCREEN_SIZE(_cols, _rows, _size) \
@@ -63,7 +63,7 @@ public:
 
 	static void static_set_screen_size(device_t &device, int cols, int rows, int size) { downcast<saa5050_device &>(device).m_cols = cols; downcast<saa5050_device &>(device).m_rows = rows; downcast<saa5050_device &>(device).m_size = size; }
 
-	template<class _Object> static devcb2_base &set_d_rd_callback(device_t &device, _Object object) { return downcast<saa5050_device &>(device).m_read_d.set_callback(object); }
+	template<class _Object> static devcb_base &set_d_rd_callback(device_t &device, _Object object) { return downcast<saa5050_device &>(device).m_read_d.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -127,7 +127,7 @@ private:
 
 	required_memory_region m_char_rom;
 
-	devcb2_read8    m_read_d;
+	devcb_read8    m_read_d;
 
 	UINT8 m_code;
 	UINT8 m_last_code;

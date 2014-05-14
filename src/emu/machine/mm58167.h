@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_MM58167_IRQ_CALLBACK(_cb) \
-	devcb = &mm58167_device::set_irq_cb(*device, DEVCB2_##_cb);
+	devcb = &mm58167_device::set_irq_cb(*device, DEVCB_##_cb);
 
 
 //**************************************************************************
@@ -39,9 +39,9 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	template<class _Object> static devcb2_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mm58167_device &>(device).m_irq_w.set_callback(wr); }
+	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mm58167_device &>(device).m_irq_w.set_callback(wr); }
 
-	devcb2_write_line m_irq_w;
+	devcb_write_line m_irq_w;
 
 protected:
 	// device-level overrides

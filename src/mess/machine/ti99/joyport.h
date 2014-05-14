@@ -56,14 +56,14 @@ public:
 	void    set_interrupt(int state);
 	void    pulse_clock();
 
-	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object) { return downcast<joyport_device &>(device).m_interrupt.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<joyport_device &>(device).m_interrupt.set_callback(object); }
 
 protected:
 	void device_start();
 	void device_config_complete();
 
 private:
-	devcb2_write_line           m_interrupt;
+	devcb_write_line           m_interrupt;
 	joyport_attached_device*    m_connected;
 };
 
@@ -72,7 +72,7 @@ SLOT_INTERFACE_EXTERN(joystick_port_994);
 SLOT_INTERFACE_EXTERN(joystick_port_gen);
 
 #define MCFG_JOYPORT_INT_HANDLER( _intcallb ) \
-	devcb = &joyport_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
+	devcb = &joyport_device::static_set_int_callback( *device, DEVCB_##_intcallb );
 
 #define MCFG_GENEVE_JOYPORT_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \

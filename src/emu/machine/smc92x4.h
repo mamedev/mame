@@ -38,33 +38,33 @@ extern const device_type SMC92X4;
 
 // Interrupt line. To be connected with the controller PCB.
 #define MCFG_SMC92X4_INTRQ_CALLBACK(_write) \
-	devcb = &smc92x4_device::set_intrq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &smc92x4_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
 // DMA in progress line. To be connected with the controller PCB.
 #define MCFG_SMC92X4_DIP_CALLBACK(_write) \
-	devcb = &smc92x4_device::set_dip_wr_callback(*device, DEVCB2_##_write);
+	devcb = &smc92x4_device::set_dip_wr_callback(*device, DEVCB_##_write);
 
 // Auxiliary Bus. These 8 lines need to be connected to external latches
 // and to a counter circuitry which works together with the external RAM.
 // We use the S0/S1 lines as address lines.
 #define MCFG_SMC92X4_AUXBUS_OUT_CALLBACK(_write) \
-	devcb = &smc92x4_device::set_auxbus_wr_callback(*device, DEVCB2_##_write);
+	devcb = &smc92x4_device::set_auxbus_wr_callback(*device, DEVCB_##_write);
 
 // Auxiliary Bus. This is only used for S0=S1=0.
 #define MCFG_SMC92X4_AUXBUS_IN_CALLBACK(_read) \
-	devcb = &smc92x4_device::set_auxbus_rd_callback(*device, DEVCB2_##_read);
+	devcb = &smc92x4_device::set_auxbus_rd_callback(*device, DEVCB_##_read);
 
 // Callback to read the contents of the external RAM via the data bus.
 // Note that the address must be set and automatically increased
 // by external circuitry.
 #define MCFG_SMC92X4_DMA_IN_CALLBACK(_read) \
-	devcb = &smc92x4_device::set_dma_rd_callback(*device, DEVCB2_##_read);
+	devcb = &smc92x4_device::set_dma_rd_callback(*device, DEVCB_##_read);
 
 // Callback to write the contents of the external RAM via the data bus.
 // Note that the address must be set and automatically increased
 // by external circuitry. */
 #define MCFG_SMC92X4_DMA_OUT_CALLBACK(_write) \
-	devcb = &smc92x4_device::set_dma_wr_callback(*device, DEVCB2_##_write);
+	devcb = &smc92x4_device::set_dma_wr_callback(*device, DEVCB_##_write);
 
 // Disk format support. This flag allows to choose between the full
 // FM/MFM format and an abbreviated track layout. The difference results
@@ -81,12 +81,12 @@ class smc92x4_device : public device_t
 public:
 	smc92x4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_intrq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dip_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_dip.set_callback(object); }
-	template<class _Object> static devcb2_base &set_auxbus_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_auxbus.set_callback(object); }
-	template<class _Object> static devcb2_base &set_auxbus_rd_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_in_auxbus.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_in_dma.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_dma.set_callback(object); }
+	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_intrq.set_callback(object); }
+	template<class _Object> static devcb_base &set_dip_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_dip.set_callback(object); }
+	template<class _Object> static devcb_base &set_auxbus_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_auxbus.set_callback(object); }
+	template<class _Object> static devcb_base &set_auxbus_rd_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_in_auxbus.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_in_dma.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_dma.set_callback(object); }
 
 	static void set_full_track_layout(device_t &device, bool lay) { downcast<smc92x4_device &>(device).m_full_track_layout = lay; }
 
@@ -108,12 +108,12 @@ protected:
 	virtual void device_reset(void);
 
 private:
-	devcb2_write_line   m_out_intrq;    // INT line
-	devcb2_write_line   m_out_dip;      // DMA in progress line
-	devcb2_write8       m_out_auxbus;   // AB0-7 lines (using S0,S1 as address)
-	devcb2_read8        m_in_auxbus;    // AB0-7 lines (S0=S1=0)
-	devcb2_read8        m_in_dma;       // DMA read access to the cache buffer
-	devcb2_write8       m_out_dma;      // DMA write access to the cache buffer
+	devcb_write_line   m_out_intrq;    // INT line
+	devcb_write_line   m_out_dip;      // DMA in progress line
+	devcb_write8       m_out_auxbus;   // AB0-7 lines (using S0,S1 as address)
+	devcb_read8        m_in_auxbus;    // AB0-7 lines (S0=S1=0)
+	devcb_read8        m_in_dma;       // DMA read access to the cache buffer
+	devcb_write8       m_out_dma;      // DMA write access to the cache buffer
 
 	UINT8 m_output1;        // internal register "output1"
 	UINT8 m_output2;        // internal register "output2"

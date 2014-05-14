@@ -19,55 +19,55 @@
 #define SCSI_PORT_DEVICE7 "7"
 
 #define MCFG_SCSI_BSY_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_bsy_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_bsy_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_SEL_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_sel_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_sel_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_CD_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_cd_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_cd_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_IO_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_io_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_io_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_MSG_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_msg_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_msg_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_REQ_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_req_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_req_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_ACK_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_ack_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_ack_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_ATN_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_atn_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_atn_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_RST_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_rst_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_rst_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA0_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data0_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data0_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA1_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data1_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data1_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA2_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data2_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data2_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA3_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data3_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data3_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA4_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data4_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data4_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA5_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data5_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data5_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA6_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data6_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data6_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_DATA7_HANDLER(_devcb) \
-	devcb = &SCSI_PORT_DEVICE::set_data7_handler(*device, DEVCB2_##_devcb);
+	devcb = &SCSI_PORT_DEVICE::set_data7_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSI_OUTPUT_LATCH_ADD(_tag, scsi_port_tag) \
 	MCFG_DEVICE_ADD(_tag, OUTPUT_LATCH, 0) \
@@ -101,23 +101,23 @@ public:
 	// construction/destruction
 	SCSI_PORT_DEVICE(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_bsy_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_bsy_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sel_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_sel_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cd_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_cd_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_io_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_io_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_msg_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_msg_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_req_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_req_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ack_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_ack_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_atn_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_atn_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rst_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_rst_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data0_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data0_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data1_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data2_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data2_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data3_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data3_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data4_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data4_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data5_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data5_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data6_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data6_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data7_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data7_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_bsy_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_bsy_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_sel_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_sel_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_cd_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_cd_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_io_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_io_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_msg_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_msg_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_req_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_req_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_ack_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_atn_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_atn_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_rst_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_rst_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data0_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data0_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data1_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data1_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data2_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data2_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data3_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data3_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data4_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data4_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data5_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data5_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data6_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data6_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_data7_handler(device_t &device, _Object object) { return downcast<SCSI_PORT_DEVICE &>(device).m_data7_handler.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_bsy );
 	DECLARE_WRITE_LINE_MEMBER( write_sel );
@@ -161,23 +161,23 @@ protected:
 	void update_data7();
 
 private:
-	devcb2_write_line m_bsy_handler;
-	devcb2_write_line m_sel_handler;
-	devcb2_write_line m_cd_handler;
-	devcb2_write_line m_io_handler;
-	devcb2_write_line m_msg_handler;
-	devcb2_write_line m_req_handler;
-	devcb2_write_line m_ack_handler;
-	devcb2_write_line m_atn_handler;
-	devcb2_write_line m_rst_handler;
-	devcb2_write_line m_data0_handler;
-	devcb2_write_line m_data1_handler;
-	devcb2_write_line m_data2_handler;
-	devcb2_write_line m_data3_handler;
-	devcb2_write_line m_data4_handler;
-	devcb2_write_line m_data5_handler;
-	devcb2_write_line m_data6_handler;
-	devcb2_write_line m_data7_handler;
+	devcb_write_line m_bsy_handler;
+	devcb_write_line m_sel_handler;
+	devcb_write_line m_cd_handler;
+	devcb_write_line m_io_handler;
+	devcb_write_line m_msg_handler;
+	devcb_write_line m_req_handler;
+	devcb_write_line m_ack_handler;
+	devcb_write_line m_atn_handler;
+	devcb_write_line m_rst_handler;
+	devcb_write_line m_data0_handler;
+	devcb_write_line m_data1_handler;
+	devcb_write_line m_data2_handler;
+	devcb_write_line m_data3_handler;
+	devcb_write_line m_data4_handler;
+	devcb_write_line m_data5_handler;
+	devcb_write_line m_data6_handler;
+	devcb_write_line m_data7_handler;
 
 	SCSI_PORT_SLOT_device *m_slot[7];
 	int m_device_count;

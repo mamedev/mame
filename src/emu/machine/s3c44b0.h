@@ -601,13 +601,13 @@ public:
 	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~s3c44b0_device() {}
 	
-	template<class _Object> static devcb2_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_gpio_port_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_w_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_i2c_scl_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_scl_w_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_i2c_sda_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_sda_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_i2c_sda_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_sda_w_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_adc_data_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_data_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_i2s_data_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_data_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_gpio_port_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_i2c_scl_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_scl_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_i2c_sda_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_sda_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_i2c_sda_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_sda_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_adc_data_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_data_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_i2s_data_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_data_w_cb.set_callback(object); }
 
 	DECLARE_READ32_MEMBER(lcd_r);
 	DECLARE_READ32_MEMBER(clkpow_r);
@@ -773,13 +773,13 @@ private:
 	s3c44b0_adc_t m_adc;
 	s3c44b0_cpuwrap_t m_cpuwrap;
 
-	devcb2_read32 m_port_r_cb;
-	devcb2_write32 m_port_w_cb;
-	devcb2_write_line m_scl_w_cb;
-	devcb2_read_line m_sda_r_cb;
-	devcb2_write_line m_sda_w_cb;
-	devcb2_read32 m_data_r_cb;
-	devcb2_write16 m_data_w_cb;
+	devcb_read32 m_port_r_cb;
+	devcb_write32 m_port_w_cb;
+	devcb_write_line m_scl_w_cb;
+	devcb_read_line m_sda_r_cb;
+	devcb_write_line m_sda_w_cb;
+	devcb_read32 m_data_r_cb;
+	devcb_write16 m_data_w_cb;
 
 	void s3c44b0_postload();
 };
@@ -788,25 +788,25 @@ extern const device_type S3C44B0;
 
 
 #define MCFG_S3C44B0_GPIO_PORT_R_CB(_devcb) \
-	devcb = &s3c44b0_device::set_gpio_port_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_gpio_port_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_S3C44B0_GPIO_PORT_W_CB(_devcb) \
-	devcb = &s3c44b0_device::set_gpio_port_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_gpio_port_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_S3C44B0_I2C_SCL_W_CB(_devcb) \
-	devcb = &s3c44b0_device::set_i2c_scl_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_i2c_scl_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_S3C44B0_I2C_SDA_R_CB(_devcb) \
-	devcb = &s3c44b0_device::set_i2c_sda_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_i2c_sda_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_S3C44B0_I2C_SDA_W_CB(_devcb) \
-	devcb = &s3c44b0_device::set_i2c_sda_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_i2c_sda_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_S3C44B0_ADC_DATA_R_CB(_devcb) \
-	devcb = &s3c44b0_device::set_adc_data_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_adc_data_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_S3C44B0_I2S_DATA_W_CB(_devcb) \
-	devcb = &s3c44b0_device::set_i2s_data_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &s3c44b0_device::set_i2s_data_w_callback(*device, DEVCB_##_devcb);
 
 
 #endif

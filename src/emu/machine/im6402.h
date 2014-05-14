@@ -58,16 +58,16 @@
 	im6402_device::set_trc(*device, _trc);
 
 #define MCFG_IM6402_TRO_CALLBACK(_write) \
-	devcb = &im6402_device::set_tro_wr_callback(*device, DEVCB2_##_write);
+	devcb = &im6402_device::set_tro_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_IM6402_DR_CALLBACK(_write) \
-	devcb = &im6402_device::set_dr_wr_callback(*device, DEVCB2_##_write);
+	devcb = &im6402_device::set_dr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_IM6402_TBRE_CALLBACK(_write) \
-	devcb = &im6402_device::set_tbre_wr_callback(*device, DEVCB2_##_write);
+	devcb = &im6402_device::set_tbre_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_IM6402_TRE_CALLBACK(_write) \
-	devcb = &im6402_device::set_tre_wr_callback(*device, DEVCB2_##_write);
+	devcb = &im6402_device::set_tre_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -86,10 +86,10 @@ public:
 
 	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
 	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }
-	template<class _Object> static devcb2_base &set_tro_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tro.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dr_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_dr.set_callback(object); }
-	template<class _Object> static devcb2_base &set_tbre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(object); }
-	template<class _Object> static devcb2_base &set_tre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tre.set_callback(object); }
+	template<class _Object> static devcb_base &set_tro_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tro.set_callback(object); }
+	template<class _Object> static devcb_base &set_dr_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_dr.set_callback(object); }
+	template<class _Object> static devcb_base &set_tbre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(object); }
+	template<class _Object> static devcb_base &set_tre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tre.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
 	DECLARE_WRITE8_MEMBER( write );
@@ -132,10 +132,10 @@ private:
 	inline void set_tbre(int state);
 	inline void set_tre(int state);
 
-	devcb2_write_line   m_write_tro;
-	devcb2_write_line   m_write_dr;
-	devcb2_write_line   m_write_tbre;
-	devcb2_write_line   m_write_tre;
+	devcb_write_line   m_write_tro;
+	devcb_write_line   m_write_dr;
+	devcb_write_line   m_write_tbre;
+	devcb_write_line   m_write_tre;
 
 	// status
 	int m_dr;

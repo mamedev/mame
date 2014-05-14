@@ -23,13 +23,13 @@
 	bml3bus_device::static_set_cputag(*device, _cputag);
 	
 #define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+	devcb = &bml3bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &bml3bus_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_OUT_FIRQ_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_firq_callback(*device, DEVCB2_##_devcb);
+	devcb = &bml3bus_device::set_out_firq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \
@@ -82,9 +82,9 @@ public:
 	
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
-	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_firq_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_firq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_firq_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_firq_cb.set_callback(object); }
 
 	void add_bml3bus_card(int slot, device_bml3bus_card_interface *card);
 	device_bml3bus_card_interface *get_bml3bus_card(int slot);
@@ -105,9 +105,9 @@ protected:
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb2_write_line    m_out_nmi_cb;
-	devcb2_write_line    m_out_irq_cb;
-	devcb2_write_line    m_out_firq_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_firq_cb;
 
 	device_bml3bus_card_interface *m_device_list[BML3BUS_MAX_SLOTS];
 	const char *m_cputag;

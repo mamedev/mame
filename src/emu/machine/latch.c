@@ -41,7 +41,7 @@ void output_latch_device::write(UINT8 data)
 {
 	if (!m_resolved)
 	{
-		// HACK: move to device_config_complete() when devcb2 supports that
+		// HACK: move to device_config_complete() when devcb supports that
 		m_bit0_handler.resolve_safe();
 		m_bit1_handler.resolve_safe();
 		m_bit2_handler.resolve_safe();

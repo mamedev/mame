@@ -31,7 +31,7 @@
 
 
 #define MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(_write) \
-	devcb = &vcs_control_port_device::set_trigger_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vcs_control_port_device::set_trigger_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -75,7 +75,7 @@ public:
 	virtual ~vcs_control_port_device() { }
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_trigger_wr_callback(device_t &device, _Object object) { return downcast<vcs_control_port_device &>(device).m_write_trigger.set_callback(object); }
+	template<class _Object> static devcb_base &set_trigger_wr_callback(device_t &device, _Object object) { return downcast<vcs_control_port_device &>(device).m_write_trigger.set_callback(object); }
 
 	// computer interface
 
@@ -113,7 +113,7 @@ protected:
 	device_vcs_control_port_interface *m_device;
 
 private:
-	devcb2_write_line m_write_trigger;
+	devcb_write_line m_write_trigger;
 };
 
 

@@ -18,7 +18,7 @@
 	sam6883_device::configure_cpu(*device, _cputag, _cpuspace);
 
 #define MCFG_SAM6883_RES_CALLBACK(_read) \
-	devcb = &sam6883_device::set_res_rd_callback(*device, DEVCB2_##_read);
+	devcb = &sam6883_device::set_res_rd_callback(*device, DEVCB_##_read);
 
 
 //**************************************************************************
@@ -87,7 +87,7 @@ class sam6883_device : public device_t, public sam6883_friend_device
 public:
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_res_rd_callback(device_t &device, _Object object) { return downcast<sam6883_device &>(device).m_read_res.set_callback(object); }
+	template<class _Object> static devcb_base &set_res_rd_callback(device_t &device, _Object object) { return downcast<sam6883_device &>(device).m_read_res.set_callback(object); }
 
 	static void configure_cpu(device_t &device, const char *tag, address_spacenum space)
 	{
@@ -172,7 +172,7 @@ private:
 
 	// incidentals
 	address_space *             m_cpu_space;
-	devcb2_read8                m_read_res;
+	devcb_read8                m_read_res;
 	sam_bank                    m_banks[8];
 	sam_space<0x0000, 0x7FFF>   m_space_0000;
 	sam_space<0x8000, 0x9FFF>   m_space_8000;

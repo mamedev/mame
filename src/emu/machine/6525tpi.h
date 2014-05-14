@@ -40,15 +40,15 @@ public:
 	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tpi6525_device() {}
 
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_pc_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_in_pc_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pc_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_ca_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_ca_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_cb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_cb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_in_pa_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pa_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_in_pb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_pc_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_in_pc_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_pc_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_ca_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_ca_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_cb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_cb_cb.set_callback(object); }
 	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -86,19 +86,19 @@ protected:
 
 private:
 	// internal state
-	devcb2_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_irq_cb;
 
-	devcb2_read8         m_in_pa_cb;
-	devcb2_write8        m_out_pa_cb;
+	devcb_read8         m_in_pa_cb;
+	devcb_write8        m_out_pa_cb;
 
-	devcb2_read8         m_in_pb_cb;
-	devcb2_write8        m_out_pb_cb;
+	devcb_read8         m_in_pb_cb;
+	devcb_write8        m_out_pb_cb;
 
-	devcb2_read8         m_in_pc_cb;
-	devcb2_write8        m_out_pc_cb;
+	devcb_read8         m_in_pc_cb;
+	devcb_write8        m_out_pc_cb;
 
-	devcb2_write_line    m_out_ca_cb;
-	devcb2_write_line    m_out_cb_cb;
+	devcb_write_line    m_out_ca_cb;
+	devcb_write_line    m_out_cb_cb;
 
 	UINT8 m_port_a, m_ddr_a, m_in_a;
 	UINT8 m_port_b, m_ddr_b, m_in_b;
@@ -122,31 +122,31 @@ extern const device_type TPI6525;
 
 
 #define MCFG_TPI6525_OUT_IRQ_CB(_devcb) \
-	devcb = &tpi6525_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_IN_PA_CB(_devcb) \
-	devcb = &tpi6525_device::set_in_pa_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_in_pa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_PA_CB(_devcb) \
-	devcb = &tpi6525_device::set_out_pa_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_out_pa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_IN_PB_CB(_devcb) \
-	devcb = &tpi6525_device::set_in_pb_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_in_pb_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_PB_CB(_devcb) \
-	devcb = &tpi6525_device::set_out_pb_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_out_pb_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_IN_PC_CB(_devcb) \
-	devcb = &tpi6525_device::set_in_pc_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_in_pc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_PC_CB(_devcb) \
-	devcb = &tpi6525_device::set_out_pc_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_out_pc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_CA_CB(_devcb) \
-	devcb = &tpi6525_device::set_out_ca_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_out_ca_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_CB_CB(_devcb) \
-	devcb = &tpi6525_device::set_out_cb_callback(*device, DEVCB2_##_devcb);
+	devcb = &tpi6525_device::set_out_cb_callback(*device, DEVCB_##_devcb);
 
 
 #endif /* __TPI6525_H__ */

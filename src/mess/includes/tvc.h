@@ -29,7 +29,7 @@
 #define CENTRONICS_TAG  "centronics"
 
 #define MCFG_TVC_SOUND_SNDINT_CALLBACK(_write) \
-	devcb = &tvc_sound_device::set_sndint_wr_callback(*device, DEVCB2_##_write);
+	devcb = &tvc_sound_device::set_sndint_wr_callback(*device, DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,7 +44,7 @@ public:
 	// construction/destruction
 	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_sndint_wr_callback(device_t &device, _Object object) { return downcast<tvc_sound_device &>(device).m_write_sndint.set_callback(object); }
+	template<class _Object> static devcb_base &set_sndint_wr_callback(device_t &device, _Object object) { return downcast<tvc_sound_device &>(device).m_write_sndint.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	void reset_divider();
@@ -67,7 +67,7 @@ private:
 	int             m_signal;
 	UINT8           m_ports[3];
 	emu_timer *     m_sndint_timer;
-	devcb2_write_line   m_write_sndint;
+	devcb_write_line   m_write_sndint;
 };
 
 

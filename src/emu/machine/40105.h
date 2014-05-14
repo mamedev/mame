@@ -25,8 +25,8 @@
 
 #define MCFG_40105_ADD(_tag, _dir, _dor) \
 	MCFG_DEVICE_ADD(_tag, CMOS_40105, 0) \
-	downcast<cmos_40105_device *>(device)->set_dir_callback(DEVCB2_##_dir); \
-	downcast<cmos_40105_device *>(device)->set_dor_callback(DEVCB2_##_dor);
+	downcast<cmos_40105_device *>(device)->set_dir_callback(DEVCB_##_dir); \
+	downcast<cmos_40105_device *>(device)->set_dor_callback(DEVCB_##_dor);
 
 
 
@@ -60,8 +60,8 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_write_line m_write_dir;
-	devcb2_write_line m_write_dor;
+	devcb_write_line m_write_dir;
+	devcb_write_line m_write_dor;
 
 	std::queue<UINT8> m_fifo;
 

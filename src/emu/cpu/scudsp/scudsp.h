@@ -35,13 +35,13 @@ enum
 
 
 #define MCFG_SCUDSP_OUT_IRQ_CB(_devcb) \
-	devcb = &scudsp_cpu_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &scudsp_cpu_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SCUDSP_IN_DMA_CB(_devcb) \
-	devcb = &scudsp_cpu_device::set_in_dma_callback(*device, DEVCB2_##_devcb);
+	devcb = &scudsp_cpu_device::set_in_dma_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SCUDSP_OUT_DMA_CB(_devcb) \
-	devcb = &scudsp_cpu_device::set_out_dma_callback(*device, DEVCB2_##_devcb);
+	devcb = &scudsp_cpu_device::set_out_dma_callback(*device, DEVCB_##_devcb);
 
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
@@ -62,9 +62,9 @@ public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 	
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(object); }
 	
 	/* port 0 */
 	DECLARE_READ32_MEMBER( program_control_r );
@@ -101,9 +101,9 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-	devcb2_write_line     m_out_irq_cb;
-	devcb2_read16         m_in_dma_cb;
-	devcb2_write16        m_out_dma_cb;
+	devcb_write_line     m_out_irq_cb;
+	devcb_read16         m_in_dma_cb;
+	devcb_write16        m_out_dma_cb;
 	
 private:
 	address_space_config m_program_config;

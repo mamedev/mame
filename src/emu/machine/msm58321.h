@@ -34,19 +34,19 @@
 //**************************************************************************
 
 #define MCFG_MSM58321_D0_HANDLER(_devcb) \
-	devcb = &msm58321_device::set_d0_handler(*device, DEVCB2_##_devcb);
+	devcb = &msm58321_device::set_d0_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D1_HANDLER(_devcb) \
-	devcb = &msm58321_device::set_d1_handler(*device, DEVCB2_##_devcb);
+	devcb = &msm58321_device::set_d1_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D2_HANDLER(_devcb) \
-	devcb = &msm58321_device::set_d2_handler(*device, DEVCB2_##_devcb);
+	devcb = &msm58321_device::set_d2_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D3_HANDLER(_devcb) \
-	devcb = &msm58321_device::set_d3_handler(*device, DEVCB2_##_devcb);
+	devcb = &msm58321_device::set_d3_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MSM58321_BUSY_HANDLER(_devcb) \
-	devcb = &msm58321_device::set_busy_handler(*device, DEVCB2_##_devcb);
+	devcb = &msm58321_device::set_busy_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MSM58321_YEAR0(_year0) \
 	msm58321_device::set_year0(*device, _year0);
@@ -65,11 +65,11 @@ public:
 	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_d0_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d0_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_d1_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_d2_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d2_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_d3_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d3_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_busy_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_busy_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d0_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_d1_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d1_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_d2_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d2_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_d3_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d3_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_busy_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_busy_handler.set_callback(object); }
 	static void set_year0(device_t &device, int year0) { downcast<msm58321_device &>(device).m_year0 = year0; }
 	static void set_default_24h(device_t &device, bool default_24h) { downcast<msm58321_device &>(device).m_default_24h = default_24h; }
 
@@ -111,11 +111,11 @@ private:
 
 	int m_year0;
 	bool m_default_24h;
-	devcb2_write_line m_d0_handler;
-	devcb2_write_line m_d1_handler;
-	devcb2_write_line m_d2_handler;
-	devcb2_write_line m_d3_handler;
-	devcb2_write_line m_busy_handler;
+	devcb_write_line m_d0_handler;
+	devcb_write_line m_d1_handler;
+	devcb_write_line m_d2_handler;
+	devcb_write_line m_d3_handler;
+	devcb_write_line m_busy_handler;
 
 	int m_cs2;                  // chip select 2
 	int m_write;                // write data

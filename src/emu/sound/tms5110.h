@@ -24,19 +24,19 @@
 /* usually 800000 for 10000 Hz sample rate.  */
 
 #define MCFG_TMS5110_M0_CB(_devcb) \
-	devcb = &tms5110_device::set_m0_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms5110_device::set_m0_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS5110_M1_CB(_devcb) \
-	devcb = &tms5110_device::set_m1_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms5110_device::set_m1_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS5110_ADDR_CB(_devcb) \
-	devcb = &tms5110_device::set_addr_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms5110_device::set_addr_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS5110_DATA_CB(_devcb) \
-	devcb = &tms5110_device::set_data_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms5110_device::set_data_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS5110_ROMCLK_CB(_devcb) \
-	devcb = &tms5110_device::set_romclk_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms5110_device::set_romclk_callback(*device, DEVCB_##_devcb);
 
 
 class tms5110_device : public device_t,
@@ -46,11 +46,11 @@ public:
 	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_addr_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_addr_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_addr_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_addr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( ctl_r );
@@ -117,14 +117,14 @@ private:
 	UINT8  m_addr_bit;
 
 	/* callbacks */
-	devcb2_write_line   m_m0_cb;      // the M0 line
-	devcb2_write_line   m_m1_cb;      // the M1 line
-	devcb2_write8       m_addr_cb;    // Write to ADD1,2,4,8 - 4 address bits
-	devcb2_read_line    m_data_cb;    // Read one bit from ADD8/Data - voice data
+	devcb_write_line   m_m0_cb;      // the M0 line
+	devcb_write_line   m_m1_cb;      // the M1 line
+	devcb_write8       m_addr_cb;    // Write to ADD1,2,4,8 - 4 address bits
+	devcb_read_line    m_data_cb;    // Read one bit from ADD8/Data - voice data
 	// On a real chip rom_clk is running all the time
 	// Here, we only use it to properly emulate the protocol.
 	// Do not rely on it to be a timed signal.
-	devcb2_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
+	devcb_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 m_old_energy;
@@ -257,8 +257,8 @@ public:
 	static void set_ctl8_bit(device_t &device, UINT8 ctl8_bit) { downcast<tmsprom_device &>(device).m_ctl8_bit = ctl8_bit; }
 	static void set_reset_bit(device_t &device, UINT8 reset_bit) { downcast<tmsprom_device &>(device).m_reset_bit = reset_bit; }
 	static void set_stop_bit(device_t &device, UINT8 stop_bit) { downcast<tmsprom_device &>(device).m_stop_bit = stop_bit; }
-	template<class _Object> static devcb2_base &set_pdc_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_pdc_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ctl_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_ctl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pdc_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_pdc_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_ctl_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_ctl_cb.set_callback(object); }
 	
 	DECLARE_WRITE_LINE_MEMBER( m0_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
@@ -299,8 +299,8 @@ private:
 	UINT8 m_ctl8_bit;                 /* bit # of ctl8 line */
 	UINT8 m_reset_bit;                /* bit # of rom reset */
 	UINT8 m_stop_bit;                 /* bit # of stop */
-	devcb2_write_line m_pdc_cb;      /* tms pdc func */
-	devcb2_write8 m_ctl_cb;          /* tms ctl func */
+	devcb_write_line m_pdc_cb;      /* tms pdc func */
+	devcb_write8 m_ctl_cb;          /* tms ctl func */
 
 	emu_timer *m_romclk_timer;
 	const UINT8 *m_rom;
@@ -337,9 +337,9 @@ extern const device_type TMSPROM;
 	tmsprom_device::set_stop_bit(*device, _bit);
 
 #define MCFG_TMSPROM_PDC_CB(_devcb) \
-	devcb = &tmsprom_device::set_pdc_callback(*device, DEVCB2_##_devcb);
+	devcb = &tmsprom_device::set_pdc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMSPROM_CTL_CB(_devcb) \
-    devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB2_##_devcb);
+    devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB_##_devcb);
 
 #endif /* __TMS5110_H__ */

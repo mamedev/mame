@@ -58,31 +58,31 @@
 	mc68901_device::set_tx_clock(*device, _clk);
 
 #define MCFG_MC68901_OUT_IRQ_CB(_devcb) \
-	devcb = &mc68901_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_GPIO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_gpio_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_gpio_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TAO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tao_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_tao_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TBO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tbo_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_tbo_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TCO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tco_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_tco_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TDO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tdo_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_tdo_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_SO_CB(_devcb) \
-	devcb = &mc68901_device::set_out_so_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc68901_device::set_out_so_callback(*device, DEVCB_##_devcb);
 
 /*#define MCFG_MC68901_OUT_RR_CB(_devcb) \
-    devcb = &mc68901_device::set_out_rr_callback(*device, DEVCB2_##_devcb);
+    devcb = &mc68901_device::set_out_rr_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TR_CB(_devcb) \
-    devcb = &mc68901_device::set_out_tr_callback(*device, DEVCB2_##_devcb);*/
+    devcb = &mc68901_device::set_out_tr_callback(*device, DEVCB_##_devcb);*/
 
 
 //**************************************************************************
@@ -102,15 +102,15 @@ public:
 	static void set_timer_clock(device_t &device, int timer_clock) { downcast<mc68901_device &>(device).m_timer_clock = timer_clock; }
 	static void set_rx_clock(device_t &device, int rx_clock) { downcast<mc68901_device &>(device).m_rx_clock = rx_clock; }
 	static void set_tx_clock(device_t &device, int tx_clock) { downcast<mc68901_device &>(device).m_tx_clock = tx_clock; }
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_gpio_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tao_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tbo_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tco_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tdo_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_so_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_so_cb.set_callback(object); }
-	//template<class _Object> static devcb2_base &set_rr_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_rr_cb.set_callback(object); }
-	//template<class _Object> static devcb2_base &set_tr_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_gpio_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tao_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tbo_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tco_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tdo_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_so_cb.set_callback(object); }
+	//template<class _Object> static devcb_base &set_rr_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_rr_cb.set_callback(object); }
+	//template<class _Object> static devcb_base &set_tr_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tr_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -247,18 +247,18 @@ private:
 	int m_rx_clock;         /* serial receive clock */
 	int m_tx_clock;         /* serial transmit clock */
 
-	devcb2_write_line        m_out_irq_cb;
+	devcb_write_line        m_out_irq_cb;
 
-	devcb2_write8            m_out_gpio_cb;
+	devcb_write8            m_out_gpio_cb;
 
-	devcb2_write_line        m_out_tao_cb;
-	devcb2_write_line        m_out_tbo_cb;
-	devcb2_write_line        m_out_tco_cb;
-	devcb2_write_line        m_out_tdo_cb;
+	devcb_write_line        m_out_tao_cb;
+	devcb_write_line        m_out_tbo_cb;
+	devcb_write_line        m_out_tco_cb;
+	devcb_write_line        m_out_tdo_cb;
 
-	devcb2_write_line        m_out_so_cb;
-	//devcb2_write_line        m_out_rr_cb;
-	//devcb2_write_line        m_out_tr_cb;
+	devcb_write_line        m_out_so_cb;
+	//devcb_write_line        m_out_rr_cb;
+	//devcb_write_line        m_out_tr_cb;
 
 	//int m_device_type;                      /* device type */
 

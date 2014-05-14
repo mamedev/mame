@@ -27,19 +27,19 @@ enum
 };
 
 #define MCFG_TMS9995_EXTOP_HANDLER( _extop) \
-	devcb = &tms9995_device::static_set_extop_callback( *device, DEVCB2_##_extop );
+	devcb = &tms9995_device::static_set_extop_callback( *device, DEVCB_##_extop );
 
 #define MCFG_TMS9995_IAQ_HANDLER( _iaq )    \
-	devcb = &tms9995_device::static_set_iaq_callback( *device, DEVCB2_##_iaq );
+	devcb = &tms9995_device::static_set_iaq_callback( *device, DEVCB_##_iaq );
 
 #define MCFG_TMS9995_CLKOUT_HANDLER( _clkout ) \
-	devcb = &tms9995_device::static_set_clkout_callback( *device, DEVCB2_##_clkout );
+	devcb = &tms9995_device::static_set_clkout_callback( *device, DEVCB_##_clkout );
 
 #define MCFG_TMS9995_HOLDA_HANDLER( _holda ) \
-	devcb = &tms9995_device::static_set_holda_callback( *device, DEVCB2_##_holda );
+	devcb = &tms9995_device::static_set_holda_callback( *device, DEVCB_##_holda );
 
 #define MCFG_TMS9995_DBIN_HANDLER( _dbin ) \
-	devcb = &tms9995_device::static_set_dbin_callback( *device, DEVCB2_##_dbin );
+	devcb = &tms9995_device::static_set_dbin_callback( *device, DEVCB_##_dbin );
 
 #define MCFG_TMS9995_ENABLE_OVINT( _ovint ) \
 	downcast<tms9995_device*>(device)->set_overflow_interrupt( _ovint );
@@ -62,11 +62,11 @@ public:
 	void set_hold(int state);
 
 	// Callbacks
-	template<class _Object> static devcb2_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_external_operation.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_iaq_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_clock_out_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_holda_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_dbin_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_external_operation.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_iaq_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_clock_out_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_holda_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_dbin_line.set_callback(object); }
 
 	// For debugger access
 	UINT8 debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
@@ -411,22 +411,22 @@ private:
 	// We could realize this via the CRU access as well, but the data bus access
 	// is not that simple to emulate. For the sake of homogenity between the
 	// chip emulations we use a dedicated callback.
-	devcb2_write8   m_external_operation;
+	devcb_write8   m_external_operation;
 
 	// Signal to the outside world that we are now getting an instruction (IAQ).
 	// In the real hardware this line is shared with the HOLDA line, and the
 	// /MEMEN line is used to decide which signal we have on the line. We do not
 	// emulate the /MEMEN line, so we have to use two separate lines.
-	devcb2_write_line   m_iaq_line;
+	devcb_write_line   m_iaq_line;
 
 	// Clock output.
-	devcb2_write_line   m_clock_out_line;
+	devcb_write_line   m_clock_out_line;
 
 	// Asserted when the CPU is in a HOLD state
-	devcb2_write_line   m_holda_line;
+	devcb_write_line   m_holda_line;
 
 	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
-	devcb2_write_line   m_dbin_line;
+	devcb_write_line   m_dbin_line;
 };
 
 

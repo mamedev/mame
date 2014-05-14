@@ -14,7 +14,7 @@
 	MCFG_DEVICE_ADD(_tag, PSXCD, 0)
 
 #define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
-	devcb = &psxcd_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &psxcd_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class psxcd_device : public cdrom_image_device
 {
@@ -22,7 +22,7 @@ public:
 	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
 	static void static_set_devname(device_t &device, const char *devname);
 	virtual bool call_load();
 	virtual void call_unload();
@@ -148,7 +148,7 @@ private:
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
 
 
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 	cpu_device *m_maincpu;
 	spu_device *m_spu;
 };

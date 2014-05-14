@@ -35,7 +35,7 @@
 
 
 #define MCFG_KR2376_STROBE_CALLBACK(_write) \
-	devcb = &kr2376_device::set_strobe_wr_callback(*device, DEVCB2_##_write);
+	devcb = &kr2376_device::set_strobe_wr_callback(*device, DEVCB_##_write);
 
 /*
  * Input pins
@@ -58,7 +58,7 @@ public:
 	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~kr2376_device() {}
 
-	template<class _Object> static devcb2_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }
+	template<class _Object> static devcb_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }
 
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );
@@ -90,7 +90,7 @@ private:
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
-	devcb2_write_line m_write_strobe;
+	devcb_write_line m_write_strobe;
 
 	enum
 	{

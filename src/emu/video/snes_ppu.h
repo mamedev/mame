@@ -71,7 +71,7 @@ public:
 	snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
-	template<class _Object> static devcb2_base &static_set_open_bus_callback(device_t &device, _Object object) { return downcast<snes_ppu_device &>(device).m_openbus_cb.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_open_bus_callback(device_t &device, _Object object) { return downcast<snes_ppu_device &>(device).m_openbus_cb.set_callback(object); }
 
 	UINT8 m_regs[0x40];
 	
@@ -274,7 +274,7 @@ protected:
 	virtual void device_reset() {};	
 
 private:
-	devcb2_read16  m_openbus_cb;
+	devcb_read16  m_openbus_cb;
 };
 
 
@@ -287,6 +287,6 @@ extern const device_type SNES_PPU;
  ***************************************************************************/
 
 #define MCFG_SNES_PPU_OPENBUS_CB(_read) \
-	devcb = &snes_ppu_device::static_set_open_bus_callback(*device, DEVCB2_##_read);
+	devcb = &snes_ppu_device::static_set_open_bus_callback(*device, DEVCB_##_read);
 
 #endif

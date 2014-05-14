@@ -12,10 +12,10 @@
 	es5503_device::static_set_channels(*device, _channels);
 
 #define MCFG_ES5503_IRQ_FUNC(_write) \
-	devcb = &es5503_device::static_set_irqf(*device, DEVCB2_##_write);
+	devcb = &es5503_device::static_set_irqf(*device, DEVCB_##_write);
 
 #define MCFG_ES5503_ADC_FUNC(_read) \
-	devcb = &es5503_device::static_set_adcf(*device, DEVCB2_##_read);
+	devcb = &es5503_device::static_set_adcf(*device, DEVCB_##_read);
 
 // ======================> es5503_device
 
@@ -29,8 +29,8 @@ public:
 
 	static void static_set_channels(device_t &device, int channels);
 
-	template<class _Object> static devcb2_base &static_set_irqf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_irq_func.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_adcf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_adc_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_irqf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_irq_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_adcf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_adc_func.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -53,8 +53,8 @@ protected:
 
 	const address_space_config  m_space_config;
 
-	devcb2_write_line   m_irq_func;
-	devcb2_read8        m_adc_func;
+	devcb_write_line   m_irq_func;
+	devcb_read8        m_adc_func;
 
 	emu_timer *m_sync_timer;
 

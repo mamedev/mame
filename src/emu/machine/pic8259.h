@@ -32,9 +32,9 @@
 
 #define MCFG_PIC8259_ADD(_tag, _out_int, _sp_en, _read_slave_ack) \
 	MCFG_DEVICE_ADD(_tag, PIC8259, 0) \
-	devcb = &pic8259_device::static_set_out_int_callback( *device, DEVCB2_##_out_int ); \
-	devcb = &pic8259_device::static_set_sp_en_callback( *device, DEVCB2_##_sp_en ); \
-	devcb = &pic8259_device::static_set_read_slave_ack_callback( *device, DEVCB2_##_read_slave_ack );
+	devcb = &pic8259_device::static_set_out_int_callback( *device, DEVCB_##_out_int ); \
+	devcb = &pic8259_device::static_set_sp_en_callback( *device, DEVCB_##_sp_en ); \
+	devcb = &pic8259_device::static_set_read_slave_ack_callback( *device, DEVCB_##_read_slave_ack );
 
 
 class pic8259_device : public device_t
@@ -42,9 +42,9 @@ class pic8259_device : public device_t
 public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_sp_en_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_read_slave_ack_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_sp_en_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_read_slave_ack_func.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -83,9 +83,9 @@ private:
 		STATE_READY
 	};
 
-	devcb2_write_line m_out_int_func;
-	devcb2_read_line m_sp_en_func;
-	devcb2_read8 m_read_slave_ack_func;
+	devcb_write_line m_out_int_func;
+	devcb_read_line m_sp_en_func;
+	devcb_read8 m_read_slave_ack_func;
 
 	pic8259_state_t m_state;
 

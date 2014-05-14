@@ -46,13 +46,13 @@
 //**************************************************************************
 
 #define MCFG_CDP1861_RD_CALLBACK(_read) \
-	devcb = &cdp1862_device::set_rd_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cdp1862_device::set_rd_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_CDP1861_BD_CALLBACK(_read) \
-	devcb = &cdp1862_device::set_bd_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cdp1862_device::set_bd_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_CDP1861_GD_CALLBACK(_read) \
-	devcb = &cdp1862_device::set_gd_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cdp1862_device::set_gd_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_CDP1862_LUMINANCE(_r, _b, _g, _bkg) \
 	cdp1862_device::static_set_luminance(*device, _r, _b, _g, _bkg);
@@ -75,9 +75,9 @@ public:
 	// construction/destruction
 	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(object); }
-	template<class _Object> static devcb2_base &set_bd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(object); }
-	template<class _Object> static devcb2_base &set_gd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_gd.set_callback(object); }
+	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(object); }
+	template<class _Object> static devcb_base &set_bd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(object); }
+	template<class _Object> static devcb_base &set_gd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_gd.set_callback(object); }
 
 	static void static_set_luminance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_lum_r = r; downcast<cdp1862_device &>(device).m_lum_b = b; downcast<cdp1862_device &>(device).m_lum_g = g; downcast<cdp1862_device &>(device).m_lum_bkg = bkg; }
 	static void static_set_chrominance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_chr_r = r; downcast<cdp1862_device &>(device).m_chr_b = b; downcast<cdp1862_device &>(device).m_chr_g = g; downcast<cdp1862_device &>(device).m_chr_bkg = bkg; }
@@ -96,9 +96,9 @@ protected:
 private:
 	inline void initialize_palette();
 
-	devcb2_read_line m_read_rd;
-	devcb2_read_line m_read_bd;
-	devcb2_read_line m_read_gd;
+	devcb_read_line m_read_rd;
+	devcb_read_line m_read_bd;
+	devcb_read_line m_read_gd;
 
 	bitmap_rgb32 m_bitmap;          // bitmap
 

@@ -733,7 +733,7 @@ void ay8910_device::device_start()
 		m_streams = 1;
 	}
 
-	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb2
+	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
 	if (type() == YM2149 && (m_flags & YM2149_PIN26_LOW))
 	{
 		master_clock /= 2;

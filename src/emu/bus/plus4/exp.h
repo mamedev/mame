@@ -71,16 +71,16 @@
 
 
 #define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &plus4_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	devcb = &plus4_expansion_slot_device::set_cd_rd_callback(*device, DEVCB2_##_read);
+	devcb = &plus4_expansion_slot_device::set_cd_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_cd_wr_callback(*device, DEVCB2_##_write);
+	devcb = &plus4_expansion_slot_device::set_cd_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_aec_wr_callback(*device, DEVCB2_##_write);
+	devcb = &plus4_expansion_slot_device::set_aec_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -100,10 +100,10 @@ public:
 	// construction/destruction
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cd_rd_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_read_dma_cd.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cd_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_dma_cd.set_callback(object); }
-	template<class _Object> static devcb2_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_aec.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_cd_rd_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_read_dma_cd.set_callback(object); }
+	template<class _Object> static devcb_base &set_cd_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_dma_cd.set_callback(object); }
+	template<class _Object> static devcb_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_aec.set_callback(object); }
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
@@ -140,10 +140,10 @@ protected:
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 
-	devcb2_write_line   m_write_irq;
-	devcb2_read8        m_read_dma_cd;
-	devcb2_write8       m_write_dma_cd;
-	devcb2_write_line   m_write_aec;
+	devcb_write_line   m_write_irq;
+	devcb_read8        m_read_dma_cd;
+	devcb_write8       m_write_dma_cd;
+	devcb_write_line   m_write_aec;
 
 	device_plus4_expansion_card_interface *m_card;
 };

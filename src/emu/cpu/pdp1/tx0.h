@@ -20,16 +20,16 @@ enum
 
 
 #define MCFG_TX0_CONFIG(_cpy_devcb, _r1l_devcb, _dis_devcb, _r3l_devcb, _prt_devcb, _rsv_devcb, _p6h_devcb, _p7h_devcb, _sel_devcb, _res_devcb) \
-	tx0_device::set_cpy_cb(*device, DEVCB2_##_cpy_devcb); \
-	tx0_device::set_r1l_cb(*device, DEVCB2_##_r1l_devcb); \
-	tx0_device::set_dis_cb(*device, DEVCB2_##_dis_devcb); \
-	tx0_device::set_r3l_cb(*device, DEVCB2_##_r3l_devcb); \
-	tx0_device::set_prt_cb(*device, DEVCB2_##_prt_devcb); \
-	tx0_device::set_rsv_cb(*device, DEVCB2_##_rsv_devcb); \
-	tx0_device::set_p6h_cb(*device, DEVCB2_##_p6h_devcb); \
-	tx0_device::set_p7h_cb(*device, DEVCB2_##_p7h_devcb); \
-	tx0_device::set_sel_cb(*device, DEVCB2_##_sel_devcb); \
-	tx0_device::set_res_cb(*device, DEVCB2_##_res_devcb);
+	tx0_device::set_cpy_cb(*device, DEVCB_##_cpy_devcb); \
+	tx0_device::set_r1l_cb(*device, DEVCB_##_r1l_devcb); \
+	tx0_device::set_dis_cb(*device, DEVCB_##_dis_devcb); \
+	tx0_device::set_r3l_cb(*device, DEVCB_##_r3l_devcb); \
+	tx0_device::set_prt_cb(*device, DEVCB_##_prt_devcb); \
+	tx0_device::set_rsv_cb(*device, DEVCB_##_rsv_devcb); \
+	tx0_device::set_p6h_cb(*device, DEVCB_##_p6h_devcb); \
+	tx0_device::set_p7h_cb(*device, DEVCB_##_p7h_devcb); \
+	tx0_device::set_sel_cb(*device, DEVCB_##_sel_devcb); \
+	tx0_device::set_res_cb(*device, DEVCB_##_res_devcb);
 
 
 class tx0_device : public cpu_device
@@ -39,16 +39,16 @@ public:
 	tx0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_cpy_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_cpy_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_r1l_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_r1l_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dis_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_dis_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_r3l_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_r3l_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_prt_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_prt_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rsv_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_rsv_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_p6h_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_p6h_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_p7h_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_p7h_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sel_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_sel_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_res_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_io_reset_callback.set_callback(object); }
+	template<class _Object> static devcb_base &set_cpy_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_cpy_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_r1l_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_r1l_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_dis_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_dis_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_r3l_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_r3l_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_prt_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_prt_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_rsv_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_rsv_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_p6h_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_p6h_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_p7h_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_p7h_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_sel_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_sel_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_res_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_io_reset_callback.set_callback(object); }
 
 	void pulse_reset();
 	void io_complete();
@@ -121,18 +121,18 @@ protected:
 	    5: reserved (for unimplemented typ instruction?)
 	    6: p6h
 	    7: p7h */
-	devcb2_write_line m_cpy_handler;
-	devcb2_write_line m_r1l_handler;
-	devcb2_write_line m_dis_handler;
-	devcb2_write_line m_r3l_handler;
-	devcb2_write_line m_prt_handler;
-	devcb2_write_line m_rsv_handler;
-	devcb2_write_line m_p6h_handler;
-	devcb2_write_line m_p7h_handler;
+	devcb_write_line m_cpy_handler;
+	devcb_write_line m_r1l_handler;
+	devcb_write_line m_dis_handler;
+	devcb_write_line m_r3l_handler;
+	devcb_write_line m_prt_handler;
+	devcb_write_line m_rsv_handler;
+	devcb_write_line m_p6h_handler;
+	devcb_write_line m_p7h_handler;
 	/* select instruction handler */
-	devcb2_write_line m_sel_handler;
+	devcb_write_line m_sel_handler;
 	/* callback called when reset line is pulsed: IO devices should reset */
-	devcb2_write_line m_io_reset_callback;
+	devcb_write_line m_io_reset_callback;
 
 	int tx0_read(offs_t address);
 	void tx0_write(offs_t address, int data);

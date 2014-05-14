@@ -37,13 +37,13 @@
 	pit8253_device::set_clk2(*device, _clk);
 
 #define MCFG_PIT8253_OUT0_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out0_handler(*device, DEVCB2_##_devcb);
+	devcb = &pit8253_device::set_out0_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT1_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out1_handler(*device, DEVCB2_##_devcb);
+	devcb = &pit8253_device::set_out1_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT2_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out2_handler(*device, DEVCB2_##_devcb);
+	devcb = &pit8253_device::set_out2_handler(*device, DEVCB_##_devcb);
 
 
 struct pit8253_timer
@@ -86,9 +86,9 @@ public:
 	static void set_clk0(device_t &device, double clk0) { downcast<pit8253_device &>(device).m_clk0 = clk0; }
 	static void set_clk1(device_t &device, double clk1) { downcast<pit8253_device &>(device).m_clk1 = clk1; }
 	static void set_clk2(device_t &device, double clk2) { downcast<pit8253_device &>(device).m_clk2 = clk2; }
-	template<class _Object> static devcb2_base &set_out0_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out1_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out2_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_out0_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_out1_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_out2_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -148,9 +148,9 @@ private:
 	double m_clk0;
 	double m_clk1;
 	double m_clk2;
-	devcb2_write_line m_out0_handler;
-	devcb2_write_line m_out1_handler;
-	devcb2_write_line m_out2_handler;
+	devcb_write_line m_out0_handler;
+	devcb_write_line m_out1_handler;
+	devcb_write_line m_out2_handler;
 };
 
 extern const device_type PIT8253;

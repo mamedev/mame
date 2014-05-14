@@ -18,26 +18,26 @@
 #define __DISPATCH_H__
 
 #define MCFG_LINE_DISPATCH_ADD(_tag, _count) \
-	MCFG_DEVICE_ADD(_tag, DEVCB2_LINE_DISPATCH_ ## _count, 0)
+	MCFG_DEVICE_ADD(_tag, DEVCB_LINE_DISPATCH_ ## _count, 0)
 
 #define MCFG_LINE_DISPATCH_FWD_CB(_entry, _count, _devcb) \
-	devcb = &devcb2_line_dispatch_device<_count>::set_fwd_cb(*device, _entry, DEVCB2_##_devcb);
+	devcb = &devcb_line_dispatch_device<_count>::set_fwd_cb(*device, _entry, DEVCB_##_devcb);
 
-template<int N> class devcb2_line_dispatch_device : public device_t {
+template<int N> class devcb_line_dispatch_device : public device_t {
 public:
-	devcb2_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void init_fwd() {
 		for(int i=0; i<N; i++)
-			fwd_cb[i] = new devcb2_write_line(*this);
+			fwd_cb[i] = new devcb_write_line(*this);
 	}
 
-	virtual ~devcb2_line_dispatch_device() {
+	virtual ~devcb_line_dispatch_device() {
 		for(int i=0; i<N; i++)
 			delete fwd_cb[i];
 	}
 
-	template<class _Object> static devcb2_base &set_fwd_cb(device_t &device, int entry, _Object object) { return downcast<devcb2_line_dispatch_device<N> &>(device).fwd_cb[entry]->set_callback(object); }
+	template<class _Object> static devcb_base &set_fwd_cb(device_t &device, int entry, _Object object) { return downcast<devcb_line_dispatch_device<N> &>(device).fwd_cb[entry]->set_callback(object); }
 
 	WRITE_LINE_MEMBER( in_w ) {
 		for(int i=0; i<N; i++)
@@ -51,13 +51,13 @@ protected:
 	}
 
 private:
-	devcb2_write_line *fwd_cb[N];
+	devcb_write_line *fwd_cb[N];
 };
 
-extern const device_type DEVCB2_LINE_DISPATCH_2;
-extern const device_type DEVCB2_LINE_DISPATCH_3;
-extern const device_type DEVCB2_LINE_DISPATCH_4;
-extern const device_type DEVCB2_LINE_DISPATCH_5;
-extern const device_type DEVCB2_LINE_DISPATCH_6;
+extern const device_type DEVCB_LINE_DISPATCH_2;
+extern const device_type DEVCB_LINE_DISPATCH_3;
+extern const device_type DEVCB_LINE_DISPATCH_4;
+extern const device_type DEVCB_LINE_DISPATCH_5;
+extern const device_type DEVCB_LINE_DISPATCH_6;
 
 #endif

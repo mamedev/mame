@@ -21,14 +21,14 @@
 extern const device_type TI99_SPEECH8;
 
 #define MCFG_SPEECH8_READY_CALLBACK(_write) \
-	devcb = &ti998_spsyn_device::set_ready_wr_callback(*device, DEVCB2_##_write);
+	devcb = &ti998_spsyn_device::set_ready_wr_callback(*device, DEVCB_##_write);
 
 class ti998_spsyn_device : public bus8z_device
 {
 public:
 	ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti998_spsyn_device &>(device).m_ready.set_callback(object); }
+	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti998_spsyn_device &>(device).m_ready.set_callback(object); }
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -57,7 +57,7 @@ private:
 //  UINT32          m_sprom_length;         // length of data pointed by speechrom_data, from 0 to 2^18
 
 	// Ready line to the CPU
-	devcb2_write_line m_ready;
+	devcb_write_line m_ready;
 };
 
 #define MCFG_TISPEECH8_ADD(_tag, _conf)     \

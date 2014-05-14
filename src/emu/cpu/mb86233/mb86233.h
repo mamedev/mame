@@ -39,9 +39,9 @@ enum
 };
 
 
-#define MCFG_MB86233_FIFO_READ_CB(_devcb) mb86233_cpu_device::set_fifo_read_cb(*device, DEVCB2_##_devcb);
-#define MCFG_MB86233_FIFO_READ_OK_CB(_devcb) mb86233_cpu_device::set_fifo_read_ok_cb(*device, DEVCB2_##_devcb);
-#define MCFG_MB86233_FIFO_WRITE_CB(_devcb) mb86233_cpu_device::set_fifo_write_cb(*device, DEVCB2_##_devcb);
+#define MCFG_MB86233_FIFO_READ_CB(_devcb) mb86233_cpu_device::set_fifo_read_cb(*device, DEVCB_##_devcb);
+#define MCFG_MB86233_FIFO_READ_OK_CB(_devcb) mb86233_cpu_device::set_fifo_read_ok_cb(*device, DEVCB_##_devcb);
+#define MCFG_MB86233_FIFO_WRITE_CB(_devcb) mb86233_cpu_device::set_fifo_write_cb(*device, DEVCB_##_devcb);
 #define MCFG_MB86233_TABLE_REGION(_region) mb86233_cpu_device::set_tablergn(*device, _region);
 
 
@@ -52,9 +52,9 @@ public:
 	mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_fifo_read_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_fifo_read_ok_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_ok_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_fifo_write_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_write_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_fifo_read_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_fifo_read_ok_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_ok_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_fifo_write_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_write_cb.set_callback(object); }
 	static void set_tablergn(device_t &device, const char *tablergn) { downcast<mb86233_cpu_device &>(device).m_tablergn = tablergn; }
 
 protected:
@@ -114,9 +114,9 @@ private:
 
 	/* FIFO */
 	int              m_fifo_wait;
-	devcb2_read32    m_fifo_read_cb;
-	devcb2_read_line m_fifo_read_ok_cb;
-	devcb2_write32   m_fifo_write_cb;
+	devcb_read32    m_fifo_read_cb;
+	devcb_read_line m_fifo_read_ok_cb;
+	devcb_write32   m_fifo_write_cb;
 	const char       *m_tablergn;
 
 	/* internal RAM */

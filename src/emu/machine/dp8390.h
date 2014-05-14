@@ -7,28 +7,28 @@
 // device stuff
 
 #define MCFG_DP8390D_IRQ_CB(_devcb) \
-	devcb = &dp8390d_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &dp8390d_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_DP8390D_BREQ_CB(_devcb) \
-	devcb = &dp8390d_device::set_breq_callback(*device, DEVCB2_##_devcb);
+	devcb = &dp8390d_device::set_breq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_DP8390D_MEM_READ_CB(_devcb) \
-	devcb = &dp8390d_device::set_mem_read_callback(*device, DEVCB2_##_devcb);
+	devcb = &dp8390d_device::set_mem_read_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_DP8390D_MEM_WRITE_CB(_devcb) \
-	devcb = &dp8390d_device::set_mem_write_callback(*device, DEVCB2_##_devcb);
+	devcb = &dp8390d_device::set_mem_write_callback(*device, DEVCB_##_devcb);
 	
 #define MCFG_RTL8019A_IRQ_CB(_devcb) \
-	devcb = &rtl8019a_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &rtl8019a_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_BREQ_CB(_devcb) \
-	devcb = &rtl8019a_device::set_breq_callback(*device, DEVCB2_##_devcb);
+	devcb = &rtl8019a_device::set_breq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_MEM_READ_CB(_devcb) \
-	devcb = &rtl8019a_device::set_mem_read_callback(*device, DEVCB2_##_devcb);
+	devcb = &rtl8019a_device::set_mem_read_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_MEM_WRITE_CB(_devcb) \
-	devcb = &rtl8019a_device::set_mem_write_callback(*device, DEVCB2_##_devcb);
+	devcb = &rtl8019a_device::set_mem_write_callback(*device, DEVCB_##_devcb);
 
 
 class dp8390_device : public device_t,
@@ -38,10 +38,10 @@ public:
 	// construction/destruction
 	dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source);
 	
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_breq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_mem_read_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_read_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_mem_write_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_write_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_breq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_mem_read_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_mem_write_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_write_cb.set_callback(object); }
 
 	DECLARE_WRITE16_MEMBER( dp8390_w );
 	DECLARE_READ16_MEMBER( dp8390_r );
@@ -62,10 +62,10 @@ protected:
 	};
 
 private:
-	devcb2_write_line    m_irq_cb;
-	devcb2_write_line    m_breq_cb;
-	devcb2_read8         m_mem_read_cb;
-	devcb2_write8        m_mem_write_cb;
+	devcb_write_line    m_irq_cb;
+	devcb_write_line    m_breq_cb;
+	devcb_read8         m_mem_read_cb;
+	devcb_write8        m_mem_write_cb;
 
 	void set_cr(UINT8 newcr);
 	void check_dma_complete();

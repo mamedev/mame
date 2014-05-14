@@ -50,10 +50,10 @@
 #define __SP0256_H__
 
 #define MCFG_SP0256_DATA_REQUEST_CB(_devcb) \
-	devcb = &sp0256_device::set_data_request_callback(*device, DEVCB2_##_devcb);
+	devcb = &sp0256_device::set_data_request_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SP0256_STANDBY_CB(_devcb) \
-	devcb = &sp0256_device::set_standby_callback(*device, DEVCB2_##_devcb);
+	devcb = &sp0256_device::set_standby_callback(*device, DEVCB_##_devcb);
 
 
 struct lpc12_t
@@ -75,8 +75,8 @@ public:
 	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~sp0256_device() { }
 
-	template<class _Object> static devcb2_base &set_data_request_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_drq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_standby_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_sby_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_request_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_standby_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_sby_cb.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER(ald_w);
 	DECLARE_READ_LINE_MEMBER(lrq_r);
@@ -101,8 +101,8 @@ private:
 	void micro();
 
 	sound_stream  *m_stream;          /* MAME core sound stream                       */
-	devcb2_write_line m_drq_cb;       /* Data request callback                        */
-	devcb2_write_line m_sby_cb;       /* Standby callback                             */
+	devcb_write_line m_drq_cb;       /* Data request callback                        */
+	devcb_write_line m_sby_cb;       /* Standby callback                             */
 
 	int            m_sby_line;        /* Standby line state                           */
 	int            m_cur_len;         /* Fullness of current sound buffer.            */

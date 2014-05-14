@@ -35,19 +35,19 @@ enum
 
 /* STATUS changed callback */
 #define MCFG_I8085A_STATUS(_devcb) \
-	i8085a_cpu_device::set_out_status_func(*device, DEVCB2_##_devcb);
+	i8085a_cpu_device::set_out_status_func(*device, DEVCB_##_devcb);
 
 /* INTE changed callback */
 #define MCFG_I8085A_INTE(_devcb) \
-	i8085a_cpu_device::set_out_inte_func(*device, DEVCB2_##_devcb);
+	i8085a_cpu_device::set_out_inte_func(*device, DEVCB_##_devcb);
 
 /* SID changed callback (8085A only) */
 #define MCFG_I8085A_SID(_devcb) \
-	i8085a_cpu_device::set_in_sid_func(*device, DEVCB2_##_devcb);
+	i8085a_cpu_device::set_in_sid_func(*device, DEVCB_##_devcb);
 
 /* SOD changed callback (8085A only) */
 #define MCFG_I8085A_SOD(_devcb) \
-	i8085a_cpu_device::set_out_sod_func(*device, DEVCB2_##_devcb);
+	i8085a_cpu_device::set_out_sod_func(*device, DEVCB_##_devcb);
 
 
 class i8085a_cpu_device :  public cpu_device
@@ -58,10 +58,10 @@ public:
 	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cputype);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_out_status_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_status_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_inte_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_inte_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_sid_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_in_sid_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_sod_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_sod_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_status_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_status_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_inte_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_inte_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_sid_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_in_sid_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_sod_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_sod_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -95,10 +95,10 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	devcb2_write8       m_out_status_func;
-	devcb2_write_line   m_out_inte_func;
-	devcb2_read_line    m_in_sid_func;
-	devcb2_write_line   m_out_sod_func;
+	devcb_write8       m_out_status_func;
+	devcb_write_line   m_out_inte_func;
+	devcb_read_line    m_in_sid_func;
+	devcb_write_line   m_out_sod_func;
 
 	int                 m_cputype;        /* 0 8080, 1 8085A */
 	PAIR                m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;

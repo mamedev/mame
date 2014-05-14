@@ -7,10 +7,10 @@
 
 /* TODO: serial ports, frequency & hook it up with m68k */
 #define MCFG_TMP68301_IN_PARALLEL_CB(_devcb) \
-	devcb = &tmp68301_device::set_in_parallel_callback(*device, DEVCB2_##_devcb);
+	devcb = &tmp68301_device::set_in_parallel_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMP68301_OUT_PARALLEL_CB(_devcb) \
-	devcb = &tmp68301_device::set_out_parallel_callback(*device, DEVCB2_##_devcb);
+	devcb = &tmp68301_device::set_out_parallel_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -26,8 +26,8 @@ public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tmp68301_device() {}
 
-	template<class _Object> static devcb2_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(object); }
 
 	// Hardware Registers
 	DECLARE_READ16_MEMBER( regs_r );
@@ -57,8 +57,8 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
-	devcb2_read16         m_in_parallel_cb;
-	devcb2_write16        m_out_parallel_cb;
+	devcb_read16         m_in_parallel_cb;
+	devcb_write16        m_out_parallel_cb;
 
 	// internal state
 	UINT16 m_regs[0x400];

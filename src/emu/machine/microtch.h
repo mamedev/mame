@@ -10,7 +10,7 @@ class microtouch_device :
 public:
 	microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	template<class _Object> static devcb2_base &static_set_tx_callback(device_t &device, _Object object) { return downcast<microtouch_device &>(device).m_out_tx_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_tx_callback(device_t &device, _Object object) { return downcast<microtouch_device &>(device).m_out_tx_func.set_callback(object); }
 
 	virtual ioport_constructor device_input_ports() const;
 	DECLARE_WRITE8_MEMBER(rx);
@@ -52,7 +52,7 @@ private:
 	int         m_last_touch_state;
 	int         m_last_x;
 	int         m_last_y;
-	devcb2_write8 m_out_tx_func;
+	devcb_write8 m_out_tx_func;
 	touch_cb m_out_touch_cb;
 	required_ioport m_touch;
 	required_ioport m_touchx;
@@ -63,7 +63,7 @@ extern const device_type MICROTOUCH;
 
 #define MCFG_MICROTOUCH_ADD(_tag, _devcb) \
 	MCFG_DEVICE_ADD(_tag, MICROTOUCH, 0) \
-	devcb = &microtouch_serial_device::static_set_tx_callback(*device, DEVCB2_##_devcb);
+	devcb = &microtouch_serial_device::static_set_tx_callback(*device, DEVCB_##_devcb);
 
 
 class microtouch_serial_device
@@ -72,7 +72,7 @@ class microtouch_serial_device
 {
 public:
 	microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	template<class _Object> static devcb2_base &static_set_stx_callback(device_t &device, _Object object) { return downcast<microtouch_serial_device &>(device).m_out_stx_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_stx_callback(device_t &device, _Object object) { return downcast<microtouch_serial_device &>(device).m_out_stx_func.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
 protected:
@@ -85,14 +85,14 @@ protected:
 private:
 	bool m_output_valid;
 	UINT8 m_output;
-	devcb2_write_line m_out_stx_func;
+	devcb_write_line m_out_stx_func;
 };
 
 extern const device_type MICROTOUCH_SERIAL;
 
 #define MCFG_MICROTOUCH_SERIAL_ADD(_tag, _clock, _devcb) \
 	MCFG_DEVICE_ADD(_tag, MICROTOUCH_SERIAL, _clock) \
-	devcb = &microtouch_serial_device::static_set_stx_callback(*device, DEVCB2_##_devcb);
+	devcb = &microtouch_serial_device::static_set_stx_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MICROTOUCH_TOUCH_CB(_class, _touch_cb) \
 	microtouch_device::static_set_touch_callback(*device, microtouch_device::touch_cb(FUNC(_class::_touch_cb), (_class *)owner));

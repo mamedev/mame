@@ -38,7 +38,7 @@
 
 
 #define MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &adam_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &adam_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -59,7 +59,7 @@ public:
 	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~adam_expansion_slot_device() { }
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 
 	// computer interface
 	UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
@@ -92,7 +92,7 @@ protected:
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 
-	devcb2_write_line   m_write_irq;
+	devcb_write_line   m_write_irq;
 
 	device_adam_expansion_slot_card_interface *m_card;
 };

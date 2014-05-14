@@ -92,55 +92,55 @@
 
 
 #define MCFG_S100_IRQ_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_NMI_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_nmi_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_nmi_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI0_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi0_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi0_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI1_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi1_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi1_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI2_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi2_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi2_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI3_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi3_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi3_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI4_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi4_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi4_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI5_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi5_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi5_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI6_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi6_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi6_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_VI7_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_vi7_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_vi7_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_DMA0_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_dma0_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_dma0_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_DMA1_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_dma1_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_dma1_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_DMA2_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_dma2_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_dma2_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_DMA3_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_dma3_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_dma3_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_RDY_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_rdy_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_rdy_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_HOLD_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_hold_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_hold_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_S100_ERROR_CALLBACK(_write) \
-	devcb = &s100_bus_t::set_error_wr_callback(*device, DEVCB2_##_write);
+	devcb = &s100_bus_t::set_error_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -214,23 +214,23 @@ public:
 	s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~s100_bus_t() { m_device_list.detach_all(); }
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_nmi.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi0_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi0.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi1_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi1.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi2_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi2.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi3_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi3.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi4_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi4.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi5_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi5.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi6_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi6.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vi7_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi7.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma0_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma0.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma1_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma1.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma2_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma2.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma3_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma3.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rdy_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_rdy.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hold_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_hold.set_callback(object); }
-	template<class _Object> static devcb2_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_error.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_nmi.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi0_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi0.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi1_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi1.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi2_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi2.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi3_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi3.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi4_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi4.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi5_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi5.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi6_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi6.set_callback(object); }
+	template<class _Object> static devcb_base &set_vi7_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi7.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma0_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma0.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma1_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma1.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma2_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma2.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma3_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma3.set_callback(object); }
+	template<class _Object> static devcb_base &set_rdy_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_rdy.set_callback(object); }
+	template<class _Object> static devcb_base &set_hold_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_hold.set_callback(object); }
+	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_error.set_callback(object); }
 
 	void add_card(device_s100_card_interface *card);
 
@@ -264,23 +264,23 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_nmi;
-	devcb2_write_line   m_write_vi0;
-	devcb2_write_line   m_write_vi1;
-	devcb2_write_line   m_write_vi2;
-	devcb2_write_line   m_write_vi3;
-	devcb2_write_line   m_write_vi4;
-	devcb2_write_line   m_write_vi5;
-	devcb2_write_line   m_write_vi6;
-	devcb2_write_line   m_write_vi7;
-	devcb2_write_line   m_write_dma0;
-	devcb2_write_line   m_write_dma1;
-	devcb2_write_line   m_write_dma2;
-	devcb2_write_line   m_write_dma3;
-	devcb2_write_line   m_write_rdy;
-	devcb2_write_line   m_write_hold;
-	devcb2_write_line   m_write_error;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_nmi;
+	devcb_write_line   m_write_vi0;
+	devcb_write_line   m_write_vi1;
+	devcb_write_line   m_write_vi2;
+	devcb_write_line   m_write_vi3;
+	devcb_write_line   m_write_vi4;
+	devcb_write_line   m_write_vi5;
+	devcb_write_line   m_write_vi6;
+	devcb_write_line   m_write_vi7;
+	devcb_write_line   m_write_dma0;
+	devcb_write_line   m_write_dma1;
+	devcb_write_line   m_write_dma2;
+	devcb_write_line   m_write_dma3;
+	devcb_write_line   m_write_rdy;
+	devcb_write_line   m_write_hold;
+	devcb_write_line   m_write_error;
 
 	simple_list<device_s100_card_interface> m_device_list;
 };

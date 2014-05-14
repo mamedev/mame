@@ -49,7 +49,7 @@
 	zx8301_device::static_set_cpu_tag(*device, "^"_tag);
 
 #define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
-	devcb = &zx8301_device::set_vsync_wr_callback(*device, DEVCB2_##_write);
+	devcb = &zx8301_device::set_vsync_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -67,7 +67,7 @@ public:
 	// construction/destruction
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
+	template<class _Object> static devcb_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -102,7 +102,7 @@ private:
 
 	required_device<cpu_device> m_cpu;
 
-	devcb2_write_line   m_write_vsync;
+	devcb_write_line   m_write_vsync;
 
 	//address_space *m_data;
 

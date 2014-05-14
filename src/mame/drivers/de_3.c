@@ -73,7 +73,7 @@ public:
 	required_device<decobsmt_device> m_decobsmt;
 	bool m_nmi_enable;
 
-	// devcb2 callbacks
+	// devcb callbacks
 	DECLARE_READ8_MEMBER(display_r);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);

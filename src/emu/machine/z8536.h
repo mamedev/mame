@@ -47,25 +47,25 @@
 //**************************************************************************
 
 #define MCFG_Z8536_IRQ_CALLBACK(_write) \
-	devcb = &z8536_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &z8536_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_Z8536_PA_IN_CALLBACK(_read) \
-	devcb = &z8536_device::set_pa_rd_callback(*device, DEVCB2_##_read);
+	devcb = &z8536_device::set_pa_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_Z8536_PA_OUT_CALLBACK(_write) \
-	devcb = &z8536_device::set_pa_wr_callback(*device, DEVCB2_##_write);
+	devcb = &z8536_device::set_pa_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_Z8536_PB_IN_CALLBACK(_read) \
-	devcb = &z8536_device::set_pb_rd_callback(*device, DEVCB2_##_read);
+	devcb = &z8536_device::set_pb_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_Z8536_PB_OUT_CALLBACK(_write) \
-	devcb = &z8536_device::set_pb_wr_callback(*device, DEVCB2_##_write);
+	devcb = &z8536_device::set_pb_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_Z8536_PC_IN_CALLBACK(_read) \
-	devcb = &z8536_device::set_pc_rd_callback(*device, DEVCB2_##_read);
+	devcb = &z8536_device::set_pc_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_Z8536_PC_OUT_CALLBACK(_write) \
-	devcb = &z8536_device::set_pc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &z8536_device::set_pc_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -82,13 +82,13 @@ public:
 	// construction/destruction
 	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pa.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pa.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pc_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pc.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pc.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pa.set_callback(object); }
+	template<class _Object> static devcb_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pa.set_callback(object); }
+	template<class _Object> static devcb_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pc_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pc.set_callback(object); }
+	template<class _Object> static devcb_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -317,16 +317,16 @@ private:
 	void match_pattern(int port);
 	void external_port_w(int port, int bit, int state);
 
-	devcb2_write_line       m_write_irq;
+	devcb_write_line       m_write_irq;
 
-	devcb2_read8            m_read_pa;
-	devcb2_write8           m_write_pa;
+	devcb_read8            m_read_pa;
+	devcb_write8           m_write_pa;
 
-	devcb2_read8            m_read_pb;
-	devcb2_write8           m_write_pb;
+	devcb_read8            m_read_pb;
+	devcb_write8           m_write_pb;
 
-	devcb2_read8            m_read_pc;
-	devcb2_write8           m_write_pc;
+	devcb_read8            m_read_pc;
+	devcb_write8           m_write_pc;
 
 	// interrupt state
 	int m_irq;

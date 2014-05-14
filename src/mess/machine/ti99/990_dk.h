@@ -18,7 +18,7 @@ public:
 
 	DECLARE_READ8_MEMBER( cru_r );
 	DECLARE_WRITE8_MEMBER( cru_w );
-	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object)
 	{
 		return downcast<fd800_legacy_device &>(device).m_int_line.set_callback(object);
 	}
@@ -42,7 +42,7 @@ private:
 	UINT16 m_cmd_reg;
 
 	int m_interrupt_f_f;
-	devcb2_write_line m_int_line;
+	devcb_write_line m_int_line;
 
 	enum buf_mode_t {
 		bm_off, bm_read, bm_write
@@ -69,6 +69,6 @@ private:
 LEGACY_FLOPPY_OPTIONS_EXTERN(fd800);
 
 #define MCFG_FD800_INT_HANDLER( _intcallb ) \
-	devcb = &fd800_legacy_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
+	devcb = &fd800_legacy_device::static_set_int_callback( *device, DEVCB_##_intcallb );
 
 #endif

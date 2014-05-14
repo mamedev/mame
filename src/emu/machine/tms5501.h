@@ -46,16 +46,16 @@
 //**************************************************************************
 
 #define MCFG_TMS5501_IRQ_CALLBACK(_write) \
-	devcb = &tms5501_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &tms5501_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_TMS5501_XMT_CALLBACK(_write) \
-	devcb = &tms5501_device::set_xmt_wr_callback(*device, DEVCB2_##_write);
+	devcb = &tms5501_device::set_xmt_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_TMS5501_XI_CALLBACK(_read) \
-	devcb = &tms5501_device::set_xi_rd_callback(*device, DEVCB2_##_read);
+	devcb = &tms5501_device::set_xi_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_TMS5501_XO_CALLBACK(_write) \
-	devcb = &tms5501_device::set_xo_wr_callback(*device, DEVCB2_##_write);
+	devcb = &tms5501_device::set_xo_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -72,10 +72,10 @@ public:
 	// construction/destruction
 	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_xmt_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(object); }
-	template<class _Object> static devcb2_base &set_xi_rd_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(object); }
-	template<class _Object> static devcb2_base &set_xo_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_xmt_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(object); }
+	template<class _Object> static devcb_base &set_xi_rd_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(object); }
+	template<class _Object> static devcb_base &set_xo_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 
@@ -170,10 +170,10 @@ private:
 	void set_interrupt(UINT8 mask);
 	void check_interrupt();
 
-	devcb2_write_line m_write_irq;
-	devcb2_write_line m_write_xmt;
-	devcb2_read8 m_read_xi;
-	devcb2_write8 m_write_xo;
+	devcb_write_line m_write_irq;
+	devcb_write_line m_write_xmt;
+	devcb_read8 m_read_xi;
+	devcb_write8 m_write_xo;
 
 	UINT8 m_irq;
 	UINT8 m_rb;

@@ -80,12 +80,12 @@ public:
 	iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~iq151cart_slot_device();
 	
-	template<class _Object> static devcb2_base &set_out_irq0_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq0_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_irq1_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq1_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq2_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_irq3_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq3_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_irq4_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq4_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq0_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq1_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq3_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq3_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq4_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_irq4_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<iq151cart_slot_device &>(device).m_out_drq_cb.set_callback(object); }
 
 	// device-level overrides
 	virtual void device_start();
@@ -115,12 +115,12 @@ public:
 	virtual void io_write(offs_t offset, UINT8 data);
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	devcb2_write_line                m_out_irq0_cb;
-	devcb2_write_line                m_out_irq1_cb;
-	devcb2_write_line                m_out_irq2_cb;
-	devcb2_write_line                m_out_irq3_cb;
-	devcb2_write_line                m_out_irq4_cb;
-	devcb2_write_line                m_out_drq_cb;
+	devcb_write_line                m_out_irq0_cb;
+	devcb_write_line                m_out_irq1_cb;
+	devcb_write_line                m_out_irq2_cb;
+	devcb_write_line                m_out_irq3_cb;
+	devcb_write_line                m_out_irq4_cb;
+	devcb_write_line                m_out_drq_cb;
 
 	device_iq151cart_interface* m_cart;
 };
@@ -135,21 +135,21 @@ extern const device_type IQ151CART_SLOT;
 ***************************************************************************/
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq0_callback(*device, DEVCB2_##_devcb);
+	devcb = &iq151cart_slot_device::set_out_irq0_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq1_callback(*device, DEVCB2_##_devcb);
+	devcb = &iq151cart_slot_device::set_out_irq1_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq2_callback(*device, DEVCB2_##_devcb);
+	devcb = &iq151cart_slot_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq3_callback(*device, DEVCB2_##_devcb);
+	devcb = &iq151cart_slot_device::set_out_irq3_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_irq4_callback(*device, DEVCB2_##_devcb);
+	devcb = &iq151cart_slot_device::set_out_irq4_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_DRQ_CB(_devcb) \
-	devcb = &iq151cart_slot_device::set_out_drq_callback(*device, DEVCB2_##_devcb);
+	devcb = &iq151cart_slot_device::set_out_drq_callback(*device, DEVCB_##_devcb);
 
 #endif /* __IQ151CART_H__ */

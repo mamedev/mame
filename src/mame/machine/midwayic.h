@@ -124,7 +124,7 @@ public:
 	static void static_set_shuffle(device_t &device, UINT8 shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_type = shuffle; }
 	static void static_set_shuffle_default(device_t &device, UINT8 shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_default = shuffle; }
 	static void static_set_auto_ack(device_t &device, UINT8 auto_ack) { downcast<midway_ioasic_device &>(device).m_auto_ack = auto_ack; }
-	template<class _Object> static devcb2_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_irq_callback.set_callback(object); }	
+	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_irq_callback.set_callback(object); }	
 
 	void set_shuffle_state(int state);
 	void fifo_w(UINT16 data);
@@ -163,7 +163,7 @@ private:
 	UINT8   m_shuffle_default;
 	UINT8   m_shuffle_active;
 	const UINT8 *   m_shuffle_map;
-	devcb2_write8 m_irq_callback;
+	devcb_write8 m_irq_callback;
 	UINT8   m_irq_state;
 	UINT16  m_sound_irq_state;
 	UINT8   m_auto_ack;
@@ -194,7 +194,7 @@ extern const device_type MIDWAY_IOASIC;
 	midway_ioasic_device::static_set_shuffle_default(*device, _shuffle);
 
 #define MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(_write) \
-	devcb = &midway_ioasic_device::set_irqhandler_callback(*device, DEVCB2_##_write);
+	devcb = &midway_ioasic_device::set_irqhandler_callback(*device, DEVCB_##_write);
 
 #define MCFG_MIDWAY_IOASIC_AUTO_ACK(_ack) \
 	midway_ioasic_device::static_set_auto_ack(*device, _ack);

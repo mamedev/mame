@@ -45,25 +45,25 @@
 ***************************************************************************/
 
 #define MCFG_I8279_OUT_IRQ_CB(_devcb) \
-	devcb = &i8279_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8279_OUT_SL_CB(_devcb) \
-	devcb = &i8279_device::set_out_sl_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_out_sl_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8279_OUT_DISP_CB(_devcb) \
-	devcb = &i8279_device::set_out_disp_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_out_disp_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8279_OUT_BD_CB(_devcb) \
-	devcb = &i8279_device::set_out_bd_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_out_bd_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8279_IN_RL_CB(_devcb) \
-	devcb = &i8279_device::set_in_rl_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_in_rl_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8279_IN_SHIFT_CB(_devcb) \
-	devcb = &i8279_device::set_in_shift_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_in_shift_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8279_IN_CTRL_CB(_devcb) \
-	devcb = &i8279_device::set_in_ctrl_callback(*device, DEVCB2_##_devcb);
+	devcb = &i8279_device::set_in_ctrl_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -77,13 +77,13 @@ public:
 	// construction/destruction
 	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_sl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_sl_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_disp_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_disp_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_bd_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_bd_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_rl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_rl_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_shift_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_shift_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_ctrl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_ctrl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_sl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_sl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_disp_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_disp_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_bd_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_bd_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_rl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_rl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_shift_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_shift_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_ctrl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_ctrl_cb.set_callback(object); }
 	
 	// read & write handlers
 	DECLARE_READ8_MEMBER(status_r);
@@ -111,13 +111,13 @@ private:
 	void set_irq(bool state);
 	void set_display_mode(UINT8 data);
 
-	devcb2_write_line    m_out_irq_cb;       // IRQ
-	devcb2_write8        m_out_sl_cb;        // Scanlines SL0-3
-	devcb2_write8        m_out_disp_cb;      // B0-3,A0-3
-	devcb2_write_line    m_out_bd_cb;        // BD
-	devcb2_read8     	m_in_rl_cb;     	// kbd readlines RL0-7
-	devcb2_read_line     m_in_shift_cb;      // Shift key
-	devcb2_read_line     m_in_ctrl_cb;       // Ctrl-Strobe line
+	devcb_write_line    m_out_irq_cb;       // IRQ
+	devcb_write8        m_out_sl_cb;        // Scanlines SL0-3
+	devcb_write8        m_out_disp_cb;      // B0-3,A0-3
+	devcb_write_line    m_out_bd_cb;        // BD
+	devcb_read8     	m_in_rl_cb;     	// kbd readlines RL0-7
+	devcb_read_line     m_in_shift_cb;      // Shift key
+	devcb_read_line     m_in_ctrl_cb;       // Ctrl-Strobe line
 
 	emu_timer *m_timer;
 

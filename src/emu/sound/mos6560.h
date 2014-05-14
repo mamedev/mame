@@ -81,10 +81,10 @@
 
 
 #define MCFG_MOS6560_POTX_CALLBACK(_read) \
-	devcb = &mos6560_device::set_potx_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos6560_device::set_potx_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_MOS6560_POTY_CALLBACK(_read) \
-	devcb = &mos6560_device::set_poty_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos6560_device::set_poty_rd_callback(*device, DEVCB_##_read);
 
 
 
@@ -139,8 +139,8 @@ public:
 	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(object); }
-	template<class _Object> static devcb2_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(object); }
+	template<class _Object> static devcb_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(object); }
+	template<class _Object> static devcb_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(object); }
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -189,8 +189,8 @@ protected:
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_colorram_space_config;
 
-	devcb2_read8    m_read_potx;
-	devcb2_read8    m_read_poty;
+	devcb_read8    m_read_potx;
+	devcb_read8    m_read_poty;
 
 	UINT8 m_reg[16];
 

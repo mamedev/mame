@@ -24,10 +24,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
 #define MCFG_EPSON_SIO_RX(_rx) \
-	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB2_##_rx);
+	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
 
 #define MCFG_EPSON_SIO_PIN(_pin) \
-	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB2_##_pin);
+	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
 
 
 //**************************************************************************
@@ -65,8 +65,8 @@ protected:
 	device_epson_sio_interface *m_cart;
 
 private:
-	devcb2_write_line m_write_rx;
-	devcb2_write_line m_write_pin;
+	devcb_write_line m_write_rx;
+	devcb_write_line m_write_pin;
 };
 
 

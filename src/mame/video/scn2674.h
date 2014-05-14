@@ -5,7 +5,7 @@
 
 #define MCFG_SCN2674_VIDEO_ADD(_tag, _clock, _irq) \
 	MCFG_DEVICE_ADD(_tag, SCN2674_VIDEO, _clock) \
-	downcast<scn2674_device *>(device)->set_callbacks(DEVCB2_##_irq);
+	downcast<scn2674_device *>(device)->set_callbacks(DEVCB_##_irq);
 
 #define MCFG_SCN2674_GFXDECODE(_gfxtag) \
 	scn2674_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
@@ -51,7 +51,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	devcb2_write_line m_interrupt_callback;
+	devcb_write_line m_interrupt_callback;
 
 	UINT8 m_scn2674_IR_pointer;
 	UINT8 m_scn2674_screen1_l;

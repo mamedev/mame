@@ -15,7 +15,7 @@
 #define CAGE_IRQ_REASON_BUFFER_EMPTY    (2)
 
 #define MCFG_ATARI_CAGE_IRQ_CALLBACK(_write) \
-	devcb = &atari_cage_device::set_irqhandler_callback(*device, DEVCB2_##_write);
+	devcb = &atari_cage_device::set_irqhandler_callback(*device, DEVCB_##_write);
 
 #define MCFG_ATARI_CAGE_SPEEDUP(_speedup) \
 	atari_cage_device::static_set_speedup(*device, _speedup);
@@ -28,7 +28,7 @@ public:
 	atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_speedup(device_t &device, offs_t speedup) { downcast<atari_cage_device &>(device).m_speedup = speedup; }
-	template<class _Object> static devcb2_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -67,7 +67,7 @@ private:
 	UINT8 m_cpu_to_cage_ready;
 	UINT8 m_cage_to_cpu_ready;
 
-	devcb2_write8 m_irqhandler;
+	devcb_write8 m_irqhandler;
 
 
 	attotime m_serial_period_per_word;

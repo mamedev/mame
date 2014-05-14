@@ -43,25 +43,25 @@
 //**************************************************************************
 
 #define MCFG_Z80PIO_OUT_INT_CB(_devcb) \
-	devcb = &z80pio_device::set_out_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_out_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80PIO_IN_PA_CB(_devcb) \
-	devcb = &z80pio_device::set_in_pa_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_in_pa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80PIO_OUT_PA_CB(_devcb) \
-	devcb = &z80pio_device::set_out_pa_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_out_pa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80PIO_OUT_ARDY_CB(_devcb) \
-	devcb = &z80pio_device::set_out_ardy_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_out_ardy_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80PIO_IN_PB_CB(_devcb) \
-	devcb = &z80pio_device::set_in_pb_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_in_pb_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80PIO_OUT_PB_CB(_devcb) \
-	devcb = &z80pio_device::set_out_pb_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_out_pb_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80PIO_OUT_BRDY_CB(_devcb) \
-	devcb = &z80pio_device::set_out_brdy_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80pio_device::set_out_brdy_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -85,13 +85,13 @@ public:
 	// construction/destruction
 	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_ardy_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_ardy_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_brdy_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_brdy_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_in_pa_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_pa_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_ardy_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_ardy_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_in_pb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_pb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_brdy_callback(device_t &device, _Object object) { return downcast<z80pio_device &>(device).m_out_brdy_cb.set_callback(object); }
 	
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
@@ -198,15 +198,15 @@ private:
 
 	// internal state
 	pio_port             m_port[2];
-	devcb2_write_line    m_out_int_cb;
+	devcb_write_line    m_out_int_cb;
 
-	devcb2_read8         m_in_pa_cb;
-	devcb2_write8        m_out_pa_cb;
-	devcb2_write_line    m_out_ardy_cb;
+	devcb_read8         m_in_pa_cb;
+	devcb_write8        m_out_pa_cb;
+	devcb_write_line    m_out_ardy_cb;
 	
-	devcb2_read8         m_in_pb_cb;
-	devcb2_write8        m_out_pb_cb;
-	devcb2_write_line    m_out_brdy_cb;
+	devcb_read8         m_in_pb_cb;
+	devcb_write8        m_out_pb_cb;
+	devcb_write_line    m_out_brdy_cb;
 };
 
 

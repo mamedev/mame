@@ -9,7 +9,7 @@
 void ym2203_update_request(void *param);
 
 #define MCFG_YM2203_IRQ_HANDLER(_devcb) \
-	devcb = &ym2203_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ym2203_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class ym2203_device : public ay8910_device
 {
@@ -17,7 +17,7 @@ public:
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2203_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2203_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -45,7 +45,7 @@ private:
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
 	void *          m_chip;
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 };
 
 extern const device_type YM2203;

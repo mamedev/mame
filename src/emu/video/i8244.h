@@ -24,9 +24,9 @@
 	MCFG_I8244_IRQ_CB(_irq_cb) \
 	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb)
 #define MCFG_I8244_IRQ_CB(_devcb) \
-	devcb = &i8244_device::set_irq_cb(*device, DEVCB2_##_devcb);
+	devcb = &i8244_device::set_irq_cb(*device, DEVCB_##_devcb);
 #define MCFG_I8244_POSTPROCESS_CB(_devcb) \
-	devcb = &i8244_device::set_postprocess_cb(*device, DEVCB2_##_devcb);
+	devcb = &i8244_device::set_postprocess_cb(*device, DEVCB_##_devcb);
 #define MCFG_I8245_ADD(_tag, _clock, _screen_tag, _irq_cb, _postprocess_cb) \
 	MCFG_DEVICE_ADD(_tag, I8245, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
@@ -83,8 +83,8 @@ public:
 
 	// static configuration helpers
 	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<i8244_device &>(device).m_screen_tag = screen_tag; }
-	template<class _Object> static devcb2_base &set_irq_cb(device_t &device, _Object object) { return downcast<i8244_device &>(device).m_irq_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_postprocess_cb(device_t &device, _Object object) { return downcast<i8244_device &>(device).m_postprocess_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object object) { return downcast<i8244_device &>(device).m_irq_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_postprocess_cb(device_t &device, _Object object) { return downcast<i8244_device &>(device).m_postprocess_func.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -127,8 +127,8 @@ protected:
 	static const device_timer_id TIMER_HBLANK = 1;
 
 	// callbacks
-	devcb2_write_line m_irq_func;
-	devcb2_write16 m_postprocess_func;
+	devcb_write_line m_irq_func;
+	devcb_write16 m_postprocess_func;
 
 	bitmap_ind16 m_tmp_bitmap;
 	emu_timer *m_line_timer;

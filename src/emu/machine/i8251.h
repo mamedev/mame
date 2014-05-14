@@ -15,25 +15,25 @@
 //**************************************************************************
 
 #define MCFG_I8251_TXD_HANDLER(_devcb) \
-	devcb = &i8251_device::set_txd_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_txd_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I8251_DTR_HANDLER(_devcb) \
-	devcb = &i8251_device::set_dtr_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_dtr_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I8251_RTS_HANDLER(_devcb) \
-	devcb = &i8251_device::set_rts_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_rts_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I8251_RXRDY_HANDLER(_devcb) \
-	devcb = &i8251_device::set_rxrdy_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_rxrdy_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I8251_TXRDY_HANDLER(_devcb) \
-	devcb = &i8251_device::set_txrdy_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_txrdy_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I8251_TXEMPTY_HANDLER(_devcb) \
-	devcb = &i8251_device::set_txempty_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_txempty_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I8251_SYNDET_HANDLER(_devcb) \
-	devcb = &i8251_device::set_syndet_handler(*device, DEVCB2_##_devcb);
+	devcb = &i8251_device::set_syndet_handler(*device, DEVCB_##_devcb);
 
 class i8251_device :  public device_t,
 	public device_serial_interface
@@ -43,13 +43,13 @@ public:
 	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_txd_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dtr_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_dtr_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rts_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rts_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rxrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rxrdy_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_txrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txrdy_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_txempty_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_syndet_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_dtr_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rts_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_rxrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rxrdy_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_txrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txrdy_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_txempty_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_syndet_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -95,13 +95,13 @@ protected:
 	};
 
 private:
-	devcb2_write_line m_txd_handler;
-	devcb2_write_line m_dtr_handler;
-	devcb2_write_line m_rts_handler;
-	devcb2_write_line m_rxrdy_handler;
-	devcb2_write_line m_txrdy_handler;
-	devcb2_write_line m_txempty_handler;
-	devcb2_write_line m_syndet_handler;
+	devcb_write_line m_txd_handler;
+	devcb_write_line m_dtr_handler;
+	devcb_write_line m_rts_handler;
+	devcb_write_line m_rxrdy_handler;
+	devcb_write_line m_txrdy_handler;
+	devcb_write_line m_txempty_handler;
+	devcb_write_line m_syndet_handler;
 
 	/* flags controlling how i8251_control_w operates */
 	UINT8 m_flags;

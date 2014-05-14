@@ -25,7 +25,7 @@
 //**************************************************************************
 
 #define MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &v1050_keyboard_device::set_out_tx_handler(*device, DEVCB2_##_devcb);
+	devcb = &v1050_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
 
 
 
@@ -41,7 +41,7 @@ public:
 	// construction/destruction
 	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -75,7 +75,7 @@ private:
 	required_ioport m_y9;
 	required_ioport m_ya;
 	required_ioport m_yb;
-	devcb2_write_line   m_out_tx_handler;
+	devcb_write_line   m_out_tx_handler;
 
 	UINT8 m_y;
 };

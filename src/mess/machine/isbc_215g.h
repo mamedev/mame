@@ -29,7 +29,7 @@ public:
 
 	static void static_set_wakeup_addr(device_t &device, UINT32 wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }
-	template<class _Object> static devcb2_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
 
 protected:
 	virtual void device_start();
@@ -46,7 +46,7 @@ private:
 	required_device<isbx_slot_device> m_sbx1;
 	required_device<isbx_slot_device> m_sbx2;
 
-	devcb2_write_line m_out_irq_func;
+	devcb_write_line m_out_irq_func;
 
 	int m_reset;
 	UINT16 m_wakeup, m_secoffset, m_sector[512];
@@ -69,7 +69,7 @@ private:
 	isbc_215g_device::static_set_maincpu_tag(*device, _maincpu_tag);
 
 #define MCFG_ISBC_215_IRQ(_irq_line) \
-	devcb = &isbc_215g_device::static_set_irq_callback(*device, DEVCB2_##_irq_line);
+	devcb = &isbc_215g_device::static_set_irq_callback(*device, DEVCB_##_irq_line);
 
 extern const device_type ISBC_215G;
 

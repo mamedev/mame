@@ -6,13 +6,13 @@
 #include "emu.h"
 
 #define MCFG_YMF271_IRQ_HANDLER(_devcb) \
-	devcb = &ymf271_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ymf271_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_YMF271_EXT_READ_HANDLER(_devcb) \
-	devcb = &ymf271_device::set_ext_read_handler(*device, DEVCB2_##_devcb);
+	devcb = &ymf271_device::set_ext_read_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_YMF271_EXT_WRITE_HANDLER(_devcb) \
-	devcb = &ymf271_device::set_ext_write_handler(*device, DEVCB2_##_devcb);
+	devcb = &ymf271_device::set_ext_write_handler(*device, DEVCB_##_devcb);
 
 class ymf271_device : public device_t,
 									public device_sound_interface
@@ -21,9 +21,9 @@ public:
 	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_ext_read_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ext_write_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_ext_write_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_ext_read_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ext_write_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_ext_write_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -153,9 +153,9 @@ private:
 	sound_stream *m_stream;
 	INT32 *m_mix_buffer;
 
-	devcb2_write_line m_irq_handler;
-	devcb2_read8 m_ext_read_handler;
-	devcb2_write8 m_ext_write_handler;
+	devcb_write_line m_irq_handler;
+	devcb_read8 m_ext_read_handler;
+	devcb_write8 m_ext_write_handler;
 };
 
 extern const device_type YMF271;

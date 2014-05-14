@@ -54,16 +54,16 @@
 	upd7220_device::static_set_draw_text_callback(*device, upd7220_draw_text_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_UPD7220_DRQ_CALLBACK(_write) \
-	devcb = &upd7220_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd7220_device::set_drq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD7220_HSYNC_CALLBACK(_write) \
-	devcb = &upd7220_device::set_hsync_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd7220_device::set_hsync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD7220_VSYNC_CALLBACK(_write) \
-	devcb = &upd7220_device::set_vsync_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd7220_device::set_vsync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD7220_BLANK_CALLBACK(_write) \
-	devcb = &upd7220_device::set_blank_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd7220_device::set_blank_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -88,10 +88,10 @@ public:
 	static void static_set_display_pixels_callback(device_t &device, upd7220_display_pixels_delegate callback) { downcast<upd7220_device &>(device).m_display_cb = callback; }
 	static void static_set_draw_text_callback(device_t &device, upd7220_draw_text_delegate callback) { downcast<upd7220_device &>(device).m_draw_text_cb = callback; }
 
-	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_drq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_hsync.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_vsync.set_callback(object); }
-	template<class _Object> static devcb2_base &set_blank_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_blank.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_drq.set_callback(object); }
+	template<class _Object> static devcb_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_hsync.set_callback(object); }
+	template<class _Object> static devcb_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_vsync.set_callback(object); }
+	template<class _Object> static devcb_base &set_blank_wr_callback(device_t &device, _Object object) { return downcast<upd7220_device &>(device).m_write_blank.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -156,10 +156,10 @@ private:
 	upd7220_display_pixels_delegate     m_display_cb;
 	upd7220_draw_text_delegate          m_draw_text_cb;
 
-	devcb2_write_line   m_write_drq;
-	devcb2_write_line   m_write_hsync;
-	devcb2_write_line   m_write_vsync;
-	devcb2_write_line   m_write_blank;
+	devcb_write_line   m_write_drq;
+	devcb_write_line   m_write_hsync;
+	devcb_write_line   m_write_vsync;
+	devcb_write_line   m_write_blank;
 
 	UINT16 m_mask;                  // mask register
 	UINT8 m_pitch;                  // number of word addresses in display memory in the horizontal direction

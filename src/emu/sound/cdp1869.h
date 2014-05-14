@@ -160,10 +160,10 @@
 #define CDP1869_PCB_READ_MEMBER(name) int name(UINT16 pma, UINT8 cma, UINT8 pmd)
 
 #define MCFG_CDP1869_PAL_NTSC_CALLBACK(_read) \
-	devcb = &cdp1869_device::set_pal_ntsc_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cdp1869_device::set_pal_ntsc_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_CDP1869_PRD_CALLBACK(_write) \
-	devcb = &cdp1869_device::set_prd_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cdp1869_device::set_prd_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CDP1869_COLOR_CLOCK(_clk) \
 	cdp1869_device::static_set_color_clock(*device, _clk);
@@ -196,8 +196,8 @@ public:
 	// construction/destruction
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_pal_ntsc_rd_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(object); }
-	template<class _Object> static devcb2_base &set_prd_wr_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(object); }
+	template<class _Object> static devcb_base &set_pal_ntsc_rd_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(object); }
+	template<class _Object> static devcb_base &set_prd_wr_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(object); }
 	static void static_set_char_ram_read(device_t &device, cdp1869_char_ram_read_delegate callback) { downcast<cdp1869_device &>(device).m_in_char_ram_func = callback; }
 	static void static_set_char_ram_write(device_t &device, cdp1869_char_ram_write_delegate callback) { downcast<cdp1869_device &>(device).m_out_char_ram_func = callback; }
 	static void static_set_pcb_read(device_t &device, cdp1869_pcb_read_delegate callback) { downcast<cdp1869_device &>(device).m_in_pcb_func = callback; }
@@ -256,8 +256,8 @@ protected:
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
 
 private:
-	devcb2_read_line        m_read_pal_ntsc;
-	devcb2_write_line       m_write_prd;
+	devcb_read_line        m_read_pal_ntsc;
+	devcb_write_line       m_write_prd;
 	cdp1869_pcb_read_delegate           m_in_pcb_func;
 	cdp1869_char_ram_read_delegate      m_in_char_ram_func;
 	cdp1869_char_ram_write_delegate     m_out_char_ram_func;

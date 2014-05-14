@@ -5,7 +5,7 @@
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
-	lr35902_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb);
+	lr35902_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
 #define MCFG_LR35902_HALT_BUG \
 	lr35902_cpu_device::set_halt_bug(*device);
 // This should be removed/improved once all gameboy boot roms have been dumped
@@ -30,7 +30,7 @@ public:
 	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
 	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_features |= LR35902_FEATURE_HALT_BUG; }
 	static void set_reset_values(device_t &device, const UINT16 *regs) { downcast<lr35902_cpu_device &>(device).c_regs = regs; }
 
@@ -98,7 +98,7 @@ protected:
 	address_space *m_program;
 	int m_icount;
 	/* Timer callback */
-	devcb2_write8 m_timer_func;
+	devcb_write8 m_timer_func;
 	/* Fetch & execute related */
 	int     m_execution_state;
 	UINT8   m_op;

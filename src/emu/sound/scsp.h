@@ -17,10 +17,10 @@
 	scsp_device::set_roffset(*device, _offs);
 
 #define MCFG_SCSP_IRQ_CB(_devcb) \
-	devcb = &scsp_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &scsp_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	devcb = &scsp_device::set_main_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &scsp_device::set_main_irq_callback(*device, DEVCB_##_devcb);
 
 
 enum SCSP_STATE {SCSP_ATTACK,SCSP_DECAY1,SCSP_DECAY2,SCSP_RELEASE};
@@ -78,8 +78,8 @@ public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_roffset(device_t &device, int roffset) { downcast<scsp_device &>(device).m_roffset = roffset; }
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(object); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
@@ -100,8 +100,8 @@ protected:
 
 private:
 	int m_roffset;                /* offset in the region */
-	devcb2_write8       m_irq_cb;  /* irq callback */
-	devcb2_write_line   m_main_irq_cb;
+	devcb_write8       m_irq_cb;  /* irq callback */
+	devcb_write_line   m_main_irq_cb;
 
 	union
 	{

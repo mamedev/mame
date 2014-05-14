@@ -14,7 +14,7 @@
 	MCFG_DEVICE_ADD(_tag, ICS2115, _clock)
 
 #define MCFG_ICS2115_IRQ_CB(_devcb) \
-	devcb = &ics2115_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &ics2115_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -92,7 +92,7 @@ public:
 	// construction/destruction
 	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<ics2115_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ics2115_device &>(device).m_irq_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -115,7 +115,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	devcb2_write_line m_irq_cb;
+	devcb_write_line m_irq_cb;
 
 	UINT8 *m_rom;
 	INT16 m_ulaw[256];

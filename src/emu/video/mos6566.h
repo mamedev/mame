@@ -95,16 +95,16 @@
 	mos6566_device::static_set_cpu_tag(*device, "^"_tag);
 
 #define MCFG_MOS6566_IRQ_CALLBACK(_write) \
-	devcb = &mos6566_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6566_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6566_BA_CALLBACK(_write) \
-	devcb = &mos6566_device::set_ba_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6566_device::set_ba_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6566_AEC_CALLBACK(_write) \
-	devcb = &mos6566_device::set_aec_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6566_device::set_aec_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS8564_K_CALLBACK(_write) \
-	devcb = &mos6566_device::set_k_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6566_device::set_k_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -216,10 +216,10 @@ public:
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ba_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_ba.set_callback(object); }
-	template<class _Object> static devcb2_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(object); }
-	template<class _Object> static devcb2_base &set_k_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_k.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_ba_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_ba.set_callback(object); }
+	template<class _Object> static devcb_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(object); }
+	template<class _Object> static devcb_base &set_k_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_k.set_callback(object); }
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -288,10 +288,10 @@ protected:
 	void draw_graphics();
 	void draw_sprites();
 
-	devcb2_write_line       m_write_irq;
-	devcb2_write_line       m_write_ba;
-	devcb2_write_line       m_write_aec;
-	devcb2_write8           m_write_k;
+	devcb_write_line       m_write_irq;
+	devcb_write_line       m_write_ba;
+	devcb_write_line       m_write_aec;
+	devcb_write8           m_write_k;
 
 	required_device<cpu_device> m_cpu;
 

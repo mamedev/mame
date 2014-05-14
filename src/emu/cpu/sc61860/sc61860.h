@@ -55,28 +55,28 @@ enum
 
 
 #define MCFG_SC61860_READ_RESET_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_reset_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_reset_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_BRK_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_brk_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_brk_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_X_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_x_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_x_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_A_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_ina_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_ina_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_A_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_outa_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_outa_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_B_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_inb_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_inb_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_B_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_outb_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_outb_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_C_HANDLER(_devcb) \
-	devcb = &sc61860_device::set_outc_cb(*device, DEVCB2_##_devcb);
+	devcb = &sc61860_device::set_outc_cb(*device, DEVCB_##_devcb);
 
 class sc61860_device : public cpu_device
 {
@@ -85,14 +85,14 @@ public:
 	sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_reset_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_reset.set_callback(object); }
-	template<class _Object> static devcb2_base &set_brk_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_brk.set_callback(object); }
-	template<class _Object> static devcb2_base &set_x_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_x.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ina_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_ina.set_callback(object); }
-	template<class _Object> static devcb2_base &set_outa_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_outa.set_callback(object); }
-	template<class _Object> static devcb2_base &set_inb_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_inb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_outb_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_outb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_outc_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_outc.set_callback(object); }
+	template<class _Object> static devcb_base &set_reset_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_reset.set_callback(object); }
+	template<class _Object> static devcb_base &set_brk_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_brk.set_callback(object); }
+	template<class _Object> static devcb_base &set_x_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_x.set_callback(object); }
+	template<class _Object> static devcb_base &set_ina_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_ina.set_callback(object); }
+	template<class _Object> static devcb_base &set_outa_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_outa.set_callback(object); }
+	template<class _Object> static devcb_base &set_inb_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_inb.set_callback(object); }
+	template<class _Object> static devcb_base &set_outb_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_outb.set_callback(object); }
+	template<class _Object> static devcb_base &set_outc_cb(device_t &device, _Object object) { return downcast<sc61860_device &>(device).m_outc.set_callback(object); }
 
 	/* this is though for power on/off of the sharps */
 	UINT8 *internal_ram();
@@ -126,14 +126,14 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	devcb2_read_line m_reset;
-	devcb2_read_line m_brk;
-	devcb2_read_line m_x;
-	devcb2_read8 m_ina;
-	devcb2_write8 m_outa;
-	devcb2_read8 m_inb;
-	devcb2_write8 m_outb;
-	devcb2_write8 m_outc;
+	devcb_read_line m_reset;
+	devcb_read_line m_brk;
+	devcb_read_line m_x;
+	devcb_read8 m_ina;
+	devcb_write8 m_outa;
+	devcb_read8 m_inb;
+	devcb_write8 m_outb;
+	devcb_write8 m_outc;
 
 	UINT8 m_p, m_q, m_r; //7 bits only?
 

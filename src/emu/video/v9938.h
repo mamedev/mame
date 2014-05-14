@@ -25,7 +25,7 @@
 	v9938_device::static_set_vram_size(*device, _vramsize);
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB2_##_irq);
+	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
 // init functions
 
@@ -191,7 +191,7 @@ private:
 
 	// interrupt
 	UINT8 m_int_state;
-	devcb2_write_line   m_int_callback;
+	devcb_write_line   m_int_callback;
 	int m_scanline;
 	// blinking
 	int m_blink, m_blink_count;

@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 
-	template<class _Object> static devcb2_base &static_set_ready_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)
 	{
 		return downcast<ti99_datamux_device &>(device).m_ready.set_callback(object);
 	}
@@ -110,7 +110,7 @@ private:
 	void ready_join();
 
 	// Ready line to the CPU
-	devcb2_write_line m_ready;
+	devcb_write_line m_ready;
 
 	// Own ready state.
 	line_state  m_muxready;
@@ -154,4 +154,4 @@ private:
 #endif
 
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	devcb = &ti99_datamux_device::static_set_ready_callback( *device, DEVCB2_##_intcallb );
+	devcb = &ti99_datamux_device::static_set_ready_callback( *device, DEVCB_##_intcallb );

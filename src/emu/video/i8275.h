@@ -55,16 +55,16 @@
 	i8275_device::static_set_display_callback(*device, i8275_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_I8275_DRQ_CALLBACK(_write) \
-	devcb = &i8275_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8275_device::set_drq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8275_IRQ_CALLBACK(_write) \
-	devcb = &i8275_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8275_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8275_HRTC_CALLBACK(_write) \
-	devcb = &i8275_device::set_hrtc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8275_device::set_hrtc_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_I8275_VRTC_CALLBACK(_write) \
-	devcb = &i8275_device::set_vrtc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &i8275_device::set_vrtc_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -87,10 +87,10 @@ public:
 	static void static_set_character_width(device_t &device, int value) { downcast<i8275_device &>(device).m_hpixels_per_column = value; }
 	static void static_set_display_callback(device_t &device, i8275_draw_character_delegate callback) { downcast<i8275_device &>(device).m_display_cb = callback; }
 
-	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_drq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_hrtc.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_vrtc.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_drq.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_hrtc.set_callback(object); }
+	template<class _Object> static devcb_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_vrtc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -182,10 +182,10 @@ protected:
 
 	static const int character_attribute[3][16];
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_drq;
-	devcb2_write_line   m_write_hrtc;
-	devcb2_write_line   m_write_vrtc;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_drq;
+	devcb_write_line   m_write_hrtc;
+	devcb_write_line   m_write_vrtc;
 
 	i8275_draw_character_delegate m_display_cb;
 	int m_hpixels_per_column;

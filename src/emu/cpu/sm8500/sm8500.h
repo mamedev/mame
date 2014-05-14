@@ -4,10 +4,10 @@
 #define __SM8500_H__
 
 #define MCFG_SM8500_DMA_CB(_devcb) \
-	sm8500_cpu_device::set_dma_cb(*device, DEVCB2_##_devcb);
+	sm8500_cpu_device::set_dma_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_SM8500_TIMER_CB(_devcb) \
-	sm8500_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb);
+	sm8500_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
 
 enum
 {
@@ -27,8 +27,8 @@ public:
 	sm8500_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_dma_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_dma_func.set_callback(object); }
-	template<class _Object> static devcb2_base &set_timer_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_timer_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_dma_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_timer_func.set_callback(object); }
 
 	/* interrupts */
 	static const int ILL_INT  = 0;
@@ -86,8 +86,8 @@ protected:
 
 	address_space_config m_program_config;
 
-	devcb2_write8 m_dma_func;
-	devcb2_write8 m_timer_func;
+	devcb_write8 m_dma_func;
+	devcb_write8 m_timer_func;
 
 	UINT16 m_PC;
 	UINT8 m_IE0;

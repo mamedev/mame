@@ -3,7 +3,7 @@
 
 #define MCFG_POWERVR2_ADD(_tag, _irq_cb)                                \
 	MCFG_DEVICE_ADD(_tag, POWERVR2, 0)                                  \
-	downcast<powervr2_device *>(device)->set_irq_cb(DEVCB2_ ## _irq_cb);
+	downcast<powervr2_device *>(device)->set_irq_cb(DEVCB_ ## _irq_cb);
 
 class powervr2_device : public device_t,
 						public device_video_interface
@@ -282,7 +282,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_write8 irq_cb;
+	devcb_write8 irq_cb;
 
 	// Core registers
 	UINT32 softreset;

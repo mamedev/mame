@@ -21,10 +21,10 @@
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_MACKBD_CLKOUT_HANDLER(_devcb) \
-	devcb = &mackbd_device::set_clkout_handler(*device, DEVCB2_##_devcb);
+	devcb = &mackbd_device::set_clkout_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MACKBD_DATAOUT_HANDLER(_devcb) \
-	devcb = &mackbd_device::set_dataout_handler(*device, DEVCB2_##_devcb);
+	devcb = &mackbd_device::set_dataout_handler(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -36,8 +36,8 @@ class mackbd_device :  public device_t
 {
 public:
 	// static config helper
-	template<class _Object> static devcb2_base &set_clkout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_clkout_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dataout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_dataout_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_clkout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_clkout_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_dataout_handler.set_callback(object); }
 
 	// construction/destruction
 	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -65,8 +65,8 @@ protected:
 private:
 	UINT8 p0, p1, p2, data_from_mac, data_to_mac;
 
-	devcb2_write_line m_clkout_handler;
-	devcb2_write_line m_dataout_handler;
+	devcb_write_line m_clkout_handler;
+	devcb_write_line m_dataout_handler;
 
 	void scan_kbd_col(int col);
 };

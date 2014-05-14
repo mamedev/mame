@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #define MCFG_GENERIC_TERMINAL_KEYBOARD_CB(_devcb) \
-	devcb = &generic_terminal_device::set_keyboard_callback(*device, DEVCB2_##_devcb);
+	devcb = &generic_terminal_device::set_keyboard_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -27,7 +27,7 @@ public:
 	generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	template<class _Object> static devcb2_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<generic_terminal_device &>(device).m_keyboard_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<generic_terminal_device &>(device).m_keyboard_cb.set_callback(object); }
 	
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -53,7 +53,7 @@ private:
 	UINT8 m_framecnt;
 	UINT8 m_y_pos;
 
-	devcb2_write8 m_keyboard_cb;
+	devcb_write8 m_keyboard_cb;
 };
 
 extern const device_type GENERIC_TERMINAL;

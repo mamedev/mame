@@ -31,11 +31,11 @@
 
 
 #define MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(_devcb) \
-	devcb = &sms_control_port_device::set_th_input_handler(*device, DEVCB2_##_devcb);
+	devcb = &sms_control_port_device::set_th_input_handler(*device, DEVCB_##_devcb);
 
 
 #define MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(_devcb) \
-	devcb = &sms_control_port_device::set_pixel_handler(*device, DEVCB2_##_devcb);
+	devcb = &sms_control_port_device::set_pixel_handler(*device, DEVCB_##_devcb);
 
 
 
@@ -56,9 +56,9 @@ public:
 	virtual ~sms_control_port_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_th_input_handler(device_t &device, _Object object) { return downcast<sms_control_port_device &>(device).m_th_pin_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_th_input_handler(device_t &device, _Object object) { return downcast<sms_control_port_device &>(device).m_th_pin_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_pixel_handler(device_t &device, _Object object) { return downcast<sms_control_port_device &>(device).m_pixel_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_pixel_handler(device_t &device, _Object object) { return downcast<sms_control_port_device &>(device).m_pixel_handler.set_callback(object); }
 
 	// Physical DE-9 connector interface
 
@@ -86,8 +86,8 @@ public:
 	device_sms_control_port_interface *m_device;
 
 private:
-	devcb2_write_line m_th_pin_handler;
-	devcb2_read32 m_pixel_handler;
+	devcb_write_line m_th_pin_handler;
+	devcb_read32 m_pixel_handler;
 };
 
 

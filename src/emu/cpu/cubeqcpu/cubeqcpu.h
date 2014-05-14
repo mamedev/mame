@@ -118,16 +118,16 @@ enum
 
 
 #define MCFG_CQUESTSND_CONFIG(_dac_w, _sound_tag) \
-	cquestsnd_cpu_device::set_dac_w(*device, DEVCB2_##_dac_w); \
+	cquestsnd_cpu_device::set_dac_w(*device, DEVCB_##_dac_w); \
 	cquestsnd_cpu_device::set_sound_region(*device, _sound_tag);
 
 
 #define MCFG_CQUESTROT_CONFIG(_linedata_w) \
-	cquestrot_cpu_device::set_linedata_w(*device, DEVCB2_##_linedata_w );
+	cquestrot_cpu_device::set_linedata_w(*device, DEVCB_##_linedata_w );
 
 
 #define MCFG_CQUESTLIN_CONFIG(_linedata_r) \
-	cquestlin_cpu_device::set_linedata_r(*device, DEVCB2_##_linedata_r );
+	cquestlin_cpu_device::set_linedata_r(*device, DEVCB_##_linedata_r );
 
 
 /***************************************************************************
@@ -141,7 +141,7 @@ public:
 	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_dac_w(device_t &device, _Object object) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(object); }
+	template<class _Object> static devcb_base &set_dac_w(device_t &device, _Object object) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(object); }
 	static void set_sound_region(device_t &device, const char *tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
 
 	DECLARE_WRITE16_MEMBER(sndram_w);
@@ -190,7 +190,7 @@ private:
 	int m_prev_ipram;
 	int m_prev_ipwrt;
 
-	devcb2_write16 m_dac_w;
+	devcb_write16 m_dac_w;
 	const char *m_sound_region_tag;
 	UINT16 *m_sound_data;
 
@@ -209,7 +209,7 @@ public:
 	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_linedata_w(device_t &device, _Object object) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(object); }
+	template<class _Object> static devcb_base &set_linedata_w(device_t &device, _Object object) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(object); }
 
 	DECLARE_READ16_MEMBER(linedata_r);
 	DECLARE_WRITE16_MEMBER(rotram_w);
@@ -239,7 +239,7 @@ protected:
 
 private:
 	address_space_config m_program_config;
-	devcb2_write16 m_linedata_w;
+	devcb_write16 m_linedata_w;
 
 	/* AM2901 internals */
 	UINT16  m_ram[16];
@@ -291,7 +291,7 @@ public:
 	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_linedata_r(device_t &device, _Object object) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_linedata_r(device_t &device, _Object object) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(object); }
 
 	DECLARE_WRITE16_MEMBER( linedata_w );
 	void cubeqcpu_swap_line_banks();
@@ -323,7 +323,7 @@ protected:
 
 private:
 	address_space_config m_program_config;
-	devcb2_read16 m_linedata_r;
+	devcb_read16 m_linedata_r;
 
 	/* 12-bit AM2901 internals */
 	UINT16  m_ram[16];

@@ -25,7 +25,7 @@ extern const device_type S2650;
 
 
 #define MCFG_S2650_FLAG_HANDLER(_devcb) \
-	devcb = &s2650_device::set_flag_handler(*device, DEVCB2_##_devcb);
+	devcb = &s2650_device::set_flag_handler(*device, DEVCB_##_devcb);
 
 class s2650_device : public cpu_device
 {
@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sense);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -71,7 +71,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	devcb2_write_line m_flag_handler;
+	devcb_write_line m_flag_handler;
 
 	UINT16  m_ppc;    /* previous program counter (page + iar) */
 	UINT16  m_page;   /* 8K page select register (A14..A13) */

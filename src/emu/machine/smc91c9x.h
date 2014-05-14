@@ -24,7 +24,7 @@ public:
 	smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~smc91c9x_device() {}
 
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<smc91c9x_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<smc91c9x_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -36,7 +36,7 @@ protected:
 
 private:
 	// internal state
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 
 	/* raw register data and masks */
 	UINT16          m_reg[64];
@@ -88,13 +88,13 @@ extern const device_type SMC91C96;
 	MCFG_DEVICE_ADD(_tag, SMC91C94, 0)
 
 #define MCFG_SMC91C94_IRQ_CALLBACK(_write) \
-	devcb = &smc91c94_device::set_irq_callback(*device, DEVCB2_##_write);
+	devcb = &smc91c94_device::set_irq_callback(*device, DEVCB_##_write);
 
 #define MCFG_SMC91C96_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SMC91C96, 0)
 
 #define MCFG_SMC91C96_IRQ_CALLBACK(_write) \
-	devcb = &smc91c96_device::set_irq_callback(*device, DEVCB2_##_write);
+	devcb = &smc91c96_device::set_irq_callback(*device, DEVCB_##_write);
 
 
 #endif

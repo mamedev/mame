@@ -67,13 +67,13 @@
 
 
 #define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &vic20_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic20_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	devcb = &vic20_expansion_slot_device::set_nmi_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic20_expansion_slot_device::set_nmi_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(_write) \
-	devcb = &vic20_expansion_slot_device::set_res_wr_callback(*device, DEVCB2_##_write);
+	devcb = &vic20_expansion_slot_device::set_res_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -93,9 +93,9 @@ public:
 	// construction/destruction
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }
-	template<class _Object> static devcb2_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_res.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }
+	template<class _Object> static devcb_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_res.set_callback(object); }
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
@@ -130,9 +130,9 @@ protected:
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_nmi;
-	devcb2_write_line   m_write_res;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_nmi;
+	devcb_write_line   m_write_res;
 
 	device_vic20_expansion_card_interface *m_card;
 };

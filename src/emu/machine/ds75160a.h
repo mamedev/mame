@@ -37,7 +37,7 @@
 
 #define MCFG_DS75160A_ADD(_tag, _read, _write) \
 	MCFG_DEVICE_ADD(_tag, DS75160A, 0)  \
-	downcast<ds75160a_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<ds75160a_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 
 
@@ -69,8 +69,8 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_read8  m_read;
-	devcb2_write8 m_write;
+	devcb_read8  m_read;
+	devcb_write8 m_write;
 
 	UINT8 m_data;
 

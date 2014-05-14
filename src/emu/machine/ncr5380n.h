@@ -12,10 +12,10 @@
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NCR5380N_IRQ_HANDLER(_devcb) \
-	devcb = &ncr5380n_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ncr5380n_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_NCR5380N_DRQ_HANDLER(_devcb) \
-	devcb = &ncr5380n_device::set_drq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ncr5380n_device::set_drq_handler(*device, DEVCB_##_devcb);
 
 class ncr5380n_device : public nscsi_device
 {
@@ -23,8 +23,8 @@ public:
 	ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq_handler(device_t &device, _Object object) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(object); }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -216,8 +216,8 @@ private:
 	void delay(int cycles);
 	void delay_cycles(int cycles);
 
-	devcb2_write_line m_irq_handler;
-	devcb2_write_line m_drq_handler;
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_drq_handler;
 };
 
 extern const device_type NCR5380N;

@@ -75,28 +75,28 @@
 	mos6526_device::static_set_tod_clock(*device, _clock);
 
 #define MCFG_MOS6526_IRQ_CALLBACK(_write) \
-	devcb = &mos6526_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6526_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6526_CNT_CALLBACK(_write) \
-	devcb = &mos6526_device::set_cnt_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6526_device::set_cnt_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6526_SP_CALLBACK(_write) \
-	devcb = &mos6526_device::set_sp_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6526_device::set_sp_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6526_PA_INPUT_CALLBACK(_read) \
-	devcb = &mos6526_device::set_pa_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos6526_device::set_pa_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_MOS6526_PA_OUTPUT_CALLBACK(_write) \
-	devcb = &mos6526_device::set_pa_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6526_device::set_pa_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6526_PB_INPUT_CALLBACK(_read) \
-	devcb = &mos6526_device::set_pb_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos6526_device::set_pb_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_MOS6526_PB_OUTPUT_CALLBACK(_write) \
-	devcb = &mos6526_device::set_pb_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6526_device::set_pb_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6526_PC_CALLBACK(_write) \
-	devcb = &mos6526_device::set_pc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos6526_device::set_pc_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -116,14 +116,14 @@ public:
 
 	static void static_set_tod_clock(device_t &device, int clock) { downcast<mos6526_device &>(device).m_tod_clock = clock; }
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pa.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pa.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pc.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(object); }
+	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pa.set_callback(object); }
+	template<class _Object> static devcb_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pa.set_callback(object); }
+	template<class _Object> static devcb_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -176,14 +176,14 @@ protected:
 	inline void write_tod(int offset, UINT8 data);
 	inline void synchronize();
 
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_pc;
-	devcb2_write_line   m_write_cnt;
-	devcb2_write_line   m_write_sp;
-	devcb2_read8        m_read_pa;
-	devcb2_write8       m_write_pa;
-	devcb2_read8        m_read_pb;
-	devcb2_write8       m_write_pb;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_pc;
+	devcb_write_line   m_write_cnt;
+	devcb_write_line   m_write_sp;
+	devcb_read8        m_read_pa;
+	devcb_write8       m_write_pa;
+	devcb_read8        m_read_pb;
+	devcb_write8       m_write_pb;
 
 	// interrupts
 	bool m_irq;

@@ -35,13 +35,13 @@
 ///*************************************************************************
 
 #define MCFG_COM8116_FX4_HANDLER(_devcb) \
-	devcb = &com8116_device::set_fx4_handler(*device, DEVCB2_##_devcb);
+	devcb = &com8116_device::set_fx4_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_COM8116_FR_HANDLER(_devcb) \
-	devcb = &com8116_device::set_fr_handler(*device, DEVCB2_##_devcb);
+	devcb = &com8116_device::set_fr_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_COM8116_FT_HANDLER(_devcb) \
-	devcb = &com8116_device::set_ft_handler(*device, DEVCB2_##_devcb);
+	devcb = &com8116_device::set_ft_handler(*device, DEVCB_##_devcb);
 
 
 ///*************************************************************************
@@ -56,9 +56,9 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_fx4_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_fr_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ft_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_fx4_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_fr_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_ft_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(object); }
 
 	void str_w(UINT8 data);
 	DECLARE_WRITE8_MEMBER( str_w );
@@ -83,9 +83,9 @@ private:
 		TIMER_FT
 	};
 
-	devcb2_write_line   m_fx4_handler;
-	devcb2_write_line   m_fr_handler;
-	devcb2_write_line   m_ft_handler;
+	devcb_write_line   m_fx4_handler;
+	devcb_write_line   m_fr_handler;
+	devcb_write_line   m_ft_handler;
 
 	int m_fx4;
 	int m_fr;

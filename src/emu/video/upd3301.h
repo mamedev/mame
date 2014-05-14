@@ -55,16 +55,16 @@
 	upd3301_device::static_set_display_callback(*device, upd3301_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_UPD3301_DRQ_CALLBACK(_write) \
-	devcb = &upd3301_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd3301_device::set_drq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD3301_INT_CALLBACK(_write) \
-	devcb = &upd3301_device::set_int_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd3301_device::set_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD3301_HRTC_CALLBACK(_write) \
-	devcb = &upd3301_device::set_hrtc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd3301_device::set_hrtc_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD3301_VRTC_CALLBACK(_write) \
-	devcb = &upd3301_device::set_vrtc_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd3301_device::set_vrtc_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -87,10 +87,10 @@ public:
 	static void static_set_character_width(device_t &device, int value) { downcast<upd3301_device &>(device).m_width = value; }
 	static void static_set_display_callback(device_t &device, upd3301_draw_character_delegate callback) { downcast<upd3301_device &>(device).m_display_cb = callback; }
 
-	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_drq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_int.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_hrtc.set_callback(object); }
-	template<class _Object> static devcb2_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_vrtc.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_drq.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_int.set_callback(object); }
+	template<class _Object> static devcb_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_hrtc.set_callback(object); }
+	template<class _Object> static devcb_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_vrtc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -126,10 +126,10 @@ private:
 
 	void draw_scanline();
 
-	devcb2_write_line   m_write_int;
-	devcb2_write_line   m_write_drq;
-	devcb2_write_line   m_write_hrtc;
-	devcb2_write_line   m_write_vrtc;
+	devcb_write_line   m_write_int;
+	devcb_write_line   m_write_drq;
+	devcb_write_line   m_write_hrtc;
+	devcb_write_line   m_write_vrtc;
 
 	upd3301_draw_character_delegate m_display_cb;
 	int m_width;

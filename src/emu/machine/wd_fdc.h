@@ -112,25 +112,25 @@
 	downcast<wd_fdc_t *>(device)->set_force_ready(true);
 
 #define MCFG_WD_FDC_INTRQ_CALLBACK(_write) \
-	devcb = &wd_fdc_t::set_intrq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wd_fdc_t::set_intrq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WD_FDC_DRQ_CALLBACK(_write) \
-	devcb = &wd_fdc_t::set_drq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wd_fdc_t::set_drq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WD_FDC_HLD_CALLBACK(_write) \
-	devcb = &wd_fdc_t::set_hld_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wd_fdc_t::set_hld_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_WD_FDC_ENP_CALLBACK(_write) \
-	devcb = &wd_fdc_t::set_enp_wr_callback(*device, DEVCB2_##_write);
+	devcb = &wd_fdc_t::set_enp_wr_callback(*device, DEVCB_##_write);
 
 class wd_fdc_t : public device_t {
 public:
 	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).intrq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).drq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hld_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).hld_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_enp_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).enp_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_hld_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).hld_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_enp_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).enp_cb.set_callback(object); }
 
 	void soft_reset();
 
@@ -364,7 +364,7 @@ private:
 
 	live_info cur_live, checkpoint_live;
 
-	devcb2_write_line intrq_cb, drq_cb, hld_cb, enp_cb;
+	devcb_write_line intrq_cb, drq_cb, hld_cb, enp_cb;
 
 	UINT8 format_last_byte;
 	int format_last_byte_count;

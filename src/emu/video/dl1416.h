@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 #define MCFG_DL1416_UPDATE_HANDLER(_devcb) \
-	devcb = &dl1416_device::set_update_handler(*device, DEVCB2_##_devcb);
+	devcb = &dl1416_device::set_update_handler(*device, DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -35,7 +35,7 @@ public:
 	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~dl1416_device() {}
 
-	template<class _Object> static devcb2_base &set_update_handler(device_t &device, _Object object) { return downcast<dl1416_device &>(device).m_update.set_callback(object); }
+	template<class _Object> static devcb_base &set_update_handler(device_t &device, _Object object) { return downcast<dl1416_device &>(device).m_update.set_callback(object); }
 
 	/* inputs */
 	DECLARE_WRITE_LINE_MEMBER( wr_w ); /* write enable */
@@ -53,7 +53,7 @@ private:
 	int m_write_enable;
 	int m_chip_enable;
 	int m_cursor_enable;
-	devcb2_write16 m_update;
+	devcb_write16 m_update;
 
 	UINT16 m_digit_ram[4]; // holds the digit code for each position
 	UINT8 m_cursor_state[4]; // holds the cursor state for each position, 0=off, 1=on

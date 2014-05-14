@@ -29,7 +29,7 @@
 //**************************************************************************
 
 #define MCFG_APRICOT_KEYBOARD_TXD_CALLBACK(_write) \
-	devcb = &apricot_keyboard_device::set_tcd_wr_callback(*device, DEVCB2_##_write);
+	devcb = &apricot_keyboard_device::set_tcd_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_txd_wr_callback(device_t &device, _Object object) { return downcast<apricot_keyboard_device &>(device).m_write_txd.set_callback(object); }
+	template<class _Object> static devcb_base &set_txd_wr_callback(device_t &device, _Object object) { return downcast<apricot_keyboard_device &>(device).m_write_txd.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -69,7 +69,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb2_write_line   m_write_txd;
+	devcb_write_line   m_write_txd;
 
 	required_ioport m_y0;
 	required_ioport m_y1;

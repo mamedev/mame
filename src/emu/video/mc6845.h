@@ -50,16 +50,16 @@
 	mc6845_device::set_on_update_addr_change_callback(*device, mc6845_on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6845_OUT_DE_CB(_write) \
-	devcb = &mc6845_device::set_out_de_callback(*device, DEVCB2_##_write);
+	devcb = &mc6845_device::set_out_de_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6845_OUT_CUR_CB(_write) \
-	devcb = &mc6845_device::set_out_cur_callback(*device, DEVCB2_##_write);
+	devcb = &mc6845_device::set_out_cur_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6845_OUT_HSYNC_CB(_write) \
-	devcb = &mc6845_device::set_out_hsync_callback(*device, DEVCB2_##_write);
+	devcb = &mc6845_device::set_out_hsync_callback(*device, DEVCB_##_write);
 
 #define MCFG_MC6845_OUT_VSYNC_CB(_write) \
-	devcb = &mc6845_device::set_out_vsync_callback(*device, DEVCB2_##_write);
+	devcb = &mc6845_device::set_out_vsync_callback(*device, DEVCB_##_write);
 
 
 /* callback definitions */
@@ -112,10 +112,10 @@ public:
 	static void set_end_update_callback(device_t &device, mc6845_end_update_delegate callback) { downcast<mc6845_device &>(device).m_end_update_cb = callback; }
 	static void set_on_update_addr_change_callback(device_t &device, mc6845_on_update_addr_changed_delegate callback) { downcast<mc6845_device &>(device).m_on_update_addr_changed_cb = callback; }
 
-	template<class _Object> static devcb2_base &set_out_de_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_de_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_cur_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_cur_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_hsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_hsync_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_vsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_de_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_de_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_cur_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_cur_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_hsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_hsync_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_vsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(object); }
 	
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -302,16 +302,16 @@ protected:
 	mc6845_on_update_addr_changed_delegate m_on_update_addr_changed_cb;
 	
 	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
-	devcb2_write_line            m_out_de_cb;
+	devcb_write_line            m_out_de_cb;
 	
 	/* if specified, this gets called for every change of the cursor pin (pin 19) */
-	devcb2_write_line            m_out_cur_cb;
+	devcb_write_line            m_out_cur_cb;
 	
 	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
-	devcb2_write_line            m_out_hsync_cb;
+	devcb_write_line            m_out_hsync_cb;
 	
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
-	devcb2_write_line            m_out_vsync_cb;
+	devcb_write_line            m_out_vsync_cb;
 };
 
 

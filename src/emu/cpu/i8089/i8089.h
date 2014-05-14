@@ -24,10 +24,10 @@
 	i8089_device::set_databus_width(*device, _databus_width);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
-	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB2_##_sintr1);
+	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
 
 #define MCFG_I8089_SINTR2(_sintr2) \
-	downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB2_##_sintr2);
+	downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
 
 
 //**************************************************************************
@@ -107,8 +107,8 @@ private:
 	required_device<i8089_channel> m_ch1;
 	required_device<i8089_channel> m_ch2;
 
-	devcb2_write_line m_write_sintr1;
-	devcb2_write_line m_write_sintr2;
+	devcb_write_line m_write_sintr1;
+	devcb_write_line m_write_sintr2;
 
 	void initialize();
 

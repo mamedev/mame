@@ -58,7 +58,7 @@
 #define MCFG_VIP_BYTEIO_PORT_ADD(_tag, _slot_intf, _def_slot, _inst) \
 	MCFG_DEVICE_ADD(_tag, VIP_BYTEIO_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<vip_byteio_port_device *>(device)->set_inst_callback(DEVCB2_##_inst);
+	downcast<vip_byteio_port_device *>(device)->set_inst_callback(DEVCB_##_inst);
 
 
 
@@ -94,7 +94,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	devcb2_write_line m_write_inst;
+	devcb_write_line m_write_inst;
 
 	device_vip_byteio_port_interface *m_cart;
 };

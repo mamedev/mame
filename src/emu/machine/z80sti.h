@@ -49,28 +49,28 @@
 	z80sti_device::set_tx_clock(*device, _clock);
 
 #define MCFG_Z80STI_OUT_INT_CB(_devcb) \
-	devcb = &z80sti_device::set_out_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_IN_GPIO_CB(_devcb) \
-	devcb = &z80sti_device::set_in_gpio_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_in_gpio_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_GPIO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_gpio_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_gpio_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_SO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_so_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_so_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TAO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tao_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_tao_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TBO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tbo_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_tbo_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TCO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tco_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_tco_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TDO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tdo_callback(*device, DEVCB2_##_devcb);
+	devcb = &z80sti_device::set_out_tdo_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -86,14 +86,14 @@ public:
 	// construction/destruction
 	z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_in_gpio_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_gpio_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_so_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_so_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tao_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_in_gpio_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_gpio_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_so_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tao_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(object); }
 	
 	static void set_rx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_tx_clock = clock; }
@@ -201,14 +201,14 @@ private:
 	void gpip_input(int bit, int state);
 
 	// device callbacks
-	devcb2_write_line        m_out_int_cb;	// this gets called on each change of the _INT pin (pin 17)
-	devcb2_read8             m_in_gpio_cb;	// this is called on each read of the GPIO pins
-	devcb2_write8            m_out_gpio_cb;	// this is called on each write of the GPIO pins
-	devcb2_write_line        m_out_so_cb;	// this gets called for each change of the SO pin (pin 37)
-	devcb2_write_line        m_out_tao_cb;	// this gets called for each change of the TAO pin (pin 1)
-	devcb2_write_line        m_out_tbo_cb;	// this gets called for each change of the TBO pin (pin 2)
-	devcb2_write_line        m_out_tco_cb;	// this gets called for each change of the TCO pin (pin 3)
-	devcb2_write_line        m_out_tdo_cb;	// this gets called for each change of the TDO pin (pin 4)
+	devcb_write_line        m_out_int_cb;	// this gets called on each change of the _INT pin (pin 17)
+	devcb_read8             m_in_gpio_cb;	// this is called on each read of the GPIO pins
+	devcb_write8            m_out_gpio_cb;	// this is called on each write of the GPIO pins
+	devcb_write_line        m_out_so_cb;	// this gets called for each change of the SO pin (pin 37)
+	devcb_write_line        m_out_tao_cb;	// this gets called for each change of the TAO pin (pin 1)
+	devcb_write_line        m_out_tbo_cb;	// this gets called for each change of the TBO pin (pin 2)
+	devcb_write_line        m_out_tco_cb;	// this gets called for each change of the TCO pin (pin 3)
+	devcb_write_line        m_out_tdo_cb;	// this gets called for each change of the TDO pin (pin 4)
 	
 	int m_rx_clock;                     // serial receive clock
 	int m_tx_clock;                     // serial transmit clock

@@ -30,10 +30,10 @@
 	es5506_device::set_channels(*device, _chan);
 	
 #define MCFG_ES5506_IRQ_CB(_devcb) \
-	devcb = &es5506_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &es5506_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ES5506_READ_PORT_CB(_devcb) \
-    devcb = &es5506_device::set_read_port_callback(*device, DEVCB2_##_devcb);
+    devcb = &es5506_device::set_read_port_callback(*device, DEVCB_##_devcb);
 
 	
 #define MCFG_ES5505_REGION0(_region) \
@@ -46,10 +46,10 @@
 	es5505_device::set_channels(*device, _chan);
 	
 #define MCFG_ES5505_IRQ_CB(_devcb) \
-	devcb = &es5505_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &es5505_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ES5505_READ_PORT_CB(_devcb) \
-    devcb = &es5505_device::set_read_port_callback(*device, DEVCB2_##_devcb);
+    devcb = &es5505_device::set_read_port_callback(*device, DEVCB_##_devcb);
 
 
 /* struct describing a single playing voice */
@@ -123,8 +123,8 @@ public:
 	static void set_region2(device_t &device, const char *region2) { downcast<es550x_device &>(device).m_region2 = region2; }
 	static void set_region3(device_t &device, const char *region3) { downcast<es550x_device &>(device).m_region3 = region3; }
 	static void set_channels(device_t &device, int channels) { downcast<es550x_device &>(device).m_channels = channels; }
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<es550x_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_read_port_callback(device_t &device, _Object object) { return downcast<es550x_device &>(device).m_read_port_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<es550x_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_port_callback(device_t &device, _Object object) { return downcast<es550x_device &>(device).m_read_port_cb.set_callback(object); }
 	
 
 protected:
@@ -170,8 +170,8 @@ protected:
 	const char * m_region2;                       /* memory region where the sample ROM lives */
 	const char * m_region3;                       /* memory region where the sample ROM lives */
 	int m_channels;                               /* number of output channels: 1 .. 6 */
-	devcb2_write_line m_irq_cb;  /* irq callback */
-	devcb2_read16 m_read_port_cb;          /* input port read */
+	devcb_write_line m_irq_cb;  /* irq callback */
+	devcb_read16 m_read_port_cb;          /* input port read */
 
 	void update_irq_state();
 	void update_internal_irq_state();

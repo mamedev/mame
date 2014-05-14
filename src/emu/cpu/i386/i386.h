@@ -18,7 +18,7 @@
 
 
 #define MCFG_I386_SMIACT(_devcb) \
-	i386_device::set_smiact(*device, DEVCB2_##_devcb);
+	i386_device::set_smiact(*device, DEVCB_##_devcb);
 
 
 class i386_device : public cpu_device
@@ -29,7 +29,7 @@ public:
 	i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width=32, int program_addr_width=32, int io_data_width=32);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_smiact(device_t &device, _Object object) { return downcast<i386_device &>(device).m_smiact.set_callback(object); }
+	template<class _Object> static devcb_base &set_smiact(device_t &device, _Object object) { return downcast<i386_device &>(device).m_smiact.set_callback(object); }
 
 	UINT64 debug_segbase(symbol_table &table, int params, const UINT64 *param);
 	UINT64 debug_seglimit(symbol_table &table, int params, const UINT64 *param);
@@ -253,7 +253,7 @@ struct I386_CALL_GATE
 	bool m_nmi_masked;
 	bool m_nmi_latched;
 	UINT32 m_smbase;
-	devcb2_write_line m_smiact;
+	devcb_write_line m_smiact;
 
 	// bytes in current opcode, debug only
 	UINT8 m_opcode_bytes[16];

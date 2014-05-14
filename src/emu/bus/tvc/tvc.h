@@ -90,8 +90,8 @@ public:
 	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~tvcexp_slot_device();
 	
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 
 	// device-level overrides
 	virtual void device_start();
@@ -105,8 +105,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(io_read);
 	virtual DECLARE_WRITE8_MEMBER(io_write);
 
-	devcb2_write_line                m_out_irq_cb;
-	devcb2_write_line                m_out_nmi_cb;
+	devcb_write_line                m_out_irq_cb;
+	devcb_write_line                m_out_nmi_cb;
 
 	device_tvcexp_interface*    m_cart;
 };
@@ -120,9 +120,9 @@ extern const device_type TVCEXP_SLOT;
 ***************************************************************************/
 
 #define MCFG_TVCEXP_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &tvcexp_slot_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &tvcexp_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TVCEXP_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &tvcexp_slot_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+	devcb = &tvcexp_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
 	
 #endif /* __TVCEXP_H__ */

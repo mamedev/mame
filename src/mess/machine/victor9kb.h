@@ -25,10 +25,10 @@
 //**************************************************************************
 
 #define MCFG_VICTOR9K_KBRDY_HANDLER(_devcb) \
-	devcb = &victor9k_keyboard_device::set_kbrdy_handler(*device, DEVCB2_##_devcb);
+	devcb = &victor9k_keyboard_device::set_kbrdy_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_VICTOR9K_KBDATA_HANDLER(_devcb) \
-	devcb = &victor9k_keyboard_device::set_kbdata_handler(*device, DEVCB2_##_devcb);
+	devcb = &victor9k_keyboard_device::set_kbdata_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -43,8 +43,8 @@ public:
 	// construction/destruction
 	victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_kbrdy_handler(device_t &device, _Object object) { return downcast<victor9k_keyboard_device &>(device).m_kbrdy_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_kbdata_handler(device_t &device, _Object object) { return downcast<victor9k_keyboard_device &>(device).m_kbdata_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbrdy_handler(device_t &device, _Object object) { return downcast<victor9k_keyboard_device &>(device).m_kbrdy_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbdata_handler(device_t &device, _Object object) { return downcast<victor9k_keyboard_device &>(device).m_kbdata_handler.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -82,8 +82,8 @@ private:
 	required_ioport m_yb;
 	required_ioport m_yc;
 
-	devcb2_write_line   m_kbrdy_handler;
-	devcb2_write_line   m_kbdata_handler;
+	devcb_write_line   m_kbrdy_handler;
+	devcb_write_line   m_kbdata_handler;
 
 	UINT8 m_y;
 	int m_kbrdy;

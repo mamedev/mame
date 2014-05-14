@@ -67,37 +67,37 @@
 //**************************************************************************
 
 #define MCFG_POKEY_POT0_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot0_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot0_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT1_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot1_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot1_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT2_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot2_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot2_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT3_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot3_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot3_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT4_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot4_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot4_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT5_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot5_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot5_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT6_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot6_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot6_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT7_R_CB(_devcb) \
-	devcb = &pokey_device::set_pot7_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_pot7_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_ALLPOT_R_CB(_devcb) \
-	devcb = &pokey_device::set_allpot_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_allpot_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_SERIN_R_CB(_devcb) \
-	devcb = &pokey_device::set_serin_r_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_serin_r_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_POKEY_SEROUT_W_CB(_devcb) \
-	devcb = &pokey_device::set_serout_w_callback(*device, DEVCB2_##_devcb);
+	devcb = &pokey_device::set_serout_w_callback(*device, DEVCB_##_devcb);
 
 /* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 /* all are, in contrast to actual hardware, ACTIVE_HIGH */
@@ -209,17 +209,17 @@ public:
 	// construction/destruction
 	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_pot0_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot0_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot1_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot1_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot2_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot2_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot3_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot3_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot4_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot4_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot5_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot5_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot6_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot6_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_pot7_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot7_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_allpot_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_allpot_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_serin_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_serin_r_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_serout_w_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_serout_w_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot0_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot0_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot1_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot1_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot2_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot2_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot3_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot3_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot4_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot4_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot5_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot5_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot6_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot6_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pot7_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_pot7_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_allpot_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_allpot_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_serin_r_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_serin_r_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_serout_w_callback(device_t &device, _Object object) { return downcast<pokey_device &>(device).m_serout_w_cb.set_callback(object); }
 	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -334,17 +334,17 @@ private:
 	UINT32 m_p9;              /* poly9 index */
 	UINT32 m_p17;             /* poly17 index */
 
-	devcb2_read8 m_pot0_r_cb;
-	devcb2_read8 m_pot1_r_cb;
-	devcb2_read8 m_pot2_r_cb;
-	devcb2_read8 m_pot3_r_cb;
-	devcb2_read8 m_pot4_r_cb;
-	devcb2_read8 m_pot5_r_cb;
-	devcb2_read8 m_pot6_r_cb;
-	devcb2_read8 m_pot7_r_cb;
-	devcb2_read8 m_allpot_r_cb;
-	devcb2_read8 m_serin_r_cb;
-	devcb2_write8 m_serout_w_cb;
+	devcb_read8 m_pot0_r_cb;
+	devcb_read8 m_pot1_r_cb;
+	devcb_read8 m_pot2_r_cb;
+	devcb_read8 m_pot3_r_cb;
+	devcb_read8 m_pot4_r_cb;
+	devcb_read8 m_pot5_r_cb;
+	devcb_read8 m_pot6_r_cb;
+	devcb_read8 m_pot7_r_cb;
+	devcb_read8 m_allpot_r_cb;
+	devcb_read8 m_serin_r_cb;
+	devcb_write8 m_serout_w_cb;
 
 	UINT8 m_POTx[8];        /* POTx   (R/D200-D207) */
 	UINT8 m_AUDCTL;         /* AUDCTL (W/D208) */

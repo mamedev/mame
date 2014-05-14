@@ -16,10 +16,10 @@ Acorn Archimedes KART interface
 //**************************************************************************
 
 #define MCFG_AAKART_OUT_TX_CB(_devcb) \
-	devcb = &aakart_device::set_out_tx_callback(*device, DEVCB2_##_devcb);
+	devcb = &aakart_device::set_out_tx_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AAKART_OUT_RX_CB(_devcb) \
-	devcb = &aakart_device::set_out_rx_callback(*device, DEVCB2_##_devcb);
+	devcb = &aakart_device::set_out_rx_callback(*device, DEVCB_##_devcb);
 	
 
 enum{
@@ -43,8 +43,8 @@ public:
 	// construction/destruction
 	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	template<class _Object> static devcb2_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_tx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_tx_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_rx_callback(device_t &device, _Object object) { return downcast<aakart_device &>(device).m_out_rx_cb.set_callback(object); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -68,8 +68,8 @@ private:
 	emu_timer *         m_mousetimer;
 	emu_timer *         m_keybtimer;
 
-	devcb2_write_line        m_out_tx_cb;
-	devcb2_write_line        m_out_rx_cb;
+	devcb_write_line        m_out_tx_cb;
+	devcb_write_line        m_out_rx_cb;
 	UINT8 m_tx_latch;
 	//UINT8 m_rx_latch;
 	UINT8 m_rx;

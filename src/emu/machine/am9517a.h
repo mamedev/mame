@@ -53,26 +53,26 @@ public:
 	// construction/destruction
 	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_hreq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_eop_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_eop_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_hreq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_eop_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_eop_cb.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_in_memr_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_memr_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_memw_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_memw_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_memr_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_memr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_memw_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_memw_cb.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_in_ior_0_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_0_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_ior_1_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_1_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_ior_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_2_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_ior_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_3_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_ior_0_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_ior_1_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_ior_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_in_ior_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_in_ior_3_cb.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_out_iow_0_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_0_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_iow_1_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_1_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_iow_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_2_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_iow_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_3_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_iow_0_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_iow_1_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_iow_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_iow_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_iow_3_cb.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_out_dack_0_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_0_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_1_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_2_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_3_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dack_0_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_2_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_3_cb.set_callback(object); }
 	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -107,24 +107,24 @@ private:
 	inline void dma_advance();
 	inline void end_of_process();
 
-	devcb2_write_line   m_out_hreq_cb;
-	devcb2_write_line   m_out_eop_cb;
+	devcb_write_line   m_out_hreq_cb;
+	devcb_write_line   m_out_eop_cb;
 
-	devcb2_read8        m_in_memr_cb;
-	devcb2_write8       m_out_memw_cb;
+	devcb_read8        m_in_memr_cb;
+	devcb_write8       m_out_memw_cb;
 
-	devcb2_read8        m_in_ior_0_cb;
-	devcb2_read8        m_in_ior_1_cb;
-	devcb2_read8        m_in_ior_2_cb;
-	devcb2_read8        m_in_ior_3_cb;
-	devcb2_write8       m_out_iow_0_cb;
-	devcb2_write8       m_out_iow_1_cb;
-	devcb2_write8       m_out_iow_2_cb;
-	devcb2_write8       m_out_iow_3_cb;
-	devcb2_write_line   m_out_dack_0_cb;
-	devcb2_write_line   m_out_dack_1_cb;
-	devcb2_write_line   m_out_dack_2_cb;
-	devcb2_write_line   m_out_dack_3_cb;
+	devcb_read8        m_in_ior_0_cb;
+	devcb_read8        m_in_ior_1_cb;
+	devcb_read8        m_in_ior_2_cb;
+	devcb_read8        m_in_ior_3_cb;
+	devcb_write8       m_out_iow_0_cb;
+	devcb_write8       m_out_iow_1_cb;
+	devcb_write8       m_out_iow_2_cb;
+	devcb_write8       m_out_iow_3_cb;
+	devcb_write_line   m_out_dack_0_cb;
+	devcb_write_line   m_out_dack_1_cb;
+	devcb_write_line   m_out_dack_2_cb;
+	devcb_write_line   m_out_dack_3_cb;
 
 	struct
 	{
@@ -159,52 +159,52 @@ extern const device_type AM9517A;
 ***************************************************************************/
 
 #define MCFG_AM9517A_OUT_HREQ_CB(_devcb) \
-	devcb = &am9517a_device::set_out_hreq_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_hreq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_EOP_CB(_devcb) \
-	devcb = &am9517a_device::set_out_eop_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_eop_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_IN_MEMR_CB(_devcb) \
-	devcb = &am9517a_device::set_in_memr_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_in_memr_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_MEMW_CB(_devcb) \
-	devcb = &am9517a_device::set_out_memw_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_memw_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_IN_IOR_0_CB(_devcb) \
-	devcb = &am9517a_device::set_in_ior_0_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_in_ior_0_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_IN_IOR_1_CB(_devcb) \
-	devcb = &am9517a_device::set_in_ior_1_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_in_ior_1_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_IN_IOR_2_CB(_devcb) \
-	devcb = &am9517a_device::set_in_ior_2_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_in_ior_2_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_IN_IOR_3_CB(_devcb) \
-	devcb = &am9517a_device::set_in_ior_3_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_in_ior_3_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_IOW_0_CB(_devcb) \
-	devcb = &am9517a_device::set_out_iow_0_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_iow_0_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_IOW_1_CB(_devcb) \
-	devcb = &am9517a_device::set_out_iow_1_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_iow_1_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_IOW_2_CB(_devcb) \
-	devcb = &am9517a_device::set_out_iow_2_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_iow_2_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_IOW_3_CB(_devcb) \
-	devcb = &am9517a_device::set_out_iow_3_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_iow_3_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_DACK_0_CB(_devcb) \
-	devcb = &am9517a_device::set_out_dack_0_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_dack_0_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_DACK_1_CB(_devcb) \
-	devcb = &am9517a_device::set_out_dack_1_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_dack_1_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_DACK_2_CB(_devcb) \
-	devcb = &am9517a_device::set_out_dack_2_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_dack_2_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AM9517A_OUT_DACK_3_CB(_devcb) \
-	devcb = &am9517a_device::set_out_dack_3_callback(*device, DEVCB2_##_devcb);
+	devcb = &am9517a_device::set_out_dack_3_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_I8237_OUT_HREQ_CB MCFG_AM9517A_OUT_HREQ_CB
 #define MCFG_I8237_OUT_EOP_CB MCFG_AM9517A_OUT_EOP_CB

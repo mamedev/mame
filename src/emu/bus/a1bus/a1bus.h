@@ -22,10 +22,10 @@
 	a1bus_device::static_set_cputag(*device, _cputag);
 
 #define MCFG_A1BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &a1bus_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &a1bus_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_A1BUS_OUT_NMI_CB(_devcb) \
-	devcb = &a1bus_device::set_out_nmi_callback(*device, DEVCB2_##_devcb);
+	devcb = &a1bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_A1BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, A1BUS_SLOT, 0) \
@@ -78,8 +78,8 @@ public:
 	
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<a1bus_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<a1bus_device &>(device).m_out_nmi_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<a1bus_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<a1bus_device &>(device).m_out_nmi_cb.set_callback(object); }
 
 	void add_a1bus_card(device_a1bus_card_interface *card);
 	device_a1bus_card_interface *get_a1bus_card();
@@ -101,8 +101,8 @@ protected:
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb2_write_line    m_out_irq_cb;
-	devcb2_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_nmi_cb;
 
 	device_a1bus_card_interface *m_device;
 	const char *m_cputag;

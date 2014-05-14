@@ -68,13 +68,13 @@
 //**************************************************************************
 
 #define MCFG_CDP1861_IRQ_CALLBACK(_write) \
-	devcb = &cdp1861_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cdp1861_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CDP1861_DMA_OUT_CALLBACK(_write) \
-	devcb = &cdp1861_device::set_dma_out_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cdp1861_device::set_dma_out_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CDP1861_EFX_CALLBACK(_write) \
-	devcb = &cdp1861_device::set_efx_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cdp1861_device::set_efx_wr_callback(*device, DEVCB_##_write);
 
 
 #define MCFG_CDP1861_SCREEN_ADD(_cdptag, _tag, _clock) \
@@ -98,9 +98,9 @@ public:
 	// construction/destruction
 	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_dma_out.set_callback(object); }
-	template<class _Object> static devcb2_base &set_efx_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_efx.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_dma_out.set_callback(object); }
+	template<class _Object> static devcb_base &set_efx_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_efx.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
@@ -124,9 +124,9 @@ private:
 		TIMER_DMA
 	};
 
-	devcb2_write_line m_write_irq;
-	devcb2_write_line m_write_dma_out;
-	devcb2_write_line m_write_efx;
+	devcb_write_line m_write_irq;
+	devcb_write_line m_write_dma_out;
+	devcb_write_line m_write_efx;
 
 	int m_disp;                     // display enabled
 	int m_dispon;                   // display on latch

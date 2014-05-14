@@ -42,12 +42,12 @@ public:
 
 	DECLARE_PALETTE_INIT(vdt911);
 
-	template<class _Object> static devcb2_base &static_set_keyint_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_keyint_callback(device_t &device, _Object object)
 	{
 		return downcast<vdt911_device &>(device).m_keyint_line.set_callback(object);
 	}
 
-	template<class _Object> static devcb2_base &static_set_lineint_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_lineint_callback(device_t &device, _Object object)
 	{
 		return downcast<vdt911_device &>(device).m_lineint_line.set_callback(object);
 	}
@@ -103,14 +103,14 @@ private:
 	required_device<beep_device>        m_beeper;
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;
-	devcb2_write_line                   m_keyint_line;
-	devcb2_write_line                   m_lineint_line;
+	devcb_write_line                   m_keyint_line;
+	devcb_write_line                   m_lineint_line;
 };
 
 extern const device_type VDT911;
 
 #define MCFG_VDT911_KEYINT_HANDLER( _intcallb ) \
-	devcb = &vdt911_device::static_set_keyint_callback( *device, DEVCB2_##_intcallb );
+	devcb = &vdt911_device::static_set_keyint_callback( *device, DEVCB_##_intcallb );
 
 #define MCFG_VDT911_LINEINT_HANDLER( _intcallb ) \
-	devcb = &vdt911_device::static_set_lineint_callback( *device, DEVCB2_##_intcallb );
+	devcb = &vdt911_device::static_set_lineint_callback( *device, DEVCB_##_intcallb );

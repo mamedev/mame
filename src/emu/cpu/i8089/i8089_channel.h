@@ -26,7 +26,7 @@
 	MCFG_DEVICE_ADD(_tag, I8089_CHANNEL, 0)
 
 #define MCFG_I8089_CHANNEL_SINTR(_sintr) \
-	downcast<i8089_channel *>(device)->set_sintr_callback(DEVCB2_##_sintr);
+	downcast<i8089_channel *>(device)->set_sintr_callback(DEVCB_##_sintr);
 
 
 //**************************************************************************
@@ -175,7 +175,7 @@ private:
 
 	void examine_ccw(UINT8 ccw);
 
-	devcb2_write_line m_write_sintr;
+	devcb_write_line m_write_sintr;
 
 	i8089_device *m_iop;
 

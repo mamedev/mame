@@ -7,19 +7,19 @@
 
 
 #define MCFG_K053252_INT1_EN_CB(_devcb) \
-	devcb = &k053252_device::set_int1_en_callback(*device, DEVCB2_##_devcb);
+	devcb = &k053252_device::set_int1_en_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_K053252_INT2_EN_CB(_devcb) \
-	devcb = &k053252_device::set_int2_en_callback(*device, DEVCB2_##_devcb);
+	devcb = &k053252_device::set_int2_en_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_K053252_INT1_ACK_CB(_devcb) \
-	devcb = &k053252_device::set_int1_ack_callback(*device, DEVCB2_##_devcb);
+	devcb = &k053252_device::set_int1_ack_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_K053252_INT2_ACK_CB(_devcb) \
-	devcb = &k053252_device::set_int2_ack_callback(*device, DEVCB2_##_devcb);
+	devcb = &k053252_device::set_int2_ack_callback(*device, DEVCB_##_devcb);
 
 /*#define MCFG_K053252_INT_TIME_CB(_devcb) \
-    devcb = &k053252_device::set_int_time_callback(*device, DEVCB2_##_devcb); */
+    devcb = &k053252_device::set_int_time_callback(*device, DEVCB_##_devcb); */
 
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	k053252_device::set_offsets(*device, _offsx, _offsy);
@@ -32,11 +32,11 @@ public:
 	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k053252_device() {}
 
-	template<class _Object> static devcb2_base &set_int1_en_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int1_en_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int2_en_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int2_en_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int1_ack_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int1_ack_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int2_ack_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int2_ack_cb.set_callback(object); }
-	//template<class _Object> static devcb2_base &set_int_time_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int1_en_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int1_en_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int2_en_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int2_en_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int1_ack_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int1_ack_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int2_ack_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int2_ack_cb.set_callback(object); }
+	//template<class _Object> static devcb_base &set_int_time_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(object); }
 	static void set_offsets(device_t &device, int offsx, int offsy) { downcast<k053252_device &>(device).m_offsx = offsx; downcast<k053252_device &>(device).m_offsy = offsy;}
 
 	DECLARE_READ8_MEMBER( read );  // CCU registers
@@ -56,11 +56,11 @@ protected:
 	UINT16  m_vc,m_vfp,m_vbp;
 	UINT8   m_vsw,m_hsw;
 
-	devcb2_write_line   m_int1_en_cb;
-	devcb2_write_line   m_int2_en_cb;
-	devcb2_write_line   m_int1_ack_cb;
-	devcb2_write_line   m_int2_ack_cb;
-//  devcb2_write8       m_int_time_cb;
+	devcb_write_line   m_int1_en_cb;
+	devcb_write_line   m_int2_en_cb;
+	devcb_write_line   m_int1_ack_cb;
+	devcb_write_line   m_int2_ack_cb;
+//  devcb_write8       m_int_time_cb;
 	int                m_offsx;
 	int                m_offsy;
 };

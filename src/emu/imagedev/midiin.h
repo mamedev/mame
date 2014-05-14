@@ -11,7 +11,7 @@
 
 
 #define MCFG_MIDIIN_INPUT_CB(_devcb) \
-	devcb = &midiin_device::set_input_callback(*device, DEVCB2_##_devcb);
+	devcb = &midiin_device::set_input_callback(*device, DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
 	
 	// image-level overrides
 	virtual bool call_load();
@@ -62,7 +62,7 @@ private:
 
 	osd_midi_device *m_midi;
 	emu_timer *m_timer;
-	devcb2_write_line        m_input_cb;
+	devcb_write_line        m_input_cb;
 	UINT8 m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;

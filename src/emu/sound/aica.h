@@ -15,10 +15,10 @@
 	aica_device::set_roffset(*device, _offs);
 
 #define MCFG_AICA_IRQ_CB(_devcb) \
-	devcb = &aica_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &aica_device::set_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AICA_MAIN_IRQ_CB(_devcb) \
-	devcb = &aica_device::set_main_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &aica_device::set_main_irq_callback(*device, DEVCB_##_devcb);
 
 enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
 
@@ -80,8 +80,8 @@ public:
 
 	static void set_master(device_t &device) { downcast<aica_device &>(device).m_master = true; }
 	static void set_roffset(device_t &device, int roffset) { downcast<aica_device &>(device).m_roffset = roffset; }
-	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(object); }
 
 	// AICA register access
 	DECLARE_READ16_MEMBER( read );
@@ -138,8 +138,8 @@ private:
 
 	bool m_master;
 	int m_roffset;                /* offset in the region */
-	devcb2_write_line m_irq_cb;
-	devcb2_write_line m_main_irq_cb;
+	devcb_write_line m_irq_cb;
+	devcb_write_line m_main_irq_cb;
 
 	union
 	{

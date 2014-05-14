@@ -76,13 +76,13 @@
 
 
 #define MCFG_UV201_EXT_INT_CALLBACK(_write) \
-	devcb = &uv201_device::set_ext_int_wr_callback(*device, DEVCB2_##_write);
+	devcb = &uv201_device::set_ext_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UV201_HBLANK_CALLBACK(_write) \
-	devcb = &uv201_device::set_hblank_wr_callback(*device, DEVCB2_##_write);
+	devcb = &uv201_device::set_hblank_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UV201_DB_CALLBACK(_read) \
-	devcb = &uv201_device::set_db_rd_callback(*device, DEVCB2_##_read);
+	devcb = &uv201_device::set_db_rd_callback(*device, DEVCB_##_read);
 
 
 
@@ -99,9 +99,9 @@ public:
 	// construction/destruction
 	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_ext_int_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_ext_int.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hblank_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_hblank.set_callback(object); }
-	template<class _Object> static devcb2_base &set_db_rd_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_read_db.set_callback(object); }
+	template<class _Object> static devcb_base &set_ext_int_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_ext_int.set_callback(object); }
+	template<class _Object> static devcb_base &set_hblank_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_hblank.set_callback(object); }
+	template<class _Object> static devcb_base &set_db_rd_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_read_db.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -132,9 +132,9 @@ private:
 	void set_y_interrupt();
 	void do_partial_update();
 
-	devcb2_write_line   m_write_ext_int;
-	devcb2_write_line   m_write_hblank;
-	devcb2_read8        m_read_db;
+	devcb_write_line   m_write_ext_int;
+	devcb_write_line   m_write_hblank;
+	devcb_read8        m_read_db;
 
 	rgb_t m_palette_val[32];
 	UINT8 m_ram[0x90];

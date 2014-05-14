@@ -29,24 +29,24 @@
 	decocpu_type1_device::static_set_cpuregion(*device, _region);
 
 #define MCFG_DECOCPU_DISPLAY(_disp_r, _disp_w) \
-	downcast<decocpu_type1_device *>(device)->set_display_read_callback(DEVCB2_##_disp_r); \
-	downcast<decocpu_type1_device *>(device)->set_display_write_callback(DEVCB2_##_disp_w);
+	downcast<decocpu_type1_device *>(device)->set_display_read_callback(DEVCB_##_disp_r); \
+	downcast<decocpu_type1_device *>(device)->set_display_write_callback(DEVCB_##_disp_w);
 
 #define MCFG_DECOCPU_DMDSTATUS(_dmdstat_r) \
-	downcast<decocpu_type1_device *>(device)->set_dmdstatus_read_callback(DEVCB2_##_dmdstat_r);
+	downcast<decocpu_type1_device *>(device)->set_dmdstatus_read_callback(DEVCB_##_dmdstat_r);
 
 #define MCFG_DECOCPU_SOUNDLATCH(_soundlatch_w) \
-	downcast<decocpu_type1_device *>(device)->set_soundlatch_write_callback(DEVCB2_##_soundlatch_w);
+	downcast<decocpu_type1_device *>(device)->set_soundlatch_write_callback(DEVCB_##_soundlatch_w);
 
 #define MCFG_DECOCPU_SWITCH(_switch_r, _switch_w) \
-	downcast<decocpu_type1_device *>(device)->set_switch_read_callback(DEVCB2_##_switch_r); \
-	downcast<decocpu_type1_device *>(device)->set_switch_write_callback(DEVCB2_##_switch_w);
+	downcast<decocpu_type1_device *>(device)->set_switch_read_callback(DEVCB_##_switch_r); \
+	downcast<decocpu_type1_device *>(device)->set_switch_write_callback(DEVCB_##_switch_w);
 
 #define MCFG_DECOCPU_LAMP(_lamp_w) \
-	downcast<decocpu_type1_device *>(device)->set_lamp_write_callback(DEVCB2_##_lamp_w);
+	downcast<decocpu_type1_device *>(device)->set_lamp_write_callback(DEVCB_##_lamp_w);
 
 #define MCFG_DECOCPU_SOLENOIDS(_sol_w) \
-	downcast<decocpu_type1_device *>(device)->set_solenoid_write_callback(DEVCB2_##_sol_w);
+	downcast<decocpu_type1_device *>(device)->set_solenoid_write_callback(DEVCB_##_sol_w);
 
 
 // 6808 CPU's input clock is 4MHz
@@ -119,14 +119,14 @@ private:
 	bool m_ca2;
 
 	// callbacks
-	devcb2_read8 m_read_display;
-	devcb2_write8 m_write_display;
-	devcb2_read8 m_read_dmdstatus;
-	devcb2_write8 m_write_soundlatch;
-	devcb2_read8 m_read_switch;
-	devcb2_write8 m_write_switch;
-	devcb2_write8 m_write_lamp;
-	devcb2_write8 m_write_solenoid;
+	devcb_read8 m_read_display;
+	devcb_write8 m_write_display;
+	devcb_read8 m_read_dmdstatus;
+	devcb_write8 m_write_soundlatch;
+	devcb_read8 m_read_switch;
+	devcb_write8 m_write_switch;
+	devcb_write8 m_write_lamp;
+	devcb_write8 m_write_solenoid;
 };
 
 class decocpu_type2_device : public decocpu_type1_device

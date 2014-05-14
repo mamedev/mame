@@ -34,13 +34,13 @@
 
 #define MCFG_UPD1990A_ADD(_tag, _clock, _data, _tp) \
 	MCFG_DEVICE_ADD((_tag), UPD1990A, _clock) \
-	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB2_##_data); \
-	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB2_##_tp);
+	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB_##_data); \
+	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB_##_tp);
 
 #define MCFG_UPD4990A_ADD(_tag, _clock, _data, _tp) \
 	MCFG_DEVICE_ADD((_tag), UPD4990A, _clock) \
-	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB2_##_data); \
-	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB2_##_tp);
+	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB_##_data); \
+	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB_##_tp);
 
 
 
@@ -115,8 +115,8 @@ private:
 		MODE_TEST
 	};
 
-	devcb2_write_line m_write_data;
-	devcb2_write_line m_write_tp;
+	devcb_write_line m_write_data;
+	devcb_write_line m_write_tp;
 
 	UINT8 m_time_counter[6];    // time counter
 	UINT8 m_shift_reg[7];       // shift register (40 bits, or 48 bits + serial command register)

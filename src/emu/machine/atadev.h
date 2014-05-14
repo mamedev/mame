@@ -38,10 +38,10 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) = 0;
 
-	devcb2_write_line m_irq_handler;
-	devcb2_write_line m_dmarq_handler;
-	devcb2_write_line m_dasp_handler;
-	devcb2_write_line m_pdiag_handler;
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_dmarq_handler;
+	devcb_write_line m_dasp_handler;
+	devcb_write_line m_pdiag_handler;
 };
 
 #endif

@@ -10,7 +10,7 @@
 #define __KC_KEYB_H__
 
 #define MCFG_KC_KEYBOARD_OUT_CALLBACK(_write) \
-	devcb = &kc_keyboard_device::set_out_wr_callback(*device, DEVCB2_##_write);
+	devcb = &kc_keyboard_device::set_out_wr_callback(*device, DEVCB_##_write);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -28,7 +28,7 @@ public:
 	kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~kc_keyboard_device();
 
-	template<class _Object> static devcb2_base &set_out_wr_callback(device_t &device, _Object object) { return downcast<kc_keyboard_device &>(device).m_write_out.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_wr_callback(device_t &device, _Object object) { return downcast<kc_keyboard_device &>(device).m_write_out.set_callback(object); }
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
@@ -48,7 +48,7 @@ private:
 
 	// internal state
 	emu_timer *                 m_timer_transmit_pulse;
-	devcb2_write_line   m_write_out;
+	devcb_write_line   m_write_out;
 
 	// pulses to transmit
 	struct

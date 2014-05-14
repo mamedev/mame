@@ -17,11 +17,11 @@
 
 /* IRQ callback function, active low, i.e. state=0 */
 #define MCFG_TMS52XX_IRQ_HANDLER(_devcb) \
-	devcb = &tms5220_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &tms5220_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 /* Ready callback function, active low, i.e. state=0 */
 #define MCFG_TMS52XX_READYQ_HANDLER(_devcb) \
-	devcb = &tms5220_device::set_readyq_handler(*device, DEVCB2_##_devcb);
+	devcb = &tms5220_device::set_readyq_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS52XX_SPEECHROM(_tag) \
 	tms5220_device::set_speechrom_tag(*device, _tag);
@@ -34,8 +34,8 @@ public:
 	tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_readyq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_readyq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_readyq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_readyq_handler.set_callback(object); }
 	static void set_speechrom_tag(device_t &device, const char *_tag) { downcast<tms5220_device &>(device).m_speechrom_tag = _tag; }
 
 	/* Control lines - once written to will switch interface into
@@ -197,8 +197,8 @@ private:
 	emu_timer *m_timer_io_ready;
 
 	/* callbacks */
-	devcb2_write_line m_irq_handler;
-	devcb2_write_line m_readyq_handler;
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_readyq_handler;
 	const char *m_speechrom_tag;
 	speechrom_device *m_speechrom;
 };

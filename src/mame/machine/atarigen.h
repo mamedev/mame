@@ -37,14 +37,14 @@
 #define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
 	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
-	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
+	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
 
 
 
 #define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB2_##_intcb);
+	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB_##_intcb);
 
 #define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
 	{ astring fulltag(device->tag(), ":playfield"); device_t *device; \
@@ -114,7 +114,7 @@ public:
 
 	// static configuration helpers
 	static void static_set_sound_cpu(device_t &device, const char *cputag);
-	template<class _Object> static devcb2_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
 
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
@@ -159,7 +159,7 @@ private:
 
 	// configuration state
 	const char *        m_sound_cpu_tag;
-	devcb2_write_line   m_main_int_cb;
+	devcb_write_line   m_main_int_cb;
 
 	// internal state
 	m6502_device *      m_sound_cpu;
@@ -186,7 +186,7 @@ public:
 	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
 
 	// getters
 	tilemap_device *alpha() const { return m_alpha_tilemap; }
@@ -228,7 +228,7 @@ private:
 	void eof_update(emu_timer &timer);
 
 	// configuration state
-	devcb2_write_line   m_scanline_int_cb;
+	devcb_write_line   m_scanline_int_cb;
 
 	// internal state
 	optional_device<tilemap_device> m_alpha_tilemap;

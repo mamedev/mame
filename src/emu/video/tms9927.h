@@ -12,7 +12,7 @@
 
 
 #define MCFG_TMS9927_VSYN_CALLBACK(_write) \
-	devcb = &tms9927_device::set_vsyn_wr_callback(*device, DEVCB2_##_write);
+	devcb = &tms9927_device::set_vsyn_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_TMS9927_CHAR_WIDTH(_pixels) \
 	tms9927_device::set_char_width(*device, _pixels);
@@ -29,7 +29,7 @@ public:
 	tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~tms9927_device() {}
 
-	template<class _Object> static devcb2_base &set_vsyn_wr_callback(device_t &device, _Object object) { return downcast<tms9927_device &>(device).m_write_vsyn.set_callback(object); }
+	template<class _Object> static devcb_base &set_vsyn_wr_callback(device_t &device, _Object object) { return downcast<tms9927_device &>(device).m_write_vsyn.set_callback(object); }
 
 	static void set_char_width(device_t &device, int pixels) { downcast<tms9927_device &>(device).m_hpixels_per_column = pixels; }
 	static void set_region_tag(device_t &device, const char *tag) { downcast<tms9927_device &>(device).m_selfload_region = tag; }
@@ -58,7 +58,7 @@ private:
 	void recompute_parameters(int postload);
 	void generic_access(address_space &space, offs_t offset);
 
-	devcb2_write_line m_write_vsyn;
+	devcb_write_line m_write_vsyn;
 	int m_hpixels_per_column;         /* number of pixels per video memory address */
 	const char *m_selfload_region;    /* name of the region with self-load data */
 

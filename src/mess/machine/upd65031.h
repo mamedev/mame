@@ -18,16 +18,16 @@
 //**************************************************************************
 
 #define MCFG_UPD65031_KB_CALLBACK(_read) \
-	devcb = &upd65031_device::set_kb_rd_callback(*device, DEVCB2_##_read);
+	devcb = &upd65031_device::set_kb_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_UPD65031_INT_CALLBACK(_write) \
-	devcb = &upd65031_device::set_int_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd65031_device::set_int_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD65031_NMI_CALLBACK(_write) \
-	devcb = &upd65031_device::set_nmi_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd65031_device::set_nmi_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD65031_SPKR_CALLBACK(_write) \
-	devcb = &upd65031_device::set_spkr_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd65031_device::set_spkr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD65031_SCR_UPDATE_CB(_class, _method) \
 	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -55,10 +55,10 @@ public:
 	// construction/destruction
 	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_kb_rd_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_read_kb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_int.set_callback(object); }
-	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_nmi.set_callback(object); }
-	template<class _Object> static devcb2_base &set_spkr_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_spkr.set_callback(object); }
+	template<class _Object> static devcb_base &set_kb_rd_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_read_kb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_int.set_callback(object); }
+	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_nmi.set_callback(object); }
+	template<class _Object> static devcb_base &set_spkr_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_spkr.set_callback(object); }
 
 	static void set_screen_update_callback(device_t &device, upd65031_screen_update_delegate callback) { downcast<upd65031_device &>(device).m_screen_update_cb = callback; }
 	static void set_memory_update_callback(device_t &device, upd65031_memory_update_delegate callback) { downcast<upd65031_device &>(device).m_out_mem_cb = callback; }
@@ -83,10 +83,10 @@ private:
 	static const device_timer_id TIMER_FLASH = 1;
 	static const device_timer_id TIMER_SPEAKER = 2;
 
-	devcb2_read8        m_read_kb;
-	devcb2_write_line   m_write_int;
-	devcb2_write_line   m_write_nmi;
-	devcb2_write_line   m_write_spkr;
+	devcb_read8        m_read_kb;
+	devcb_write_line   m_write_int;
+	devcb_write_line   m_write_nmi;
+	devcb_write_line   m_write_spkr;
 
 	upd65031_screen_update_delegate m_screen_update_cb;  // callback for update the LCD
 	upd65031_memory_update_delegate m_out_mem_cb;        // callback for update bankswitch

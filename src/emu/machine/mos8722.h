@@ -50,19 +50,19 @@
 //**************************************************************************
 
 #define MCFG_MOS8722_Z80EN_CALLBACK(_write) \
-	devcb = &mos8722_device::set_z80en_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos8722_device::set_z80en_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS8722_FSDIR_CALLBACK(_write) \
-	devcb = &mos8722_device::set_fsdir_wr_callback(*device, DEVCB2_##_write);
+	devcb = &mos8722_device::set_fsdir_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS8722_GAME_CALLBACK(_read) \
-	devcb = &mos8722_device::set_game_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos8722_device::set_game_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_MOS8722_EXROM_CALLBACK(_read) \
-	devcb = &mos8722_device::set_exrom_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos8722_device::set_exrom_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_MOS8722_SENSE40_CALLBACK(_read) \
-	devcb = &mos8722_device::set_sense40_rd_callback(*device, DEVCB2_##_read);
+	devcb = &mos8722_device::set_sense40_rd_callback(*device, DEVCB_##_read);
 
 
 
@@ -78,11 +78,11 @@ public:
 	// construction/destruction
 	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_z80en_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(object); }
-	template<class _Object> static devcb2_base &set_fsdir_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(object); }
-	template<class _Object> static devcb2_base &set_game_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_game.set_callback(object); }
-	template<class _Object> static devcb2_base &set_exrom_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_exrom.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sense40_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(object); }
+	template<class _Object> static devcb_base &set_z80en_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(object); }
+	template<class _Object> static devcb_base &set_fsdir_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(object); }
+	template<class _Object> static devcb_base &set_game_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_game.set_callback(object); }
+	template<class _Object> static devcb_base &set_exrom_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_exrom.set_callback(object); }
+	template<class _Object> static devcb_base &set_sense40_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(object); }
 
 
 	UINT8 read(offs_t offset, UINT8 data);
@@ -136,11 +136,11 @@ private:
 		RCR_SHARE_16K
 	};
 
-	devcb2_write_line   m_write_z80en;
-	devcb2_write_line   m_write_fsdir;
-	devcb2_read_line    m_read_game;
-	devcb2_read_line    m_read_exrom;
-	devcb2_read_line    m_read_sense40;
+	devcb_write_line   m_write_z80en;
+	devcb_write_line   m_write_fsdir;
+	devcb_read_line    m_read_game;
+	devcb_read_line    m_read_exrom;
+	devcb_read_line    m_read_sense40;
 
 	UINT8 m_reg[16];
 

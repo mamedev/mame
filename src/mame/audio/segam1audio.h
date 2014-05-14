@@ -54,7 +54,7 @@ private:
 	int m_to_68k[8];
 	int m_fifo_rptr;
 	int m_fifo_wptr;
-	devcb2_write_line   m_main_irq_cb;
+	devcb_write_line   m_main_irq_cb;
 };
 
 

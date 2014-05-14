@@ -57,13 +57,13 @@ public:
 	void set_hold(int state);
 
 	// Callbacks
-	template<class _Object> static devcb2_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_external_operation.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_intlevel_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_get_intlevel.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_iaq_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_clock_out_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_wait_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_wait_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_holda_line.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_dbin_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_external_operation.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_intlevel_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_get_intlevel.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_iaq_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_clock_out_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_wait_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_wait_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_holda_line.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_dbin_line.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -165,22 +165,22 @@ protected:
 	// Clock output. This is not a pin of the TMS9900 because the TMS9900
 	// needs an external clock, and usually one of those external lines is
 	// used for this purpose.
-	devcb2_write_line   m_clock_out_line;
+	devcb_write_line   m_clock_out_line;
 
 	// Wait output. When asserted (high), the CPU is in a wait state.
-	devcb2_write_line   m_wait_line;
+	devcb_write_line   m_wait_line;
 
 	// HOLD Acknowledge line. When asserted (high), the CPU is in HOLD state.
-	devcb2_write_line   m_holda_line;
+	devcb_write_line   m_holda_line;
 
 	// Signal to the outside world that we are now getting an instruction
-	devcb2_write_line   m_iaq_line;
+	devcb_write_line   m_iaq_line;
 
 	// Get the value of the interrupt level lines
-	devcb2_read8    m_get_intlevel;
+	devcb_read8    m_get_intlevel;
 
 	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
-	devcb2_write_line   m_dbin_line;
+	devcb_write_line   m_dbin_line;
 
 	// Trigger external operation. This is achieved by putting a special value in
 	// the most significant three bits of the address bus (TMS9995: data bus) and
@@ -202,7 +202,7 @@ protected:
 	// We could realize this via the CRU access as well, but the data bus access
 	// is not that simple to emulate. For the sake of homogenity between the
 	// chip emulations we use a dedicated callback.
-	devcb2_write8   m_external_operation;
+	devcb_write8   m_external_operation;
 
 
 private:

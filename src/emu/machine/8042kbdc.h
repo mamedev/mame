@@ -28,19 +28,19 @@ enum kbdc8042_type_t
 	kbdc8042_device::set_keyboard_type(*device, _kbdt);
 
 #define MCFG_KBDC8042_SYSTEM_RESET_CB(_devcb) \
-	devcb = &kbdc8042_device::set_system_reset_callback(*device, DEVCB2_##_devcb);
+	devcb = &kbdc8042_device::set_system_reset_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_GATE_A20_CB(_devcb) \
-	devcb = &kbdc8042_device::set_gate_a20_callback(*device, DEVCB2_##_devcb);
+	devcb = &kbdc8042_device::set_gate_a20_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &kbdc8042_device::set_input_buffer_full_callback(*device, DEVCB2_##_devcb);
+	devcb = &kbdc8042_device::set_input_buffer_full_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &kbdc8042_device::set_output_buffer_empty_callback(*device, DEVCB2_##_devcb);
+	devcb = &kbdc8042_device::set_output_buffer_empty_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_SPEAKER_CB(_devcb) \
-    devcb = &kbdc8042_device::set_speaker_callback(*device, DEVCB2_##_devcb);
+    devcb = &kbdc8042_device::set_speaker_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -57,11 +57,11 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	
 	static void set_keyboard_type(device_t &device, kbdc8042_type_t keybtype) { downcast<kbdc8042_device &>(device).m_keybtype = keybtype; }
-	template<class _Object> static devcb2_base &set_system_reset_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_gate_a20_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_gate_a20_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_input_buffer_full_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_input_buffer_full_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_output_buffer_empty_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_output_buffer_empty_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_speaker_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_speaker_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_system_reset_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_gate_a20_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_gate_a20_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_input_buffer_full_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_input_buffer_full_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_output_buffer_empty_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_speaker_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_speaker_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -110,12 +110,12 @@ protected:
 
 	kbdc8042_type_t     m_keybtype;
 	
-	devcb2_write_line    m_system_reset_cb;
-	devcb2_write_line    m_gate_a20_cb;
-	devcb2_write_line    m_input_buffer_full_cb;
-	devcb2_write_line    m_output_buffer_empty_cb;
+	devcb_write_line    m_system_reset_cb;
+	devcb_write_line    m_gate_a20_cb;
+	devcb_write_line    m_input_buffer_full_cb;
+	devcb_write_line    m_output_buffer_empty_cb;
 
-	devcb2_write8        m_speaker_cb;
+	devcb_write8        m_speaker_cb;
 };
 
 // device type definition

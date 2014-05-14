@@ -43,7 +43,7 @@
 #include "m6502.h"
 
 #define MCFG_M6510_PORT_CALLBACKS(_read, _write) \
-	downcast<m6510_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+	downcast<m6510_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
 
 #define MCFG_M6510_PORT_PULLS(_up, _down) \
 	downcast<m6510_device *>(device)->set_pulls(_up, _down);
@@ -89,8 +89,8 @@ protected:
 		virtual UINT8 read_decrypted(UINT16 adr);
 	};
 
-	devcb2_read8  read_port;
-	devcb2_write8 write_port;
+	devcb_read8  read_port;
+	devcb_write8 write_port;
 
 	UINT8 pullup, floating, dir, port, drive;
 

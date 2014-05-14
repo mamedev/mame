@@ -254,17 +254,17 @@ void ata_interface_device::device_start()
 		{
 			if (i == 0)
 			{
-				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, irq0_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dmarq0_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dasp0_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, pdiag0_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, irq0_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dmarq0_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dasp0_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, pdiag0_write_line));
 			}
 			else
 			{
-				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, irq1_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dmarq1_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dasp1_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, pdiag1_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, irq1_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dmarq1_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, dasp1_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", ata_interface_device, pdiag1_write_line));
 			}
 
 			dev->write_csel(i);

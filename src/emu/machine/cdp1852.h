@@ -38,16 +38,16 @@
 //**************************************************************************
 
 #define MCFG_CDP1852_MODE_CALLBACK(_read) \
-	devcb = &cdp1852_device::set_mode_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cdp1852_device::set_mode_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_CDP1852_SR_CALLBACK(_write) \
-	devcb = &cdp1852_device::set_sr_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cdp1852_device::set_sr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CDP1852_DI_CALLBACK(_read) \
-	devcb = &cdp1852_device::set_data_rd_callback(*device, DEVCB2_##_read);
+	devcb = &cdp1852_device::set_data_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_CDP1852_DO_CALLBACK(_write) \
-	devcb = &cdp1852_device::set_data_wr_callback(*device, DEVCB2_##_write);
+	devcb = &cdp1852_device::set_data_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -63,10 +63,10 @@ public:
 	// construction/destruction
 	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_mode_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(object); }
-	template<class _Object> static devcb2_base &set_sr_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_data.set_callback(object); }
-	template<class _Object> static devcb2_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_data.set_callback(object); }
+	template<class _Object> static devcb_base &set_mode_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(object); }
+	template<class _Object> static devcb_base &set_sr_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_data.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_data.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -80,10 +80,10 @@ protected:
 private:
 	void set_sr_line(int state);
 
-	devcb2_read_line    m_read_mode;
-	devcb2_write_line   m_write_sr;
-	devcb2_read8        m_read_data;
-	devcb2_write8       m_write_data;
+	devcb_read_line    m_read_mode;
+	devcb_write_line   m_write_sr;
+	devcb_read8        m_read_data;
+	devcb_write8       m_write_data;
 
 	int m_new_data;             // new data written
 	UINT8 m_data;               // data latch

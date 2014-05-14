@@ -17,7 +17,7 @@ class tap_990_device : public device_t
 {
 public:
 	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object)
 	{
 		return downcast<tap_990_device &>(device).m_int_line.set_callback(object);
 	}
@@ -50,7 +50,7 @@ private:
 	void    read_transport_status();
 	void    execute_command();
 
-	devcb2_write_line m_int_line;
+	devcb_write_line m_int_line;
 
 	UINT16 m_w[8];
 
@@ -58,4 +58,4 @@ private:
 };
 
 #define MCFG_TI990_TAPE_INT_HANDLER( _intcallb )  \
-	devcb = &tap_990_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
+	devcb = &tap_990_device::static_set_int_callback( *device, DEVCB_##_intcallb );

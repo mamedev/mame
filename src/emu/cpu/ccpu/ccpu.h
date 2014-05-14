@@ -39,7 +39,7 @@ typedef device_delegate<void (INT16, INT16, INT16, INT16, UINT8)> ccpu_vector_de
 
 
 #define MCFG_CCPU_EXTERNAL_FUNC(_devcb) \
-	ccpu_cpu_device::set_external_func(*device, DEVCB2_##_devcb);
+	ccpu_cpu_device::set_external_func(*device, DEVCB_##_devcb);
 
 #define MCFG_CCPU_VECTOR_FUNC(d) \
 	ccpu_cpu_device::set_vector_func(*device, d);
@@ -52,7 +52,7 @@ public:
 	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_external_func(device_t &device, _Object object) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(object); }
+	template<class _Object> static devcb_base &set_external_func(device_t &device, _Object object) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(object); }
 	static void set_vector_func(device_t &device, ccpu_vector_delegate callback) { downcast<ccpu_cpu_device &>(device).m_vector_callback = callback; }
 
 	DECLARE_READ8_MEMBER( read_jmi );
@@ -108,7 +108,7 @@ protected:
 	UINT16              m_miflag, m_nextmiflag, m_nextnextmiflag;
 	UINT16              m_drflag;
 
-	devcb2_read8        m_external_input;
+	devcb_read8        m_external_input;
 	ccpu_vector_delegate m_vector_callback;
 
 	UINT8               m_waiting;

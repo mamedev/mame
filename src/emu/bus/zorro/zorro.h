@@ -165,16 +165,16 @@
 
 // callbacks
 #define MCFG_EXPANSION_SLOT_OVR_HANDLER(_devcb) \
-	devcb = &zorro_device::set_ovr_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro_device::set_ovr_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_SLOT_INT2_HANDLER(_devcb) \
-	devcb = &zorro_device::set_int2_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro_device::set_int2_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_SLOT_INT6_HANDLER(_devcb) \
-	devcb = &zorro_device::set_int6_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro_device::set_int6_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_SLOT_IPL_HANDLER(_devcb) \
-	devcb = &exp_slot_device::set_ipl_handler(*device, DEVCB2_##_devcb);
+	devcb = &exp_slot_device::set_ipl_handler(*device, DEVCB_##_devcb);
 
 // ======================> zorro 2 bus
 
@@ -186,25 +186,25 @@
 	MCFG_ZORRO_SLOT_ADD("zorrobus", _tag, _slot_intf, _def_slot)
 
 #define MCFG_ZORRO2_OVR_HANDLER(_devcb) \
-	devcb = &zorro_device::set_ovr_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro_device::set_ovr_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_INT2_HANDLER(_devcb) \
-	devcb = &zorro_device::set_int2_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro_device::set_int2_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_INT6_HANDLER(_devcb) \
-	devcb = &zorro_device::set_int6_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro_device::set_int6_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT1_HANDLER(_devcb) \
-	devcb = &zorro2_device::set_eint1_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro2_device::set_eint1_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT4_HANDLER(_devcb) \
-	devcb = &zorro2_device::set_eint4_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro2_device::set_eint4_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT5_HANDLER(_devcb) \
-	devcb = &zorro2_device::set_eint5_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro2_device::set_eint5_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT7_HANDLER(_devcb) \
-	devcb = &zorro2_device::set_eint7_handler(*device, DEVCB2_##_devcb);
+	devcb = &zorro2_device::set_eint7_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -252,11 +252,11 @@ public:
 	// static configuration helpers
 	static void set_cputag(device_t &device, const char *tag);
 
-	template<class _Object> static devcb2_base &set_int2_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_int2_handler(device_t &device, _Object object)
 		{ return downcast<zorro_device &>(device).m_int2_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_int6_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_int6_handler(device_t &device, _Object object)
 		{ return downcast<zorro_device &>(device).m_int6_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ovr_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_ovr_handler(device_t &device, _Object object)
 		{ return downcast<zorro_device &>(device).m_ovr_handler.set_callback(object); }
 
 	virtual void add_card(device_zorro_card_interface *card) = 0;
@@ -281,9 +281,9 @@ protected:
 private:
 	const char *m_cputag;
 
-	devcb2_write_line m_ovr_handler;
-	devcb2_write_line m_int2_handler;
-	devcb2_write_line m_int6_handler;
+	devcb_write_line m_ovr_handler;
+	devcb_write_line m_int2_handler;
+	devcb_write_line m_int6_handler;
 };
 
 // ======================> expansion slot device
@@ -296,7 +296,7 @@ public:
 	exp_slot_device(const machine_config &mconfig, device_type type, const char *name,
 		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_ipl_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_ipl_handler(device_t &device, _Object object)
 		{ return downcast<exp_slot_device &>(device).m_ipl_handler.set_callback(object); }
 
 	// the expansion slot can only have a single card
@@ -313,7 +313,7 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_write8 m_ipl_handler;
+	devcb_write8 m_ipl_handler;
 
 	device_exp_card_interface *m_dev;
 };
@@ -331,13 +331,13 @@ public:
 	zorro2_device(const machine_config &mconfig, device_type type, const char *name,
 		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_eint1_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_eint1_handler(device_t &device, _Object object)
 		{ return downcast<zorro2_device &>(device).m_eint1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_eint4_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_eint4_handler(device_t &device, _Object object)
 		{ return downcast<zorro2_device &>(device).m_eint4_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_eint5_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_eint5_handler(device_t &device, _Object object)
 		{ return downcast<zorro2_device &>(device).m_eint5_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_eint7_handler(device_t &device, _Object object)
+	template<class _Object> static devcb_base &set_eint7_handler(device_t &device, _Object object)
 		{ return downcast<zorro2_device &>(device).m_eint7_handler.set_callback(object); }
 
 	// device-level overrides
@@ -362,10 +362,10 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_write_line m_eint1_handler;
-	devcb2_write_line m_eint4_handler;
-	devcb2_write_line m_eint5_handler;
-	devcb2_write_line m_eint7_handler;
+	devcb_write_line m_eint1_handler;
+	devcb_write_line m_eint4_handler;
+	devcb_write_line m_eint5_handler;
+	devcb_write_line m_eint7_handler;
 
 	simple_list<device_zorro2_card_interface> m_dev;
 

@@ -15,10 +15,10 @@
 	MCFG_DEVICE_ADD(_tag, TAITO8741_4PACK, 0)
 
 #define MCFG_TAITO8741_PORT_HANDLERS(_devcb0, _devcb1, _devcb2, _devcb3) \
-	devcb = &taito8741_4pack_device::set_port_handler_0_callback(*device, DEVCB2_##_devcb0); \
-	devcb = &taito8741_4pack_device::set_port_handler_1_callback(*device, DEVCB2_##_devcb1); \
-	devcb = &taito8741_4pack_device::set_port_handler_2_callback(*device, DEVCB2_##_devcb2); \
-	devcb = &taito8741_4pack_device::set_port_handler_3_callback(*device, DEVCB2_##_devcb3);
+	devcb = &taito8741_4pack_device::set_port_handler_0_callback(*device, DEVCB_##_devcb0); \
+	devcb = &taito8741_4pack_device::set_port_handler_1_callback(*device, DEVCB_##_devcb1); \
+	devcb = &taito8741_4pack_device::set_port_handler_2_callback(*device, DEVCB_##_devcb2); \
+	devcb = &taito8741_4pack_device::set_port_handler_3_callback(*device, DEVCB_##_devcb3);
 
 #define MCFG_TAITO8741_MODES(_mode0, _mode1, _mode2, _mode3) \
 	taito8741_4pack_device::static_set_mode(*device, 0, _mode0);    \
@@ -58,10 +58,10 @@ public:
 	taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~taito8741_4pack_device() {}
 
-	template<class _Object> static devcb2_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_handler_1_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_1_r.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_1_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_1_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
 
 	static void static_set_mode(device_t &device, int num, UINT8 mode) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].mode = mode; }
 	static void static_set_connect(device_t &device, int num, int conn) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].connect = conn; }
@@ -98,10 +98,10 @@ private:
 	// internal state
 	I8741       m_taito8741[4];
 
-	devcb2_read8 m_port_handler_0_r;
-	devcb2_read8 m_port_handler_1_r;
-	devcb2_read8 m_port_handler_2_r;
-	devcb2_read8 m_port_handler_3_r;
+	devcb_read8 m_port_handler_0_r;
+	devcb_read8 m_port_handler_1_r;
+	devcb_read8 m_port_handler_2_r;
+	devcb_read8 m_port_handler_3_r;
 };
 
 
@@ -116,10 +116,10 @@ extern const device_type TAITO8741_4PACK;
 	MCFG_DEVICE_ADD(_tag, JOSVOLLY8741_4PACK, 0)
 
 #define MCFG_JOSVOLLY8741_PORT_HANDLERS(_devcb0, _devcb1, _devcb2, _devcb3) \
-	devcb = &josvolly8741_4pack_device::set_port_handler_0_callback(*device, DEVCB2_##_devcb0); \
-	devcb = &josvolly8741_4pack_device::set_port_handler_1_callback(*device, DEVCB2_##_devcb1); \
-	devcb = &josvolly8741_4pack_device::set_port_handler_2_callback(*device, DEVCB2_##_devcb2); \
-	devcb = &josvolly8741_4pack_device::set_port_handler_3_callback(*device, DEVCB2_##_devcb3);
+	devcb = &josvolly8741_4pack_device::set_port_handler_0_callback(*device, DEVCB_##_devcb0); \
+	devcb = &josvolly8741_4pack_device::set_port_handler_1_callback(*device, DEVCB_##_devcb1); \
+	devcb = &josvolly8741_4pack_device::set_port_handler_2_callback(*device, DEVCB_##_devcb2); \
+	devcb = &josvolly8741_4pack_device::set_port_handler_3_callback(*device, DEVCB_##_devcb3);
 
 #define MCFG_JOSVOLLY8741_CONNECT(_con0, _con1, _con2, _con3) \
 	josvolly8741_4pack_device::static_set_connect(*device, 0, _con0);   \
@@ -144,10 +144,10 @@ public:
 	josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~josvolly8741_4pack_device() {}
 
-	template<class _Object> static devcb2_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_handler_1_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_1_r.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
-	template<class _Object> static devcb2_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_1_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_1_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
 
 	static void static_set_connect(device_t &device, int num, int conn) { downcast<josvolly8741_4pack_device &>(device).m_i8741[num].connect = conn; }
 
@@ -174,10 +174,10 @@ private:
 	JV8741 m_i8741[4];
 	int m_nmi_enable;
 
-	devcb2_read8 m_port_handler_0_r;
-	devcb2_read8 m_port_handler_1_r;
-	devcb2_read8 m_port_handler_2_r;
-	devcb2_read8 m_port_handler_3_r;
+	devcb_read8 m_port_handler_0_r;
+	devcb_read8 m_port_handler_1_r;
+	devcb_read8 m_port_handler_2_r;
+	devcb_read8 m_port_handler_3_r;
 };
 
 

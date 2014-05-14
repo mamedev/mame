@@ -51,10 +51,10 @@ enum
 	voodoo_device::static_set_cpu_tag(*device, _tag); 
 
 #define MCFG_VOODOO_VBLANK_CB(_devcb) \
-	devcb = &voodoo_device::static_set_vblank_callback(*device, DEVCB2_##_devcb);
+	devcb = &voodoo_device::static_set_vblank_callback(*device, DEVCB_##_devcb);
  
 #define MCFG_VOODOO_STALL_CB(_devcb) \
-	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB2_##_devcb);
+	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
  
 
 /***************************************************************************
@@ -79,8 +79,8 @@ public:
 	static void static_set_tmumem(device_t &device, int value1, int value2) { downcast<voodoo_device &>(device).m_tmumem0 = value1; downcast<voodoo_device &>(device).m_tmumem1 = value2; }
 	static void static_set_screen_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_screen = tag; }
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
-	template<class _Object> static devcb2_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
-	template<class _Object> static devcb2_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
 	
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
@@ -94,8 +94,8 @@ public:
 	UINT8               m_tmumem1;
 	const char *        m_screen;
 	const char *        m_cputag;
-	devcb2_write_line   m_vblank;
-	devcb2_write_line   m_stall;
+	devcb_write_line   m_vblank;
+	devcb_write_line   m_stall;
 	
 protected:
 	// device-level overrides

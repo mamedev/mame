@@ -1703,7 +1703,7 @@ ADDRESS_MAP_END
 	MCFG_DEVICE_ADD(_tag, PUZZLET_IO, 0)
 
 #define MCFG_PUZZLET_IO_DATA_CALLBACK(_devcb) \
-	devcb = &puzzlet_io_device::set_data_cb(*device, DEVCB2_##_devcb);
+	devcb = &puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
 
 class puzzlet_io_device : public device_t {
 public:
@@ -1712,14 +1712,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 
-	template<class _Object> static devcb2_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
 
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	devcb2_write_line data_cb;
+	devcb_write_line data_cb;
 	required_ioport port;
 	int ce, clk;
 	int cur_bit;

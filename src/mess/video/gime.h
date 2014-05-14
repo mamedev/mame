@@ -26,13 +26,13 @@
 #define MCFG_GIME_FSYNC_CALLBACK    MCFG_MC6847_FSYNC_CALLBACK
 
 #define MCFG_GIME_IRQ_CALLBACK(_write) \
-	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_GIME_FIRQ_CALLBACK(_write) \
-	devcb = &gime_base_device::set_firq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &gime_base_device::set_firq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
-	devcb = &gime_base_device::set_floating_bus_rd_callback(*device, DEVCB2_##_read);
+	devcb = &gime_base_device::set_floating_bus_rd_callback(*device, DEVCB_##_read);
 
 /* interface */
 struct gime_interface
@@ -54,9 +54,9 @@ class cococart_slot_device;
 class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
-	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
-	template<class _Object> static devcb2_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
+	template<class _Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
@@ -159,9 +159,9 @@ private:
 	static const UINT8 hires_font[128][12];
 
 	// callbacks
-	devcb2_write_line   m_write_irq;
-	devcb2_write_line   m_write_firq;
-	devcb2_read8        m_read_floating_bus;
+	devcb_write_line   m_write_irq;
+	devcb_write_line   m_write_firq;
+	devcb_read8        m_read_floating_bus;
 
 	// device state
 	UINT8                       m_gime_registers[16];

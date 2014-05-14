@@ -41,16 +41,16 @@ typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> 
 	crtc_ega_device::set_hpixels_per_column(*device, _pix);
 
 #define MCFG_CRTC_EGA_RES_OUT_DE_CB(_devcb) \
-	devcb = &crtc_ega_device::set_res_out_de_callback(*device, DEVCB2_##_devcb);
+	devcb = &crtc_ega_device::set_res_out_de_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(_devcb) \
-	devcb = &crtc_ega_device::set_res_out_hsync_callback(*device, DEVCB2_##_devcb);
+	devcb = &crtc_ega_device::set_res_out_hsync_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(_devcb) \
-	devcb = &crtc_ega_device::set_res_out_vsync_callback(*device, DEVCB2_##_devcb);
+	devcb = &crtc_ega_device::set_res_out_vsync_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(_devcb) \
-	devcb = &crtc_ega_device::set_res_out_vblank_callback(*device, DEVCB2_##_devcb);
+	devcb = &crtc_ega_device::set_res_out_vblank_callback(*device, DEVCB_##_devcb);
 
 
 class crtc_ega_device : public device_t,
@@ -59,13 +59,13 @@ class crtc_ega_device : public device_t,
 public:
 	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_res_out_de_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_de_callback(device_t &device, _Object object) 
 						{ return downcast<crtc_ega_device &>(device).m_res_out_de_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_res_out_hsync_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_hsync_callback(device_t &device, _Object object) 
 						{ return downcast<crtc_ega_device &>(device).m_res_out_hsync_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_res_out_vsync_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_vsync_callback(device_t &device, _Object object) 
 						{ return downcast<crtc_ega_device &>(device).m_res_out_vsync_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_res_out_vblank_callback(device_t &device, _Object object) 
+	template<class _Object> static devcb_base &set_res_out_vblank_callback(device_t &device, _Object object) 
 						{ return downcast<crtc_ega_device &>(device).m_res_out_vblank_cb.set_callback(object); }
 
 	static void set_begin_update_callback(device_t &device, crtc_ega_begin_update_delegate callback) { downcast<crtc_ega_device &>(device).m_begin_update_cb = callback; }
@@ -110,10 +110,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb2_write_line   m_res_out_de_cb;
-	devcb2_write_line   m_res_out_hsync_cb;
-	devcb2_write_line   m_res_out_vsync_cb;
-	devcb2_write_line   m_res_out_vblank_cb;
+	devcb_write_line   m_res_out_de_cb;
+	devcb_write_line   m_res_out_hsync_cb;
+	devcb_write_line   m_res_out_vsync_cb;
+	devcb_write_line   m_res_out_vblank_cb;
 
 	/* if specified, this gets called before any pixel update,
 	 optionally return a pointer that will be passed to the

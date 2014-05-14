@@ -23,7 +23,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(enable);
 
-	template<class _Object> static devcb2_base &static_set_keypress_callback(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_keypress_callback(device_t &device, _Object object)
 		{ return downcast<pc_keyboard_device &>(device).m_out_keypress_func.set_callback(object); }
 
 	enum KEYBOARD_TYPE
@@ -74,7 +74,7 @@ private:
 	optional_ioport m_ioport_6;
 	optional_ioport m_ioport_7;
 
-	devcb2_write_line m_out_keypress_func;
+	devcb_write_line m_out_keypress_func;
 	emu_timer *m_keyboard_timer;
 };
 
@@ -120,16 +120,16 @@ extern const device_type AT_KEYB;
 
 #define MCFG_PC_KEYB_ADD(_tag, _cb) \
 	MCFG_DEVICE_ADD(_tag, PC_KEYB, 0) \
-	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB2_##_cb);
+	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB_##_cb);
 
 #define MCFG_AT_KEYB_ADD(_tag, _def_set, _cb) \
 	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
 	at_keyboard_device::static_set_type(*device, pc_keyboard_device::KEYBOARD_TYPE_AT, _def_set); \
-	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB2_##_cb);
+	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB_##_cb);
 
 #define MCFG_AT_MF2_KEYB_ADD(_tag, _def_set, _cb) \
 	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
 	at_keyboard_device::static_set_type(*device, pc_keyboard_device::KEYBOARD_TYPE_MF2, _def_set); \
-	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB2_##_cb);
+	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB_##_cb);
 
 #endif /* PCKEYBRD_H */

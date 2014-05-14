@@ -20,16 +20,16 @@
 	r3000_device::static_set_endianness(*device, _endianness);
 
 #define MCFG_R3000_BRCOND0_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond0_input(*device, DEVCB2_##_devcb);
+	devcb = &r3000_device::static_set_brcond0_input(*device, DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND1_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond1_input(*device, DEVCB2_##_devcb);
+	devcb = &r3000_device::static_set_brcond1_input(*device, DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND2_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond2_input(*device, DEVCB2_##_devcb);
+	devcb = &r3000_device::static_set_brcond2_input(*device, DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND3_INPUT(_devcb) \
-	devcb = &r3000_device::static_set_brcond3_input(*device, DEVCB2_##_devcb);
+	devcb = &r3000_device::static_set_brcond3_input(*device, DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -87,22 +87,22 @@ public:
 		downcast<r3000_device &>(device).m_endianness = endianness;
 	}
 
-	template<class _Object> static devcb2_base &static_set_brcond0_input(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_brcond0_input(device_t &device, _Object object)
 	{
 		return downcast<r3000_device &>(device).m_in_brcond0.set_callback(object);
 	}
 
-	template<class _Object> static devcb2_base &static_set_brcond1_input(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_brcond1_input(device_t &device, _Object object)
 	{
 		return downcast<r3000_device &>(device).m_in_brcond1.set_callback(object);
 	}
 
-	template<class _Object> static devcb2_base &static_set_brcond2_input(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_brcond2_input(device_t &device, _Object object)
 	{
 		return downcast<r3000_device &>(device).m_in_brcond2.set_callback(object);
 	}
 
-	template<class _Object> static devcb2_base &static_set_brcond3_input(device_t &device, _Object object)
+	template<class _Object> static devcb_base &static_set_brcond3_input(device_t &device, _Object object)
 	{
 		return downcast<r3000_device &>(device).m_in_brcond3.set_callback(object);
 	}
@@ -256,10 +256,10 @@ protected:
 	size_t      m_dcache_size;
 
 	// I/O
-	devcb2_read_line    m_in_brcond0;
-	devcb2_read_line    m_in_brcond1;
-	devcb2_read_line    m_in_brcond2;
-	devcb2_read_line    m_in_brcond3;
+	devcb_read_line    m_in_brcond0;
+	devcb_read_line    m_in_brcond1;
+	devcb_read_line    m_in_brcond2;
+	devcb_read_line    m_in_brcond3;
 };
 
 

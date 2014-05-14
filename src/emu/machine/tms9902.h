@@ -49,10 +49,10 @@ class tms9902_device : public device_t
 public:
 	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	template<class _Object> static devcb2_base &set_int_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_rcv_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_xmit_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_xmit_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_ctrl_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_ctrl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_rcv_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_xmit_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_xmit_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_ctrl_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_ctrl_cb.set_callback(object); }
 	
 	void    set_clock(bool state);
 
@@ -90,10 +90,10 @@ private:
 	void    initiate_transmit();
 	void    reset_uart();
 
-	devcb2_write_line    m_int_cb;
-	devcb2_write_line    m_rcv_cb;
-	devcb2_write8        m_xmit_cb;
-	devcb2_write8        m_ctrl_cb;     // needs to be used with get_config_value
+	devcb_write_line    m_int_cb;
+	devcb_write_line    m_rcv_cb;
+	devcb_write8        m_xmit_cb;
+	devcb_write8        m_ctrl_cb;     // needs to be used with get_config_value
 
 	// tms9902 clock rate (PHI* pin, normally connected to TMS9900 Phi3*)
 	// Official range is 2MHz-3.3MHz.  Some tms9902s were sold as "MP9214", and
@@ -189,15 +189,15 @@ private:
 ***************************************************************************/
 
 #define MCFG_TMS9902_INT_CB(_devcb) \
-	devcb = &tms9902_device::set_int_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms9902_device::set_int_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS9902_RCV_CB(_devcb) \
-	devcb = &tms9902_device::set_rcv_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms9902_device::set_rcv_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS9902_XMIT_CB(_devcb) \
-	devcb = &tms9902_device::set_xmit_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms9902_device::set_xmit_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS9902_CTRL_CB(_devcb) \
-	devcb = &tms9902_device::set_ctrl_callback(*device, DEVCB2_##_devcb);
+	devcb = &tms9902_device::set_ctrl_callback(*device, DEVCB_##_devcb);
 
 #endif /* __TMS9902_H__ */

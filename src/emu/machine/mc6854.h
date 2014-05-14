@@ -21,19 +21,19 @@ typedef device_delegate<void (UINT8 *data, int length)> mc6854_out_frame_delegat
 
 
 #define MCFG_MC6854_OUT_IRQ_CB(_devcb) \
-	devcb = &mc6854_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc6854_device::set_out_irq_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_TXD_CB(_devcb) \
-	devcb = &mc6854_device::set_out_txd_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc6854_device::set_out_txd_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_FRAME_CB(_class, _method) \
 	mc6854_device::set_out_frame_callback(*device, mc6854_out_frame_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6854_OUT_RTS_CB(_devcb) \
-	devcb = &mc6854_device::set_out_rts_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc6854_device::set_out_rts_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_DTR_CB(_devcb) \
-	devcb = &mc6854_device::set_out_dtr_callback(*device, DEVCB2_##_devcb);
+	devcb = &mc6854_device::set_out_dtr_callback(*device, DEVCB_##_devcb);
 
 
 class mc6854_device : public device_t
@@ -42,11 +42,11 @@ public:
 	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mc6854_device() {}
 
-	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_txd_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_txd_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_txd_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_txd_cb.set_callback(object); }
 	static void set_out_frame_callback(device_t &device, mc6854_out_frame_delegate callback) { downcast<mc6854_device &>(device).m_out_frame_cb = callback; }
-	template<class _Object> static devcb2_base &set_out_rts_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_rts_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_dtr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_rts_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_rts_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_dtr_cb.set_callback(object); }
 	
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER( read );
@@ -73,17 +73,17 @@ protected:
 
 private:
 	// internal state
-	devcb2_write_line  m_out_irq_cb; /* interrupt request */
+	devcb_write_line  m_out_irq_cb; /* interrupt request */
 	
 	/* low-level, bit-based interface */
-	devcb2_write_line  m_out_txd_cb; /* transmit bit */
+	devcb_write_line  m_out_txd_cb; /* transmit bit */
 	 
 	 /* high-level, frame-based interface */
 	mc6854_out_frame_delegate	m_out_frame_cb;
 	
 	/* control lines */
-	devcb2_write_line  m_out_rts_cb; /* 1 = transmitting, 0 = idle */
-	devcb2_write_line  m_out_dtr_cb; /* 1 = data transmit ready, 0 = busy */
+	devcb_write_line  m_out_rts_cb; /* 1 = transmitting, 0 = idle */
+	devcb_write_line  m_out_dtr_cb; /* 1 = data transmit ready, 0 = busy */
 
 	/* registers */
 	UINT8 m_cr1, m_cr2, m_cr3, m_cr4; /* control registers */

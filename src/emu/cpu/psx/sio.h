@@ -19,7 +19,7 @@ extern const device_type PSX_SIO0;
 extern const device_type PSX_SIO1;
 
 #define MCFG_PSX_SIO_IRQ_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &psxsio_device::set_irq_handler(*device, DEVCB_##_devcb);
 #define SIO_BUF_SIZE ( 8 )
 
 #define SIO_STATUS_TX_RDY ( 1 << 0 )
@@ -43,7 +43,7 @@ public:
 	psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -78,7 +78,7 @@ private:
 
 	emu_timer *m_timer;
 
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 
 	psxsiodev_device *devices[ 10 ];
 	int deviceCount;

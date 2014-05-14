@@ -53,16 +53,16 @@
 	MCFG_DEVICE_ADD(_tag, MCS3201, 0)
 
 #define MCFG_MCS3201_INPUT_HANDLER(_devcb) \
-	devcb = &mcs3201_device::set_input_handler(*device, DEVCB2_##_devcb);
+	devcb = &mcs3201_device::set_input_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD765_INTRQ_CALLBACK(_write) \
-	devcb = &upd765_family_device::set_intrq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd765_family_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD765_DRQ_CALLBACK(_write) \
-	devcb = &upd765_family_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd765_family_device::set_drq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD765_HDL_CALLBACK(_write) \
-	devcb = &upd765_family_device::set_hdl_wr_callback(*device, DEVCB2_##_write);
+	devcb = &upd765_family_device::set_hdl_wr_callback(*device, DEVCB_##_write);
 
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
@@ -92,9 +92,9 @@ public:
 
 	upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).intrq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_hdl_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).hdl_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_hdl_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).hdl_cb.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
 
@@ -308,7 +308,7 @@ protected:
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
-	devcb2_write_line intrq_cb, drq_cb, hdl_cb;
+	devcb_write_line intrq_cb, drq_cb, hdl_cb;
 	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
 	floppy_info flopi[4];
 
@@ -478,7 +478,7 @@ public:
 	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_input_handler(device_t &device, _Object object) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_input_handler(device_t &device, _Object object) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 	DECLARE_READ8_MEMBER( input_r );
@@ -487,7 +487,7 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_read8 m_input_handler;
+	devcb_read8 m_input_handler;
 };
 
 extern const device_type UPD765A;

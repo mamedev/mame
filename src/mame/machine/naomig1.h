@@ -5,7 +5,7 @@
 
 #define MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                          \
 	MCFG_DEVICE_ADD(_tag, type, 0)                                      \
-	downcast<naomi_g1_device *>(device)->set_irq_cb(DEVCB2_ ## _irq_cb);
+	downcast<naomi_g1_device *>(device)->set_irq_cb(DEVCB_ ## _irq_cb);
 
 class naomi_g1_device : public device_t
 {
@@ -62,7 +62,7 @@ private:
 	UINT32 gdstar, gdlen, gddir, gden, gdst;
 
 	emu_timer *timer;
-	devcb2_write8 irq_cb;
+	devcb_write8 irq_cb;
 	dma_cb _dma_cb;
 
 	void dma(void *dma_ptr, UINT32 main_adr, UINT32 size, bool to_mainram);

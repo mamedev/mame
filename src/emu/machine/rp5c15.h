@@ -35,10 +35,10 @@
 //**************************************************************************
 
 #define MCFG_RP5C15_OUT_ALARM_CB(_devcb) \
-	devcb = &rp5c15_device::set_out_alarm_callback(*device, DEVCB2_##_devcb);
+	devcb = &rp5c15_device::set_out_alarm_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_RP5C15_OUT_CLKOUT_CB(_devcb) \
-	devcb = &rp5c15_device::set_out_clkout_callback(*device, DEVCB2_##_devcb);
+	devcb = &rp5c15_device::set_out_clkout_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -53,8 +53,8 @@ public:
 	// construction/destruction
 	rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_alarm_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_out_clkout_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_clkout_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_alarm_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_clkout_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_clkout_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -80,8 +80,8 @@ private:
 	static const device_timer_id TIMER_16HZ = 1;
 	static const device_timer_id TIMER_CLKOUT = 2;
 
-	devcb2_write_line        m_out_alarm_cb;
-	devcb2_write_line        m_out_clkout_cb;
+	devcb_write_line        m_out_alarm_cb;
+	devcb_write_line        m_out_clkout_cb;
 
 	UINT8 m_reg[2][13];         // clock registers
 	UINT8 m_ram[13];            // RAM

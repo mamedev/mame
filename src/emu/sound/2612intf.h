@@ -8,7 +8,7 @@
 void ym2612_update_request(void *param);
 
 #define MCFG_YM2612_IRQ_HANDLER(_devcb) \
-	devcb = &ym2612_device::set_irq_handler(*device, DEVCB2_##_devcb);
+	devcb = &ym2612_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class ym2612_device : public device_t,
 									public device_sound_interface
@@ -18,7 +18,7 @@ public:
 	ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2612_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2612_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -44,7 +44,7 @@ private:
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
 	void *          m_chip;
-	devcb2_write_line m_irq_handler;
+	devcb_write_line m_irq_handler;
 };
 
 extern const device_type YM2612;

@@ -21,7 +21,7 @@ public:
 	upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~upd775x_device() {}
 
-	template<class _Object> static devcb2_base &set_drq_callback(device_t &device, _Object object) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(object); }
+	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(object); }
 
 	void set_bank_base(offs_t base);
 
@@ -81,7 +81,7 @@ protected:
 	UINT32      m_romoffset;                  /* ROM offset to make save/restore easier */
 	UINT32      m_rommask;                    /* maximum address offset */
 
-	devcb2_write_line m_drqcallback;
+	devcb_write_line m_drqcallback;
 
 	void update_adpcm(int data);
 	void advance_state();
@@ -123,9 +123,9 @@ extern const device_type UPD7759;
 extern const device_type UPD7756;
 
 #define MCFG_UPD7759_DRQ_CALLBACK(_write) \
-	devcb = &upd7759_device::set_drq_callback(*device, DEVCB2_##_write);
+	devcb = &upd7759_device::set_drq_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD7756_DRQ_CALLBACK(_write) \
-	devcb = &upd7756_device::set_drq_callback(*device, DEVCB2_##_write);
+	devcb = &upd7756_device::set_drq_callback(*device, DEVCB_##_write);
 
 #endif /* __UPD7759_H__ */
