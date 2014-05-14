@@ -543,7 +543,7 @@ bool read_hash_config(device_image_interface &image, const char *sysname, astrin
 	const hash_info *info = NULL;
 
 	/* open the hash file */
-	hashfile = hashfile_open(image.device().machine().options(), sysname, FALSE, NULL);
+	hashfile = hashfile_open(image.device().mconfig().options(), sysname, FALSE, NULL);
 	if (!hashfile)
 		return false;
 
@@ -568,7 +568,7 @@ bool hashfile_extrainfo(device_image_interface &image, astring &result)
 	/* now read the hash file */
 	image.crc();
 	extra_info = NULL;
-	int drv = driver_list::find(image.device().machine().system());
+	int drv = driver_list::find(*image.device().mconfig().options().system());
 	int compat, open = drv;
 	bool hashfound;
 	do
