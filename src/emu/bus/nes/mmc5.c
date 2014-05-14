@@ -118,7 +118,9 @@ void nes_exrom_device::pcb_reset()
 	m_ex1_bank = 0;
 	m_vcount = 0;
 
-	memset(m_vrom_bank, 0x3ff, ARRAY_LENGTH(m_vrom_bank));
+	for (int i = 0; i < 12; i++)
+		m_vrom_bank[i] = 0x3ff;
+
 	m_prg_regs[0] = 0xfc;
 	m_prg_regs[1] = 0xfd;
 	m_prg_regs[2] = 0xfe;
@@ -391,19 +393,19 @@ inline UINT8 nes_exrom_device::base_chr_r(int bank, UINT32 offset)
 			break;
 	}
 
-	return m_vrom[helper];
+	return m_vrom[helper & (m_vrom.bytes() - 1)];
 }
 
 inline UINT8 nes_exrom_device::split_chr_r(UINT32 offset)
 {
 	UINT32 helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
-	return m_vrom[helper];
+	return m_vrom[helper & (m_vrom.bytes() - 1)];
 }
 
 inline UINT8 nes_exrom_device::bg_ex1_chr_r(UINT32 offset)
 {
 	UINT32 helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
-	return m_vrom[helper];
+	return m_vrom[helper & (m_vrom.bytes() - 1)];
 }
 
 READ8_MEMBER(nes_exrom_device::chr_r)
