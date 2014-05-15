@@ -352,9 +352,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		}
 	}
 
-	if (type & GBA_CHIP_RTC)
+	if (chip & GBA_CHIP_RTC)
 	{
-		osd_printf_verbose("game has RTC - not emulated at the moment\n");
+		osd_printf_info("game has RTC - not emulated at the moment\n");
 		chip &= ~GBA_CHIP_RTC;
 	}
 
