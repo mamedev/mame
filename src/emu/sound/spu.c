@@ -319,7 +319,7 @@ public:
 		if (ref_count==0)
 		{
 			cache_size-=(dend-data)<<1;
-			global_free(const_cast<sample_cache*>(this));
+			global_free(this);
 		}
 	}
 

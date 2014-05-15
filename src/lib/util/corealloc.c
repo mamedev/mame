@@ -18,14 +18,6 @@
 
 #define LOG_ALLOCS      (0)
 
-// define this to initialize allocated memory to a fixed non-0 value
-#ifdef MAME_DEBUG
-#define INITIALIZE_ALLOCATED_MEMORY
-#endif
-
-// define this to zap memory to a fixed non-0 value before freeing
-//#define OVERWRITE_FREED_MEMORY
-
 
 
 //**************************************************************************
