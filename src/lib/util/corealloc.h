@@ -19,18 +19,6 @@
 
 
 //**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-// define this to initialize allocated memory to a fixed non-0 value
-//#define INITIALIZE_ALLOCATED_MEMORY
-
-// define this to zap memory to a fixed non-0 value before freeing
-//#define OVERWRITE_FREED_MEMORY
-
-
-
-//**************************************************************************
 //  MACROS
 //**************************************************************************
 
@@ -39,8 +27,8 @@
 #define global_alloc_clear(_type)                   new(__FILE__, __LINE__, zeromem) _type
 #define global_alloc_array(_type, _num)             new(__FILE__, __LINE__) _type[_num]
 #define global_alloc_array_clear(_type, _num)       new(__FILE__, __LINE__, zeromem) _type[_num]
-#define global_free(_ptr)                           do { delete _ptr; } while (0)
-#define global_free_array(_ptr)                     do { delete[] _ptr; } while (0)
+#define global_free(_ptr)                           do { operator delete(_ptr, __FILE__, __LINE__); } while (0)
+#define global_free_array(_ptr)                     do { operator delete[](_ptr, __FILE__, __LINE__); } while (0)
 
 
 
