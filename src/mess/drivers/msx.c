@@ -4,7 +4,6 @@
 **
 ** Todo/known issues:
 ** - expertdp: Floppy support broken
-** - cf3300: Floppy support broken
 ** - piopx7: Laserdisc integration doesn't exist
 ** - spc800: Haven't been able to test operation of the han rom yet
 ** - svi728: Expansion slot not emulated
@@ -24,19 +23,13 @@
 ** - cpc300: How to get passed MSX-TUTOR?
 ** - cpc300e: How to test han support?
 ** - cpc400: How to test han support?
-** - cpc400: Floppy support broken
-** - cpc400s: Floppy support broken
 ** - expert20: Does not boot
 ** - fs4500: Firmware not emulated
 ** - fs4500: Matsuhita switched device not emulated
 ** - fs4600: Firmware not emulated
 ** - fs4600: Kanji12 not emulated
-** - fs4600: Floppy support broken
 ** - fs4700: Firmware not emulated
-** - fs4700: Floppy support broken
 ** - fs4700: Matsushita switched device not emulated
-** - fs5000: Does not boot; floppy support broken
-** - fs5500: Floppy support broken
 ** - fs5500: Matsushita switched device not emulated
 ** - fsa1f: Floppy not emulated
 ** - fsa1fm: Floppy not emulated
@@ -47,10 +40,10 @@
 ** - hotbit20: Does not boot
 ** - hbf1: Does not boot
 ** - hbf12: Does not boot
-** - hbf1xd: Does not boot because of floppy being broken
-** - hbf1xdm2: Does not boot because of floppy being broken
+** - hbf1xd: Does not boot when no floppy disk is present
+** - hbf1xdm2: Does not boot when no floppy disk is present
 ** - hbf5: Does not boot
-** - hbf500p: Does not boot because of floppy being broken
+** - hbf500p: Does not boot when no floppy disk is present
 ** - hbf700d: Does not boot when no floppy disk is present
 ** - hbf700f: Does not boot when no floppy disk is present
 ** - hbf900a: Does not boot when no floppy disk is present
@@ -1181,6 +1174,9 @@ static MACHINE_CONFIG_FRAGMENT( msx_wd2793 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx_mb8877a )
+	// From CF-3300 FDC schematic:
+	// READY + HLT - pulled high
+	// -DDEN - pulled low
 	MCFG_MB8877x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END

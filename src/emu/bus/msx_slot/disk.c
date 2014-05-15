@@ -291,7 +291,7 @@ void msx_slot_disk2_device::set_control(UINT8 data)
 	if (m_floppy)
 	{
 		m_floppy->mon_w((m_control & 0x08) ? 0 : 1);
-		m_floppy->ss_w((m_control & 0x04) ? 0 : 1);
+		m_floppy->ss_w((m_control & 0x04) ? 1 : 0);
 	}
 
 	m_fdc->set_floppy(m_floppy);
