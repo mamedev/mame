@@ -3,7 +3,6 @@
 **
 **
 ** Todo/known issues:
-** - expertdp: Floppy support broken
 ** - piopx7: Laserdisc integration doesn't exist
 ** - spc800: Haven't been able to test operation of the han rom yet
 ** - svi728: Expansion slot not emulated
