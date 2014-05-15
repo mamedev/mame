@@ -437,9 +437,7 @@
 
   To Do:
 
-  - Workaround to hide the unused last column (16 pixels), but forced on the 6845.
   - Find the input that unlocks the "KEY-LOCK" mode in the settings.
-  - Proper flip mode.
   - Resistors Network.
 
 **********************************************************************************/
@@ -453,6 +451,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "sound/okim6295.h"
+#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "majorpkr.lh"
 
@@ -462,30 +461,31 @@ class majorpkr_state : public driver_device
 public:
 	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			oki(*this, "oki") ,
-		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_palette_bank(*this, "palette_bank"),
+		m_vram_bank(*this, "vram_bank"),
+		m_rom_bank(*this, "rom_bank"),
+		m_fg_vram(*this, "fg_vram"),
+		m_bg_vram(*this, "bg_vram") { }
 
-	int m_mux_data;
-	int m_palette_bank;
-	int m_vram_bank;
-	int m_flip_state;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<address_map_bank_device> m_palette_bank;
+	required_device<address_map_bank_device> m_vram_bank;
+
+	required_memory_bank m_rom_bank;
+	required_shared_ptr<UINT8> m_fg_vram;
+	required_shared_ptr<UINT8> m_bg_vram;
 
 	tilemap_t    *m_bg_tilemap, *m_fg_tilemap;
 
-	UINT8 m_videoram[0x1000];
-
-	required_device<okim6295_device> oki;
+	int m_mux_data;
+	int m_flip_state;
 
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_READ8_MEMBER(paletteram_r);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(fg_vram_w);
+	DECLARE_WRITE8_MEMBER(bg_vram_w);
 	DECLARE_WRITE8_MEMBER(vidreg_w);
 	DECLARE_READ8_MEMBER(mux_port_r);
 	DECLARE_READ8_MEMBER(mux_port2_r);
@@ -498,10 +498,6 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
 };
 
 
@@ -511,7 +507,7 @@ public:
 
 TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 {
-	int code = m_videoram[0x800 + 2 * tile_index] + (m_videoram[0x800 + 2 * tile_index + 1] << 8);
+	int code = m_bg_vram[2 * tile_index] + (m_bg_vram[2 * tile_index + 1] << 8);
 
 	SET_TILE_INFO_MEMBER(0,
 			(code & 0x1fff),
@@ -521,7 +517,7 @@ TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 
 TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 {
-	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
+	int code = m_fg_vram[2 * tile_index] + (m_fg_vram[2 * tile_index + 1] << 8);
 
 	SET_TILE_INFO_MEMBER(1,
 			(code & 0x07ff),
@@ -535,31 +531,13 @@ void majorpkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(majorpkr_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(majorpkr_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	m_fg_tilemap->set_transparent_pen(0);
-
-	m_generic_paletteram_8.allocate(4 * 0x800);
 }
 
 
 UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	rectangle custom_clip;
-
-	/* The following custom_clip is to exclude the last char column (unused)
-	   form the render. We need more proof about how the video is working.
-	*/
-	custom_clip = cliprect;
-	custom_clip.max_x -= 16;
-
-	m_bg_tilemap->draw(screen, bitmap, custom_clip, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, custom_clip, 0, 0);
-
-	if (m_flip_state == 1)
-	{
-		m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
-		m_fg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
-	}
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -571,72 +549,49 @@ UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER(majorpkr_state::rom_bank_w)
 {
-	membank("rom_bank")->set_entry(data & 0x3);
+	m_rom_bank->set_entry(data & 0x3);
+	if (data & (0x3 ^ 0xff))
+		logerror("%s: accessing rom bank %02X\n", machine().describe_context(), data);
 }
-
 
 WRITE8_MEMBER(majorpkr_state::palette_bank_w)
 {
-	m_palette_bank=data;
+	m_palette_bank->set_bank(data & 0x3);
+	if (data & (0x3 ^ 0xff))
+		logerror("%s: accessing palette bank %02X\n", machine().describe_context(), data);
 }
-
-
-READ8_MEMBER(majorpkr_state::paletteram_r)
-{
-	return m_generic_paletteram_8[m_palette_bank * 0x800 + offset];
-}
-
-WRITE8_MEMBER(majorpkr_state::paletteram_w)
-{
-	m_generic_paletteram_8[m_palette_bank * 0x800 + offset] = data;
-
-	offset >>= 1;
-	int color = m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2] + m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
-	m_palette->set_pen_color(offset + m_palette_bank * 256 * 4, rgb_t(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
-}
-
 
 WRITE8_MEMBER(majorpkr_state::vram_bank_w)
 {
-	m_vram_bank = data & 1;
+	m_vram_bank->set_bank(data & 0x3);
+	if (data & (0x3 ^ 0xff))
+		logerror("%s: accessing vram bank %02X\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(majorpkr_state::vram_r)
+WRITE8_MEMBER(majorpkr_state::fg_vram_w)
 {
-	return m_videoram[m_vram_bank * 0x800 + offset];
+	m_fg_vram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(majorpkr_state::vram_w)
+WRITE8_MEMBER(majorpkr_state::bg_vram_w)
 {
-	m_videoram[m_vram_bank * 0x800 + offset] = data;
-
-	if (m_vram_bank == 0)
-	{
-		m_fg_tilemap->mark_tile_dirty(offset >> 1);
-	}
-	else
-	{
-		if (m_vram_bank == 1)
-		{
-			m_bg_tilemap->mark_tile_dirty(offset >> 1);
-		}
-		else
-		{
-			//logerror("accessing vram bank %d (offset = %x , data = %x )\n", m_vram_bank, offset,data);
-		}
-	}
+	m_bg_vram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE8_MEMBER(majorpkr_state::vidreg_w)
 {
 /*  If bit6 is active, the screen is drawn upside down.
-    (also 0xfc and 0x11 are written to the CRTC registers 0xc0 and 0xd0)
+    (also 0xfc and 0x11 are written to the CRTC registers 0x0c and 0x0d)
     So, the CRTC display start address = 0xfc11
 */
 	if (data & 0x40)
 	{
 		/* upside down screen */
 		m_flip_state = 1;
+		m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+		m_fg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 	}
 
 /*  If bit6 is not active, the screen is drawn normally.
@@ -647,6 +602,8 @@ WRITE8_MEMBER(majorpkr_state::vidreg_w)
 	{
 		/* normal screen */
 		m_flip_state = 0;
+		m_bg_tilemap->set_flip(0);
+		m_fg_tilemap->set_flip(0);
 	}
 }
 
@@ -769,10 +726,20 @@ WRITE8_MEMBER(majorpkr_state::pulses_w)
 
 static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_ROMBANK("rom_bank")
+	AM_RANGE(0xe000, 0xe7ff) AM_ROMBANK("rom_bank")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(paletteram_r, paletteram_w)   /* 4*4 palettes - 4 banks? */
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(vram_r, vram_w)               /* two tilemaps - 2 banks? */
+	AM_RANGE(0xf000, 0xf7ff) AM_DEVICE("palette_bank", address_map_bank_device, amap8)
+	AM_RANGE(0xf800, 0xffff) AM_DEVICE("vram_bank", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( palettebanks, AS_PROGRAM, 8, majorpkr_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vrambanks, AS_PROGRAM, 8, majorpkr_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(bg_vram_w) AM_SHARE("bg_vram")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM // spare vram? cleared during boot along with fg and bg
 ADDRESS_MAP_END
 
 /*
@@ -996,8 +963,8 @@ static const gfx_layout tilelayout =
 ******************************/
 
 static GFXDECODE_START( majorpkr )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 8*256, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 8 )
+	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 8*256, 8 )
+	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0, 8 )
 GFXDECODE_END
 
 
@@ -1012,22 +979,36 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state,  irq0_line_hold)
 
+	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+
+	MCFG_DEVICE_ADD("vram_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(vrambanks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(52.786)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)               /* through CRTC registers: 768 x 296 */
-	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
+	MCFG_SCREEN_RAW_PARAMS(CRTC_CLOCK*16, (47+1)*16, 0, (36*16)-16, (36+1)*8, 0, (28*8)) /* from CRTC registers */
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majorpkr)
+
 	MCFG_PALETTE_ADD("palette", 0x100 * 16)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK) /* verified */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_VISAREA_ADJUST(0,-16,0,0)
 	MCFG_MC6845_CHAR_WIDTH(16)
 
 	/* sound hardware */
@@ -1042,15 +1023,14 @@ MACHINE_CONFIG_END
 *************************/
 
 ROM_START( majorpkr )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "6_27c512_823b.bin", 0x00000, 0x0e000, CRC(a3d5475e) SHA1(cb41508b55da8b8c658a2f2ccc6ebda09db29040)  )
-	ROM_CONTINUE(0x10000,0x2000)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6_27c512_823b.bin", 0x00000, 0x10000, CRC(a3d5475e) SHA1(cb41508b55da8b8c658a2f2ccc6ebda09db29040)  )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "bg_gfx", 0 )
 	ROM_LOAD( "p1_27c040_7d3b.bin", 0x00000, 0x80000, CRC(67299eff) SHA1(34d3d8baf08dea495b699dd63272b445e2acb42d) )
 	ROM_LOAD( "p2_27c040_6039.bin", 0x80000, 0x80000, CRC(2d68b177) SHA1(01c934e0383991f2208b915cc5015463a8b6a8fd) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "fg_gfx", 0 )
 	ROM_LOAD( "3_27c010_af18.bin", 0x00000, 0x20000, CRC(54452bb8) SHA1(9d13c17b85dd0185ba64fc6f90425e0c75363960) )
 	ROM_LOAD( "4_27c010_92d6.bin", 0x20000, 0x20000, CRC(2e1e0972) SHA1(729dba2ef6ae8a7299c7ceb38835bebb0c42d28e) )
 
@@ -1066,7 +1046,7 @@ ROM_END
 DRIVER_INIT_MEMBER(majorpkr_state,majorpkr)
 {
 	UINT8 * ROM = (UINT8 *)memregion("maincpu")->base();
-	membank("rom_bank")->configure_entries(0, 4, &ROM[0x10000], 0x800);
+	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);
 }
 
 
