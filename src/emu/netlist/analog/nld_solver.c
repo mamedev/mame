@@ -106,9 +106,28 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 	}
 }
 
-ATTR_HOT void netlist_matrix_solver_t::update_inputs()
+ATTR_HOT double netlist_matrix_solver_t::update_inputs(const double hn)
 {
+    double m_xx = 0.0001;
+#if NEW_LTE
+    for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+    {
+        netlist_net_t *n = (*p)->m_proxied_net;
+        double DD_n = (n->m_cur_Analog - n->m_last_Analog) / hn;
+        double DD2 = (DD_n - n->m_DD_n_m_1) / (hn + n->m_h_n_m_1);
+        n->m_DD_n_m_1 = DD_n;
+        n->m_h_n_m_1 = hn;
+        double xx;
+        if (fabs(DD2) > 1e-100)
+            xx=sqrt(1.0e-3/fabs(0.5*DD2));
+        else
+            xx=0.0001;
+        if (xx<m_xx) m_xx = xx;
+    }
+    if (m_xx < 2e-9) m_xx = 2e-9;
+    //printf("%20s %f us\n", name().cstr(), m_xx * 1000000.0);
 
+#endif
 #if NEW_INPUT
     // avoid recursive calls. Inputs are updated outside this call
     for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
@@ -133,7 +152,7 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
             (*p)->net().m_last_Analog = (*p)->net().m_cur_Analog;
 	}
 #endif
-
+	return m_xx;
 }
 
 
@@ -159,8 +178,14 @@ ATTR_HOT void netlist_matrix_solver_t::schedule()
     if (!m_Q_sync.net().is_queued())
         m_Q_sync.net().push_to_queue(m_params.m_nt_sync_delay);
 #else
-    if (solve())
-        update_inputs();
+#if NEW_LTE
+    double xx = solve();
+    if (xx<10e-6)
+        if (!m_Q_sync.net().is_queued())
+            m_Q_sync.net().push_to_queue(netlist_time::from_double(xx));
+#else
+    solve();
+#endif
 #endif
 }
 
@@ -178,8 +203,14 @@ ATTR_COLD void netlist_matrix_solver_t::reset()
 
 ATTR_COLD void netlist_matrix_solver_t::update()
 {
-    if (solve())
-        update_inputs();
+#if NEW_LTE
+    double xx = solve();
+    if (xx<10e-6)
+        if (!m_Q_sync.net().is_queued())
+            m_Q_sync.net().push_to_queue(netlist_time::from_double(xx));
+#else
+    solve();
+#endif
 }
 
 
@@ -190,7 +221,7 @@ ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 		m_steps[k]->step_time(dd);
 }
 
-ATTR_HOT bool netlist_matrix_solver_t::solve()
+ATTR_HOT double netlist_matrix_solver_t::solve()
 {
 
 	netlist_time now = owner().netlist().time();
@@ -198,7 +229,7 @@ ATTR_HOT bool netlist_matrix_solver_t::solve()
 
 	// We are already up to date. Avoid oscillations.
 	if (delta < netlist_time::from_nsec(1))
-	    return true;
+	    return 1.0;
 
 	NL_VERBOSE_OUT(("Step!\n"));
 	/* update all terminals for new time step */
@@ -223,7 +254,7 @@ ATTR_HOT bool netlist_matrix_solver_t::solve()
 		{
             owner().netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
 	        m_Q_sync.net().push_to_queue(m_params.m_nt_sync_delay);
-	        return false;
+	        return 1.0;
 		}
 	}
 	else
@@ -231,7 +262,7 @@ ATTR_HOT bool netlist_matrix_solver_t::solve()
 		while (solve_non_dynamic() > m_params.m_gs_loops)
             owner().netlist().warning("Non-Dynamic Solve iterations exceeded .. Consider increasing RESCHED_LOOPS");
 	}
-	return true;
+	return update_inputs(delta.as_double());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -770,25 +801,33 @@ NETLIB_UPDATE(solver)
 				this_resched[i] = m_mat_solvers[i]->solve();
 		}
 #else
+	// FIXME: parameter
+	double m_xx = m_inc.as_double() * 100;
     for (int i = 0; i < t_cnt; i++)
     {
         if (m_mat_solvers[i]->is_timestep())
-            if (m_mat_solvers[i]->solve())
-                m_mat_solvers[i]->update_inputs();
+            {
+                double xx = m_mat_solvers[i]->solve();
+                if (m_xx > xx)
+                    m_xx = xx;
+            }
     }
 #endif
 
     /* step circuit */
     if (!m_Q_step.net().is_queued())
+#if NEW_LTE
+        m_Q_step.net().push_to_queue(netlist_time::from_double(m_xx));
+#else
         m_Q_step.net().push_to_queue(m_inc);
+#endif
 }
 
 ATTR_COLD void NETLIB_NAME(solver)::solve_all()
 {
     for (int i = 0; i < m_mat_solvers.count(); i++)
         //m_mat_solvers[i]->m_Q_sync.net().push_to_queue(m_mat_solvers[i]->m_params.m_nt_sync_delay);
-        if (m_mat_solvers[i]->solve())
-            m_mat_solvers[i]->update_inputs();
+        m_mat_solvers[i]->solve();
 }
 
 

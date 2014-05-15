@@ -473,6 +473,10 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
+#if NEW_LTE
+    , m_DD_n_m_1(0.0)
+    , m_h_n_m_1(1e-6)
+#endif
 {
 	m_last_Q = 0;
 	m_new_Q = 0;

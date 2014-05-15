@@ -157,6 +157,9 @@
 #include "pstring.h"
 #include "pstate.h"
 
+#define NEW_INPUT (1)
+#define NEW_LTE (0)
+
 // ----------------------------------------------------------------------------------------
 // Type definitions
 // ----------------------------------------------------------------------------------------
@@ -651,6 +654,10 @@ public:
 	double m_last_Analog;
 	double m_cur_Analog;
 	double m_new_Analog;
+#if NEW_LTE
+    double m_DD_n_m_1;
+    double m_h_n_m_1;
+#endif
 
 };
 

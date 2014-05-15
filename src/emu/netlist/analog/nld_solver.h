@@ -9,8 +9,6 @@
 #include "../nl_setup.h"
 #include "../nl_base.h"
 
-#define NEW_INPUT (1)
-
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
@@ -51,9 +49,9 @@ public:
 	ATTR_HOT virtual int solve_non_dynamic() = 0;
 	ATTR_HOT virtual void step(const netlist_time delta);
 
-	ATTR_HOT bool solve();
+	ATTR_HOT double solve();
 
-	ATTR_HOT void update_inputs();
+	ATTR_HOT double update_inputs(const double hn);
 	ATTR_HOT void update_dynamic();
 
 	ATTR_HOT void schedule();
