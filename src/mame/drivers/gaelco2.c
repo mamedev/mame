@@ -147,12 +147,6 @@ static INPUT_PORTS_START( maniacsq )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gaelcosnd_interface maniacsq_snd_interface =
-{
-	"gfx1",                                 /* memory region */
-	{ 0*0x0080000, 1*0x0080000, 0, 0 },     /* start of each ROM bank */
-};
-
 static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)     /* 13 MHz? */
@@ -179,8 +173,9 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
-	MCFG_SOUND_CONFIG(maniacsq_snd_interface)
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0080000, 1 * 0x0080000, 0, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -266,12 +261,6 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -6.0 / 240, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static const gaelcosnd_interface bang_snd_interface =
-{
-	"gfx1",                                                 /* memory region */
-	{ 0*0x0200000, 1*0x0200000, 2*0x0200000, 3*0x0200000 }  /* start of each ROM bank */
-};
-
 static MACHINE_CONFIG_START( bang, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
@@ -300,8 +289,9 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GAELCO_CG1V_ADD("gaelco", 0)
-	MCFG_SOUND_CONFIG(bang_snd_interface)
+	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0200000, 1 * 0x0200000, 2 * 0x0200000, 3 * 0x0200000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -510,12 +500,6 @@ static INPUT_PORTS_START( alighunt )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gaelcosnd_interface alighunt_snd_interface =
-{
-	"gfx1",                                                 /* memory region */
-	{ 0*0x0400000, 1*0x0400000, 2*0x0400000, 3*0x0400000 }  /* start of each ROM bank */
-};
-
 static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)         /* 12 MHz */
@@ -542,8 +526,9 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
-	MCFG_SOUND_CONFIG(alighunt_snd_interface)
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0400000, 1 * 0x0400000, 2 * 0x0400000, 3 * 0x0400000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -753,12 +738,6 @@ static INPUT_PORTS_START( touchgo )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_TOGGLE
 INPUT_PORTS_END
 
-static const gaelcosnd_interface touchgo_snd_interface =
-{
-	"gfx1",                                 /* memory region */
-	{ 0*0x0400000, 1*0x0400000, 0, 0 }      /* start of each ROM bank */
-};
-
 static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)         /* 16 MHz */
@@ -794,8 +773,10 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
-	MCFG_SOUND_CONFIG(touchgo_snd_interface)
+
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0400000, 1 * 0x0400000, 0, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -947,12 +928,6 @@ static INPUT_PORTS_START( snowboar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static const gaelcosnd_interface snowboar_snd_interface =
-{
-	"gfx1",                                 /* memory region */
-	{ 0*0x0400000, 1*0x0400000, 0, 0 }      /* start of each ROM bank */
-};
-
 static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
@@ -981,8 +956,9 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GAELCO_CG1V_ADD("gaelco", 0)
-	MCFG_SOUND_CONFIG(snowboar_snd_interface)
+	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0400000, 1 * 0x0400000, 0, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1189,12 +1165,6 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Wheel")
 INPUT_PORTS_END
 
-static const gaelcosnd_interface wrally2_snd_interface =
-{
-	"gfx1",                             /* memory region */
-	{ 0*0x0200000, 1*0x0200000, 0, 0 }  /* start of each ROM bank */
-};
-
 static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)         /* 13 MHz */
@@ -1233,8 +1203,10 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
-	MCFG_SOUND_CONFIG(wrally2_snd_interface)
+
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0200000, 1 * 0x0200000, 0, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

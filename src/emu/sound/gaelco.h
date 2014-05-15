@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __GALELCO_H__
-#define __GALELCO_H__
+#ifndef __GAELCO_SND_H__
+#define __GAELCO_SND_H__
 
 #define GAELCO_NUM_CHANNELS     0x07
 #define GAELCO_VOLUME_LEVELS    0x10
@@ -11,14 +11,12 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_GAELCO_GAE1_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, GAELCO_GAE1, _clock)
-#define MCFG_GAELCO_GAE1_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, GAELCO_GAE1, _clock)
-#define MCFG_GAELCO_CG1V_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, GAELCO_CG1V, _clock)
-#define MCFG_GAELCO_CG1V_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, GAELCO_CG1V, _clock)
+#define MCFG_GAELCO_SND_DATA(_tag) \
+	gaelco_gae1_device::set_snd_data_tag(*device, _tag);
+
+#define MCFG_GAELCO_BANKS(_offs1, _offs2, _offs3, _offs4) \
+	gaelco_gae1_device::set_bank_offsets(*device, _offs1, _offs2, _offs3, _offs4);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -34,15 +32,6 @@ struct gaelco_sound_channel
 };
 
 
-// ======================> External interface
-
-struct gaelcosnd_interface
-{
-	const char *gfxregion;  /* shared gfx region name */
-	int banks[4];           /* start of each ROM bank */
-};
-
-
 // ======================> gaelco_gae1_device
 
 class gaelco_gae1_device : public device_t,
@@ -53,6 +42,16 @@ public:
 	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~gaelco_gae1_device() { }
 
+	static void set_snd_data_tag(device_t &device, const char *tag) { downcast<gaelco_gae1_device &>(device).m_data_tag = tag; }
+	static void set_bank_offsets(device_t &device, int offs1, int offs2, int offs3, int offs4)
+	{
+		gaelco_gae1_device &dev = downcast<gaelco_gae1_device &>(device);
+		dev.m_banks[0] = offs1;
+		dev.m_banks[1] = offs2;
+		dev.m_banks[2] = offs3;
+		dev.m_banks[3] = offs4;
+	}
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -70,6 +69,8 @@ private:
 	UINT8 *m_snd_data;                                      /* PCM data */
 	int m_banks[4];                                         /* start of each ROM bank */
 	gaelco_sound_channel m_channel[GAELCO_NUM_CHANNELS];    /* 7 stereo channels */
+
+	const char *m_data_tag;
 
 	UINT16 m_sndregs[0x38];
 
@@ -92,4 +93,4 @@ public:
 extern const device_type GAELCO_CG1V;
 
 
-#endif /* __GALELCO_H__ */
+#endif /* __GAELCO_SND_H__ */

@@ -58,7 +58,8 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char
 	: device_t(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock, "gaelco_gae1", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
-		m_snd_data(NULL)
+		m_snd_data(NULL),
+		m_data_tag(NULL)
 {
 }
 
@@ -66,7 +67,8 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
-		m_snd_data(NULL)
+		m_snd_data(NULL),
+		m_data_tag(NULL)
 {
 }
 
@@ -236,21 +238,15 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 
 void gaelco_gae1_device::device_start()
 {
-	int j, vol;
-	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)static_config();
-
-	/* copy rom banks */
-	for (j = 0; j < 4; j++){
-		m_banks[j] = intf->banks[j];
-	}
 	m_stream = stream_alloc(0, 2, 8000);
-	m_snd_data = (UINT8 *)machine().root_device().memregion(intf->gfxregion)->base();
+
+	m_snd_data = (UINT8 *)machine().root_device().memregion(m_data_tag)->base();
 	if (m_snd_data == NULL)
 		m_snd_data = *region();
 
 	/* init volume table */
-	for (vol = 0; vol < GAELCO_VOLUME_LEVELS; vol++){
-		for (j = -128; j <= 127; j++){
+	for (int vol = 0; vol < GAELCO_VOLUME_LEVELS; vol++){
+		for (int j = -128; j <= 127; j++){
 			m_volume_table[vol][(j ^ 0x80) & 0xff] = (vol*j*256)/(GAELCO_VOLUME_LEVELS - 1);
 		}
 	}
@@ -266,8 +262,6 @@ void gaelco_gae1_device::device_stop()
 		wav_close(wavraw);
 	wavraw = NULL;
 }
-
-
 
 
 /*============================================================================
