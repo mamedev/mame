@@ -70,6 +70,8 @@ const device_type SAM6883 = &device_creator<sam6883_device>;
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock, "sam6883", __FILE__),
+		m_cpu_tag(NULL),
+		m_cpu_space_ref(AS_PROGRAM),
 		m_read_res(*this),
 		m_space_0000(*this),
 		m_space_8000(*this),
