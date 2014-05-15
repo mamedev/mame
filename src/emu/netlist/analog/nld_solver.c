@@ -18,6 +18,19 @@
 #define SOLVER_VERBOSE_OUT(x) do {} while (0)
 //#define SOLVER_VERBOSE_OUT(x) printf x
 
+ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t()
+: m_owner(NULL)
+{
+}
+
+ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
+{
+#if NEW_INPUT
+    for (int i = 0; i < m_inps.count(); i++)
+        delete m_inps[i];
+#endif
+}
+
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
 	m_owner = &aowner;
@@ -66,10 +79,24 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 					NL_VERBOSE_OUT(("Added terminal\n"));
 					break;
 				case netlist_terminal_t::INPUT:
-					if (!m_inps.contains(p))
-						m_inps.add(p);
-					NL_VERBOSE_OUT(("Added input\n"));
-					break;
+				    {
+#if NEW_INPUT
+				        // FIXME: multiple outputs per net ...
+                        netlist_analog_output_t *m = new netlist_analog_output_t();
+                        m->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
+                        //register_output("m", *m);
+                        m_inps.add(m);
+                        m->m_proxied_net = &p->net();
+                        m->net().register_con(*p);
+                        // FIXME: repeated
+                        m->net().rebuild_list();
+#else
+                        if (!m_inps.contains(p))
+                            m_inps.add(p)
+#endif
+                        NL_VERBOSE_OUT(("Added input\n"));
+				    }
+                    break;
 				default:
 					owner().netlist().error("unhandled element found\n");
 					break;
@@ -81,6 +108,18 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 
 ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 {
+
+#if NEW_INPUT
+    // avoid recursive calls. Inputs are updated outside this call
+    for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+        if ((*p)->m_proxied_net->m_last_Analog != (*p)->m_proxied_net->m_cur_Analog)
+            (*p)->set_Q((*p)->m_proxied_net->m_cur_Analog);
+    for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+    {
+        if ((*p)->m_proxied_net->m_last_Analog != (*p)->m_proxied_net->m_cur_Analog)
+            (*p)->m_proxied_net->m_last_Analog = (*p)->m_proxied_net->m_cur_Analog;
+    }
+#else
 	for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
 	{
 		if ((*p)->net().m_last_Analog != (*p)->net().m_cur_Analog)
@@ -93,6 +132,7 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
         if ((*p)->net().m_last_Analog != (*p)->net().m_cur_Analog)
             (*p)->net().m_last_Analog = (*p)->net().m_cur_Analog;
 	}
+#endif
 
 }
 
@@ -156,14 +196,15 @@ ATTR_HOT bool netlist_matrix_solver_t::solve()
 	netlist_time now = owner().netlist().time();
 	netlist_time delta = now - m_last_step;
 
-	if (delta < netlist_time::from_nsec(1)) // always update capacitors
-		delta = netlist_time::from_nsec(1);
-	{
-		NL_VERBOSE_OUT(("Step!\n"));
-		/* update all terminals for new time step */
-		m_last_step = now;
-		step(delta);
-	}
+	// We are already up to date. Avoid oscillations.
+	if (delta < netlist_time::from_nsec(1))
+	    return true;
+
+	NL_VERBOSE_OUT(("Step!\n"));
+	/* update all terminals for new time step */
+	m_last_step = now;
+	//printf("usecs: %f\n", delta.as_double()*1000000.0);
+	step(delta);
 
 	if (is_dynamic())
 	{
@@ -832,11 +873,12 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
         ms->m_params.m_nr_loops = m_nr_loops.Value();
 		ms->m_params.m_nt_sync_delay = m_sync_delay.Value();
 
-        ms->setup(groups[i], *this);
 
         register_sub(*ms, pstring::sprintf("Solver %d",m_mat_solvers.count()));
 
-		m_mat_solvers.add(ms);
+        ms->setup(groups[i], *this);
+
+        m_mat_solvers.add(ms);
 
         netlist().log("Solver %s", ms->name().cstr());
         netlist().log("       # %d ==> %d nets %s", i, groups[i].count(), (*(*groups[i].first())->m_core_terms.first())->name().cstr());

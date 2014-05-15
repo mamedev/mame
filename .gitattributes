@@ -368,6 +368,7 @@ nl_examples/74123_mstable.c svneol=native#text/plain
 nl_examples/bjt.c svneol=native#text/plain
 nl_examples/bjt_eb.c svneol=native#text/plain
 nl_examples/bjt_eb_pnp.c svneol=native#text/plain
+nl_examples/breakout.c svneol=native#text/plain
 nl_examples/cd4066.c svneol=native#text/plain
 nl_examples/msx_mixer_stage.c svneol=native#text/plain
 nl_examples/ne555_astable.c svneol=native#text/plain

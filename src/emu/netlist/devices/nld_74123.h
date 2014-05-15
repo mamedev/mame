@@ -3,7 +3,7 @@
 /*
  * nld_74123.h
  *
- *  74123: PRECISION TIMERS
+ *  74123: Dual Retriggerable One-Shot with Clear and Complementary Outputs
  *
  *           +--------------+
  *        A1 |1     ++    16| VCC
@@ -43,8 +43,12 @@ public:
 
     netlist_analog_input_t m_CV;
 
-	netlist_sig_t m_last_trig;
+    netlist_sig_t m_last_trig;
 	UINT8         m_state;
+	double        m_KP;
+
+    netlist_param_double_t m_K;
+    netlist_param_double_t m_RI;
 
 );
 

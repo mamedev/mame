@@ -723,6 +723,8 @@ public:
 
 	ATTR_HOT void set_Q(const double newQ);
 
+    netlist_net_t *m_proxied_net; // only for proxy nets in analog input logic
+
 };
 
 // ----------------------------------------------------------------------------------------

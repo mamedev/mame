@@ -20,10 +20,10 @@ NETLIST_START(74123_mstable)
 
     /* Wiring up the 74123 */
 
-    CLOCK(clk, 500)
+    CLOCK(clk, 50)
     TTL_74123(mf)
 
-    RES(R, 1000)
+    RES(R, 10000)
     CAP(C, 1e-6)
 
     NET_C(GND, mf.GND)
@@ -38,8 +38,8 @@ NETLIST_START(74123_mstable)
     NET_C(mf.B,    V5)
     NET_C(mf.A, clk.Q)
 
-    //LOG(logC, C.2)
-    //LOG(logQ, mf.Q)
-    //LOG(logX, clk.Q)
+    LOG(logC, C.2)
+    LOG(logQ, mf.Q)
+    LOG(logX, clk.Q)
 
 NETLIST_END()

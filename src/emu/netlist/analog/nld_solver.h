@@ -9,6 +9,8 @@
 #include "../nl_setup.h"
 #include "../nl_base.h"
 
+#define NEW_INPUT (1)
+
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
@@ -40,8 +42,8 @@ public:
 	typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
-	netlist_matrix_solver_t() : m_owner(NULL) {}
-	virtual ~netlist_matrix_solver_t() {}
+	ATTR_COLD netlist_matrix_solver_t();
+	ATTR_COLD virtual ~netlist_matrix_solver_t();
 
 	ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 
@@ -75,7 +77,11 @@ protected:
 
     netlist_net_t::list_t m_nets;
 	dev_list_t m_dynamic;
+#if NEW_INPUT
+	netlist_list_t<netlist_analog_output_t *> m_inps;
+#else
 	netlist_core_terminal_t::list_t m_inps;
+#endif
 	dev_list_t m_steps;
 	netlist_time m_last_step;
 

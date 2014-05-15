@@ -841,7 +841,7 @@ ATTR_HOT void netlist_analog_output_t::set_Q(const double newQ)
     if (newQ != net().m_new_Analog)
     {
         net().m_new_Analog = newQ;
-        net().push_to_queue(NLTIME_FROM_NS(0));
+        net().push_to_queue(NLTIME_FROM_NS(1));
     }
 }
 
