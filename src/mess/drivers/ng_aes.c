@@ -375,7 +375,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 		case 0x0140:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD OBJ BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_sprite_bus = true;
-			optimize_sprite_data();
+			m_sprgen->optimize_sprite_data();
 			break;
 		case 0x0142:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD PCM BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
@@ -1015,6 +1015,10 @@ void ng_aes_state::common_machine_start()
 	save_item(NAME(m_main_cpu_bank_address));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(ng_aes_state::neogeo_postload), this));
+
+	m_sprgen->set_screen(m_screen);
+	m_sprgen->set_sprite_region(m_region_sprites);
+	m_sprgen->set_fixed_regions(m_region_fixed, m_region_fixedbios);
 }
 
 MACHINE_START_MEMBER(ng_aes_state,neogeo)
@@ -1077,7 +1081,7 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 	m_recurse = false;
 
 	/* AES has no SFIX ROM and always uses the cartridge's */
-	neogeo_set_fixed_layer_source(1);
+	m_sprgen->neogeo_set_fixed_layer_source(1);
 
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
@@ -1453,9 +1457,9 @@ UINT32 ng_aes_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 	// fill with background color first
 	bitmap.fill(m_pens[0x0fff], cliprect);
 
-	if (m_has_sprite_bus) draw_sprites(bitmap, cliprect.min_y);
+	if (m_has_sprite_bus) m_sprgen->draw_sprites(bitmap, cliprect.min_y);
 
-	if (m_has_text_bus) draw_fixed_layer(bitmap, cliprect.min_y);
+	if (m_has_text_bus) m_sprgen->draw_fixed_layer(bitmap, cliprect.min_y);
 
 	return 0;
 }

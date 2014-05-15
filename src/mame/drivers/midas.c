@@ -7,7 +7,6 @@
     a reengineered Neo-Geo, with a few differences: no Z80, better sound chip, serial eeprom and 256 color tiles.
     Plus a PIC12C508A microcontroller, probably for the protection checks (I've patched them out for now).
 
-    This driver should be merged with neogeo.c
     Hardware description:
 
     http://web.archive.org/web/20041018094226/http://www.andamiro.com/kor/business/hard_05.html
@@ -17,7 +16,7 @@
     VRAM        256kbyte (4Display/Access bank)
 
     PaletteRAM  96kbyte
-
+	
     Display     320(x)*224(y)
 
     Sprite      16(x)*240(y(max))*380(max) (96 sprite/line(max))
@@ -55,22 +54,22 @@
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-
+#include "includes/neogeo.h"
 
 class midas_state : public driver_device
 {
 public:
 	midas_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gfxregs(*this, "gfxregs"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_sprgen(*this, "spritegen"),
+		m_screen(*this, "screen"),
+		m_zoomram(*this, "zoomtable")
+		{ }
 
-	UINT16 *m_gfxram;
-	required_shared_ptr<UINT16> m_gfxregs;
-	tilemap_t *m_tmap;
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
 	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
@@ -79,16 +78,25 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(hammer_led_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
+	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
 	DECLARE_DRIVER_INIT(livequiz);
-	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
-	UINT32 screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_start();
+	virtual void machine_reset();
+
+
+	UINT32 screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(livequiz_irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<neosprite_midas_device> m_sprgen;
+	required_device<screen_device> m_screen;
+	required_shared_ptr<UINT16> m_zoomram;
+
+	void screen_eof_midas(screen_device &screen, bool state);
+
 };
 
 
@@ -96,122 +104,18 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(midas_state::get_tile_info)
-{
-	UINT16 code = m_gfxram[ tile_index + 0x7000 ];
-	SET_TILE_INFO_MEMBER(1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));
-}
-
 void midas_state::video_start()
 {
-	m_gfxram = auto_alloc_array(machine(), UINT16, 0x20000/2);
-
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(midas_state::get_tile_info),this), TILEMAP_SCAN_COLS,8,8,0x80,0x20);
-
-	m_tmap->set_transparent_pen(0);
 }
 
-void midas_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *s       =   m_gfxram + 0x8000;
-	UINT16 *codes   =   m_gfxram;
+	// fill with background color first
+	bitmap.fill(0x0, cliprect);
 
-	int sx_old = 0, sy_old = 0, ynum_old = 0, xzoom_old = 0;
-	int xdim, ydim, xscale, yscale;
-	int i,y;
+	m_sprgen->draw_sprites(bitmap, cliprect.min_y);
 
-	for (i = 0; i < 0x180; i++,s++,codes+=0x40)
-	{
-		int zoom    =   s[0x000];
-		int sy      =   s[0x200];
-		int sx      =   s[0x400];
-
-		int xzoom   =   ((zoom >> 8) & 0x0f) + 1;
-		int yzoom   =   ((zoom >> 0) & 0x7f) + 1;
-
-		int ynum;
-
-		if (sy & 0x40)
-		{
-			ynum    =   ynum_old;
-
-			sx      =   sx_old + xzoom_old;
-			sy      =   sy_old;
-
-			if (sx >= 0x1f0)
-				sx -= 0x200;
-		}
-		else
-		{
-			ynum    =   sy & 0x3f;
-
-			sx      =   (sx >> 7);
-			sy      =   0x200 - (sy >> 7);
-
-			if (sx >= 0x1f0)
-				sx -= 0x200;
-
-			if (ynum > 0x20)
-				ynum = 0x20;
-		}
-
-		ynum_old    =   ynum;
-		sx_old      =   sx;
-		sy_old      =   sy;
-		xzoom_old   =   xzoom;
-
-		// Use fixed point values (16.16), for accuracy
-
-		sx          <<= 16;
-		sy          <<= 16;
-
-		xdim    =   ( xzoom << 16 ) * 16 / 16;
-		ydim    =   ( yzoom << 16 ) * 16 / 0x80;
-
-		xscale  =   xdim / 16;
-		yscale  =   ydim / 16;
-
-		// Let's approximate to the nearest greater integer value
-		// to avoid holes in between tiles
-
-		if (xscale & 0xffff)    xscale += (1<<16) / 16;
-		if (yscale & 0xffff)    yscale += (1<<16) / 16;
-
-		// Draw the tiles
-
-		for (y = 0; y < ynum; y++)
-		{
-			UINT16 code     =   codes[y*2];
-			UINT16 attr     =   codes[y*2+1];
-
-			m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
-							code,
-							attr >> 8,
-							attr & 1, attr & 2,
-							sx / 0x10000, ((sy + y * ydim) / 0x10000)&0x1ff,
-							xscale, yscale, 0           );
-		}
-	}
-}
-
-UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-	if ( machine().input().code_pressed(KEYCODE_Z) )
-	{
-		int msk = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1 << 0;  // for m_tmap
-		if (machine().input().code_pressed(KEYCODE_A))  msk |= 1 << 1;  // for sprites
-		if (msk != 0) layers_ctrl &= msk;
-	}
-#endif
-
-	bitmap.fill(4095, cliprect);
-
-	if (layers_ctrl & 2)    draw_sprites(bitmap,cliprect);
-	if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, 0, 0);
+	m_sprgen->draw_fixed_layer(bitmap, cliprect.min_y);
 
 	return 0;
 }
@@ -238,23 +142,34 @@ READ16_MEMBER(midas_state::ret_ffff)
 
 WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 {
-	COMBINE_DATA( m_gfxregs + offset );
-
-	switch( offset )
+	/* accessing the LSB only is not mapped */
+	if (mem_mask != 0x00ff)
 	{
-		case 1:
+		/* accessing the MSB only stores same data in MSB and LSB */
+		if (mem_mask == 0xff00)
+			data = (data & 0xff00) | (data >> 8);
+
+		switch (offset)
 		{
-			UINT16 addr = m_gfxregs[0];
-			m_gfxram[addr] = data;
-			m_gfxregs[0] += m_gfxregs[2];
-
-			if ( addr >= 0x7000 && addr <= 0x7fff ) m_tmap->mark_tile_dirty(addr - 0x7000);
-
-			break;
+		case 0x00: m_sprgen->set_videoram_offset(data); break;
+		case 0x01: m_sprgen->set_videoram_data(data); break;
+		case 0x02: m_sprgen->set_videoram_modulo(data); break;
 		}
 	}
 }
 
+WRITE16_MEMBER(midas_state::midas_zoomtable_w)
+{
+	COMBINE_DATA(&m_zoomram[offset]);
+	UINT8 *rgn          =   memregion("zoomy")->base();
+
+	if (ACCESSING_BITS_0_7)
+	{
+		rgn[offset+0x00000] = data & 0xff;
+		rgn[offset+0x10000] = data & 0xff;
+	}
+
+}
 /***************************************************************************************
                                        Live Quiz Show
 ***************************************************************************************/
@@ -297,7 +212,7 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM // zoom table?
+	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM_WRITE(midas_zoomtable_w) AM_SHARE("zoomtable") // zoom table?
 
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
 ADDRESS_MAP_END
@@ -361,7 +276,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 
 	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
 
 	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
@@ -380,7 +295,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 
 	AM_RANGE(0xbc0004, 0xbc0005) AM_READ(hammer_sensor_r )
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM // zoom table?
+	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM_WRITE(midas_zoomtable_w) AM_SHARE("zoomtable") // zoom table?
 
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
 ADDRESS_MAP_END
@@ -389,17 +304,14 @@ ADDRESS_MAP_END
 static const gfx_layout layout16x16x8 =
 {
 	16,16,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1,1),
 	8,
 	{
-		RGN_FRAC(3,4)+8,RGN_FRAC(3,4)+0,
-		RGN_FRAC(2,4)+8,RGN_FRAC(2,4)+0,
-		RGN_FRAC(1,4)+8,RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0
+		56,48,40,32,24,16,8,0
 	},
-	{ STEP8(8*16*2+7,-1), STEP8(7,-1) },
-	{ STEP16(0,8*2) },
-	16*16*2
+	{ 0,1,2,3,4,5,6,7, 16*64+0, 6*64+1, 6*64+2, 6*64+3, 6*64+4, 6*64+5, 6*64+6, 6*64+7,  },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	16*128
 };
 
 static const gfx_layout layout8x8x8_2 =
@@ -692,11 +604,34 @@ static INPUT_PORTS_START( hammer )
 
 INPUT_PORTS_END
 
+void midas_state::machine_start()
+{
+	m_sprgen->set_pens((pen_t*)m_palette->pens());
+	m_sprgen->set_screen(m_screen);
+	m_sprgen->set_sprite_region(memregion("sprites"));
+	m_sprgen->set_fixed_regions(memregion("tiles"), memregion("tiles"));
+}
+
+void midas_state::machine_reset()
+{
+
+}
+
+	
+
 
 WRITE_LINE_MEMBER(midas_state::livequiz_irqhandler)
 {
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
+
+
+void midas_state::screen_eof_midas(screen_device &screen, bool state)
+{
+	m_sprgen->buffer_vram();
+}
+
+
 
 static MACHINE_CONFIG_START( livequiz, midas_state )
 
@@ -709,12 +644,11 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
+	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_DRIVER(midas_state, screen_eof_midas)
+
+	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
@@ -743,12 +677,11 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
+	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_DRIVER(midas_state, screen_eof_midas)
+
+	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
@@ -861,16 +794,19 @@ ROM_START( livequiz )
 	ROM_LOAD( "sub_pic12c508a.u4",   0x000000, 0x000400, CRC(e52ebdc4) SHA1(0f3af66b5ea184e49188e74a873699324a3930f1) )
 
 	ROM_REGION( 0x800000, "sprites", 0 )
-	ROM_LOAD( "flash.u15", 0x000000, 0x200000, CRC(d6eb56f1) SHA1(52d67bb25dd968c79eccb05159a578516b27e557) )
-	ROM_LOAD( "flash.u19", 0x200000, 0x200000, CRC(daa81532) SHA1(9e66bb4639b92c3d76b7918535f55883f22f24b2) )
-	ROM_LOAD( "flash.u16", 0x400000, 0x200000, CRC(4c9fd873) SHA1(6e185304ce29771265d3c48b0ef0e840d8bed02d) )
-	ROM_LOAD( "flash.u20", 0x600000, 0x200000, CRC(b540a8c7) SHA1(25b9b30c7d5ff1e410ea30580017e45590542561) )
+	ROM_LOAD32_BYTE( "flash.u15", 0x000000, 0x200000, CRC(d6eb56f1) SHA1(52d67bb25dd968c79eccb05159a578516b27e557) )
+	ROM_LOAD32_BYTE( "flash.u19", 0x000001, 0x200000, CRC(daa81532) SHA1(9e66bb4639b92c3d76b7918535f55883f22f24b2) )
+	ROM_LOAD32_BYTE( "flash.u16", 0x000002, 0x200000, CRC(4c9fd873) SHA1(6e185304ce29771265d3c48b0ef0e840d8bed02d) )
+	ROM_LOAD32_BYTE( "flash.u20", 0x000003, 0x200000, CRC(b540a8c7) SHA1(25b9b30c7d5ff1e410ea30580017e45590542561) )
 
 	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "27c4096.u23", 0x000000, 0x080000, CRC(25121de8) SHA1(edf24d87551639b871baf3243b452a4e2ba84107) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "flash.u5", 0x000000, 0x200000, CRC(dc062792) SHA1(ec415c918c47ce9d181f014cde317af5717600e4) )
+
+	ROM_REGION( 0x20000, "zoomy", ROMREGION_ERASE00 )
+	/* uploaded */
 ROM_END
 
 DRIVER_INIT_MEMBER(midas_state,livequiz)
@@ -944,17 +880,17 @@ ROM_START( hammer )
 	ROM_LOAD16_WORD_SWAP( "p.u22", 0x000000, 0x200000, CRC(687f1596) SHA1(3dc5fb0af1e8c4f3a42ce4aad39635b1111831d8) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
-	ROM_LOAD( "a0l.u44", 0x000000, 0x200000, CRC(b9cafd81) SHA1(24698970d1aea0907e2963c872ce61077f44c3af) )
-	ROM_LOAD( "a0h.u46", 0x200000, 0x200000, CRC(f60f188b) SHA1(486f26c473b46efb402662b2f374e361cd7b4284) )
+	ROM_LOAD32_BYTE( "a0l.u44", 0x000000, 0x200000, CRC(b9cafd81) SHA1(24698970d1aea0907e2963c872ce61077f44c3af) )
+	ROM_LOAD32_BYTE( "a0h.u46", 0x800000, 0x200000, CRC(f60f188b) SHA1(486f26c473b46efb402662b2f374e361cd7b4284) )
 
-	ROM_LOAD( "a1l.u48", 0x400000, 0x200000, CRC(82129cf9) SHA1(6d68e943854bc9e8ea555bf03107dc9e836ca4d9) )
-	ROM_LOAD( "a1h.u50", 0x600000, 0x200000, CRC(76897c90) SHA1(aded60d3db834598cd54ad9140eee7be4129cb27) )
+	ROM_LOAD32_BYTE( "a1l.u48", 0x000001, 0x200000, CRC(82129cf9) SHA1(6d68e943854bc9e8ea555bf03107dc9e836ca4d9) )
+	ROM_LOAD32_BYTE( "a1h.u50", 0x800001, 0x200000, CRC(76897c90) SHA1(aded60d3db834598cd54ad9140eee7be4129cb27) )
 
-	ROM_LOAD( "a2l.u45", 0x800000, 0x200000, CRC(d8086ee5) SHA1(9d5f2b3a0f903a69cfd1108ddf5ea61b571c3fe3) )
-	ROM_LOAD( "a2h.u47", 0xa00000, 0x200000, CRC(a64aa2df) SHA1(7e4eb049cd6a5971a455488a484f225763921614) )
+	ROM_LOAD32_BYTE( "a2l.u45", 0x000002, 0x200000, CRC(d8086ee5) SHA1(9d5f2b3a0f903a69cfd1108ddf5ea61b571c3fe3) )
+	ROM_LOAD32_BYTE( "a2h.u47", 0x800002, 0x200000, CRC(a64aa2df) SHA1(7e4eb049cd6a5971a455488a484f225763921614) )
 
-	ROM_LOAD( "a3l.u49", 0xc00000, 0x200000, CRC(4e83cf00) SHA1(e66a0b4eae0f46bf36126be3795cfac3ad3d4282) )
-	ROM_LOAD( "a3h.u51", 0xe00000, 0x200000, CRC(834de39f) SHA1(6e9867180ca20e64f60bad5cad82674ce8f45b7b) )
+	ROM_LOAD32_BYTE( "a3l.u49", 0x000003, 0x200000, CRC(4e83cf00) SHA1(e66a0b4eae0f46bf36126be3795cfac3ad3d4282) )
+	ROM_LOAD32_BYTE( "a3h.u51", 0x800003, 0x200000, CRC(834de39f) SHA1(6e9867180ca20e64f60bad5cad82674ce8f45b7b) )
 
 	ROM_REGION( 0x080000, "tiles", ROMREGION_ERASE )
 	// Use the tiles rom from livequiz (not present in this set) to show some debug text
@@ -963,7 +899,10 @@ ROM_START( hammer )
 	ROM_REGION( 0x400000, "ymz", 0 )
 	ROM_LOAD( "s0.u25", 0x000000, 0x200000, CRC(c049a3e0) SHA1(0c7016c3128c170a84ad3f92fad1165775210e3d) )
 	ROM_LOAD( "s1.u26", 0x200000, 0x200000, CRC(9cc4b3ec) SHA1(b91a8747074a1032eb7f70a015d394fe8e896d7e) )
+
+	ROM_REGION( 0x20000, "zoomy", ROMREGION_ERASE00 )
+	/* uploaded */
 ROM_END
 
-GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
 GAME( 2000, hammer,   0, hammer,   hammer, driver_device,   0,        ROT0, "Andamiro", "Hammer",         0 )

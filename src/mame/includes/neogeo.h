@@ -6,19 +6,11 @@
 
 #include "machine/upd1990a.h"
 #include "machine/ng_memcard.h"
+#include "video/neogeo_spr.h"
 
-#define NEOGEO_MASTER_CLOCK                     (24000000)
-#define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
-#define NEOGEO_AUDIO_CPU_CLOCK                  (NEOGEO_MASTER_CLOCK / 6)
-#define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
-#define NEOGEO_PIXEL_CLOCK                      (NEOGEO_MASTER_CLOCK / 4)
-#define NEOGEO_HTOTAL                           (0x180)
-#define NEOGEO_HBEND                            (0x01e) /* this should really be 29.5 */
-#define NEOGEO_HBSTART                          (0x15e) /* this should really be 349.5 */
-#define NEOGEO_VTOTAL                           (0x108)
-#define NEOGEO_VBEND                            (0x010)
-#define NEOGEO_VBSTART                          (0x0f0)
-#define NEOGEO_VSSTART                          (0x100)
+// On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
+// Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.
+#define NEOGEO_VBLANK_IRQ_HTIM (attotime::from_ticks(56+2, NEOGEO_MASTER_CLOCK))
 
 
 class neogeo_state : public driver_device
@@ -39,7 +31,8 @@ public:
 		m_save_ram(*this, "saveram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_memcard(*this, "memcard")
+		m_memcard(*this, "memcard"),
+		m_sprgen(*this, "spritegen")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(io_control_w);
@@ -130,8 +123,7 @@ public:
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
-	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
 
 	// MVS-specific
@@ -158,31 +150,17 @@ protected:
 	void neogeo_set_display_counter_msb(UINT16 data);
 	void neogeo_set_display_counter_lsb(UINT16 data);
 	void set_video_control( UINT16 data );
-	void optimize_sprite_data();
-	void draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline );
-	void set_videoram_offset( UINT16 data );
-	UINT16 get_videoram_data(  );
-	void set_videoram_data( UINT16 data);
-	void set_videoram_modulo( UINT16 data);
-	UINT16 get_videoram_modulo(  );
+	
+
+
+
+
 	void compute_rgb_weights(  );
 	void regenerate_pens();
 	pen_t get_pen( UINT16 data );
 	void neogeo_set_palette_bank( UINT8 data );
 	void neogeo_set_screen_dark( UINT8 data );
-	void set_auto_animation_speed( UINT8 data);
-	void set_auto_animation_disabled( UINT8 data);
-	UINT8 neogeo_get_auto_animation_counter(  );
-	void create_auto_animation_timer(  );
-	void start_auto_animation_timer(  );
-	void neogeo_set_fixed_layer_source( UINT8 data );
-	inline int rows_to_height(int rows);
-	inline int sprite_on_scanline(int scanline, int y, int rows);
-	void draw_sprites( bitmap_rgb32 &bitmap, int scanline );
-	void parse_sprites( int scanline );
-	void create_sprite_line_timer(  );
-	void start_sprite_line_timer(  );
-	UINT16 get_video_control(  );
+
 	void audio_cpu_check_nmi();
 	void select_controller( UINT8 data );
 	void set_save_ram_unlock( UINT8 data );
@@ -359,8 +337,6 @@ protected:
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;
 	emu_timer  *m_vblank_interrupt_timer;
-	emu_timer  *m_auto_animation_timer;
-	emu_timer  *m_sprite_line_timer;
 	UINT32     m_display_counter;
 	UINT8      m_vblank_interrupt_pending;
 	UINT8      m_display_position_interrupt_pending;
@@ -369,23 +345,8 @@ protected:
 	UINT8      m_vblank_level;
 	UINT8      m_raster_level;
 
-	UINT16     *m_videoram;
-	UINT16     m_vram_offset;
-	UINT16     m_vram_read_buffer;
-	UINT16     m_vram_modulo;
-
-	const UINT8 *m_region_zoomy;
-
-	dynamic_array<UINT8> m_sprite_gfx;
-	UINT32     m_sprite_gfx_address_mask;
-
-	UINT8      m_auto_animation_speed;
-	UINT8      m_auto_animation_disabled;
-	UINT8      m_auto_animation_counter;
-	UINT8      m_auto_animation_frame_counter;
-
-	UINT8      m_fixed_layer_source;
-	UINT8      m_fixed_layer_bank_type;
+	required_device<neosprite_optimized_device> m_sprgen;
+	UINT16 get_video_control(  );
 
 	// color/palette related
 	// TODO: disentangle from the rest of the video emulation
@@ -416,6 +377,8 @@ protected:
 	const UINT8 *address_0_7_xor;
 
 	UINT16 m_cartridge_ram[0x1000];
+
+
 };
 
 

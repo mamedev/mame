@@ -1771,6 +1771,7 @@ $(MESSOBJ)/snk.a:               \
 	$(MAME_MACHINE)/neocrypt.o  \
 	$(MAME_MACHINE)/neoprot.o   \
 	$(MAME_MACHINE)/neoboot.o   \
+	$(MAME_VIDEO)/neogeo_spr.o  \
 	$(MAME_DRIVERS)/neogeo.o    \
 	$(MESS_DRIVERS)/ngp.o       \
 	$(MESS_VIDEO)/k1ge.o        \
