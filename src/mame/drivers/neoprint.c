@@ -51,7 +51,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
