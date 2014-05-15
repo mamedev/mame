@@ -19,8 +19,8 @@
   - RAM:        11x 4116 (16K x 1) Dynamic RAM. Changed to equivalent MM5290N-3.
 
   - ROMs:       6X 2716.
-  - PROMs:      1X 74S471 bipolar PROM (256 x 8), filled with 0xff but works).
-                Colors look fine and without this device there is no picture.
+  - PROMs:      1X 74S471 bipolar PROM (256 x 8) at location 10C, filled with 0xff.
+                Colors look fine and without this device there is no picture at all.
 
   - Crystal:    1x 20 MHz.
 
@@ -86,9 +86,9 @@
   | '--------'   '--------'     '---------'     '--------'    '--------'  '--------'   |
   |                                                                                    |
   |   RESNET     .--------.     .---------.     .--------.    .--------.  .--------.   |
-  |              |F-7417PC|     |SN74S471N|     | 74LS04 |    |  ???   |  |  ???   | 10|
+  |              |F-7417PC|     |SN74S471N|     | 74LS04 |    |74LS112N|  |74LS112N| 10|
   |   RESNET     '--------'     '---------'     '--------'    '--------'  '--------'   |
-  |                                                                                    |
+  |                                PROM                                                    |
   |                                                                AUDIO               |
   |                                                                   DISCRETE         |
   |                                2x22 EDGE CONNECTOR                     CIRCUITRY   |
