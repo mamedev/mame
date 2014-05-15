@@ -834,8 +834,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	}
 
 	// use info from nes.hsi if available!
-//  if (hashfile_extrainfo(*this, mapinfo))
-	if (0)
+	if (hashfile_extrainfo(*this, mapinfo))
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
