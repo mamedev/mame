@@ -172,6 +172,8 @@ gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UI
 
 void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 {
+	m_srcdata = srcdata;
+
 	// configure ourselves
 	m_width = m_origwidth = gl.width;
 	m_height = m_origheight = gl.height;
@@ -199,7 +201,7 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 
 		// RAW graphics must have a pointer up front
 		assert(srcdata != NULL);
-		m_gfxdata = const_cast<UINT8 *>(m_srcdata);
+		m_gfxdata = const_cast<UINT8 *>(srcdata);
 	}
 
 	// decoded graphics case
@@ -234,9 +236,6 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 		m_pen_usage.resize(m_total_elements);
 	else
 		m_pen_usage.reset();
-
-	// set the source
-	set_source(srcdata);
 }
 
 
@@ -255,6 +254,48 @@ void gfx_element::set_raw_layout(const UINT8 *srcdata, UINT32 width, UINT32 heig
 	layout.yoffset[0] = linemod;
 	layout.charincrement = charmod;
 	set_layout(layout, srcdata);
+}
+
+
+//-------------------------------------------------
+// set_source - set the source data for a gfx_element
+//-------------------------------------------------
+
+void gfx_element::set_source(const UINT8 *source)
+{
+	m_srcdata = source;
+	memset(m_dirty, 1, elements());
+	if (m_layout_is_raw) m_gfxdata = const_cast<UINT8 *>(source);
+}
+
+
+//-------------------------------------------------
+// set_source_and_total - set the source data
+// and total elements for a gfx_element
+//-------------------------------------------------
+
+void gfx_element::set_source_and_total(const UINT8 *source, UINT32 total)
+{
+	m_srcdata = source;
+	m_total_elements = total;
+
+	// mark everything dirty
+	m_dirty.resize_and_clear(m_total_elements, 1);
+
+	// allocate a pen usage array for entries with 32 pens or less
+	if (m_color_depth <= 32)
+		m_pen_usage.resize(m_total_elements);
+
+	if (m_layout_is_raw)
+	{
+		m_gfxdata = const_cast<UINT8 *>(source);
+	}
+	else
+	{
+		// allocate memory for the data
+		m_gfxdata_allocated.resize(m_total_elements * m_char_modulo);
+		m_gfxdata = &m_gfxdata_allocated[0];
+	}
 }
 
 

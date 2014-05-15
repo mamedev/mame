@@ -62,7 +62,8 @@ public:
 	// setters
 	void set_layout(const gfx_layout &gl, const UINT8 *srcdata);
 	void set_raw_layout(const UINT8 *srcdata, UINT32 width, UINT32 height, UINT32 total, UINT32 linemod, UINT32 charmod);
-	void set_source(const UINT8 *source) { m_srcdata = source; if (m_layout_is_raw) m_gfxdata = const_cast<UINT8 *>(source); memset(m_dirty, 1, elements()); }
+	void set_source(const UINT8 *source);
+	void set_source_and_total(const UINT8 *source, UINT32 total);
 	void set_xormask(UINT32 xormask) { m_layout_xormask = xormask; }
 	void set_palette(palette_device *palette) { m_palette = palette; }
 	void set_colors(UINT32 colors) { m_total_colors = colors; }
