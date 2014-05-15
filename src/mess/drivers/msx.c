@@ -6,7 +6,6 @@
 ** - piopx7: Laserdisc integration doesn't exist
 ** - spc800: Haven't been able to test operation of the han rom yet
 ** - svi728: Expansion slot not emulated
-** - svi738: Floppy support broken causing the system not to boot into basic anymore
 ** - svi738: v9938 not emulated
 ** - svi738: rs232c not emulated
 ** - hx10: Expansion slot not emulated (hx10s also??)
@@ -17,7 +16,6 @@
 ** - y503iir, y503iir2: Net not emulated
 ** - y503iir, y503iir2: Floppy support broken
 ** - yis503m: sfg not emulated
-** - ax350: Floppy support broken
 ** - ax370: Floppy not emulated
 ** - cpc300: How to get passed MSX-TUTOR?
 ** - cpc300e: How to test han support?
@@ -39,15 +37,7 @@
 ** - hotbit20: Does not boot
 ** - hbf1: Does not boot
 ** - hbf12: Does not boot
-** - hbf1xd: Does not boot when no floppy disk is present
-** - hbf1xdm2: Does not boot when no floppy disk is present
 ** - hbf5: Does not boot
-** - hbf500p: Does not boot when no floppy disk is present
-** - hbf700d: Does not boot when no floppy disk is present
-** - hbf700f: Does not boot when no floppy disk is present
-** - hbf900a: Does not boot when no floppy disk is present
-** - hbg900ap: Does not boot when no floppy disk is present
-** - hbg900p: Does not boot when no floppy disk is present
 ** - tpc310: Floppy support broken
 ** - tpp311: Firmware not working?
 ** - tps312: Firmware?
@@ -69,9 +59,7 @@
 ** - phc70fd: Floppy not emulated
 ** - phc70fd2: Floppy not emulated
 ** - hbf1xdj: Firmware not emulated
-** - hbf1xdj: Does not boot when no floppy disk is present
 ** - hbf1xv: Firmare not emulated
-** - hbf1xv: Does not boot when no floppy disk is present
 ** - hbf9sp: Firmware not working, can't get into basic
 ** - fsa1gt: Add Turbo-R support
 ** - fsa1st: Add Turbo-R support
@@ -1164,12 +1152,16 @@ static MACHINE_CONFIG_FRAGMENT( msx_fd1793 )
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_wd2793 )
+static MACHINE_CONFIG_FRAGMENT( msx_wd2793_force_ready )
 	// From NMS8245 schematics:
 	// READY + HLT - pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( msx_wd2793 )
+	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx_mb8877a )
@@ -2641,7 +2633,7 @@ static MACHINE_CONFIG_DERIVED( svi738sw, msx_pal )
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 1, 1, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 2)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
 	MCFG_FRAGMENT_ADD( msx1_floplist )
 
@@ -2672,7 +2664,7 @@ static MACHINE_CONFIG_DERIVED( svi738pl, msx_pal )
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 1, 1, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 2)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
 	MCFG_FRAGMENT_ADD( msx1_floplist )
 
@@ -2964,7 +2956,7 @@ static MACHINE_CONFIG_DERIVED( y503iir, msx_pal )
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 	MCFG_MSX_LAYOUT_ROM("net", 3, 3, 1, 1, "maincpu", 0xc000)   /* Net */
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx1_floplist )
 
@@ -2992,7 +2984,7 @@ static MACHINE_CONFIG_DERIVED( y503iir2, msx_pal )
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 	MCFG_MSX_LAYOUT_ROM("net", 3, 3, 1, 1, "maincpu", 0xc000)   /* Net */
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx1_floplist )
 
@@ -3101,7 +3093,7 @@ static MACHINE_CONFIG_DERIVED( msx2_gen, msx2_pal )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 3, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3138,7 +3130,7 @@ static MACHINE_CONFIG_DERIVED( ax350, msx2_pal )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3371,7 +3363,7 @@ static MACHINE_CONFIG_DERIVED( mlg30, msx2 )
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB Mapper RAM */
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3569,7 +3561,7 @@ static MACHINE_CONFIG_DERIVED( fs5000, msx2 )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3871,7 +3863,7 @@ static MACHINE_CONFIG_DERIVED( nms8245, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0x2c000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3902,7 +3894,7 @@ static MACHINE_CONFIG_DERIVED( nms8245f, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0x3c000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3935,7 +3927,7 @@ static MACHINE_CONFIG_DERIVED( nms8250, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3949,6 +3941,8 @@ ROM_START (nms8250j)
 	ROM_LOAD ("8250jbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("8250jext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	ROM_LOAD ("8250jdisk.rom", 0xc000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+
+	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD ("8250jkfn.rom", 0x20000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799))
 ROM_END
 
@@ -3964,7 +3958,7 @@ static MACHINE_CONFIG_DERIVED( nms8250j, msx2 )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -3996,7 +3990,7 @@ static MACHINE_CONFIG_DERIVED( nms8255, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4027,7 +4021,7 @@ static MACHINE_CONFIG_DERIVED( nms8280, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4058,7 +4052,7 @@ static MACHINE_CONFIG_DERIVED( nms8280g, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4090,7 +4084,7 @@ static MACHINE_CONFIG_DERIVED( vg8230, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4106,6 +4100,8 @@ ROM_START (vg8230j)
 	ROM_LOAD ("8230jdisk.rom", 0xc000, 0x4000, CRC(7639758a) SHA1(0f5798850d11b316a4254b222ca08cc4ad6d4da2))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
+
+	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD ("8230jkfn.rom", 0x20000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799))
 ROM_END
 
@@ -4121,7 +4117,7 @@ static MACHINE_CONFIG_DERIVED( vg8230j, msx2 )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4153,7 +4149,7 @@ static MACHINE_CONFIG_DERIVED( vg8235, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4185,7 +4181,7 @@ static MACHINE_CONFIG_DERIVED( vg8235f, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_ssdd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4216,7 +4212,7 @@ static MACHINE_CONFIG_DERIVED( vg8240, msx2_pal )
 	MCFG_MSX_RAMIO_SET_BITS(0xf8)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4268,7 +4264,7 @@ static MACHINE_CONFIG_DERIVED( mpc25fd, msx2 )
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB?? RAM */
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4512,7 +4508,7 @@ static MACHINE_CONFIG_DERIVED( hbf500, msx2 )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4639,7 +4635,7 @@ static MACHINE_CONFIG_DERIVED( hbf700p, msx2_pal )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4669,7 +4665,7 @@ static MACHINE_CONFIG_DERIVED( hbf700s, msx2_pal )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 3, 0x40000)   /* 256KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -4704,7 +4700,7 @@ static MACHINE_CONFIG_DERIVED( hbf900, msx2 )
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_ROM("empty", 3, 3, 1, 1, "maincpu", 0x10000)	// Empty/unknown, optional fmpac rom used to be loaded here, or should the util rom be loaded?
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -5127,7 +5123,7 @@ static MACHINE_CONFIG_DERIVED( msx2pgen, msx2p )
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0x20000)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -5161,7 +5157,7 @@ static MACHINE_CONFIG_DERIVED( expert3i, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -5197,7 +5193,7 @@ static MACHINE_CONFIG_DERIVED( expert3t, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
@@ -5229,7 +5225,7 @@ static MACHINE_CONFIG_DERIVED( expertac, msx2p )
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("xbasic", 3, 3, 1, 1, "maincpu", 0x24000)
 
-	MCFG_FRAGMENT_ADD( msx_wd2793 )
+	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
