@@ -20,6 +20,7 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 		m_dma_write_1(*this),
 		m_dma_write_2(*this),
 		m_dma_write_3(*this),
+		m_cpu_tag(NULL),
 		m_cpu(NULL)
 {
 	for (int i = 0; i < 4; i++)
@@ -29,27 +30,9 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 			m_in_progress[i] = 0;
 			m_transfer_size[i] = 0;
 			m_halted[i] = 0;
+			m_our_clock[i] = attotime::zero;
+			m_burst_clock[i] = attotime::zero;
 		}
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hd63450_device::device_config_complete()
-{
-		// inherit a copy of the static data
-	const hd63450_interface *intf = reinterpret_cast<const hd63450_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<hd63450_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_cpu_tag = "";
-	}
 }
 
 //-------------------------------------------------

@@ -35,6 +35,14 @@
 #define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_write_3_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_HD63450_CPU(_tag) \
+	hd63450_device::set_cpu_tag(*device, _tag);
+
+#define MCFG_HD63450_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
+	hd63450_device::set_our_clocks(*device, _clk1, _clk2, _clk3, _clk4);
+
+#define MCFG_HD63450_BURST_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
+	hd63450_device::set_burst_clocks(*device, _clk1, _clk2, _clk3, _clk4);
 
 struct hd63450_regs
 {  // offsets in bytes
@@ -58,15 +66,7 @@ struct hd63450_regs
 	unsigned char gcr;  // [3f]  General Control Register (R/W)
 };
 
-struct hd63450_interface
-{
-	const char *m_cpu_tag;
-	attotime m_our_clock[4];
-	attotime m_burst_clock[4];
-};
-
-class hd63450_device : public device_t,
-								public hd63450_interface
+class hd63450_device : public device_t
 {
 public:
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -83,6 +83,24 @@ public:
 	template<class _Object> static devcb_base &set_dma_write_2_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_2.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_write_3_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_3.set_callback(object); }
 
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<hd63450_device &>(device).m_cpu_tag = tag; }
+	static void set_our_clocks(device_t &device, attotime clk1, attotime clk2, attotime clk3, attotime clk4)
+	{
+		hd63450_device &dev = downcast<hd63450_device &>(device);
+		dev.m_our_clock[0] = clk1;
+		dev.m_our_clock[1] = clk2;
+		dev.m_our_clock[2] = clk3;
+		dev.m_our_clock[3] = clk4;
+	}
+	static void set_burst_clocks(device_t &device, attotime clk1, attotime clk2, attotime clk3, attotime clk4)
+	{
+		hd63450_device &dev = downcast<hd63450_device &>(device);
+		dev.m_burst_clock[0] = clk1;
+		dev.m_burst_clock[1] = clk2;
+		dev.m_burst_clock[2] = clk3;
+		dev.m_burst_clock[3] = clk4;
+	}
+	
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER(drq0_w);
@@ -97,7 +115,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -113,6 +130,10 @@ private:
 	devcb_write8 m_dma_write_2;
 	devcb_write8 m_dma_write_3;
 
+	const char *m_cpu_tag;
+	attotime m_our_clock[4];
+	attotime m_burst_clock[4];
+	
 	// internal state
 	hd63450_regs m_reg[4];
 	emu_timer* m_timer[4];  // for timing data reading/writing each channel

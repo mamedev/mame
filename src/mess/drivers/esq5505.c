@@ -600,13 +600,6 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static const hd63450_interface dmac_interface =
-{
-	"maincpu",  // CPU - 68000
-	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
-	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
-};
-
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
@@ -666,7 +659,9 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
-	MCFG_DEVICE_CONFIG(dmac_interface)
+	MCFG_HD63450_CPU("maincpu")	// CPU - 68000
+	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
+	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(esq5505_state, dma_end))
 	MCFG_HD63450_DMA_ERROR_CB(WRITE8(esq5505_state, dma_error))
 	MCFG_HD63450_DMA_READ_0_CB(READ8(esq5505_state, fdc_read_byte))  // ch 0 = fdc, ch 1 = 340001 (ADC?)

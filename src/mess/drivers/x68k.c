@@ -1296,13 +1296,6 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static const hd63450_interface dmac_interface =
-{
-	"maincpu",  // CPU - 68000
-	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
-	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
-};
-
 static INPUT_PORTS_START( x68000 )
 	PORT_START("ctrltype")
 	PORT_CONFNAME(0x0f, 0x00, "Joystick Port 1")
@@ -1714,14 +1707,16 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(x68k_state, ppi_port_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(x68k_state, ppi_port_c_w))
 
-	MCFG_DEVICE_ADD( "hd63450", HD63450, 0 )
-	MCFG_DEVICE_CONFIG(dmac_interface)
+	MCFG_DEVICE_ADD("hd63450", HD63450, 0)
+	MCFG_HD63450_CPU("maincpu")	// CPU - 68000
+	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
+	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(x68k_state, dma_end))
 	MCFG_HD63450_DMA_ERROR_CB(WRITE8(x68k_state, dma_error))
 	MCFG_HD63450_DMA_READ_0_CB(READ8(x68k_state, fdc_read_byte))
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(x68k_state, fdc_write_byte))
 
-	MCFG_DEVICE_ADD( "scc", SCC8530, 5000000 )
+	MCFG_DEVICE_ADD("scc", SCC8530, 5000000)
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_RP5C15_OUT_ALARM_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
