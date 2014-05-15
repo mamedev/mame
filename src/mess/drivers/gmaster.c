@@ -19,9 +19,7 @@ public:
 		, m_io_joy(*this, "JOY")
 	{ }
 
-	virtual void machine_start();
 	DECLARE_PALETTE_INIT(gmaster);
-
 	DECLARE_READ8_MEMBER(gmaster_io_r);
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
 	DECLARE_READ8_MEMBER(gmaster_port_r);
@@ -30,10 +28,8 @@ public:
 	UINT32 screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gmaster_interrupt);
 
-protected:
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_ioport m_io_joy;
+private:
+	virtual void machine_start();
 
 	struct
 	{
@@ -44,8 +40,12 @@ protected:
 		bool delayed;
 		UINT8 pixels[8][64];
 	} m_video;
+
 	UINT8 m_ports[5];
 	UINT8 m_ram[0x4000];
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport m_io_joy;
 };
 
 
@@ -277,20 +277,10 @@ INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
 	m_maincpu->set_input_line(UPD7810_INTFE1, ASSERT_LINE);
 }
 
-#if 0
-static const UPD7810_CONFIG config = {
-//  TYPE_78C10, // 78c11 in handheld
-	TYPE_7810, // temporarily until 7810 core fixes synchronized
-	NULL
-};
-#endif
-
-
 static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)  // upd78c11 in the unit
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_CPU_IO_MAP( gmaster_io)
-	MCFG_CPU_CONFIG( config )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gmaster_state,  gmaster_interrupt)
 
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -299,7 +289,6 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gmaster_state, screen_update_gmaster)
 	MCFG_SCREEN_PALETTE("palette")
-
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gmaster_palette))
 	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -323,5 +312,5 @@ ROM_START(gmaster)
 ROM_END
 
 
-/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT  COMPANY                 FULLNAME */
-CONS( 1990, gmaster,       0,          0, gmaster,  gmaster, gmaster_state,    gmaster,    "Hartung", "Game Master", GAME_IMPERFECT_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
+CONS( 1990, gmaster,  0,      0,        gmaster,  gmaster, gmaster_state, gmaster, "Hartung", "Game Master", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
