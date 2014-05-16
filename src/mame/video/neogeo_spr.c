@@ -783,15 +783,14 @@ inline void neosprite_midas_device::draw_pixel(int romaddr, UINT32* dst, pen_t *
 	const UINT8* src = m_region_sprites->base() + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
 	const int x = romaddr & 0x7;
 	
-	const UINT8 gfx = 
-		              (((src[0x7] >> x) & 0x01) << 7) |
-			    	  (((src[0x3] >> x) & 0x01) << 6) |
-				      (((src[0x6] >> x) & 0x01) << 5) |
-				      (((src[0x2] >> x) & 0x01) << 4) |		
-		              (((src[0x5] >> x) & 0x01) << 3) |
-			    	  (((src[0x1] >> x) & 0x01) << 2) |
-				      (((src[0x4] >> x) & 0x01) << 1) |
-				      (((src[0x0] >> x) & 0x01) << 0);
+	const UINT8 gfx =	(((src[0x7] >> x) & 0x01) << 7) |
+						(((src[0x6] >> x) & 0x01) << 6) |
+						(((src[0x5] >> x) & 0x01) << 5) |
+						(((src[0x4] >> x) & 0x01) << 4) |
+						(((src[0x3] >> x) & 0x01) << 3) |
+						(((src[0x2] >> x) & 0x01) << 2) |
+						(((src[0x1] >> x) & 0x01) << 1) |
+						(((src[0x0] >> x) & 0x01) << 0);
 
 	if (gfx)
 		*dst = line_pens[gfx];
