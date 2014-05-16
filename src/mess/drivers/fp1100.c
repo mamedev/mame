@@ -44,6 +44,7 @@
     sometimes you'll get the Casio Basic title. Cursor will be flashing.
     - The message will most likely be blue, but it should be white.
     - Sometimes it will be in inverse video, and sometimes not.
+    - Sometimes it will beep, and sometimes not.
     - The interrupt timing is quite critical.
 
 
@@ -256,7 +257,7 @@ d7     - 1=display area; 0=cursor
 */
 WRITE8_MEMBER( fp1100_state::colour_control_w )
 {
-	data = BITSWAP8(data, 7, 4, 5, 6, 3, 0, 1, 2);  // change BRG to RGB
+	data = BITSWAP8(data, 7, 4, 6, 5, 3, 0, 2, 1);  // change BRG to RGB
 
 	m_col_border = data & 7;
 
@@ -341,6 +342,7 @@ WRITE8_MEMBER( fp1100_state::portc_w )
 		m_maincpu->set_input_line_and_vector(0, BIT(data, 3) ? CLEAR_LINE : HOLD_LINE, 0xf0);
 	if (LOG) printf("%s: PortC:%X\n",machine().describe_context(),data);
 	m_upd7801.portc = data;
+	m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	m_centronics->write_strobe(BIT(data, 6));
 }
 
