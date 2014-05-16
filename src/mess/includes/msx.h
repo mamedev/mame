@@ -39,6 +39,7 @@
 #include "bus/msx_slot/bunsetsu.h"
 #include "bus/msx_slot/fs4600.h"
 #include "bus/msx_slot/panasonic08.h"
+#include "bus/msx_slot/sony08.h"
 
 
 #define TC8521_TAG  "rtc"
@@ -84,6 +85,10 @@
 
 #define MCFG_MSX_LAYOUT_PANASONIC08(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
 	MCFG_MSX_SLOT_PANASONIC08_ADD(_tag, _page, _numpages, _region, _offset) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
+#define MCFG_MSX_LAYOUT_SONY08(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_SONY08_ADD(_tag, _page, _numpages, _region, _offset) \
 	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
 
 

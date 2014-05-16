@@ -58,8 +58,6 @@
 ** - fsa1wxa: Floppy not emulated
 ** - phc70fd: Floppy not emulated
 ** - phc70fd2: Floppy not emulated
-** - hbf1xdj: Firmware not emulated
-** - hbf1xv: Firmare not emulated
 ** - hbf9sp: Firmware not working, can't get into basic
 ** - fsa1gt: Add Turbo-R support
 ** - fsa1st: Add Turbo-R support
@@ -5588,7 +5586,7 @@ static MACHINE_CONFIG_DERIVED( hbf1xdj, msx2p )
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
-/*	MCFG_MSX_LAYOUT_("firm", 0, 3, 1, 4, SONY08, 0x100000, 0x30000) */ /* Sony 08KB MSX-JE Mapper must be emulated */
+	MCFG_MSX_LAYOUT_SONY08("firm", 0, 3, 0, 4, "maincpu", 0x30000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 0, 0x10000)   /* 64KB Mapper RAM */
@@ -5635,7 +5633,7 @@ static MACHINE_CONFIG_DERIVED( hbf1xv, msx2p )
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
-/*	MCFG_MSX_LAYOUT_("firm", 0, 3, 1, 4, SONY08, 0x100000, 0x30000) */ /* Sony 08KB MSX-JE Mapper must be emulated */
+	MCFG_MSX_LAYOUT_SONY08("firm", 0, 3, 0, 4, "maincpu", 0x30000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 0, 0x10000)   /* 64KB Mapper RAM */
