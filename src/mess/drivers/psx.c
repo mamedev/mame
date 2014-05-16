@@ -356,7 +356,7 @@ int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 	unsigned long n_compressed;
 	unsigned char *p_n_compressed;
 	unsigned long n_uncompressed;
-	unsigned char *p_n_uncompressed;
+	dynamic_buffer p_n_uncompressed;
 
 	struct PSF_HEADER
 	{
@@ -392,7 +392,7 @@ int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 		}
 
 		n_uncompressed = 0x200000;
-		p_n_uncompressed = global_alloc_array( unsigned char, n_uncompressed );
+		p_n_uncompressed.resize( n_uncompressed );
 
 		if( uncompress( p_n_uncompressed, &n_uncompressed, p_n_compressed, n_compressed ) != Z_OK )
 		{
@@ -406,8 +406,6 @@ int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 		{
 			n_return = 1;
 		}
-
-		global_free_array( p_n_uncompressed );
 	}
 	return n_return;
 }

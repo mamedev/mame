@@ -299,26 +299,20 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 
 SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 {
-	UINT8 *snapshot_data;
+	dynamic_buffer snapshot_data(snapshot_size);
 
-	if (!(snapshot_data = global_alloc_array(UINT8, snapshot_size)))
-		return IMAGE_INIT_FAIL;
-
-	if (image.fread( snapshot_data, snapshot_size) != snapshot_size)
+	if (image.fread(snapshot_data, snapshot_size) != snapshot_size)
 	{
-		global_free_array(snapshot_data);
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (strncmp((char *)snapshot_data, "PS01", 4))
+	if (strncmp((char *)(UINT8 *)snapshot_data, "PS01", 4))
 	{
-		global_free_array(snapshot_data);
 		return IMAGE_INIT_FAIL;
 	}
 
 	primo_setup_pss(snapshot_data, snapshot_size);
 
-	global_free_array(snapshot_data);
 	return IMAGE_INIT_PASS;
 }
 
@@ -332,7 +326,6 @@ SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 {
 	int i;
-
 
 	UINT16 load_addr;
 	UINT16 start_addr;
@@ -350,19 +343,14 @@ void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 
 QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 {
-	UINT8 *quickload_data;
+	dynamic_buffer quickload_data(quickload_size);
 
-	if (!(quickload_data = global_alloc_array(UINT8, quickload_size)))
-		return IMAGE_INIT_FAIL;
-
-	if (image.fread( quickload_data, quickload_size) != quickload_size)
+	if (image.fread(quickload_data, quickload_size) != quickload_size)
 	{
-		global_free_array(quickload_data);
 		return IMAGE_INIT_FAIL;
 	}
 
 	primo_setup_pp(quickload_data, quickload_size);
 
-	global_free_array(quickload_data);
 	return IMAGE_INIT_PASS;
 }
