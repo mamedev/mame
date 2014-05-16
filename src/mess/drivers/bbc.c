@@ -762,12 +762,15 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_DEVICE_ADD("i8271", I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
 	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
-	MCFG_WD1770_ADD("wd177x", default_wd17xx_interface_2_drives )
+
+	MCFG_DEVICE_ADD("wd177x", WD1770, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
-	/* slot devices */
+	/* cartridges */
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* software lists */
@@ -824,11 +827,15 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_DEVICE_ADD("i8271", I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
 	MCFG_I8271_FLOPPIES(FLOPPY_0, FLOPPY_1)
-	MCFG_WD1770_ADD("wd177x", default_wd17xx_interface_2_drives )
+
+	MCFG_DEVICE_ADD("wd177x", WD1770, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
+	/* cartridges */
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
 	/* software lists */
@@ -988,9 +995,11 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* fdc */
-	MCFG_WD1770_ADD("wd177x", default_wd17xx_interface_2_drives )
+	MCFG_DEVICE_ADD("wd177x", WD1770, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
 	/* rom slots */
@@ -1076,7 +1085,8 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd177x")
-	MCFG_WD1772_ADD("wd177x", default_wd17xx_interface_2_drives )
+	MCFG_DEVICE_ADD("wd177x", WD1772, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 

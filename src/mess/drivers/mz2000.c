@@ -819,8 +819,11 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877_ADD("mb8877a",default_wd17xx_interface)
+	MCFG_DEVICE_ADD("mb8877a", MB8877, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
+
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2000_flop")
 
 	MCFG_CASSETTE_ADD( "cassette" )

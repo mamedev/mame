@@ -526,7 +526,9 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
+	MCFG_DEVICE_ADD("wd1771", FD1771, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(z80netf_floppy_interface)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netf)

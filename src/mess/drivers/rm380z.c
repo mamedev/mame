@@ -155,7 +155,9 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_RAM_DEFAULT_SIZE("56K")
 
 	/* floppy disk */
-	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
+	MCFG_DEVICE_ADD("wd1771", FD1771, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rm380z_floppy_interface)
 
 	/* keyboard */

@@ -950,12 +950,6 @@ static const floppy_interface ql_floppy_interface =
 	NULL
 };
 
-wd17xx_interface ql_wd17xx_interface =
-{
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -1117,12 +1111,15 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_ZX8302_IN_RAW1_CB(READLINE(ql_state, zx8302_raw1_r))
 	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
 	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
 
-	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(ql_state,disk_io_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(ql_state,disk_io_drq_w))
-	MCFG_WD17XX_DDEN_CALLBACK(READLINE(ql_state,disk_io_dden_r))
+	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(ql_state, disk_io_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(ql_state, disk_io_drq_w))
+	MCFG_WD17XX_DDEN_CALLBACK(READLINE(ql_state, disk_io_dden_r))
+
 	MCFG_MICRODRIVE_ADD(MDV_1)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)

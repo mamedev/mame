@@ -438,11 +438,6 @@ const device_type TI99_FDC = &device_creator<ti_fdc_device>;
 #define TI_FDCLEG_TAG "ti_dssd_controller_legacy"
 #define FDCLEG_TAG "wd1771"
 
-const wd17xx_interface ti_wd17xx_interface =
-{
-	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
-};
-
 ti_fdc_legacy_device::ti_fdc_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 			: ti_expansion_card_device(mconfig, TI99_FDC_LEG, "TI-99 Standard DSSD Floppy Controller LEGACY", tag, owner, clock, "ti99_fdc_leg", __FILE__),
 			m_fd1771(*this, FDCLEG_TAG) { }
@@ -720,7 +715,8 @@ void ti_fdc_legacy_device::device_reset(void)
 }
 
 MACHINE_CONFIG_FRAGMENT( ti_fdc_legacy )
-	MCFG_FD1771_ADD(FDCLEG_TAG, ti_wd17xx_interface )
+	MCFG_DEVICE_ADD(FDCLEG_TAG, FD1771, 0)
+	MCFG_WD17XX_DRIVE_TAGS(PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL)
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(ti_fdc_legacy_device, intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(ti_fdc_legacy_device, drq_w))
 MACHINE_CONFIG_END

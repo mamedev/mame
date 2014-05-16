@@ -169,12 +169,12 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793_ADD("fdc", default_wd17xx_interface)
+	MCFG_DEVICE_ADD("fdc", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
-
-
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
@@ -208,7 +208,9 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793_ADD("fdc", default_wd17xx_interface)
+	MCFG_DEVICE_ADD("fdc", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
 	MCFG_DEVICE_ADD("piaide", PIA6821, 0)
@@ -219,8 +221,6 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 //  MCFG_IDE_CONTROLLER_ADD("ide", NULL)
 //  MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)
 //  MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, "hdd", NULL, false )  /* FIXME */ bebox
-
-
 MACHINE_CONFIG_END
 
 
@@ -256,7 +256,9 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793_ADD("fdc", default_wd17xx_interface)
+	MCFG_DEVICE_ADD("fdc", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
@@ -265,8 +267,6 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swtpc09_state, dmf3_via_write_porta))
 	//MCFG_VIA6522_CA1_HANDLER(WRITELINE(swtpc09_state, dmf3_via_write_ca1))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swtpc09_state, dmf3_via_irq))
-
-
 MACHINE_CONFIG_END
 
 

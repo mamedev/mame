@@ -471,7 +471,8 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_MB8877_ADD("fdc",default_wd17xx_interface)
+	MCFG_DEVICE_ADD("fdc", MB8877, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")

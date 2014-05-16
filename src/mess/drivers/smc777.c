@@ -1071,12 +1071,17 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_MB8876_ADD("fdc",default_wd17xx_interface_2_drives)
+	/* devices */
+	MCFG_DEVICE_ADD("fdc", MB8876, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(smc777_state, smc777_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(smc777_state, smc777_fdc_drq_w))
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)
+
 	MCFG_SOFTWARE_LIST_ADD("flop_list","smc777")
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider

@@ -259,12 +259,14 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", myb3k)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	/* Devices */
+	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/4)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_MB8877_ADD("fdc", default_wd17xx_interface_2_drives) //unknown type
+	MCFG_DEVICE_ADD("fdc", MB8877, 0)	// unknown type
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
 MACHINE_CONFIG_END
 

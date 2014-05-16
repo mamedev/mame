@@ -315,9 +315,11 @@ static const floppy_interface concept_floppy_interface =
 
 
 static MACHINE_CONFIG_FRAGMENT( fdc )
-	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface )
+	MCFG_DEVICE_ADD("wd179x", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(concept_fdc_device, intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(concept_fdc_device, drq_w))
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(concept_floppy_interface)
 MACHINE_CONFIG_END
 

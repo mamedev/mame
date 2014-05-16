@@ -646,7 +646,10 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
-	MCFG_WD2793_ADD("wd2793", default_wd17xx_interface )
+
+	MCFG_DEVICE_ADD("wd2793", WD2793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_0_w))

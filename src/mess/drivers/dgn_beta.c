@@ -364,7 +364,8 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_b))
 
-	MCFG_WD2797_ADD(FDC_TAG, default_wd17xx_interface)
+	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(dgn_beta_state,dgnbeta_fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(dgn_beta_state,dgnbeta_fdc_drq_w))
 

@@ -147,9 +147,11 @@ WRITE_LINE_MEMBER( coco_fdc_device::fdc_drq_w )
 //**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT(coco_fdc)
-	MCFG_WD1773_ADD(WD_TAG, default_wd17xx_interface)
+	MCFG_DEVICE_ADD(WD_TAG, WD1773, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(coco_fdc_device, fdc_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(coco_fdc_device, fdc_drq_w))
+
 	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL_32_768kHz)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
 
@@ -409,7 +411,9 @@ WRITE8_MEMBER(coco_fdc_device::write)
 //**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
-	MCFG_WD2797_ADD(WD2797_TAG, default_wd17xx_interface_2_drives)
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 

@@ -615,7 +615,9 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* Mini Disc */
-	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface_1_drive)
+	MCFG_DEVICE_ADD("wd179x", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
+
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, minidisc_floppy_interface)
 
 	/* video hardware */

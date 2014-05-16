@@ -17,6 +17,18 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+#define MCFG_WD17XX_DRIVE_TAGS(_tag1, _tag2, _tag3, _tag4) \
+	wd1770_device::set_drive_tags(*device, _tag1, _tag2, _tag3, _tag4);
+
+#define MCFG_WD17XX_DEFAULT_DRIVE4_TAGS \
+	MCFG_WD17XX_DRIVE_TAGS(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3)
+
+#define MCFG_WD17XX_DEFAULT_DRIVE2_TAGS \
+	MCFG_WD17XX_DRIVE_TAGS(FLOPPY_0, FLOPPY_1, NULL, NULL)
+
+#define MCFG_WD17XX_DEFAULT_DRIVE1_TAGS \
+	MCFG_WD17XX_DRIVE_TAGS(FLOPPY_0, NULL, NULL, NULL)
+
 #define MCFG_WD17XX_INTRQ_CALLBACK(_write) \
 	devcb = &wd1770_device::set_intrq_wr_callback(*device, DEVCB_##_write);
 
@@ -26,15 +38,6 @@
 #define MCFG_WD17XX_DDEN_CALLBACK(_write) \
 	devcb = &wd1770_device::set_dden_rd_callback(*device, DEVCB_##_write);
 
-/* Interface */
-struct wd17xx_interface
-{
-	const char *floppy_drive_tags[4];
-};
-
-extern const wd17xx_interface default_wd17xx_interface;
-extern const wd17xx_interface default_wd17xx_interface_2_drives;
-extern const wd17xx_interface default_wd17xx_interface_1_drive;
 
 /***************************************************************************
     MACROS
@@ -49,7 +52,16 @@ public:
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_out_intrq_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_out_drq_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<wd1770_device &>(device).m_in_dden_func.set_callback(object); }
-
+	
+	static void set_drive_tags(device_t &device, const char *tag1, const char *tag2, const char *tag3, const char *tag4)
+	{
+		wd1770_device &dev = downcast<wd1770_device &>(device);
+		dev.m_floppy_drive_tags[0] = tag1;
+		dev.m_floppy_drive_tags[1] = tag2;
+		dev.m_floppy_drive_tags[2] = tag3;
+		dev.m_floppy_drive_tags[3] = tag4;
+	}
+	
 	/* the following are not strictly part of the wd179x hardware/emulation
 	but will be put here for now until the flopdrv code has been finalised more */
 	void set_drive(UINT8);     /* set drive wd179x is accessing */
@@ -82,9 +94,9 @@ public:
 	READ_LINE_MEMBER( intrq_r );
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 protected:
 	int wd17xx_dden();
 	void wd17xx_clear_drq();
@@ -116,6 +128,8 @@ protected:
 	devcb_write_line m_out_intrq_func;
 	devcb_write_line m_out_drq_func;
 	devcb_read_line m_in_dden_func;
+	
+	const char *m_floppy_drive_tags[4];
 
 	/* input lines */
 	int m_mr;            /* master reset */
@@ -188,9 +202,6 @@ protected:
 
 	/* Were we busy when we received a FORCE_INT command */
 	UINT8   m_was_busy;
-
-	/* Pointer to interface */
-	const wd17xx_interface *m_intf;
 };
 
 extern ATTR_DEPRECATED const device_type WD1770;
@@ -382,100 +393,5 @@ public:
 
 extern ATTR_DEPRECATED const device_type MB8877;
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_FD1771_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1771, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1781_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1781, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1791_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1791, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1792_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1792, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1793_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1793, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1794_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1794, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1795_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1795, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1797_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1797, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1761_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1761, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1762_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1762, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1763_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1763, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1764_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1764, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1765_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1765, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_FD1767_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, FD1767, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_WD2793_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD2793, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_WD2795_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD2795, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_WD2797_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD2797, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_WD1770_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1770, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_WD1772_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1772, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_WD1773_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1773, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MB8866_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MB8866, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MB8876_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MB8876, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MB8877_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MB8877, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* __WD17XX_H__ */

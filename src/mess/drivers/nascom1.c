@@ -329,9 +329,10 @@ static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", nascom2)
 
-	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface)
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(nascom1_state,nascom2_fdc_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(nascom1_state,nascom2_fdc_drq_w))
+	MCFG_DEVICE_ADD("wd1793", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(nascom1_state, nascom2_fdc_intrq_w))
+	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(nascom1_state, nascom2_fdc_drq_w))
 	MCFG_WD17XX_DDEN_CALLBACK(VCC)
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nascom2_floppy_interface)

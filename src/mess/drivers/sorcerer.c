@@ -466,8 +466,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
+
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
-	MCFG_MICROPOLIS_ADD("fdc", default_micropolis_interface )
+
+	MCFG_DEVICE_ADD("fdc", MICROPOLIS, 0)
+	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop")
 MACHINE_CONFIG_END

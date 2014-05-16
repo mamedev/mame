@@ -58,23 +58,6 @@ static const UINT8 track_SD[][2] = {
 #endif
 
 /***************************************************************************
-    DEFAULT INTERFACES
-***************************************************************************/
-
-const micropolis_interface default_micropolis_interface =
-{
-	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-#if 0
-const micropolis_interface default_micropolis_interface_2_drives =
-{
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-#endif
-
-
-/***************************************************************************
     MAME DEVICE INTERFACE
 ***************************************************************************/
 
@@ -98,32 +81,10 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_drive(NULL)
 {
 	for (int i = 0; i < 6144; i++)
-	{
 		m_buffer[i] = 0;
-	}
-}
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void micropolis_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const micropolis_interface *intf = reinterpret_cast<const micropolis_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<micropolis_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_floppy_drive_tags[0] = "";
-		m_floppy_drive_tags[1] = "";
-		m_floppy_drive_tags[2] = "";
-		m_floppy_drive_tags[3] = "";
-	}
+	for (int i = 0; i < 4; i++)
+		m_floppy_drive_tags[i] = NULL;
 }
 
 //-------------------------------------------------
@@ -155,21 +116,17 @@ void micropolis_device::device_start()
 
 void micropolis_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		if(m_floppy_drive_tags[i])
+		if (m_floppy_drive_tags[i])
 		{
-			legacy_floppy_image_device *img = NULL;
-
-			img = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[i]);
+			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[i]);
 
 			if (img)
 			{
 				img->floppy_drive_set_controller(this);
-				//img->floppy_drive_set_index_pulse_callback( wd17xx_index_pulse_callback);
-				img->floppy_drive_set_rpm( 300.);
+				//img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
+				img->floppy_drive_set_rpm(300.);
 			}
 		}
 	}

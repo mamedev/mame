@@ -260,9 +260,11 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
 
-	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
+	MCFG_DEVICE_ADD("mb8877", MB8877, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osborne1_floppy_interface)
+
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")

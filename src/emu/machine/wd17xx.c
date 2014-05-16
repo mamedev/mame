@@ -283,27 +283,6 @@ static const UINT8 track_SD[][2] = {
 
 
 /***************************************************************************
-    DEFAULT INTERFACES
-***************************************************************************/
-
-const wd17xx_interface default_wd17xx_interface =
-{
-	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-const wd17xx_interface default_wd17xx_interface_2_drives =
-{
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-const wd17xx_interface default_wd17xx_interface_1_drive =
-{
-	{ FLOPPY_0, NULL, NULL, NULL}
-};
-
-
-
-/***************************************************************************
     HELPER FUNCTIONS
 ***************************************************************************/
 
@@ -1082,9 +1061,9 @@ void wd1770_device::set_drive(UINT8 drive)
 	if (VERBOSE)
 		logerror("wd17xx_set_drive: $%02x\n", drive);
 
-	if (m_intf->floppy_drive_tags[drive] != NULL)
+	if (m_floppy_drive_tags[drive] != NULL)
 	{
-		m_drive = siblingdevice<legacy_floppy_image_device>(m_intf->floppy_drive_tags[drive]);
+		m_drive = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[drive]);
 	}
 }
 
@@ -1982,23 +1961,18 @@ wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, dev
 	m_out_drq_func(*this),
 	m_in_dden_func(*this)
 {
+	for (int i = 0; i < 4; i++)
+		m_floppy_drive_tags[i] = NULL;
 }
+
 wd1770_device::wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_out_intrq_func(*this),
 	m_out_drq_func(*this),
 	m_in_dden_func(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wd1770_device::device_config_complete()
-{
+	for (int i = 0; i < 4; i++)
+		m_floppy_drive_tags[i] = NULL;
 }
 
 //-------------------------------------------------
@@ -2007,10 +1981,6 @@ void wd1770_device::device_config_complete()
 
 void wd1770_device::device_start()
 {
-	assert(static_config() != NULL);
-
-	m_intf = (const wd17xx_interface*)static_config();
-
 	m_status = STA_1_TRACK0;
 	m_pause_time = 1000;
 
@@ -2045,24 +2015,22 @@ static void wd17xx_index_pulse_callback(device_t *controller, device_t *img, int
 
 void wd1770_device::device_reset()
 {
-	int i;
-
 	/* set the default state of some input lines */
 	m_mr = ASSERT_LINE;
 	m_wprt = ASSERT_LINE;
 	m_dden = ASSERT_LINE;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		if(m_intf->floppy_drive_tags[i]!=NULL) {
-			legacy_floppy_image_device *img = NULL;
+		if (m_floppy_drive_tags[i]) 
+		{
+			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[i]);
 
-			img = siblingdevice<legacy_floppy_image_device>(m_intf->floppy_drive_tags[i]);
-
-			if (img!=NULL) {
+			if (img) 
+			{
 				img->floppy_drive_set_controller(this);
 				img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
-				img->floppy_drive_set_rpm( 300.);
+				img->floppy_drive_set_rpm(300.);
 			}
 		}
 	}

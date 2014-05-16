@@ -161,7 +161,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* Devices */
+	/* devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_8255_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_8255_portb_r))
@@ -176,8 +176,10 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives)
+	MCFG_DEVICE_ADD("wd1793", FD1793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_DDEN_CALLBACK(VCC)
+
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 
 	/* cartridge */

@@ -207,9 +207,11 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	MCFG_RAM_EXTRA_OPTIONS("2M")
 
 	// floppy
-	MCFG_WD2797_ADD("wd2797", default_wd17xx_interface_1_drive)
+	MCFG_DEVICE_ADD("wd2797", WD2797, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
 	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
 	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
+
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_interface)
 MACHINE_CONFIG_END
 
