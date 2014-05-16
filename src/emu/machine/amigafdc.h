@@ -62,9 +62,17 @@ private:
 
 		attotime delays[38];
 
+		attotime write_start_time;
+		attotime write_buffer[32];
+		int write_position;
+
 		void set_clock(attotime period);
 		void reset(attotime when);
 		int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
+		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+		void start_writing(attotime tm);
+		void commit(floppy_image_device *floppy, attotime tm);
+		void stop_writing(floppy_image_device *floppy, attotime tm);
 	};
 
 	struct live_info {
@@ -95,6 +103,7 @@ private:
 	void dma_check();
 	void dma_done();
 	void dma_write(UINT16 value);
+	UINT16 dma_read();
 
 	void live_start();
 	void checkpoint();
