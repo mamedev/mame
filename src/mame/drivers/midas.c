@@ -610,6 +610,7 @@ void midas_state::machine_start()
 	m_sprgen->set_screen(m_screen);
 	m_sprgen->set_sprite_region(memregion("sprites"));
 	m_sprgen->set_fixed_regions(memregion("tiles"), memregion("tiles"));
+	m_sprgen->neogeo_set_fixed_layer_source(0); // temporary: ensure banking is disabled
 }
 
 void midas_state::machine_reset()
