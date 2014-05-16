@@ -50,7 +50,7 @@
 #include "emu.h"
 #include "resnet.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 
 double compute_resistor_weights(

@@ -892,7 +892,7 @@ ROM_START( hammer )
 	ROM_LOAD32_BYTE( "a3l.u49", 0x000003, 0x200000, CRC(4e83cf00) SHA1(e66a0b4eae0f46bf36126be3795cfac3ad3d4282) )
 	ROM_LOAD32_BYTE( "a3h.u51", 0x800003, 0x200000, CRC(834de39f) SHA1(6e9867180ca20e64f60bad5cad82674ce8f45b7b) )
 
-	ROM_REGION( 0x080000, "tiles", ROMREGION_ERASE )
+	ROM_REGION( 0x080000, "tiles", ROMREGION_ERASE00 )
 	// Use the tiles rom from livequiz (not present in this set) to show some debug text
 //  ROM_LOAD( "27c4096.u23", 0x000000, 0x080000, CRC(25121de8) SHA1(edf24d87551639b871baf3243b452a4e2ba84107) )
 
