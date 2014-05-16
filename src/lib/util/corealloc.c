@@ -16,7 +16,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_ALLOCS      (1)
+#define LOG_ALLOCS      (0)
 
 // define this to initialize allocated memory to a fixed non-0 value
 #ifdef MAME_DEBUG
