@@ -627,7 +627,7 @@ WRITE_LINE_MEMBER(midas_state::livequiz_irqhandler)
 
 void midas_state::screen_eof_midas(screen_device &screen, bool state)
 {
-	m_sprgen->buffer_vram();
+	if (state) m_sprgen->buffer_vram();
 }
 
 
