@@ -410,8 +410,7 @@ void ti99_datamux_device::device_reset(void)
 	// better use a region?
 	if (m_ram16b==NULL)
 	{
-		m_ram16b = global_alloc_array(UINT16, 32768/2);
-		memset(m_ram16b, 0, 32768);
+		m_ram16b = global_alloc_array_clear(UINT16, 32768/2);
 	}
 
 	// Now building the list of active devices at this databus multiplex.

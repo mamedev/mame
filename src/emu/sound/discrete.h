@@ -3751,6 +3751,7 @@ enum
  * add and delete may be slow - the focus is on access!
  */
 
+ // TODO: replace with dynamic_array from utils
 template<class _ElementType> struct dynamic_array_t
 {
 public:

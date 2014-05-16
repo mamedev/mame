@@ -1602,7 +1602,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	int data_count = 0;
 	int i;
-	UINT8 *buffer;
+	dynamic_buffer buffer;
 
 	sync_latches_out();
 
@@ -1620,9 +1620,9 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 			data_count = TRKSIZE_DD;
 	}
 
-	buffer = global_alloc_array(UINT8, data_count);
+	buffer.resize(data_count);
 
-	m_drive->floppy_drive_read_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
+	m_drive->floppy_drive_read_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, (char *)(UINT8 *)buffer, &data_count);
 	sync_status_in();
 
 	// Transfer the buffer to the external memory. We assume the memory
@@ -1640,20 +1640,18 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 		m_out_dma((offs_t)0, buffer[i]);
 	}
 	m_out_dip(CLEAR_LINE);
-
-	global_free_array(buffer);
 }
 
 void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 {
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	int i;
-	UINT8 *buffer;
+	dynamic_buffer buffer;
 	int data_count=0;
 	sync_latches_out();
 
 	data_count = m_harddisk->get_track_length();
-	buffer = global_alloc_array(UINT8, data_count);
+	buffer.resize(data_count);
 
 	/* buffer and data_count are allocated and set by the function. */
 	m_harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, buffer);
@@ -1679,8 +1677,6 @@ void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 		m_out_dma((offs_t)0, buffer[i]);
 	}
 	m_out_dip(CLEAR_LINE);
-
-	global_free_array(buffer);
 }
 
 
