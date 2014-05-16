@@ -16,7 +16,15 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_ALLOCS      (0)
+#define LOG_ALLOCS      (1)
+
+// define this to initialize allocated memory to a fixed non-0 value
+#ifdef MAME_DEBUG
+#define INITIALIZE_ALLOCATED_MEMORY
+#endif
+
+// define this to zap memory to a fixed non-0 value before freeing
+//#define OVERWRITE_FREED_MEMORY
 
 
 
@@ -172,9 +180,8 @@ void free_file_line(void *memory, const char *file, int line, bool array)
 
 
 //-------------------------------------------------
-//  dump_unfreed_mem - called from the exit path
-//  of any code that wants to check for unfreed
-//  memory
+//  track_memory - enables or disables the memory
+//	tracking
 //-------------------------------------------------
 
 void track_memory(bool track)

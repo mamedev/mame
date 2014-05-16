@@ -19,18 +19,6 @@
 
 
 //**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-// define this to initialize allocated memory to a fixed non-0 value
-//#define INITIALIZE_ALLOCATED_MEMORY
-
-// define this to zap memory to a fixed non-0 value before freeing
-//#define OVERWRITE_FREED_MEMORY
-
-
-
-//**************************************************************************
 //  MACROS
 //**************************************************************************
 
