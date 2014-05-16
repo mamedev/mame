@@ -158,7 +158,7 @@
 #include "pstate.h"
 
 #define NEW_INPUT (1)
-#define NEW_LTE (0)
+#define NEW_LTE (1)
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
