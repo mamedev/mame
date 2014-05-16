@@ -183,6 +183,8 @@ void nes_fjump2_device::pcb_reset()
 	chr8(0, CHRRAM);
 	memset(m_reg, 0, sizeof(m_reg));
 	set_prg();
+
+	m_irq_enable = 0;
 }
 
 
