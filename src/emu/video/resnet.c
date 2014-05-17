@@ -612,6 +612,10 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 		int level = ((inputs >> i) & 1);
 		if (di.rgb[channel].R[i] != 0.0 && !level)
 		{
+		    // There is no difference in the calculation of the "low" input
+		    // (transistor conducting to ground) between TTL output and
+		    // open collector output. This is documented explicitly in the
+		    // code below (no difference if / else.
 			if (OpenCol)
 			{
 				rTotal += 1.0 / di.rgb[channel].R[i];
