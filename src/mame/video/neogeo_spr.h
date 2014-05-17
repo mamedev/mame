@@ -36,8 +36,7 @@ public:
 	void create_auto_animation_timer(  );
 	void start_auto_animation_timer(  );
 	void neogeo_set_fixed_layer_source( UINT8 data );
-	inline int rows_to_height(int rows);
-	inline int sprite_on_scanline(int scanline, int y, int rows);
+	inline bool sprite_on_scanline(int scanline, int y, int rows);
 	virtual void draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens) = 0;
 	void draw_sprites( bitmap_rgb32 &bitmap, int scanline );
 	void parse_sprites( int scanline );

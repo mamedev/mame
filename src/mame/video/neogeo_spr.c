@@ -298,23 +298,10 @@ static const int zoom_x_tables[][16] =
 };
 
 
-inline int neosprite_base_device::rows_to_height(int rows)
+
+inline bool neosprite_base_device::sprite_on_scanline(int scanline, int y, int rows)
 {
-	if ((rows == 0) || (rows > 0x20))
-		rows = 0x20;
-
-	return rows * 0x10;
-}
-
-
-inline int neosprite_base_device::sprite_on_scanline(int scanline, int y, int rows)
-{
-	/* check if the current scanline falls inside this sprite,
-	   two possible scenerios, wrap around or not */
-	int max_y = (y + rows_to_height(rows) - 1) & 0x1ff;
-
-	return (((max_y >= y) &&  (scanline >= y) && (scanline <= max_y)) ||
-			((max_y <  y) && ((scanline >= y) || (scanline <= max_y))));
+	return (rows == 0) || (rows >= 0x20) || ((scanline - y) & 0x1ff) < (rows * 0x10);
 }
 
 
