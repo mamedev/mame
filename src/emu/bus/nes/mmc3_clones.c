@@ -559,11 +559,11 @@ void nes_bmc_gc6in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
-	mmc3_common_initialize(0xff, 0xff, 0);
 	m_reg[0] = 0x00;
 	m_reg[1] = 0xff;
 	m_reg[2] = 0x03;
 	m_reg[3] = 0;
+	mmc3_common_initialize(0xff, 0xff, 0);
 	set_prg(m_prg_base, m_prg_mask);
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
