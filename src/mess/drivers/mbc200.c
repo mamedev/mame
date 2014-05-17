@@ -236,6 +236,9 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbc200_floppy_interface)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
 MACHINE_CONFIG_END
 
 /* ROM definition */

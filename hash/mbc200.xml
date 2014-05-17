@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="vixen" description="Sanyo MBC-200/MBC-1200 diskettes">
+
+	<software name="boot">
+		<description>Boot disk</description>
+		<year>198?</year>
+		<publisher>Sanyo</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="176855">
+				<rom name="mbc1200.imd" size="176855" crc="33bdf336" sha1="f908e66f3fe6896e9ba066893a6efe577327cf0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boota" cloneof="boot">
+		<description>Boot disk (Alt)</description>
+		<year>198?</year>
+		<publisher>Sanyo</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="176855">
+				<rom name="sanyo12.imd" size="176855" crc="073d0deb" sha1="d44df2692025e068daba1d250d00e996e452b132" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

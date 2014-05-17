@@ -156,6 +156,7 @@ hash/m20.xml svneol=native#text/xml
 hash/m5.xml svneol=native#text/xml
 hash/mac_flop.xml svneol=native#text/xml
 hash/mac_hdd.xml svneol=native#text/xml
+hash/mbc200.xml svneol=native#text/plain
 hash/mbc55x.xml svneol=native#text/xml
 hash/mc1502_flop.xml svneol=native#text/xml
 hash/megacd.xml svneol=native#text/xml
