@@ -23,7 +23,7 @@ class dcs_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev = 1);
 
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	static void static_set_dram_in_mb(device_t &device, int dram_in_mb) { downcast<dcs_audio_device &>(device).m_dram_in_mb = dram_in_mb; }
@@ -34,12 +34,12 @@ public:
 	void set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
-	int data_r();
+	UINT8 data_r();
 	void ack_w();
 	int data2_r();
 	int control_r();
 
-	void data_w(int data);
+	void data_w(UINT8 data);
 	void reset_w(int state);
 
 	void fifo_notify(int count, int max);
@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
 
+	DECLARE_READ32_MEMBER(de_r);
+	DECLARE_WRITE32_MEMBER(de_w);
+
 	// non public
 	void dcs_boot();
 	TIMER_CALLBACK_MEMBER( dcs_reset );
@@ -55,6 +58,9 @@ public:
 	DECLARE_READ16_MEMBER( dcs_dataram_r );
 	DECLARE_WRITE16_MEMBER( dcs_dataram_w );
 	DECLARE_WRITE16_MEMBER( dcs_data_bank_select_w );
+	DECLARE_WRITE16_MEMBER( dcs_data_bank_select2_w );
+	DECLARE_READ16_MEMBER( dcs_dataram_bank_select_r );
+	DECLARE_WRITE16_MEMBER( dcs_dataram_bank_select_w );
 	inline void sdrc_update_bank_pointers();
 	void sdrc_remap_memory();
 	void sdrc_reset();
@@ -68,7 +74,7 @@ public:
 	DECLARE_WRITE16_MEMBER( denver_w );
 	DECLARE_READ16_MEMBER( latch_status_r );
 	DECLARE_READ16_MEMBER( fifo_input_r );
-	void dcs_delayed_data_w(int data);
+	void dcs_delayed_data_w(UINT8 data);
 	TIMER_CALLBACK_MEMBER( dcs_delayed_data_w_callback );
 	DECLARE_WRITE16_MEMBER( input_latch_ack_w );
 	DECLARE_READ16_MEMBER( input_latch_r );
@@ -101,7 +107,8 @@ public:
 	
 protected:
 	// device-level overrides
-	virtual void device_start();	
+	virtual void device_start();
+	virtual void device_reset();
 	
 protected:
 	struct sdrc_state
@@ -164,8 +171,9 @@ protected:
 	/* I/O with the host */
 	UINT8       m_auto_ack;
 	UINT16      m_latch_control;
-	UINT16      m_input_data;
-	UINT16      m_output_data;
+	UINT8       m_input_data;
+	UINT8       m_output_data;
+	UINT8       m_pre_output_data;
 	UINT16      m_output_control;
 	UINT64      m_output_control_cycles;
 	UINT8       m_last_output_full;
@@ -259,7 +267,6 @@ public:
 	
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-		
 };
 
 // device type definition

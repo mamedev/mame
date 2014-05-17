@@ -2157,6 +2157,11 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/wpc_s.o  \
 	$(MACHINE)/wpc.o \
 	$(AUDIO)/wpcsnd.o \
+	$(VIDEO)/wpc_dmd.o \
+	$(MACHINE)/wpc_pic.o \
+	$(MACHINE)/wpc_lamp.o \
+	$(MACHINE)/wpc_out.o \
+	$(MACHINE)/wpc_shift.o \
 	$(DRIVERS)/zac_1.o  \
 	$(DRIVERS)/zac_2.o  \
 	$(DRIVERS)/zac_proto.o  \
