@@ -374,7 +374,7 @@ void nes_waixing_fs304_device::pcb_reset()
 	prg32(0);
 	chr8(0, m_chr_source);
 
-	m_reg[0] = m_reg[1] = 0;
+	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
 
