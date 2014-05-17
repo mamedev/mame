@@ -355,6 +355,7 @@ BUSOBJS += $(BUSOBJ)/isa/svga_cirrus.o
 BUSOBJS += $(BUSOBJ)/isa/ega.o
 BUSOBJS += $(BUSOBJ)/isa/vga.o
 BUSOBJS += $(BUSOBJ)/isa/vga_ati.o
+BUSOBJS += $(BUSOBJ)/isa/mach32.o
 BUSOBJS += $(BUSOBJ)/isa/svga_tseng.o
 BUSOBJS += $(BUSOBJ)/isa/svga_s3.o
 BUSOBJS += $(BUSOBJ)/isa/s3virge.o

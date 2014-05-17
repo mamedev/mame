@@ -398,6 +398,8 @@ public:
 	READ16_MEMBER(mach8_sourcey_r);
 	WRITE16_MEMBER(mach8_ext_leftscissor_w);
 	WRITE16_MEMBER(mach8_ext_topscissor_w);
+	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
+
 protected:
 	virtual void device_start();
 	struct
@@ -405,6 +407,7 @@ protected:
 		UINT16 scratch0;
 		UINT16 scratch1;
 		UINT16 linedraw;
+		UINT16 clksel;
 	} mach8;
 };
 
@@ -522,6 +525,7 @@ private:
 	{
 		UINT8 ext_reg[64];
 		UINT8 ext_reg_select;
+		UINT8 vga_chip_id;
 	} ati;
 	mach8_device* m_8514;
 };

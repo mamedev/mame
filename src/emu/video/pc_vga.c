@@ -275,7 +275,9 @@ void ati_vga_device::device_start()
 {
 	svga_device::device_start();
 	memset(&ati, 0, sizeof(ati));
+	save_pointer(ati.ext_reg,"ATi Extended Registers",64);
 	m_8514 = subdevice<mach8_device>("8514a");
+	ati.vga_chip_id = 0x06;  // 28800-6
 }
 
 void s3_vga_device::device_start()
@@ -5303,8 +5305,16 @@ READ8_MEMBER(ati_vga_device::mem_r)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		offset &= 0xffff;
-		return vga.memory[(offset+svga.bank_r*0x10000)];
+		if(ati.ext_reg[0x3d] & 0x04)
+		{
+			offset &= 0x1ffff;
+			return vga.memory[(offset+svga.bank_r*0x20000)];
+		}
+		else
+		{
+			offset &= 0xffff;
+			return vga.memory[(offset+svga.bank_r*0x10000)];
+		}
 	}
 
 	return vga_device::mem_r(space,offset,mem_mask);
@@ -5314,8 +5324,16 @@ WRITE8_MEMBER(ati_vga_device::mem_w)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		offset &= 0xffff;
-		vga.memory[(offset+svga.bank_w*0x10000)] = data;
+		if(ati.ext_reg[0x3d] & 0x04)
+		{
+			offset &= 0x1ffff;
+			vga.memory[(offset+svga.bank_w*0x20000)] = data;
+		}
+		else
+		{
+			offset &= 0xffff;
+			vga.memory[(offset+svga.bank_w*0x10000)] = data;
+		}
 	}
 	else
 		vga_device::mem_w(space,offset,data,mem_mask);
@@ -5336,8 +5354,14 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 		case 0x20:
 			ret = 0x10;  // 512kB memory
 			break;
+		case 0x28:  // Vertical line counter (high)
+			ret = (machine().first_screen()->vpos() >> 8) & 0x03;
+			break;
+		case 0x29:  // Vertical line counter (low)
+			ret = machine().first_screen()->vpos() & 0xff;  // correct?
+			break;
 		case 0x2a:
-			ret = 0x06;  // Chip revision (6 for the 28800-6, 5 for the 28800-5)
+			ret = ati.vga_chip_id;  // Chip revision (6 for the 28800-6, 5 for the 28800-5)
 			break;
 		case 0x37:
 			{
@@ -5346,8 +5370,13 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 				ret |= eep->do_read() << 3;
 			}
 			break;
+		case 0x3d:
+			ret = ati.ext_reg[ati.ext_reg_select] & 0x0f;
+			ret |= 0x10;  // EGA DIP switch emulation
+			break;
 		default:
 			ret = ati.ext_reg[ati.ext_reg_select];
+			logerror("ATI: Extended VGA register 0x01CE index %02x read\n",ati.ext_reg_select);
 		}
 		break;
 	}
@@ -5398,7 +5427,6 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			//logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
-
 			if(data & 0x04)
 			{
 				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
