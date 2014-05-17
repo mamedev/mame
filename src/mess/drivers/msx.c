@@ -3566,11 +3566,12 @@ static MACHINE_CONFIG_DERIVED( fs5000, msx2 )
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
 
-/* MSX2 - National FS-5500F1/F2*/
+/* MSX2 - National FS-5500F2*/
+/* The National FS-5500 had two versions: */
 /* F1 has 1 floppy drive */
 /* F2 has 2 floppy drives */
 
-ROM_START (fs5500)
+ROM_START (fs5500f1)
 	ROM_REGION (0x30000, "maincpu",0)
 	ROM_LOAD ("5500bios.rom", 0x0000, 0x8000, CRC(5bf38e13) SHA1(44e0dd215b2a9f0770dd76fb49187c05b083eed9))
 	ROM_LOAD ("5500ext.rom", 0x8000, 0x4000, CRC(3c42c367) SHA1(4be8371f3b03e70ddaca495958345f3c4f8e2d36))
@@ -3584,7 +3585,7 @@ ROM_START (fs5500)
 	ROM_LOAD ("5500kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fs5500, msx2 )
+static MACHINE_CONFIG_DERIVED( fs5500f1, msx2 )
 	// YM2149 in (S-1985 MSX Engine)
 	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -3607,6 +3608,53 @@ static MACHINE_CONFIG_DERIVED( fs5500, msx2 )
 
 	MCFG_FRAGMENT_ADD( msx_mb8877a )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
+	MCFG_FRAGMENT_ADD( msx2_floplist )
+
+	MCFG_FRAGMENT_ADD( msx2_cartlist )
+MACHINE_CONFIG_END
+
+/* MSX2 - National FS-5500F2*/
+/* The National FS-5500 had two versions: */
+/* F1 has 1 floppy drive */
+/* F2 has 2 floppy drives */
+
+ROM_START (fs5500f2)
+	ROM_REGION (0x30000, "maincpu",0)
+	ROM_LOAD ("5500bios.rom", 0x0000, 0x8000, CRC(5bf38e13) SHA1(44e0dd215b2a9f0770dd76fb49187c05b083eed9))
+	ROM_LOAD ("5500ext.rom", 0x8000, 0x4000, CRC(3c42c367) SHA1(4be8371f3b03e70ddaca495958345f3c4f8e2d36))
+	ROM_LOAD ("5500disk.rom", 0xc000, 0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0xff)
+	ROM_LOAD ("5500imp.rom", 0x20000, 0x8000, CRC(6173a88c) SHA1(b677a861b67e8763a11d5dcf52416b42493ade57))
+	ROM_LOAD ("5500kdr.rom", 0x28000, 0x8000, CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6))
+
+	ROM_REGION(0x20000, "kanji", 0)
+	ROM_LOAD ("5500kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
+ROM_END
+
+static MACHINE_CONFIG_DERIVED( fs5500f2, msx2 )
+	// YM2149 in (S-1985 MSX Engine)
+	// FDC: mb8877a, 2 3.5" DSDD drive
+	// 2 Cartridge slots
+	// S-1985 MSX Engine
+	// Matsushita switched device
+
+	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
+	MCFG_MSX_LAYOUT_ROM("empty1", 0, 1, 0, 4, "maincpu", 0x10000)
+	MCFG_MSX_LAYOUT_ROM("empty2", 0, 2, 0, 4, "maincpu", 0x10000)
+	MCFG_MSX_LAYOUT_ROM("empty3", 0, 3, 0, 4, "maincpu", 0x10000)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
+	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
+	MCFG_MSX_LAYOUT_ROM("kdr", 3, 0, 1, 2, "maincpu", 0x28000)
+	MCFG_MSX_LAYOUT_ROM("imp", 3, 1, 1, 2, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
+	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
+
+	MCFG_MSX_S1985_ADD("s1985")
+
+	MCFG_FRAGMENT_ADD( msx_mb8877a )
+	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
@@ -5877,7 +5925,8 @@ COMP(1986, hx23f,     msx2,     0,      hx23f,    msx2, msx_state,     msx,     
 COMP(1986, cx7m,      msx2,     0,      cx7m,     msx2, msx_state,     msx,     "Yamaha", "CX7M" , 0)
 COMP(1986, cx7m128,   msx2,     0,      cx7m128,  msx2, msx_state,     msx,     "Yamaha", "CX7M-128", 0)
 COMP(1983, mlg30,     msx2,     0,      mlg30,    msx2, msx_state,     msx,     "Mistubishi", "ML-G30", GAME_NOT_WORKING) // Screen flashes a few times before going into basic
-COMP(1985, fs5500,    msx2,     0,      fs5500,   msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5500F1/F2 (Japan)", 0 )
+COMP(1985, fs5500f1,  msx2,     0,      fs5500f1, msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5500F1 (Japan)", 0 )
+COMP(1985, fs5500f2,  msx2,     0,      fs5500f2, msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5500F2 (Japan)", 0 )
 COMP(1986, fs4500,    msx2,     0,      fs4500,   msx2jp, msx_state,   msx,     "National / Matsushita", "FS-4500 (Japan)", 0 )
 COMP(1986, fs4700,    msx2,     0,      fs4700,   msx2jp, msx_state,   msx,     "National / Matsushita", "FS-4700 (Japan)", 0 )
 COMP(1986, fs5000,    msx2,     0,      fs5000,   msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5000F2 (Japan)", 0 )
