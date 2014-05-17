@@ -44,8 +44,7 @@
 ** - tpc310: Floppy support broken
 ** - tpp311: Firmware not working?
 ** - tps312: Firmware?
-** - hx23: Firmware?
-** - hx23f: Firmware support broken, can't get into basic
+** - hx23f: The builtin word processor displays white squares instead of text
 ** - cx7m: sfg not emulated
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
@@ -5058,7 +5057,7 @@ static MACHINE_CONFIG_DERIVED( hx23, msx2_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM("ram2", 3, 0, 0, 2)   /* 32KB RAM */
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_ROM("word", 3, 3, 0, 4, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_ROM("word", 3, 3, 1, 2, "maincpu", 0x20000)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -5086,7 +5085,7 @@ static MACHINE_CONFIG_DERIVED( hx23f, msx2_pal )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 0, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_ROM("word", 3, 3, 0, 4, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_ROM("word", 3, 3, 1, 2, "maincpu", 0x20000)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
