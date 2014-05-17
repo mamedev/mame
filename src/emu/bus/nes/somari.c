@@ -101,6 +101,7 @@ void nes_somari_device::pcb_reset()
 	m_mmc_vrom_bank[3] = 0x05;
 	m_mmc_vrom_bank[4] = 0x06;
 	m_mmc_vrom_bank[5] = 0x07;
+	m_mmc3_mirror_reg = 0;
 
 	m_alt_irq = 0;
 	m_irq_enable = 0;
@@ -121,6 +122,7 @@ void nes_somari_device::pcb_reset()
 	for (int i = 0; i < 8; ++i)
 		m_vrc_vrom_bank[i] = i;
 	bank_update_switchmode();
+	m_vrc_mirror_reg = 0;
 }
 
 
