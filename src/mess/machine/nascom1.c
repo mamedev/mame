@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "includes/nascom1.h"
 #include "cpu/z80/z80.h"
-#include "machine/wd17xx.h"
 #include "machine/ay31015.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -45,16 +44,15 @@ READ8_MEMBER(nascom1_state::nascom2_fdc_select_r)
 
 WRITE8_MEMBER(nascom1_state::nascom2_fdc_select_w)
 {
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	m_nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
 
-	if (data & 0x01) fdc->set_drive(0);
-	if (data & 0x02) fdc->set_drive(1);
-	if (data & 0x04) fdc->set_drive(2);
-	if (data & 0x08) fdc->set_drive(3);
-	if (data & 0x10) fdc->set_side((data & 0x10) >> 4);
+	if (data & 0x01) m_fdc->set_drive(0);
+	if (data & 0x02) m_fdc->set_drive(1);
+	if (data & 0x04) m_fdc->set_drive(2);
+	if (data & 0x08) m_fdc->set_drive(3);
+	if (data & 0x10) m_fdc->set_side((data & 0x10) >> 4);
 }
 
 
@@ -78,10 +76,8 @@ READ8_MEMBER(nascom1_state::nascom2_fdc_status_r)
 
 READ8_MEMBER(nascom1_state::nascom1_port_00_r)
 {
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
-
 	if (m_portstat.stat_count < 9)
-		return (ioport(keynames[m_portstat.stat_count])->read() | ~0x7f);
+		return ((m_keyboard[m_portstat.stat_count])->read() | ~0x7f);
 
 	return (0xff);
 }
