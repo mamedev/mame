@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "includes/nemesis.h"
+#include "video/resnet.h"
 
 
 static const struct
@@ -165,46 +166,37 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 	}
 }
 
+void nemesis_state::create_palette_lookups()
+{
+	static const res_net_info nemesis_net_info =
+	{
+		RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
+		{
+			{ RES_NET_AMP_EMITTER, 1000, 0, 5, { 4700, 2400, 1200, 620, 300 } },
+			{ RES_NET_AMP_EMITTER, 1000, 0, 5, { 4700, 2400, 1200, 620, 300 } },
+			{ RES_NET_AMP_EMITTER, 1000, 0, 5, { 4700, 2400, 1200, 620, 300 } }
+		}
+	};
+
+	for (int i = 0; i < 32; i++)
+		m_palette_lookup[i] = compute_res_net(i, 0, nemesis_net_info);
+
+#define BOOST_WHITE_LEVEL 0
+	if (BOOST_WHITE_LEVEL)
+		m_palette->palette()->set_contrast(255.0 / m_palette_lookup[31]);
+#undef BOOST_WHITE_LEVEL
+}
+
 
 WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 {
-	int r, g, b, bit1, bit2, bit3, bit4, bit5;
-
 	COMBINE_DATA(m_paletteram + offset);
 	data = m_paletteram[offset];
 
-	/* Mish, 30/11/99 - Schematics show the resistor values are:
-	    300 Ohms
-	    620 Ohms
-	    1200 Ohms
-	    2400 Ohms
-	    4700 Ohms
-
-	    So the correct weights per bit are 8, 17, 33, 64, 133
-	*/
-
-	#define MULTIPLIER 8 * bit1 + 17 * bit2 + 33 * bit3 + 64 * bit4 + 133 * bit5
-
-	bit1 = BIT(data, 0);
-	bit2 = BIT(data, 1);
-	bit3 = BIT(data, 2);
-	bit4 = BIT(data, 3);
-	bit5 = BIT(data, 4);
-	r = MULTIPLIER;
-	bit1 = BIT(data, 5);
-	bit2 = BIT(data, 6);
-	bit3 = BIT(data, 7);
-	bit4 = BIT(data, 8);
-	bit5 = BIT(data, 9);
-	g = MULTIPLIER;
-	bit1 = BIT(data, 10);
-	bit2 = BIT(data, 11);
-	bit3 = BIT(data, 12);
-	bit4 = BIT(data, 13);
-	bit5 = BIT(data, 14);
-	b = MULTIPLIER;
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	int r = (data >> 0) & 0x1f;
+	int g = (data >> 5) & 0x1f;
+	int b = (data >> 10) & 0x1f;
+	m_palette->set_pen_color(offset, m_palette_lookup[r],m_palette_lookup[g],m_palette_lookup[b]);
 }
 
 WRITE16_MEMBER(nemesis_state::salamander_palette_word_w)
@@ -242,7 +234,6 @@ WRITE16_MEMBER(nemesis_state::nemesis_colorram2_word_w)
 }
 
 
-/* we have to straighten out the 16-bit word into bytes for gfxdecode() to work */
 WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
 {
 	UINT16 oldword = m_charram[offset];
@@ -265,25 +256,17 @@ WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
 
 void nemesis_state::nemesis_postload()
 {
-	int i, offs;
-
-	for (offs = 0; offs < m_charram.bytes(); offs++)
+	for (int i = 0; i < 8; i++)
 	{
-		for (i = 0; i < 8; i++)
-		{
-			int w = sprite_data[i].width;
-			int h = sprite_data[i].height;
-			m_gfxdecode->gfx(sprite_data[i].char_type)->mark_dirty(offs * 4 / (w * h));
-		}
+		m_gfxdecode->gfx(i)->mark_all_dirty();
 	}
-	m_background->mark_all_dirty();
-	m_foreground->mark_all_dirty();
 }
 
 
-/* claim a palette dirty array */
 void nemesis_state::video_start()
 {
+	create_palette_lookups();
+
 	m_spriteram_words = m_spriteram.bytes() / 2;
 
 	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nemesis_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);

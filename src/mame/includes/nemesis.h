@@ -45,7 +45,7 @@ public:
 	required_shared_ptr<UINT16> m_colorram1;
 	required_shared_ptr<UINT16> m_colorram2;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT8> m_gx400_shared_ram;
 	optional_shared_ptr<UINT8> m_voiceram;
 
@@ -57,6 +57,7 @@ public:
 	int       m_flipscreen;
 	UINT8     m_irq_port_last;
 	UINT8     m_blank_tile[8*8];
+	UINT8     m_palette_lookup[32];
 
 	/* misc */
 	int       m_irq_on;
@@ -118,6 +119,7 @@ public:
 	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
+	void create_palette_lookups();
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
