@@ -506,7 +506,7 @@ CCOMFLAGS += -pipe
 
 # add -g if we need symbols, and ensure we have frame pointers
 ifdef SYMBOLS
-CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer
+CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer -fno-optimize-sibling-calls
 endif
 
 # add -v if we need verbose build information

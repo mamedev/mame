@@ -98,6 +98,7 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-x",                       "" },
 	{ 0,        "c++",                      "" },
 	{ 0,        "-flto",                    "/GL" },
+	{ 0,        "-fno-optimize-sibling-calls", "" },
 	{ 0 }
 };
 
