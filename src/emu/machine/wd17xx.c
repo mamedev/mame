@@ -1,5 +1,7 @@
 /***************************************************************************
 
+	!!! DEPRECATED, USE src/emu/wd_fdc.h FOR NEW DRIVERS !!!
+
     wd17xx.c
 
     Implementations of the Western Digital 17xx and 27xx families of
