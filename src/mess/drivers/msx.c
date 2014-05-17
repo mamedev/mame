@@ -1,6 +1,10 @@
 /*
 ** msx.c : driver for MSX
 **
+** cpc300:
+**  To get out of the MSX Tutor press the SELECT key. Entering SET SYSTEM 1 should
+**  disable the MSX Tutor on next boot and SET SYSTEM 0 should enable.
+**
 **
 ** Todo/known issues:
 ** - piopx7: Laserdisc integration doesn't exist
@@ -17,9 +21,7 @@
 ** - y503iir, y503iir2: Floppy support broken
 ** - yis503m: sfg not emulated
 ** - ax370: Floppy not emulated
-** - cpc300: How to get passed MSX-TUTOR?
-** - cpc300e: How to test han support?
-** - cpc400: How to test han support?
+** - cpc300: Config for MSX Tutor ON/OFF is not saved
 ** - expert20: Does not boot
 ** - fs4500: Firmware not emulated
 ** - fs4500: Matsuhita switched device not emulated
@@ -35,9 +37,10 @@
 ** - nms8280, nms8280g: Digitizer functionality not emulated
 ** - vg8230j: Floppy support broken?
 ** - hotbit20: Does not boot
-** - hbf1: Does not boot
-** - hbf12: Does not boot
-** - hbf5: Does not boot
+** - hbf1: Does not boot. This seems to be caused by a raise condition between setting the VBlank bit in the
+           VDP status register and the z80 taking the interrupt. Currently the interrupt gets taken before the
+           bit can be read, so the code goes into an infinite loop.
+** - hbf12: Does not boot; see hbf1.
 ** - tpc310: Floppy support broken
 ** - tpp311: Firmware not working?
 ** - tps312: Firmware?
@@ -3218,6 +3221,7 @@ static MACHINE_CONFIG_DERIVED( cpc300e, msx2 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
+	// No joystick port??
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("han", 0, 1, 1, 1, "maincpu", 0x28000)
@@ -4519,7 +4523,7 @@ static MACHINE_CONFIG_DERIVED( hbf5, msx2_pal )
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 1, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_ROM("note", 0, 1, 2, 1, "maincpu", 0xc000)
+	MCFG_MSX_LAYOUT_ROM("note", 0, 1, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 0, 2, 0x10000)   /* 64KB?? Mapper RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
@@ -5905,7 +5909,7 @@ COMP(1986, nms8250,   msx2,     0,      nms8250,  msx2, msx_state,     msx,     
 COMP(1986, nms8255,   msx2,     0,      nms8255,  msx2, msx_state,     msx,     "Philips", "NMS-8255", 0)
 COMP(1986, nms8280,   msx2,     0,      nms8280,  msx2, msx_state,     msx,     "Philips", "NMS-8280", 0)
 COMP(1986, nms8280g,  msx2,     0,      nms8280g, msx2, msx_state,     msx,     "Philips", "NMS-8280G", 0)
-COMP(19??, hbf5,      msx2,     0,      hbf5,     msx2, msx_state,     msx,     "Sony", "HB-F5", GAME_NOT_WORKING) // Will not go into basic
+COMP(19??, hbf5,      msx2,     0,      hbf5,     msx2, msx_state,     msx,     "Sony", "HB-F5", 0)
 COMP(1985, hbf9p,     msx2,     0,      hbf9p,    msx2, msx_state,     msx,     "Sony", "HB-F9P" , 0)
 COMP(19??, hbf9pr,    msx2,     0,      hbf9pr,   msx2, msx_state,     msx,     "Sony", "HB-F9P Russion", GAME_NOT_WORKING) // Keyboard responds differently
 COMP(1985, hbf9s,     msx2,     0,      hbf9s,    msx2, msx_state,     msx,     "Sony", "HB-F9S" , 0)
