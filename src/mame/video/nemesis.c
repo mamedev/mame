@@ -168,8 +168,7 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 
 void nemesis_state::create_palette_lookups()
 {
-
-    // driver is 74LS09 (AND gates with open collector
+    // driver is 74LS09 (AND gates with open collector)
 
 	static const res_net_info nemesis_net_info =
 	{
@@ -184,10 +183,11 @@ void nemesis_state::create_palette_lookups()
 	for (int i = 0; i < 32; i++)
 		m_palette_lookup[i] = compute_res_net(i, 0, nemesis_net_info);
 
-#define BOOST_WHITE_LEVEL 0
-	if (BOOST_WHITE_LEVEL)
-		m_palette->palette()->set_contrast(255.0 / m_palette_lookup[31]);
-#undef BOOST_WHITE_LEVEL
+	// normalize black/white levels
+	double black = m_palette_lookup[0];
+	double white = 255.0 / (m_palette_lookup[31] - black);
+	for (int i = 0; i < 32; i++)
+		m_palette_lookup[i] = (m_palette_lookup[i] - black) * white + 0.5;
 }
 
 
