@@ -58,7 +58,6 @@
 
 #include "emu.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "formats/dsk_dsk.h"

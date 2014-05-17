@@ -25,7 +25,6 @@
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
 #include "machine/z80ctc.h"
-//#include "machine/z80sio.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 
