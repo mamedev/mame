@@ -604,6 +604,9 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("136K")   /* 128KB Main RAM + RAM in ROM bank (8) */
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "osborne2")
 MACHINE_CONFIG_END
 
 

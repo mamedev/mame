@@ -204,6 +204,7 @@ hash/orion_cass.xml svneol=native#text/xml
 hash/orion_flop.xml svneol=native#text/xml
 hash/orionpro_flop.xml svneol=native#text/xml
 hash/osborne1.xml svneol=native#text/xml
+hash/osborne2.xml svneol=native#text/xml
 hash/p500_flop.xml svneol=native#text/xml
 hash/partner_cass.xml svneol=native#text/xml
 hash/partner_flop.xml svneol=native#text/xml
