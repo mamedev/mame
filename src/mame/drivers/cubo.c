@@ -1063,11 +1063,11 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 
 	/* cia */
 	// these are setup differently on other amiga drivers (needed for floppy to work) which is correct / why?
-	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, amiga_state::CLK_E_PAL)
+	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cubo_state, akiko_cia_0_port_a_write))
-	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, amiga_state::CLK_E_PAL)
+	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 
 	MCFG_MICROTOUCH_ADD("microtouch", WRITE8(cubo_state, microtouch_tx))
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
 MACHINE_CONFIG_END
 
 

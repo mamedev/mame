@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
-#include "machine/6526cia.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
 
@@ -297,19 +296,19 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_0_portb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, amiga_state::CLK_E_NTSC)
+	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_1_porta_r))
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_1_porta_w))
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
 MACHINE_CONFIG_END
 
 
