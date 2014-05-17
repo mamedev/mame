@@ -1109,6 +1109,9 @@ WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
 
 WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
 {
+	if (LOG_CIA)
+		logerror("%s: cia_0_irq: %d\n", machine().describe_context(), state);
+
 	m_cia_0_irq = state;
 	update_irq2();
 }
@@ -1129,6 +1132,9 @@ READ8_MEMBER( amiga_state::cia_1_port_a_read )
 
 WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
 {
+	if (LOG_CIA)
+		logerror("%s: cia_1_irq: %d\n", machine().describe_context(), state);
+
 	m_cia_1_irq = state;
 	update_irq6();
 }

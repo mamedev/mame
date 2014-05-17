@@ -131,7 +131,7 @@ const device_type MOS5710 = &device_creator<mos5710_device>;
 
 inline void mos6526_device::update_pa()
 {
-	UINT8 pa = m_pra | ~m_ddra;
+	UINT8 pa = m_pra | (m_pa_in & ~m_ddra);
 
 	if (m_pa != pa)
 	{
@@ -147,7 +147,7 @@ inline void mos6526_device::update_pa()
 
 inline void mos6526_device::update_pb()
 {
-	UINT8 pb = m_prb | ~m_ddrb;
+	UINT8 pb = m_prb | (m_pb_in & ~m_ddrb);
 
 	if (CRA_PBON)
 	{
@@ -183,6 +183,14 @@ inline void mos6526_device::set_cra(UINT8 data)
 	{
 		m_ta_pb6 = 1;
 	}
+
+	// switching to serial output mode with a one-shot timer causes a pulse?
+	if (!CRA_SPMODE && BIT(data, 6) && CRA_RUNMODE)
+		m_write_sp(1);
+
+	// lower sp again when switching back to input?
+	if (CRA_SPMODE && !BIT(data, 6) && CRA_RUNMODE)
+		m_write_sp(0);
 
 	m_cra = data;
 	update_pb();
@@ -329,20 +337,17 @@ inline void mos6526_device::write_tod(int offset, UINT8 data)
 
 inline void mos6526_device::serial_input()
 {
-	if (m_count_a0 && !CRA_SPMODE)
+	m_shift <<= 1;
+	m_bits++;
+
+	m_shift |= m_sp;
+
+	if (m_bits == 8)
 	{
-		m_shift <<= 1;
-		m_bits++;
+		m_sdr = m_shift;
+		m_bits = 0;
 
-		m_shift |= m_sp;
-
-		if (m_bits == 8)
-		{
-			m_sdr = m_shift;
-			m_bits = 0;
-
-			m_icr |= ICR_SP;
-		}
+		m_icr |= ICR_SP;
 	}
 }
 
@@ -494,16 +499,8 @@ inline void mos6526_device::clock_pipeline()
 	// timer A pipeline
 	m_count_a3 = m_count_a2;
 
-	switch (CRA_INMODE)
-	{
-	case CRA_INMODE_PHI2:
+	if (CRA_INMODE == CRA_INMODE_PHI2)
 		m_count_a2 = 1;
-		break;
-
-	case CRA_INMODE_CNT:
-		m_count_a2 = m_count_a1;
-		break;
-	}
 
 	m_count_a2 &= CRA_STARTED;
 	m_count_a1 = m_count_a0;
@@ -523,10 +520,6 @@ inline void mos6526_device::clock_pipeline()
 	{
 	case CRB_INMODE_PHI2:
 		m_count_b2 = 1;
-		break;
-
-	case CRB_INMODE_CNT:
-		m_count_b2 = m_count_b1;
 		break;
 
 	case CRB_INMODE_TA:
@@ -566,8 +559,6 @@ inline void mos6526_device::synchronize()
 		m_pc = 1;
 		m_write_pc(m_pc);
 	}
-
-	serial_input();
 
 	clock_ta();
 
@@ -723,6 +714,8 @@ void mos6526_device::device_reset()
 	m_ddrb = 0;
 	m_pa = 0xff;
 	m_pb = 0xff;
+	m_pa_in = 0;
+	m_pb_in = 0;
 
 	m_sp = 1;
 	m_cnt = 1;
@@ -806,14 +799,16 @@ READ8_MEMBER( mos6526_device::read )
 {
 	UINT8 data = 0;
 
-	switch (offset)
+	switch (offset & 0x0f)
 	{
 	case PRA:
 		data = (m_read_pa(0) & ~m_ddra) | (m_pra & m_ddra);
+		m_pa_in = data;
 		break;
 
 	case PRB:
 		data = (m_read_pb(0) & ~m_ddrb) | (m_prb & m_ddrb);
+		m_pb_in = data;
 
 		if (CRA_PBON)
 		{
@@ -915,7 +910,7 @@ READ8_MEMBER( mos8520_device::read )
 {
 	UINT8 data = 0;
 
-	switch (offset)
+	switch (offset & 0x0f)
 	{
 	case TOD_MIN:
 		if (!m_tod_latched)
@@ -944,7 +939,7 @@ READ8_MEMBER( mos8520_device::read )
 
 WRITE8_MEMBER( mos6526_device::write )
 {
-	switch (offset)
+	switch (offset & 0x0f)
 	{
 	case PRA:
 		m_pra = data;
@@ -986,6 +981,12 @@ WRITE8_MEMBER( mos6526_device::write )
 			m_load_a0 = 1;
 		}
 
+		if (CRA_RUNMODE)
+		{
+			m_ta = m_ta_latch;
+			set_cra(m_cra | CRA_START);
+		}
+
 		if (m_load_a2)
 		{
 			m_ta = (data << 8) | (m_ta & 0xff);
@@ -1007,6 +1008,12 @@ WRITE8_MEMBER( mos6526_device::write )
 		if (!CRB_STARTED)
 		{
 			m_load_b0 = 1;
+		}
+
+		if (CRB_RUNMODE)
+		{
+			m_tb = m_tb_latch;
+			set_crb(m_crb | CRB_START);
 		}
 
 		if (m_load_b2)
@@ -1074,7 +1081,7 @@ WRITE8_MEMBER( mos6526_device::write )
 
 WRITE8_MEMBER( mos8520_device::write )
 {
-	switch (offset)
+	switch (offset & 0x0f)
 	{
 	default:
 		mos6526_device::write(space, offset, data);
@@ -1112,8 +1119,13 @@ WRITE_LINE_MEMBER( mos6526_device::cnt_w )
 
 	if (!m_cnt && state)
 	{
-		m_count_a0 = 1;
-		m_count_b0 = 1;
+		serial_input();
+
+		if (CRA_INMODE == CRA_INMODE_CNT)
+			m_ta--;
+
+		if (CRB_INMODE == CRB_INMODE_CNT)
+			m_tb--;
 	}
 
 	m_cnt = state;

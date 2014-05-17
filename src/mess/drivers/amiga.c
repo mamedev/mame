@@ -14,7 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
 #include "machine/6525tpi.h"
-#include "machine/6526cia.h"
+#include "machine/mos6526.h"
 #include "machine/gayle.h"
 #include "machine/ataintf.h"
 #include "machine/dmac.h"
@@ -417,26 +417,25 @@ DRIVER_INIT_MEMBER( a1000_state, ntsc )
 
 DRIVER_INIT_MEMBER( a2000_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL;	// 8371 (later versions 8372A)
+	m_agnus_id = AGNUS_PAL;		// 8371 (later versions 8372A)
 	m_denise_id = DENISE;		// 8362
 }
 
 DRIVER_INIT_MEMBER( a2000_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC;	// 8370 (later versions 8372A)
+	m_agnus_id = AGNUS_NTSC;	// 8370 (later versions 8372A)
 	m_denise_id = DENISE;		// 8362
 }
 
 DRIVER_INIT_MEMBER( a500_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL;	// 8371 (later versions 8372A)
-	m_denise_id = 0x0097; /*DENISE;*/		// 8362
-	m_denise_id = 0x00fc;
+	m_agnus_id = AGNUS_PAL;		// 8371 (later versions 8372A)
+	m_denise_id = DENISE;		// 8362
 }
 
 DRIVER_INIT_MEMBER( a500_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC;	// 8370 (later versions 8372A)
+	m_agnus_id = AGNUS_NTSC;	// 8370 (later versions 8372A)
 	m_denise_id = DENISE;		// 8362
 }
 
@@ -941,6 +940,7 @@ static ADDRESS_MAP_START( a2000_mem, AS_PROGRAM, 16, a2000_state )
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
 	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
+	AM_RANGE(0xf00000, 0xf7ffff) AM_NOP // cartridge space
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
@@ -955,6 +955,7 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, a500_state )
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
 	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
+	AM_RANGE(0xf00000, 0xf7ffff) AM_NOP // cartridge space
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
@@ -1240,14 +1241,15 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga)
 
 	// cia
-	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, amiga_state::CLK_E_PAL)
+	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("cia_0_port_a"))
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", amigakbd_device, kdat_w))
 
-	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, amiga_state::CLK_E_PAL)
+	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, cia_1_port_a_read))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("fdc", amiga_fdc, ciaaprb_w))
@@ -1279,8 +1281,8 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 
 	// keyboard
 	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)
-	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, sp_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a1000, amiga_base, a1000_state )
@@ -1719,6 +1721,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32, amiga_base, cd32_state )
 
 	MCFG_DEVICE_MODIFY("cia_0")
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cd32_state, akiko_cia_0_port_a_write))
+	MCFG_MOS6526_SP_CALLBACK(NULL)
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cd32_cdrom")

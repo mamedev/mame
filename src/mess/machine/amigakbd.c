@@ -9,7 +9,6 @@
 #include "includes/amiga.h"
 #include "amigakbd.h"
 
-
 #define KEYBOARD_BUFFER_SIZE    256
 
 const device_type AMIGAKBD = &device_creator<amigakbd_device>;
@@ -46,10 +45,8 @@ void amigakbd_device::device_start()
 
 void amigakbd_device::kbd_sendscancode(UINT8 scancode )
 {
-	int j;
-
-	/* send over to the cia A */
-	for( j = 0; j < 8; j++ )
+	// send over to the cia
+	for(int j = 0; j < 8; j++)
 	{
 		m_write_kclk(0);    /* lower cnt */
 		m_write_kdat(BIT(scancode << j, 7)); /* set the serial data */
@@ -82,6 +79,13 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		m_timer->adjust(machine().first_screen()->frame_period() / 4);
 	}
+}
+
+WRITE_LINE_MEMBER( amigakbd_device::kdat_w )
+{
+	// todo: do something with the handshake
+	// the real keyboard times out if it doesn't receive a handshake
+	// after a key and goes into resync mode
 }
 
 INPUT_CHANGED_MEMBER( amigakbd_device::kbd_update )

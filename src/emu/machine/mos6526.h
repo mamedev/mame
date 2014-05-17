@@ -171,7 +171,7 @@ protected:
 	inline void clock_tb();
 	inline void clock_pipeline();
 	inline UINT8 bcd_increment(UINT8 value);
-	inline void clock_tod();
+	virtual inline void clock_tod();
 	inline UINT8 read_tod(int offset);
 	inline void write_tod(int offset, UINT8 data);
 	inline void synchronize();
@@ -202,6 +202,8 @@ protected:
 	UINT8 m_ddrb;
 	UINT8 m_pa;
 	UINT8 m_pb;
+	UINT8 m_pa_in;
+	UINT8 m_pb_in;
 
 	// serial
 	int m_sp;
@@ -270,7 +272,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-	inline void clock_tod();
+	virtual inline void clock_tod();
 };
 
 

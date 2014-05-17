@@ -34,6 +34,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( kbd_update );
 
+	DECLARE_WRITE_LINE_MEMBER( kdat_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -53,4 +55,5 @@ private:
 
 // device type definition
 extern const device_type AMIGAKBD;
-#endif /* AMIGAKBD_H */
+
+#endif // AMIGAKBD_H
