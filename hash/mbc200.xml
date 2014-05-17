@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="vixen" description="Sanyo MBC-200/MBC-1200 diskettes">
+<softwarelist name="mbc200" description="Sanyo MBC-200/MBC-1200 diskettes">
 
 	<software name="boot">
 		<description>Boot disk</description>

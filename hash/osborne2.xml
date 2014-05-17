@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="vixen" description="Osborne 2 Executive diskettes">
+<softwarelist name="osborne2" description="Osborne 2 Executive diskettes">
 
 	<software name="system">
 		<description>System Disk</description>
