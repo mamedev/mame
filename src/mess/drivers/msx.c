@@ -60,7 +60,6 @@
 ** - fsa1wxa: Floppy not emulated
 ** - phc70fd: Floppy not emulated
 ** - phc70fd2: Floppy not emulated
-** - hbf9sp: Firmware not working, can't get into basic
 ** - fsa1gt: Add Turbo-R support
 ** - fsa1st: Add Turbo-R support
 **
@@ -5724,8 +5723,8 @@ static MACHINE_CONFIG_DERIVED( hbf9sp, msx2p )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_ROM("firm1", 3, 0, 2, 1, "maincpu", 0x20000)
-	MCFG_MSX_LAYOUT_ROM("firm2", 3, 1, 2, 2, "maincpu", 0x24000)
+	MCFG_MSX_LAYOUT_ROM("firm1", 3, 0, 1, 1, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_ROM("firm2", 3, 1, 1, 2, "maincpu", 0x24000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB?? Mapper RAM */
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
@@ -5970,7 +5969,7 @@ COMP(1989, hbf1xv,    msx2p,    0,      hbf1xv,   msx2jp, msx_state,   msx,     
 COMP(1988, phc70fd,   msx2p,    0,      phc70fd,  msx2jp, msx_state,   msx,     "Sanyo", "WAVY PHC-70FD (Japan)", 0 )
 COMP(1988, phc70fd2,  msx2p,    0,      phc70fd2, msx2jp, msx_state,   msx,     "Sanyo", "WAVY PHC-70FD2 (Japan)", 0 )
 COMP(1989, phc35j,    msx2p,    0,      phc35j,   msx2jp, msx_state,   msx,     "Sanyo", "WAVY PHC-35J (Japan)", 0)
-COMP(19??, hbf9sp,    msx2p,    0,      hbf9sp,   msx2jp, msx_state,   msx,     "Sony", "HB-F9S+", GAME_NOT_WORKING) // No MSX animation, screen switches between 2 single colors
+COMP(19??, hbf9sp,    msx2p,    0,      hbf9sp,   msx2jp, msx_state,   msx,     "Sony", "HB-F9S+", 0)
 
 /* Temporary placeholders */
 COMP(19??, fsa1gt,    msx2p,    0,      fsa1gt,   msx2jp, msx_state,   msx,     "Panasonic", "FS-A1GT", GAME_NOT_WORKING)
