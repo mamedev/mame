@@ -232,12 +232,12 @@ void nes_waixing_j_device::device_start()
 void nes_waixing_j_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	mmc3_common_initialize(0xff, 0xff, 0);
 
 	m_reg[0] = 0x01;
 	m_reg[1] = 0x02;
 	m_reg[2] = 0x7e;
 	m_reg[3] = 0x7f;
+	mmc3_common_initialize(0xff, 0xff, 0);
 	set_prg(m_prg_base, m_prg_mask);
 }
 
