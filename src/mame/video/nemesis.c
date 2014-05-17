@@ -168,9 +168,12 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 
 void nemesis_state::create_palette_lookups()
 {
+
+    // driver is 74LS09 (AND gates with open collector
+
 	static const res_net_info nemesis_net_info =
 	{
-		RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
+		RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,
 		{
 			{ RES_NET_AMP_EMITTER, 1000, 0, 5, { 4700, 2400, 1200, 620, 300 } },
 			{ RES_NET_AMP_EMITTER, 1000, 0, 5, { 4700, 2400, 1200, 620, 300 } },
