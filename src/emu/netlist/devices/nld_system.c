@@ -32,7 +32,7 @@ NETLIB_UPDATE_PARAM(clock)
 
 NETLIB_UPDATE(clock)
 {
-	OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
+	OUTLOGIC(m_Q, !m_Q.net_logic().new_Q(), m_inc  );
 }
 
 // ----------------------------------------------------------------------------------------

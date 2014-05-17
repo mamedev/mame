@@ -103,7 +103,10 @@ public:
 		m_P.m_Idr = (  V) * G - I;
 	}
 
-	ATTR_HOT inline double deltaV() { return m_P.net().Q_Analog()- m_N.net().Q_Analog(); }
+	ATTR_HOT inline double deltaV()
+	{
+	    return nl_downcast<netlist_analog_net_t &>(m_P.net()).Q_Analog()
+	            - nl_downcast<netlist_analog_net_t &>(m_N.net()).Q_Analog(); }
 
 	ATTR_HOT void set_mat(double a11, double a12, double a21, double a22, double r1, double r2)
 	{

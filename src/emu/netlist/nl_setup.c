@@ -522,7 +522,7 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	else
 	{
 		NL_VERBOSE_OUT(("adding net ...\n"));
-		netlist_net_t *anet =  new netlist_net_t(netlist_object_t::NET, netlist_object_t::ANALOG);
+		netlist_analog_net_t *anet =  new netlist_analog_net_t(netlist_object_t::NET);
 		t1.set_net(*anet);
 		//m_netlist.solver()->m_nets.add(anet);
 		// FIXME: Nets should have a unique name

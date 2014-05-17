@@ -43,7 +43,7 @@ public:
 	ATTR_COLD netlist_matrix_solver_t();
 	ATTR_COLD virtual ~netlist_matrix_solver_t();
 
-	ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
+	ATTR_COLD virtual void setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 
 	// return true if a reschedule is needed ...
 	ATTR_HOT virtual int solve_non_dynamic() = 0;
@@ -73,7 +73,7 @@ protected:
 
     netlist_ttl_input_t m_fb_sync;
 
-    netlist_net_t::list_t m_nets;
+    netlist_analog_net_t::list_t m_nets;
 	dev_list_t m_dynamic;
 #if NEW_INPUT
 	netlist_list_t<netlist_analog_output_t *> m_inps;
@@ -95,7 +95,7 @@ public:
 
 	virtual ~netlist_matrix_solver_direct_t() {}
 
-	ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
+	ATTR_COLD virtual void setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 	ATTR_HOT virtual int solve_non_dynamic();
 

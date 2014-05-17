@@ -65,6 +65,13 @@ void CLIB_DECL logerror(const char *format, ...)
 	va_end(arg);
 }
 
+void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type)
+{
+    printf("Error: bad downcast<> or device<>.  Tried to convert a %s to a %s, which are incompatible.\n",
+            src_type.name(), dst_type.name());
+    throw;
+}
+
 struct options_entry oplist[] =
 {
 	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },

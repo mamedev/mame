@@ -265,7 +265,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 			m_time = m_stop;
 
 	} else {
-		netlist_net_t &mc_net = m_mainclock->m_Q.net();
+		netlist_logic_net_t &mc_net = m_mainclock->m_Q.net_logic();
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time = mc_net.time();
 
@@ -467,23 +467,18 @@ template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, n
 
 ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamily)
 	: netlist_object_t(atype, afamily)
-	, m_solver(NULL)
 	, m_railterminal(NULL)
-	, m_num_cons(0)
+    , m_num_cons(0)
+    , m_new_Q(0)
+    , m_cur_Q (0)
+    , m_last_Q(0)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
-#if NEW_LTE
-    , m_DD_n_m_1(0.0)
-    , m_h_n_m_1(1e-6)
-#endif
+    , m_new_Analog(0.0)
+    , m_last_Analog(0.0)
+    , m_cur_Analog(0.0)
 {
-	m_last_Q = 0;
-	m_new_Q = 0;
-	m_cur_Q = 0;
-	m_last_Analog = 0.0;
-	m_new_Analog = 0.0;
-	m_cur_Analog = 0.0;
 };
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
@@ -492,15 +487,27 @@ ATTR_COLD netlist_net_t::~netlist_net_t()
         netlist().remove_save_items(this);
 }
 
+ATTR_COLD netlist_analog_net_t::netlist_analog_net_t(const type_t atype)
+    : netlist_net_t(atype, ANALOG)
+    , m_solver(NULL)
+#if NEW_LTE
+    , m_DD_n_m_1(0.0)
+    , m_h_n_m_1(1e-6)
+#endif
+{
+};
+
+ATTR_COLD netlist_logic_net_t::netlist_logic_net_t(const type_t atype)
+    : netlist_net_t(atype, LOGIC)
+{
+};
+
+
 ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 {
 	m_active++;
 
-	if (USE_ADD_REMOVE_LIST)
-	{
-		m_list_active.insert(term);
-		//m_list.add(term);
-	}
+	m_list_active.insert(term);
 
 	if (USE_DEACTIVE_DEVICE)
 	{
@@ -533,11 +540,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 {
 	m_active--;
-
-	if (USE_ADD_REMOVE_LIST)
-	{
-		m_list_active.remove(term);
-	}
+	m_list_active.remove(term);
 
 	if (USE_DEACTIVE_DEVICE)
 	{
@@ -558,15 +561,16 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 
 ATTR_COLD void netlist_net_t::reset()
 {
-	m_last_Analog = 0.0;
-	m_cur_Analog = 0.0;
-	m_new_Analog = 0.0;
-	m_last_Q = 0; // set to something we will never hit.
-	m_new_Q = 0;
-	m_cur_Q = 0;
 	m_time = netlist_time::zero;
 	m_active = 0;
 	m_in_queue = 2;
+
+    m_last_Q = 0;
+    m_new_Q = 0;
+    m_cur_Q = 0;
+    m_last_Analog = 0.0;
+    m_cur_Analog = 0.0;
+    m_new_Analog = 0.0;
 
 	/* rebuild m_list */
 
@@ -582,6 +586,16 @@ ATTR_COLD void netlist_net_t::reset()
             m_active++;
 }
 
+ATTR_COLD void netlist_logic_net_t::reset()
+{
+    netlist_net_t::reset();
+}
+
+ATTR_COLD void netlist_analog_net_t::reset()
+{
+    netlist_net_t::reset();
+}
+
 ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &aname)
 {
 	netlist_object_t::init_object(nl, aname);
@@ -590,16 +604,26 @@ ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &ana
 
 ATTR_COLD void netlist_net_t::save_register()
 {
-	save(NAME(m_last_Analog));
-	save(NAME(m_cur_Analog));
-	save(NAME(m_new_Analog));
-	save(NAME(m_last_Q));
-	save(NAME(m_cur_Q));
-	save(NAME(m_new_Q));
 	save(NAME(m_time));
 	save(NAME(m_active));
 	save(NAME(m_in_queue));
+    save(NAME(m_last_Analog));
+    save(NAME(m_cur_Analog));
+    save(NAME(m_new_Analog));
+    save(NAME(m_last_Q));
+    save(NAME(m_cur_Q));
+    save(NAME(m_new_Q));
 	netlist_object_t::save_register();
+}
+
+ATTR_COLD void netlist_analog_net_t::save_register()
+{
+    netlist_object_t::save_register();
+}
+
+ATTR_COLD void netlist_logic_net_t::save_register()
+{
+    netlist_object_t::save_register();
 }
 
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
@@ -677,50 +701,28 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 
 	m_cur_Analog = m_new_Analog;
 
-	if (USE_ADD_REMOVE_LIST)
-	{
-		switch (m_active)
-		{
-		case 2:
-			update_dev(p, mask);
-			p = m_list_active.next(p);
-			if (p == NULL) break;
-		case 1:
-			update_dev(p, mask);
-			break;
-		default:
-			while (p != NULL)
-			{
-				update_dev(p, mask);
-				p = m_list_active.next(p);
-			}
-			break;
-		}
-	}
-	else
-	{
-		switch (m_num_cons)
-		{
-		case 2:
-			update_dev(p, mask);
-			p = m_list_active.next(p);
-		case 1:
-			update_dev(p, mask);
-			break;
-		default:
-			do
-			{
-				update_dev(p, mask);
-				p = m_list_active.next(p);
-			} while (p != NULL);
-			break;
-		}
-	}
+    switch (m_active)
+    {
+    case 2:
+        update_dev(p, mask);
+        p = m_list_active.next(p);
+        if (p == NULL) break;
+    case 1:
+        update_dev(p, mask);
+        break;
+    default:
+        while (p != NULL)
+        {
+            update_dev(p, mask);
+            p = m_list_active.next(p);
+        }
+        break;
+    }
 	m_last_Q = m_cur_Q;
 	m_last_Analog = m_cur_Analog;
 }
 
-ATTR_HOT void netlist_net_t::schedule_solve()
+ATTR_HOT void netlist_analog_net_t::schedule_solve()
 {
 	if (m_solver != NULL)
 		m_solver->schedule();
@@ -782,12 +784,22 @@ ATTR_COLD void netlist_core_terminal_t::set_net(netlist_net_t &anet)
 
 netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
 	: netlist_core_terminal_t(atype, afamily)
-	, m_my_net(NET, afamily)
 {
+    if (afamily == LOGIC)
+        m_my_net = new netlist_logic_net_t(NET);
+    else
+        m_my_net = new netlist_analog_net_t(NET);
+
 	//m_net = new net_net_t(NET_DIGITAL);
 	set_state(STATE_OUT);
-	this->set_net(m_my_net);
+	this->set_net(*m_my_net);
 }
+
+ATTR_COLD netlist_output_t::~netlist_output_t()
+{
+    delete m_my_net;
+}
+
 
 ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const pstring &aname)
 {
@@ -807,9 +819,9 @@ ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
 
 ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 {
-	net().m_cur_Q = val;
-	net().m_new_Q = val;
-	net().m_last_Q = val;
+	net_logic().m_cur_Q = val;
+	net_logic().m_new_Q = val;
+	net_logic().m_last_Q = val;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -826,25 +838,25 @@ ATTR_COLD netlist_ttl_output_t::netlist_ttl_output_t()
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
-	: netlist_output_t(OUTPUT, ANALOG)
+	: netlist_output_t(OUTPUT, ANALOG), m_proxied_net(NULL)
 {
-	net().m_last_Analog = 0.97;
-	net().m_cur_Analog = 0.98;
-	net().m_new_Analog = 0.99;
+	net_analog().m_last_Analog = 0.97;
+	net_analog().m_cur_Analog = 0.98;
+	net_analog().m_new_Analog = 0.99;
 }
 
 ATTR_COLD void netlist_analog_output_t::initial(const double val)
 {
-	net().m_cur_Analog = val * 0.98;
-	net().m_cur_Analog = val * 0.99;
-	net().m_new_Analog = val * 1.0;
+	net_analog().m_cur_Analog = val * 0.98;
+	net_analog().m_cur_Analog = val * 0.99;
+	net_analog().m_new_Analog = val * 1.0;
 }
 
 ATTR_HOT void netlist_analog_output_t::set_Q(const double newQ)
 {
-    if (newQ != net().m_new_Analog)
+    if (newQ != net_analog().m_new_Analog)
     {
-        net().m_new_Analog = newQ;
+        net_analog().m_new_Analog = newQ;
         net().push_to_queue(NLTIME_FROM_NS(1));
     }
 }
@@ -940,7 +952,7 @@ ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const
 // mainclock
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net)
+ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_logic_net_t &net)
 {
 	net.m_new_Q ^= 1;
 	net.update_devs();
@@ -966,7 +978,7 @@ NETLIB_UPDATE_PARAM(mainclock)
 
 NETLIB_UPDATE(mainclock)
 {
-	netlist_net_t &net = m_Q.net();
+	netlist_logic_net_t &net = m_Q.net_logic();
 	// this is only called during setup ...
 	net.m_new_Q = !net.m_new_Q;
 	net.set_time(netlist().time() + m_inc);

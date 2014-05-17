@@ -15,8 +15,8 @@
 // netlist_matrix_solver
 // ----------------------------------------------------------------------------------------
 
-#define SOLVER_VERBOSE_OUT(x) do {} while (0)
-//#define SOLVER_VERBOSE_OUT(x) printf x
+//#define SOLVER_VERBOSE_OUT(x) do {} while (0)
+#define SOLVER_VERBOSE_OUT(x) printf x
 
 ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t()
 : m_owner(NULL)
@@ -31,13 +31,13 @@ ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
 #endif
 }
 
-ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
+ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
 	m_owner = &aowner;
 
 	NL_VERBOSE_OUT(("New solver setup\n"));
 
-	for (netlist_net_t * const * pn = nets.first(); pn != NULL; pn = nets.next(pn))
+	for (netlist_analog_net_t * const * pn = nets.first(); pn != NULL; pn = nets.next(pn))
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
@@ -70,7 +70,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 							break;
 					}
 					{
-						netlist_terminal_t *pterm = static_cast<netlist_terminal_t *>(p);
+						netlist_terminal_t *pterm = nl_downcast<netlist_terminal_t *>(p);
 						if (pterm->m_otherterm->net().isRailNet())
 							(*pn)->m_rails.add(pterm);
 						else
@@ -86,7 +86,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
                         m->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
                         //register_output("m", *m);
                         m_inps.add(m);
-                        m->m_proxied_net = &p->net();
+                        m->m_proxied_net = nl_downcast<netlist_analog_net_t *>(&p->net());
                         m->net().register_con(*p);
                         // FIXME: repeated
                         m->net().rebuild_list();
@@ -112,7 +112,7 @@ ATTR_HOT double netlist_matrix_solver_t::update_inputs(const double hn)
 #if NEW_LTE
     for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
     {
-        netlist_net_t *n = (*p)->m_proxied_net;
+        netlist_analog_net_t *n = (*p)->m_proxied_net;
         double DD_n = (n->m_cur_Analog - n->m_last_Analog) / hn;
         double DD2 = (DD_n - n->m_DD_n_m_1) / (hn + n->m_h_n_m_1);
         n->m_DD_n_m_1 = DD_n;
@@ -280,7 +280,7 @@ ATTR_COLD int netlist_matrix_solver_direct_t<m_N, _storage_N>::get_net_idx(netli
 }
 
 template <int m_N, int _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
 {
 	netlist_matrix_solver_t::setup(nets, owner);
 
@@ -288,8 +288,8 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_ne
 	m_rail_start = 0;
 	for (int k = 0; k < N(); k++)
 	{
-		netlist_net_t *net = m_nets[k];
-		const netlist_net_t::terminal_list_t &terms = net->m_terms;
+		netlist_analog_net_t *net = m_nets[k];
+		const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
 		for (int i = 0; i < terms.count(); i++)
 		{
 			m_terms[m_term_num].net_this = k;
@@ -306,9 +306,9 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_ne
 	m_rail_start = m_term_num;
 	for (int k = 0; k < N(); k++)
 	{
-		netlist_net_t *net = m_nets[k];
-		const netlist_net_t::terminal_list_t &terms = net->m_terms;
-		const netlist_net_t::terminal_list_t &rails = net->m_rails;
+		netlist_analog_net_t *net = m_nets[k];
+		const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
+		const netlist_analog_net_t::terminal_list_t &rails = net->m_rails;
 		for (int i = 0; i < terms.count(); i++)
 		{
 			m_terms[m_term_num].net_this = k;
@@ -368,7 +368,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
 
 		RHS[t.net_this] += t.term->m_Idr;
 		A[t.net_this][t.net_this] += t.term->m_gt;
-		RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
+		RHS[t.net_this] += t.term->m_go * nl_downcast<netlist_analog_net_t &>(t.term->m_otherterm->net()).Q_Analog();
 	}
 #endif
 }
@@ -522,7 +522,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 ATTR_HOT int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 {
 
-    netlist_net_t *net = m_nets[0];
+    netlist_analog_net_t *net = m_nets[0];
 	double m_A[1][1] = { {0.0} };
 	double m_RHS[1] = { 0.0 };
 	build_LE(m_A, m_RHS);
@@ -605,9 +605,9 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 		double gabs_t = 0.0;
 		double RHS_t = 0.0;
 
-		netlist_net_t *net = this->m_nets[k];
-		const netlist_net_t::terminal_list_t &terms = net->m_terms;
-		const netlist_net_t::terminal_list_t &rails = net->m_rails;
+		netlist_analog_net_t *net = this->m_nets[k];
+		const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
+		const netlist_analog_net_t::terminal_list_t &rails = net->m_rails;
 		const int term_count = terms.count();
 		const int rail_count = rails.count();
 
@@ -616,7 +616,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 			gtot_t += rails[i]->m_gt;
 			gabs_t += fabs(rails[i]->m_go);
 			RHS_t += rails[i]->m_Idr;
-			RHS_t += rails[i]->m_go * rails[i]->m_otherterm->net().Q_Analog();
+			RHS_t += rails[i]->m_go * nl_downcast<netlist_analog_net_t &>(rails[i]->m_otherterm->net()).Q_Analog();
 		}
 
 		for (int i = 0; i < term_count; i++)
@@ -650,15 +650,15 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 
 		for (int k = 0; k < this->N(); k++)
 		{
-			netlist_net_t *net = this->m_nets[k];
-			const netlist_net_t::terminal_list_t &terms = net->m_terms;
+			netlist_analog_net_t *net = this->m_nets[k];
+			const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
 			const int term_count = terms.count();
 
 			double iIdr = RHS[k];
 
 			for (int i = 0; i < term_count; i++)
 			{
-                iIdr += terms[i]->m_go * terms[i]->m_otherterm->net().m_new_Analog;
+                iIdr += terms[i]->m_go * nl_downcast<netlist_analog_net_t &>(terms[i]->m_otherterm->net()).m_new_Analog;
 			}
 
 			//double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
@@ -692,9 +692,9 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 // solver
 // ----------------------------------------------------------------------------------------
 
-typedef netlist_net_t::list_t  *net_groups_t;
+typedef netlist_analog_net_t::list_t  *net_groups_t;
 
-ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t *net)
+ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, netlist_analog_net_t *net)
 {
 	if (net->isRailNet())
 		return true;
@@ -706,7 +706,7 @@ ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, net
 	return false;
 }
 
-ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
+ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_analog_net_t *net)
 {
 	if (net->m_core_terms.is_empty())
 		return;
@@ -721,7 +721,7 @@ ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_n
 		{
 			SOLVER_VERBOSE_OUT(("isterminal\n"));
 			netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-			netlist_net_t *other_net = &pt->m_otherterm->net();
+			netlist_analog_net_t *other_net = nl_downcast<netlist_analog_net_t *>(&pt->m_otherterm->net());
 			if (!already_processed(groups, cur_group, other_net))
 				process_net(groups, cur_group, other_net);
 		}
@@ -833,23 +833,28 @@ ATTR_COLD void NETLIB_NAME(solver)::solve_all()
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
-	netlist_net_t::list_t groups[100];
+	netlist_analog_net_t::list_t groups[100];
 	int cur_group = -1;
 
-	SOLVER_VERBOSE_OUT(("Scanning net groups ...\n"));
+	netlist().log("Scanning net groups ...\n");
 	// determine net groups
 	for (netlist_net_t * const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
-		NL_VERBOSE_OUT(("proc %s\n", (*pn)->name().cstr()));
-		if (!already_processed(groups, cur_group, *pn))
-		{
-			cur_group++;
-			process_net(groups, cur_group, *pn);
-		}
+	    netlist().log("processing %s", (*pn)->name().cstr());
+	    if (!(*pn)->isRailNet())
+	    {
+	        netlist().log("   ==> not a rail net");
+	        netlist_analog_net_t *n = nl_downcast<netlist_analog_net_t *>(*pn);
+	        if (!already_processed(groups, cur_group, n))
+	        {
+	            cur_group++;
+	            process_net(groups, cur_group, n);
+	        }
+	    }
 	}
 
 	// setup the solvers
-	SOLVER_VERBOSE_OUT(("Found %d net groups in %d nets\n", cur_group + 1, netlist().m_nets.count()));
+	netlist().log("Found %d net groups in %d nets\n", cur_group + 1, netlist().m_nets.count());
 	for (int i = 0; i <= cur_group; i++)
 	{
 		netlist_matrix_solver_t *ms;
@@ -920,7 +925,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
         m_mat_solvers.add(ms);
 
         netlist().log("Solver %s", ms->name().cstr());
-        netlist().log("       # %d ==> %d nets %s", i, groups[i].count(), (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+        netlist().log("       # %d ==> %d nets", i, groups[i].count()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
 		netlist().log("       has %s elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
 		netlist().log("       has %s elements", ms->is_timestep() ? "timestep" : "no timestep");
 		for (int j=0; j<groups[i].count(); j++)

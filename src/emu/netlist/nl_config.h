@@ -30,8 +30,6 @@
 
 // The following adds about 10% performance ...
 
-#define USE_ADD_REMOVE_LIST     (1)
-
 #define USE_OPENMP              (0)
 
 // Use nano-second resolution - Sufficient for now
@@ -127,5 +125,47 @@ typedef UINT8 netlist_sig_t;
 #warning To use openmp compile and link with "-fopenmp"
 #endif
 #endif
+
+//============================================================
+//  Downcasting
+//============================================================
+
+// template function for casting from a base class to a derived class that is checked
+// in debug builds and fast in release builds
+template<class _Dest, class _Source>
+inline _Dest nl_downcast(_Source *src)
+{
+#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
+    try {
+        if (dynamic_cast<_Dest>(src) != src)
+        {
+            report_bad_cast(typeid(src), typeid(_Dest));
+        }
+    }
+    catch (std::bad_cast &)
+    {
+        report_bad_cast(typeid(src), typeid(_Dest));
+    }
+#endif
+    return static_cast<_Dest>(src);
+}
+
+template<class _Dest, class _Source>
+inline _Dest nl_downcast(_Source &src)
+{
+#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
+    try {
+        if (&dynamic_cast<_Dest>(src) != &src)
+        {
+            report_bad_cast(typeid(src), typeid(_Dest));
+        }
+    }
+    catch (std::bad_cast &)
+    {
+        report_bad_cast(typeid(src), typeid(_Dest));
+    }
+#endif
+    return static_cast<_Dest>(src);
+}
 
 #endif /* NLCONFIG_H_ */

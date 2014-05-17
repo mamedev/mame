@@ -53,7 +53,7 @@ NETLIB_UPDATE(7493ff)
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(18);
 	//if (m_reset == 0)
-		OUTLOGIC(m_Q, (!m_Q.net().new_Q()) & m_reset, out_delay);
+		OUTLOGIC(m_Q, (!m_Q.net_logic().new_Q()) & m_reset, out_delay);
 }
 
 NETLIB_UPDATE(7493)

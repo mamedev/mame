@@ -48,21 +48,15 @@ NETLIB_START(9316_subABCD)
 
 NETLIB_RESET(9316_subABCD)
 {
-	if (1 || !USE_ADD_REMOVE_LIST)
-	{
-		m_A.inactivate();
-		m_B.inactivate();
-		m_C.inactivate();
-		m_D.inactivate();
-	}
+    m_A.inactivate();
+    m_B.inactivate();
+    m_C.inactivate();
+    m_D.inactivate();
 }
 
 ATTR_HOT inline UINT8 NETLIB_NAME(9316_subABCD::read_ABCD)()
 {
-	if (1 || !USE_ADD_REMOVE_LIST)
-		return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
-	else
-		return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+    return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 }
 
 NETLIB_UPDATE(9316_subABCD)
