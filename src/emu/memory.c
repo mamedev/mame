@@ -1550,7 +1550,7 @@ void memory_manager::initialize()
 	// disable logging of unmapped access when no one receives it
 	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 	{
-		if (!machine().options().log() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
+		if (!machine().options().log() && !machine().options().oslog() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
 			space->set_log_unmap(false);
 	}
 
