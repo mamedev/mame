@@ -202,15 +202,6 @@ WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 	m_palette->set_pen_color(offset, m_palette_lookup[r],m_palette_lookup[g],m_palette_lookup[b]);
 }
 
-WRITE16_MEMBER(nemesis_state::salamander_palette_word_w)
-{
-	COMBINE_DATA(m_paletteram + offset);
-	offset &= ~1;
-
-	data = ((m_paletteram[offset] << 8) & 0xff00) | (m_paletteram[offset + 1] & 0xff);
-	m_palette->set_pen_color(offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-}
-
 
 WRITE16_MEMBER(nemesis_state::nemesis_videoram1_word_w)
 {

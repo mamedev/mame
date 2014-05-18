@@ -98,7 +98,6 @@ public:
 	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipy_word_w);
 	DECLARE_WRITE16_MEMBER(salamand_control_port_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_palette_word_w);
-	DECLARE_WRITE16_MEMBER(salamander_palette_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_videoram1_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_videoram2_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_colorram1_word_w);
