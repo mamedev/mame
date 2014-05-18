@@ -62,6 +62,7 @@ ToDo:
 - Tape loading is not very reliable
 - Add back the disk support when we can get some info on it
   (6600, 6500-6503 wd179x disc controller? 6400, 6401)
+- Need to add back the disk format in the new wdc code
 - Need disk-based software
 
 
@@ -73,9 +74,7 @@ ToDo:
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/6821pia.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
 #include "formats/apf_apt.h"
@@ -97,6 +96,8 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_cass(*this, "cassette")
 		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
 	{ }
 
 	DECLARE_READ8_MEMBER(videoram_r);
@@ -126,7 +127,9 @@ private:
 	required_device<pia6821_device> m_pia0;
 	optional_device<pia6821_device> m_pia1;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<wd1770_device> m_fdc;
+	optional_device<fd1771_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
 	dynamic_buffer m_cart_ram;
 };
 
@@ -259,12 +262,18 @@ WRITE8_MEMBER( apf_state::apf_dischw_w)
 	/* bit 3 is index of drive to select */
 	UINT8 drive = BIT(data, 3);
 
-	m_fdc->set_drive(drive);
-	floppy_image_legacy *floppy;
-	floppy = floppy_get_device(machine(), drive)->flopimg_get_image();
-	floppy_get_device(machine(), drive)->floppy_mon_w((floppy != NULL) ? 0 : 1);
-	floppy_get_device(machine(), drive)->floppy_drive_set_ready_state((floppy != NULL) ? 1 : 0,0);
+	floppy_image_device *floppy = NULL;
+	if (drive)
+		floppy = m_floppy1->get_device();
+	else
+		floppy = m_floppy0->get_device();
 
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+	}
 
 	logerror("disc w %04x %04x\n",offset,data);
 }
@@ -294,7 +303,7 @@ static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	// These need to be confirmed, disk does not work
 	AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	AM_RANGE( 0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
+	AM_RANGE( 0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
 	AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
 	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
 	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
@@ -522,6 +531,11 @@ DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
 	return IMAGE_INIT_PASS;
 }
 
+static SLOT_INTERFACE_START( apf_floppies )
+	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+SLOT_INTERFACE_END
+
+#if 0
 static LEGACY_FLOPPY_OPTIONS_START(apfimag)
 	LEGACY_FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -537,6 +551,7 @@ static const floppy_interface apfimag_floppy_interface =
 	LEGACY_FLOPPY_OPTIONS_NAME(apfimag),
 	NULL
 };
+#endif
 
 static MACHINE_CONFIG_START( apfm1000, apf_state )
 
@@ -597,10 +612,9 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	
-	MCFG_DEVICE_ADD("fdc", FD1771, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
+	MCFG_FD1771x_ADD("fdc", 1000000) // guess
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525sd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
