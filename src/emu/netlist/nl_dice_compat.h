@@ -15,8 +15,9 @@
 //#define CHIP(_n, _t) netlist.register_dev(NET_NEW(_t ## _dip), _n);
 #define CHIP(_n, _t) setup.register_dev( new nld_ ## _t ## _dip(), _n);
 
-#define CONNECTION( ... ) CONNECTIONX( __VA_ARGS__ )
-#define CONNECTIONX(_a, _b, _c, _d) setup.register_link(_a "." # _b, _c "." # _d);
+#define CONNECTION( ... ) CONNECTIONX( CONNECTIONY( __VA_ARGS__ ) )
+#define CONNECTIONX(_a) setup.register_link(_a);
+#define CONNECTIONY(_a, _b, _c, _d) _a "." #_b, _c "." #_d
 #define NET_CSTR(_a, _b) setup.register_link( _a, _b);
 
 #define CIRCUIT_LAYOUT(x) NETLIST_START(x)
