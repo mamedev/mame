@@ -117,7 +117,8 @@ P Konami 80's AC Special                        1998       GC826 UA          826
 D *Mambo a GoGo                                 2001.06
 D Punchmania Hokuto no Ken                      2000.03                      918 JA B02
 D Punchmania Hokuto no Ken 2                    2000.12                      A09 JA A02
-P Salary Man Champ                              2001.02    GCA18 JA          A18 JA(needs redump)
+P Salary Man Champ
+P Salary Man Champ - 2 Player                   2001.02    GCA18 JA          A18 JA(needs redump)
 P *Step Champ                                   1999.12
 
 P: plain System573
@@ -4648,6 +4649,33 @@ ROM_START( salarymc )
 	DISK_IMAGE_READONLY( "a18jaa02", 0, SHA1(740cc93ec65433098153684fdfc418a098a43736) )
 ROM_END
 
+ROM_START( stepchmp )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000084, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq930ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(de141979) SHA1(fc91a8384852cb940ec1461c8a561118e9850c85) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gq930ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.31m", 0x000000, 0x200000, CRC(274f1813) SHA1(ff6053c0889e9b10bf5eeebda68a051bcf8d7430) )
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.27m", 0x000000, 0x200000, CRC(257f9f8a) SHA1(65f51b1b26809a96798b015c1625f52f7280d9d1) )
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.31l",  0x000000, 0x200000, CRC(dd3a1821) SHA1(b00ce3e88737f9aa935d0f9e5dc587c28d509483) )
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.27l",  0x000000, 0x200000, CRC(fff93684) SHA1(a5653bef9ff58bbbb77b6e18c1bbb017ae171426) )
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.31j",  0x000000, 0x200000, CRC(40cfee5b) SHA1(4dd0bbe9a49b7220d670b2387a7468124cf05938) )
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.27j",  0x000000, 0x200000, CRC(96ea2ee4) SHA1(ad0c1da7441fb0cc08c917e99b9df48faddd2487) )
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.31h",  0x000000, 0x200000, CRC(3ddffadd) SHA1(fa2c1289f4813e987bcadf83853627b2e7578978) )
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
+	ROM_LOAD( "gq930ja.27h",  0x000000, 0x200000, CRC(256f0794) SHA1(f95d5a8a53dea4d1f4d766124e94ee103cc1e3b2) )
+ROM_END
+
 GAME( 1997, sys573,    0,        konami573,  konami573, driver_device, 0,        ROT0, "Konami", "System 573 BIOS", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, hndlchmp,  sys573,   konami573,  hndlchmp,  driver_device, 0,        ROT0, "Konami", "Handle Champ (GQ710 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4704,6 +4732,7 @@ GAME( 1999, dsfdct,    sys573,   ddr3m,      ddr,       driver_device, 0,       
 GAME( 1999, dsfdcta,   dsfdct,   dsfdcta,    ddr,       ksys573_state, ddr,      ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn2m,    sys573,   drmn2m,     drmn,      driver_device, 0,        ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 1999, drmn2mpu,  drmn2m,   drmn2m,     drmn,      driver_device, 0,        ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, stepchmp,  sys573,   salarymc,   hyperbbc,  ksys573_state, salarymc, ROT0, "Konami", "Step Champ (GQ930 VER. JA)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 2000, dncfrks,   sys573,   dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,       dncfrks,  dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gunmania,  sys573,   gunmania,   gunmania,  driver_device, 0,        ROT0, "Konami", "GunMania (GL906 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
