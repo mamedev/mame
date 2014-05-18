@@ -2813,6 +2813,18 @@ static MACHINE_CONFIG_DERIVED( townshr, towns )
 	MCFG_RAM_EXTRA_OPTIONS("12M,20M,28M")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( townsftv, towns )
+	MCFG_CPU_REPLACE("maincpu",I486, 33000000)
+	MCFG_CPU_PROGRAM_MAP(towns_mem)
+	MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("6M")
+	MCFG_RAM_EXTRA_OPTIONS("32M,68M")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( marty, marty_state )
 	MCFG_FRAGMENT_ADD(towns_base)
 
@@ -2900,6 +2912,18 @@ ROM_START( fmtownsmx )
 	ROM_LOAD("mytownsmx.rom",  0x00, 0x20, CRC(16e78766) SHA1(38e8810bee9ee6b54c3999d27f499b89e4a4c33f) )
 ROM_END
 
+/* 33MHz 80486SX, 6MB RAM expandable up to 68MB, dumped from an FM Towns II Fresh TV */
+ROM_START( fmtownsftv )
+	ROM_REGION32_LE( 0x280000, "user", 0)
+	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
+	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) )
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
+	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(afe4ebcf) SHA1(4cd51de4fca9bd7a3d91d09ad636fa6b47a41df5) )
+	ROM_REGION( 0x20, "serial", 0)
+	ROM_LOAD("mytownsftv.rom",  0x00, 0x20, CRC(a961aae7) SHA1(bba02edafdfaa6fb1b8122f623259a87a555c307) )
+ROM_END
+
 ROM_START( fmtmarty )
 	ROM_REGION32_LE( 0x480000, "user", 0)
 	ROM_LOAD("mrom.m36",  0x000000, 0x080000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
@@ -2931,7 +2955,8 @@ COMP( 1989, fmtowns,  0,        0,      towns,      towns, driver_device,    0, 
 COMP( 1989, fmtownsa, fmtowns,  0,      towns,      towns, driver_device,    0,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
 COMP( 1991, fmtownsux,fmtowns,  0,      townsux,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II UX", GAME_NOT_WORKING)
 COMP( 1992, fmtownshr,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II HR", GAME_NOT_WORKING)
-COMP( 1992, fmtownsmx,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II MX", GAME_NOT_WORKING)
+COMP( 1993, fmtownsmx,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II MX", GAME_NOT_WORKING)
+COMP( 1994, fmtownsftv,fmtowns, 0,      townsftv,   towns, driver_device,    0,  "Fujitsu",   "FM-Towns II FreshTV", GAME_NOT_WORKING)
 COMP( 19??, fmtownssj,fmtowns,  0,      townssj,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II SJ", GAME_NOT_WORKING)
 CONS( 1993, fmtmarty, 0,        0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Marty",  GAME_NOT_WORKING)
 CONS( 1994, carmarty, fmtmarty, 0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Car Marty",  GAME_NOT_WORKING)
