@@ -28,44 +28,41 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/mc6845.h"
-#include "machine/wd17xx.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
+#include "machine/wd_fdc.h"
 
 class mbc200_state : public driver_device
 {
 public:
 	mbc200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_6845(*this, "crtc"),
-		m_fdc(*this, "fdc"),
-		m_ppi(*this, "ppi8255_2"),
-		m_floppy0(*this, FLOPPY_0),
-		m_floppy1(*this, FLOPPY_1),
-		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
-
-	virtual void machine_start();
-
-	required_device<mc6845_device> m_6845;
-	required_device<mb8876_device> m_fdc;
-	required_device<i8255_device> m_ppi;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_ppi(*this, "ppi8255_2")
+		, m_vram(*this, "vram")
+		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+	{ }
 
 	DECLARE_READ8_MEMBER(from_master_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_READ8_MEMBER(ppi_hs_r);
+	UINT32 screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<palette_device> m_palette;
 
+private:
+	virtual void machine_start();
 	UINT8 m_hs_bit;
 	UINT8 m_comm_latch;
-	required_shared_ptr<UINT8> m_vram;
-
 	virtual void video_start();
-	UINT32 screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<mc6845_device> m_crtc;
+	required_device<i8255_device> m_ppi;
+	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
+	required_device<mb8876_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 
@@ -85,7 +82,7 @@ static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
 	AM_RANGE(0xea, 0xea) AM_READ(ppi_hs_r)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
@@ -127,10 +124,15 @@ INPUT_PORTS_END
 
 void mbc200_state::machine_start()
 {
-	m_floppy0->floppy_mon_w(CLEAR_LINE);
-	m_floppy1->floppy_mon_w(CLEAR_LINE);
-	m_floppy0->floppy_drive_set_ready_state(1, 1);
-	m_floppy1->floppy_drive_set_ready_state(1, 1);
+	floppy_image_device *floppy = NULL;
+	floppy = m_floppy0->get_device();
+// floppy1 not supported currently
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+	}
 }
 
 void mbc200_state::video_start()
@@ -175,12 +177,19 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 	m_hs_bit &= ~0x80;
 }
 
+#if 0
 static const floppy_interface mbc200_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	"floppy_5_25"
 };
+#endif
+
+static SLOT_INTERFACE_START( mbc200_floppies )
+	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+SLOT_INTERFACE_END
+
 
 static const gfx_layout mbc200_chars_8x8 =
 {
@@ -232,10 +241,9 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
 
-	MCFG_DEVICE_ADD("fdc", MB8876, 0) // MB8876A
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbc200_floppy_interface)
+	MCFG_MB8876x_ADD("fdc", 1000000) // guess
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "525sd", floppy_image_device::default_floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
