@@ -25,7 +25,7 @@ Games on this system include....
 | | 2003 | F-Zero AX                                                | Sega / Nintendo  | GDROM | GDT-0004       |              |               |
 | | 2003 | F-Zero AX (Rev A)                                        | Sega / Nintendo  | GDROM | GDT-0004A      |              |               |
 | | 2003 | F-Zero AX (Rev B)                                        | Sega / Nintendo  | GDROM | GDT-0004B      |              |               |
-|*| 2003 | F-Zero AX (Rev C)                                        | Sega / Nintendo  | GDROM | GDT-0004C      |              |               |
+|*| 2003 | F-Zero AX (Rev C)                                        | Sega / Nintendo  | GDROM | GDT-0004C      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | F-Zero AX (Rev D)                                        | Sega / Nintendo  | GDROM | GDT-0004D      |              |               |
 |*| 2003 | F-Zero AX (Rev E)                                        | Sega / Nintendo  | GDROM | GDT-0004E      |              |               |
 |*| 2003 | The Key Of Avalon: The Wizard Master (server) (Rev C)    | Sega             | GDROM | GDT-0005C      |              |               |
@@ -593,6 +593,31 @@ ROM_START( vs2002ex )
 ROM_END
 
 
+/*
+Title             F-ZERO AX
+Media ID          06BB
+Media Config      GD-ROM1/1
+Regions           J
+Peripheral String 0000000
+Product Number    GDT-0004C
+Version           V3.000
+Release Date      20030611
+ 
+PIC16C621A-20/P (317-0362-COM) 
+Sticker: 253-5508-0362
+*/ 
+
+ROM_START( fzeroax )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0004c", 0, SHA1(f51691a26745afc36110e5d433eb216f108a43d4) )
+
+	ROM_REGION( 0x4000, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD( "317-0362-com.data", 0x000000, 0x004000, CRC(23d83347) SHA1(ca5a629e7405710fd4fa0af7c668192bdf8ca725) )
+ROM_END
+
+
 ROM_START( avalons )
 	TRIFORCE_BIOS
 
@@ -782,6 +807,7 @@ GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0,
 // GD-ROM games
 GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
 GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
+GAME( 2003, fzeroax,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo",  "F-Zero AX (Rev C) (GDT-0004C)", GAME_IS_SKELETON )
 GAME( 2003, avalons,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon - The Wizard Master (server) (Rev C) (GDT-0005C)", GAME_IS_SKELETON )
 GAME( 2003, gekpurya, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_IS_SKELETON )
 GAME( 2004, avalon13, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev C) (GDT-0010C)", GAME_IS_SKELETON )
