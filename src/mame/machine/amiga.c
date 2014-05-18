@@ -1154,6 +1154,7 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_DDFSTOP) = 0xd8;
 	CUSTOM_REG(REG_INTENA) = 0x0000;
 	CUSTOM_REG(REG_SERDATR) = 0x3000;
+	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
 }
 
 READ16_MEMBER( amiga_state::custom_chip_r )
@@ -1263,7 +1264,8 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_DSKDATR:   case REG_JOY0DAT:   case REG_JOY1DAT:   case REG_CLXDAT:
 		case REG_ADKCONR:   case REG_POT0DAT:   case REG_POT1DAT:   case REG_POTGOR:
 		case REG_SERDATR:   case REG_DSKBYTR:   case REG_INTENAR:   case REG_INTREQR:
-			/* read-only registers */
+			// read-only registers
+			return;
 			break;
 
 		case REG_DSKDAT:
@@ -1480,6 +1482,20 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_DIWHIGH:
 			if (IS_AGA(state))
 				amiga_aga_diwhigh_written(space.machine(), 1);
+			break;
+
+		case REG_BEAMCON0:
+			// only available on ecs agnus
+			if (m_agnus_id >= AGNUS_HR_PAL)
+			{
+				int height = BIT(data, 5) ? SCREEN_HEIGHT_PAL : SCREEN_HEIGHT_NTSC;
+				rectangle visarea = m_screen->visible_area();
+				visarea.sety(BIT(data, 5) ? VBLANK_PAL : VBLANK_NTSC, height - 1);
+				attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * SCREEN_WIDTH * height;
+				m_screen->configure(SCREEN_WIDTH, height, visarea, period);
+
+				CUSTOM_REG(REG_BEAMCON0) = data;
+			}
 			break;
 
 		default:

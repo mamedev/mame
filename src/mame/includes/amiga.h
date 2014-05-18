@@ -253,6 +253,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_COLOR29     (0x1BA/2)   /* W    D    Color table 29 */
 #define REG_COLOR30     (0x1BC/2)   /* W    D    Color table 30 */
 #define REG_COLOR31     (0x1BE/2)   /* W    D    Color table 31 */
+#define REG_BEAMCON0	(0x1dc/2)	// W  A      Programmable signal generator (ECS Agnus)
 #define REG_DIWHIGH     (0x1E4/2)   /* W  A D    Display window upper bits for start/stop */
 #define REG_FMODE       (0x1FC/2)   /* W  A D    Fetch mode */
 
@@ -455,6 +456,14 @@ public:
 	static const int CLK_7M_NTSC = CLK_28M_NTSC / 4;
 	static const int CLK_C1_NTSC = CLK_28M_NTSC / 8;
 	static const int CLK_E_NTSC = CLK_7M_NTSC / 10;
+
+	// screen layout
+	static const int SCREEN_WIDTH = 910;
+	static const int SCREEN_HEIGHT_PAL = 312;
+	static const int SCREEN_HEIGHT_NTSC = 262;
+	static const int VBLANK_PAL = 29; // 26
+	static const int VBLANK_NTSC = 21;
+	static const int HBLANK = 186;
 
 	required_shared_ptr<UINT16> m_chip_ram;
 	required_shared_ptr<UINT16> m_custom_regs;

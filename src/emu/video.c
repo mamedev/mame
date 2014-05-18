@@ -642,8 +642,12 @@ bool video_manager::finish_screen_updates()
 {
 	// finish updating the screens
 	screen_device_iterator iter(machine().root_device());
+
 	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+	{
 		screen->update_partial(screen->visible_area().max_y);
+		screen->reset_partial_updates();
+	}
 
 	// now add the quads for all the screens
 	bool anything_changed = m_output_changed;

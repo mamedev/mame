@@ -1010,6 +1010,11 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
 /* TODO: alg.c requires that this uses RGB32 */
 UINT32 amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// sometimes the core tells us to render a bunch of lines to keep up (resolution change, for example)
+	// this causes trouble for us since it can happen at any time
+	if (cliprect.min_y != cliprect.max_y)
+		return 0;
+
 	// render each scanline in the visible region
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		amiga_render_scanline(machine(), bitmap, y);

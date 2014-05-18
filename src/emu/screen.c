@@ -71,7 +71,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_vblank_end_time(attotime::zero),
 		m_vblank_begin_timer(NULL),
 		m_vblank_end_timer(NULL),
-		m_scanline0_timer(NULL),
 		m_scanline_timer(NULL),
 		m_frame_number(0),
 		m_partial_updates_this_frame(0)
@@ -110,6 +109,7 @@ void screen_device::static_set_type(device_t &device, screen_type_enum type)
 void screen_device::static_set_raw(device_t &device, UINT32 pixclock, UINT16 htotal, UINT16 hbend, UINT16 hbstart, UINT16 vtotal, UINT16 vbend, UINT16 vbstart)
 {
 	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_clock = pixclock;
 	screen.m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 	screen.m_vblank = screen.m_refresh / vtotal * (vtotal - (vbstart - vbend));
 	screen.m_width = htotal;
@@ -313,9 +313,6 @@ void screen_device::device_start()
 	m_vblank_begin_timer = timer_alloc(TID_VBLANK_START);
 	m_vblank_end_timer = timer_alloc(TID_VBLANK_END);
 
-	// allocate a timer to reset partial updates
-	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
-
 	// allocate a timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer = timer_alloc(TID_SCANLINE);
@@ -408,11 +405,6 @@ void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			vblank_end();
 			break;
 
-		// first visible scanline
-		case TID_SCANLINE0:
-			reset_partial_updates();
-			break;
-
 		// subsequent scanlines when scanline updates are enabled
 		case TID_SCANLINE:
 
@@ -466,13 +458,6 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	else
 		m_vblank_period = m_vblank;
 
-	// if we are on scanline 0 already, reset the update timer immediately
-	// otherwise, defer until the next scanline 0
-	if (vpos() == 0)
-		m_scanline0_timer->adjust(attotime::zero);
-	else
-		m_scanline0_timer->adjust(time_until_pos(0));
-
 	// start the VBLANK timer
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
 
@@ -494,15 +479,13 @@ void screen_device::reset_origin(int beamy, int beamx)
 	m_vblank_start_time = m_vblank_end_time - attotime(0, m_vblank_period);
 
 	// if we are resetting relative to (0,0) == VBLANK end, call the
-	// scanline 0 timer by hand now; otherwise, adjust it for the future
+	// scanline 0 timer by hand now
 	if (beamy == 0 && beamx == 0)
 		reset_partial_updates();
-	else
-		m_scanline0_timer->adjust(time_until_pos(0));
 
 	// if we are resetting relative to (visarea.max_y + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
-	if (beamy == m_visarea.max_y + 1 && beamx == 0)
+	if (beamy == ((m_visarea.max_y + 1) % m_height) && beamx == 0)
 		vblank_begin();
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
@@ -661,7 +644,6 @@ void screen_device::reset_partial_updates()
 {
 	m_last_partial_scan = 0;
 	m_partial_updates_this_frame = 0;
-	m_scanline0_timer->adjust(time_until_pos(0));
 }
 
 
