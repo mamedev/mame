@@ -3,6 +3,7 @@
 
 
 #include "msx_switched.h"
+#include "machine/nvram.h"
 
 
 extern const device_type MSX_MATSUSHITA;
@@ -23,6 +24,7 @@ public:
 	template<class _Object> static devcb_base &set_turbo_callback(device_t &device, _Object object) { return downcast<msx_matsushita_device &>(device).m_turbo_out_cb.set_callback(object); }
 
 	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
 	virtual UINT8 get_id();
@@ -31,8 +33,14 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(io_write);
 
 private:
-	required_ioport   m_io_config;
-	devcb_write_line  m_turbo_out_cb;
+	required_ioport m_io_config;
+	required_device<nvram_device> m_nvram;
+	devcb_write_line m_turbo_out_cb;
+	UINT16 m_address;
+	dynamic_buffer m_sram;
+	UINT8 m_nibble1;
+	UINT8 m_nibble2;
+	UINT8 m_pattern;
 };
 
 #endif

@@ -22,13 +22,8 @@
 ** - yis503m: sfg not emulated
 ** - cpc300: Config for MSX Tutor ON/OFF is not saved
 ** - expert20: Does not boot
-** - fs4500: Firmware not emulated
-** - fs4500: Matsuhita switched device not emulated
 ** - fs4600: Firmware not emulated
 ** - fs4600: Kanji12 not emulated
-** - fs4700: Firmware not emulated
-** - fs4700: Matsushita switched device not emulated
-** - fs5500: Matsushita switched device not emulated
 ** - fsa1fm: Firmware not emulated
 ** - fsa1fm: kanji12 not emulated
 ** - nms8280, nms8280g: Digitizer functionality not emulated
@@ -46,7 +41,6 @@
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
 ** - expertac: Does not boot
-** - expertdx: Floppy not emulated
 ** - fsa1fx: Floppy not emulated
 ** - fsa1fx: Keeps rebooting into firmware
 ** - fsa1wsx: Firmware not emulated
@@ -3396,7 +3390,7 @@ static MACHINE_CONFIG_DERIVED( fs4500, msx2 )
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("font", 0, 2, 0, 1, "maincpu", 0x20000)
-	MCFG_MSX_LAYOUT_BUNSETSU("buns", 0, 2, 2, 2, "maincpu", 0x24000, "bunsetsu")
+	MCFG_MSX_LAYOUT_BUNSETSU("buns", 0, 2, 1, 2, "maincpu", 0x24000, "bunsetsu")
 	MCFG_MSX_LAYOUT_ROM("jush", 0, 3, 1, 2, "maincpu", 0x2c000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
@@ -3407,6 +3401,8 @@ static MACHINE_CONFIG_DERIVED( fs4500, msx2 )
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 
 	MCFG_MSX_S1985_ADD("s1985")
+
+	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -3509,6 +3505,8 @@ static MACHINE_CONFIG_DERIVED( fs4700, msx2 )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
+	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
+
 	MCFG_FRAGMENT_ADD( msx_mb8877a )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
@@ -3600,6 +3598,8 @@ static MACHINE_CONFIG_DERIVED( fs5500f1, msx2 )
 
 	MCFG_MSX_S1985_ADD("s1985")
 
+	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
+
 	MCFG_FRAGMENT_ADD( msx_mb8877a )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
@@ -3646,6 +3646,8 @@ static MACHINE_CONFIG_DERIVED( fs5500f2, msx2 )
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
 	MCFG_MSX_S1985_ADD("s1985")
+
+	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
 
 	MCFG_FRAGMENT_ADD( msx_mb8877a )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
