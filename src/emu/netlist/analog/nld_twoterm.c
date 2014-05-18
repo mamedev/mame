@@ -59,9 +59,9 @@ NETLIB_UPDATE(twoterm)
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	/* we only need to call the non-rail terminal */
 	if (!m_P.net().isRailNet())
-		m_P.net_analog().schedule_solve();
+		m_P.net().as_analog().schedule_solve();
 	else
-		m_N.net_analog().schedule_solve();
+		m_N.net().as_analog().schedule_solve();
 }
 
 // ----------------------------------------------------------------------------------------

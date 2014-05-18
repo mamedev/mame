@@ -399,12 +399,6 @@ public:
 	ATTR_HOT inline const netlist_net_t & RESTRICT net() const { return *m_net;}
 	ATTR_HOT inline netlist_net_t & RESTRICT net() { return *m_net;}
 
-	ATTR_HOT inline netlist_logic_net_t & RESTRICT net_logic();
-    ATTR_HOT inline const netlist_logic_net_t & RESTRICT net_logic() const;
-
-	ATTR_HOT inline netlist_analog_net_t & RESTRICT net_analog();
-    ATTR_HOT inline const netlist_analog_net_t & RESTRICT net_analog() const;
-
 	ATTR_HOT inline const bool is_state(const state_e astate) const { return (m_state == astate); }
 	ATTR_HOT inline const state_e state() const { return m_state; }
 	ATTR_HOT inline void set_state(const state_e astate)
@@ -569,6 +563,12 @@ public:
 	ATTR_COLD void register_con(netlist_core_terminal_t &terminal);
 	ATTR_COLD void merge_net(netlist_net_t *othernet);
 	ATTR_COLD void register_railterminal(netlist_output_t &mr);
+
+    ATTR_HOT inline netlist_logic_net_t & RESTRICT as_logic();
+    ATTR_HOT inline const netlist_logic_net_t & RESTRICT as_logic() const;
+
+    ATTR_HOT inline netlist_analog_net_t & RESTRICT as_analog();
+    ATTR_HOT inline const netlist_analog_net_t & RESTRICT as_analog() const;
 
 	ATTR_HOT void update_devs();
 
@@ -776,10 +776,10 @@ public:
 
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time delay)
 	{
-		if (EXPECTED(newQ !=  net_logic().m_new_Q))
+		if (EXPECTED(newQ !=  net().as_logic().m_new_Q))
 		{
-			net_logic().m_new_Q = newQ;
-			net_logic().push_to_queue(delay);
+			net().as_logic().m_new_Q = newQ;
+			net().as_logic().push_to_queue(delay);
 		}
 	}
 private:
@@ -977,7 +977,7 @@ public:
 
 	ATTR_HOT inline const double INPANALOG(const netlist_analog_input_t &inp) const { return inp.Q_Analog(); }
 
-	ATTR_HOT inline const double TERMANALOG(const netlist_terminal_t &term) const { return term.net_analog().Q_Analog(); }
+	ATTR_HOT inline const double TERMANALOG(const netlist_terminal_t &term) const { return term.net().as_analog().Q_Analog(); }
 
 	ATTR_HOT inline void OUTANALOG(netlist_analog_output_t &out, const double val)
 	{
@@ -1231,28 +1231,28 @@ ATTR_HOT inline void netlist_param_double_t::setTo(const double param)
 	}
 }
 
-ATTR_HOT inline netlist_logic_net_t & RESTRICT netlist_core_terminal_t::net_logic()
+ATTR_HOT inline netlist_logic_net_t & RESTRICT netlist_net_t::as_logic()
 {
     assert(family() == LOGIC);
-    return static_cast<netlist_logic_net_t &>(*m_net);
+    return static_cast<netlist_logic_net_t &>(*this);
 }
 
-ATTR_HOT inline const netlist_logic_net_t & RESTRICT netlist_core_terminal_t::net_logic() const
+ATTR_HOT inline const netlist_logic_net_t & RESTRICT netlist_net_t::as_logic() const
 {
     assert(family() == LOGIC);
-    return static_cast<netlist_logic_net_t &>(*m_net);
+    return static_cast<const netlist_logic_net_t &>(*this);
 }
 
-ATTR_HOT inline netlist_analog_net_t & RESTRICT netlist_core_terminal_t::net_analog()
+ATTR_HOT inline netlist_analog_net_t & RESTRICT netlist_net_t::as_analog()
 {
     assert(family() == ANALOG);
-    return static_cast<netlist_analog_net_t &>(*m_net);
+    return static_cast<netlist_analog_net_t &>(*this);
 }
 
-ATTR_HOT inline const netlist_analog_net_t & RESTRICT netlist_core_terminal_t::net_analog() const
+ATTR_HOT inline const netlist_analog_net_t & RESTRICT netlist_net_t::as_analog() const
 {
     assert(family() == ANALOG);
-    return static_cast<netlist_analog_net_t &>(*m_net);
+    return static_cast<const netlist_analog_net_t &>(*this);
 }
 
 
@@ -1261,7 +1261,7 @@ ATTR_HOT inline void netlist_input_t::inactivate()
 	if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
 	{
 		set_state(STATE_INP_PASSIVE);
-		net_logic().dec_active(*this);
+		net().as_logic().dec_active(*this);
 	}
 }
 
@@ -1269,7 +1269,7 @@ ATTR_HOT inline void netlist_input_t::activate()
 {
 	if (is_state(STATE_INP_PASSIVE))
 	{
-		net_logic().inc_active(*this);
+		net().as_logic().inc_active(*this);
 		set_state(STATE_INP_ACTIVE);
 	}
 }
@@ -1278,7 +1278,7 @@ ATTR_HOT inline void netlist_logic_input_t::activate_hl()
 {
 	if (is_state(STATE_INP_PASSIVE))
 	{
-		net_logic().inc_active(*this);
+		net().as_logic().inc_active(*this);
 		set_state(STATE_INP_HL);
 	}
 }
@@ -1287,7 +1287,7 @@ ATTR_HOT inline void netlist_logic_input_t::activate_lh()
 {
 	if (is_state(STATE_INP_PASSIVE))
 	{
-		net_logic().inc_active(*this);
+		net().as_logic().inc_active(*this);
 		set_state(STATE_INP_LH);
 	}
 }
@@ -1310,17 +1310,17 @@ ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const
 {
-	return net_logic().Q();
+	return net().as_logic().Q();
 }
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::last_Q() const
 {
-	return net_logic().last_Q();
+	return net().as_logic().last_Q();
 }
 
 ATTR_HOT inline const double netlist_analog_input_t::Q_Analog() const
 {
-	return net_analog().Q_Analog();
+	return net().as_analog().Q_Analog();
 }
 
 

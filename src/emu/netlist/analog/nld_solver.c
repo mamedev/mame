@@ -11,12 +11,14 @@
 #include "omp.h"
 #endif
 
+#define USE_PIVOT_SEARCH (0)
+
+#define SOLVER_VERBOSE_OUT(x) do {} while (0)
+//#define SOLVER_VERBOSE_OUT(x) printf x
+
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver
 // ----------------------------------------------------------------------------------------
-
-//#define SOLVER_VERBOSE_OUT(x) do {} while (0)
-#define SOLVER_VERBOSE_OUT(x) printf x
 
 ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t()
 : m_owner(NULL)
@@ -70,7 +72,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 							break;
 					}
 					{
-						netlist_terminal_t *pterm = nl_downcast<netlist_terminal_t *>(p);
+						netlist_terminal_t *pterm = dynamic_cast<netlist_terminal_t *>(p);
 						if (pterm->m_otherterm->net().isRailNet())
 							(*pn)->m_rails.add(pterm);
 						else
@@ -81,12 +83,22 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 				case netlist_terminal_t::INPUT:
 				    {
 #if NEW_INPUT
-				        // FIXME: multiple outputs per net ...
-                        netlist_analog_output_t *m = new netlist_analog_output_t();
-                        m->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
+                        netlist_analog_output_t *m = NULL;
+                        for (int i = 0; i < m_inps.count(); i++)
+                            if (m_inps[i]->m_proxied_net == &p->net().as_analog())
+                            {
+                                m = m_inps[i];
+                                break;
+                            }
+
+                        if (m == NULL)
+                        {
+                            m = new netlist_analog_output_t();
+                            m->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
+                            m_inps.add(m);
+                            m->m_proxied_net = &p->net().as_analog();
+                        }
                         //register_output("m", *m);
-                        m_inps.add(m);
-                        m->m_proxied_net = nl_downcast<netlist_analog_net_t *>(&p->net());
                         m->net().register_con(*p);
                         // FIXME: repeated
                         m->net().rebuild_list();
@@ -368,7 +380,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
 
 		RHS[t.net_this] += t.term->m_Idr;
 		A[t.net_this][t.net_this] += t.term->m_gt;
-		RHS[t.net_this] += t.term->m_go * nl_downcast<netlist_analog_net_t &>(t.term->m_otherterm->net()).Q_Analog();
+		RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().as_analog().Q_Analog();
 	}
 #endif
 }
@@ -390,29 +402,32 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 #endif
 
 	for (int i = 0; i < N(); i++) {
-#if 0
-		/* Find the row with the largest first value */
-		int maxrow = i;
-		for (int j = i + 1; j < N(); j++)
-		{
-			if (fabs(A[j][i]) > fabs(A[maxrow][i]))
-				maxrow = j;
-		}
+	    // FIXME: use a parameter to enable pivoting?
+	    if (USE_PIVOT_SEARCH)
+	    {
+	        /* Find the row with the largest first value */
+	        int maxrow = i;
+	        for (int j = i + 1; j < N(); j++)
+	        {
+	            if (fabs(A[j][i]) > fabs(A[maxrow][i]))
+	                maxrow = j;
+	        }
 
-		if (maxrow != i)
-		{
-            /* Swap the maxrow and ith row */
-            for (int k = i; k < N(); k++) {
-                const double tmp = A[i][k];
-                A[i][k] = A[maxrow][k];
-                A[maxrow][k] = tmp;
-            }
-            const double tmpR = RHS[i];
-            RHS[i] = RHS[maxrow];
-            RHS[maxrow] = tmpR;
-		}
-#endif
-		/* Singular matrix? */
+	        if (maxrow != i)
+	        {
+	            /* Swap the maxrow and ith row */
+	            for (int k = i; k < N(); k++) {
+	                const double tmp = A[i][k];
+	                A[i][k] = A[maxrow][k];
+	                A[maxrow][k] = tmp;
+	            }
+	            const double tmpR = RHS[i];
+	            RHS[i] = RHS[maxrow];
+	            RHS[maxrow] = tmpR;
+	        }
+	    }
+
+	    /* Singular matrix? */
 		double f = A[i][i];
 		//if (fabs(f) < 1e-20) printf("Singular!");
 		f = 1.0 / f;
@@ -616,7 +631,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 			gtot_t += rails[i]->m_gt;
 			gabs_t += fabs(rails[i]->m_go);
 			RHS_t += rails[i]->m_Idr;
-			RHS_t += rails[i]->m_go * nl_downcast<netlist_analog_net_t &>(rails[i]->m_otherterm->net()).Q_Analog();
+			RHS_t += rails[i]->m_go * rails[i]->m_otherterm->net().as_analog().Q_Analog();
 		}
 
 		for (int i = 0; i < term_count; i++)
@@ -658,7 +673,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
 
 			for (int i = 0; i < term_count; i++)
 			{
-                iIdr += terms[i]->m_go * nl_downcast<netlist_analog_net_t &>(terms[i]->m_otherterm->net()).m_new_Analog;
+                iIdr += terms[i]->m_go * terms[i]->m_otherterm->net().as_analog().m_new_Analog;
 			}
 
 			//double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
@@ -721,7 +736,7 @@ ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_a
 		{
 			SOLVER_VERBOSE_OUT(("isterminal\n"));
 			netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-			netlist_analog_net_t *other_net = nl_downcast<netlist_analog_net_t *>(&pt->m_otherterm->net());
+			netlist_analog_net_t *other_net = &pt->m_otherterm->net().as_analog();
 			if (!already_processed(groups, cur_group, other_net))
 				process_net(groups, cur_group, other_net);
 		}
@@ -836,15 +851,15 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	netlist_analog_net_t::list_t groups[100];
 	int cur_group = -1;
 
-	netlist().log("Scanning net groups ...\n");
+	netlist().log("Scanning net groups ...");
 	// determine net groups
 	for (netlist_net_t * const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
-	    netlist().log("processing %s", (*pn)->name().cstr());
+	    SOLVER_VERBOSE_OUT(("processing %s\n", (*pn)->name().cstr()));
 	    if (!(*pn)->isRailNet())
 	    {
-	        netlist().log("   ==> not a rail net");
-	        netlist_analog_net_t *n = nl_downcast<netlist_analog_net_t *>(*pn);
+	        SOLVER_VERBOSE_OUT(("   ==> not a rail net\n"));
+	        netlist_analog_net_t *n = &(*pn)->as_analog();
 	        if (!already_processed(groups, cur_group, n))
 	        {
 	            cur_group++;
