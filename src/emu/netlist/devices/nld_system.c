@@ -91,9 +91,8 @@ ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 {
     double R = INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low;
     double V = INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V;
-#if NEW_LTE
+
     m_R.update_dev();
-#endif
     OUTANALOG(m_Q, V);
     m_R.set_R(R);
 }

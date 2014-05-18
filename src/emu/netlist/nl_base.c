@@ -490,10 +490,8 @@ ATTR_COLD netlist_net_t::~netlist_net_t()
 ATTR_COLD netlist_analog_net_t::netlist_analog_net_t(const type_t atype)
     : netlist_net_t(atype, ANALOG)
     , m_solver(NULL)
-#if NEW_LTE
     , m_DD_n_m_1(0.0)
     , m_h_n_m_1(1e-6)
-#endif
 {
 };
 
@@ -618,10 +616,8 @@ ATTR_COLD void netlist_net_t::save_register()
 
 ATTR_COLD void netlist_analog_net_t::save_register()
 {
-#if NEW_LTE
     save(NAME(m_DD_n_m_1));
     save(NAME(m_h_n_m_1));
-#endif
     netlist_net_t::save_register();
 }
 
@@ -729,7 +725,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 ATTR_HOT void netlist_analog_net_t::schedule_solve()
 {
 	if (m_solver != NULL)
-		m_solver->schedule();
+		m_solver->update();
 }
 
 // ----------------------------------------------------------------------------------------

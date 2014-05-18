@@ -140,7 +140,6 @@ public:
 	inline void set_R(const double R)
 	{
 	    set(1.0 / R, 0.0, 0.0);
-	    //update_dev();
 	}
 
 protected:

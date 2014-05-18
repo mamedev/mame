@@ -106,7 +106,7 @@ NETLIB_UPDATE_PARAM(R)
 	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
 
     // FIXME: Only attached nets should be brought up to current time
-    netlist().solver()->solve_all(); // bring up current time
+    netlist().solver()->update_to_current_time(); // bring up current time
 	if (m_R.Value() > 1e-9)
 		set_R(m_R.Value());
 	else
