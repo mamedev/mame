@@ -41,13 +41,12 @@
            bit can be read, so the code goes into an infinite loop.
 ** - hbf12: Does not boot; see hbf1.
 ** - tpc310: Floppy support broken
+**           7fbb <- c7  => seek 199???
 ** - hx23f: The builtin word processor displays white squares instead of text
 ** - cx7m: sfg not emulated
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
 ** - expertac: Does not boot
-** - fsa1fx: Floppy not emulated
-** - fsa1fx: Keeps rebooting into firmware
 ** - fsa1wsx: Firmware not emulated
 ** - fsa1wx: Firmware not emulated
 ** - fsa1wx: Floppy not emulated
@@ -398,6 +397,7 @@ Spectravideo SVI-707 - MB8877A - 1 5.25" SSDD drive (320KB) - There seem to be 2
 #include "formats/dsk_dsk.h"
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
+#include "machine/msx_systemflags.h"
 
 
 static ADDRESS_MAP_START ( msx_memory_map, AS_PROGRAM, 8, msx_state )
@@ -5345,6 +5345,8 @@ static MACHINE_CONFIG_DERIVED( fsa1fx, msx2p )
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
 	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
 
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
 	MCFG_FRAGMENT_ADD( msx2_floplist )
@@ -5390,6 +5392,8 @@ static MACHINE_CONFIG_DERIVED( fsa1wsx, msx2p )
 
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
 	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
@@ -5439,6 +5443,8 @@ static MACHINE_CONFIG_DERIVED( fsa1wx, msx2p )
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
 	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
 
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
@@ -5485,6 +5491,8 @@ static MACHINE_CONFIG_DERIVED( fsa1wxa, msx2p )
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
 	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
 
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
@@ -5520,6 +5528,8 @@ static MACHINE_CONFIG_DERIVED( phc35j, msx2p )
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0x20000)
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -5557,6 +5567,8 @@ static MACHINE_CONFIG_DERIVED( phc70fd, msx2p )
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x28000)
 	MCFG_MSX_LAYOUT_ROM("bas", 3, 3, 2, 1, "maincpu", 0x2c000)
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
@@ -5599,6 +5611,8 @@ static MACHINE_CONFIG_DERIVED( phc70fd2, msx2p )
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x28000)
 	MCFG_MSX_LAYOUT_ROM("bas", 3, 3, 2, 1, "maincpu", 0x2c000)
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
@@ -5644,6 +5658,8 @@ static MACHINE_CONFIG_DERIVED( hbf1xdj, msx2p )
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0x20000)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x28000)
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
 
 	MCFG_MSX_S1985_ADD("s1985")
 
@@ -5692,6 +5708,8 @@ static MACHINE_CONFIG_DERIVED( hbf1xv, msx2p )
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x28000)
 
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
+
 	MCFG_MSX_S1985_ADD("s1985")
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
@@ -5725,6 +5743,8 @@ static MACHINE_CONFIG_DERIVED( hbf9sp, msx2p )
 	MCFG_MSX_LAYOUT_ROM("firm1", 3, 0, 1, 1, "maincpu", 0x20000)
 	MCFG_MSX_LAYOUT_ROM("firm2", 3, 1, 1, 2, "maincpu", 0x24000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB?? Mapper RAM */
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -5760,6 +5780,8 @@ static MACHINE_CONFIG_DERIVED( fsa1gt, msx2 )
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0x30000)
 	MCFG_MSX_LAYOUT_DISK4("dos", 3, 2, 1, 3, "maincpu", 0x20000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 0, 4, "maincpu", 0x80000)
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 
@@ -5800,6 +5822,8 @@ static MACHINE_CONFIG_DERIVED( fsa1st, msx2 )
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0x30000)
 	MCFG_MSX_LAYOUT_DISK4("dos", 3, 2, 1, 3, "maincpu", 0x20000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 0, 4, "maincpu", 0x80000)
+
+	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
 
 	MCFG_FRAGMENT_ADD( msx_ym2413 )
 

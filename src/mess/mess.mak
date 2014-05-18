@@ -1005,6 +1005,7 @@ $(MESSOBJ)/ascii.a:             \
 	$(MESS_MACHINE)/msx_switched.o \
 	$(MESS_MACHINE)/msx_matsushita.o \
 	$(MESS_MACHINE)/msx_s1985.o \
+	$(MESS_MACHINE)/msx_systemflags.o \
 
 $(MESSOBJ)/at.a:                \
 	$(MESS_MACHINE)/at.o        \
