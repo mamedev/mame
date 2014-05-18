@@ -5,6 +5,13 @@
 **  To get out of the MSX Tutor press the SELECT key. Entering SET SYSTEM 1 should
 **  disable the MSX Tutor on next boot and SET SYSTEM 0 should enable.
 **
+** tpp311:
+**  This machine is supposed to boot into logo; it was made to only run logo.
+**
+** tps312:
+**  - To get into MSX-WRITE type: CALL WRITE
+**  - To get into MSX-PLAN type: CALL MSXPLAN
+**
 **
 ** Todo/known issues:
 ** - piopx7: Laserdisc integration doesn't exist
@@ -22,10 +29,10 @@
 ** - yis503m: sfg not emulated
 ** - cpc300: Config for MSX Tutor ON/OFF is not saved
 ** - expert20: Does not boot
-** - fs4600: Firmware not emulated
-** - fs4600: Kanji12 not emulated
+** - fs4600: Kanji12 not emulated; how to trigger usage of kanji12??
 ** - fsa1fm: Firmware not emulated
 ** - fsa1fm: kanji12 not emulated
+** - fsa1fm: Modem not emulated
 ** - nms8280, nms8280g: Digitizer functionality not emulated
 ** - vg8230j: Floppy support broken?
 ** - hotbit20: Does not boot
@@ -34,8 +41,6 @@
            bit can be read, so the code goes into an infinite loop.
 ** - hbf12: Does not boot; see hbf1.
 ** - tpc310: Floppy support broken
-** - tpp311: Firmware not working?
-** - tps312: Firmware?
 ** - hx23f: The builtin word processor displays white squares instead of text
 ** - cx7m: sfg not emulated
 ** - expert3i: IDE not emulated
@@ -3442,7 +3447,6 @@ static MACHINE_CONFIG_DERIVED( fs4600, msx2 )
 	MCFG_MSX_LAYOUT_ROM("fon2", 0, 3, 0, 1, "maincpu", 0x24000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
-	//MCFG_MSX_LAYOUT_("firm", 3, 1, 0, 4, ASCII16, 0x100000, 0x30000) /* National FS-4600 Mapper must be emulated */
 	MCFG_MSX_LAYOUT_FS4600("firm", 3, 1, 0, 4, "maincpu", 0x30000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
@@ -4997,7 +5001,7 @@ static MACHINE_CONFIG_DERIVED( tpp311, msx2_pal )
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 1, 0, 0x10000)   /* 64KB?? Mapper RAM */
-	MCFG_MSX_LAYOUT_ROM("logo", 2, 0, 0, 2, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_ROM("logo", 2, 0, 1, 2, "maincpu", 0x20000)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
 MACHINE_CONFIG_END
 
@@ -5020,8 +5024,9 @@ static MACHINE_CONFIG_DERIVED( tps312, msx2_pal )
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 1, 0, 0x20000)   /* 128KB?? Mapper RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
-	MCFG_MSX_LAYOUT_ROM("write", 3, 1, 0, 1, "maincpu", 0x28000)
-	MCFG_MSX_LAYOUT_ROM("plan", 3, 2, 0, 2, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_ROM("write", 3, 1, 1, 1, "maincpu", 0x28000)
+	MCFG_MSX_LAYOUT_ROM("plan", 3, 2, 1, 1, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_ROM("planlow", 3, 2, 0, 1, "maincpu", 0x24000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 3)
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
