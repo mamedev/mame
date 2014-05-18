@@ -27,7 +27,7 @@ Games on this system include....
 | | 2003 | F-Zero AX (Rev B)                                        | Sega / Nintendo  | GDROM | GDT-0004B      |              |               |
 |*| 2003 | F-Zero AX (Rev C)                                        | Sega / Nintendo  | GDROM | GDT-0004C      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | F-Zero AX (Rev D)                                        | Sega / Nintendo  | GDROM | GDT-0004D      |              |               |
-|*| 2003 | F-Zero AX (Rev E)                                        | Sega / Nintendo  | GDROM | GDT-0004E      |              |               |
+|*| 2003 | F-Zero AX (Rev E)                                        | Sega / Nintendo  | GDROM | GDT-0004E      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | The Key Of Avalon: The Wizard Master (server) (Rev C)    | Sega             | GDROM | GDT-0005C      |              |               |
 | | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev C)    | Sega             | GDROM | GDT-0006C      |              |               |
 |*| 2003 | Gekitou Pro Yakyuu Mizushima Shinji All Stars (Rev C)    | Sega             | GDROM | GDT-0008C      | 317-0371-JPN |               |
@@ -592,6 +592,28 @@ ROM_START( vs2002ex )
 	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
 ROM_END
 
+/*
+Title             F-ZERO AX
+Media ID          6BB7
+Media Config      GD-ROM1/1
+Regions           J
+Peripheral String 0000000
+Product Number    GDT-0004E
+Version           V5.002
+Release Date      20031203 
+ 
+PIC16C621A-20/P (317-0362-COM) 
+Sticker: 253-5508-0362
+*/
+ROM_START( fzeroax )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0004e", 0, SHA1(9910d321690d8e5c1927a558c23a0b3394061e4d) )
+
+	ROM_REGION( 0x4000, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD( "317-0362-com.data", 0x000000, 0x004000, CRC(23d83347) SHA1(ca5a629e7405710fd4fa0af7c668192bdf8ca725) )
+ROM_END
 
 /*
 Title             F-ZERO AX
@@ -606,8 +628,7 @@ Release Date      20030611
 PIC16C621A-20/P (317-0362-COM) 
 Sticker: 253-5508-0362
 */ 
-
-ROM_START( fzeroax )
+ROM_START( fzeroaxc )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
@@ -807,7 +828,8 @@ GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0,
 // GD-ROM games
 GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
 GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
-GAME( 2003, fzeroax,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo",  "F-Zero AX (Rev C) (GDT-0004C)", GAME_IS_SKELETON )
+GAME( 2003, fzeroax,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo",  "F-Zero AX (Rev E) (GDT-0004E)", GAME_IS_SKELETON )
+GAME( 2003, fzeroaxc, fzeroax,  triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo",  "F-Zero AX (Rev C) (GDT-0004C)", GAME_IS_SKELETON )
 GAME( 2003, avalons,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon - The Wizard Master (server) (Rev C) (GDT-0005C)", GAME_IS_SKELETON )
 GAME( 2003, gekpurya, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_IS_SKELETON )
 GAME( 2004, avalon13, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev C) (GDT-0010C)", GAME_IS_SKELETON )
