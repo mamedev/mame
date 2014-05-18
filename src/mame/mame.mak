@@ -2137,6 +2137,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/s7.o  \
 	$(DRIVERS)/s8.o  \
 	$(DRIVERS)/s9.o  \
+	$(DRIVERS)/sam.o  \
 	$(DRIVERS)/sleic.o  \
 	$(DRIVERS)/spectra.o  \
 	$(DRIVERS)/spinb.o  \
