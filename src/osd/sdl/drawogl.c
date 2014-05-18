@@ -1141,6 +1141,11 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	if (sdl->init_context)
 	{
 		// do some one-time OpenGL setup
+#if (SDLMAME_SDL2)
+	    // FIXME: SRGB conversion is working on SDL2, may be of use
+	    // when we eventually target gamma and monitor profiles.
+        //glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
 		glShadeModel(GL_SMOOTH);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepth(1.0f);
