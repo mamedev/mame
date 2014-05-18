@@ -13,6 +13,7 @@ const device_type DP8473 = &device_creator<dp8473_device>;
 const device_type PC8477A = &device_creator<pc8477a_device>;
 const device_type WD37C65C = &device_creator<wd37c65c_device>;
 const device_type MCS3201 = &device_creator<mcs3201_device>;
+const device_type TC8566AF = &device_creator<tc8566af_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, upd765a_device)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
@@ -93,6 +94,13 @@ DEVICE_ADDRESS_MAP_START( map, 8, mcs3201_device )
 	AM_RANGE(0x4, 0x4) AM_READ(msr_r)
 	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START( map, 8, tc8566af_device )
+	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
+	AM_RANGE(0x3, 0x3) AM_WRITE(cr1_w)
+	AM_RANGE(0x4, 0x4) AM_READ(msr_r)
+	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
 
@@ -2296,3 +2304,31 @@ READ8_MEMBER( mcs3201_device::input_r )
 {
 	return m_input_handler();
 }
+
+tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: upd765_family_device(mconfig, TC8566AF, "TC8566AF", tag, owner, clock, "tc8566af", __FILE__)
+	, m_cr1(0)
+{
+	ready_polled = true;
+	ready_connected = true;
+	select_connected = true;
+}
+
+void tc8566af_device::device_start()
+{
+	upd765_family_device::device_start();
+	save_item(NAME(m_cr1));
+}
+
+WRITE8_MEMBER(tc8566af_device::cr1_w)
+{
+	m_cr1 = data;
+
+	if (m_cr1 & 0x02)
+	{
+		// Not sure if this inverted or not
+		tc_w((m_cr1 & 0x01) ? true : false);
+	}
+}
+
+

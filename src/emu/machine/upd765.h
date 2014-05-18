@@ -52,6 +52,9 @@
 #define MCFG_MCS3201_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MCS3201, 0)
 
+#define MCFG_TC8566AF_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TC8566AF, 0)
+
 #define MCFG_MCS3201_INPUT_HANDLER(_devcb) \
 	devcb = &mcs3201_device::set_input_handler(*device, DEVCB_##_devcb);
 
@@ -490,6 +493,21 @@ private:
 	devcb_read8 m_input_handler;
 };
 
+class tc8566af_device : public upd765_family_device {
+public:
+	tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual DECLARE_ADDRESS_MAP(map, 8);
+
+	DECLARE_WRITE8_MEMBER(cr1_w);
+
+protected:
+	virtual void device_start();
+
+private:
+	UINT8 m_cr1;
+};
+
 extern const device_type UPD765A;
 extern const device_type UPD765B;
 extern const device_type I8272A;
@@ -501,5 +519,6 @@ extern const device_type DP8473;
 extern const device_type PC8477A;
 extern const device_type WD37C65C;
 extern const device_type MCS3201;
+extern const device_type TC8566AF;
 
 #endif

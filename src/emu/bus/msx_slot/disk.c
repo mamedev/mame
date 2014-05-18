@@ -35,11 +35,12 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 const device_type MSX_SLOT_DISK1 = &device_creator<msx_slot_disk1_device>;
 const device_type MSX_SLOT_DISK2 = &device_creator<msx_slot_disk2_device>;
+const device_type MSX_SLOT_DISK3 = &device_creator<msx_slot_disk3_device>;
+const device_type MSX_SLOT_DISK4 = &device_creator<msx_slot_disk4_device>;
 
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: msx_slot_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_fdc(NULL)
 	, m_floppy0(NULL)
 	, m_floppy1(NULL)
 	, m_floppy(NULL)
@@ -59,14 +60,8 @@ void msx_slot_disk_device::device_start()
 		fatalerror("msx_slot_disk_device: no FDC tag specified\n");
 	}
 
-	m_fdc = owner()->subdevice<wd_fdc_analog_t>(m_fdc_tag);
 	m_floppy0 = owner()->subdevice<floppy_connector>(m_floppy0_tag);
 	m_floppy1 = owner()->subdevice<floppy_connector>(m_floppy1_tag);
-
-	if (m_fdc == NULL)
-	{
-		fatalerror("msx_slot_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
-	}
 
 	if (m_floppy0 == NULL && m_floppy1 == NULL)
 	{
@@ -75,8 +70,49 @@ void msx_slot_disk_device::device_start()
 }
 
 
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_fdc(NULL)
+{
+}
+
+
+void msx_slot_wd_disk_device::device_start()
+{
+	msx_slot_disk_device::device_start();
+
+	m_fdc = owner()->subdevice<wd_fdc_analog_t>(m_fdc_tag);
+
+	if (m_fdc == NULL)
+	{
+		fatalerror("msx_slot_wd_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
+	}
+}
+
+
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_fdc(NULL)
+{
+}
+
+
+void msx_slot_tc8566_disk_device::device_start()
+{
+	msx_slot_disk_device::device_start();
+
+	m_fdc = owner()->subdevice<tc8566af_device>(m_fdc_tag);
+
+	if (m_fdc == NULL)
+	{
+		fatalerror("msx_slot_tc8566_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
+	}
+}
+
+
+
 msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_disk_device(mconfig, MSX_SLOT_DISK1, "MSX Internal floppy type 1", tag, owner, clock, "msx_slot_disk1", __FILE__)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK1, "MSX Internal floppy type 1", tag, owner, clock, "msx_slot_disk1", __FILE__)
 	, m_side_control(0)
 	, m_control(0)
 {
@@ -85,7 +121,7 @@ msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, cons
 
 void msx_slot_disk1_device::device_start()
 {
-	msx_slot_disk_device::device_start();
+	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
@@ -229,12 +265,17 @@ WRITE8_MEMBER(msx_slot_disk1_device::write)
 		case 0xbffd:
 			set_control(data);
 			break;
+
+		default:
+			logerror("msx_slot_disk1_device::write: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+
 	}
 }
 
 
 msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msx_slot_disk_device(mconfig, MSX_SLOT_DISK2, "MSX Internal floppy type 2", tag, owner, clock, "msx_slot_disk2", __FILE__)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK2, "MSX Internal floppy type 2", tag, owner, clock, "msx_slot_disk2", __FILE__)
 	, m_control(0)
 {
 }
@@ -242,7 +283,7 @@ msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, cons
 
 void msx_slot_disk2_device::device_start()
 {
-	msx_slot_disk_device::device_start();
+	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_control));
 
@@ -362,8 +403,108 @@ WRITE8_MEMBER(msx_slot_disk2_device::write)
 			break;
 
 		default:
-			printf("Unmapped write writing %02x to %04x\n", data, offset);
+			logerror("msx_slot_disk2_device::write: Unmapped write writing %02x to %04x\n", data, offset);
 			break;
 	}
+}
+
+
+
+
+
+
+msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, "MSX Internal floppy type 3", tag, owner, clock, "msx_slot_disk3", __FILE__)
+{
+}
+
+
+WRITE8_MEMBER(msx_slot_disk3_device::write)
+{
+	switch (offset)
+	{
+		case 0x7ff8:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
+			m_fdc->dor_w(space, 2, data);
+			break;
+
+		case 0x7ff9:   // CR1 : 0 - 0 - C4E - C4 - SBME - SBM - TCE - FDCTC
+			m_fdc->cr1_w(space, 3, data);
+			break;
+
+		case 0x7ffb:   // Data Register
+			m_fdc->fifo_w(space, 5, data);
+			break;
+
+		default:
+			logerror("msx_slot_disk3_device::write: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+	}
+}
+
+
+READ8_MEMBER(msx_slot_disk3_device::read)
+{
+	switch (offset)
+	{
+		case 0x7ffa:   // Status Register
+			return m_fdc->msr_r(space, 4);
+		case 0x7ffb:   // Data Register
+			return m_fdc->fifo_r(space, 5);
+	}
+
+    return msx_slot_rom_device::read(space, offset);
+}
+
+
+
+
+
+msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4, "MSX Internal floppy type 4", tag, owner, clock, "msx_slot_disk4", __FILE__)
+{
+}
+
+
+WRITE8_MEMBER(msx_slot_disk4_device::write)
+{
+	switch (offset)
+	{
+		case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
+			break;
+
+		case 0x7ff2:   // CR0 : 0 - 0 - MEN1 - MEN0 - 0 - -FRST - 0 - DSA
+			m_fdc->dor_w(space, 2, data);
+			break;
+
+		case 0x7ff3:   // CR1 : 0 - 0 - C4E - C4 - SBME - SBM - TCE - FDCTC
+			m_fdc->cr1_w(space, 3, data);
+			break;
+
+		case 0x7ff5:   // Data Register
+			m_fdc->fifo_w(space, 5, data);
+			break;
+
+		default:
+			logerror("msx_slot_disk4_device::write: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+	}
+}
+
+
+READ8_MEMBER(msx_slot_disk4_device::read)
+{
+	switch (offset)
+	{
+		case 0x7ff1:   // FDD : x - x - MC1 - MC0 - x - x - x - x
+			logerror("msx_slot_disk4_device::write: Unmapped read from Media Change register\n");
+			break;
+
+		case 0x7ff4:   // Status Register
+			return m_fdc->msr_r(space, 4);
+		case 0x7ff5:   // Data Register
+			return m_fdc->fifo_r(space, 5);
+	}
+
+	return msx_slot_rom_device::read(space, offset);
 }
 
