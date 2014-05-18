@@ -7,10 +7,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "sound/speaker.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/z80dart.h"
 #include "machine/pit8253.h"
@@ -31,16 +29,20 @@ public:
 			m_pia_0( *this, "pia_0" ),
 			m_pia_1( *this, "pia_1" ),
 			m_sio( *this, "sio" ),
-			m_speaker( *this, "speaker" )
+			m_speaker( *this, "speaker" ),
+			m_floppy0( *this, "mb8877:0:525ssdd" ),
+			m_floppy1( *this, "mb8877:1:525ssdd" )
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mb8877_device>  m_mb8877;
+	required_device<mb8877_t>  m_mb8877;
 	required_device<ram_device> m_messram;
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
 	required_device<z80dart_device> m_sio;
 	required_device<speaker_sound_device>   m_speaker;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 
 	virtual void video_start();
 
@@ -213,7 +215,7 @@ static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)               /* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", mb8877_device, read, write )                /* MB8877 @ UB17 input clock = 1MHz */
+	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_t, read, write )                /* MB8877 @ UB17 input clock = 1MHz */
 	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w ) /* SIO @ UD4 */
 	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)               /* 6821 PIA @ UD8 */
 	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ(osbexec_kbd_r )                    /* KBD */
@@ -384,10 +386,15 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 	switch ( data & 0x06 )
 	{
 	case 0x02:
-		m_mb8877->set_drive( 1 );
+		m_mb8877->set_floppy(m_floppy1);
+		m_floppy1->mon_w(0);
 		break;
 	case 0x04:
-		m_mb8877->set_drive( 0 );
+		m_mb8877->set_floppy(m_floppy0);
+		m_floppy0->mon_w(0);
+		break;
+	default:
+		m_mb8877->set_floppy(NULL);
 		break;
 	}
 
@@ -430,6 +437,7 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
+ /*
 static LEGACY_FLOPPY_OPTIONS_START(osbexec )
 	LEGACY_FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -462,15 +470,11 @@ static LEGACY_FLOPPY_OPTIONS_START(osbexec )
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
+*/
 
-
-static const floppy_interface osbexec_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(osbexec),
-	NULL
-};
-
+static SLOT_INTERFACE_START( osborne2_floppies )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+SLOT_INTERFACE_END
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
@@ -595,11 +599,10 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
 
-	MCFG_DEVICE_ADD("mb8877", MB8877, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-	//MCFG_WD17XX_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osbexec_floppy_interface)
+	MCFG_DEVICE_ADD("mb8877", MB8877x, MAIN_CLOCK/24)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
+	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
