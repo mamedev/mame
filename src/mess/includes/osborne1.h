@@ -15,9 +15,7 @@
 #include "machine/6850acia.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 
 class osborne1_state : public driver_device
 {
@@ -37,6 +35,8 @@ public:
 		m_beep(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
 		m_ieee(*this, IEEE488_TAG),
+		m_floppy0(*this, "mb8877:0:525ssdd"),
+		m_floppy1(*this, "mb8877:1:525ssdd"),
 		m_row0(*this, "ROW0"),
 		m_row1(*this, "ROW1"),
 		m_row2(*this, "ROW2"),
@@ -60,10 +60,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
-	required_device<mb8877_device> m_fdc;
+	required_device<mb8877_t> m_fdc;
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_device<ieee488_device> m_ieee;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 
 	DECLARE_WRITE8_MEMBER(osborne1_0000_w);
 	DECLARE_WRITE8_MEMBER(osborne1_1000_w);

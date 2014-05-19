@@ -1052,7 +1052,7 @@ UINT8 wd_fdc_t::status_r()
 			intrq_cb(intrq);
 	}
 
-	if(main_state == IDLE || status_type_1) {
+	if((main_state == IDLE && !drq) || status_type_1) {
 		if(floppy && floppy->idx_r())
 			status |= S_IP;
 		else

@@ -166,6 +166,7 @@ static const z80_daisy_config osborne1_daisy_chain[] =
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
+ /*
 static LEGACY_FLOPPY_OPTIONS_START(osborne1 )
 	LEGACY_FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -198,13 +199,12 @@ static LEGACY_FLOPPY_OPTIONS_START(osborne1 )
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
+*/
 
-static const floppy_interface osborne1_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(osborne1),
-	"floppy_5_25"
-};
+static SLOT_INTERFACE_START( osborne1_floppies )
+	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD ) // Siemens FDD 100-5, custom Osborne electronics
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD ) // MPI 52(?), custom Osborne electronics
+SLOT_INTERFACE_END
 
 /* F4 Character Displayer */
 static const gfx_layout osborne1_charlayout =
@@ -229,7 +229,6 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_CPU_PROGRAM_MAP( osborne1_mem)
 	MCFG_CPU_IO_MAP( osborne1_io)
 	MCFG_CPU_CONFIG( osborne1_daisy_chain )
-
 
 	MCFG_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
 
@@ -260,10 +259,10 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
 
-	MCFG_DEVICE_ADD("mb8877", MB8877, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osborne1_floppy_interface)
+	MCFG_DEVICE_ADD("mb8877", MB8877x, MAIN_CLOCK/16)
+	MCFG_WD_FDC_FORCE_READY
+	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))

@@ -53,7 +53,7 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100: /* Floppy */
-			data = m_fdc->read( space, offset );
+			data = m_fdc->read( space, offset & 0x03 );
 			break;
 		case 0x200: /* Keyboard */
 			/* Row 0 */
@@ -104,7 +104,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100: /* Floppy */
-			m_fdc->write(space, offset, data );
+			m_fdc->write(space, offset & 0x03, data );
 			break;
 		case 0x900: /* IEEE488 PIA */
 			m_pia0->write(space, offset & 0x03, data );
@@ -261,6 +261,7 @@ WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
 WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 {
 	m_fdc->dden_w(BIT(data, 0));
+	logerror("dden %u\n",BIT(data, 0));
 
 	data -= 0xea; // remove bias
 
@@ -278,10 +279,19 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	m_beep_state = BIT(data, 5);
 
 	if (BIT(data, 6))
-		m_fdc->set_drive( 0 );
+	{
+		m_fdc->set_floppy(m_floppy0);
+		m_floppy0->mon_w(0);
+	}
+	else if (BIT(data, 7))
+	{
+		m_fdc->set_floppy(m_floppy1);
+		m_floppy1->mon_w(0);
+	}
 	else
-	if (BIT(data, 7))
-		m_fdc->set_drive( 1 );
+	{
+		m_fdc->set_floppy(NULL);
+	}
 
 	//logerror("Video pia port b write: %02X\n", data );
 }
@@ -388,34 +398,8 @@ TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
 	m_pia1->ca1_w(0);
 }
 
-static void osborne1_load_proc(device_image_interface &image)
-{
-	int size = image.length();
-	osborne1_state *state = image.device().machine().driver_data<osborne1_state>();
-
-	switch( size )
-	{
-	case 40 * 10 * 256:
-		state->m_fdc->dden_w(ASSERT_LINE);
-		break;
-	case 40 * 5 * 1024:
-		state->m_fdc->dden_w(CLEAR_LINE);
-		break;
-	case 40 * 8 * 512:
-		state->m_fdc->dden_w(ASSERT_LINE);
-		break;
-	case 40 * 18 * 128:
-		state->m_fdc->dden_w(ASSERT_LINE);
-		break;
-	case 40 * 9 * 512:
-		state->m_fdc->dden_w(CLEAR_LINE);
-		break;
-	}
-}
-
 void osborne1_state::machine_reset()
 {
-	int drive;
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
@@ -427,9 +411,6 @@ void osborne1_state::machine_reset()
 	m_p_chargen = memregion( "chargen" )->base();
 
 	memset( m_ram->pointer() + 0x10000, 0xFF, 0x1000 );
-
-	for(drive=0;drive<2;drive++)
-		floppy_get_device(machine(), drive)->floppy_install_load_proc(osborne1_load_proc);
 
 	space.set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), this));
 }
