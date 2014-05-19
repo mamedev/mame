@@ -70,6 +70,7 @@ protected:
 	inline void writeword(offs_t address, UINT16 data);
 
 private:
+	inline void inc_ar(int value);
 	inline void fifo_w_clear();
 	inline void queue_w(UINT8 data);
 	inline void dequeue_w(UINT8 *data);

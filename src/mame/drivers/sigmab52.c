@@ -111,11 +111,10 @@
 
   TODO:
 
-  - GFX decode.
   - Improve memory map.
-  - Color decode.
-  - Sound support.
-  - Inputs.
+  - Layout.
+  - Bill validator.
+  - ACIA
 
 
 *******************************************************************************/
@@ -127,7 +126,9 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/h63484.h"
 
@@ -138,205 +139,180 @@ public:
 	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_hd63484(*this, "hd63484") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_6840ptm_2(*this, "6840ptm_2"),
+		m_palette(*this, "palette"),
+		m_bank1(*this, "bank1"),
+		m_prom(*this, "proms"),
+		m_in0(*this, "IN0")
+	{ }
 
-	int m_latch;
-	unsigned int m_acrtc_data;
-//  DECLARE_WRITE8_MEMBER(acrtc_w);
-//  DECLARE_READ8_MEMBER(acrtc_r);
 	DECLARE_READ8_MEMBER(unk_f700_r);
-	DECLARE_WRITE8_MEMBER(unk_f710_w);
-	DECLARE_READ8_MEMBER(unk_f721_r);
+	DECLARE_READ8_MEMBER(unk_f760_r);
+	DECLARE_READ8_MEMBER(in0_r);
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE8_MEMBER(audiocpu_cmd_irq_w);
+	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_DRIVER_INIT(jwildb52);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
+	void audiocpu_irq_update();
 	virtual void machine_start();
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(sigmab52);
-	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(timer_irq);
+	virtual void machine_reset();
+
 	required_device<cpu_device> m_maincpu;
-	required_device<h63484_device> m_hd63484;
+	required_device<cpu_device> m_audiocpu;
+	required_device<ptm6840_device> m_6840ptm_2;
+	required_device<palette_device> m_palette;
+	required_memory_bank m_bank1;
+	required_memory_region m_prom;
+	required_ioport m_in0;
+
+	UINT64      m_coin_start_cycles;
+	UINT64      m_hopper_start_cycles;
+	int         m_audiocpu_cmd_irq;
 };
-
-
-
-
-/*************************
-*     Video Hardware     *
-*************************/
-
-
-void sigmab52_state::video_start()
-{
-}
-
-
-UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-#if 0
-	int x, y, b, src;
-
-	address_space &space = machine().driver_data()->generic_space();
-	b = ((m_hd63484->regs_r(space, 0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
-
-//save vram to file
-#if 0
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		FILE *p = fopen("vram.bin", "wb");
-		fwrite(&HD63484_ram[0], 1, 0x40000 * 4, p);
-		fclose(p);
-	}
-#endif
-//copied form other acrtc based games
-
-	for (y = 0; y < 480; y++)
-	{
-		for (x = 0; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
-		{
-			src = m_hd63484->ram_r(space, b & (HD63484_RAM_SIZE - 1), 0xffff);
-
-			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
-			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
-			bitmap.pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
-			bitmap.pix16(y, x + 3) = ((src & 0xf000) >> 12) << 0;
-			b++;
-		}
-	}
-
-if (!machine().input().code_pressed(KEYCODE_O))
-	if ((m_hd63484->regs_r(space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
-	{
-		int sy = (m_hd63484->regs_r(space, 0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(space, 0x88/2, 0xffff) >> 8);
-		int h = m_hd63484->regs_r(space, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((m_hd63484->regs_r(space, 0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(space, 0x84/2, 0xffff) >> 8)) * 4;
-		int w = (m_hd63484->regs_r(space, 0x92/2, 0xffff) & 0xff) * 2;
-		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
-
-		b = (((m_hd63484->regs_r(space, 0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xde/2, 0xffff));
-
-
-		for (y = sy; y <= sy + h && y < 480; y++)
-		{
-			for (x = 0; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff)* 4; x += 4)
-			{
-					src = m_hd63484->ram_r(space, b & (HD63484_RAM_SIZE - 1), 0xffff);
-
-				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 4)
-					{
-						bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
-						bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
-						bitmap.pix16(y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
-						bitmap.pix16(y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
-					}
-				b++;
-			}
-		}
-	}
-#endif
-
-	return 0;
-}
-
-
-PALETTE_INIT_MEMBER(sigmab52_state, sigmab52)
-{
-}
-
-
-/*************************
-*      ACRTC Access      *
-*************************/
-
-#if 0
-WRITE8_MEMBER(sigmab52_state::acrtc_w)
-{
-	if(!offset)
-	{
-		//address select
-		m_hd63484->address_w(space, 0, data, 0x00ff);
-		m_latch = 0;
-	}
-	else
-	{
-		if(!m_latch)
-		{
-			m_acrtc_data = data;
-
-		}
-
-		else
-		{
-			m_acrtc_data <<= 8;
-			m_acrtc_data |= data;
-
-			m_hd63484->data_w(space, 0, m_acrtc_data, 0xffff);
-		}
-
-		m_latch ^= 1;
-	}
-}
-
-READ8_MEMBER(sigmab52_state::acrtc_r)
-{
-	if(offset&1)
-	{
-		return m_hd63484->data_r(space, 0, 0xff);
-	}
-
-	else
-	{
-		return 0x7b; //fake status read (instead m_hd63484->status_r(space, 0, 0xff); )
-	}
-}
-#endif
 
 
 /*************************
 *      Misc Handlers     *
 *************************/
 
+void sigmab52_state::audiocpu_irq_update()
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, (m_6840ptm_2->irq_state() || m_audiocpu_cmd_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(sigmab52_state::ptm2_irq)
+{
+	audiocpu_irq_update();
+}
+
 READ8_MEMBER(sigmab52_state::unk_f700_r)
 {
 	return 0x7f;
 }
 
-WRITE8_MEMBER(sigmab52_state::unk_f710_w)
+READ8_MEMBER(sigmab52_state::unk_f760_r)
 {
-	membank("bank1" )->set_base(&memregion("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	return 0x80;    // used for test the sound CPU
 }
 
-READ8_MEMBER(sigmab52_state::unk_f721_r)
+READ8_MEMBER(sigmab52_state::in0_r)
 {
-	return 0x04;    // test is stuck. feeding bit3 the error message appear...
+	UINT8 data = 0xff;
+
+	// if the hopper is active simulate the coin-out sensor
+	if (m_hopper_start_cycles)
+	{
+		attotime diff = m_maincpu->cycles_to_attotime(m_maincpu->total_cycles() - m_hopper_start_cycles);
+
+		if (diff > attotime::from_msec(100))
+			data &= ~0x01;
+
+		if (diff > attotime::from_msec(200))
+			m_hopper_start_cycles = m_maincpu->total_cycles();
+	}
+
+	// simulates the passage of coins through multiple sensors
+	if (m_coin_start_cycles)
+	{
+		attotime diff = m_maincpu->cycles_to_attotime(m_maincpu->total_cycles() - m_coin_start_cycles);
+
+		if (diff > attotime::from_msec(20) && diff < attotime::from_msec(100))
+			data &= ~0x02;
+		if (diff > attotime::from_msec(50) && diff < attotime::from_msec(200))
+			data &= ~0x04;
+
+		if (diff > attotime::from_msec(200))
+			m_coin_start_cycles = 0;
+	}
+
+	UINT16 in0 = m_in0->read();
+	for(int i=0; i<16; i++)
+		if (!BIT(in0, i))
+		{
+			data &= ~(i << 4);
+			break;
+		}
+
+	return data;
 }
 
+WRITE8_MEMBER(sigmab52_state::bank1_w)
+{
+	m_bank1->set_entry(BIT(data, 7));
+}
+
+WRITE8_MEMBER(sigmab52_state::hopper_w)
+{
+	m_hopper_start_cycles = data & 0x01 ? m_maincpu->total_cycles() : 0;
+}
+
+WRITE8_MEMBER(sigmab52_state::audiocpu_cmd_irq_w)
+{
+	m_audiocpu_cmd_irq = ASSERT_LINE;
+	audiocpu_irq_update();
+}
+
+WRITE8_MEMBER(sigmab52_state::audiocpu_irq_ack_w)
+{
+	if (data & 0x01)
+	{
+		m_audiocpu_cmd_irq = CLEAR_LINE;
+		audiocpu_irq_update();
+	}
+}
+
+WRITE8_MEMBER(sigmab52_state::palette_bank_w)
+{
+	int bank = data & 0x0f;
+	UINT8 *prom = (UINT8*)*m_prom;
+
+	for (int i = 0; i<m_palette->entries(); i++)
+	{
+		UINT8 d = prom[(bank << 4) | i];
+		m_palette->set_pen_color(i, pal3bit(d >> 5), pal3bit(d >> 2), pal2bit(d >> 0));
+	}
+}
 
 /*************************
 *      Memory Maps       *
 *************************/
 
 static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0x8000, 0xf6ff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0xf6ff) AM_ROM
 
-	AM_RANGE(0xf700, 0xf700) AM_READ(unk_f700_r)
-	AM_RANGE(0xf710, 0xf710) AM_WRITE(unk_f710_w)
-	AM_RANGE(0xf721, 0xf721) AM_READ(unk_f721_r)
+	AM_RANGE(0xf700, 0xf700) AM_READ(unk_f700_r)    // ACIA ???
+	AM_RANGE(0xf710, 0xf710) AM_WRITE(bank1_w)
+
+	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
 
 	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", h63484_device, status_r, address_w)
 	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
 
-	//AM_RANGE(0xf730, 0xf731) AM_READWRITE(acrtc_r, acrtc_w)
-	AM_RANGE(0xf740, 0xf740) AM_READ_PORT("IN0")
-	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")    // random checks to active high to go further with the test.
+	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
+	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")
 	AM_RANGE(0xf742, 0xf742) AM_READ_PORT("IN2")
 	AM_RANGE(0xf743, 0xf743) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf744, 0xf744) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf745, 0xf745) AM_READ_PORT("DSW3")
 	AM_RANGE(0xf746, 0xf746) AM_READ_PORT("DSW4")
-	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2")
+	AM_RANGE(0xf747, 0xf747) AM_READ_PORT("IN3")
+	AM_RANGE(0xf750, 0xf750) AM_WRITE(palette_bank_w)
+
+	AM_RANGE(0xf760, 0xf760) AM_READ(unk_f760_r)
+
+	AM_RANGE(0xf780, 0xf780) AM_WRITE(audiocpu_cmd_irq_w)
+	AM_RANGE(0xf790, 0xf790) AM_WRITE(soundlatch_byte_w)
+
+	AM_RANGE(0xf7d5, 0xf7d5) AM_WRITE(hopper_w)
+	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Unknown R/W:
@@ -344,26 +320,21 @@ ADDRESS_MAP_END
   F700  W
   F701 R
 
-  F726 RW
-  F727 RW
-
-  F747 R
-
-  F750  W
-
   F7D4  W
-  F7D5  W
 
   F7E6 RW
   F7E7 RW
 
 */
 
-#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8, sigmab52_state )
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x6020, 0x6027) AM_DEVREADWRITE("6840ptm_2", ptm6840_device, read, write)
+	AM_RANGE(0x6030, 0x6030) AM_WRITE(audiocpu_irq_ack_w)
+	AM_RANGE(0x6050, 0x6050) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6060, 0x6061) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
-#endif
 
 /* Unknown R/W:
 
@@ -375,177 +346,168 @@ static ADDRESS_MAP_START( jwildb52_hd63484_map, AS_0, 16, sigmab52_state )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
+INPUT_CHANGED_MEMBER( sigmab52_state::coin_drop_start )
+{
+	if (newval && !m_coin_start_cycles)
+		m_coin_start_cycles = m_maincpu->total_cycles();
+}
+
+
 /*************************
 *      Input Ports       *
 *************************/
 
 static INPUT_PORTS_START( jwildb52 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 5
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 4
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 3
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 1
+
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Double")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Max Bet")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_BET )      PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("One Bet")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Collect / Payout")
+
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("Max Bet")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_BET )      PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)  PORT_NAME("One Bet")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x50, EQUALS, 0x10)
+
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Double")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Deal")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Draw")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x40)  PORT_NAME("Collect")
+
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )         PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)  PORT_NAME("Deal")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)  PORT_NAME("Draw")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_POKER_CANCEL  )  PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )         PORT_CONDITION("DSW1", 0x50, EQUALS, 0x50)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("IN1-1") // keys Q & O are used for debugging purposes.
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3") // pressing this one the message "PLEASE SET #10 IN D/S-2 ON" appear. Only SW4-8 seems to has effect.
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Meter")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Last")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Machine Door")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Weight Switch")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Attendant Call")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Drop Door")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Meter Wire")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("V Door")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, sigmab52_state, coin_drop_start, NULL)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1 - #01" )    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1-1" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1 - #02" )    PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "DSW1-2" )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW1 - #04" )    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "DSW1-3" )        PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1 - #08" )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "DSW1-4" )        PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1 - #10" )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "DSW1-5" )        PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1 - #20" )    PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "DSW1-6" )        PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW1 - #40" )    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "DSW1-7" )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1 - #80" )    PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "DSW1-8" )        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2 - #01" )    PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "JW-1" )          PORT_DIPLOCATION("JW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW2 - #02" )    PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, "JW-2" )          PORT_DIPLOCATION("JW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW2 - #04" )    PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "JW-3" )          PORT_DIPLOCATION("JW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW2 - #08" )    PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "JW-4" )          PORT_DIPLOCATION("JW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW2 - #10" )    PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "JW-5" )          PORT_DIPLOCATION("JW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW2 - #20" )    PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "JW-6" )          PORT_DIPLOCATION("JW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2 - #40" )    PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "DSW1-9" )        PORT_DIPLOCATION("SW1:9")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2 - #80" )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "DSW1-10" )       PORT_DIPLOCATION("SW1:10")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3 - #01" )    PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2-1" )        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW3 - #02" )    PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "DSW2-2" )        PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW3 - #04" )    PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x04, 0x04, "DSW2-3" )        PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW3 - #08" )    PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x08, 0x08, "DSW2-4" )        PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW3 - #10" )    PORT_DIPLOCATION("SW3:5")
+	PORT_DIPNAME( 0x10, 0x10, "DSW2-5" )        PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW3 - #20" )    PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x20, 0x20, "DSW2-6" )        PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW3 - #40" )    PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x40, 0x40, "DSW2-7" )        PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW3 - #80" )    PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x80, 0x80, "DSW2-8" )        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4 - #01" )    PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW4 - #02" )    PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW4 - #04" )    PORT_DIPLOCATION("SW4:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW4 - #08" )    PORT_DIPLOCATION("SW4:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW4 - #10" )    PORT_DIPLOCATION("SW4:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW4 - #20" )    PORT_DIPLOCATION("SW4:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW4 - #40" )    PORT_DIPLOCATION("SW4:7")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x40, "DSW2-9" )        PORT_DIPLOCATION("SW2:9")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW4 - #80" )    PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x80, 0x80, "DSW2-10" )       PORT_DIPLOCATION("SW2:10")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
-
-
-/******************************
-*   Interrupts Gen (to fix)   *
-******************************/
-
-INTERRUPT_GEN_MEMBER(sigmab52_state::timer_irq)
-{
-	device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
 
 
 /*************************
@@ -554,35 +516,15 @@ INTERRUPT_GEN_MEMBER(sigmab52_state::timer_irq)
 
 void sigmab52_state::machine_start()
 {
-	membank("bank1")->set_base(&memregion("maincpu")->base()[0x10000 + 0x0000]);
+	UINT8 *rom = (UINT8*)*memregion("maincpu");
+	m_bank1->configure_entries(0, 2, rom, 0x4000);
+}
 
-	membank("bank2")->set_base(&memregion("maincpu")->base()[0x10000 + 0xf800]);
-
-	membank("bank3")->set_base(&memregion("maincpu")->base()[0x10000 + 0x8000]);
-
-/*
-
-  ACRTC memory:
-
-  00000-3ffff = RAM
-  40000-7ffff = ROM
-  80000-bffff = unused
-  c0000-fffff = unused
-
-*/
-
-#if 0
-	{
-		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
-		int i;
-
-		address_space &space = generic_space();
-		for(i = 0; i < 0x40000/2; ++i)
-		{
-			m_hd63484->ram_w(space, i + 0x40000/2, rom[i], 0xffff);
-		}
-	}
-#endif
+void sigmab52_state::machine_reset()
+{
+	m_bank1->set_entry(1);
+	m_coin_start_cycles = 0;
+	m_hopper_start_cycles = 0;
 }
 
 /*************************
@@ -594,15 +536,19 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)    /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab52_state,  timer_irq)    /* Fix me */
 
-#if 0
 	MCFG_CPU_ADD("audiocpu", M6809, MAIN_CLOCK/9)   /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
-	//temporary teh same int as for main cpu
-	MCFG_CPU_PERIODIC_INT_DRIVER(sigmab52_state, timer_irq,  1000)          /* Fix me */
-#endif
 
+	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(MAIN_CLOCK/9)       // FIXME
+	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+
+	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(MAIN_CLOCK/18)      // FIXME
+	MCFG_PTM6840_IRQ_CB(WRITELINE(sigmab52_state, ptm2_irq))
+
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
@@ -614,8 +560,12 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 
 	MCFG_H63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(sigmab52_state, sigmab52)
+	MCFG_PALETTE_ADD("palette", 16)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM3812, AUX_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -625,8 +575,8 @@ MACHINE_CONFIG_END
 *************************/
 
 ROM_START( jwildb52 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "poker.ic95", 0x10000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poker.ic95", 0x00000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "cards_2001-1.ic45", 0x00003, 0x10000, CRC(7664455e) SHA1(c9f129060e63b9ac9058ab94208846e4dc578ead) )
@@ -634,8 +584,8 @@ ROM_START( jwildb52 )
 	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00000, 0x10000, CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
 	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00002, 0x10000, CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound-01-00.43", 0x8000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sound-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
@@ -643,8 +593,8 @@ ROM_END
 
 
 ROM_START( jwildb52a )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sigm_wrk.bin", 0x10000, 0x10000, CRC(15c83c6c) SHA1(7a05bd94ea8b1ad051fbe6580a6550d4bb47dd15) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sigm_wrk.bin", 0x00000, 0x10000, CRC(15c83c6c) SHA1(7a05bd94ea8b1ad051fbe6580a6550d4bb47dd15) )
 
 	/* No gfx & sound dumps. Using the ones from parent set for now... */
 
@@ -654,8 +604,8 @@ ROM_START( jwildb52a )
 	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00000, 0x10000, BAD_DUMP CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
 	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00002, 0x10000, BAD_DUMP CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound-01-00.43", 0x8000, 0x8000, BAD_DUMP CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sound-01-00.43", 0x0000, 0x8000, BAD_DUMP CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, BAD_DUMP CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
@@ -663,8 +613,8 @@ ROM_END
 
 
 ROM_START( jwildb52h )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "jokers_wild_ver_xxx.ic95", 0x10000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jokers_wild_ver_xxx.ic95", 0x00000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "2006-1_harrahs.ic45", 0x00003, 0x10000, CRC(6e6871dc) SHA1(5dfc99c808c06ec34838324181988d4550c1ed1a) )
@@ -672,8 +622,8 @@ ROM_START( jwildb52h )
 	ROM_LOAD32_BYTE( "2006-3_harrahs.ic47", 0x00000, 0x10000, CRC(d66af95a) SHA1(70bba1aeea9221541b82642045ce8ecf26e1d08c) )
 	ROM_LOAD32_BYTE( "2006-4_harrahs.ic48", 0x00002, 0x10000, CRC(2bf196cb) SHA1(686ca0dd84c48f51efee5349ea3db65531dd4a52) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "poker-01-00.43", 0x8000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "poker-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
@@ -686,7 +636,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab52_state,jwildb52)
 {
-	//HD63484_start(machine());
 }
 
 

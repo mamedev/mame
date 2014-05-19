@@ -382,6 +382,17 @@ inline void h63484_device::writeword(offs_t address, UINT16 data)
 }
 
 
+inline void h63484_device::inc_ar(int value)
+{
+	if(m_ar & 0x80)
+	{
+		if (m_ar + value > 0xff)    // TODO: what happens if it overflows?
+			logerror("HD63484 '%s': Address Register overflows 0x%02x\n", tag(), m_ar + value);
+
+		m_ar = (m_ar + value) & 0xff;
+	}
+}
+
 inline void h63484_device::fifo_w_clear()
 {
 	int i;
@@ -1922,6 +1933,8 @@ READ16_MEMBER( h63484_device::data_r )
 	else
 		res = video_registers_r(m_ar);
 
+	inc_ar(2);
+
 	return res;
 }
 
@@ -1941,11 +1954,7 @@ WRITE16_MEMBER( h63484_device::data_w )
 
 	video_registers_w(m_ar);
 
-	if(m_ar & 0x80)
-	{
-		m_ar+=2;
-		m_ar &= 0xff; // TODO: what happens if it overflows?
-	}
+	inc_ar(2);
 }
 
 READ8_MEMBER( h63484_device::status_r )
@@ -1967,6 +1976,8 @@ READ8_MEMBER( h63484_device::data_r )
 	else
 		res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
 
+	inc_ar(1);
+
 	return res;
 }
 
@@ -1985,11 +1996,7 @@ WRITE8_MEMBER( h63484_device::data_w )
 	else
 		video_registers_w(m_ar & 0xfe);
 
-	if(m_ar & 0x80)
-	{
-		m_ar++;
-		m_ar &= 0xff; // TODO: what happens if it overflows?
-	}
+	inc_ar(1);
 }
 
 void h63484_device::device_start()
