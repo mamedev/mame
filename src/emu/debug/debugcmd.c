@@ -53,7 +53,7 @@ struct cheat_map
 
 struct cheat_system
 {
-	char        cpu;
+	char        cpu[2];
 	UINT8       width;
 	dynamic_array<cheat_map> cheatmap;
 	UINT8       undo;
@@ -409,6 +409,8 @@ void debug_command_init(running_machine &machine)
 	name = machine.options().debug_script();
 	if (name[0] != 0)
 		debug_cpu_source_script(machine, name);
+
+	cheat.cpu[0] = cheat.cpu[1] = 0;
 }
 
 
@@ -2023,7 +2025,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	}
 
 	/* determine the writable extent of each region in total */
-	for (i = 0; i <= region_count; i++)
+	for (i = 0; i < region_count; i++)
 		if (!cheat_region[i].disabled)
 			for (curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += cheat.width)
 				if (cheat_address_is_valid(*space, curaddr))
@@ -2040,18 +2042,18 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 		/* initialize new cheat system */
 		cheat.cheatmap.resize(real_length);
 		cheat.undo = 0;
-		cheat.cpu = (params > 3) ? *param[3] : '0';
+		cheat.cpu[0] = (params > 3) ? *param[3] : '0';
 	}
 	else
 	{
 		/* add range to cheat system */
-		if (cheat.cpu == 0)
+		if (cheat.cpu[0] == 0)
 		{
 			debug_console_printf(machine, "Use cheatinit before cheatrange\n");
 			return;
 		}
 
-		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
+		if (!debug_command_parameter_cpu_space(machine, cheat.cpu, AS_PROGRAM, space))
 			return;
 
 		active_cheat = cheat.cheatmap.count();
@@ -2106,13 +2108,13 @@ static void execute_cheatnext(running_machine &machine, int ref, int params, con
 		CHEAT_CHANGEDBY
 	};
 
-	if (cheat.cpu == 0)
+	if (cheat.cpu[0] == 0)
 	{
 		debug_console_printf(machine, "Use cheatinit before cheatnext\n");
 		return;
 	}
 
-	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
+	if (!debug_command_parameter_cpu_space(machine, cheat.cpu, AS_PROGRAM, space))
 		return;
 
 	if (params > 1 && !debug_command_parameter_number(machine, param[1], &comp_value))
@@ -2267,10 +2269,10 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	UINT64 sizemask;
 	FILE *f = NULL;
 
-	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
+	if (!debug_command_parameter_cpu_space(machine, cheat.cpu, AS_PROGRAM, space))
 		return;
 
-	if (!debug_command_parameter_cpu(machine, &cheat.cpu, &cpu))
+	if (!debug_command_parameter_cpu(machine, cheat.cpu, &cpu))
 		return;
 
 	if (params > 0)
