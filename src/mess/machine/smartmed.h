@@ -5,7 +5,12 @@
 #ifndef __SMARTMEDIA_H__
 #define __SMARTMEDIA_H__
 
+#include "formats/imageutl.h"
+
 //#define SMARTMEDIA_IMAGE_SAVE
+
+#define MCFG_NAND_TYPE(_type)                           \
+	nand_device::set_nand_type(*device, _type);
 
 #define MCFG_NAND_RNB_CALLBACK(_write) \
 	devcb = &nand_device::set_rnb_wr_callback(*device, DEVCB_##_write);
@@ -13,12 +18,6 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-struct smartmedia_cartslot_config
-{
-	const char *                    interface;
-};
-
 
 enum sm_mode_t
 {
@@ -42,36 +41,17 @@ enum pointer_sm_mode_t
 
 
 // "Sequential Row Read is available only on K9F5608U0D_Y,P,V,F or K9F5608D0D_Y,P"
-
-#define NAND_CHIP_K9F5608U0D   { 2, { 0xEC, 0x75                   },  512, 16,  32, 2048, 1, 2, 1 } /* K9F5608U0D */
-#define NAND_CHIP_K9F5608U0D_J { 2, { 0xEC, 0x75                   },  512, 16,  32, 2048, 1, 2, 0 } /* K9F5608U0D-Jxxx */
-#define NAND_CHIP_K9F5608U0B   { 2, { 0xEC, 0x75                   },  512, 16,  32, 2048, 1, 2, 0 } /* K9F5608U0B */
-#define NAND_CHIP_K9F1G08U0B   { 5, { 0xEC, 0xF1, 0x00, 0x95, 0x40 }, 2048, 64,  64, 1024, 2, 2, 0 } /* K9F1G08U0B */
-#define NAND_CHIP_K9LAG08U0M   { 5, { 0xEC, 0xD5, 0x55, 0x25, 0x68 }, 2048, 64, 128, 8192, 2, 3, 0 } /* K9LAG08U0M */
-
-struct nand_chip
+enum
 {
-	int id_len;
-	UINT8 id[5];
-	int page_size;
-	int oob_size;
-	int pages_per_block;
-	int blocks_per_device;
-	int col_address_cycles;
-	int row_address_cycles;
-	int sequential_row_read;
-};
-
-// ======================> nand_interface
-
-struct nand_interface
-{
-	nand_chip        m_chip;
+	NAND_CHIP_K9F5608U0D = 0,	// K9F5608U0D
+	NAND_CHIP_K9F5608U0D_J,		// K9F5608U0D-Jxxx
+	NAND_CHIP_K9F5608U0B,		// K9F5608U0B
+	NAND_CHIP_K9F1G08U0B,		// K9F1G08U0B
+	NAND_CHIP_K9LAG08U0M		// K9LAG08U0M
 };
 
 // ======================> nand_device
-class nand_device : public device_t,
-					public nand_interface
+class nand_device : public device_t
 {
 public:
 	// construction/destruction
@@ -80,6 +60,80 @@ public:
 
 	template<class _Object> static devcb_base &set_rnb_wr_callback(device_t &device, _Object object) { return downcast<nand_device &>(device).m_write_rnb.set_callback(object); }
 
+	static void set_nand_type(device_t &device, int type)
+	{
+		nand_device &dev = downcast<nand_device &>(device);
+		switch (type)
+		{
+			case NAND_CHIP_K9F5608U0D:
+				dev.m_id_len = 2;
+				dev.m_id[0] = 0xec;
+				dev.m_id[1] = 0x75;
+				dev.m_page_data_size = 512;
+				dev.m_page_total_size = 512 + 16;
+				dev.m_log2_pages_per_block = compute_log2(32);
+				dev.m_num_pages = 32 * 2048;
+				dev.m_col_address_cycles = 1;
+				dev.m_row_address_cycles = 2;
+				dev.m_sequential_row_read = 1;
+				break;
+			case NAND_CHIP_K9F5608U0D_J:
+			case NAND_CHIP_K9F5608U0B:
+				dev.m_id_len = 2;
+				dev.m_id[0] = 0xec;
+				dev.m_id[1] = 0x75;
+				dev.m_page_data_size = 512;
+				dev.m_page_total_size = 512 + 16;
+				dev.m_log2_pages_per_block = compute_log2(32);
+				dev.m_num_pages = 32 * 2048;
+				dev.m_col_address_cycles = 1;
+				dev.m_row_address_cycles = 2;
+				dev.m_sequential_row_read = 0;
+				break;
+			case NAND_CHIP_K9F1G08U0B:
+				dev.m_id_len = 5;
+				dev.m_id[0] = 0xec;
+				dev.m_id[1] = 0xf1;
+				dev.m_id[2] = 0x00;
+				dev.m_id[3] = 0x95;
+				dev.m_id[4] = 0x40;
+				dev.m_page_data_size = 2048;
+				dev.m_page_total_size = 2048 + 64;
+				dev.m_log2_pages_per_block = compute_log2(64);
+				dev.m_num_pages = 64 * 1024;
+				dev.m_col_address_cycles = 2;
+				dev.m_row_address_cycles = 2;
+				dev.m_sequential_row_read = 0;
+				break;
+			case NAND_CHIP_K9LAG08U0M:
+				dev.m_id_len = 5;
+				dev.m_id[0] = 0xec;
+				dev.m_id[1] = 0xd5;
+				dev.m_id[2] = 0x55;
+				dev.m_id[3] = 0x25;
+				dev.m_id[4] = 0x68;
+				dev.m_page_data_size = 2048;
+				dev.m_page_total_size = 2048 + 64;
+				dev.m_log2_pages_per_block = compute_log2(128);
+				dev.m_num_pages = 128 * 8192;
+				dev.m_col_address_cycles = 2;
+				dev.m_row_address_cycles = 3;
+				dev.m_sequential_row_read = 0;
+				break;
+			default:
+				printf("Unknown NAND type!\n");
+				dev.m_id_len = 0;
+				dev.m_page_data_size = 0;
+				dev.m_page_total_size = 0;
+				dev.m_log2_pages_per_block = 0;
+				dev.m_num_pages = 0;
+				dev.m_col_address_cycles = 0;
+				dev.m_row_address_cycles = 0;
+				dev.m_sequential_row_read = 0;
+				break;
+		}
+	}
+	
 	int is_present();
 	int is_protected();
 	int is_busy();
@@ -96,7 +150,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	int m_page_data_size;   // 256 for a 2MB card, 512 otherwise
 	int m_page_total_size;// 264 for a 2MB card, 528 otherwise
@@ -133,7 +186,7 @@ protected:
 	int m_col_address_cycles;
 	int m_row_address_cycles;
 	int m_sequential_row_read;
-
+	
 	devcb_write_line m_write_rnb;
 
 	#ifdef SMARTMEDIA_IMAGE_SAVE
@@ -141,8 +194,7 @@ protected:
 	#endif
 };
 
-// device type definition
-extern const device_type NAND;
+
 
 class smartmedia_image_device : public nand_device,
 								public device_image_interface
@@ -167,7 +219,6 @@ public:
 	virtual void call_unload();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
-	void set_image_interface(const char *image_interface) { m_image_interface = image_interface; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -175,29 +226,12 @@ protected:
 	bool smartmedia_format_1();
 	bool smartmedia_format_2();
 	int detect_geometry( UINT8 id1, UINT8 id2);
-
-	const char *m_image_interface;
 };
 
+
 // device type definition
+extern const device_type NAND;
 extern const device_type SMARTMEDIA;
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_NAND_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, NAND, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define NAND_INTERFACE(name) \
-	const nand_interface(name) =
-
-#define MCFG_SMARTMEDIA_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SMARTMEDIA, 0)
-
-#define MCFG_SMARTMEDIA_INTERFACE(_interface)                           \
-	downcast<smartmedia_image_device *>(device)->set_image_interface(_interface);
 
 #endif /* __SMARTMEDIA_H__ */

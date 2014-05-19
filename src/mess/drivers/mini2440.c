@@ -209,11 +209,6 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 	// do nothing
 }
 
-static NAND_INTERFACE( mini2440_nand_intf )
-{
-	NAND_CHIP_K9F1G08U0B
-};
-
 static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_CPU_ADD("maincpu", ARM920T, 400000000)
 	MCFG_CPU_PROGRAM_MAP(mini2440_map)
@@ -247,7 +242,8 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_S3C2440_NAND_DATA_R_CB(READ8(mini2440_state, s3c2440_nand_data_r))
 	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(mini2440_state, s3c2440_nand_data_w))
 
-	MCFG_NAND_ADD("nand", mini2440_nand_intf)
+	MCFG_DEVICE_ADD("nand", NAND, 0)
+	MCFG_NAND_TYPE(NAND_CHIP_K9F1G08U0B)
 	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2440", s3c2440_device, frnb_w))
 MACHINE_CONFIG_END
 

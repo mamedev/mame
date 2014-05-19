@@ -1690,7 +1690,6 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
-
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("dac1", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1699,7 +1698,7 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_SMARTMEDIA_ADD("smartmedia")
+	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 
 	MCFG_SOFTWARE_LIST_ADD("memc_list","gp32")
 MACHINE_CONFIG_END

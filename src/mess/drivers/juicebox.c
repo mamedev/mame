@@ -328,8 +328,8 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(juicebox_state, s3c44b0_gpio_port_w))
 	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16(juicebox_state, s3c44b0_i2s_data_w))
 
-	MCFG_SMARTMEDIA_ADD("smartmedia")
-	MCFG_SMARTMEDIA_INTERFACE("smartmedia")
+	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")
 MACHINE_CONFIG_END
