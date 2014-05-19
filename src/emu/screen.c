@@ -453,10 +453,10 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 	// if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
 	// from the visible area, otherwise just used the supplied value
-	if (m_vblank == 0 && !m_oldstyle_vblank_supplied)
-		m_vblank_period = m_scantime * (height - visarea.height());
-	else
+	if (m_oldstyle_vblank_supplied)
 		m_vblank_period = m_vblank;
+	else
+		m_vblank_period = m_scantime * (height - visarea.height());
 
 	// start the VBLANK timer
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
@@ -565,11 +565,25 @@ bool screen_device::update_partial(int scanline)
 		}
 	}
 
+	// skip if we already rendered this line
+	if (scanline == m_last_partial_scan - 1)
+	{
+		LOG_PARTIAL_UPDATES(("skipped because line was already rendered\n"));
+		return false;
+	}
+
+	// skip if outside of visible area
+	if (scanline < visible_area().min_y || scanline > visible_area().max_y)
+	{
+		LOG_PARTIAL_UPDATES(("skipped because outside of visible area\n"));
+		return false;
+	}
+
 	// skip if less than the lowest so far
 	if (scanline < m_last_partial_scan)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because less than previous\n"));
-		return FALSE;
+		return false;
 	}
 
 	// set the start/end scanlines
@@ -802,7 +816,7 @@ void screen_device::vblank_begin()
 	// reset the VBLANK start timer for the next frame
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
 
-	// if no VBLANK period, call the VBLANK end callback immedietely, otherwise reset the timer
+	// if no VBLANK period, call the VBLANK end callback immediately, otherwise reset the timer
 	if (m_vblank_period == 0)
 		vblank_end();
 	else
@@ -829,6 +843,8 @@ void screen_device::vblank_end()
 
 	// increment the frame number counter
 	m_frame_number++;
+
+	reset_partial_updates();
 }
 
 
