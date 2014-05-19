@@ -126,7 +126,7 @@ READ8_MEMBER(msx_slot_panasonic08_device::read)
 
 WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 {
-	if ((offset & 0xc000) == 0x8000)
+	if ((offset & 0xc000) == 0x8000 || (offset & 0xc000) == 0x0000)
 	{
 		UINT8 bank = m_selected_bank[offset >> 13];
 		if (bank >= 0x80 && bank < 0x84)   // Are these banks were sram is present? Mirroring?

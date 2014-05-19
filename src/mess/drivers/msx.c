@@ -47,10 +47,6 @@
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
 ** - expertac: Does not boot
-** - fsa1wx: Firmware not emulated
-** - fsa1wx: Floppy not emulated
-** - fsa1wxa: Firmware not emulated
-** - fsa1wxa: Floppy not emulated
 ** - fsa1gt: Add Turbo-R support
 ** - fsa1st: Add Turbo-R support
 **
