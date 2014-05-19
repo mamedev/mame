@@ -41,7 +41,6 @@
 #include "sound/okim6295.h"
 
 
-
 /***************************************************************************
     Seibu Sound System
 ***************************************************************************/
@@ -79,16 +78,6 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, SEIBU_SOUND, "Seibu Sound System", tag, owner, clock, "seibu_sound", __FILE__),
 		m_main2sub_pending(0),
 		m_sub2main_pending(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void seibu_sound_device::device_config_complete()
 {
 }
 
@@ -502,28 +491,9 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 		m_nibble(0),
 		m_playing(0),
 		//m_allocated(0),
+		m_rom_tag(NULL),
 		m_base(NULL)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void seibu_adpcm_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const seibu_adpcm_interface *intf = reinterpret_cast<const seibu_adpcm_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<seibu_adpcm_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_rom_region = "";
-	}
 }
 
 //-------------------------------------------------
@@ -534,7 +504,7 @@ void seibu_adpcm_device::device_start()
 {
 	m_playing = 0;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
-	m_base = machine().root_device().memregion(m_rom_region)->base();
+	m_base = machine().root_device().memregion(m_rom_tag)->base();
 	m_adpcm.reset();
 }
 
@@ -546,9 +516,8 @@ void seibu_adpcm_device::decrypt(const char *region)
 {
 	UINT8 *ROM = machine().root_device().memregion(region)->base();
 	int len = machine().root_device().memregion(region)->bytes();
-	int i;
 
-	for (i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
 		ROM[i] = BITSWAP8(ROM[i], 7, 5, 3, 1, 6, 4, 2, 0);
 	}
@@ -618,16 +587,3 @@ void seibu_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample
 		samples--;
 	}
 }
-
-//  Handlers for early Seibu/Tad games with dual channel ADPCM
-
-
-const seibu_adpcm_interface seibu_adpcm1_intf =
-{
-	"adpcm1"
-};
-
-const seibu_adpcm_interface seibu_adpcm2_intf =
-{
-	"adpcm2"
-};

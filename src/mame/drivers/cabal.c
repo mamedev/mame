@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -491,11 +491,11 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_CONFIG(seibu_adpcm1_intf)
+	MCFG_SEIBU_ADPCM_ROMREGION("adpcm1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_CONFIG(seibu_adpcm2_intf)
+	MCFG_SEIBU_ADPCM_ROMREGION("adpcm2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_CONFIG_END
 

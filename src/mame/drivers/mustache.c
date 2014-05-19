@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
 
 	/* sound hardware */
-	MCFG_SEIBU_SOUND_ADD("seibu_sound") // for seibu_sound_decrypt on the MAIN cpu (not sound)
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)	// for seibu_sound_decrypt on the MAIN cpu (not sound)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

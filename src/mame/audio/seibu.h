@@ -67,7 +67,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -96,16 +95,16 @@ extern const device_type SEIBU_SOUND;
 
 struct seibu_adpcm_interface
 {
-	const char *m_rom_region;
 };
 
 class seibu_adpcm_device : public device_t,
-									public device_sound_interface,
-									public seibu_adpcm_interface
+									public device_sound_interface
 {
 public:
 	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~seibu_adpcm_device() {}
+
+	static void set_adpcm_rom_tag(device_t &device, const char *tag) { downcast<seibu_adpcm_device &>(device).m_rom_tag = tag; }
 
 	void decrypt(const char *region);
 	DECLARE_WRITE8_MEMBER( adr_w );
@@ -113,7 +112,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
@@ -128,19 +126,16 @@ protected:
 	UINT8 m_nibble;
 	UINT8 m_playing;
 	//UINT8 m_allocated;
+	const char *m_rom_tag;
 	UINT8 *m_base;
 };
 
 extern const device_type SEIBU_ADPCM;
 
-extern const seibu_adpcm_interface seibu_adpcm1_intf;
-extern const seibu_adpcm_interface seibu_adpcm2_intf;
-
-
 /**************************************************************************/
 
-#define MCFG_SEIBU_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEIBU_SOUND, 0)
+#define MCFG_SEIBU_ADPCM_ROMREGION(_tag) \
+	seibu_adpcm_device::set_adpcm_rom_tag(*device, _tag);
 
 #define SEIBU_COIN_INPUTS                                           \
 	PORT_START("COIN")                                              \
@@ -158,37 +153,37 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 #define SEIBU_SOUND_SYSTEM_CPU(freq)                                \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)                           \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU2_SOUND_SYSTEM_CPU(freq)                               \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu2_sound_map)                          \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(freq)                       \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu2_airraid_sound_map)                  \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(freq)                       \
 	MCFG_CPU_ADD("audiocpu",  Z80, freq)                            \
 	MCFG_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map)                  \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(freq)                    \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu_newzeroteam_sound_map)               \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU3_SOUND_SYSTEM_CPU(freq)                               \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu3_sound_map)                          \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU3A_SOUND_SYSTEM_CPU(freq)                              \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map)                    \
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2)            \
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
@@ -199,6 +194,7 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 																	\
 	MCFG_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_LOW)              \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
 #define SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(freq1,freq2)     \
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
 																	\
@@ -208,6 +204,7 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 																	\
 	MCFG_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_HIGH)             \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 #define SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(freq1,freq2)            \
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
 																	\
@@ -218,6 +215,7 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 																	\
 	MCFG_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_LOW)              \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
 #define SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(freq1)          \
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
 																	\
@@ -249,13 +247,14 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 																	\
 	MCFG_SOUND_ADD("ym2", YM2203, freq)                             \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
 #define SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE                          \
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)                     \
-	MCFG_SOUND_CONFIG(seibu_adpcm1_intf)                                  \
+	MCFG_SEIBU_ADPCM_ROMREGION("adpcm1")                      \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)                     \
 																	\
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)                     \
-	MCFG_SOUND_CONFIG(seibu_adpcm2_intf)                                  \
+	MCFG_SEIBU_ADPCM_ROMREGION("adpcm2")                      \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 /**************************************************************************/
