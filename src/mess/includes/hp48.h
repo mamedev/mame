@@ -163,29 +163,30 @@ public:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/***************************** serial ********************************/
-
-extern void hp48_rs232_start_recv_byte( running_machine &machine, UINT8 data );
-
+/* list of memory modules from highest to lowest priority */
+#define HP48_HDW  0
+#define HP48_NCE2 1
+#define HP48_CE1  2
+#define HP48_CE2  3
+#define HP48_NCE3 4
+#define HP48_NCE1 5
 
 /****************************** cards ********************************/
 
-/* port specification */
-struct hp48_port_interface
-{
-	int port;                 /* port index: 0 or 1 (for port 1 and 2) */
-	int module;               /* memory module where the port is visible */
-	int max_size;             /* maximum size, in bytes 128 KB or 4 GB */
-};
-
 class hp48_port_image_device :  public device_t,
-								public device_image_interface,
-								public hp48_port_interface
+								public device_image_interface
 {
 public:
 	// construction/destruction
 	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void set_port_config(device_t &device, int port, int module, int max_size)
+	{
+		downcast<hp48_port_image_device &>(device).m_port = port; 
+		downcast<hp48_port_image_device &>(device).m_module = module;
+		downcast<hp48_port_image_device &>(device).m_max_size = max_size;
+	}
+	
 	// image-level overrides
 	virtual iodevice_t image_type() const { return IO_MEMCARD; }
 
@@ -208,16 +209,15 @@ protected:
 private:
 	void hp48_fill_port();
 	void hp48_unfill_port();
-};
 
-extern const struct hp48_port_interface hp48sx_port1_config;
-extern const struct hp48_port_interface hp48sx_port2_config;
-extern const struct hp48_port_interface hp48gx_port1_config;
-extern const struct hp48_port_interface hp48gx_port2_config;
+	int m_port;                 /* port index: 0 or 1 (for port 1 and 2) */
+	int m_module;               /* memory module where the port is visible */
+	int m_max_size;             /* maximum size, in bytes 128 KB or 4 GB */
+};
 
 // device type definition
 extern const device_type HP48_PORT;
 
-#define MCFG_HP48_PORT_ADD(_tag, _intrf) \
+#define MCFG_HP48_PORT_ADD(_tag, _port, _module, _max_size) \
 	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	hp48_port_image_device::set_port_config(*device, _port, _module, _max_size);

@@ -32,15 +32,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* list of memory modules from highest to lowest priority */
-#define HP48_HDW  0
-#define HP48_NCE2 1
-#define HP48_CE1  2
-#define HP48_CE2  3
-#define HP48_NCE3 4
-#define HP48_NCE1 5
-
-
 /* state field in hp48_module */
 #define HP48_MODULE_UNCONFIGURED 0
 #define HP48_MODULE_MASK_KNOWN   1
@@ -982,29 +973,21 @@ void hp48_state::hp48_encode_nibble( UINT8* dst, UINT8* src, int size )
 
 
 /* ----- card images ------ */
-
-/* port information configurations */
-const struct hp48_port_interface hp48sx_port1_config = { 0, HP48_CE1,     128*1024 };
-const struct hp48_port_interface hp48sx_port2_config = { 1, HP48_CE2,     128*1024 };
-const struct hp48_port_interface hp48gx_port1_config = { 0, HP48_CE2,     128*1024 };
-const struct hp48_port_interface hp48gx_port2_config = { 1, HP48_NCE3, 4*1024*1024 };
-
 const device_type HP48_PORT = &device_creator<hp48_port_image_device>;
 
 /* helper for load and create */
 void hp48_port_image_device::hp48_fill_port()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
-	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
-	int size = state->m_port_size[conf->port];
-	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), conf->module, size, state->m_port_write[conf->port] ));
-	state->m_port_data[conf->port] = global_alloc_array(UINT8, 2 * size);
-	memset( state->m_port_data[conf->port], 0, 2 * size );
-	state->m_modules[conf->module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
-	state->m_modules[conf->module].read     = read8_delegate();
-	state->m_modules[conf->module].write    = write8_delegate();
-	state->m_modules[conf->module].isnop    = state->m_port_write[conf->port] ? 0 : 1;
-	state->m_modules[conf->module].data     = state->m_port_data[conf->port];
+	int size = state->m_port_size[m_port];
+	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), m_module, size, state->m_port_write[m_port] ));
+	state->m_port_data[m_port] = global_alloc_array(UINT8, 2 * size);
+	memset( state->m_port_data[m_port], 0, 2 * size );
+	state->m_modules[m_module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
+	state->m_modules[m_module].read     = read8_delegate();
+	state->m_modules[m_module].write    = write8_delegate();
+	state->m_modules[m_module].isnop    = state->m_port_write[m_port] ? 0 : 1;
+	state->m_modules[m_module].data     = state->m_port_data[m_port];
 	state->hp48_apply_modules();
 }
 
@@ -1012,58 +995,55 @@ void hp48_port_image_device::hp48_fill_port()
 void hp48_port_image_device::hp48_unfill_port()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
-	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	LOG(( "hp48_unfill_port\n" ));
-	state->m_modules[conf->module].off_mask = 0x00fff;  /* 2 KB */
-	state->m_modules[conf->module].read     = read8_delegate();
-	state->m_modules[conf->module].write    = write8_delegate();
-	state->m_modules[conf->module].data     = NULL;
-	state->m_modules[conf->module].isnop    = 1;
-	state->m_port_size[conf->port]          = 0;
+	state->m_modules[m_module].off_mask = 0x00fff;  /* 2 KB */
+	state->m_modules[m_module].read     = read8_delegate();
+	state->m_modules[m_module].write    = write8_delegate();
+	state->m_modules[m_module].data     = NULL;
+	state->m_modules[m_module].isnop    = 1;
+	state->m_port_size[m_port]          = 0;
 }
 
 
 bool hp48_port_image_device::call_load()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
-	struct hp48_port_interface* conf = (struct hp48_port_interface*)static_config();
 	int size = length();
-	if ( size == 0 ) size = conf->max_size; /* default size */
+	if ( size == 0 ) size = m_max_size; /* default size */
 	LOG(( "hp48_port_image load: size=%i\n", size ));
 
 	/* check size */
-	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
+	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, conf->max_size );
+		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->m_port_size[conf->port] = size;
-	state->m_port_write[conf->port] = !is_readonly();
+	state->m_port_size[m_port] = size;
+	state->m_port_write[m_port] = !is_readonly();
 	hp48_fill_port( );
-	fread(state->m_port_data[conf->port], state->m_port_size[conf->port] );
-	state->hp48_decode_nibble( state->m_port_data[conf->port], state->m_port_data[conf->port], state->m_port_size[conf->port] );
+	fread(state->m_port_data[m_port], state->m_port_size[m_port] );
+	state->hp48_decode_nibble( state->m_port_data[m_port], state->m_port_data[m_port], state->m_port_size[m_port] );
 	return IMAGE_INIT_PASS;
 }
 
 bool hp48_port_image_device::call_create(int format_type, option_resolution *format_options)
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
-	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
-	int size = conf->max_size;
+	int size = m_max_size;
 	LOG(( "hp48_port_image create: size=%i\n", size ));
 	/* XXX defaults to max_size; get user-specified size instead */
 
 	/* check size */
 	/* size must be a power of 2 between 32K and max_size */
-	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
+	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, conf->max_size );
+		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->m_port_size[conf->port] = size;
-	state->m_port_write[conf->port] = 1;
+	state->m_port_size[m_port] = size;
+	state->m_port_write[m_port] = 1;
 	hp48_fill_port();
 	return IMAGE_INIT_PASS;
 }
@@ -1071,16 +1051,15 @@ bool hp48_port_image_device::call_create(int format_type, option_resolution *for
 void hp48_port_image_device::call_unload()
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
-	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	LOG(( "hp48_port image unload: %s size=%i rw=%i\n",
-			tag(), state->m_port_size[conf->port], state->m_port_write[conf->port] ));
-	if ( state->m_port_write[conf->port] )
+			tag(), state->m_port_size[m_port], state->m_port_write[m_port] ));
+	if ( state->m_port_write[m_port] )
 	{
-		state->hp48_encode_nibble( state->m_port_data[conf->port], state->m_port_data[conf->port], state->m_port_size[conf->port] );
+		state->hp48_encode_nibble( state->m_port_data[m_port], state->m_port_data[m_port], state->m_port_size[m_port] );
 		fseek( 0, SEEK_SET );
-		fwrite( state->m_port_data[conf->port], state->m_port_size[conf->port] );
+		fwrite( state->m_port_data[m_port], state->m_port_size[m_port] );
 	}
-	global_free_array( state->m_port_data[conf->port] );
+	global_free_array( state->m_port_data[m_port] );
 	hp48_unfill_port();
 	state->hp48_apply_modules();
 }

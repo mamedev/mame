@@ -1298,8 +1298,8 @@ static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48gx )
 
 	/* expansion ports */
-	MCFG_HP48_PORT_ADD ( "port1", hp48gx_port1_config )
-	MCFG_HP48_PORT_ADD ( "port2", hp48gx_port2_config )
+	MCFG_HP48_PORT_ADD ( "port1", 0, HP48_CE2,     128*1024 )
+	MCFG_HP48_PORT_ADD ( "port2", 1, HP48_NCE3, 4*1024*1024 )
 
 	/* serial I/O */
 	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1333,8 +1333,8 @@ static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48sx )
 
 	/* expansion ports */
-	MCFG_HP48_PORT_ADD  ( "port1", hp48sx_port1_config )
-	MCFG_HP48_PORT_ADD  ( "port2", hp48sx_port2_config )
+	MCFG_HP48_PORT_ADD  ( "port1", 0, HP48_CE1, 128*1024)
+	MCFG_HP48_PORT_ADD  ( "port2", 1, HP48_CE2, 128*1024)
 
 	/* serial I/O */
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
