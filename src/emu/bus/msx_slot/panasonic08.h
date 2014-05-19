@@ -2,6 +2,7 @@
 #define __MSX_SLOT_PANASONIC08_H
 
 #include "slot.h"
+#include "machine/nvram.h"
 
 
 extern const device_type MSX_SLOT_PANASONIC08;
@@ -29,13 +30,14 @@ public:
 	void restore_banks();
 
 private:
+	required_device<nvram_device> m_nvram;
 	const char *m_region;
 	UINT32 m_region_offset;
 	const UINT8 *m_rom;
 	UINT8 m_selected_bank[8];
 	const UINT8 *m_bank_base[8];
 	UINT8 m_control;
-	UINT8 m_sram[0x2000];
+	dynamic_buffer m_sram;
 
 	void map_bank(int bank);
 };

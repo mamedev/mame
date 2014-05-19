@@ -47,7 +47,6 @@
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
 ** - expertac: Does not boot
-** - fsa1wsx: Firmware not emulated
 ** - fsa1wx: Firmware not emulated
 ** - fsa1wx: Floppy not emulated
 ** - fsa1wxa: Firmware not emulated

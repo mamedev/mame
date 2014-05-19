@@ -17,6 +17,7 @@ const device_type MSX_SLOT_PANASONIC08 = &device_creator<msx_slot_panasonic08_de
 msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_SLOT_PANASONIC08, "MSX Internal Panasonic08", tag, owner, clock, "msx_slot_panasonic08", __FILE__)
 	, msx_internal_slot_interface()
+	, m_nvram(*this, "nvram")
 	, m_region(NULL)
 	, m_region_offset(0)
 	, m_rom(NULL)
@@ -27,11 +28,11 @@ msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &m
 		m_selected_bank[i] = 0;
 		m_bank_base[i] = 0;
 	}
-	memset(m_sram, 0, sizeof(m_sram));
 }
 
 
 static MACHINE_CONFIG_FRAGMENT( panasonic08 )
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -66,11 +67,14 @@ void msx_slot_panasonic08_device::device_start()
 		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_region);
 	}
 
+	m_sram.resize(0x4000);
+
+	m_nvram->set_base((UINT8*)m_sram, 0x4000);
+
 	m_rom = m_rom_region->base() + m_region_offset;
 
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_control));
-	save_item(NAME(m_sram));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_panasonic08_device::restore_banks), this));
 
@@ -83,7 +87,7 @@ void msx_slot_panasonic08_device::map_bank(int bank)
 	if (m_selected_bank[bank] >= 0x80 && m_selected_bank[bank] < 0x84)   // Are these banks were sram is present? Mirroring?
 	{
 		logerror("panasonic08: mapping bank %d to sram\n", bank);
-		m_bank_base[bank] = m_sram;
+		m_bank_base[bank] = m_sram + (((m_selected_bank[bank] & 0x7f) * 0x2000) & 0x3fff);
 	}
 	else
 	{
@@ -127,9 +131,10 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 		UINT8 bank = m_selected_bank[offset >> 13];
 		if (bank >= 0x80 && bank < 0x84)   // Are these banks were sram is present? Mirroring?
 		{
-			logerror("panasonic08: writing %02x to sram %04x\n", data, offset & 0x1fff);
-			m_sram[offset & 0x1fff] = data;
+			logerror("msx_slot_panasonic08: writing %02x to sram %04x, bank = %02x\n", data, offset & 0x1fff, bank);
+			m_sram[((bank & 0x01) * 0x2000) + (offset & 0x1fff)] = data;
 		}
+		return;
 	}
 
 	switch (offset)
@@ -149,7 +154,7 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 			map_bank(2);
 			break;
 
-		case 0x6c00:
+		case 0x6c00:    /* Switches 0x6000-0x7FFF */
 			m_selected_bank[3] = data;
 			map_bank(3);
 			break;
@@ -159,7 +164,7 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 			map_bank(4);
 			break;
 
-		case 0x7800:
+		case 0x7800:    /* Switches 0xA000-0xBFFF */
 			m_selected_bank[5] = data;
 			map_bank(5);
 			break;
@@ -169,7 +174,7 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 			break;
 
 		default:
-			logerror("Unhandled write %02x to %04x\n", data, offset);
+			logerror("msx_slot_panasonic08: Unhandled write %02x to %04x\n", data, offset);
 			break;
 	}
 }
