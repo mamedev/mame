@@ -70,7 +70,7 @@ Notes:
 
 void vixen_state::update_interrupt()
 {
-	int state = (m_cmd_d1 && m_fdint) || m_vsync || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
+	int state = (m_cmd_d1 && m_fdint) || m_vsync;// || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -666,7 +666,7 @@ static SLOT_INTERFACE_START( vixen_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void vixen_state::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
 {
 	m_fdint = state;
 	update_interrupt();
@@ -797,6 +797,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
 	MCFG_FD1797x_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(vixen_state, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()

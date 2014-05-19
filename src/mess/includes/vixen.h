@@ -49,6 +49,7 @@ public:
 			m_y5(*this, "Y5"),
 			m_y6(*this, "Y6"),
 			m_y7(*this, "Y7"),
+			m_cmd_d1(0),
 			m_fdint(0),
 			m_vsync(0),
 			m_srq(1),
@@ -104,7 +105,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
-	void fdc_intrq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DIRECT_UPDATE_MEMBER(vixen_direct_update_handler);
 
 	// memory state
