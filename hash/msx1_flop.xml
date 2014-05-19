@@ -58,5 +58,42 @@
 	</part>
 	</software>
 
+<!--
+System software
+
+The following floppies came with the machines.
+-->
+
+	<software name="cf3300">
+		<description>National CF-3300</description>
+		<year>1985</year>
+		<publisher>National</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="3300dsk.dsk" size="368640" crc="7aee6273" sha1="f41a08339ba6d0788309aaf7c1d6f978f0f18665" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svi738" supported="partial">
+		<description>Spectravideo SVI-738</description>
+		<year>1985</year>
+		<publisher>Spectravideo</publisher>
+		<part name="cpm1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="738cpm1.dsk" size="368640" crc="02b05c62" sha1="6c14dae92677e5a3693ba51472cb6373f265774a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cpm2" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="738cpm2.dsk" size="368640" crc="46f95d1b" sha1="de98bcc4e84293d2f3139741ae995a1413f9e11d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="msxdos" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="738msxdos.dsk" size="368640" crc="0430d57f" sha1="221faaf9fcbed0ecf82cb0f6b1965a384f952c8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

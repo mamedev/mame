@@ -37,8 +37,8 @@
 ** - vg8230j: Floppy support broken?
 ** - hotbit20: Does not boot
 ** - hbf1: Does not boot. This seems to be caused by a raise condition between setting the VBlank bit in the
-           VDP status register and the z80 taking the interrupt. Currently the interrupt gets taken before the
-           bit can be read, so the code goes into an infinite loop.
+**         VDP status register and the z80 taking the interrupt. Currently the interrupt gets taken before the
+**         bit can be read, so the code goes into an infinite loop.
 ** - hbf12: Does not boot; see hbf1.
 ** - tpc310: Floppy support broken
 **           7fbb <- c7  => seek 199???
