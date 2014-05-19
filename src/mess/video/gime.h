@@ -34,15 +34,14 @@
 #define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
 	devcb = &gime_base_device::set_floating_bus_rd_callback(*device, DEVCB_##_read);
 
-/* interface */
-struct gime_interface
-{
-	const char *m_screen_tag;   /* screen we are acting on */
-	const char *m_maincpu_tag;  /* tag of main CPU */
-	const char *m_ram_tag;      /* tag of RAM device */
-	const char *m_ext_tag;      /* tag of expansion device */
-};
+#define MCFG_GIME_MAINCPU(_tag) \
+	gime_base_device::set_maincpu_tag(*device, _tag);
 
+#define MCFG_GIME_RAM(_tag) \
+	gime_base_device::set_ram_tag(*device, _tag);
+
+#define MCFG_GIME_EXT(_tag) \
+	gime_base_device::set_ext_tag(*device, _tag);
 
 
 //**************************************************************************
@@ -57,6 +56,9 @@ public:
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
 	template<class _Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
+	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
+	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
+	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
@@ -198,6 +200,10 @@ private:
 	pixel_t                     m_rgb_palette[64];
 	UINT8                       m_dummy_bank[0x2000];
 
+	const char *m_maincpu_tag;  /* tag of main CPU */
+	const char *m_ram_tag;      /* tag of RAM device */
+	const char *m_ext_tag;      /* tag of expansion device */
+	
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
 	static const device_timer_id TIMER_HSYNC_OFF = 1;

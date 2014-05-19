@@ -110,7 +110,10 @@ gime_base_device::gime_base_device(const machine_config &mconfig, device_type ty
 	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
 		m_write_irq(*this),
 		m_write_firq(*this),
-		m_read_floating_bus(*this)
+		m_read_floating_bus(*this),
+		m_maincpu_tag(NULL),
+		m_ram_tag(NULL),
+		m_ext_tag(NULL)
 {
 }
 
@@ -122,22 +125,18 @@ gime_base_device::gime_base_device(const machine_config &mconfig, device_type ty
 
 void gime_base_device::device_start(void)
 {
-	// get the config
-	const gime_interface *config = (const gime_interface *) static_config();
-	assert(config);
-
 	// find the RAM device - make sure that it is started
-	m_ram = machine().device<ram_device>(config->m_ram_tag);
+	m_ram = machine().device<ram_device>(m_ram_tag);
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
 	// find the CART device - make sure that it is started
-	m_cart_device = machine().device<cococart_slot_device>(config->m_ext_tag);
+	m_cart_device = machine().device<cococart_slot_device>(m_ext_tag);
 	if (!m_cart_device->started())
 		throw device_missing_dependencies();
 
 	// find the CPU device - make sure that it is started
-	m_cpu = machine().device<cpu_device>(config->m_maincpu_tag);
+	m_cpu = machine().device<cpu_device>(m_maincpu_tag);
 	if (!m_cpu->started())
 		throw device_missing_dependencies();
 
@@ -170,7 +169,7 @@ void gime_base_device::device_start(void)
 	m_read_floating_bus.resolve_safe(0);
 
 	// set up ROM/RAM pointers
-	m_rom = machine().root_device().memregion(config->m_maincpu_tag)->base();
+	m_rom = machine().root_device().memregion(m_maincpu_tag)->base();
 	m_cart_rom = m_cart_device->get_cart_base();
 
 	// populate palettes
