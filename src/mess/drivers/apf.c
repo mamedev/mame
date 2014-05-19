@@ -532,7 +532,7 @@ DEVICE_IMAGE_LOAD_MEMBER( apf_state, apf_cart )
 }
 
 static SLOT_INTERFACE_START( apf_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
 
 #if 0
@@ -613,8 +613,8 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	
 	MCFG_FD1771x_ADD("fdc", 1000000) // guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525sd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 

@@ -2,12 +2,14 @@
 
         Sanyo MBC-200
 
-        Machine MBC-1200 is identicaly but sold outside of Japan
+        Machine MBC-1200 is identical but sold outside of Japan
 
         16 x HM6116P-3 2K x 8 SRAM soldered onboard (so 32k ram)
         4 x HM6116P-3 2K x 8 SRAM socketed (so 8k ram)
         4 x MB83256 32K x 8 socketed (128k ram)
-        Dual 5.25" floppies.
+        Floppy = 5.25"
+        MBC1200 has one floppy while MBC1250 has 2. The systems
+        are otherwise identical.
 
         On back side:
             - keyboard DIN connector
@@ -16,10 +18,16 @@
 
         TODO:
         - Master-Slave hand-shaking thru PPI8255 doesn't work properly
-          (checks if bit 7 is high on master side, you appaently can't do
+          (checks if bit 7 is high on master side, you apparently can't do
            that with current core(s)), kludged to work for now.
 
-        31/10/2011 Skeleton driver.
+        2011-10-31 Skeleton driver.
+        2014-05-18 Made rom get copied into ram, boot code from disk
+                   requires that ram is there otherwise you get
+                   a MEMORY ERROR. Now, CP/M loads and is executed, but
+                   nothing shows on the screen.
+                   Tried new wdc code, but the disk couldn't be read at all.
+
 
 ****************************************************************************/
 
@@ -28,7 +36,9 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/mc6845.h"
-#include "machine/wd_fdc.h"
+//#include "machine/wd_fdc.h"
+#include "machine/wd17xx.h"
+
 
 class mbc200_state : public driver_device
 {
@@ -41,8 +51,10 @@ public:
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		//, m_floppy0(*this, "fdc:0")
+		//, m_floppy1(*this, "fdc:1")
+		, m_floppy0(*this, FLOPPY_0)
+		, m_floppy1(*this, FLOPPY_1)
 	{ }
 
 	DECLARE_READ8_MEMBER(from_master_r);
@@ -53,22 +65,25 @@ public:
 
 private:
 	virtual void machine_start();
+	virtual void machine_reset();
 	UINT8 m_hs_bit;
 	UINT8 m_comm_latch;
-	virtual void video_start();
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
 	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
-	required_device<mb8876_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	//required_device<mb8876_t> m_fdc;
+	//required_device<floppy_connector> m_floppy0;
+	//required_device<floppy_connector> m_floppy1;
+	required_device<mb8876_device> m_fdc;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 };
 
 
 static ADDRESS_MAP_START(mbc200_mem, AS_PROGRAM, 8, mbc200_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
+	AM_RANGE( 0x0000, 0x0fff ) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -82,7 +97,8 @@ static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
+	//AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
 	AM_RANGE(0xea, 0xea) AM_READ(ppi_hs_r)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
@@ -119,24 +135,23 @@ static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( mbc200 )
+static INPUT_PORTS_START( mbc200 )
 INPUT_PORTS_END
 
 void mbc200_state::machine_start()
 {
-	floppy_image_device *floppy = NULL;
-	floppy = m_floppy0->get_device();
+//	floppy_image_device *floppy = NULL;
+//	floppy = m_floppy0->get_device();
 // floppy1 not supported currently
-	m_fdc->set_floppy(floppy);
+//	m_fdc->set_floppy(floppy);
 
-	if (floppy)
-	{
-		floppy->mon_w(0);
-	}
-}
+//	if (floppy)
+//		floppy->mon_w(0);
 
-void mbc200_state::video_start()
-{
+	m_floppy0->floppy_mon_w(0);
+	m_floppy1->floppy_mon_w(0);
+	m_floppy0->floppy_drive_set_ready_state(1, 1);
+	m_floppy1->floppy_drive_set_ready_state(1, 1);
 }
 
 UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -177,24 +192,29 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 	m_hs_bit &= ~0x80;
 }
 
-#if 0
+void mbc200_state::machine_reset()
+{
+	UINT8* roms = memregion("roms")->base();
+	UINT8* main = memregion("maincpu")->base();
+	memcpy(main, roms, 0x1000);
+}
+
 static const floppy_interface mbc200_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	"floppy_5_25"
 };
-#endif
 
-static SLOT_INTERFACE_START( mbc200_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+//static SLOT_INTERFACE_START( mbc200_floppies )
+//	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
+//SLOT_INTERFACE_END
 
 
 static const gfx_layout mbc200_chars_8x8 =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	256,
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -203,7 +223,7 @@ static const gfx_layout mbc200_chars_8x8 =
 };
 
 static GFXDECODE_START( mbc200 )
-	GFXDECODE_ENTRY( "subcpu", 0x0000, mbc200_chars_8x8, 0, 4 )
+	GFXDECODE_ENTRY( "subcpu", 0x1800, mbc200_chars_8x8, 0, 1 )
 GFXDECODE_END
 
 
@@ -241,9 +261,12 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
 
-	MCFG_MB8876x_ADD("fdc", 1000000) // guess
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "525sd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	//MCFG_MB8876x_ADD("fdc", 1000000) // guess
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_DEVICE_ADD("fdc", MB8876, 0) // MB8876A
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbc200_floppy_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
@@ -252,6 +275,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( mbc200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "roms", 0 )
 	ROM_LOAD( "d2732a.bin",  0x0000, 0x1000, CRC(bf364ce8) SHA1(baa3a20a5b01745a390ef16628dc18f8d682d63b))
 	ROM_REGION( 0x10000, "subcpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5l2764.bin", 0x0000, 0x2000, CRC(377300a2) SHA1(8563172f9e7f84330378a8d179f4138be5fda099))
@@ -259,5 +283,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, mbc200,  0,       0,    mbc200,     mbc200, driver_device,   0,  "Sanyo",   "MBC-200",      GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT   COMPANY   FULLNAME       FLAGS */
+COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, driver_device,   0,  "Sanyo",   "MBC-200", GAME_NOT_WORKING | GAME_NO_SOUND)
