@@ -244,6 +244,7 @@ public:
 	DECLARE_DRIVER_INIT(frogger);
 	DECLARE_DRIVER_INIT(froggrmc);
 	DECLARE_DRIVER_INIT(froggers);
+	DECLARE_DRIVER_INIT(quaak);
 	DECLARE_DRIVER_INIT(turtles);
 	DECLARE_DRIVER_INIT(scorpion);
 	DECLARE_DRIVER_INIT(anteater);
@@ -278,6 +279,7 @@ public:
 	void jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void quaak_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int flip_and_clip(rectangle &draw, int xstart, int xend, const rectangle &cliprect);
 	void amidar_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
