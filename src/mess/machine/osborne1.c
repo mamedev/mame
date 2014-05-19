@@ -261,7 +261,6 @@ WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
 WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 {
 	m_fdc->dden_w(BIT(data, 0));
-	logerror("dden %u\n",BIT(data, 0));
 
 	data -= 0xea; // remove bias
 
