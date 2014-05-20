@@ -330,6 +330,7 @@ public:
 	zorro2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	zorro2_device(const machine_config &mconfig, device_type type, const char *name,
 		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	~zorro2_device();
 
 	template<class _Object> static devcb_base &set_eint1_handler(device_t &device, _Object object)
 		{ return downcast<zorro2_device &>(device).m_eint1_handler.set_callback(object); }

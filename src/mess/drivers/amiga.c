@@ -218,7 +218,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd0;
 
 protected:
-	virtual void update_irq2();
+	virtual void update_int2();
 
 private:
 	int m_gayle_int2;
@@ -240,7 +240,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd1;
 
 protected:
-	virtual void update_irq2();
+	virtual void update_int2();
 
 private:
 	int m_gayle_int2;
@@ -560,13 +560,13 @@ WRITE16_MEMBER( a1000_state::write_protect_w )
 WRITE_LINE_MEMBER( a2000_state::zorro2_int2_w )
 {
 	m_zorro2_int2 = state;
-	update_irq2();
+	update_int2();
 }
 
 WRITE_LINE_MEMBER( a2000_state::zorro2_int6_w )
 {
 	m_zorro2_int6 = state;
-	update_irq6();
+	update_int6();
 }
 
 void a2000_state::update_int2()
@@ -627,7 +627,7 @@ WRITE32_MEMBER( a3000_state::motherboard_w )
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-void a600_state::update_irq2()
+void a600_state::update_int2()
 {
 	int state = (m_cia_0_irq || m_gayle_int2);
 	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
@@ -636,10 +636,10 @@ void a600_state::update_irq2()
 WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
 {
 	m_gayle_int2 = state;
-	update_irq2();
+	update_int2();
 }
 
-void a1200_state::update_irq2()
+void a1200_state::update_int2()
 {
 	int state = (m_cia_0_irq || m_gayle_int2);
 	set_interrupt((state ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
@@ -648,7 +648,7 @@ void a1200_state::update_irq2()
 WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
 {
 	m_gayle_int2 = state;
-	update_irq2();
+	update_int2();
 }
 
 READ32_MEMBER( a4000_state::scsi_r )

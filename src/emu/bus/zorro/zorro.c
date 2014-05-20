@@ -197,6 +197,15 @@ zorro2_device::zorro2_device(const machine_config &mconfig, device_type type, co
 }
 
 //-------------------------------------------------
+//  zorro2_device - destructor
+//-------------------------------------------------
+
+zorro2_device::~zorro2_device()
+{
+	m_dev.detach_all();
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

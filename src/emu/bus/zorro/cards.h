@@ -25,8 +25,11 @@
 #define __CARDS_H__
 
 #include "emu.h"
+
+#include "a2052.h"
 #include "a590.h"
 #include "action_replay.h"
+#include "buddha.h"
 
 SLOT_INTERFACE_EXTERN( a1000_expansion_cards );
 SLOT_INTERFACE_EXTERN( a500_expansion_cards );

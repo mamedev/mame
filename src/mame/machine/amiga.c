@@ -363,6 +363,16 @@ void amiga_state::set_interrupt(int interrupt)
 	custom_chip_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, interrupt, 0xffff);
 }
 
+void amiga_state::update_int2()
+{
+	set_interrupt((m_cia_0_irq ? INTENA_SETCLR : 0x0000) | INTENA_PORTS);
+}
+
+void amiga_state::update_int6()
+{
+	set_interrupt((m_cia_1_irq ? INTENA_SETCLR : 0x0000) | INTENA_EXTER);
+}
+
 void amiga_state::update_irqs()
 {
 	amiga_state *state = this;
@@ -1113,7 +1123,7 @@ WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
 		logerror("%s: cia_0_irq: %d\n", machine().describe_context(), state);
 
 	m_cia_0_irq = state;
-	update_irq2();
+	update_int2();
 }
 
 READ8_MEMBER( amiga_state::cia_1_port_a_read )
@@ -1136,7 +1146,7 @@ WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
 		logerror("%s: cia_1_irq: %d\n", machine().describe_context(), state);
 
 	m_cia_1_irq = state;
-	update_irq6();
+	update_int6();
 }
 
 

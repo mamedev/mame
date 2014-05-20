@@ -513,16 +513,8 @@ protected:
 
 	// interrupts
 	void set_interrupt(int interrupt);
-
-	virtual void update_irq2()
-	{
-		set_interrupt((m_cia_0_irq ? 0x8000 : 0x0000) | INTENA_PORTS);
-	}
-
-	virtual void update_irq6()
-	{
-		set_interrupt((m_cia_1_irq ? 0x8000 : 0x0000) | INTENA_EXTER);
-	}
+	virtual void update_int2();
+	virtual void update_int6();
 
 	virtual void vblank();
 
