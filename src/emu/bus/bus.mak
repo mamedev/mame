@@ -414,6 +414,7 @@ BUSOBJS += $(BUSOBJ)/msx_cart/fmpac.o
 BUSOBJS += $(BUSOBJ)/msx_cart/konami.o
 BUSOBJS += $(BUSOBJ)/msx_cart/korean.o
 BUSOBJS += $(BUSOBJ)/msx_cart/majutsushi.o
+BUSOBJS += $(BUSOBJ)/msx_cart/msx_audio.o
 BUSOBJS += $(BUSOBJ)/msx_cart/msxdos2.o
 BUSOBJS += $(BUSOBJ)/msx_cart/nomapper.o
 BUSOBJS += $(BUSOBJ)/msx_cart/rtype.o

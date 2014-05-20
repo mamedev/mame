@@ -7,6 +7,7 @@
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
+#include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
 #include "rtype.h"
@@ -35,6 +36,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("korean_126in1", MSX_CART_KOREAN_126IN1)
 	SLOT_INTERFACE_INTERNAL("sound_snatcher", MSX_CART_SOUND_SNATCHER)
 	SLOT_INTERFACE_INTERNAL("sound_sdsnatch", MSX_CART_SOUND_SDSNATCHER)
+	SLOT_INTERFACE_INTERNAL("msx_audio", MSX_CART_MSX_AUDIO)
 SLOT_INTERFACE_END
 
 

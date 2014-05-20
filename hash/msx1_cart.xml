@@ -17025,6 +17025,18 @@ kept for now until finding out what those bytes affect...
 	<!-- SORT -->
 
 
+	<software name="nms1205">
+		<description>Philips NMS-1205 Music Module</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msx_audio" />
+			<dataarea name="rom" size="32768">
+				<rom name="nms1205.bin" size="32768" crc="5ecaeef0" sha1="c7463e1fd0433c5d41b70670d6c10fd781b66426" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 
 </softwarelist>
