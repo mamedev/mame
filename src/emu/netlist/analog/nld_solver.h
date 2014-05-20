@@ -56,24 +56,19 @@ public:
 
 	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
 
+    ATTR_HOT void update_forced();
+
 	/* netdevice functions */
 	ATTR_HOT  virtual void update();
     ATTR_COLD virtual void start();
     ATTR_COLD virtual void reset();
 
 	netlist_solver_parameters_t m_params;
-    netlist_ttl_output_t m_Q_sync;
 
 protected:
 
-    netlist_ttl_input_t m_fb_sync;
-
     netlist_analog_net_t::list_t m_nets;
-	dev_list_t m_dynamic;
-	netlist_list_t<netlist_analog_output_t *> m_inps;
 
-	dev_list_t m_steps;
-	netlist_time m_last_step;
 
 	NETLIB_NAME(solver) *m_owner;
 
@@ -81,6 +76,15 @@ protected:
     ATTR_HOT virtual int vsolve_non_dynamic() = 0;
 
 private:
+
+    netlist_time m_last_step;
+    dev_list_t m_steps;
+    dev_list_t m_dynamic;
+    netlist_list_t<netlist_analog_output_t *> m_inps;
+
+    netlist_ttl_input_t m_fb_sync;
+    netlist_ttl_output_t m_Q_sync;
+
     ATTR_HOT void step(const netlist_time delta);
 
     /* bring the whole system to the current time
@@ -99,7 +103,11 @@ class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
 
-	netlist_matrix_solver_direct_t() : netlist_matrix_solver_t() {}
+	netlist_matrix_solver_direct_t()
+    : netlist_matrix_solver_t()
+    , m_term_num(0)
+    , m_rail_start(0)
+    {}
 
 	virtual ~netlist_matrix_solver_direct_t() {}
 
@@ -188,7 +196,6 @@ public:
 		ATTR_COLD ~NETLIB_NAME(solver)();
 
 		ATTR_COLD void post_start();
-        ATTR_COLD void update_to_current_time();
 
 		ATTR_HOT inline double gmin() { return m_gmin.Value(); }
 

@@ -156,7 +156,9 @@ public:
 	: NETLIB_NAME(QBJT)(BJT_EB),
 		m_D_CB(netlist_object_t::ANALOG),
 		m_D_EB(netlist_object_t::ANALOG),
-		m_D_EC(netlist_object_t::ANALOG)
+		m_D_EC(netlist_object_t::ANALOG),
+		m_alpha_f(0),
+	    m_alpha_r(0)
 		{ }
 
 	NETLIB_UPDATE_TERMINALS()

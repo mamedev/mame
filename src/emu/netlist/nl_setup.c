@@ -171,6 +171,9 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
 		case netlist_terminal_t::NETLIST:
 			return "NETLIST";
 			break;
+        case netlist_terminal_t::QUEUE:
+            return "QUEUE";
+			break;
 	}
 	// FIXME: noreturn
 	netlist().error("Unknown object type %d\n", in.type());
@@ -264,6 +267,9 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 		case netlist_terminal_t::NETLIST:
 			netlist().error("Netlist registration not yet supported - %s\n", name.cstr());
 			break;
+        case netlist_terminal_t::QUEUE:
+            netlist().error("QUEUE registration not yet supported - %s\n", name.cstr());
+            break;
 	}
 }
 
@@ -409,7 +415,6 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 			connect(proxy->out(), *p);
 		}
 		out.net().m_core_terms.clear(); // clear the list
-		out.net().m_num_cons = 0;
 #endif
 		out.net().register_con(proxy->m_I);
 		out_cast.set_proxy(proxy);
@@ -522,7 +527,7 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	else
 	{
 		NL_VERBOSE_OUT(("adding net ...\n"));
-		netlist_analog_net_t *anet =  new netlist_analog_net_t(netlist_object_t::NET);
+		netlist_analog_net_t *anet =  new netlist_analog_net_t();
 		t1.set_net(*anet);
 		//m_netlist.solver()->m_nets.add(anet);
 		// FIXME: Nets should have a unique name
@@ -618,7 +623,7 @@ void netlist_setup_t::resolve_inputs()
 
 	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
-		if ((*pn)->m_core_terms.is_empty())
+		if ((*pn)->num_cons() == 0)
 		{
 			todelete.add(*pn);
 		}

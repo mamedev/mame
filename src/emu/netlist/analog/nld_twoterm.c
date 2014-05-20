@@ -13,6 +13,7 @@
 ATTR_COLD netlist_generic_diode::netlist_generic_diode()
 {
 	m_Vd = 0.7;
+	set_param(1e-15, 1, 1e-15);
 }
 
 ATTR_COLD void netlist_generic_diode::set_param(const double Is, const double n, double gmin)
@@ -106,12 +107,12 @@ NETLIB_UPDATE_PARAM(R)
 	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
 
     // FIXME: Only attached nets should be brought up to current time
-    netlist().solver()->update_to_current_time(); // bring up current time
+    //netlist().solver()->update_to_current_time(); // bring up current time
+    update_dev();
 	if (m_R.Value() > 1e-9)
 		set_R(m_R.Value());
 	else
 		set_R(1e-9);
-	//update_dev();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -152,11 +153,16 @@ NETLIB_UPDATE_PARAM(POT)
 	double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
 		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
-	m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
+
+	// FIXME: Only attached nets should be brought up to current time
+    //netlist().solver()->update_to_current_time(); // bring up current time
+
+    m_R1.update_dev();
+    m_R2.update_dev();
+
+    m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
 	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), netlist().gmin()));
-	// force a schedule all
-	m_R1.update_dev();
-	m_R2.update_dev();
+
 }
 
 // ----------------------------------------------------------------------------------------

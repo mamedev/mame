@@ -71,9 +71,9 @@ class NETLIB_NAME(VCCS) : public netlist_device_t
 {
 public:
 	ATTR_COLD NETLIB_NAME(VCCS)()
-	: netlist_device_t(VCCS) {  }
+	: netlist_device_t(VCCS), m_gfac(1.0) {  }
 	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
-	: netlist_device_t(afamily) {  }
+	: netlist_device_t(afamily), m_gfac(1.0) {  }
 
 protected:
 	ATTR_COLD virtual void start();

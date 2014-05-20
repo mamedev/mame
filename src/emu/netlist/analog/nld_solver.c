@@ -123,15 +123,15 @@ ATTR_HOT double netlist_matrix_solver_t::compute_next_timestep(const double hn)
 
             double h_n_m_1 = n->m_h_n_m_1;
             // limit last timestep in equation.
-            if (h_n_m_1 > 10.0 * hn)
-                h_n_m_1 = 10.0 * hn;
+            //if (h_n_m_1 > 3 * hn)
+            //    h_n_m_1 = 3 * hn;
 
             double DD2 = (DD_n - n->m_DD_n_m_1) / (hn + h_n_m_1);
             double new_net_timestep;
 
             n->m_DD_n_m_1 = DD_n;
             n->m_h_n_m_1 = hn;
-            if (fabs(DD2) > 1e-100) // avoid div-by-zero
+            if (fabs(DD2) > 1e-200) // avoid div-by-zero
                 new_net_timestep = sqrt(m_params.m_lte / fabs(0.5*DD2));
             else
                 new_net_timestep = m_params.m_max_timestep;
@@ -142,6 +142,8 @@ ATTR_HOT double netlist_matrix_solver_t::compute_next_timestep(const double hn)
         if (new_solver_timestep < m_params.m_min_timestep)
             new_solver_timestep = m_params.m_min_timestep;
     }
+    //if (new_solver_timestep > 10.0 * hn)
+    //    new_solver_timestep = 10.0 * hn;
 	return new_solver_timestep;
 }
 
@@ -190,13 +192,20 @@ ATTR_COLD void netlist_matrix_solver_t::update()
 {
     const double new_timestep = solve();
 
-    if (m_params.m_dynamic)
-        if (new_timestep < 10e-6)
-            if (!m_Q_sync.net().is_queued())
-                m_Q_sync.net().push_to_queue(netlist_time::from_double(new_timestep));
-
+    if (m_params.m_dynamic && new_timestep > 0)
+        m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(new_timestep));
 }
 
+ATTR_COLD void netlist_matrix_solver_t::update_forced()
+{
+    const double new_timestep = solve();
+
+    if (!m_params.m_dynamic)
+        return;
+
+     if (new_timestep > 0)
+        m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
+}
 
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
@@ -213,7 +222,7 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 
 	// We are already up to date. Avoid oscillations.
 	if (delta < netlist_time::from_nsec(1))
-	    return 1.0;
+	    return -1.0;
 
 	NL_VERBOSE_OUT(("Step!\n"));
 	/* update all terminals for new time step */
@@ -237,7 +246,7 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
             owner().netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
-	        m_Q_sync.net().push_to_queue(m_params.m_nt_sync_delay);
+	        m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 	        return 1.0;
 		}
 	}
@@ -275,7 +284,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 	for (int k = 0; k < N(); k++)
 	{
 		netlist_analog_net_t *net = m_nets[k];
-		const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
+		const netlist_terminal_t::list_t &terms = net->m_terms;
 		for (int i = 0; i < terms.count(); i++)
 		{
 			m_terms[m_term_num].net_this = k;
@@ -293,8 +302,8 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 	for (int k = 0; k < N(); k++)
 	{
 		netlist_analog_net_t *net = m_nets[k];
-		const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
-		const netlist_analog_net_t::terminal_list_t &rails = net->m_rails;
+		const netlist_terminal_t::list_t &terms = net->m_terms;
+		const netlist_terminal_t::list_t &rails = net->m_rails;
 		for (int i = 0; i < terms.count(); i++)
 		{
 			m_terms[m_term_num].net_this = k;
@@ -595,8 +604,8 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 		double RHS_t = 0.0;
 
 		netlist_analog_net_t *net = this->m_nets[k];
-		const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
-		const netlist_analog_net_t::terminal_list_t &rails = net->m_rails;
+		const netlist_terminal_t::list_t &terms = net->m_terms;
+		const netlist_terminal_t::list_t &rails = net->m_rails;
 		const int term_count = terms.count();
 		const int rail_count = rails.count();
 
@@ -640,7 +649,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 		for (int k = 0; k < this->N(); k++)
 		{
 			netlist_analog_net_t *net = this->m_nets[k];
-			const netlist_analog_net_t::terminal_list_t &terms = net->m_terms;
+			const netlist_terminal_t::list_t &terms = net->m_terms;
 			const int term_count = terms.count();
 
 			double iIdr = RHS[k];
@@ -681,41 +690,6 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 // solver
 // ----------------------------------------------------------------------------------------
 
-typedef netlist_analog_net_t::list_t  *net_groups_t;
-
-ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, netlist_analog_net_t *net)
-{
-	if (net->isRailNet())
-		return true;
-	for (int i = 0; i <= cur_group; i++)
-	{
-		if (groups[i].contains(net))
-			return true;
-	}
-	return false;
-}
-
-ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_analog_net_t *net)
-{
-	if (net->m_core_terms.is_empty())
-		return;
-	/* add the net */
-	SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, net->name().cstr()));
-	groups[cur_group].add(net);
-	for (int i = 0; i < net->m_core_terms.count(); i++)
-	{
-	    netlist_core_terminal_t *p = net->m_core_terms[i];
-	    SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
-		if (p->isType(netlist_terminal_t::TERMINAL))
-		{
-			SOLVER_VERBOSE_OUT(("isterminal\n"));
-			netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-			netlist_analog_net_t *other_net = &pt->m_otherterm->net().as_analog();
-			if (!already_processed(groups, cur_group, other_net))
-				process_net(groups, cur_group, other_net);
-		}
-	}
-}
 
 
 NETLIB_START(solver)
@@ -732,7 +706,7 @@ NETLIB_START(solver)
     register_param("NR_LOOPS", m_nr_loops, 25);      // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
     register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
-    register_param("DYNAMIC_TS", m_dynamic, 1);
+    register_param("DYNAMIC_TS", m_dynamic, 0);
 	register_param("LTE", m_lte, 1e-3);             // 1mV diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 2e-9);   // double timestep resolution
 
@@ -769,7 +743,10 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 NETLIB_UPDATE(solver)
 {
-	int t_cnt = m_mat_solvers.count();
+	if (m_params.m_dynamic)
+	    return;
+
+    const int t_cnt = m_mat_solvers.count();
 
 #if HAS_OPENMP && USE_OPENMP
 	if (m_parallel.Value())
@@ -793,14 +770,12 @@ NETLIB_UPDATE(solver)
 		}
 #else
 	// FIXME: parameter
-	double next_time_step = m_params.m_max_timestep;
     for (int i = 0; i < t_cnt; i++)
     {
         if (m_mat_solvers[i]->is_timestep())
             {
-                const double ts = m_mat_solvers[i]->solve();
-                if (next_time_step > ts)
-                    next_time_step = ts;
+            // Ignore return value
+                ATTR_UNUSED const double ts = m_mat_solvers[i]->solve();
             }
     }
 #endif
@@ -808,22 +783,8 @@ NETLIB_UPDATE(solver)
     /* step circuit */
     if (!m_Q_step.net().is_queued())
     {
-        if (m_params.m_dynamic)
-            m_Q_step.net().push_to_queue(netlist_time::from_double(next_time_step));
-        else
-            m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
+        m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
     }
-}
-
-ATTR_COLD void NETLIB_NAME(solver)::update_to_current_time()
-{
-    /* bring the whole system to the current time
-     * Don't schedule a new calculation time. The recalculation has to be
-     * triggered by the caller after the netlist element was changed.
-     */
-    for (int i = 0; i < m_mat_solvers.count(); i++)
-        //m_mat_solvers[i]->m_Q_sync.net().push_to_queue(m_mat_solvers[i]->m_params.m_nt_sync_delay);
-        m_mat_solvers[i]->solve();
 }
 
 
@@ -843,7 +804,13 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
     m_params.m_max_timestep = netlist_time::from_hz(m_freq.Value()).as_double();
 
     if (m_params.m_dynamic)
+    {
         m_params.m_max_timestep *= 100.0;
+    }
+    else
+    {
+        m_params.m_min_timestep = m_params.m_max_timestep;
+    }
 
 	netlist().log("Scanning net groups ...");
 	// determine net groups
@@ -854,10 +821,10 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	    {
 	        SOLVER_VERBOSE_OUT(("   ==> not a rail net\n"));
 	        netlist_analog_net_t *n = &(*pn)->as_analog();
-	        if (!already_processed(groups, cur_group, n))
+	        if (!n->already_processed(groups, cur_group))
 	        {
 	            cur_group++;
-	            process_net(groups, cur_group, n);
+	            n->process_net(groups, cur_group);
 	        }
 	    }
 	}
