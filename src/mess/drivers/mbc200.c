@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(from_master_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_READ8_MEMBER(ppi_hs_r);
-	UINT32 screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
 private:
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xb0, 0xb0) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 //  AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_READ(from_master_r)
@@ -152,36 +152,6 @@ void mbc200_state::machine_start()
 	m_floppy1->floppy_mon_w(0);
 	m_floppy0->floppy_drive_set_ready_state(1, 1);
 	m_floppy1->floppy_drive_set_ready_state(1, 1);
-}
-
-UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x,y,xi,yi;
-	int count;
-
-	count = 0;
-
-	for(y=0;y<100;y++)
-	{
-		for(x=0;x<80;x++)
-		{
-			for(yi=0;yi<4;yi++)
-			{
-				for(xi=0;xi<8;xi++)
-				{
-					UINT8 dot;
-					dot = (m_vram[count] >> (7-xi)) & 1;
-
-					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*4+yi, x*8+xi) = m_palette->pen(dot);
-				}
-
-				count++;
-			}
-		}
-	}
-
-	return 0;
 }
 
 WRITE8_MEMBER( mbc200_state::porta_w )
@@ -210,6 +180,27 @@ static const floppy_interface mbc200_floppy_interface =
 //	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
 //SLOT_INTERFACE_END
 
+MC6845_UPDATE_ROW( mbc200_state::update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 gfx;
+	UINT16 mem,x;
+	UINT32 *p = &bitmap.pix32(y);
+
+	for (x = 0; x < x_count; x++)
+	{
+		mem = (ma+x)*4+ra;
+		gfx = m_vram[mem];
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
+	}
+}
 
 static const gfx_layout mbc200_chars_8x8 =
 {
@@ -243,15 +234,14 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mbc200_state, screen_update_mbc200)
-	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4) // HD46505SP
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 
