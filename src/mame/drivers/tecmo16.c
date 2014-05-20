@@ -385,6 +385,7 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
+	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -14,6 +14,24 @@
 #include "tecmo_spr.h"
 
 
+const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
+
+tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TECMO_SPRITE, "Teccmo 16-bit Sprite", tag, owner, clock, "tecmo_spr", __FILE__),
+		device_video_interface(mconfig, *this)
+{
+}
+
+
+void tecmo_spr_device::device_start()
+{
+}
+
+void tecmo_spr_device::device_reset()
+{
+}
+
+
 
 static const UINT8 layout[8][8] =
 {
@@ -66,7 +84,7 @@ static const UINT8 layout[8][8] =
 
 
 /* from gals pinball (which was in turn from ninja gaiden) */
-int spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites, UINT16* spriteram)
+int tecmo_spr_device::spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites, UINT16* spriteram)
 {
 	int count = 0;
 	int offs;
@@ -138,7 +156,7 @@ int spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bit
 
 
 // comad bootleg of spbactn
-void galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
+void tecmo_spr_device::galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
 {
 	int offs;
 
@@ -180,7 +198,7 @@ void galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, 
 	}
 }
 
-void tecmo16_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, UINT16 spriteram16_bytes, int game_is_riot, int flipscreen )
+void tecmo_spr_device::tecmo16_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, UINT16 spriteram16_bytes, int game_is_riot, int flipscreen )
 {
 	UINT16 *spriteram16 = spriteram;
 	int offs;
@@ -326,7 +344,7 @@ void tecmo16_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bi
 
 #define NUM_SPRITES 256
 
-void gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
+void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
 {
 	gfx_element *gfx = gfxdecode->gfx(3);
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
@@ -435,7 +453,7 @@ void gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bi
 }
 
 
-void raiga_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen  )
+void tecmo_spr_device::raiga_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen  )
 {
 	gfx_element *gfx = gfxdecode->gfx(3);
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;

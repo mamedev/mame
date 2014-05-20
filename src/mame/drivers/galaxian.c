@@ -10748,7 +10748,7 @@ GAME( 1981, froggers, frogger,  froggers, frogger, galaxian_state,  froggers, RO
 GAME( 1981, frogf,    frogger,  frogf,    frogger, galaxian_state,  froggers, ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogg,    frogger,  galaxian, frogg, galaxian_state,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, froggrs,  frogger,  froggers, frogger,  galaxian_state, froggrs,  ROT90,  "bootleg (Coin Music)", "Frogger (Scramble hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1981, quaak,    frogger,  quaak,    frogger,  galaxian_state, quaak,    ROT90,  "bootleg", "Quaaak (bootleg of Frogger)", GAME_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
+GAME( 1981, quaak,    frogger,  quaak,    frogger,  galaxian_state, quaak,    ROT90,  "bootleg", "Quaak (bootleg of Frogger)", GAME_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
 
 
 /*

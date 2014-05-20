@@ -767,6 +767,8 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
+	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 
 	/* sound hardware */
@@ -824,6 +826,8 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnbowl)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+
+	/* NOT using Tecmo Sprite device - signifcant changes, maybe a clone of something else */
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
@@ -941,6 +945,8 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastninj)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+
+	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0) // should be different
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,mastninj)
 

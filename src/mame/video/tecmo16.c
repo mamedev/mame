@@ -320,7 +320,7 @@ UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 
 	m_tx_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	tecmo16_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_game_is_riot, m_flipscreen);
+	m_sprgen->tecmo16_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_game_is_riot, m_flipscreen);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
