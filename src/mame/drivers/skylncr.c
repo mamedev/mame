@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-  Sky Lancer / Mad Zoo / Super Star '97
+  Sky Lancer / Butterfly / Mad Zoo / Super Star '97
   Bordun International.
 
   Original preliminary driver by Luca Elia.
@@ -1077,6 +1077,150 @@ static INPUT_PORTS_START( neraidou )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( gallag50 )
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET) PORT_NAME("Bet/Throttle")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
+	PORT_DIPNAME( 0x01, 0x01, "Hardware Type (could be inverted)" )	// leave it off, otherwise the game works bad and resets
+	PORT_DIPSETTING(    0x01, "Rolla" )
+	PORT_DIPSETTING(    0x00, "Sky" )
+	PORT_DIPNAME( 0x0e, 0x0e, "Main Game Percentage" )
+	PORT_DIPSETTING(    0x0e, "91%" )
+	PORT_DIPSETTING(    0x0c, "92%" )
+	PORT_DIPSETTING(    0x0a, "93%" )
+	PORT_DIPSETTING(    0x08, "94%" )
+	PORT_DIPSETTING(    0x06, "95%" )
+	PORT_DIPSETTING(    0x04, "96%" )
+	PORT_DIPSETTING(    0x02, "97%" )
+	PORT_DIPSETTING(    0x00, "98%" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Reels Speed" )
+	PORT_DIPSETTING(    0x20, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Rate" )
+	PORT_DIPSETTING(    0x40, "24" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x80, "x100" )
+
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x00, "Rolla GFX" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Title" )
+	PORT_DIPSETTING(    0x10, "Petalouda (Greek for Butterfly)" )
+	PORT_DIPSETTING(    0x00, "Gallag" )
+	PORT_DIPNAME( 0x20, 0x20, "Alt GFX Decode (For different HW)" )		// could be a mix with 08 'Rolla GFX'
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Butterfly Win Rate" )
+	PORT_DIPSETTING(    0xc0, "15%" )
+	PORT_DIPSETTING(    0x80, "20%" )
+	PORT_DIPSETTING(    0x40, "25%" )
+	PORT_DIPSETTING(    0x00, "30%" )
+
+	PORT_START("DSW3")  /* AY8910 port A */
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
+	PORT_DIPNAME( 0x18, 0x18, "Credit Limit" )
+	PORT_DIPSETTING(    0x00, "120000" )
+	PORT_DIPSETTING(    0x08, "100000" )
+	PORT_DIPSETTING(    0x10, "80000" )
+	PORT_DIPSETTING(    0x18, "50000" )
+	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )
+	PORT_DIPSETTING(    0xc0, "8" )
+	PORT_DIPSETTING(    0x80, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x00, "64" )
+
+	PORT_START("DSW4")  /* AY8910 port B */
+	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Pulse / 130 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )
+	PORT_DIPNAME( 0x18, 0x00, "High Bet Limit" )
+	PORT_DIPSETTING(    0x18, "32" )
+	PORT_DIPSETTING(    0x10, "50" )
+	PORT_DIPSETTING(    0x08, "72" )
+	PORT_DIPSETTING(    0x00, "99" )
+	PORT_DIPNAME( 0x20, 0x00, "Rolla HW" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown Feature" )
+	PORT_DIPSETTING(    0x80, "Full Cutted" )
+	PORT_DIPSETTING(    0x00, "Full Open" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sstar97 )
 	PORT_START("IN1")   /* $00 (PPI0 port A) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
@@ -1364,6 +1508,23 @@ ROM_START( mbutrfly )
 	ROM_LOAD16_BYTE( "mb.u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )	// identical to butterfly.
 ROM_END
 
+ROM_START( gallag50 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "27512.u9",  0x00000, 0x10000, CRC(355f8c3b) SHA1(d419fcb96bf936eaf7afb1a4b38a9e1d2a191686) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "27c301.u29", 0x00000, 0x20000, CRC(adf3208a) SHA1(251e94efe90b8250cb8d75255bd5b58a6b7825a7) )
+	ROM_LOAD16_BYTE( "27c301.u31", 0x00001, 0x20000, CRC(24f20819) SHA1(a6fd1febe061f84e2bf3609bbf7c95912a04db70) )
+	ROM_LOAD16_BYTE( "27c301.u33", 0x40000, 0x20000, CRC(7ec63f5a) SHA1(47e91f21a674a949b0085cf2d8463da245328db3) )
+	ROM_LOAD16_BYTE( "27c301.u35", 0x40001, 0x20000, CRC(68c186d6) SHA1(6e8b5d489c4ba2a65dadf3a8cb3c07c2fedc1cb1) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "27c301.u52", 0x00000, 0x20000, CRC(f3de59f4) SHA1(3b70a8677647a54333049a59cf01ba2c63c33d87) )
+	ROM_LOAD16_BYTE( "27c301.u54", 0x00001, 0x20000, CRC(f399751b) SHA1(2b7f3ed4181d654b67154b9587ee971ee881f35c) )
+	ROM_LOAD16_BYTE( "27c301.u56", 0x40000, 0x20000, CRC(7eec4edf) SHA1(897fbbcda8d1c42b3a59f0f2f68e295e054d062d) )
+	ROM_LOAD16_BYTE( "27c301.u58", 0x40001, 0x20000, CRC(afd0d391) SHA1(cc024d37cc23f94ef09a8a543cb1604e3f82c306) )
+ROM_END
+
 /*
 
 Mad Zoo PCB Layout
@@ -1504,11 +1665,12 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                       FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",           0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",         0 )
-GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)", GAME_NOT_WORKING )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                      0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                 0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star '97 (version V153B)",               0 )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                         FLAGS  */
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   GAME_NOT_WORKING )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star '97 (version V153B)",                 0 )
