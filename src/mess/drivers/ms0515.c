@@ -8,9 +8,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 #include "machine/ram.h"
 #include "machine/i8255.h"
 
@@ -20,11 +18,13 @@ public:
 	ms0515_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_floppy(*this, "vg93:0:525qd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<floppy_image_device> m_floppy;
 
 	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
 	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
@@ -70,10 +70,10 @@ static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 
 	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
 
-	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8("vg93", fd1793_device, status_r, command_w,0x00ff)
-	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8("vg93", fd1793_device, track_r, track_w,0x00ff)
-	AM_RANGE(0177644, 0177645) AM_DEVREADWRITE8("vg93", fd1793_device, sector_r, sector_w,0x00ff)
-	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8("vg93", fd1793_device, data_r, data_w,0x00ff)
+	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8("vg93", fd1793_t, status_r, cmd_w,0x00ff)
+	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8("vg93", fd1793_t, track_r, track_w,0x00ff)
+	AM_RANGE(0177644, 0177645) AM_DEVREADWRITE8("vg93", fd1793_t, sector_r, sector_w,0x00ff)
+	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8("vg93", fd1793_t, data_r, data_w,0x00ff)
 
 	//AM_RANGE(0177700, 0177701) // read data
 	//AM_RANGE(0177720, 0177721) // write data     // protocol S2
@@ -126,13 +126,13 @@ void ms0515_state::machine_reset()
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;
 
-	machine().device<legacy_floppy_image_device>(FLOPPY_0)->floppy_mon_w(0); // turn it on
+	m_floppy->mon_w(0); // turn it on
 }
 
 /* Input ports */
 static INPUT_PORTS_START( ms0515 )
 INPUT_PORTS_END
-
+/*
 static LEGACY_FLOPPY_OPTIONS_START(ms0515)
 	LEGACY_FLOPPY_OPTION(ms0515, "dsk", "MS0515 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -141,13 +141,11 @@ static LEGACY_FLOPPY_OPTIONS_START(ms0515)
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
 LEGACY_FLOPPY_OPTIONS_END
+*/
 
-static const floppy_interface ms0515_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(ms0515),
-	NULL
-};
+static SLOT_INTERFACE_START( ms0515_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // 720 KB
+SLOT_INTERFACE_END
 
 UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -228,11 +226,8 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_T11_INITIAL_MODE(0xf2ff)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
-	MCFG_DEVICE_ADD("vg93", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
-	MCFG_WD17XX_DDEN_CALLBACK(VCC)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ms0515_floppy_interface)
+	MCFG_DEVICE_ADD("vg93", FD1793x, 1000000)
+	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
