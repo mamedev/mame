@@ -566,61 +566,48 @@ bool screen_device::update_partial(int scanline)
 	}
 
 	// skip if we already rendered this line
-	if (scanline == m_last_partial_scan - 1)
+	if (scanline < m_last_partial_scan)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because line was already rendered\n"));
 		return false;
 	}
 
-	// skip if outside of visible area
-	if (scanline < visible_area().min_y || scanline > visible_area().max_y)
-	{
-		LOG_PARTIAL_UPDATES(("skipped because outside of visible area\n"));
-		return false;
-	}
-
-	// skip if less than the lowest so far
-	if (scanline < m_last_partial_scan)
-	{
-		LOG_PARTIAL_UPDATES(("skipped because less than previous\n"));
-		return false;
-	}
-
-	// set the start/end scanlines
+	// set the range of scanlines to render
 	rectangle clip = m_visarea;
 	if (m_last_partial_scan > clip.min_y)
 		clip.min_y = m_last_partial_scan;
 	if (scanline < clip.max_y)
 		clip.max_y = scanline;
 
-	// render if necessary
-	bool result = false;
-	if (clip.min_y <= clip.max_y)
+	// skip if entirely outside of visible area
+	if (clip.min_y > clip.max_y)
 	{
-		UINT32 flags = UPDATE_HAS_NOT_CHANGED;
-
-		g_profiler.start(PROFILER_VIDEO);
-		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
-
-		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-		switch (curbitmap.format())
-		{
-			default:
-			case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-			case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
-		}
-
-		m_partial_updates_this_frame++;
-		g_profiler.stop();
-
-		// if we modified the bitmap, we have to commit
-		m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
-		result = true;
+		LOG_PARTIAL_UPDATES(("skipped because outside of visible area\n"));
+		return false;
 	}
+
+	// otherwise, render
+	LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
+	g_profiler.start(PROFILER_VIDEO);
+
+	UINT32 flags = UPDATE_HAS_NOT_CHANGED;
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+	switch (curbitmap.format())
+	{
+		default:
+		case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+		case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+	}
+
+	m_partial_updates_this_frame++;
+	g_profiler.stop();
+
+	// if we modified the bitmap, we have to commit
+	m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
 
 	// remember where we left off
 	m_last_partial_scan = scanline + 1;
-	return result;
+	return true;
 }
 
 
