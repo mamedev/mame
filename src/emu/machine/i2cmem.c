@@ -88,7 +88,9 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 	m_e2( 0 ),
 	m_wc( 0 ),
 	m_sdar( 1 ),
-	m_state( STATE_IDLE )
+	m_state( STATE_IDLE ),
+	m_shift( 0 ),
+	m_byteaddr( 0 )
 {
 }
 
