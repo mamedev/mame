@@ -244,6 +244,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	MCFG_TECMO_SPRITE_GFX_REGION(1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

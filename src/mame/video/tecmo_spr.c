@@ -18,7 +18,8 @@ const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TECMO_SPRITE, "Teccmo 16-bit Sprite", tag, owner, clock, "tecmo_spr", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_gfxregion(0)
 {
 }
 
@@ -31,6 +32,13 @@ void tecmo_spr_device::device_reset()
 {
 }
 
+
+void tecmo_spr_device::set_gfx_region(device_t &device, int gfxregion)
+{
+	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
+	dev.m_gfxregion = gfxregion;
+//  printf("decospr_device::set_gfx_region()\n");
+}
 
 
 static const UINT8 layout[8][8] =
@@ -138,9 +146,9 @@ int tecmo_spr_device::spbactn_draw_sprites(screen_device &screen, gfxdecode_devi
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-						gfxdecode->gfx(2)->transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(m_gfxregion)->transpen_raw(bitmap,cliprect,
 						code + layout[row][col],
-						gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
+						gfxdecode->gfx(m_gfxregion)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 						flipx, flipy,
 						x, y,
 						0);
@@ -153,6 +161,120 @@ int tecmo_spr_device::spbactn_draw_sprites(screen_device &screen, gfxdecode_devi
 
 	return count;
 }
+
+
+
+#define NUM_SPRITES 256
+
+void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
+{
+	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
+	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
+	int count = NUM_SPRITES;
+
+	/* draw all sprites from front to back */
+	while (count--)
+	{
+		UINT32 attributes = source[0];
+		UINT32 priority_mask;
+		int col,row;
+
+		if (attributes & 0x04)
+		{
+			UINT32 priority = (attributes >> 6) & 3;
+			UINT32 flipx = (attributes & 1);
+			UINT32 flipy = (attributes & 2);
+
+			UINT32 color = source[2];
+			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
+			UINT32 sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
+
+			/* raiga needs something like this */
+			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
+
+			int ypos = (source[3] + spr_offset_y) & 0x01ff;
+			int xpos = source[4] & 0x01ff;
+
+			color = (color >> 4) & 0x0f;
+
+			/* wraparound */
+			if (xpos >= 256)
+				xpos -= 512;
+			if (ypos >= 256)
+				ypos -= 512;
+
+			if (flip_screen)
+			{
+				flipx = !flipx;
+				flipy = !flipy;
+
+				xpos = 256 - (8 * sizex) - xpos;
+				ypos = 256 - (8 * sizey) - ypos;
+
+				if (xpos <= -256)
+					xpos += 512;
+				if (ypos <= -256)
+					ypos += 512;
+			}
+
+			/* bg: 1; fg:2; text: 4 */
+			switch( priority )
+			{
+				default:
+				case 0x0: priority_mask = 0;                    break;
+				case 0x1: priority_mask = 0xf0;                 break;  /* obscured by text layer */
+				case 0x2: priority_mask = 0xf0 | 0xcc;          break;  /* obscured by foreground */
+				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
+			}
+
+
+			/* blending */
+			if (attributes & 0x20)
+			{
+				color |= 0x80;
+
+				for (row = 0; row < sizey; row++)
+				{
+					for (col = 0; col < sizex; col++)
+					{
+						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
+						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+
+						gfx->prio_transpen_raw(bitmap_sp,cliprect,
+							number + layout[row][col],
+							gfx->colorbase() + color * gfx->granularity(),
+							flipx, flipy,
+							sx, sy,
+							screen.priority(), priority_mask, 0);
+					}
+				}
+			}
+			else
+			{
+				bitmap_ind16 &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+
+				for (row = 0; row < sizey; row++)
+				{
+					for (col = 0; col < sizex; col++)
+					{
+						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
+						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+
+						gfx->prio_transpen_raw(bitmap,cliprect,
+							number + layout[row][col],
+							gfx->colorbase() + color * gfx->granularity(),
+							flipx, flipy,
+							sx, sy,
+							screen.priority(), priority_mask, 0);
+					}
+				}
+			}
+		}
+		source -= 8;
+	}
+}
+
+
 
 
 // comad bootleg of spbactn
@@ -187,7 +309,7 @@ void tecmo_spr_device::galspnbl_draw_sprites( screen_device &screen, gfxdecode_d
 				{
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-					gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 						code + layout[row][col],
 						color,
 						flipx,flipy,
@@ -195,368 +317,5 @@ void tecmo_spr_device::galspnbl_draw_sprites( screen_device &screen, gfxdecode_d
 				}
 			}
 		}
-	}
-}
-
-void tecmo_spr_device::tecmo16_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, UINT16 spriteram16_bytes, int game_is_riot, int flipscreen )
-{
-	UINT16 *spriteram16 = spriteram;
-	int offs;
-
-	bitmap_ind16 &bitmap = bitmap_bg;
-
-	for (offs = spriteram16_bytes/2 - 8;offs >= 0;offs -= 8)
-	{
-		if (spriteram16[offs] & 0x04)   /* enable */
-		{
-			int code,color,sizex,sizey,flipx,flipy,xpos,ypos;
-			int x,y,priority,priority_mask;
-
-			code = spriteram16[offs+1];
-			color = (spriteram16[offs+2] & 0xf0) >> 4;
-			sizex = 1 << ((spriteram16[offs+2] & 0x03) >> 0);
-
-			if(game_is_riot)
-				sizey = sizex;
-			else
-				sizey = 1 << ((spriteram16[offs+2] & 0x0c) >> 2);
-
-			if (sizex >= 2) code &= ~0x01;
-			if (sizey >= 2) code &= ~0x02;
-			if (sizex >= 4) code &= ~0x04;
-			if (sizey >= 4) code &= ~0x08;
-			if (sizex >= 8) code &= ~0x10;
-			if (sizey >= 8) code &= ~0x20;
-			flipx = spriteram16[offs] & 0x01;
-			flipy = spriteram16[offs] & 0x02;
-			xpos = spriteram16[offs+4];
-			if (xpos >= 0x8000) xpos -= 0x10000;
-			ypos = spriteram16[offs+3];
-			if (ypos >= 0x8000) ypos -= 0x10000;
-			priority = (spriteram16[offs] & 0xc0) >> 6;
-
-			/* bg: 1; fg:2; text: 4 */
-			switch (priority)
-			{
-				default:
-				case 0x0: priority_mask = 0; break;
-				case 0x1: priority_mask = 0xf0; break; /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0|0xcc; break; /* obscured by foreground */
-				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
-			}
-
-			if (flipscreen)
-			{
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			/* blending */
-			if (spriteram16[offs] & 0x20)
-			{
-				color |= 0x80;
-
-				for (y = 0;y < sizey;y++)
-				{
-					for (x = 0;x < sizex;x++)
-					{
-						int sx,sy;
-
-						if (!flipscreen)
-						{
-							sx = xpos + 8*(flipx?(sizex-1-x):x);
-							sy = ypos + 8*(flipy?(sizey-1-y):y);
-						} else {
-							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
-							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
-						}
-						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
-								code + layout[y][x],
-								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-								flipx,flipy,
-								sx,sy,
-								screen.priority(), priority_mask,0);
-
-						/* wrap around x */
-						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
-								code + layout[y][x],
-								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-								flipx,flipy,
-								sx-512,sy,
-								screen.priority(), priority_mask,0);
-
-						/* wrap around x */
-						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
-								code + layout[y][x],
-								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-								flipx,flipy,
-								sx+512,sy,
-								screen.priority(), priority_mask,0);
-					}
-				}
-			}
-			else
-			{
-				bitmap_ind16 &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
-
-				for (y = 0;y < sizey;y++)
-				{
-					for (x = 0;x < sizex;x++)
-					{
-						int sx,sy;
-
-						if (!flipscreen)
-						{
-							sx = xpos + 8*(flipx?(sizex-1-x):x);
-							sy = ypos + 8*(flipy?(sizey-1-y):y);
-						} else {
-							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
-							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
-						}
-						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
-								code + layout[y][x],
-								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-								flipx,flipy,
-								sx,sy,
-								screen.priority(), priority_mask,0);
-
-						/* wrap around x */
-						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
-								code + layout[y][x],
-								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-								flipx,flipy,
-								sx-512,sy,
-								screen.priority(), priority_mask,0);
-
-						/* wrap around x */
-						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
-								code + layout[y][x],
-								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-								flipx,flipy,
-								sx+512,sy,
-								screen.priority(), priority_mask,0);
-					}
-				}
-			}
-		}
-	}
-}
-
-#define NUM_SPRITES 256
-
-void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
-{
-	gfx_element *gfx = gfxdecode->gfx(3);
-	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
-	int count = NUM_SPRITES;
-
-	/* draw all sprites from front to back */
-	while (count--)
-	{
-		UINT32 attributes = source[0];
-		UINT32 priority_mask;
-		int col,row;
-
-		if (attributes & 0x04)
-		{
-			UINT32 priority = (attributes >> 6) & 3;
-			UINT32 flipx = (attributes & 1);
-			UINT32 flipy = (attributes & 2);
-
-			UINT32 color = source[2];
-			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
-			UINT32 sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
-
-			/* raiga needs something like this */
-			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
-
-			int ypos = (source[3] + spr_offset_y) & 0x01ff;
-			int xpos = source[4] & 0x01ff;
-
-			color = (color >> 4) & 0x0f;
-
-			/* wraparound */
-			if (xpos >= 256)
-				xpos -= 512;
-			if (ypos >= 256)
-				ypos -= 512;
-
-			if (flip_screen)
-			{
-				flipx = !flipx;
-				flipy = !flipy;
-
-				xpos = 256 - (8 * sizex) - xpos;
-				ypos = 256 - (8 * sizey) - ypos;
-
-				if (xpos <= -256)
-					xpos += 512;
-				if (ypos <= -256)
-					ypos += 512;
-			}
-
-			/* bg: 1; fg:2; text: 4 */
-			switch( priority )
-			{
-				default:
-				case 0x0: priority_mask = 0;                    break;
-				case 0x1: priority_mask = 0xf0;                 break;  /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0 | 0xcc;          break;  /* obscured by foreground */
-				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
-			}
-
-
-			/* blending */
-			if (attributes & 0x20)
-			{
-				color |= 0x80;
-
-				for (row = 0; row < sizey; row++)
-				{
-					for (col = 0; col < sizex; col++)
-					{
-						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
-
-						gfx->prio_transpen_raw(bitmap_sp,cliprect,
-							number + layout[row][col],
-							gfx->colorbase() + color * gfx->granularity(),
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), priority_mask, 0);
-					}
-				}
-			}
-			else
-			{
-				bitmap_ind16 &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
-
-				for (row = 0; row < sizey; row++)
-				{
-					for (col = 0; col < sizex; col++)
-					{
-						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
-
-						gfx->prio_transpen_raw(bitmap,cliprect,
-							number + layout[row][col],
-							gfx->colorbase() + color * gfx->granularity(),
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), priority_mask, 0);
-					}
-				}
-			}
-		}
-		source -= 8;
-	}
-}
-
-
-void tecmo_spr_device::raiga_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen  )
-{
-	gfx_element *gfx = gfxdecode->gfx(3);
-	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
-	int count = NUM_SPRITES;
-
-	/* draw all sprites from front to back */
-	while (count--)
-	{
-		UINT32 attributes = source[0];
-		UINT32 priority_mask;
-		int col,row;
-
-		if (attributes & 0x04)
-		{
-			UINT32 priority = (attributes >> 6) & 3;
-			UINT32 flipx = (attributes & 1);
-			UINT32 flipy = (attributes & 2);
-
-			UINT32 color = source[2];
-			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
-			UINT32 sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
-
-			/* raiga needs something like this */
-			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
-
-			int ypos = (source[3] + spr_offset_y) & 0x01ff;
-			int xpos = source[4] & 0x01ff;
-
-			color = (color >> 4) & 0x0f;
-
-			/* wraparound */
-			if (xpos >= 256)
-				xpos -= 512;
-			if (ypos >= 256)
-				ypos -= 512;
-
-			if (flip_screen)
-			{
-				flipx = !flipx;
-				flipy = !flipy;
-
-				xpos = 256 - (8 * sizex) - xpos;
-				ypos = 256 - (8 * sizey) - ypos;
-
-				if (xpos <= -256)
-					xpos += 512;
-				if (ypos <= -256)
-					ypos += 512;
-			}
-
-			/* bg: 1; fg:2; text: 4 */
-			switch( priority )
-			{
-				default:
-				case 0x0: priority_mask = 0;                    break;
-				case 0x1: priority_mask = 0xf0;                 break;  /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0 | 0xcc;          break;  /* obscured by foreground */
-				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
-			}
-
-			/* blending */
-			if (attributes & 0x20)
-			{
-				color |= 0x80;
-
-				for (row = 0; row < sizey; row++)
-				{
-					for (col = 0; col < sizex; col++)
-					{
-						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
-
-						gfx->prio_transpen_raw(bitmap_sp,cliprect,
-							number + layout[row][col],
-							gfx->colorbase() + color * gfx->granularity(),
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), priority_mask, 0);
-					}
-				}
-			}
-			else
-			{
-				bitmap_ind16 &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
-
-				for (row = 0; row < sizey; row++)
-				{
-					for (col = 0; col < sizex; col++)
-					{
-						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
-
-						gfx->prio_transpen_raw(bitmap,cliprect,
-							number + layout[row][col],
-							gfx->colorbase() + color * gfx->granularity(),
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), priority_mask, 0);
-					}
-				}
-			}
-		}
-
-		source -= 8;
 	}
 }
