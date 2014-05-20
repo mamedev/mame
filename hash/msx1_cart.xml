@@ -2830,7 +2830,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="breakinj" supported="no">
+	<software name="breakinj">
 		<description>Break In (Jpn)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
@@ -5303,7 +5303,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="flideck" supported="no">
+	<software name="flideck">
 		<description>Flight Deck (Jpn)</description>
 		<year>1986</year>
 		<publisher>Pony Canyon</publisher>
@@ -5316,7 +5316,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="flidecka" cloneof="flideck" supported="no">
+	<software name="flidecka" cloneof="flideck">
 		<description>Flight Deck (Jpn, Alt)</description>
 		<year>1986</year>
 		<publisher>Pony Canyon</publisher>
@@ -8426,7 +8426,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="gabalin" supported="no">
+	<software name="gabalin">
 		<description>Mashou no Yakata - Gabalin (Jpn)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
@@ -8440,7 +8440,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="gabalina" cloneof="gabalin" supported="no">
+	<software name="gabalina" cloneof="gabalin">
 		<description>Mashou no Yakata - Gabalin (Jpn, Alt)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
@@ -11285,7 +11285,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="skootera" cloneof="skooter" supported="no">
+	<software name="skootera" cloneof="skooter">
 		<description>Skooter (Jpn, Alt)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
@@ -13175,7 +13175,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="xanaduk" cloneof="xanadu" supported="no">
+	<software name="xanaduk" cloneof="xanadu" supported="partial">
 		<description>Xanadu - Dragon Slayer II (Kor)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
@@ -13721,7 +13721,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmpac" supported="no"><!-- Actually untested... -->
+	<software name="fmpac"><!-- Actually untested... -->
 		<description>FM Pana Amusement Cartridge</description>
 		<year>19??</year>
 		<publisher>Panasoft</publisher>
@@ -13885,7 +13885,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="gmaster2" supported="no">
+	<software name="gmaster2">
 		<description>Konami no Shin 10-bai Cartridge (Jpn)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
@@ -14525,6 +14525,7 @@ kept for now until finding out what those bytes affect...
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msx_audio" />
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="msx audio (japan) (hx-mu900) (program).rom" size="32768" crc="dc405f8c" sha1="0d246b0e3edc63803fcce861ea07eadf29dc488c" offset="0" />

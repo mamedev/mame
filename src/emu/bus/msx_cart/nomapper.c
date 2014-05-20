@@ -35,6 +35,11 @@ void msx_cart_nomapper::initialize_cartridge()
 		}
 	}
 
+	if (size == 0x10000)
+	{
+		m_start_address = 0;
+	}
+
 	m_end_address = MIN(m_start_address + size, 0x10000);
 }
 

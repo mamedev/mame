@@ -14,7 +14,7 @@ msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag,
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
 	}
@@ -35,22 +35,22 @@ void msx_cart_konami::device_start()
 
 void msx_cart_konami::restore_banks()
 {
-	m_bank_base[0] = get_rom_base();
-	m_bank_base[1] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-	m_bank_base[2] = get_rom_base();
-	m_bank_base[3] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-	m_bank_base[4] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-	m_bank_base[5] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-	m_bank_base[6] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-	m_bank_base[7] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
+	m_bank_base[0] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
+	m_bank_base[1] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
+	m_bank_base[2] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
+	m_bank_base[3] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
+	m_bank_base[4] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
+	m_bank_base[5] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
+	m_bank_base[6] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
+	m_bank_base[7] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
 }
 
 
 void msx_cart_konami::device_reset()
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_selected_bank[i] = i + 1;
+		m_selected_bank[i] = i;
 	}
 }
 
@@ -87,22 +87,28 @@ WRITE8_MEMBER(msx_cart_konami::write_cart)
 {
 	switch (offset)
 	{
-		case 0x6000:
+		case 0x4000:
 			m_selected_bank[0] = data;
-			m_bank_base[1] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
-			m_bank_base[3] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
+			m_bank_base[0] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
+			m_bank_base[2] = get_rom_base() + ( m_selected_bank[0] & m_bank_mask ) * 0x2000;
+			break;
+
+		case 0x6000:
+			m_selected_bank[1] = data;
+			m_bank_base[1] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
+			m_bank_base[3] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
 			break;
 
 		case 0x8000:
-			m_selected_bank[1] = data;
-			m_bank_base[4] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
-			m_bank_base[6] = get_rom_base() + ( m_selected_bank[1] & m_bank_mask ) * 0x2000;
+			m_selected_bank[2] = data;
+			m_bank_base[4] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
+			m_bank_base[6] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
 			break;
 
 		case 0xa000:
-			m_selected_bank[2] = data;
-			m_bank_base[5] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
-			m_bank_base[7] = get_rom_base() + ( m_selected_bank[2] & m_bank_mask ) * 0x2000;
+			m_selected_bank[3] = data;
+			m_bank_base[5] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
+			m_bank_base[7] = get_rom_base() + ( m_selected_bank[3] & m_bank_mask ) * 0x2000;
 			break;
 	}
 }

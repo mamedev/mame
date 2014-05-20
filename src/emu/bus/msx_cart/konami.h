@@ -33,7 +33,7 @@ public:
 
 private:
 	UINT8 m_bank_mask;
-	UINT8 m_selected_bank[3];
+	UINT8 m_selected_bank[4];
 	UINT8 *m_bank_base[8];
 };
 
