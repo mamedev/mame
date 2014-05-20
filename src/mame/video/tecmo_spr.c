@@ -189,7 +189,7 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 
 
 
-			if (pri_hack == -1)
+			if (pri_hack == -1) // this is what the majority of the current drivers use
 			{
 				/* blending */
 				if (attributes & 0x20)
@@ -201,6 +201,13 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 				{
 					bitmap = (priority >= 2) ? &bitmap_bg : &bitmap_fg;
 				}
+			}
+			else if (pri_hack == -2) // render to a single bitmap, with all priority / colour data mixed in for later processing (assumings sprites can't blend sprites we should probably be doing this)
+			{
+
+				// this contains the blend bit and the priority bits
+				color |= (source[attributes_word] & 0x00f0);
+				bitmap = &bitmap_prihack;
 			}
 			else // spbactn
 			{

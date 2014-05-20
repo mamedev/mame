@@ -76,6 +76,7 @@ VIDEO_START_MEMBER(spbactn_state,spbactn)
 	/* allocate bitmaps */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
@@ -149,24 +150,31 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
 	m_tile_bitmap_fg.fill(0, cliprect);
-
+	m_sprite_bitmap.fill(0, cliprect);
+	
+#if 1
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 
-	if (m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 0, m_tile_bitmap_bg))
+	if (m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 0, m_tile_bitmap_bg))
 	{
 		m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	}
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 1, m_tile_bitmap_bg);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 1, m_tile_bitmap_bg);
 	
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 2, m_tile_bitmap_fg);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 3, m_tile_bitmap_fg);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 2, m_tile_bitmap_fg);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 3, m_tile_bitmap_fg);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
+#else
+
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), -2, m_sprite_bitmap);
+
+#endif
 	return 0;
 }
 
