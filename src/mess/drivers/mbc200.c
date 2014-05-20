@@ -47,7 +47,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
-		, m_ppi(*this, "ppi8255_2")
+		, m_ppi_m(*this, "ppi_m")
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "fdc")
@@ -57,19 +57,17 @@ public:
 		, m_floppy1(*this, FLOPPY_1)
 	{ }
 
-	DECLARE_READ8_MEMBER(from_master_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(ppi_hs_r);
+	DECLARE_READ8_MEMBER(p2_porta_r);
+	DECLARE_WRITE8_MEMBER(pm_porta_w);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
 private:
 	virtual void machine_start();
 	virtual void machine_reset();
-	UINT8 m_hs_bit;
 	UINT8 m_comm_latch;
 	required_device<mc6845_device> m_crtc;
-	required_device<i8255_device> m_ppi;
+	required_device<i8255_device> m_ppi_m;
 	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
 	//required_device<mb8876_t> m_fdc;
@@ -87,9 +85,11 @@ static ADDRESS_MAP_START(mbc200_mem, AS_PROGRAM, 8, mbc200_state)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER( mbc200_state::ppi_hs_r )
+WRITE8_MEMBER( mbc200_state::pm_porta_w )
 {
-	return (m_ppi->read(space, 2) & 0x7f) | m_hs_bit;
+	machine().scheduler().synchronize(); // force resync
+	printf("A %02x %c\n",data,data);
+	m_comm_latch = data; // to slave CPU
 }
 
 static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
@@ -99,8 +99,7 @@ static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
 	//AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
-	AM_RANGE(0xea, 0xea) AM_READ(ppi_hs_r)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi_m", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("i8251_2", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
@@ -114,24 +113,22 @@ static ADDRESS_MAP_START(mbc200_sub_mem, AS_PROGRAM, 8, mbc200_state)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(mbc200_state::from_master_r)
+READ8_MEMBER(mbc200_state::p2_porta_r)
 {
-	UINT8 tmp;
 	machine().scheduler().synchronize(); // force resync
-	tmp = m_comm_latch;
+	UINT8 tmp = m_comm_latch;
 	m_comm_latch = 0;
-	m_hs_bit |= 0x80;
+	m_ppi_m->pc6_w(0); // ppi_ack
 	return tmp;
 }
 
 static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi_1", i8255_device, read, write)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-//  AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0xd0, 0xd0) AM_READ(from_master_r)
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi_2", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -152,14 +149,6 @@ void mbc200_state::machine_start()
 	m_floppy1->floppy_mon_w(0);
 	m_floppy0->floppy_drive_set_ready_state(1, 1);
 	m_floppy1->floppy_drive_set_ready_state(1, 1);
-}
-
-WRITE8_MEMBER( mbc200_state::porta_w )
-{
-	machine().scheduler().synchronize(); // force resync
-	printf("A %02x %c\n",data,data);
-	m_comm_latch = data; // to slave CPU
-	m_hs_bit &= ~0x80;
 }
 
 void mbc200_state::machine_reset()
@@ -243,10 +232,13 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_DEVICE_ADD("ppi_1", I8255, 0)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc200_state, porta_w))
+	MCFG_DEVICE_ADD("ppi_2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(mbc200_state, p2_porta_r))
+
+	MCFG_DEVICE_ADD("ppi_m", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc200_state, pm_porta_w))
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
