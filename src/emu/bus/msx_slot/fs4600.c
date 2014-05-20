@@ -129,7 +129,7 @@ WRITE8_MEMBER(msx_slot_fs4600_device::write)
 					break;
 
 				default:
-					logerror("Unhandled write %02x to %04x\n", data, offset);
+					logerror("msx_slot_fs4600: Unhandled write %02x to %04x\n", data, offset);
 					break;
 			}
 		}
@@ -153,7 +153,7 @@ WRITE8_MEMBER(msx_slot_fs4600_device::write)
 					break;
 
 				default:
-					logerror("Unhandled write %02x to %04x\n", data, offset);;
+					logerror("msx_slot_fs4600: Unhandled write %02x to %04x\n", data, offset);;
 					break;
 			}
 		}

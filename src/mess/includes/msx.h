@@ -65,7 +65,7 @@
 
 #define MCFG_MSX_LAYOUT_DISK1(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
 	MCFG_MSX_SLOT_DISK1_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
-	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages + 1, device);   /* Memory mapped FDC registers are also accessible through page 2 */
 
 #define MCFG_MSX_LAYOUT_DISK2(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
 	MCFG_MSX_SLOT_DISK2_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \

@@ -1122,6 +1122,7 @@ static MACHINE_CONFIG_FRAGMENT( msx2_cartlist )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx2_floplist )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
 MACHINE_CONFIG_END
 

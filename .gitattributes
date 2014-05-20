@@ -177,6 +177,7 @@ hash/msx1_cass.xml svneol=native#text/xml
 hash/msx1_flop.xml svneol=native#text/xml
 hash/msx2.hsi svneol=native#text/xml
 hash/msx2_cart.xml svneol=native#text/xml
+hash/msx2_flop.xml svneol=native#text/xml
 hash/myvision.xml svneol=native#text/xml
 hash/mz2000_cass.xml svneol=native#text/xml
 hash/mz2000_flop.xml svneol=native#text/xml

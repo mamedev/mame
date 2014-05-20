@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="msx2_flop" description="MSX2 disk images">
+
+<!--
+System software
+
+The following floppies came with the machines.
+-->
+
+	<software name="cpc400">
+		<description>Daewoo CPC-400/CPC-400S</description>
+		<year>1988</year>
+		<publisher>Daewoo</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="400dsk.dsk" size="737280" crc="f768fc98" sha1="fe713680c0369f9d647b8518545b87fd6a972546" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs4600">
+		<description>National FS-4600</description>
+		<year>1986</year>
+		<publisher>National</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="4600dsk.dsk" size="737280" crc="6d9cf4f2" sha1="943453956a592e3110d86fdf6da83f1ef0ae06f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs4700">
+		<description>National FS-4700</description>
+		<year>1986</year>
+		<publisher>National</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="4700dsk1.dsk" size="737280" crc="c7fcca03" sha1="12e744a314449829087a28f34ddbed2c7c8b2320" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="4700dsk2.dsk" size="737280" crc="dd430730" sha1="f6d7d05a2df62091eb60d5e297e993c06bc35d4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs5000">
+		<description>iNational FS-5000</description>
+		<year>1986</year>
+		<publisher>National</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="5000dsk.dsk" size="737280" crc="0af3ba5c" sha1="005a81fd931308acd2ac09e80cfef9d0b287f599" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs5500">
+		<description>National FS-5000 F1/F2</description>
+		<year>1985</year>
+		<publisher>National</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="5500dsk.dsk" size="737280" crc="e57c466a" sha1="314de9cc5f6fddf61d500bff2fbcb11e6ef846c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fsa1f" supported="no">
+		<description>Panasonic FS-A1F</description>
+		<year>1987</year>
+		<publisher>Panasonic</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="a1fdsk.dsk" size="737280" crc="3584d100" sha1="5704964e739f25d8cca135507a20feee2fd34d3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fsa1fm">
+		<description>Panasonic FS-A1FM</description>
+		<year>1987</year>
+		<publisher>Panasonic</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="a1fmdsk.dsk" size="737280" crc="cd1d0443" sha1="dd63d8d292a92cbc65114778623fefbc25fac80f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms8245">
+		<description>Philips NMS-8245/NMS-8250/NMS-8255</description>
+		<year>i1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8245dsk1.dsk" size="737280" crc="f21ab050" sha1="f6d59d521705e529c22e10ac1ab05231853c8eb3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8245dsk2.dsk" size="737280" crc="02be07da" sha1="c143376b6ad71e50d2c042a132843bab768a638c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8245dsk3.dsk" size="737280" crc="84c47dd7" sha1="8d14eeacc546715adf54b41ffc912d4698364832" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms8245f" cloneof="nms8245">
+		<description>Philips NMS-8245F</description>
+		<year>i1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8245fdsk1.dsk" size="737280" crc="cf3f8a18" sha1="660ed2747e566f7286ea800db26d058e6a242e59" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8245fdsk2.dsk" size="737280" crc="02be07da" sha1="c143376b6ad71e50d2c042a132843bab768a638c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8245fdsk3.dsk" size="737280" crc="84c47dd7" sha1="8d14eeacc546715adf54b41ffc912d4698364832" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms8280" cloneof="nms8245">
+		<description>Philips NMS-8280/NMS-8280G</description>
+		<year>i1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8280dsk1.dsk" size="737280" crc="f21ab050" sha1="f6d59d521705e529c22e10ac1ab05231853c8eb3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8280dsk2.dsk" size="737280" crc="02be07da" sha1="c143376b6ad71e50d2c042a132843bab768a638c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8280dsk3.dsk" size="737280" crc="84c47dd7" sha1="8d14eeacc546715adf54b41ffc912d4698364832" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8280dsk4.dsk" size="737280" crc="f882aa10" sha1="65da56b697ee1210984642197cafca2773f1fb70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vg8230">
+		<description>Philips VG-8230/VG-8235/VG-8240</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="8230dsk1.dsk" size="368640" crc="1d853d80" sha1="a3886d46b3f010b130c1ee87b901a1a90c91cec0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="8230dsk2.dsk" size="368640" crc="d2627c81" sha1="316e025f03cba158ba8cdeb9e57e2529f34f505c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vg8235f">
+		<description>Philips VG-8235F</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="8235fdsk1.dsk" size="368640" crc="46c1ee02" sha1="774f69665d06c2ba7b6c772133a3190168c091d2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="8235fdsk2.dsk" size="368640" crc="54d4c27f" sha1="9bde1eeb50c8a5a849031007aef5e4f79e804648" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbf700d">
+		<description>Sony HB-F700D</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700ddsk1.dsk" size="737280" crc="0b47d718" sha1="eb195f3adceb91407da335a19ec6b466be44a200" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700ddsk2.dsk" size="737280" crc="a3d91aea" sha1="9983552c8ce2db98f42576daaf70858999dbc979" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbf700f" cloneof="hbf700d">
+		<description>Sony HB-F700F</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700fdsk1.dsk" size="737280" crc="c6f2e252" sha1="22bb1c4c69dfeb85887b2ba35ed57f619898eadb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700fdsk2.dsk" size="737280" crc="a3d91aea" sha1="9983552c8ce2db98f42576daaf70858999dbc979" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbf700p" cloneof="hbf700d">
+		<description>Sony HB-F700P</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700pdsk1.dsk" size="737280" crc="6772f7f8" sha1="a3558f467936b8df4508f797e0e31337196184c0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700pdsk2.dsk" size="737280" crc="a3d91aea" sha1="9983552c8ce2db98f42576daaf70858999dbc979" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbf700s" cloneof="hbf700d">
+		<description>Sony HB-F700S</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="73720">
+				<rom name="700sdsk1.dsk" size="737280" crc="cc7c0972" sha1="b9cbe7decaf796b8cde9a70de50d634b5e2b2a2b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="700sdsk2.dsk" size="737280" crc="a3d91aea" sha1="9983552c8ce2db98f42576daaf70858999dbc979" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbf900" supported="partial">
+		<description>Sony HB-F900</description>
+		<year>1986</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="f900dsk1.dsk" size="737280" crc="204add4f" sha1="a1c4afc2304776484e5175a65cc33a8a38b95ea0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="f900dsk2.dsk" size="737280" crc="7b519ef0" sha1="7dabe31e7ed845430ed96760ba2cb16894fad691" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbg900p">
+		<description>Sony HB-G900P/HB-G900AP</description>
+		<year>1986</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="g900dsk1.dsk" size="737280" crc="7fb8a042" sha1="af812c91f466a7f98dd8ef4aa6f1d7cb4e0f9c73" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="g900dsk2.dsk" size="737280" crc="49387227" sha1="cb82b845daabd736f35e4b331b80cfd1017a0378" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="g900dsk3.dsk" size="737280" crc="d000a8c6" sha1="058bc14259d29c3f12c3271e852cfc1d02f11f55" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="g900dsk4.dsk" size="737280" crc="076c2aa6" sha1="eb20ca11ccdf7b8626769695978c46dfaeae0a19" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="">
+		<description></description>
+		<year></year>
+		<publisher></publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="" size="737280" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+</softwarelist>
