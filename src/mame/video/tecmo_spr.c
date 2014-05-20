@@ -190,7 +190,14 @@ void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_dev
 			UINT32 sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
 
 			/* raiga needs something like this */
-			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
+			UINT32 number = (source[1]);
+
+			if (sizex >= 2) number &= ~0x01;
+			if (sizey >= 2) number &= ~0x02;
+			if (sizex >= 4) number &= ~0x04;
+			if (sizey >= 4) number &= ~0x08;
+			if (sizex >= 8) number &= ~0x10;
+			if (sizey >= 8) number &= ~0x20;
 
 			int ypos = (source[3] + spr_offset_y) & 0x01ff;
 			int xpos = source[4] & 0x01ff;
