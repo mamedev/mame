@@ -377,7 +377,7 @@ UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &b
 	m_text_layer->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen());
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(), -1, m_sprite_bitmap);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
@@ -402,7 +402,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	m_text_layer->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen());
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(), -1, m_sprite_bitmap);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);

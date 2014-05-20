@@ -153,19 +153,17 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 
-
-	if (m_sprgen->spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, cliprect, 0, alt_sprites, m_spvideoram))
+	if (m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 0, m_tile_bitmap_bg))
 	{
 		m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	}
 
-	m_sprgen->spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, cliprect, 1, alt_sprites, m_spvideoram);
-
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 1, m_tile_bitmap_bg);
+	
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
-
-	m_sprgen->spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_fg, cliprect, 2, alt_sprites, m_spvideoram);
-	m_sprgen->spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_fg, cliprect, 3, alt_sprites, m_spvideoram);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 2, m_tile_bitmap_fg);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), 3, m_tile_bitmap_fg);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);

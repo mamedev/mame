@@ -19,7 +19,8 @@ const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TECMO_SPRITE, "Teccmo 16-bit Sprite", tag, owner, clock, "tecmo_spr", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_gfxregion(0)
+		m_gfxregion(0),
+		m_altformat(0)
 {
 }
 
@@ -37,7 +38,12 @@ void tecmo_spr_device::set_gfx_region(device_t &device, int gfxregion)
 {
 	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
 	dev.m_gfxregion = gfxregion;
-//  printf("decospr_device::set_gfx_region()\n");
+}
+
+void tecmo_spr_device::set_alt_format(device_t &device)
+{
+	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
+	dev.m_altformat = 1;
 }
 
 
@@ -73,124 +79,69 @@ static const UINT8 layout[8][8] =
  *    5,6,7|                  | unused
  */
 
-/* sprite format (galspnbl):
- *
- *  word        bit                 usage
- * --------+-fedcba9876543210-+----------------
- *    0    | ---------------x | flip x
- *         | --------------x- | flip y
- *         | -------------x-- | enable
- *         | ----------xx---- | priority?
- *         | ---------x------ | flicker?
- *    1    | xxxxxxxxxxxxxxxx | code
- *    2    | --------xxxx---- | color
- *         | --------------xx | size: 8x8, 16x16, 32x32, 64x64
- *    3    | xxxxxxxxxxxxxxxx | y position
- *    4    | xxxxxxxxxxxxxxxx | x position
- *    5,6,7|                  | unused
- */
-
-
-/* from gals pinball (which was in turn from ninja gaiden) */
-int tecmo_spr_device::spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites, UINT16* spriteram)
-{
-	int count = 0;
-	int offs;
-
-	for (offs = (0x1000 - 16) / 2; offs >= 0; offs -= 8)
-	{
-		int sx, sy, code, color, size, attr, flipx, flipy;
-		int col, row;
-
-		attr = spriteram[offs];
-
-		int pri = (spriteram[offs] & 0x0030);
-//      int pri = (spriteram[offs+2] & 0x0030);
-
-
-		if ((attr & 0x0004) &&
-			((pri & 0x0030) >> 4) == priority)
-		{
-			flipx = attr & 0x0001;
-			flipy = attr & 0x0002;
-
-			code = spriteram[offs + 1];
-
-			if (alt_sprites)
-			{
-				color = spriteram[offs + 0];
-			}
-			else
-			{
-				color = spriteram[offs + 2];
-			}
-
-			size = 1 << (spriteram[offs + 2] & 0x0003);               /* 1,2,4,8 */
-			color = (color & 0x00f0) >> 4;
-
-			sx = spriteram[offs + 4];
-			sy = spriteram[offs + 3];
-
-			attr &= ~0x0040;                            /* !!! */
-
-			if (attr & 0x0040)
-				color |= 0x0180;
-			else
-				color |= 0x0080;
-
-
-			for (row = 0; row < size; row++)
-			{
-				for (col = 0; col < size; col++)
-				{
-					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
-					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-
-						gfxdecode->gfx(m_gfxregion)->transpen_raw(bitmap,cliprect,
-						code + layout[row][col],
-						gfxdecode->gfx(m_gfxregion)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
-						flipx, flipy,
-						x, y,
-						0);
-				}
-			}
-
-			count++;
-		}
-	}
-
-	return count;
-}
-
-
-
 #define NUM_SPRITES 256
 
-void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
+int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, int pri_hack, bitmap_ind16 &bitmap_prihack )
 {
 	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
 	int count = NUM_SPRITES;
+	int drawn = 0;
+	int screenwidth = screen.width();
+
+
+	int attributes_word = 0;
+	int tilenumber_word = 1;
+	int colour_word = 2;
+	int yposition_word = 3;
+	int xposition_word = 4;
+	int enable_word = attributes_word;
+
+	if (m_altformat) // spbactn proto, this isn't right.. there are more changes I think
+	{
+		colour_word = 0;
+		attributes_word = 2;
+	}
+
+	int xmask;
+
+	if (screenwidth == 512)
+		xmask = 512;
+	else
+		xmask = 256;
 
 	/* draw all sprites from front to back */
 	while (count--)
 	{
-		UINT32 attributes = source[0];
+		UINT32 attributes = source[attributes_word];
 		UINT32 priority_mask;
 		int col,row;
 
-		if (attributes & 0x04)
+		if (source[enable_word] & 0x04)
 		{
 			UINT32 priority = (attributes >> 6) & 3;
+			
+			// hack for spbactn which still calls us multi-pass (and uses different bits into the mixer as priority?)
+			if (pri_hack != -1)
+			{
+				int alt_pri;
+				alt_pri = (source[0] & 0x0030)>>4;
+				if (alt_pri != pri_hack)
+				{
+					source -= 8;
+					continue;
+				}
+			}
+			
 			UINT32 flipx = (attributes & 1);
 			UINT32 flipy = (attributes & 2);
 
-			UINT32 color = source[2];
+			UINT32 color = source[colour_word];
 			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
 			UINT32 sizey = 1 << ((color >> sprite_sizey) & 3); /* 1,2,4,8 */
 
-			/* raiga needs something like this */
-			UINT32 number = (source[1]);
+			/* raiga & fstarfrc need something like this */
+			UINT32 number = (source[tilenumber_word]);
 
 			if (sizex >= 2) number &= ~0x01;
 			if (sizey >= 2) number &= ~0x02;
@@ -199,14 +150,14 @@ void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_dev
 			if (sizex >= 8) number &= ~0x10;
 			if (sizey >= 8) number &= ~0x20;
 
-			int ypos = (source[3] + spr_offset_y) & 0x01ff;
-			int xpos = source[4] & 0x01ff;
+			int ypos = (source[yposition_word] + spr_offset_y) & 0x01ff;
+			int xpos = source[xposition_word] & ((xmask*2)-1);
 
 			color = (color >> 4) & 0x0f;
 
 			/* wraparound */
-			if (xpos >= 256)
-				xpos -= 512;
+			if (xpos >= xmask)
+				xpos -= (xmask*2);
 			if (ypos >= 256)
 				ypos -= 512;
 
@@ -234,57 +185,92 @@ void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_dev
 				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
 			}
 
+			bitmap_ind16* bitmap;
 
-			/* blending */
-			if (attributes & 0x20)
+
+
+			if (pri_hack == -1)
 			{
-				color |= 0x80;
-
-				for (row = 0; row < sizey; row++)
+				/* blending */
+				if (attributes & 0x20)
 				{
-					for (col = 0; col < sizex; col++)
-					{
-						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+					color |= 0x80;
+					bitmap = &bitmap_sp;
+				}
+				else
+				{
+					bitmap = (priority >= 2) ? &bitmap_bg : &bitmap_fg;
+				}
+			}
+			else // spbactn
+			{
+				// this is nonsense
+				attributes &= ~0x0040;                            /* !!! */
 
-						gfx->prio_transpen_raw(bitmap_sp,cliprect,
+				if (attributes & 0x0040)
+					color |= 0x0180;
+				else
+					color |= 0x0080;
+
+				bitmap = &bitmap_prihack;
+			}
+
+			for (row = 0; row < sizey; row++)
+			{
+				for (col = 0; col < sizex; col++)
+				{
+					int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
+					int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+
+					if (pri_hack == -1)
+					{
+						gfx->prio_transpen_raw(*bitmap, cliprect,
 							number + layout[row][col],
 							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
 							sx, sy,
 							screen.priority(), priority_mask, 0);
 					}
-				}
-			}
-			else
-			{
-				bitmap_ind16 &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
-
-				for (row = 0; row < sizey; row++)
-				{
-					for (col = 0; col < sizex; col++)
+					else // spbactn
 					{
-						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
-
-						gfx->prio_transpen_raw(bitmap,cliprect,
+						gfx->transpen_raw(*bitmap, cliprect,
 							number + layout[row][col],
 							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
 							sx, sy,
-							screen.priority(), priority_mask, 0);
+							0);
 					}
 				}
-			}
+			}	
+
+			drawn++;
+
 		}
 		source -= 8;
 	}
+
+	return drawn;
 }
 
-
-
-
 // comad bootleg of spbactn
+
+/* sprite format (galspnbl):
+ *
+ *  word        bit                 usage
+ * --------+-fedcba9876543210-+----------------
+ *    0    | ---------------x | flip x
+ *         | --------------x- | flip y
+ *         | -------------x-- | enable
+ *         | ----------xx---- | priority?
+ *         | ---------x------ | flicker?
+ *    1    | xxxxxxxxxxxxxxxx | code
+ *    2    | --------xxxx---- | color
+ *         | --------------xx | size: 8x8, 16x16, 32x32, 64x64
+ *    3    | xxxxxxxxxxxxxxxx | y position
+ *    4    | xxxxxxxxxxxxxxxx | x position
+ *    5,6,7|                  | unused
+ */
+
 void tecmo_spr_device::galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
 {
 	int offs;
@@ -321,6 +307,7 @@ void tecmo_spr_device::galspnbl_draw_sprites( screen_device &screen, gfxdecode_d
 						color,
 						flipx,flipy,
 						x,y,0);
+
 				}
 			}
 		}
