@@ -17,9 +17,12 @@
             - RS-232C 25pin connector
 
         TODO:
-        - Master-Slave hand-shaking thru PPI8255 doesn't work properly
-          (checks if bit 7 is high on master side, you apparently can't do
-           that with current core(s)), kludged to work for now.
+        - Keyboard
+        - Sound
+        - CP/M display (it runs into the weeds internally)
+        - Other connections to the various PPI's
+        - UART connections
+        - Any other devices?
 
         2011-10-31 Skeleton driver.
         2014-05-18 Made rom get copied into ram, boot code from disk
