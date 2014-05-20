@@ -15,9 +15,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 
 class myb3k_state : public driver_device
 {
@@ -27,12 +25,16 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
+	m_floppy0(*this, "fdc:0:8dsdd"),
+	m_floppy1(*this, "fdc:1:8dsdd"),
 	m_p_vram(*this, "p_vram"),
 	m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mb8877_device> m_fdc;
+	required_device<mb8877_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
@@ -121,15 +123,21 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	/* ---- --xx horizontal step count (number of offsets of vram RAM data to skip, 64 >> n) */
 
 	m_vmode = data;
-}
 
+}
 WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
-	m_fdc->set_drive(data & 3);
-	floppy_get_device(machine(), data & 3)->floppy_mon_w(!(data & 4) ? 1: 0);
-	floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(data & 0x4,0);
-	//m_fdc->set_side((data & 0x10)>>4);
+	floppy_image_device *floppy = NULL;
+
+	if (data & 1) floppy = m_floppy0;
+	if (data & 2) floppy = m_floppy1;
+
+	if (floppy)
+	{
+		floppy->mon_w(!(data & 4) ? 1: 0);
+		floppy->ss_w((data & 0x10)>>4);
+	}
 }
 
 static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
@@ -149,7 +157,7 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc", mb8877_device, read, write) //FDC, almost likely wd17xx
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc", mb8877_t, read, write) //FDC, almost likely wd17xx
 	AM_RANGE(0x24, 0x24) AM_WRITE(myb3k_fdc_output_w)
 //  AM_RANGE(0x520,0x524) mirror of above
 ADDRESS_MAP_END
@@ -233,19 +241,16 @@ static GFXDECODE_START( myb3k )
 	GFXDECODE_ENTRY( "ipl", 0x0000, myb3k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const floppy_interface myb3k_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD_40, //todo
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
+static SLOT_INTERFACE_START( myb3k_floppies )
+	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4000000) /* unknown clock*/
 	MCFG_CPU_PROGRAM_MAP(myb3k_map)
 	MCFG_CPU_IO_MAP(myb3k_io)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -264,10 +269,9 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 0)	// unknown type
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
+	MCFG_DEVICE_ADD("fdc", MB8877x, 2000000)	// unknown type
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */
