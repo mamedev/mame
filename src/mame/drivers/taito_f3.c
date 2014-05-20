@@ -488,7 +488,7 @@ static MACHINE_CONFIG_DERIVED( f3_eeprom, f3 )
 	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3 )
+static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3_224b )
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
