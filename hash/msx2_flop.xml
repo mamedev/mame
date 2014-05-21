@@ -92,7 +92,7 @@ The following floppies came with the machines.
 
 	<software name="nms8245">
 		<description>Philips NMS-8245/NMS-8250/NMS-8255</description>
-		<year>i1986</year>
+		<year>1986</year>
 		<publisher>Philips</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -113,7 +113,7 @@ The following floppies came with the machines.
 
 	<software name="nms8245f" cloneof="nms8245">
 		<description>Philips NMS-8245F</description>
-		<year>i1986</year>
+		<year>1986</year>
 		<publisher>Philips</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -134,7 +134,7 @@ The following floppies came with the machines.
 
 	<software name="nms8280" cloneof="nms8245">
 		<description>Philips NMS-8280/NMS-8280G</description>
-		<year>i1986</year>
+		<year>1986</year>
 		<publisher>Philips</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -263,7 +263,7 @@ The following floppies came with the machines.
 				<rom name="f900dsk1.dsk" size="737280" crc="204add4f" sha1="a1c4afc2304776484e5175a65cc33a8a38b95ea0" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="f900dsk2.dsk" size="737280" crc="7b519ef0" sha1="7dabe31e7ed845430ed96760ba2cb16894fad691" offset="0" />
 			</dataarea>
