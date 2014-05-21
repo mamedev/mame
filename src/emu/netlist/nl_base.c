@@ -732,7 +732,7 @@ ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t 
 
 ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 {
-	assert(m_num_cons != 0);
+	//assert(m_num_cons != 0);
 	assert(this->isRailNet());
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
