@@ -990,6 +990,7 @@ void m37710_cpu_device::device_start()
 	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
 
 	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
 	m_ICount = 0;
@@ -1192,59 +1193,49 @@ void m37710_cpu_device::m37710i_set_execution_mode(UINT32 mode)
 /* ================================= MEMORY =============================== */
 /* ======================================================================== */
 
-#define ADDRESS_37710(A) ((A)&0xffffff)
-
 UINT32 m37710_cpu_device::m37710i_read_8_normal(UINT32 address)
 {
-	address = ADDRESS_37710(address);
 	return m37710_read_8(address);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_8_immediate(UINT32 address)
 {
-	address = ADDRESS_37710(address);
 	return m37710_read_8_immediate(address);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_8_direct(UINT32 address)
 {
-	address = ADDRESS_37710(address);
 	return m37710_read_8(address);
 }
 
 void m37710_cpu_device::m37710i_write_8_normal(UINT32 address, UINT32 value)
 {
-	address = ADDRESS_37710(address);
-	m37710_write_8(address, MAKE_UINT_8(value));
+	m37710_write_8(address, value);
 }
 
 void m37710_cpu_device::m37710i_write_8_direct(UINT32 address, UINT32 value)
 {
-	address = ADDRESS_37710(address);
-	m37710_write_8(address, MAKE_UINT_8(value));
+	m37710_write_8(address, value);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_16_normal(UINT32 address)
 {
-	address = ADDRESS_37710(address);
 	if (address & 1)
-		return m37710i_read_8_normal(address) | m37710i_read_8_normal(address+1)<<8;
+		return m37710_read_8(address) | m37710_read_8(address+1)<<8;
 	else
 		return m37710_read_16(address);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_16_immediate(UINT32 address)
 {
-	address = ADDRESS_37710(address);
 	if (address & 1)
 		return m37710_read_8_immediate(address) | m37710_read_8_immediate(address+1)<<8;
 	else
-		return m37710_read_16(address);
+		return m37710_read_16_immediate(address);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_16_direct(UINT32 address)
 {
-	address = ADDRESS_37710(address);
 	if (address & 1)
 		return m37710_read_8(address) | m37710_read_8((address)+1)<<8;
 	else
@@ -1253,7 +1244,6 @@ UINT32 m37710_cpu_device::m37710i_read_16_direct(UINT32 address)
 
 void m37710_cpu_device::m37710i_write_16_normal(UINT32 address, UINT32 value)
 {
-	address = ADDRESS_37710(address);
 	if (address & 1)
 	{
 		m37710_write_8(address, value);
@@ -1265,7 +1255,6 @@ void m37710_cpu_device::m37710i_write_16_normal(UINT32 address, UINT32 value)
 
 void m37710_cpu_device::m37710i_write_16_direct(UINT32 address, UINT32 value)
 {
-	address = ADDRESS_37710(address);
 	if (address & 1)
 	{
 		m37710_write_8(address, value);
@@ -1277,20 +1266,20 @@ void m37710_cpu_device::m37710i_write_16_direct(UINT32 address, UINT32 value)
 
 UINT32 m37710_cpu_device::m37710i_read_24_normal(UINT32 address)
 {
-	return   m37710i_read_16_normal(address)       |
-			(m37710i_read_8_normal(address+2)<<16);
+	return   m37710_read_16(address)       |
+			(m37710_read_8(address+2)<<16);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_24_immediate(UINT32 address)
 {
-	return   m37710i_read_16_immediate(address)       |
-			(m37710i_read_8_immediate(address+2)<<16);
+	return   m37710_read_16_immediate(address)       |
+			(m37710_read_8_immediate(address+2)<<16);
 }
 
 UINT32 m37710_cpu_device::m37710i_read_24_direct(UINT32 address)
 {
-	return   m37710i_read_16_direct(address)         |
-			(m37710i_read_8_direct(address+2)<<16);
+	return   m37710_read_16(address)         |
+			(m37710_read_8(address+2)<<16);
 }
 
 

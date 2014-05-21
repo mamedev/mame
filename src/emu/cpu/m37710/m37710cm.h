@@ -24,9 +24,10 @@
 #define M37710_CALL_DEBUGGER(x)         debugger_instruction_hook(this, x)
 #define m37710_read_8(addr)             m_program->read_byte(addr)
 #define m37710_write_8(addr,data)       m_program->write_byte(addr,data)
-#define m37710_read_8_immediate(A)      m_program->read_byte(A)
+#define m37710_read_8_immediate(A)      m_direct->read_decrypted_byte(A, BYTE_XOR_LE(0))
 #define m37710_read_16(addr)            m_program->read_word(addr)
 #define m37710_write_16(addr,data)      m_program->write_word(addr,data)
+#define m37710_read_16_immediate(A)     m_direct->read_decrypted_word(A)
 #define m37710_jumping(A)
 #define m37710_branching(A)
 
@@ -63,11 +64,6 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 /* ================================== CPU ================================= */
 /* ======================================================================== */
-
-
-extern UINT32 m37710i_adc_tbl[];
-extern UINT32 m37710i_sbc_tbl[];
-
 
 #define REG_A           m_a     /* Accumulator */
 #define REG_B           m_b     /* Accumulator hi byte */

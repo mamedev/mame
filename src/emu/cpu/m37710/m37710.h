@@ -159,6 +159,7 @@ private:
 	UINT32 m_source;        /* temp register */
 	UINT32 m_destination;   /* temp register */
 	address_space *m_program;
+	direct_read_data *m_direct;
 	address_space *m_io;
 	UINT32 m_stopped;       /* Sets how the CPU is stopped */
 
