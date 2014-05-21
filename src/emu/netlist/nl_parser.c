@@ -457,7 +457,7 @@ void netlist_parser::device(const pstring &dev_type)
 		tok = get_token();
 	}
 	if (cnt != termlist.count())
-		fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
+		m_setup.netlist().error("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
 	require_token(tok, m_tok_param_right);
 }
 

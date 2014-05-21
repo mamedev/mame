@@ -4,7 +4,7 @@
  */
 
 #include "nld_log.h"
-#include "sound/wavwrite.h"
+//#include "sound/wavwrite.h"
 
 //FIXME: what to do with save states?
 

@@ -10,6 +10,7 @@
 NETLIST_START(pong_fast)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
+	PARAM(Solver.LTE,     1e-4) // Default is not enough for paddle control if using LTE
 
 	ANALOG_INPUT(V5, 5)
 

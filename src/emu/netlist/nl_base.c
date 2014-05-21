@@ -93,7 +93,7 @@ ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &
 	save_register();
 }
 
-ATTR_COLD const pstring netlist_object_t::name() const
+ATTR_COLD const pstring &netlist_object_t::name() const
 {
 	if (m_name == "")
 		netlist().error("object not initialized");
@@ -133,16 +133,6 @@ netlist_base_t::netlist_base_t()
 {
 }
 
-template <class T>
-static void tagmap_free_entries(T &tm)
-{
-	for (typename T::entry_t *entry = tm.first(); entry != NULL; entry = tm.next(entry))
-	{
-		delete entry->object();
-	}
-	tm.reset();
-}
-
 netlist_base_t::~netlist_base_t()
 {
 	for (int i=0; i < m_nets.count(); i++)
@@ -155,7 +145,7 @@ netlist_base_t::~netlist_base_t()
 
 	m_nets.clear();
 
-	tagmap_free_entries<tagmap_devices_t>(m_devices);
+	m_devices.clear_and_free();
 
 	pstring::resetmem();
 }
@@ -186,9 +176,9 @@ ATTR_COLD void netlist_base_t::start()
 		m_solver->start_dev();
 
 	NL_VERBOSE_OUT(("Initializing devices ...\n"));
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		netlist_device_t *dev = entry->object();
+    for (netlist_device_t * const * entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+		netlist_device_t *dev = *entry;
 		if (dev != m_solver)
 			dev->start_dev();
 	}
@@ -226,25 +216,22 @@ ATTR_COLD void netlist_base_t::reset()
 		m_nets[i]->do_reset();
 
 	// Reset all devices once !
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	for (int i = 0; i < m_devices.count(); i++)
 	{
-		netlist_device_t *dev = entry->object();
-		dev->do_reset();
+	    m_devices[i]->do_reset();
 	}
 
 	// Step all devices once !
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		netlist_device_t *dev = entry->object();
-		//printf("step %s\n", dev->name().cstr());
-		dev->update_dev();
+    for (int i = 0; i < m_devices.count(); i++)
+    {
+        m_devices[i]->update_dev();
 	}
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		entry->object()->update_param();
+    for (int i = 0; i < m_devices.count(); i++)
+    {
+        m_devices[i]->update_param();
 	}
 }
 
@@ -262,9 +249,6 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 			e->object()->update_devs();
 
 			add_to_stat(m_perf_out_processed, 1);
-			if (FATAL_ERROR_AFTER_NS)
-				if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-					error("Stopped");
 		}
 		if (m_queue.is_empty())
 			m_time = m_stop;
@@ -294,9 +278,6 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 				mc_time += inc;
 				NETLIB_NAME(mainclock)::mc_update(mc_net);
 			}
-			if (FATAL_ERROR_AFTER_NS)
-				if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-					error("Stopped");
 
 			add_to_stat(m_perf_out_processed, 1);
 		}

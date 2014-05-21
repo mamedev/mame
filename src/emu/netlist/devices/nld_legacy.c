@@ -4,7 +4,7 @@
  */
 
 #include "nld_legacy.h"
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 NETLIB_START(nicRSFF)
 {

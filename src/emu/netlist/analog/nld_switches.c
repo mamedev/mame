@@ -4,7 +4,7 @@
  */
 
 #include "nld_switches.h"
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define R_OFF   (1.0 / netlist().gmin())
 #define R_ON    0.01

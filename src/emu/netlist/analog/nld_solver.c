@@ -3,6 +3,8 @@
  *
  */
 
+#include <algorithm>
+
 #include "nld_solver.h"
 #include "nld_twoterm.h"
 #include "../nl_lists.h"
@@ -22,6 +24,9 @@
 
 ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t()
 : m_owner(NULL)
+, m_calculations(0)
+, m_gs_fail(0)
+, m_gs_total(0)
 {
 }
 
@@ -260,6 +265,23 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 	return next_time_step;
 }
 
+void netlist_matrix_solver_t::log_stats()
+{
+#if 0
+    printf("==============================================\n");
+    printf("Solver %s\n", name().cstr());
+    printf("       ==> %d nets\n", m_nets.count()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+    printf("       has %s elements\n", is_dynamic() ? "dynamic" : "no dynamic");
+    printf("       has %s elements\n", is_timestep() ? "timestep" : "no timestep");
+    printf("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %4.1f average\n",
+            m_calculations,
+            m_calculations * 10 / (int) (netlist().time().as_double() * 10.0),
+            m_gs_fail,
+            100.0 * (double) m_gs_fail / (double) m_calculations,
+            (double) m_gs_total / (double) m_calculations);
+#endif
+}
+
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver - Direct base
 // ----------------------------------------------------------------------------------------
@@ -384,13 +406,15 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 	printf("\n");
 #endif
 
-	for (int i = 0; i < N(); i++) {
+    const int kN = N();
+
+	for (int i = 0; i < kN; i++) {
 	    // FIXME: use a parameter to enable pivoting?
 	    if (USE_PIVOT_SEARCH)
 	    {
 	        /* Find the row with the largest first value */
 	        int maxrow = i;
-	        for (int j = i + 1; j < N(); j++)
+	        for (int j = i + 1; j < kN; j++)
 	        {
 	            if (fabs(A[j][i]) > fabs(A[maxrow][i]))
 	                maxrow = j;
@@ -399,14 +423,10 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 	        if (maxrow != i)
 	        {
 	            /* Swap the maxrow and ith row */
-	            for (int k = i; k < N(); k++) {
-	                const double tmp = A[i][k];
-	                A[i][k] = A[maxrow][k];
-	                A[maxrow][k] = tmp;
+	            for (int k = i; k < kN; k++) {
+	                std::swap(A[i][k], A[maxrow][k]);
 	            }
-	            const double tmpR = RHS[i];
-	            RHS[i] = RHS[maxrow];
-	            RHS[maxrow] = tmpR;
+	            std::swap(RHS[i], RHS[maxrow]);
 	        }
 	    }
 
@@ -416,13 +436,14 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 		f = 1.0 / f;
 
 		/* Eliminate column i from row j */
-		for (int j = i + 1; j < N(); j++)
-		{
-			if (A[j][i] != 0.0)
-			{
-	            const double f1 = A[j][i] * f;
 
-	            for (int k = i; k < N(); k++)
+		for (int j = i + 1; j < kN; j++)
+		{
+            //__builtin_prefetch(&A[j+1][i], 1);
+            const double f1 = A[j][i] * f;
+			if (f1 != 0.0)
+			{
+	            for (int k = i; k < kN; k++)
 					A[j][k] -= A[i][k] * f1;
 
 	            RHS[j] -= RHS[i] * f1;
@@ -430,11 +451,12 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 		}
 	}
 	/* back substitution */
-	for (int j = N() - 1; j >= 0; j--)
+	for (int j = kN - 1; j >= 0; j--)
 	{
+        //__builtin_prefetch(&A[j-1][j], 0);
 		double tmp = 0;
-		for (int k = j + 1; k < N(); k++)
-			tmp += A[j][k] * x[k];
+        for (int k = j + 1; k < kN; k++)
+            tmp += A[j][k] * x[k];
 		x[j] = (RHS[j] - tmp) / A[j][j];
 	}
 #if 0
@@ -660,9 +682,9 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 			}
 
 			//double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
-			double new_val = net->m_new_Analog * one_m_w[k] + iIdr * w[k];
+			const double new_val = net->m_new_Analog * one_m_w[k] + iIdr * w[k];
 
-			double e = (new_val - net->m_new_Analog);
+			const double e = (new_val - net->m_new_Analog);
 			cerr += e * e;
 
 			net->m_new_Analog = new_val;
@@ -674,11 +696,16 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 		resched_cnt++;
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
+	this->m_gs_total += resched_cnt;
 	if (resched)
 	{
 	    //this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
-	    return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic();
+	    this->m_gs_fail++;
+	    int tmp = netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic();
+        this->m_calculations++;
+        return tmp;
 	}
+    this->m_calculations++;
 
     for (int k = 0; k < this->N(); k++)
         this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_new_Analog;
@@ -702,12 +729,12 @@ NETLIB_START(solver)
 
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("CONVERG", m_convergence, 0.3);
-	register_param("GS_LOOPS", m_gs_loops, 7);      // Gauss-Seidel loops
-    register_param("NR_LOOPS", m_nr_loops, 25);      // Newton-Raphson loops
+	register_param("GS_LOOPS", m_gs_loops, 7);              // Gauss-Seidel loops
+    register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
     register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
     register_param("DYNAMIC_TS", m_dynamic, 0);
-	register_param("LTE", m_lte, 1e-3);             // 1mV diff/timestep
+	register_param("LTE", m_lte, 1e-3);                     // 1mV diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 2e-9);   // double timestep resolution
 
 	// internal staff
@@ -731,6 +758,9 @@ NETLIB_UPDATE_PARAM(solver)
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
+    for (int i = 0; i < m_mat_solvers.count(); i++)
+        m_mat_solvers[i]->log_stats();
+
 	netlist_matrix_solver_t * const *e = m_mat_solvers.first();
 	while (e != NULL)
 	{
@@ -852,20 +882,26 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				ms = new netlist_matrix_solver_direct_t<4,4>();
 				//ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
 				break;
-#if 0
 			case 5:
-				//ms = new netlist_matrix_solver_direct_t<5,5>();
-				ms = new netlist_matrix_solver_gauss_seidel_t<5,5>();
+				ms = new netlist_matrix_solver_direct_t<5,5>();
+				//ms = new netlist_matrix_solver_gauss_seidel_t<5,5>();
 				break;
 			case 6:
-				//ms = new netlist_matrix_solver_direct_t<6,6>();
-				ms = new netlist_matrix_solver_gauss_seidel_t<6,6>();
+				ms = new netlist_matrix_solver_direct_t<6,6>();
+				//ms = new netlist_matrix_solver_gauss_seidel_t<6,6>();
 				break;
-#endif
+            case 7:
+                //ms = new netlist_matrix_solver_direct_t<6,6>();
+                ms = new netlist_matrix_solver_gauss_seidel_t<7,7>();
+                break;
+            case 8:
+                //ms = new netlist_matrix_solver_direct_t<6,6>();
+                ms = new netlist_matrix_solver_gauss_seidel_t<8,8>();
+                break;
 			default:
 				if (net_count <= 16)
 				{
-					//ms = new netlist_matrix_solver_direct_t<0,16>();
+				    //ms = new netlist_matrix_solver_direct_t<0,16>();
 					ms = new netlist_matrix_solver_gauss_seidel_t<0,16>();
 				}
 				else if (net_count <= 32)
@@ -912,3 +948,4 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 
 }
+

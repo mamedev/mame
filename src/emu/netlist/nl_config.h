@@ -40,8 +40,6 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
-typedef UINT8 netlist_sig_t;
-
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -50,7 +48,6 @@ typedef UINT8 netlist_sig_t;
 
 #define NL_VERBOSE                  (0)
 #define NL_KEEP_STATISTICS          (0)
-#define FATAL_ERROR_AFTER_NS        (0) //(1000)
 
 #if (NL_VERBOSE)
 	#define NL_VERBOSE_OUT(x)       printf x
@@ -102,18 +99,89 @@ typedef UINT8 netlist_sig_t;
 
 
 //============================================================
-//  Performance tracking
+//  Compiling standalone
 //============================================================
 
 // Compiling without mame ?
 
 #ifndef ATTR_HOT
-#warning ATTR_HOT not defined
+//#warning ATTR_HOT not defined
+
+// standard C includes
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
+
+// standard C++ includes
+#include <exception>
+#include <typeinfo>
+#include <new>
+
 #define ATTR_HOT
+#define ATTR_COLD
+#define ATTR_PRINTF(n1,n2)
+#define RESTRICT
+#define EXPECTED
+#define UNEXPECTED
+#define ATTR_UNUSED             __attribute__((__unused__))
+
+// this macro passes an item followed by a string version of itself as two consecutive parameters
+#define NAME(x) x, #x
+
+/* 8-bit values */
+typedef unsigned char                       UINT8;
+typedef signed char                         INT8;
+
+/* 16-bit values */
+typedef unsigned short                      UINT16;
+typedef signed short                        INT16;
+
+/* 32-bit values */
+#ifndef _WINDOWS_H
+typedef unsigned int                        UINT32;
+typedef signed int                          INT32;
 #endif
 
-#ifndef ATTR_COLD
-#define ATTR_COLD
+/* 64-bit values */
+#ifndef _WINDOWS_H
+#ifdef _MSC_VER
+typedef signed __int64                      INT64;
+typedef unsigned __int64                    UINT64;
+#else
+__extension__ typedef unsigned long long    UINT64;
+__extension__ typedef signed long long      INT64;
+#endif
+#endif
+
+#ifdef MAME_DEBUG
+#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#else
+#define assert(x)               do { } while (0)
+//#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
+#define assert_always(x, msg)   do { } while (0)
+#endif
+
+/* U64 and S64 are used to wrap long integer constants. */
+#if defined(__GNUC__) || defined(_MSC_VER)
+#define U64(val) val##ULL
+#define S64(val) val##LL
+#else
+#define U64(val) val
+#define S64(val) val
+#endif
+
+/* Standard MIN/MAX macros */
+#ifndef MIN
+#define MIN(x,y)            ((x) < (y) ? (x) : (y))
+#endif
+#ifndef MAX
+#define MAX(x,y)            ((x) > (y) ? (x) : (y))
+#endif
+
+
 #endif
 
 //============================================================
@@ -126,46 +194,5 @@ typedef UINT8 netlist_sig_t;
 #endif
 #endif
 
-//============================================================
-//  Downcasting
-//============================================================
-
-// template function for casting from a base class to a derived class that is checked
-// in debug builds and fast in release builds
-template<class _Dest, class _Source>
-inline _Dest nl_downcast(_Source *src)
-{
-#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
-    try {
-        if (dynamic_cast<_Dest>(src) != src)
-        {
-            report_bad_cast(typeid(src), typeid(_Dest));
-        }
-    }
-    catch (std::bad_cast &)
-    {
-        report_bad_cast(typeid(src), typeid(_Dest));
-    }
-#endif
-    return static_cast<_Dest>(src);
-}
-
-template<class _Dest, class _Source>
-inline _Dest nl_downcast(_Source &src)
-{
-#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
-    try {
-        if (&dynamic_cast<_Dest>(src) != &src)
-        {
-            report_bad_cast(typeid(src), typeid(_Dest));
-        }
-    }
-    catch (std::bad_cast &)
-    {
-        report_bad_cast(typeid(src), typeid(_Dest));
-    }
-#endif
-    return static_cast<_Dest>(src);
-}
 
 #endif /* NLCONFIG_H_ */

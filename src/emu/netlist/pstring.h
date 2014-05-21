@@ -9,6 +9,7 @@
 
 #include "nl_config.h"
 #include <cstdio>
+#include <ctype.h>
 
 // ----------------------------------------------------------------------------------------
 // pblockbool: allocate small memory more efficiently at the expense of some overhead

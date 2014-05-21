@@ -83,6 +83,7 @@ public:
 	struct link_t
 	{
 		link_t() { }
+        link_t(void *) { }
 		// Copy constructor
 		link_t(const link_t &from)
 		{
@@ -100,11 +101,13 @@ public:
 
 		bool operator==(const link_t &rhs) const { return (e1 == rhs.e1) && (e2 == rhs.e2); }
 		link_t &operator=(const link_t &rhs) { e1 = rhs.e1; e2 = rhs.e2; return *this; }
+
+		const pstring &name() const { return e1; }
 	};
 
-	typedef tagmap_t<pstring, 393> tagmap_nstring_t;
-	typedef tagmap_t<netlist_param_t *, 393> tagmap_param_t;
-	typedef tagmap_t<netlist_core_terminal_t *, 393> tagmap_terminal_t;
+	typedef netlist_tagmap_t<link_t> tagmap_nstring_t;
+	typedef netlist_tagmap_t<netlist_param_t *> tagmap_param_t;
+	typedef netlist_tagmap_t<netlist_core_terminal_t *> tagmap_terminal_t;
 	typedef netlist_list_t<link_t> tagmap_link_t;
 
 	netlist_setup_t(netlist_base_t &netlist);

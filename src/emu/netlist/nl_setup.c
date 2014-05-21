@@ -46,10 +46,10 @@ void netlist_setup_t::init()
 netlist_setup_t::~netlist_setup_t()
 {
 	m_links.clear();
-	m_alias.reset();
-	m_params.reset();
-	m_terminals.reset();
-	m_params_temp.reset();
+	m_alias.clear();
+	m_params.clear();
+	m_terminals.clear();
+	m_params_temp.clear();
 
 	netlist().set_setup(NULL);
 
@@ -84,7 +84,7 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 
 	dev->init(netlist(), fqn);
 
-	if (!(netlist().m_devices.add(fqn, dev, false)==TMERR_NONE))
+	if (!(netlist().m_devices.add(dev, false)==true))
 		netlist().error("Error adding %s to device list\n", name.cstr());
 	return dev;
 }
@@ -92,17 +92,14 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 template <class T>
 static void remove_start_with(T &hm, pstring &sw)
 {
-	typename T::entry_t *entry = hm.first();
-	while (entry != NULL)
-	{
-		typename T::entry_t *next = hm.next(entry);
-		pstring x = entry->tag().cstr();
+    for (int i = hm.count() - 1; i >= 0; i++)
+    {
+        pstring x = hm[i]->name();
 		if (sw.equals(x.substr(0, sw.len())))
 		{
-			NL_VERBOSE_OUT(("removing %s\n", entry->tag().cstr()));
-			hm.remove(entry->object());
+			NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
+			hm.remove(hm[i]);
 		}
-		entry = next;
 	}
 }
 
@@ -113,7 +110,6 @@ void netlist_setup_t::remove_dev(const pstring &name)
 	if (dev == NULL)
 		netlist().error("Device %s does not exist\n", name.cstr());
 
-	//remove_start_with<tagmap_input_t>(m_inputs, temp);
 	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
 	remove_start_with<tagmap_param_t>(m_params, temp);
 
@@ -125,7 +121,7 @@ void netlist_setup_t::remove_dev(const pstring &name)
 			m_links.remove(*p);
 		p = n;
 	}
-	netlist().m_devices.remove(name);
+	netlist().m_devices.remove_by_name(name);
 }
 
 void netlist_setup_t::register_model(const pstring &model)
@@ -135,7 +131,7 @@ void netlist_setup_t::register_model(const pstring &model)
 
 void netlist_setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 {
-	if (!(m_alias.add(alias, out, false)==TMERR_NONE))
+	if (!(m_alias.add(link_t(alias, out), false)==true))
 		netlist().error("Error adding alias %s to alias list\n", alias.cstr());
 }
 
@@ -194,7 +190,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 				else
 					term.init_object(dev, dev.name() + "." + name);
 
-				if (!(m_terminals.add(term.name(), &term, false)==TMERR_NONE))
+				if (!(m_terminals.add(&term, false)==true))
 					netlist().error("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
 				NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
 			}
@@ -204,7 +200,8 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 		case netlist_terminal_t::PARAM:
 			{
 				netlist_param_t &param = dynamic_cast<netlist_param_t &>(obj);
-				const pstring val = m_params_temp.find(name);
+				//printf("name: %s\n", name.cstr());
+				const pstring val = m_params_temp.find(name).e2;
 				if (val != "")
 				{
 					switch (param.param_type())
@@ -257,7 +254,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 							netlist().error("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
 					}
 				}
-				if (!(m_params.add(name, &param, false)==TMERR_NONE))
+				if (!(m_params.add(&param, false)==true))
 					netlist().error("Error adding parameter %s to parameter list\n", name.cstr());
 			}
 			break;
@@ -306,7 +303,7 @@ void netlist_setup_t::register_param(const pstring &param, const pstring &value)
 {
 	pstring fqn = build_fqn(param);
 
-	if (!(m_params_temp.add(fqn, value, false)==TMERR_NONE))
+	if (!(m_params_temp.add(link_t(fqn, value), false)==true))
 		netlist().error("Error adding parameter %s to parameter list\n", param.cstr());
 }
 
@@ -318,7 +315,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		temp = m_alias.find(ret);
+		temp = m_alias.find(ret).e2;
 	} while (temp != "");
 
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
@@ -608,9 +605,9 @@ void netlist_setup_t::resolve_inputs()
 
 	//netlist().log("printing outputs ...");
 	/* print all outputs */
-	for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
+	for (int i = 0; i < m_terminals.count(); i++)
 	{
-		ATTR_UNUSED netlist_output_t *out = dynamic_cast<netlist_output_t *>(entry->object());
+		ATTR_UNUSED netlist_output_t *out = dynamic_cast<netlist_output_t *>(m_terminals[i]);
 		//if (out != NULL)
 			//VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
 	}
@@ -649,23 +646,23 @@ void netlist_setup_t::resolve_inputs()
 	pstring errstr("");
 
 	netlist().log("looking for terminals not connected ...");
-	for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
-	{
-		if (!entry->object()->has_net())
+    for (int i = 0; i < m_terminals.count(); i++)
+    {
+		if (!m_terminals[i]->has_net())
 			errstr += pstring::sprintf("Found terminal %s without a net\n",
-					entry->object()->name().cstr());
-		else if (entry->object()->net().num_cons() == 0)
+			        m_terminals[i]->name().cstr());
+		else if (m_terminals[i]->net().num_cons() == 0)
 			netlist().warning("Found terminal %s without connections",
-					entry->object()->name().cstr());
+			        m_terminals[i]->name().cstr());
 	}
 	if (errstr != "")
 		netlist().error("%s", errstr.cstr());
 
 
 	netlist().log("looking for two terms connected to rail nets ...\n");
-	for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
+	for (int i=0; i < netlist().m_devices.count(); i++)
 	{
-		NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(entry->object());
+		NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
 		if (t != NULL)
 		{
 			has_twoterms = true;
@@ -720,7 +717,7 @@ void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (netlist_setup_t::tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+		for (netlist_setup_t::devices_list_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 		{
 			//entry->object()->s
 			printf("Device %20s : %12d %15ld\n", entry->object()->name().cstr(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));

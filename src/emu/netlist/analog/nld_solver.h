@@ -65,6 +65,8 @@ public:
 
 	netlist_solver_parameters_t m_params;
 
+	ATTR_COLD void log_stats();
+
 protected:
 
     netlist_analog_net_t::list_t m_nets;
@@ -74,6 +76,10 @@ protected:
 
     // return true if a reschedule is needed ...
     ATTR_HOT virtual int vsolve_non_dynamic() = 0;
+
+    int m_calculations;
+    int m_gs_fail;
+    int m_gs_total;
 
 private:
 
@@ -114,7 +120,7 @@ public:
 	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 
-	ATTR_HOT inline const int N() const { return (m_N == 0) ? m_nets.count() : m_N; }
+	ATTR_HOT inline const int N() const { if (m_N == 0) return m_nets.count(); else return m_N; }
 
 protected:
     ATTR_HOT virtual int vsolve_non_dynamic();
@@ -193,7 +199,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_matrix_solver_t::list_t m_mat_solvers;
 public:
 
-		ATTR_COLD ~NETLIB_NAME(solver)();
+		ATTR_COLD virtual ~NETLIB_NAME(solver)();
 
 		ATTR_COLD void post_start();
 

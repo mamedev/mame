@@ -161,6 +161,8 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
+typedef UINT8 netlist_sig_t;
+
 class netlist_core_device_t;
 
 #if USE_PMFDELEGATES
@@ -315,7 +317,7 @@ public:
 	ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
 	ATTR_COLD bool isInitialized() { return (m_netlist != NULL); }
 
-	ATTR_COLD const pstring name() const;
+	ATTR_COLD const pstring &name() const;
 
 	PSTATE_INTERFACE_DECL()
 
@@ -1071,8 +1073,41 @@ private:
 // netlist_base_t
 // ----------------------------------------------------------------------------------------
 
+template <class _C>
+class netlist_tagmap_t : public netlist_list_t<_C>
+{
+public:
+    _C find(const pstring name) const
+    {
+        for (int i=0; i < this->count(); i++)
+            if (get_name((*this)[i]) == name)
+                return (*this)[i];
+        return _C(NULL);
+    }
 
-typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
+    void remove_by_name(const pstring name)
+    {
+        netlist_list_t<_C>::remove(find(name));
+    }
+
+    bool add(_C dev, bool allow_duplicate)
+    {
+        if (allow_duplicate)
+            netlist_list_t<_C>::add(dev);
+        else
+        {
+            if (!(this->find(get_name(dev)) == _C(NULL)))
+                return false;
+            netlist_list_t<_C>::add(dev);
+        }
+        return true;
+    }
+
+private:
+    template <typename T> static const pstring get_name(T &elem) { return elem.name(); }
+    template <typename T> static const pstring get_name(T *elem) { return elem->name(); }
+
+};
 
 class netlist_base_t : public netlist_object_t, public pstate_manager_t
 {
@@ -1119,9 +1154,9 @@ public:
 	netlist_list_t<_C *> get_device_list()
 	{
 		netlist_list_t<_C *> tmp;
-		for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+		for (netlist_device_t * const *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 		{
-			_C *dev = dynamic_cast<_C *>(entry->object());
+			_C *dev = dynamic_cast<_C *>(*entry);
 			if (dev != NULL)
 				tmp.add(dev);
 		}
@@ -1131,9 +1166,10 @@ public:
 	template<class _C>
 	_C *get_first_device()
 	{
-		for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-		{
-			_C *dev = dynamic_cast<_C *>(entry->object());
+	    //FIXME:
+        for (netlist_device_t * const *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+        {
+            _C *dev = dynamic_cast<_C *>(*entry);
 			if (dev != NULL)
 				return dev;
 		}
@@ -1144,9 +1180,9 @@ public:
 	_C *get_single_device(const char *classname)
 	{
 		_C *ret = NULL;
-		for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-		{
-			_C *dev = dynamic_cast<_C *>(entry->object());
+        for (netlist_device_t * const *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+        {
+            _C *dev = dynamic_cast<_C *>(*entry);
 			if (dev != NULL)
 			{
 				if (ret != NULL)
@@ -1158,7 +1194,7 @@ public:
 		return ret;
 	}
 
-	tagmap_devices_t m_devices;
+	netlist_tagmap_t<netlist_device_t *> m_devices;
 	netlist_net_t::list_t m_nets;
 
 protected:
