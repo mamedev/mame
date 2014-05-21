@@ -345,8 +345,8 @@ public:
 	DECLARE_DRIVER_INIT(lasstixx);
 	DECLARE_DRIVER_INIT(lsrquiz);
 
-	required_ioport m_p1_port;
-	required_ioport m_p2_port;
+	optional_ioport m_p1_port;
+	optional_ioport m_p2_port;
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
