@@ -61,6 +61,8 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_get_disc(*device, _func);
 #define MCFG_LASERDISC_AUDIO(_func) \
 	laserdisc_device::static_set_audio(*device, _func);
+#define MCFG_LASERDISC_SCREEN(_tag) \
+	laserdisc_device::static_set_screen(*device, _tag);
 #define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
 	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \

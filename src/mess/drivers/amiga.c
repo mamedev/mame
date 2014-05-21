@@ -920,6 +920,13 @@ static ADDRESS_MAP_START( overlay_1mb_map32, AS_PROGRAM, 32, amiga_state )
 ADDRESS_MAP_END
 
 // Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
+static ADDRESS_MAP_START( overlay_2mb_map16, AS_PROGRAM, 16, amiga_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
+ADDRESS_MAP_END
+
+// Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
 static ADDRESS_MAP_START( overlay_2mb_map32, AS_PROGRAM, 32, amiga_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
@@ -1227,30 +1234,6 @@ static SLOT_INTERFACE_START( amiga_floppies )
 SLOT_INTERFACE_END
 
 // basic elements common to all amigas
-static MACHINE_CONFIG_FRAGMENT( pal_video )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS
-	(
-		amiga_state::CLK_28M_PAL / 4 * 2,
-		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
-		amiga_state::SCREEN_HEIGHT_PAL, amiga_state::VBLANK_PAL, amiga_state::SCREEN_HEIGHT_PAL
-	)
-	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( ntsc_video )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS
-	(
-		amiga_state::CLK_28M_NTSC / 4 * 2,
-		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
-		amiga_state::SCREEN_HEIGHT_NTSC, amiga_state::VBLANK_NTSC, amiga_state::SCREEN_HEIGHT_NTSC
-	)
-	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	// video
 	MCFG_FRAGMENT_ADD(pal_video)
@@ -1558,7 +1541,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a600, amiga_base, a600_state )
 	MCFG_CPU_PROGRAM_MAP(a600_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map)
+	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map16)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)

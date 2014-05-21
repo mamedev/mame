@@ -606,5 +606,7 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline);
 void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
 void amiga_aga_diwhigh_written(running_machine &machine, int written);
+MACHINE_CONFIG_EXTERN( pal_video );
+MACHINE_CONFIG_EXTERN( ntsc_video );
 
 #endif /* __AMIGA_H__ */

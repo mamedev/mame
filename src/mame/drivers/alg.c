@@ -367,16 +367,14 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	/* video hardware */
+	MCFG_FRAGMENT_ADD(ntsc_video)
+
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
+	MCFG_LASERDISC_SCREEN("screen")
 	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
 	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-
-	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_SCREEN_REFRESH_RATE(59.997)
-	MCFG_SCREEN_SIZE(512*2, 262)
-	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
 	MCFG_PALETTE_ADD("palette", 4097)
 	MCFG_PALETTE_INIT_OWNER(alg_state,amiga)
@@ -411,22 +409,18 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( alg_r2, alg_r1 )
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_r2)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( picmatic, alg_r1 )
-
 	/* adjust for PAL specs */
 	MCFG_CPU_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(main_map_picmatic)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(512*2, 312)
-	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
+	MCFG_DEVICE_REMOVE("screen")
+	MCFG_FRAGMENT_ADD(pal_video)
 
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_PAL)

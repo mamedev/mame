@@ -110,7 +110,7 @@ PALETTE_INIT_MEMBER(amiga_state,amiga)
  *
  *************************************/
 
-VIDEO_START_MEMBER(amiga_state,amiga)
+VIDEO_START_MEMBER( amiga_state, amiga )
 {
 	int j;
 
@@ -1058,3 +1058,32 @@ void amiga_state::update_screenmode()
 	// finally set our new mode
 	m_screen->configure(SCREEN_WIDTH, height, visarea, period);
 }
+
+
+//**************************************************************************
+//  MACHINE DRIVER FRAGMENTS
+//**************************************************************************
+
+MACHINE_CONFIG_FRAGMENT( pal_video )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS
+	(
+		amiga_state::CLK_28M_PAL / 4 * 2,
+		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
+		amiga_state::SCREEN_HEIGHT_PAL, amiga_state::VBLANK_PAL, amiga_state::SCREEN_HEIGHT_PAL
+	)
+	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+	MCFG_SCREEN_PALETTE("palette")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( ntsc_video )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS
+	(
+		amiga_state::CLK_28M_NTSC / 4 * 2,
+		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
+		amiga_state::SCREEN_HEIGHT_NTSC, amiga_state::VBLANK_NTSC, amiga_state::SCREEN_HEIGHT_NTSC
+	)
+	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+	MCFG_SCREEN_PALETTE("palette")
+MACHINE_CONFIG_END
