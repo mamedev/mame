@@ -171,8 +171,26 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
 #else
+	bitmap.fill(0, cliprect);
 
 	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), -2, m_sprite_bitmap);
+
+
+	int y, x;
+	const pen_t *paldata = m_palette->pens();
+
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		UINT32 *dd = &bitmap.pix32(y);
+		UINT16 *sd2 = &m_sprite_bitmap.pix16(y);
+
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			UINT16 pixel = (sd2[x] & 0xff) + 0x800;
+
+			if (pixel & 0xf) dd[x] = paldata[pixel];
+		}
+	}
 
 #endif
 	return 0;

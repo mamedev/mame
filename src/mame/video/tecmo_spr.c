@@ -84,7 +84,20 @@ static const UINT8 layout[8][8] =
 int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, int pri_hack, bitmap_ind16 &bitmap_prihack )
 {
 	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
-	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
+	UINT16 *source;
+	int sourceinc;
+
+
+	if (pri_hack == -2)
+	{
+		source = spriteram;
+		sourceinc = 8;
+	}
+	else
+	{
+		source = (NUM_SPRITES - 1) * 8 + spriteram;
+		sourceinc = -8;
+	}
 	int count = NUM_SPRITES;
 	int drawn = 0;
 	int screenwidth = screen.width();
@@ -97,7 +110,7 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 	int xposition_word = 4;
 	int enable_word = attributes_word;
 
-	if (m_altformat) // spbactn proto, this isn't right.. there are more changes I think
+	if (m_altformat) // spbactn proto, this isn't right..(it's probably just passing the priority / colour bits into the mixer swapped around, so can be handled externally once we output a single bitmap)
 	{
 		colour_word = 0;
 		attributes_word = 2;
@@ -122,13 +135,13 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 			UINT32 priority = (attributes >> 6) & 3;
 			
 			// hack for spbactn which still calls us multi-pass (and uses different bits into the mixer as priority?)
-			if (pri_hack != -1)
+			if (pri_hack >= 0)
 			{
 				int alt_pri;
 				alt_pri = (source[0] & 0x0030)>>4;
 				if (alt_pri != pri_hack)
 				{
-					source -= 8;
+					source += sourceinc;
 					continue;
 				}
 			}
@@ -253,7 +266,7 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 			drawn++;
 
 		}
-		source -= 8;
+		source += sourceinc;
 	}
 
 	return drawn;
