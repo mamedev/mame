@@ -57,7 +57,7 @@ ROM_START(kz26)
 	ROM_RELOAD(0x8000, 0x2000)
 	ROM_RELOAD(0xc000, 0x2000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("sound1.su3", 0x0000, 0x2000, CRC(f9550ab4) SHA1(7186158f515fd9fbe5a7a09c6b7d2e8dfc3b4bb2))
+	ROM_LOAD("sound1.su3", 0x0000, 0x2000, CRC(8ad1a804) SHA1(6177619f09af4302ffddd8c0c1b374dab7f47e91))
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x8000, 0x2000)
 	ROM_RELOAD(0xc000, 0x2000)
@@ -82,6 +82,44 @@ ROM_START(spain82)
 	ROM_RELOAD(0xd000, 0x0800)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("spasnd.bin", 0x0000, 0x2000, CRC(62412e2e) SHA1(9e48dc3295e78e1024f726906be6e8c3fe3e61b1))
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ ??/84 Nautilus
+/-------------------------------------------------------------------*/
+ROM_START(nautilus)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("nautilus.rom", 0x0000, 0x2000, CRC(197e5492) SHA1(0f83fc2e742fd0cca0bd162add4bef68c6620067))
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("nautilus.snd", 0x0000, 0x2000, CRC(413d110f) SHA1(8360f652296c46339a70861efb34c41e92b25d0e))
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ ??/84 The Raid
+/-------------------------------------------------------------------*/
+ROM_START(theraid)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("theraid.rom", 0x0000, 0x2000, CRC(97aa1489) SHA1(6b691b287138cc78cfc1010f380ff8c66342c39b))
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("theraid.snd", 0x0000, 0x2000, CRC(e33f8363) SHA1(e7f251c334b15e12b1eb7e079c2e9a5f64338052))
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)
@@ -149,6 +187,79 @@ ROM_START(starfirp)
 	ROM_RELOAD(0xe000, 0x0800)
 ROM_END
 
+ROM_START(starfirpa)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("starcpua.rom", 0x0000, 0x2000, CRC(29bac350) SHA1(ab3e3ea4881be954f7fa7278800ffd791c4581da))
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("starfu3.rom", 0x0000, 0x2000, CRC(5d602d80) SHA1(19d21adbcbd0067c051f3033468eda8c5af57be1))
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_LOAD("starfu4.rom", 0x2000, 0x0800, CRC(9af8be9a) SHA1(da6db3716db73baf8e1493aba91d4d85c5d613b4))
+	ROM_RELOAD(0x6000, 0x0800)
+	ROM_RELOAD(0xa000, 0x0800)
+	ROM_RELOAD(0xe000, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ ??/86 Flash Dragon
+/-------------------------------------------------------------------*/
+ROM_START(fldragon)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("fldrcpu1.rom", 0x0000, 0x2000, CRC(e513ded0) SHA1(64ed3dcff53311fb93bd50d105a4c1186043fdd7))
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_LOAD("fldrcpu2.rom", 0x2000, 0x2000, CRC(6ff2b276) SHA1(040b614f0b0587521ef5550b5587b94a7f3f178b))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)	
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("fdsndu3.rom", 0x0000, 0x2000, NO_DUMP)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_LOAD("fdsndu4.rom", 0x2000, 0x0800, NO_DUMP)
+	ROM_RELOAD(0x6000, 0x0800)
+	ROM_RELOAD(0xa000, 0x0800)
+	ROM_RELOAD(0xe000, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ ??/85 Stop Ship
+/-------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------
+/ ??/87 Skill Flight
+/-------------------------------------------------------------------*/
+ROM_START(sklflite)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("skflcpu1.rom", 0x0000, 0x2000, CRC(8f833b55) SHA1(1729203582c22b51d1cc401aa8f270aa5cdadabe))
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_LOAD("skflcpu2.rom", 0x2000, 0x2000, CRC(ffc497aa) SHA1(3e88539ae1688322b9268f502d8ca41cffb28df3))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)	
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sfsndu3.rom", 0x0000, 0x2000, NO_DUMP)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x8000, 0x2000)
+	ROM_RELOAD(0xc000, 0x2000)
+	ROM_LOAD("sfsndu4.rom", 0x2000, 0x0800, NO_DUMP)
+	ROM_RELOAD(0x6000, 0x0800)
+	ROM_RELOAD(0xa000, 0x0800)
+	ROM_RELOAD(0xe000, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ ??/87 Phantom Ship
+/-------------------------------------------------------------------*/
+
 /*-------------------------------------------------------------------
 / Trailer (1985)
 /-------------------------------------------------------------------*/
@@ -170,8 +281,13 @@ ROM_START(trailer)
 ROM_END
 
 GAME(1982,  spain82,    0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Spain '82",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  nautilus,   0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Nautilus",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  theraid,    0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "The Raid",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1984,  ufo_x,      0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "UFO-X",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1984,  kz26,       0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "KZ-26",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,  rock2500,   0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Rock 2500",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,  starfirp,   0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Star Fire",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  starfirpa,  starfirp,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Star Fire (alternate set)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,  trailer,    0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Trailer",      GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  fldragon,   0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Flash Dragon",      GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  sklflite,   0,  play_5, play_5, play_5_state,   play_5, ROT0,   "Playmatic",        "Skill Flight (Playmatic)",      GAME_IS_SKELETON_MECHANICAL)

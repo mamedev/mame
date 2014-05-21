@@ -191,6 +191,19 @@ ROM_END
 /*-------------------------------------------------------------------
 / Zira (??/80)
 /-------------------------------------------------------------------*/
+ROM_START(zira)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("zira_u8.bin", 0x0000, 0x0800, CRC(53f8bf17) SHA1(5eb74f27bc65374a85dd44bbc8f6142488c226a2))
+	ROM_RELOAD(0x4000, 0x0800)
+	ROM_RELOAD(0x8000, 0x0800)
+	ROM_RELOAD(0xc000, 0x0800)
+	ROM_LOAD("zira_u9.bin", 0x0800, 0x0800, CRC(d50a2419) SHA1(81b157f579a433389506817b1b6e02afaa2cf0d5))
+	ROM_RELOAD(0x4800, 0x0800)
+	ROM_RELOAD(0x8800, 0x0800)
+	ROM_RELOAD(0xc800, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("zira.snd", 0x0000, 0x0400, NO_DUMP)
+ROM_END
 
 /*-------------------------------------------------------------------
 / Cerberus (03/82)
@@ -234,3 +247,4 @@ GAME(1980,  attack,    0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "
 GAME(1980,  blkfever,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Black Fever",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1982,  cerberup,  0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Cerberus (Pinball)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,  madrace,   0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Mad Race",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  zira,      0,      play_2,  play_2, play_2_state,  play_2,  ROT0,  "Playmatic",    "Zira",           GAME_IS_SKELETON_MECHANICAL)
