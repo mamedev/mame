@@ -13,6 +13,7 @@ public:
 	static void set_blendcols(device_t &device, int bgblend_comp, int fgblend_comp, int txblend_comp, int spblend_comp);
 	static void set_regularcols(device_t &device, int bgregular_comp, int fgregular_comp, int txregular_comp, int spregular_comp);
 	static void set_blendsource(device_t &device, int spblend_source, int fgblend_source);
+	static void set_revspritetile(device_t &device);
 
 protected:
 	virtual void device_start();
@@ -38,6 +39,7 @@ protected:
 	int m_txregular_comp;
 	int m_spregular_comp;
 
+	int m_revspritetile;
 
 private:
 
@@ -60,6 +62,9 @@ extern const device_type TECMO_MIXER;
 
 #define MCFG_TECMO_MIXER_BLENDSOUCE(_spblend_source, _fgblend_source) \
 	tecmo_mix_device::set_blendsource(*device, _spblend_source, _fgblend_source);
+
+#define MCFG_TECMO_MIXER_REVSPRITETILE \
+	tecmo_mix_device::set_revspritetile(*device);
 
 
 

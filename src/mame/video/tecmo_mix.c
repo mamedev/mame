@@ -23,7 +23,9 @@ tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *ta
 		m_bgregular_comp(0),
 		m_fgregular_comp(0),
 		m_txregular_comp(0),
-		m_spregular_comp(0)
+		m_spregular_comp(0),
+
+		m_revspritetile(0)
 
 {
 }
@@ -78,6 +80,12 @@ void tecmo_mix_device::set_blendsource(device_t &device, int spblend_source, int
 	dev.m_fgblend_source = fgblend_source;
 }
 
+void tecmo_mix_device::set_revspritetile(device_t &device)
+{
+	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
+	dev.m_revspritetile = 3;
+}
+
 void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device* palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp)
 {
 	//int frame = (screen.frame_number()) & 1;
@@ -115,10 +123,8 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 			if (sprpixel&0xf)
 			{
-				switch (m_sprpri)
+				if (m_sprpri == (0 ^ m_revspritetile)) // behind all
 				{
-				case 0: // behind all
-				
 
 					if (fgpixel & 0xf) // is the fg used?
 					{
@@ -150,11 +156,9 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 						}
 
 					}
-			
-					break;
-
-				case 1: // above bg, behind tx, fg
-				
+				}
+				else  if (m_sprpri == (1 ^ m_revspritetile)) // above bg, behind tx, fg
+				{
 					if (fgpixel & 0xf) // is the fg used?
 					{
 						if (fgbln)
@@ -194,12 +198,11 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 							dd[x] = paldata[sprpixel + m_spregular_comp];
 						}
 					}
-			
-				
-					break;
 
-				case 2: // above bg,fg, behind tx
-				
+
+				}
+				else if (m_sprpri == (2 ^ m_revspritetile)) // above bg,fg, behind tx
+				{
 					if (m_sprbln)
 					{
 						// unusued by this game?
@@ -211,10 +214,10 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 						dd[x] = paldata[sprpixel + m_spregular_comp];
 						//dd[x] = rand();
 					}
-					break;
+				}
 
-				case 3: // above all?
-				
+				else if (m_sprpri == (3 ^ m_revspritetile)) // above all?
+				{
 					if (m_sprbln)
 					{
 						// unusued by this game?
@@ -224,8 +227,6 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					{
 						dd[x] = paldata[sprpixel + m_spregular_comp];
 					}
-				
-					break;
 
 				}
 			}
