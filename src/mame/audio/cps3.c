@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cps3.h" // ! see m_base
 #include "cps3.h"
 
 
@@ -48,10 +47,6 @@ void cps3_sound_device::device_start()
 
 void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// the actual 'user5' region only exists on the nocd sets, on the others it's allocated in the initialization.
-	// it's a shared gfx/sound region, so can't be allocated as part of the sound device.
-	m_base = (INT8*)machine().driver_data<cps3_state>()->m_user5region;
-
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));

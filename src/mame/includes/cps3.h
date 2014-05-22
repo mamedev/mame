@@ -6,6 +6,8 @@
 
 #include "machine/intelfsh.h"
 #include "cpu/sh2/sh2.h"
+#include "audio/cps3.h"
+
 
 class cps3_state : public driver_device
 {
@@ -15,6 +17,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_cps3sound(*this, "cps3sound"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_colourram(*this, "colourram"),
@@ -29,6 +32,7 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<cps3_sound_device> m_cps3sound;
 
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_spriteram;
