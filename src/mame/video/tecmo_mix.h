@@ -14,6 +14,7 @@ public:
 	static void set_regularcols(device_t &device, int bgregular_comp, int fgregular_comp, int txregular_comp, int spregular_comp);
 	static void set_blendsource(device_t &device, int spblend_source, int fgblend_source);
 	static void set_revspritetile(device_t &device);
+	static void set_bgpen(device_t &device, int bgpen);
 
 protected:
 	virtual void device_start();
@@ -40,6 +41,7 @@ protected:
 	int m_spregular_comp;
 
 	int m_revspritetile;
+	int m_bgpen;
 
 private:
 
@@ -66,6 +68,7 @@ extern const device_type TECMO_MIXER;
 #define MCFG_TECMO_MIXER_REVSPRITETILE \
 	tecmo_mix_device::set_revspritetile(*device);
 
-
+#define MCFG_TECMO_MIXER_BGPEN(_bgpen) \
+	tecmo_mix_device::set_bgpen(*device, _bgpen);
 
 

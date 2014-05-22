@@ -38,12 +38,15 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 	UINT16 *videoram1 = &m_videoram2[0x0800];
 	UINT16 *videoram2 = m_videoram2;
 
+	int colour = ((videoram2[tile_index] & 0xf0) >> 4);
+
 	/* bit 3 controls blending */
-	tileinfo.category = (videoram2[tile_index] & 0x08) >> 3;
+	if ((videoram2[tile_index] & 0x08))
+		colour += 0x10;
 
 	SET_TILE_INFO_MEMBER(2,
 			videoram1[tile_index] & 0x0fff,
-			((videoram2[tile_index] & 0xf0) >> 4) | (tileinfo.category ? 0x80 : 0x00),
+			colour,
 			0);
 }
 
@@ -74,8 +77,8 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_text_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_background->set_transparent_pen(0);
-	m_foreground->set_transparent_pen(0);
+//	m_background->set_transparent_pen(0);
+//	m_foreground->set_transparent_pen(0);
 	m_text_layer->set_transparent_pen(0);
 
 	m_background->set_scrolldy(0, 33);
@@ -121,8 +124,8 @@ VIDEO_START_MEMBER(gaiden_state,raiga)
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_text_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_background->set_transparent_pen(0);
-	m_foreground->set_transparent_pen(0);
+//	m_background->set_transparent_pen(0);
+//	m_foreground->set_transparent_pen(0);
 	m_text_layer->set_transparent_pen(0);
 
 	/* set up sprites */
@@ -362,50 +365,28 @@ void gaiden_state::drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-
-	m_tile_bitmap_bg.fill(0x200, cliprect);
-	m_tile_bitmap_fg.fill(0, cliprect);
-	m_sprite_bitmap.fill(0, cliprect);
-
-	/* draw tilemaps into a 16-bit bitmap */
-	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 1);
-	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 2);
-	/* draw the blended tiles at a lower priority
-	   so sprites covered by them will still be drawn */
-	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 1, 0);
-	m_text_layer->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
-
-	/* draw sprites into a 16-bit bitmap */
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(), -1, m_sprite_bitmap);
-
-	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	screen_update_raiga(screen, bitmap, cliprect);
 	return 0;
 
 }
 
 UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-
-	m_tile_bitmap_bg.fill(0x200, cliprect);
+	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
 	m_sprite_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
-	/* draw tilemaps into a 16-bit bitmap */
-	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 1);
-	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 2);
-	/* draw the blended tiles at a lower priority
-	   so sprites covered by them will still be drawn */
-	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 1, 0);
-	m_text_layer->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(), -2, m_sprite_bitmap);
+	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
+	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
-	/* draw sprites into a 16-bit bitmap */
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(), -1, m_sprite_bitmap);
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)0, &m_sprite_bitmap);
 
-	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	// todo, this should go through the mixer!
+	m_text_layer->draw(screen, bitmap, cliprect, 0, 0);
+
+
 	return 0;
 }
 

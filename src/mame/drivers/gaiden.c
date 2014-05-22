@@ -665,16 +665,16 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( gaiden )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )  /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x300, 16 )  /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x200, 16+128 )  /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 16+128 )  /* sprites 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 0x1000 )  /* sprites 8x8 */
 GFXDECODE_END
 
 static GFXDECODE_START( raiga )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )  /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x300, 16 )  /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x200, 16 + 128 ) /* tiles 16x16 (only colors 0x00-x0f and 0x80-0x8f are used) */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 16 + 128 ) /* sprites 8x8 (only colors 0x00-x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 ) /* tiles 16x16 (only colors 0x00-x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 0x1000 ) /* sprites 8x8 (only colors 0x00-x0f and 0x80-0x8f are used) */
 GFXDECODE_END
 
 static const gfx_layout mastninj_tile2layout =
@@ -776,6 +776,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
 	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x200)
 	MCFG_TECMO_MIXER_REVSPRITETILE
+	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x200)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 

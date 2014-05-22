@@ -25,7 +25,8 @@ tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *ta
 		m_txregular_comp(0),
 		m_spregular_comp(0),
 
-		m_revspritetile(0)
+		m_revspritetile(0),
+		m_bgpen(0)
 
 {
 }
@@ -85,6 +86,13 @@ void tecmo_mix_device::set_revspritetile(device_t &device)
 	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
 	dev.m_revspritetile = 3;
 }
+
+void tecmo_mix_device::set_bgpen(device_t &device, int bgpen)
+{
+	tecmo_mix_device &dev = downcast<tecmo_mix_device &>(device);
+	dev.m_bgpen = bgpen;
+}
+
 
 void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device* palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp)
 {
@@ -189,8 +197,8 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 						{
 							// needs if bgpixel & 0xf check?
 
-							//fg isn't used, sprite is used and blended with bg? -- used on trail of ball / flippers
-							dd[x] = paldata[bgpixel + m_bgblend_comp];/* +paldata[sprpixel + m_spblend_source];*/  // WRONG??
+							//fg isn't used, sprite is used and blended with bg? -- used on trail of ball / flippers (looks odd)  -- some ninja gaiden enemy deaths (when behind fg) (looks ok?)  (maybe we need to check for colour saturation?)
+							dd[x] = paldata[bgpixel + m_bgblend_comp] + paldata[sprpixel + m_spblend_source];
 						}
 						else
 						{
@@ -205,8 +213,27 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 				{
 					if (m_sprbln)
 					{
-						// unusued by this game?
-						dd[x] = 0;// rand();
+						if (fgpixel & 0xf) // is the fg used?
+						{
+							if (fgbln)
+							{
+								// blended sprite over blended fg pixel?
+								dd[x] =  rand();
+							}
+							else
+							{
+								// blended sprite over solid fgpixel?
+								dd[x] = paldata[fgpixel + m_fgblend_comp] + paldata[sprpixel + m_spblend_source];
+							}
+						}
+						else // needs if bgpixel & 0xf check?
+						{
+							// blended sprite over solid bg pixel
+							dd[x] = paldata[bgpixel + m_bgblend_comp] + paldata[sprpixel + m_spblend_source];
+						//	dd[x] =  rand();
+						}
+						
+						
 
 					}
 					else
@@ -237,18 +264,22 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					if (fgbln)
 					{
 						// needs if bgpixel & 0xf check?
-						dd[x] = paldata[fgpixel + m_fgblend_source] + paldata[bgpixel + 0x0000+0x300];
+						dd[x] = paldata[fgpixel + m_fgblend_source] + paldata[bgpixel + m_bgblend_comp];
 				
 					}
 					else
 					{
-						dd[x] = paldata[fgpixel + 0x800 + 0x200];
+						dd[x] = paldata[fgpixel + m_fgregular_comp];
 					}
 					
 				}
-				else /*if (bgpixel & 0x0f) */
+				else if (bgpixel & 0x0f)
 				{
-					dd[x] = paldata[bgpixel + 0x800 + 0x300];
+					dd[x] = paldata[bgpixel + m_bgregular_comp];
+				}
+				else
+				{
+					dd[x] = paldata[m_bgpen];// pen 0x200 on raiga  0xb00 on spbactn
 				}
 			}
 		}
