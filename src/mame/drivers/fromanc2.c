@@ -21,7 +21,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "rendlay.h"
 #include "includes/fromanc2.h"
 
 
@@ -57,11 +56,11 @@ READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 
 	switch (m_portselect)
 	{
-	case 0x01:  ret = ioport("KEY0")->read(); break;
-	case 0x02:  ret = ioport("KEY1")->read(); break;
-	case 0x04:  ret = ioport("KEY2")->read(); break;
-	case 0x08:  ret = ioport("KEY3")->read(); break;
-	default:    ret = 0xffff;
+		case 0x01:  ret = ioport("KEY0")->read(); break;
+		case 0x02:  ret = ioport("KEY1")->read(); break;
+		case 0x04:  ret = ioport("KEY2")->read(); break;
+		case 0x08:  ret = ioport("KEY3")->read(); break;
+		default:    ret = 0xffff;
 			logerror("PC:%08X unknown %02X\n", space.device().safe_pc(), m_portselect);
 			break;
 	}
@@ -87,7 +86,7 @@ CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
 WRITE16_MEMBER(fromanc2_state::fromanc2_eeprom_w)
 {
 	if (ACCESSING_BITS_8_15)
-		ioport("EEPROMOUT")->write(data, 0xffff);
+		ioport("EEPROMOUT")->write(data >> 8, 0xff);
 }
 
 WRITE16_MEMBER(fromanc2_state::fromancr_eeprom_w)
@@ -396,9 +395,9 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fromanc4 )
