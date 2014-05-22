@@ -3878,7 +3878,8 @@ ROM_START( altbeastj1 )
 	ROM_LOAD16_BYTE( "epr-11669.a5", 0x000001, 0x20000, CRC(005ecd11) SHA1(c392195955cf727752f03db92414701cc2bf1f4a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0065.key", 0x0000, 0x2000, NO_DUMP )
+	// reconstructed key; some of the RNG-independent bits could be incorrect
+    ROM_LOAD( "317-0065.key", 0x0000, 0x2000, BAD_DUMP CRC(9e0f619d) SHA1(b0392e84d1c9af681dc9bb2ca3636e7cc41a605b) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "opr-11674.a14", 0x00000, 0x20000, CRC(a57a66d5) SHA1(5103583d48997abad12a0c5fee26431c486ced52) )
@@ -6719,7 +6720,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,             INPUT,    INIT,               MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT0,   "Sega", "Ace Attacker (FD1094 317-0059)", GAME_NOT_WORKING )
+GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", GAME_NOT_WORKING )
 
 GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
 GAME( 1987, aliensyn7,  aliensyn, system16b,           aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
@@ -6733,7 +6734,7 @@ GAME( 1988, altbeast5,  altbeast, system16b_fd1094,    altbeast, segas16b_state,
 GAME( 1988, altbeast4,  altbeast, system16b,           altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4, MC-8123B 317-0066)", 0 )
 GAME( 1988, altbeastj3, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan, FD1094 317-0068)", 0 )
 GAME( 1988, altbeast2,  altbeast, system16b,           altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2, MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeastj1, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan, FD1094 317-0065)", GAME_NOT_WORKING ) // No CPU decrypt key
+GAME( 1988, altbeastj1, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan, FD1094 317-0065)", 0 )
 
 GAME( 1990, aurail,     0,        system16b,           aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 3, US, unprotected)", 0 )
 GAME( 1990, aurail1,    aurail,   system16b_fd1089b,   aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 2, World, FD1089B 317-0168)", 0 )
