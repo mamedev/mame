@@ -369,12 +369,12 @@ private:
 // netlist_core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_core_terminal_t : public netlist_owned_object_t, public plinked_list_element<netlist_core_terminal_t>
+class netlist_core_terminal_t : public netlist_owned_object_t, public plinkedlist_element_t<netlist_core_terminal_t>
 {
 	NETLIST_PREVENT_COPYING(netlist_core_terminal_t)
 public:
 
-	typedef netlist_list_t<netlist_core_terminal_t *> list_t;
+	typedef plinearlist_t<netlist_core_terminal_t *> list_t;
 
 	/* needed here ... */
 
@@ -429,7 +429,7 @@ class netlist_terminal_t : public netlist_core_terminal_t
 	NETLIST_PREVENT_COPYING(netlist_terminal_t)
 public:
 
-    typedef netlist_list_t<netlist_terminal_t *> list_t;
+    typedef plinearlist_t<netlist_terminal_t *> list_t;
 
 	ATTR_COLD netlist_terminal_t();
 
@@ -554,7 +554,7 @@ class netlist_net_t : public netlist_object_t
 	NETLIST_PREVENT_COPYING(netlist_net_t)
 public:
 
-	typedef netlist_list_t<netlist_net_t *> list_t;
+	typedef plinearlist_t<netlist_net_t *> list_t;
 
 	ATTR_COLD netlist_net_t(const family_t afamily);
 	ATTR_COLD virtual ~netlist_net_t();
@@ -592,7 +592,7 @@ public:
 
     ATTR_COLD void move_connections(netlist_net_t *new_net);
 
-    netlist_list_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
+    plinearlist_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 protected:  //FIXME: needed by current solver code
 
@@ -606,7 +606,7 @@ protected:  //FIXME: needed by current solver code
 private:
 
     netlist_core_terminal_t * RESTRICT m_railterminal;
-    plinked_list<netlist_core_terminal_t> m_list_active;
+    plinkedlist_t<netlist_core_terminal_t> m_list_active;
 
     netlist_time m_time;
     INT32        m_active;
@@ -627,7 +627,7 @@ class netlist_logic_net_t : public netlist_net_t
     NETLIST_PREVENT_COPYING(netlist_logic_net_t)
 public:
 
-    typedef netlist_list_t<netlist_logic_net_t *> list_t;
+    typedef plinearlist_t<netlist_logic_net_t *> list_t;
 
     ATTR_COLD netlist_logic_net_t();
     ATTR_COLD virtual ~netlist_logic_net_t() { };
@@ -694,7 +694,7 @@ class netlist_analog_net_t : public netlist_net_t
     NETLIST_PREVENT_COPYING(netlist_analog_net_t)
 public:
 
-    typedef netlist_list_t<netlist_analog_net_t *> list_t;
+    typedef plinearlist_t<netlist_analog_net_t *> list_t;
 
     ATTR_COLD netlist_analog_net_t();
     ATTR_COLD virtual ~netlist_analog_net_t() { };
@@ -927,7 +927,7 @@ class netlist_core_device_t : public netlist_object_t
 	NETLIST_PREVENT_COPYING(netlist_core_device_t)
 public:
 
-	typedef netlist_list_t<netlist_core_device_t *> list_t;
+	typedef plinearlist_t<netlist_core_device_t *> list_t;
 
 	ATTR_COLD netlist_core_device_t(const family_t afamily, const netlist_logic_family_desc_t *family_desc);
 
@@ -1033,7 +1033,7 @@ public:
 
 	ATTR_COLD void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
-	netlist_list_t<pstring, 20> m_terminals;
+	plinearlist_t<pstring, 20> m_terminals;
 
 protected:
 
@@ -1077,41 +1077,6 @@ private:
 // netlist_base_t
 // ----------------------------------------------------------------------------------------
 
-template <class _C>
-class netlist_tagmap_t : public netlist_list_t<_C>
-{
-public:
-    _C find(const pstring name) const
-    {
-        for (int i=0; i < this->count(); i++)
-            if (get_name((*this)[i]) == name)
-                return (*this)[i];
-        return _C(NULL);
-    }
-
-    void remove_by_name(const pstring name)
-    {
-        netlist_list_t<_C>::remove(find(name));
-    }
-
-    bool add(_C dev, bool allow_duplicate)
-    {
-        if (allow_duplicate)
-            netlist_list_t<_C>::add(dev);
-        else
-        {
-            if (!(this->find(get_name(dev)) == _C(NULL)))
-                return false;
-            netlist_list_t<_C>::add(dev);
-        }
-        return true;
-    }
-
-private:
-    template <typename T> static const pstring get_name(T &elem) { return elem.name(); }
-    template <typename T> static const pstring get_name(T *elem) { return elem->name(); }
-
-};
 
 class netlist_base_t : public netlist_object_t, public pstate_manager_t
 {
@@ -1155,9 +1120,9 @@ public:
 	ATTR_COLD void log(const char *format, ...) const ATTR_PRINTF(2,3);
 
 	template<class _C>
-	netlist_list_t<_C *> get_device_list()
+	plinearlist_t<_C *> get_device_list()
 	{
-		netlist_list_t<_C *> tmp;
+		plinearlist_t<_C *> tmp;
 		for (netlist_device_t * const *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 		{
 			_C *dev = dynamic_cast<_C *>(*entry);
@@ -1198,7 +1163,7 @@ public:
 		return ret;
 	}
 
-	netlist_tagmap_t<netlist_device_t *> m_devices;
+	pnamedlist_t<netlist_device_t *> m_devices;
 	netlist_net_t::list_t m_nets;
 
 protected:
@@ -1433,7 +1398,7 @@ public:
 class netlist_factory_t
 {
 public:
-	typedef netlist_list_t<net_device_t_base_factory *> list_t;
+	typedef plinearlist_t<net_device_t_base_factory *> list_t;
 
 	ATTR_COLD netlist_factory_t();
 	ATTR_COLD ~netlist_factory_t();

@@ -8,7 +8,7 @@
 
 #include "nl_config.h"
 #include "nl_time.h"
-#include "nl_lists.h"
+#include "plists.h"
 #include "pstring.h"
 
 // ----------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class pstate_manager_t;
 class pstate_callback_t
 {
 public:
-	typedef netlist_list_t<pstate_callback_t *> list_t;
+	typedef plinearlist_t<pstate_callback_t *> list_t;
 
 	virtual ~pstate_callback_t() { };
 
@@ -70,7 +70,7 @@ protected:
 
 struct pstate_entry_t
 {
-	typedef netlist_list_t<pstate_entry_t *> list_t;
+	typedef plinearlist_t<pstate_entry_t *> list_t;
 
 	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
 			const int size, const int count, void *ptr)

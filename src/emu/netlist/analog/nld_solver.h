@@ -41,7 +41,7 @@ struct netlist_solver_parameters_t
 class netlist_matrix_solver_t : public netlist_device_t
 {
 public:
-	typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
+	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
 	ATTR_COLD netlist_matrix_solver_t();
@@ -86,7 +86,7 @@ private:
     netlist_time m_last_step;
     dev_list_t m_steps;
     dev_list_t m_dynamic;
-    netlist_list_t<netlist_analog_output_t *> m_inps;
+    plinearlist_t<netlist_analog_output_t *> m_inps;
 
     netlist_ttl_input_t m_fb_sync;
     netlist_ttl_output_t m_Q_sync;

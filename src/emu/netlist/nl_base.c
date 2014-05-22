@@ -758,7 +758,7 @@ ATTR_HOT void netlist_analog_net_t::schedule_solve()
 
 ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
-, plinked_list_element<netlist_core_terminal_t>()
+, plinkedlist_element_t<netlist_core_terminal_t>()
 , m_family_desc(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
@@ -771,6 +771,7 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 , m_go(NETLIST_GMIN_DEFAULT)
 , m_gt(NETLIST_GMIN_DEFAULT)
 , m_otherterm(NULL)
+, m_otherterm_ptr(NULL)
 {
 }
 

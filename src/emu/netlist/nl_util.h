@@ -7,7 +7,7 @@
 #define NL_UTIL_H_
 
 #include "pstring.h"
-#include "nl_lists.h"
+#include "plists.h"
 
 class nl_util
 {
@@ -16,7 +16,7 @@ private:
 	nl_util() {};
 
 public:
-	typedef netlist_list_t<pstring, 10> pstring_list;
+	typedef plinearlist_t<pstring, 10> pstring_list;
 
 	static pstring_list split(const pstring &str, const pstring &onstr)
 	{

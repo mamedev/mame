@@ -127,7 +127,7 @@ private:
 
 	pstring m_identifier_chars;
 	pstring m_number_chars;
-	netlist_list_t<pstring> m_tokens;
+	plinearlist_t<pstring> m_tokens;
 	pstring m_whitespace;
 	char  m_string;
 
@@ -182,7 +182,7 @@ private:
 class netlist_source_t
 {
 public:
-	typedef netlist_list_t<netlist_source_t> list_t;
+	typedef plinearlist_t<netlist_source_t> list_t;
 
 	enum source_e
 	{
