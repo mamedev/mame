@@ -272,7 +272,7 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 			if(m_ma == 0xf) { return mz3500_shared_ram_r(space,(offset & 0x7ff)); }
 		}
 
-		printf("Error: read with unmapped memory bank offset %04x MS %02x MA %02x\n",offset,m_ms,m_ma);
+		printf("Read with unmapped memory bank offset %04x MS %02x MA %02x\n",offset,m_ms,m_ma);
 	}
 	else if(m_ms == 1)
 	{
@@ -314,7 +314,7 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 			}
 		}
 
-		printf("Error: read with unmapped memory bank offset %04x MS %02x MA %02x MO %02x\n",offset,m_ms,m_ma,m_mo);
+		printf("Read with unmapped memory bank offset %04x MS %02x MA %02x MO %02x\n",offset,m_ms,m_ma,m_mo);
 	}
 	else if (m_ms == 3) // RAM based BASIC
 	{
@@ -328,7 +328,7 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 				case 0x2: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0xe000);
 			}
 
-			printf("Error: read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
+			printf("Read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
 		}
 		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x4000); }
 		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x8000); }
@@ -370,7 +370,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 			if(m_ma == 0xf) { mz3500_shared_ram_w(space,(offset & 0x7ff),data); return; }
 		}
 
-		printf("Error: write with unmapped memory bank offset %04x data %02x MS %02x MA %02x\n",offset,data,m_ms,m_ma);
+		printf("Write with unmapped memory bank offset %04x data %02x MS %02x MA %02x\n",offset,data,m_ms,m_ma);
 	}
 	else if(m_ms == 1) // System Loading & CP/M
 	{
@@ -407,7 +407,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 			}
 		}
 
-		printf("Error: write with unmapped memory bank offset %04x data %02x MS %02x MA %02x\n",offset,data,m_ms,m_ma);
+		printf("Write with unmapped memory bank offset %04x data %02x MS %02x MA %02x\n",offset,data,m_ms,m_ma);
 	}
 	else if (m_ms == 3) // RAM based BASIC
 	{
@@ -421,7 +421,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 				case 0x2: mz3500_work_ram_w(space,(offset & 0x1fff) | 0xe000,data); return;
 			}
 
-			printf("Error: read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
+			printf("Read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
 		}
 		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x4000,data); return; }
 		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x8000,data); return; }
