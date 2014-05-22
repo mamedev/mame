@@ -1770,6 +1770,7 @@ src/emu/cpu/lr35902/opc_main.h svneol=native#text/plain
 src/emu/cpu/m37710/m37710.c svneol=native#text/plain
 src/emu/cpu/m37710/m37710.h svneol=native#text/plain
 src/emu/cpu/m37710/m37710cm.h svneol=native#text/plain
+src/emu/cpu/m37710/m37710il.h svneol=native#text/plain
 src/emu/cpu/m37710/m37710o0.c svneol=native#text/plain
 src/emu/cpu/m37710/m37710o1.c svneol=native#text/plain
 src/emu/cpu/m37710/m37710o2.c svneol=native#text/plain

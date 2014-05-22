@@ -1205,6 +1205,8 @@ endif
 
 M37710DEPS = \
 	$(CPUSRC)/m37710/m37710.h \
+	$(CPUSRC)/m37710/m37710cm.h \
+	$(CPUSRC)/m37710/m37710il.h \
 	$(CPUSRC)/m37710/m37710op.h \
 	$(CPUSRC)/m37710/m7700ds.h
 

@@ -88,7 +88,7 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 	FLAG_Z = !(value & FLAGPOS_Z);
 	FLAG_C = value << 8;
 	m37710i_set_flag_mx(value);
-	m37710i_set_flag_i(value);
+	FLAG_I = value & FLAGPOS_I;
 }
 
 
@@ -485,7 +485,7 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 #undef OP_CLI
 #define OP_CLI()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			m37710i_set_flag_i(IFLAG_CLEAR);                      \
+			FLAG_I = IFLAG_CLEAR;                      \
 			m37710i_update_irqs()
 
 /* M37710   Clear oVerflow flag */
@@ -1362,7 +1362,6 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 			m37710i_set_reg_ipl(m37710i_pull_8());                    \
 			m37710i_jump_16(m37710i_pull_16());                   \
 			REG_PB = m37710i_pull_8() << 16;                    \
-			m37710i_jumping(REG_PB | REG_PC);                           \
 			m37710i_update_irqs()
 
 /* M37710  Return from Subroutine Long */
@@ -1506,7 +1505,7 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 #undef OP_SEI
 #define OP_SEI()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			m37710i_set_flag_i(IFLAG_SET)
+			FLAG_I = IFLAG_SET
 
 /* M37710  Set Program status word */
 #undef OP_SEP

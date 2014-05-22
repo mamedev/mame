@@ -3,9 +3,6 @@
 #ifndef __M37710CM_H__
 #define __M37710CM_H__
 
-#define m37710i_branching(A)
-#define m37710i_jumping(A)
-
 
 /* ======================================================================== */
 /* ================================ INCLUDES ============================== */
@@ -25,11 +22,9 @@
 #define m37710_read_8(addr)             m_program->read_byte(addr)
 #define m37710_write_8(addr,data)       m_program->write_byte(addr,data)
 #define m37710_read_8_immediate(A)      m_direct->read_decrypted_byte(A, BYTE_XOR_LE(0))
-#define m37710_read_16(addr)            m_program->read_word(addr)
-#define m37710_write_16(addr,data)      m_program->write_word(addr,data)
+#define m37710_read_16(addr)            m_program->read_word_unaligned(addr)
+#define m37710_write_16(addr,data)      m_program->write_word_unaligned(addr,data)
 #define m37710_read_16_immediate(A)     m_direct->read_decrypted_word(A)
-#define m37710_jumping(A)
-#define m37710_branching(A)
 
 
 /* ======================================================================== */

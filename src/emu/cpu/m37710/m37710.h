@@ -238,9 +238,6 @@ private:
 	int m37710i_execute_M0X1(int cycles);
 	int m37710i_execute_M1X0(int cycles);
 	int m37710i_execute_M1X1(int cycles);
-	void m37710i_push_8(UINT32 value);
-	void m37710i_push_16(UINT32 value);
-	UINT32 m37710i_get_reg_p();
 	void m37710i_update_irqs();
 	void m37710_set_pc(unsigned val);
 	unsigned m37710_get_sp();
@@ -262,7 +259,9 @@ private:
 	UINT32 m37710i_read_24_normal(UINT32 address);
 	UINT32 m37710i_read_24_immediate(UINT32 address);
 	UINT32 m37710i_read_24_direct(UINT32 address);
+	void m37710i_push_8(UINT32 value);
 	UINT32 m37710i_pull_8();
+	void m37710i_push_16(UINT32 value);
 	UINT32 m37710i_pull_16();
 	void m37710i_push_24(UINT32 value);
 	UINT32 m37710i_pull_24();
@@ -270,7 +269,7 @@ private:
 	void m37710i_jump_24(UINT32 address);
 	void m37710i_branch_8(UINT32 offset);
 	void m37710i_branch_16(UINT32 offset);
-	void m37710i_set_flag_i(UINT32 value);
+	UINT32 m37710i_get_reg_p();
 	void m37710i_set_reg_ipl(UINT32 value);
 	void m37710i_interrupt_software(UINT32 vector);
 	void m37710i_set_flag_m0x0(UINT32 value);
