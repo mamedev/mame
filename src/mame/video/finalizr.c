@@ -7,20 +7,70 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "video/resnet.h"
 #include "includes/finalizr.h"
 
+
+/***************************************************************************
+
+  The palette PROMs are connected to the RGB output this way:
+
+  bit 7 -- 220  ohm resistor  -- \
+        -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
+        -- 1   kohm resistor  -- |
+        -- 2.2 kohm resistor  -- /
+        -- 220  ohm resistor  -- \
+        -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- RED
+        -- 1   kohm resistor  -- |
+  bit 0 -- 2.2 kohm resistor  -- /
+
+
+  bit 3 -- 220  ohm resistor  -- \
+        -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- BLUE
+        -- 1   kohm resistor  -- |
+  bit 0 -- 2.2 kohm resistor  -- /
+
+***************************************************************************/
 
 PALETTE_INIT_MEMBER(finalizr_state, finalizr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
+	static const int resistances[4] = { 2200, 1000, 470, 220 };
+	double rweights[4], gweights[4], bweights[4];
 	int i;
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			4, &resistances[0], rweights, 470, 0,
+			4, &resistances[0], gweights, 470, 0,
+			4, &resistances[0], bweights, 470, 0);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x00] >> 0);
-		int g = pal4bit(color_prom[i + 0x00] >> 4);
-		int b = pal4bit(color_prom[i + 0x20] >> 0);
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		bit3 = (color_prom[i] >> 3) & 0x01;
+		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 4) & 0x01;
+		bit1 = (color_prom[i] >> 5) & 0x01;
+		bit2 = (color_prom[i] >> 6) & 0x01;
+		bit3 = (color_prom[i] >> 7) & 0x01;
+		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+
+		/* blue component */
+		bit0 = (color_prom[i + 0x20] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x20] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x20] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x20] >> 3) & 0x01;
+		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
