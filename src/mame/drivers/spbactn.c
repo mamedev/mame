@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(2)
-	MCFG_TECMO_SPRITE_ALT_FORMAT
+	//MCFG_TECMO_SPRITE_ALT_FORMAT
 
 	/* sound hardware  - different? */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

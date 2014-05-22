@@ -19,8 +19,7 @@ const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TECMO_SPRITE, "Teccmo 16-bit Sprite", tag, owner, clock, "tecmo_spr", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_gfxregion(0),
-		m_altformat(0)
+		m_gfxregion(0)
 {
 }
 
@@ -38,12 +37,6 @@ void tecmo_spr_device::set_gfx_region(device_t &device, int gfxregion)
 {
 	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
 	dev.m_gfxregion = gfxregion;
-}
-
-void tecmo_spr_device::set_alt_format(device_t &device)
-{
-	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
-	dev.m_altformat = 1;
 }
 
 
@@ -109,12 +102,6 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 	int yposition_word = 3;
 	int xposition_word = 4;
 	int enable_word = attributes_word;
-
-	if (m_altformat) // spbactn proto, this isn't right..(it's probably just passing the priority / colour bits into the mixer swapped around, so can be handled externally once we output a single bitmap)
-	{
-		colour_word = 0;
-		attributes_word = 2;
-	}
 
 	int xmask;
 
@@ -206,8 +193,8 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 			else // render to a single bitmap, with all priority / colour data mixed in for later processing (assumings sprites can't blend sprites we should probably be doing this)
 			{
 
-				// this contains the blend bit and the priority bits
-				color |= (source[attributes_word] & 0x00f0);
+				// this contains the blend bit and the priority bits, the spbactn proto uses 0x0300 for priority, spbactn uses 0x0030, others use 0x00c0
+				color |= (source[attributes_word] & 0x03f0);
 				bitmap = &bitmap_prihack;
 			}
 
