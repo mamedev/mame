@@ -20,18 +20,23 @@
 #include "includes/finalizr.h"
 
 
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_irq_enable) // vblank irq
+	if (scanline == 240 && m_irq_enable) // vblank irq
 		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && m_nmi_enable) // timer irq
+	else if (((scanline % 32) == 0) && m_nmi_enable) // timer irq
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+
+WRITE8_MEMBER(finalizr_state::finalizr_videoctrl_w)
+{
+	m_charbank = data & 3;
+	m_spriterambank = data & 8;
+	/* other bits unknown */
+}
 
 WRITE8_MEMBER(finalizr_state::finalizr_coin_w)
 {
@@ -257,10 +262,9 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2)    /* 9.216MHz clkin ?? */
+	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2) /* 9.216MHz clkin ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
