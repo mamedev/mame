@@ -367,7 +367,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
 			//m_A[t.net_other][t.net_this] += -t.term->m_otherterm->m_go;
 		}
 		else
-			RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
+			RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().as_analog().Q_Analog();
 	}
 #else
 	for (int i = 0; i < m_rail_start; i++)
@@ -443,9 +443,22 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
             const double f1 = A[j][i] * f;
 			if (f1 != 0.0)
 			{
-	            for (int k = i; k < kN; k++)
-					A[j][k] -= A[i][k] * f1;
-
+	            int k = i;
+                for (; k < kN - 7 ; k+=8)
+                {
+                    double * RESTRICT d = &A[j][k];
+                    double * RESTRICT s = &A[i][k];
+                    d[0] -= f1 * s[0];
+                    d[1] -= f1 * s[1];
+                    d[2] -= f1 * s[2];
+                    d[3] -= f1 * s[3];
+                    d[4] -= f1 * s[4];
+                    d[5] -= f1 * s[5];
+                    d[6] -= f1 * s[6];
+                    d[7] -= f1 * s[7];
+                }
+                for (; k < kN; k++)
+                    A[j][k] -= A[i][k] * f1;
 	            RHS[j] -= RHS[i] * f1;
 			}
 		}
@@ -583,7 +596,7 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::vsolve_non_dynamic()
 	const double d = A[1][1];
 
 	double new_val[2];
-	new_val[1] = a / (a*d - b*c) * (RHS[1] - c / a * RHS[0]);
+	new_val[1] = a / (a * d - b * c) * (RHS[1] - c / a * RHS[0]);
 	new_val[0] = (RHS[0] - b * new_val[1]) / a;
 
 	if (is_dynamic())
@@ -625,9 +638,9 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 		double gabs_t = 0.0;
 		double RHS_t = 0.0;
 
-		netlist_analog_net_t *net = this->m_nets[k];
-		const netlist_terminal_t::list_t &terms = net->m_terms;
-		const netlist_terminal_t::list_t &rails = net->m_rails;
+		const netlist_analog_net_t &net = *this->m_nets[k];
+		const netlist_terminal_t::list_t &terms = net.m_terms;
+		const netlist_terminal_t::list_t &rails = net.m_rails;
 		const int term_count = terms.count();
 		const int rail_count = rails.count();
 
@@ -644,6 +657,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 			gtot_t += terms[i]->m_gt;
 			gabs_t += fabs(terms[i]->m_go);
 			RHS_t += terms[i]->m_Idr;
+			terms[i]->m_otherterm_ptr = &terms[i]->m_otherterm->net().as_analog().m_new_Analog;
 		}
 
 		gabs_t *= this->m_params.m_convergence_factor;
@@ -662,7 +676,9 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 		RHS[k] = RHS_t;
 	}
     for (int k = 0; k < this->N(); k++)
+    {
         this->m_nets[k]->m_new_Analog = this->m_nets[k]->m_cur_Analog;
+    }
 
 	do {
 		resched = false;
@@ -670,24 +686,22 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 
 		for (int k = 0; k < this->N(); k++)
 		{
-			netlist_analog_net_t *net = this->m_nets[k];
-			const netlist_terminal_t::list_t &terms = net->m_terms;
+			netlist_analog_net_t &net = *this->m_nets[k];
+			const netlist_terminal_t::list_t &terms = net.m_terms;
 			const int term_count = terms.count();
 
-			double iIdr = RHS[k];
+			double Idrive = RHS[k];
 
 			for (int i = 0; i < term_count; i++)
-			{
-                iIdr += terms[i]->m_go * terms[i]->m_otherterm->net().as_analog().m_new_Analog;
-			}
+                Idrive += terms[i]->m_go * *(terms[i]->m_otherterm_ptr);
 
 			//double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
-			const double new_val = net->m_new_Analog * one_m_w[k] + iIdr * w[k];
+			const double new_val = net.m_new_Analog * one_m_w[k] + Idrive * w[k];
 
-			const double e = (new_val - net->m_new_Analog);
+			const double e = (new_val - net.m_new_Analog);
 			cerr += e * e;
 
-			net->m_new_Analog = new_val;
+			net.m_new_Analog = new_val;
 		}
 		if (cerr > this->m_params.m_accuracy * this->m_params.m_accuracy)
 		{
@@ -729,7 +743,7 @@ NETLIB_START(solver)
 
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("CONVERG", m_convergence, 0.3);
-	register_param("GS_LOOPS", m_gs_loops, 7);              // Gauss-Seidel loops
+	register_param("GS_LOOPS", m_gs_loops, 5);              // Gauss-Seidel loops
     register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
     register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
