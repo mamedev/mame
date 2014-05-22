@@ -133,19 +133,7 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 		if (source[enable_word] & 0x04)
 		{
 			UINT32 priority = (attributes >> 6) & 3;
-			
-			// hack for spbactn which still calls us multi-pass (and uses different bits into the mixer as priority?)
-			if (pri_hack >= 0)
-			{
-				int alt_pri;
-				alt_pri = (source[0] & 0x0030)>>4;
-				if (alt_pri != pri_hack)
-				{
-					source += sourceinc;
-					continue;
-				}
-			}
-			
+						
 			UINT32 flipx = (attributes & 1);
 			UINT32 flipy = (attributes & 2);
 
@@ -215,23 +203,11 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 					bitmap = (priority >= 2) ? &bitmap_bg : &bitmap_fg;
 				}
 			}
-			else if (pri_hack == -2) // render to a single bitmap, with all priority / colour data mixed in for later processing (assumings sprites can't blend sprites we should probably be doing this)
+			else // render to a single bitmap, with all priority / colour data mixed in for later processing (assumings sprites can't blend sprites we should probably be doing this)
 			{
 
 				// this contains the blend bit and the priority bits
 				color |= (source[attributes_word] & 0x00f0);
-				bitmap = &bitmap_prihack;
-			}
-			else // spbactn
-			{
-				// this is nonsense
-				attributes &= ~0x0040;                            /* !!! */
-
-				if (attributes & 0x0040)
-					color |= 0x0180;
-				else
-					color |= 0x0080;
-
 				bitmap = &bitmap_prihack;
 			}
 

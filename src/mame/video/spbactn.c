@@ -3,35 +3,6 @@
 #include "includes/spbactn.h"
 
 
-static void blendbitmaps(palette_device &palette,
-		bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,
-		const rectangle &cliprect)
-{
-	int y,x;
-	const pen_t *paldata = palette.pens();
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		UINT32 *dd  = &dest.pix32(y);
-		UINT16 *sd1 = &src1.pix16(y);
-		UINT16 *sd2 = &src2.pix16(y);
-
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			if (sd2[x])
-			{
-				if (sd2[x] & 0x1000)
-					dd[x] = paldata[sd1[x] & 0x07ff] + paldata[sd2[x]];
-				else
-					dd[x] = paldata[sd2[x]];
-			}
-			else
-				dd[x] = paldata[sd1[x]];
-		}
-	}
-}
-
-
 
 WRITE16_MEMBER(spbactn_state::bg_videoram_w)
 {
@@ -43,7 +14,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tileno = m_bgvideoram[tile_index+0x2000];
-	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4)+0x80, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4), 0);
 }
 
 
@@ -62,9 +33,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 
 	/* blending */
 	if (attr & 0x0008)
-		color += 0x00f0;
-	else
-		color |= 0x0080;
+		color += 0x0010;
 
 	SET_TILE_INFO_MEMBER(0, tileno, color, 0);
 }
@@ -149,32 +118,19 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
 
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
+	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
 	m_sprite_bitmap.fill(0, cliprect);
-	
-#if 1
-	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-
-
-	if (m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 0, m_tile_bitmap_bg))
-	{
-		m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
-	}
-
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 1, m_tile_bitmap_bg);
-	
-	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
-
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 2, m_tile_bitmap_fg);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spvideoram, 0, 0, flip_screen(), 3, m_tile_bitmap_fg);
-
-	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
-#else
 	bitmap.fill(0, cliprect);
 
 	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_tile_bitmap_fg, cliprect, m_spvideoram, 0, 0, flip_screen(), -2, m_sprite_bitmap);
+	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
+
+
+	//int frame = (screen.frame_number()) & 1;
+	// note this game has no tx layer, comments relate to other drivers
 
 	int y, x;
 	const pen_t *paldata = m_palette->pens();
@@ -183,16 +139,165 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	{
 		UINT32 *dd = &bitmap.pix32(y);
 		UINT16 *sd2 = &m_sprite_bitmap.pix16(y);
+		UINT16 *fg = &m_tile_bitmap_fg.pix16(y);
+		UINT16 *bg = &m_tile_bitmap_bg.pix16(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pixel = (sd2[x] & 0xff) + 0x800;
+			UINT16 sprpixel = (sd2[x]);
 
-			if (pixel & 0xf) dd[x] = paldata[pixel];
+			UINT16 sprpri = (sprpixel & 0x0300) >> 8;
+			UINT16 sprbln = (sprpixel & 0x0400) >> 8;
+			sprpixel &= 0xff;
+
+			UINT16 fgpixel = (fg[x]);
+			UINT16 fgbln = (fgpixel & 0x0100) >> 8;
+			fgpixel &= 0xff;
+
+			UINT16 bgpixel = (bg[x]);
+			bgpixel &= 0xff;
+
+			if (sprpixel&0xf)
+			{
+				switch (sprpri)
+				{
+				case 0: // behind all
+				
+
+					if (fgpixel & 0xf) // is the fg used?
+					{
+						if (fgbln)
+						{
+							dd[x] = rand();
+						}
+						else
+						{
+							// solid FG
+							dd[x] = paldata[fgpixel + 0x800 + 0x200];
+						}
+					}
+					else if (bgpixel & 0x0f)
+					{
+						// solid BG
+						dd[x] = paldata[bgpixel + 0x800 + 0x300];
+					}
+					else
+					{
+						if (sprbln)
+						{ // sprite is blended with bgpen?
+							dd[x] = rand();
+						}
+						else
+						{
+							// solid sprite
+							dd[x] = paldata[sprpixel + 0x800 + 0x000];
+						}
+
+					}
+			
+					break;
+
+				case 1: // above bg, behind tx, fg
+				
+					if (fgpixel & 0xf) // is the fg used?
+					{
+						if (fgbln)
+						{
+							if (sprbln)
+							{
+								// needs if bgpixel & 0xf check?
+
+								// fg is used and blended with sprite, sprite is used and blended with bg?  -- used on 'trail' of ball when ball is under the transparent area
+								dd[x] = paldata[bgpixel + 0x0000 + 0x300] + paldata[sprpixel + 0x1000 + 0x000]; // WRONG??
+							}
+							else
+							{
+								// fg is used and blended with opaque sprite						
+								dd[x] = paldata[fgpixel + 0x1000 + 0x100] + paldata[sprpixel + 0x000 + 0x000];
+							}
+						}
+						else
+						{
+							// fg is used and opaque
+							dd[x] = paldata[fgpixel + 0x800 + 0x200];
+						}
+
+					}
+					else
+					{
+						if (sprbln)
+						{
+							// needs if bgpixel & 0xf check?
+
+							//fg isn't used, sprite is used and blended with bg? -- used on trail of ball / flippers
+							dd[x] = paldata[bgpixel + 0x0000 + 0x300];/* +paldata[sprpixel + 0x1000 + 0x000];*/  // WRONG??
+						}
+						else
+						{
+							// fg isn't used, sprite is used and is opaque
+							dd[x] = paldata[sprpixel + 0x800 + 0x000];
+						}
+					}
+			
+				
+					break;
+
+				case 2: // above bg,fg, behind tx
+				
+					if (sprbln)
+					{
+						// unusued by this game?
+						dd[x] = 0;// rand();
+
+					}
+					else
+					{
+						dd[x] = paldata[sprpixel + 0x800 + 0x000];
+						//dd[x] = rand();
+					}
+					break;
+
+				case 3: // above all?
+				
+					if (sprbln)
+					{
+						// unusued by this game?
+						dd[x] = rand();
+					}
+					else
+					{
+						dd[x] = paldata[sprpixel + 0x800 + 0x000];
+					}
+				
+					break;
+
+				}
+			}
+			else // NON SPRITE CASES
+			{
+				if (fgpixel & 0x0f)
+				{
+					if (fgbln)
+					{
+						// needs if bgpixel & 0xf check?
+						dd[x] = paldata[fgpixel + 0x1000 + 0x100] + paldata[bgpixel + 0x0000+0x300];
+				
+					}
+					else
+					{
+						dd[x] = paldata[fgpixel + 0x800 + 0x200];
+					}
+					
+				}
+				else /*if (bgpixel & 0x0f) */
+				{
+					dd[x] = paldata[bgpixel + 0x800 + 0x300];
+				}
+			}
 		}
 	}
 
-#endif
+
 	return 0;
 }
 
