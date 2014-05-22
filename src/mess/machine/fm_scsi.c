@@ -209,7 +209,7 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 			// command complete
 			send_command(m_command,m_command_index);
 			m_result_length = get_length();
-			phase = get_phase();
+			phase = legacy_scsi_host_adapter::get_phase();
 			if(m_command[0] == 1)  // rezero unit command - not implemented in SCSI code
 				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			else
