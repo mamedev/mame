@@ -388,6 +388,12 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(2)
 
+	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
+	MCFG_TECMO_MIXER_SHIFTS(8,10,4) // wrong
+	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
+	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
+	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

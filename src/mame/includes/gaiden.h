@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "video/tecmo_spr.h"
+#include "video/tecmo_mix.h"
 
 class gaiden_state : public driver_device
 {
@@ -20,7 +21,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_mixer(*this, "mixer")
 		{ }
 
 	/* memory pointers */
@@ -107,4 +109,5 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<tecmo_spr_device> m_sprgen;
+	optional_device<tecmo_mix_device> m_mixer;
 };
