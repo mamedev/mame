@@ -462,6 +462,7 @@ hardware modification to the security cart.....
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "includes/cps3.h"
+#include "audio/cps3.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "machine/wd33c93.h"

@@ -4096,6 +4096,7 @@ src/mame/audio/circus.c svneol=native#text/plain
 src/mame/audio/cliffhgr.c svneol=native#text/plain
 src/mame/audio/copsnrob.c svneol=native#text/plain
 src/mame/audio/cps3.c svneol=native#text/plain
+src/mame/audio/cps3.h svneol=native#text/plain
 src/mame/audio/crbaloon.c svneol=native#text/plain
 src/mame/audio/cyberbal.c svneol=native#text/plain
 src/mame/audio/dcs.c svneol=native#text/plain
