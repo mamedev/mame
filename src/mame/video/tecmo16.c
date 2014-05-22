@@ -17,21 +17,21 @@
 TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
 {
 	int tile = m_videoram[tile_index] & 0x1fff;
-	int color = m_colorram[tile_index] & 0x0f;
+	int color = m_colorram[tile_index] & 0x1f;
 
 	/* bit 4 controls blending */
-	tileinfo.category = (m_colorram[tile_index] & 0x10) >> 4;
+	//tileinfo.category = (m_colorram[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO_MEMBER(1,
 			tile,
-			color | (tileinfo.category ? 0x70 : 0x00),
+			color,
 			0);
 }
 
 TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 {
 	int tile = m_videoram2[tile_index] & 0x1fff;
-	int color = (m_colorram2[tile_index] & 0x0f)+0x10;
+	int color = (m_colorram2[tile_index] & 0x0f);
 
 	SET_TILE_INFO_MEMBER(1,
 			tile,
@@ -235,26 +235,22 @@ void tecmo16_state::blendbitmaps(bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_in
 
 UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-
-	m_tile_bitmap_bg.fill(0x300, cliprect);
+	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
 	m_sprite_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
-	/* draw tilemaps into a 16-bit bitmap */
-	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 1);
-	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 2);
-	/* draw the blended tiles at a lower priority
-	   so sprites covered by them will still be drawn */
-	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 1, 0);
-	m_tx_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
+	if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 0, 0, flip_screen(),  m_sprite_bitmap);
+	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, 2, 0, flip_screen(),  m_sprite_bitmap);
 
-	/* draw sprites into a 16-bit bitmap */
-	if (m_game_is_riot) m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, 0, 0, flip_screen(), -1, m_sprite_bitmap);
-	else m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, 2, 0, flip_screen(), -1, m_sprite_bitmap);
+	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
+
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)0, &m_sprite_bitmap);
+
+	// todo, this should go through the mixer!
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 
-	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }

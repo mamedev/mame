@@ -355,8 +355,8 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( tecmo16 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   1*16*16, 16   )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2*16*16, 16*2 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0*16*16, 16   )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 0x1000   )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -389,10 +389,12 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_TECMO_SPRITE_GFX_REGION(2)
 
 	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
-	MCFG_TECMO_MIXER_SHIFTS(8,10,4) // wrong
+	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
 	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
 	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
 	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
+	MCFG_TECMO_MIXER_REVSPRITETILE
+	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

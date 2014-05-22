@@ -74,25 +74,17 @@ static const UINT8 layout[8][8] =
 
 #define NUM_SPRITES 256
 
-int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, int pri_hack, bitmap_ind16 &bitmap_prihack )
+void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap )
 {
 	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
 	UINT16 *source;
 	int sourceinc;
 
 
-	if (pri_hack == -2)
-	{
-		source = spriteram;
-		sourceinc = 8;
-	}
-	else
-	{
-		source = (NUM_SPRITES - 1) * 8 + spriteram;
-		sourceinc = -8;
-	}
+	source = spriteram;
+	sourceinc = 8;
+
 	int count = NUM_SPRITES;
-	int drawn = 0;
 	int screenwidth = screen.width();
 
 
@@ -114,13 +106,10 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 	while (count--)
 	{
 		UINT32 attributes = source[attributes_word];
-		UINT32 priority_mask;
 		int col,row;
 
 		if (source[enable_word] & 0x04)
-		{
-			UINT32 priority = (attributes >> 6) & 3;
-						
+		{				
 			UINT32 flipx = (attributes & 1);
 			UINT32 flipy = (attributes & 2);
 
@@ -163,40 +152,16 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 					ypos += 512;
 			}
 
-			/* bg: 1; fg:2; text: 4 */
-			switch( priority )
-			{
-				default:
-				case 0x0: priority_mask = 0;                    break;
-				case 0x1: priority_mask = 0xf0;                 break;  /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0 | 0xcc;          break;  /* obscured by foreground */
-				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
-			}
 
 			bitmap_ind16* bitmap;
 
 
 
-			if (pri_hack == -1) // this is what the majority of the current drivers use
-			{
-				/* blending */
-				if (attributes & 0x20)
-				{
-					color |= 0x80;
-					bitmap = &bitmap_sp;
-				}
-				else
-				{
-					bitmap = (priority >= 2) ? &bitmap_bg : &bitmap_fg;
-				}
-			}
-			else // render to a single bitmap, with all priority / colour data mixed in for later processing (assumings sprites can't blend sprites we should probably be doing this)
-			{
 
-				// this contains the blend bit and the priority bits, the spbactn proto uses 0x0300 for priority, spbactn uses 0x0030, others use 0x00c0
-				color |= (source[attributes_word] & 0x03f0);
-				bitmap = &bitmap_prihack;
-			}
+			// this contains the blend bit and the priority bits, the spbactn proto uses 0x0300 for priority, spbactn uses 0x0030, others use 0x00c0
+			color |= (source[attributes_word] & 0x03f0);
+			bitmap = &sprite_bitmap;
+	
 
 			for (row = 0; row < sizey; row++)
 			{
@@ -205,34 +170,18 @@ int tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_devi
 					int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 					int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-					if (pri_hack == -1)
-					{
-						gfx->prio_transpen_raw(*bitmap, cliprect,
-							number + layout[row][col],
-							gfx->colorbase() + color * gfx->granularity(),
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), priority_mask, 0);
-					}
-					else // spbactn
-					{
-						gfx->transpen_raw(*bitmap, cliprect,
-							number + layout[row][col],
-							gfx->colorbase() + color * gfx->granularity(),
-							flipx, flipy,
-							sx, sy,
-							0);
-					}
+					gfx->transpen_raw(*bitmap, cliprect,
+						number + layout[row][col],
+						gfx->colorbase() + color * gfx->granularity(),
+						flipx, flipy,
+						sx, sy,
+						0);
+					
 				}
 			}	
-
-			drawn++;
-
 		}
 		source += sourceinc;
 	}
-
-	return drawn;
 }
 
 // comad bootleg of spbactn
