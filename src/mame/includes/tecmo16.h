@@ -61,8 +61,6 @@ public:
 	DECLARE_VIDEO_START(ginkun);
 	DECLARE_VIDEO_START(riot);
 	UINT32 screen_update_tecmo16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void blendbitmaps(bitmap_rgb32 &dest, bitmap_ind16 &src1, bitmap_ind16 &src2, bitmap_ind16 &src3,
-		int sx, int sy, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;

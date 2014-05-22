@@ -192,44 +192,6 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_y_w)
 
 /******************************************************************************/
 
-/* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
-void tecmo16_state::blendbitmaps(bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
-		int sx,int sy,const rectangle &cliprect)
-{
-	int y,x;
-	const pen_t *paldata = m_palette->pens();
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		UINT32 *dd  = &dest.pix32(y);
-		UINT16 *sd1 = &src1.pix16(y);
-		UINT16 *sd2 = &src2.pix16(y);
-		UINT16 *sd3 = &src3.pix16(y);
-
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			if (sd3[x])
-			{
-				if (sd2[x])
-					dd[x] = paldata[sd2[x] | 0x0400] | paldata[sd3[x]];
-				else
-					dd[x] = paldata[sd1[x] | 0x0400] | paldata[sd3[x]];
-			}
-			else
-			{
-				if (sd2[x])
-				{
-					if (sd2[x] & 0x800)
-						dd[x] = paldata[sd1[x] | 0x0400] | paldata[sd2[x]];
-					else
-						dd[x] = paldata[sd2[x]];
-				}
-				else
-					dd[x] = paldata[sd1[x]];
-			}
-		}
-	}
-}
 
 /******************************************************************************/
 
