@@ -14508,27 +14508,44 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="panaudio">
+	<software name="fsca1" supported="no">
 		<description>Panasonic FS-CA1 MSX-Audio + BASIC (Jpn)</description>
 		<year>1988</year>
 		<publisher>Panasonic</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxaud_fsca1" />
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="131072">
 				<rom name="msx audio (japan) (fs-ca1) (program).rom" size="131072" crc="90e893ba" sha1="930eae7057af1652abae794072b296a59decd61b" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="4096">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="tosaudio">
+	<software name="hxmu900">
 		<description>Toshiba HX-MU900 MSX-Audio</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
 		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="msx_audio" />
+			<feature name="slot" value="msxaud_hxmu900" />
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="msx audio (japan) (hx-mu900) (program).rom" size="32768" crc="dc405f8c" sha1="0d246b0e3edc63803fcce861ea07eadf29dc488c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms1205">
+		<description>Philips NMS-1205 Music Module</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxaud_nms1205" />
+			<dataarea name="rom" size="32768">
+				<rom name="nms1205.bin" size="32768" crc="5ecaeef0" sha1="c7463e1fd0433c5d41b70670d6c10fd781b66426" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -17024,19 +17041,6 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<!-- SORT -->
-
-
-	<software name="nms1205">
-		<description>Philips NMS-1205 Music Module</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="msx_audio" />
-			<dataarea name="rom" size="32768">
-				<rom name="nms1205.bin" size="32768" crc="5ecaeef0" sha1="c7463e1fd0433c5d41b70670d6c10fd781b66426" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
 
 
