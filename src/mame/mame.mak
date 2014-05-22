@@ -1979,6 +1979,7 @@ $(MAMEOBJ)/technos.a: \
 
 $(MAMEOBJ)/tehkan.a: \
 	$(VIDEO)/tecmo_spr.o \
+	$(VIDEO)/tecmo_mix.o \
 	$(DRIVERS)/bombjack.o $(VIDEO)/bombjack.o \
 	$(DRIVERS)/gaiden.o $(VIDEO)/gaiden.o \
 	$(DRIVERS)/lvcards.o $(VIDEO)/lvcards.o \
