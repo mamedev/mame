@@ -2934,6 +2934,20 @@ ROM_START( fmtmarty )
 	ROM_CONTINUE(0x200000,0x40000)
 ROM_END
 
+ROM_START( fmtmarty2 )
+	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
+	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(937311f6) SHA1(7b1c97fa778986134104a6964c8fe13e3654f52e) )
+	ROM_LOAD("mar_ex0.rom",  0x280000, 0x080000, CRC(f67540f6) SHA1(1611fc4683dab72e56a5d0ee0f757e5878900b31) )
+	ROM_LOAD("mar_ex1.rom",  0x300000, 0x080000, CRC(99938a4b) SHA1(167d8ae47312cdaa30b8597144f60f54ce9f74d3) )
+	ROM_LOAD("mar_ex2.rom",  0x380000, 0x080000, CRC(c6783422) SHA1(b2ed2ba42b8132d139480484fe116ba7774e1604) )
+	ROM_LOAD("mar_ex3.rom",  0x400000, 0x080000, CRC(4aa43e16) SHA1(19b669aa6488bdaf8569e89b1b1067e51246a768) )
+	ROM_REGION( 0x20, "serial", 0)
+	ROM_LOAD("mytownsm2.rom",  0x00, 0x20, CRC(44f2f076) SHA1(e4d3be54e66931c947993ded9ddbae716ad51ca5) )
+ROM_END
+
 ROM_START( carmarty )
 	ROM_REGION32_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
@@ -2959,4 +2973,5 @@ COMP( 1993, fmtownsmx,fmtowns,  0,      townshr,    towns, driver_device,    0, 
 COMP( 1994, fmtownsftv,fmtowns, 0,      townsftv,   towns, driver_device,    0,  "Fujitsu",   "FM-Towns II FreshTV", GAME_NOT_WORKING)
 COMP( 19??, fmtownssj,fmtowns,  0,      townssj,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II SJ", GAME_NOT_WORKING)
 CONS( 1993, fmtmarty, 0,        0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Marty",  GAME_NOT_WORKING)
+CONS( 1993, fmtmarty2,fmtmarty, 0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Marty 2",  GAME_NOT_WORKING)
 CONS( 1994, carmarty, fmtmarty, 0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Car Marty",  GAME_NOT_WORKING)
