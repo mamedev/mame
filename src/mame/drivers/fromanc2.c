@@ -83,25 +83,15 @@ CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
 	return m_subcpu_nmi_flag & 0x01;
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_eeprom_w)
+WRITE16_MEMBER(fromanc2_state::fromancr_gfxbank_eeprom_w)
 {
-	if (ACCESSING_BITS_8_15)
-		ioport("EEPROMOUT")->write(data >> 8, 0xff);
-}
-
-WRITE16_MEMBER(fromanc2_state::fromancr_eeprom_w)
-{
+	fromancr_gfxbank_w(data & 0xfff8);
 	if (ACCESSING_BITS_0_7)
 	{
-		fromancr_gfxbank_w(data & 0xfff8);
-		ioport("EEPROMOUT")->write(data, 0xff);
+		m_eeprom->di_write(data & 0x01);
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 	}
-}
-
-WRITE16_MEMBER(fromanc2_state::fromanc4_eeprom_w)
-{
-	if (ACCESSING_BITS_0_7)
-		ioport("EEPROMOUT")->write(data, 0xff);
 }
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
@@ -179,8 +169,8 @@ static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromanc2_videoram_2_w)        // VRAM 0, 1 (2P)
 	AM_RANGE(0x980000, 0x983fff) AM_WRITE(fromanc2_videoram_3_w)        // VRAM 2, 3 (2P)
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromanc2_paletteram_0_r, fromanc2_paletteram_0_w) // PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromanc2_paletteram_1_r, fromanc2_paletteram_1_w) // PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write) AM_SHARE("lpalette") // PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write) AM_SHARE("rpalette") // PALETTE (2P)
 
 	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromanc2_gfxreg_0_w)          // SCROLL REG (1P/2P)
 	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromanc2_gfxreg_2_w)          // SCROLL REG (1P/2P)
@@ -196,7 +186,7 @@ static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r  )           // SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)         // GFXBANK (1P)
 	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)         // GFXBANK (2P)
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromanc2_eeprom_w)            // EEPROM DATA
+	AM_RANGE(0xd01600, 0xd01601) AM_WRITE_PORT("EEPROMOUT")             // EEPROM DATA
 	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)          // INPUT KEY MATRIX
 	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)        // PORT SELECT (1P/2P)
 
@@ -211,8 +201,8 @@ static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromancr_videoram_2_w)        // VRAM TEXT (1P/2P)
 	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP                            // VRAM Unused ?
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromancr_paletteram_0_r, fromancr_paletteram_0_w) // PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_1_w) // PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write) AM_SHARE("lpalette") // PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write) AM_SHARE("rpalette") // PALETTE (2P)
 
 	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)          // SCROLL REG (1P/2P)
 	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP                            // ?
@@ -224,7 +214,7 @@ static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)            // SUB CPU WRITE
 	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r)             // SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITENOP                            // COIN COUNTER ?
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_eeprom_w)            // EEPROM DATA, GFXBANK (1P/2P)
+	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_gfxbank_eeprom_w)    // EEPROM DATA, GFXBANK (1P/2P)
 	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)          // INPUT KEY MATRIX
 	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)        // PORT SELECT (1P/2P)
 
@@ -241,7 +231,7 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 
 	AM_RANGE(0xd10000, 0xd10001) AM_WRITENOP                        // ?
 	AM_RANGE(0xd30000, 0xd30001) AM_WRITENOP                        // ?
-	AM_RANGE(0xd50000, 0xd50001) AM_WRITE(fromanc4_eeprom_w)        // EEPROM DATA
+	AM_RANGE(0xd50000, 0xd50001) AM_WRITE_PORT("EEPROMOUT")         // EEPROM DATA
 
 	AM_RANGE(0xd70000, 0xd70001) AM_WRITE(fromanc2_sndcmd_w)        // SOUND REQ (1P/2P)
 
@@ -249,8 +239,8 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE(fromanc4_videoram_1_w)    // VRAM BG (1P/2P)
 	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)    // VRAM TEXT (1P/2P)
 
-	AM_RANGE(0xdb0000, 0xdb0fff) AM_READWRITE(fromanc4_paletteram_0_r, fromanc4_paletteram_0_w) // PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_1_w) // PALETTE (2P)
+	AM_RANGE(0xdb0000, 0xdb0fff) AM_RAM_DEVWRITE("lpalette", palette_device, write) AM_SHARE("lpalette") // PALETTE (1P)
+	AM_RANGE(0xdc0000, 0xdc0fff) AM_RAM_DEVWRITE("rpalette", palette_device, write) AM_SHARE("rpalette") // PALETTE (2P)
 
 	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)      // INPUT KEY MATRIX
 	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
@@ -395,9 +385,10 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0xf8ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fromanc4 )
@@ -419,6 +410,7 @@ static INPUT_PORTS_START( fromanc4 )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -440,10 +432,10 @@ static const gfx_layout fromanc2_tilelayout =
 };
 
 static GFXDECODE_START( fromanc2 )
-	GFXDECODE_ENTRY( "gfx1", 0, fromanc2_tilelayout, (  0 * 2), (256 * 2) )
-	GFXDECODE_ENTRY( "gfx2", 0, fromanc2_tilelayout, (256 * 2), (256 * 2) )
-	GFXDECODE_ENTRY( "gfx3", 0, fromanc2_tilelayout, (512 * 2), (256 * 2) )
-	GFXDECODE_ENTRY( "gfx4", 0, fromanc2_tilelayout, (768 * 2), (256 * 2) )
+	GFXDECODE_ENTRY( "gfx1", 0, fromanc2_tilelayout,   0, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, fromanc2_tilelayout, 256, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, fromanc2_tilelayout, 512, 4 )
+	GFXDECODE_ENTRY( "gfx4", 0, fromanc2_tilelayout, 768, 4 )
 GFXDECODE_END
 
 static const gfx_layout fromancr_tilelayout =
@@ -458,9 +450,9 @@ static const gfx_layout fromancr_tilelayout =
 };
 
 static GFXDECODE_START( fromancr )
-	GFXDECODE_ENTRY( "gfx1", 0, fromancr_tilelayout, (512 * 2), 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, fromancr_tilelayout, (256 * 2), 2 )
-	GFXDECODE_ENTRY( "gfx3", 0, fromancr_tilelayout, (  0 * 2), 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, fromancr_tilelayout, 512, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, fromancr_tilelayout, 256, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, fromancr_tilelayout,   0, 1 )
 GFXDECODE_END
 
 
@@ -536,8 +528,13 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromanc2)
-	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromanc2)
+
+	MCFG_PALETTE_ADD("lpalette", 2048)
+	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_PALETTE_ADD("rpalette", 2048)
+	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -546,7 +543,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -554,7 +551,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
 
@@ -588,8 +585,13 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromancr)
-	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
+
+	MCFG_PALETTE_ADD("lpalette", 2048)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	MCFG_PALETTE_ADD("rpalette", 2048)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -598,7 +600,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -606,7 +608,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
 
@@ -636,18 +638,22 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromancr)
-	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
+
+	MCFG_PALETTE_ADD("lpalette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ADD("rpalette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(2048, 256)
+	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -655,7 +661,7 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc4)
 

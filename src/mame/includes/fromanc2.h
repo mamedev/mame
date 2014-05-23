@@ -5,15 +5,15 @@ class fromanc2_state : public driver_device
 public:
 	fromanc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_eeprom(*this, "eeprom"),
-		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_lpalette(*this, "lpalette"),
+		m_rpalette(*this, "rpalette") { }
 
 	/* memory pointers */
-	UINT16   *m_paletteram[2];
 	UINT16   *m_videoram[2][4];
 	UINT8    *m_bankedram;
 
@@ -33,15 +33,17 @@ public:
 	UINT8    m_datalatch_2l;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_lpalette;
+	required_device<palette_device> m_rpalette;
 	DECLARE_WRITE16_MEMBER(fromanc2_sndcmd_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_portselect_w);
 	DECLARE_READ16_MEMBER(fromanc2_keymatrix_r);
-	DECLARE_WRITE16_MEMBER(fromanc2_eeprom_w);
-	DECLARE_WRITE16_MEMBER(fromancr_eeprom_w);
-	DECLARE_WRITE16_MEMBER(fromanc4_eeprom_w);
+	DECLARE_WRITE16_MEMBER(fromancr_gfxbank_eeprom_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_subcpu_w);
 	DECLARE_READ16_MEMBER(fromanc2_subcpu_r);
 	DECLARE_READ8_MEMBER(fromanc2_maincpu_r_l);
@@ -51,18 +53,6 @@ public:
 	DECLARE_WRITE8_MEMBER(fromanc2_subcpu_nmi_clr);
 	DECLARE_READ8_MEMBER(fromanc2_sndcpu_nmi_clr);
 	DECLARE_WRITE8_MEMBER(fromanc2_subcpu_rombank_w);
-	DECLARE_READ16_MEMBER(fromanc2_paletteram_0_r);
-	DECLARE_READ16_MEMBER(fromanc2_paletteram_1_r);
-	DECLARE_WRITE16_MEMBER(fromanc2_paletteram_0_w);
-	DECLARE_WRITE16_MEMBER(fromanc2_paletteram_1_w);
-	DECLARE_READ16_MEMBER(fromancr_paletteram_0_r);
-	DECLARE_READ16_MEMBER(fromancr_paletteram_1_r);
-	DECLARE_WRITE16_MEMBER(fromancr_paletteram_0_w);
-	DECLARE_WRITE16_MEMBER(fromancr_paletteram_1_w);
-	DECLARE_READ16_MEMBER(fromanc4_paletteram_0_r);
-	DECLARE_READ16_MEMBER(fromanc4_paletteram_1_r);
-	DECLARE_WRITE16_MEMBER(fromanc4_paletteram_0_w);
-	DECLARE_WRITE16_MEMBER(fromanc4_paletteram_1_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_videoram_0_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_videoram_1_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_videoram_2_w);
@@ -119,7 +109,4 @@ public:
 	void fromancr_gfxbank_w( int data );
 	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
