@@ -236,6 +236,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galspnbl_state, screen_update_galspnbl)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galspnbl)
 
@@ -245,6 +246,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(1)
+	MCFG_TECMO_SPRITE_BOOTLEG(1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

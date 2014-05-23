@@ -21,7 +21,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_screen(*this, "screen")
 		{ }
 
 	/* memory pointers */
@@ -43,5 +44,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tecmo_spr_device> m_sprgen;
+	required_device<screen_device> m_screen;
+	bitmap_ind16 m_sprite_bitmap;
+	DECLARE_VIDEO_START(galspnbl);
+
+	void mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
 };

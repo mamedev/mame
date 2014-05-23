@@ -1,5 +1,4 @@
 /* Various Tecmo Sprite implementations
- - for unifying and converting to a device
 
  - check wc90.c, tecmo.c, tbowl.c others? - they seem more significantly different but are they close to each other
    (but at the same time use the same 'layout' table as this implementation)
@@ -19,7 +18,8 @@ const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TECMO_SPRITE, "Teccmo 16-bit Sprite", tag, owner, clock, "tecmo_spr", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_gfxregion(0)
+m_gfxregion(0),
+m_bootleg(0)
 {
 }
 
@@ -39,17 +39,23 @@ void tecmo_spr_device::set_gfx_region(device_t &device, int gfxregion)
 	dev.m_gfxregion = gfxregion;
 }
 
+void tecmo_spr_device::set_bootleg(device_t &device, int bootleg)
+{
+	tecmo_spr_device &dev = downcast<tecmo_spr_device &>(device);
+	dev.m_bootleg = bootleg;
+}
+
 
 static const UINT8 layout[8][8] =
 {
-	{ 0, 1, 4, 5,16,17,20,21},
-	{ 2, 3, 6, 7,18,19,22,23},
-	{ 8, 9,12,13,24,25,28,29},
-	{10,11,14,15,26,27,30,31},
-	{32,33,36,37,48,49,52,53},
-	{34,35,38,39,50,51,54,55},
-	{40,41,44,45,56,57,60,61},
-	{42,43,46,47,58,59,62,63}
+	{ 0, 1, 4, 5, 16, 17, 20, 21 },
+	{ 2, 3, 6, 7, 18, 19, 22, 23 },
+	{ 8, 9, 12, 13, 24, 25, 28, 29 },
+	{ 10, 11, 14, 15, 26, 27, 30, 31 },
+	{ 32, 33, 36, 37, 48, 49, 52, 53 },
+	{ 34, 35, 38, 39, 50, 51, 54, 55 },
+	{ 40, 41, 44, 45, 56, 57, 60, 61 },
+	{ 42, 43, 46, 47, 58, 59, 62, 63 }
 };
 
 
@@ -74,7 +80,7 @@ static const UINT8 layout[8][8] =
 
 #define NUM_SPRITES 256
 
-void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap )
+void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen, bitmap_ind16 &sprite_bitmap)
 {
 	gfx_element *gfx = gfxdecode->gfx(m_gfxregion);
 	UINT16 *source;
@@ -93,7 +99,6 @@ void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_dev
 	int colour_word = 2;
 	int yposition_word = 3;
 	int xposition_word = 4;
-	int enable_word = attributes_word;
 
 	int xmask;
 
@@ -106,9 +111,27 @@ void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_dev
 	while (count--)
 	{
 		UINT32 attributes = source[attributes_word];
-		int col,row;
+		int col, row;
 
-		if (source[enable_word] & 0x04)
+		int enabled = source[attributes_word] & 0x04;
+
+		if (enabled)
+		{
+			if (m_bootleg == 1)
+			{
+				// I don't think the galspinbl / hotpinbl bootlegs have blending, instead they use this bit to flicker sprites on/off each frame, so handle it here (we can't handle it in the mixing)
+				// alternatively these sprites could just be disabled like the tiles marked with the 'mix' bit appear to be (they're only used for ball / flipper trails afaik)
+				if (source[attributes_word] & 0x0040)
+				{
+					int frame = screen.frame_number() & 1;
+					if (frame==1)
+						enabled = 0;
+				}
+
+			}
+		}
+
+		if (enabled)
 		{				
 			UINT32 flipx = (attributes & 1);
 			UINT32 flipy = (attributes & 2);
@@ -184,64 +207,3 @@ void tecmo_spr_device::gaiden_draw_sprites( screen_device &screen, gfxdecode_dev
 	}
 }
 
-// comad bootleg of spbactn
-
-/* sprite format (galspnbl):
- *
- *  word        bit                 usage
- * --------+-fedcba9876543210-+----------------
- *    0    | ---------------x | flip x
- *         | --------------x- | flip y
- *         | -------------x-- | enable
- *         | ----------xx---- | priority?
- *         | ---------x------ | flicker?
- *    1    | xxxxxxxxxxxxxxxx | code
- *    2    | --------xxxx---- | color
- *         | --------------xx | size: 8x8, 16x16, 32x32, 64x64
- *    3    | xxxxxxxxxxxxxxxx | y position
- *    4    | xxxxxxxxxxxxxxxx | x position
- *    5,6,7|                  | unused
- */
-
-void tecmo_spr_device::galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
-{
-	int offs;
-
-
-	for (offs = (spriteram_bytes - 16) / 2; offs >= 0; offs -= 8)
-	{
-		int sx, sy, code, color, size, attr, flipx, flipy;
-		int col, row;
-
-		attr = spriteram[offs];
-		if ((attr & 0x0004) && ((attr & 0x0040) == 0 || (screen.frame_number() & 1))
-//              && ((attr & 0x0030) >> 4) == priority)
-				&& ((attr & 0x0020) >> 5) == priority)
-		{
-			code = spriteram[offs + 1];
-			color = spriteram[offs + 2];
-			size = 1 << (color & 0x0003); // 1,2,4,8
-			color = (color & 0x00f0) >> 4;
-//          sx = spriteram[offs + 4] + screenscroll;
-			sx = spriteram[offs + 4];
-			sy = spriteram[offs + 3];
-			flipx = attr & 0x0001;
-			flipy = attr & 0x0002;
-
-			for (row = 0; row < size; row++)
-			{
-				for (col = 0; col < size; col++)
-				{
-					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
-					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-					gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
-						code + layout[row][col],
-						color,
-						flipx,flipy,
-						x,y,0);
-
-				}
-			}
-		}
-	}
-}
