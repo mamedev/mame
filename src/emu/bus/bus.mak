@@ -1128,6 +1128,7 @@ OBJDIRS += $(BUSOBJ)/zorro
 BUSOBJS += $(BUSOBJ)/zorro/zorro.o
 BUSOBJS += $(BUSOBJ)/zorro/cards.o
 BUSOBJS += $(BUSOBJ)/zorro/a2052.o
+BUSOBJS += $(BUSOBJ)/zorro/a2232.o
 BUSOBJS += $(BUSOBJ)/zorro/a590.o
 BUSOBJS += $(BUSOBJ)/zorro/action_replay.o
 BUSOBJS += $(BUSOBJ)/zorro/buddha.o

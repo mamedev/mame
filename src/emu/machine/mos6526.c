@@ -798,6 +798,9 @@ void mos6526_device::execute_run()
 
 READ8_MEMBER( mos6526_device::read )
 {
+	if (space.debugger_access())
+		return 0xff;
+
 	UINT8 data = 0;
 
 	switch (offset & 0x0f)

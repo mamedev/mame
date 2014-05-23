@@ -31,6 +31,7 @@
 #ifndef __MOS6551__
 #define __MOS6551__
 
+#include "emu.h"
 #include "machine/clock.h"
 
 #define MCFG_MOS6551_XTAL(_xtal) \

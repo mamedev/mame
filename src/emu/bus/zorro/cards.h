@@ -27,6 +27,7 @@
 #include "emu.h"
 
 #include "a2052.h"
+#include "a2232.h"
 #include "a590.h"
 #include "action_replay.h"
 #include "buddha.h"
