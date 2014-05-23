@@ -5,21 +5,36 @@ Emulation of the different MSX-AUDIO devices:
 - Panasonic FS-CA1
   - Y8950
   - 4KB ram
+  - Connector for Toshiba HX-MU901 keyboard
 
 - Toshiba HX-MU900
   - Y8950
   - No midi ports
   - No ram
+  - Connector for Toshiba HX-MU901 keyboard
 
 - Philips NMS-1205
   - Y8950
   - Midi ports
   - 32KB sample ram
+  - Connector for Philips NMS-1160 keyboard
+
+
+The keyboards:
+- Toshiba HX-MU901
+  - 49 keys: 4 full octaves + high C
+  - ENTER key
+  - SELECT key
+  - multi sensor (?)
+
+- Philips NMS-1160
 
 **********************************************************************************/
 
 #include "emu.h"
 #include "msx_audio.h"
+#include "bus/msx_cart/msx_audio_kb.h"
+
 
 const device_type MSX_CART_MSX_AUDIO_HXMU900 = &device_creator<msx_cart_msx_audio_hxmu900>;
 const device_type MSX_CART_MSX_AUDIO_NMS1205 = &device_creator<msx_cart_msx_audio_nms1205>;
@@ -39,6 +54,10 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_hxmu900 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)    // Not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
+	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
+
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -77,6 +96,8 @@ READ8_MEMBER(msx_cart_msx_audio_hxmu900::read_cart)
 
 
 
+
+
 msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_NMS1205, "MSX Cartridge - MSX-AUDIO NMS-1205", tag, owner, clock, "msx_audio_nms1205", __FILE__)
 	, msx_cart_interface(mconfig, *this)
@@ -93,6 +114,10 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
+	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
+
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 MACHINE_CONFIG_END
@@ -136,6 +161,7 @@ READ8_MEMBER(msx_cart_msx_audio_nms1205::read_cart)
 
 
 
+
 msx_cart_msx_audio_fsca1::msx_cart_msx_audio_fsca1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, "MSX Cartridge - MSX-AUDIO FS-CA1", tag, owner, clock, "msx_audio_fsca1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
@@ -151,6 +177,10 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_fsca1 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
+	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
+
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -233,6 +263,7 @@ WRITE8_MEMBER(msx_cart_msx_audio_fsca1::write_y8950)
 		}
 	}
 }
+
 
 READ8_MEMBER(msx_cart_msx_audio_fsca1::read_y8950)
 {
