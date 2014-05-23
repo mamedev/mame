@@ -459,6 +459,14 @@ ROM_START(gw_l5)
 	ROM_LOAD("u18snd", 0x100000, 0x80000, CRC(37bbe485) SHA1(e6b7ccef250db0c801e3dd8ebf93522b466ca1ec))
 ROM_END
 
+ROM_START(gw_pb)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("u6-p-b.rom", 0x00000, 0x80000, CRC(c2c76ce7) SHA1(bc5874f8012feaa92230415067b56f56aae109bc))
+	ROM_REGION(0x180000, "sound1", 0)
+	ROM_LOAD("u18-sp1.rom", 0x100000, 0x80000, CRC(fc5a5ff6) SHA1(bbe810135e05f81d1399ee0cb490ee93d6f9bb03))
+ROM_END
+
 ROM_START(gw_pc)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "code", 0)
@@ -841,6 +849,7 @@ GAME(1994,  tafg_h3,    tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_
 GAME(1994,  tafg_la2,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",                "The Addams Family Special Collectors Edition (LA-2)",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_la3,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",                "The Addams Family Special Collectors Edition (LA-3)",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  gw_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",             "The Getaway: High Speed II (L-5)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  gw_pb,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",             "The Getaway: High Speed II (P-B)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  gw_pc,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",             "The Getaway: High Speed II (P-C)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  gw_l1,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",             "The Getaway: High Speed II (L-1)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  gw_l2,      gw_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",             "The Getaway: High Speed II (L-2)",             GAME_IS_SKELETON_MECHANICAL)

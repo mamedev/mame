@@ -451,6 +451,18 @@ ROM_START(comet_l5)
 	ROM_LOAD("cpu_u49.128", 0xc000, 0x4000, CRC(f1db0cbe) SHA1(59b7f36fb2003b90b288abeff56df62ce50f10c6))
 ROM_END
 
+/*--------------------
+/ Still Crazy (#534)
+/--------------------*/
+ROM_START(scrzy_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("scrzy_20.bin", 0x6000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b))
+	ROM_RELOAD(0xe000, 0x2000)
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("scrzy_49.bin", 0xc000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152))
+	ROM_RELOAD(0x8000, 0x4000)
+ROM_END
+
 /*--------------------------------
 / Strike Zone (Shuffle) (#916)
 /---------------------------------*/
@@ -496,3 +508,4 @@ GAME( 1985, comet_l5, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Com
 GAME( 1984, szone_l5, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1984, szone_l2, szone_l5, s9, s9, driver_device, 0, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1985, alcat_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1984, scrzy_l1, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Still Crazy (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -149,6 +149,21 @@ ROM_START(lapbylap)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Moon Light (1987)
+/-------------------------------------------------------------------*/
+ROM_START(pinmoonlg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ci-3.bin", 0x0000, 0x2000, CRC(56b901ae) SHA1(7269d1a100c378b21454f9f80f5bd9fbb736c222))
+	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_LOAD("ci-11.bin", 0x00000, 0x2000, CRC(a0732fe4) SHA1(54f62cd81bdb7e1924acb67ddbe43eb3d0a4eab0))
+	ROM_REGION(0x40000, "user1", 0)
+	ROM_LOAD("ci-24.bin", 0x00000, 0x10000, CRC(6406bd18) SHA1(ae45ed9e8b1fd278a36a68b780352dbbb6ee781e))
+	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
+	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
+	ROM_LOAD("ci-21.bin", 0x30000, 0x10000, CRC(0febb4a7) SHA1(e6cc1b26ddfe9cd58da29de2a50a83ce50afe323))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Metal Man (1992)
 /-------------------------------------------------------------------*/
 ROM_START(metalman)
@@ -173,5 +188,6 @@ GAME(1986,  canasta,    0,      inder,  inder, inder_state, inder,  ROT0,   "Ind
 GAME(1988,  pinclown,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Clown (Inder)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  corsario,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Corsario",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  mundial,    0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Mundial 90",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  pinmoonlg,  0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Moon Light (Inder)",   GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  metalman,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Metal Man",            GAME_IS_SKELETON_MECHANICAL)
 GAME(1986,  lapbylap,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Lap By Lap",           GAME_IS_SKELETON_MECHANICAL)

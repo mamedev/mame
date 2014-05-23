@@ -2338,6 +2338,30 @@ ROM_START(cc_13)
 	ROM_LOAD16_BYTE("sav7_8.rom", 0xa00000, 0x100000, CRC(90fb1277) SHA1(502c920e1d54d285a4d4af401e574f785149da47))
 ROM_END
 
+ROM_START(cc_10)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("cc_g11.1_0", 0x00000, 0x100000, CRC(c4e2e838) SHA1(3223dd03353dead0f41626b04c9f019d6fe1528c))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("sav2_8.rom", 0x000000, 0x100000, CRC(94928841) SHA1(953586d6abe8222a6cd6b74e417fa4ce078efa43))
+	ROM_LOAD16_BYTE("sav3_8.rom", 0x200000, 0x100000, CRC(a22b13f0) SHA1(5df6ea9d5059cd04bdb369c1c7255b09d64b3c65))
+	ROM_LOAD16_BYTE("sav4_8.rom", 0x400000, 0x100000, CRC(fe8324e2) SHA1(72c56d094cb4185a083a7da81fd527a908ce9de0))
+	ROM_LOAD16_BYTE("sav5_8.rom", 0x600000, 0x100000, CRC(1b2a1ff3) SHA1(2d9a5952c7ac000c47d87d198ff7ca62913ec73f))
+	ROM_LOAD16_BYTE("sav6_8.rom", 0x800000, 0x100000, CRC(2cccf10e) SHA1(3b9b9c87ab3c0d74eaacde416d18f3357f8302bd))
+	ROM_LOAD16_BYTE("sav7_8.rom", 0xa00000, 0x100000, CRC(90fb1277) SHA1(502c920e1d54d285a4d4af401e574f785149da47))
+ROM_END
+
+ROM_START(cc_104)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("cc_g11.104", 0x00000, 0x100000, CRC(21a7b816) SHA1(0e67da694b8713e15e04bf0c49a48e14f057a737))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("sav2_8.rom", 0x000000, 0x100000, CRC(94928841) SHA1(953586d6abe8222a6cd6b74e417fa4ce078efa43))
+	ROM_LOAD16_BYTE("sav3_8.rom", 0x200000, 0x100000, CRC(a22b13f0) SHA1(5df6ea9d5059cd04bdb369c1c7255b09d64b3c65))
+	ROM_LOAD16_BYTE("sav4_8.rom", 0x400000, 0x100000, CRC(fe8324e2) SHA1(72c56d094cb4185a083a7da81fd527a908ce9de0))
+	ROM_LOAD16_BYTE("sav5_8.rom", 0x600000, 0x100000, CRC(1b2a1ff3) SHA1(2d9a5952c7ac000c47d87d198ff7ca62913ec73f))
+	ROM_LOAD16_BYTE("sav6_8.rom", 0x800000, 0x100000, CRC(2cccf10e) SHA1(3b9b9c87ab3c0d74eaacde416d18f3357f8302bd))
+	ROM_LOAD16_BYTE("sav7_8.rom", 0xa00000, 0x100000, CRC(90fb1277) SHA1(502c920e1d54d285a4d4af401e574f785149da47))
+ROM_END
+
 /*-----------------
 /  Cirqus Voltaire
 /------------------*/
@@ -2427,6 +2451,16 @@ ROM_END
 ROM_START(congo_13)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD("cong1_30.rom", 0x00000, 0x80000, CRC(e68c0404) SHA1(e851f42e6bd0e910fc87b9500cbacac3c088b488))
+	ROM_RELOAD(0x80000, 0x80000)
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("cgs2v1_1.rom", 0x000000, 0x100000, CRC(2b7637ae) SHA1(5b5d7214c632a506b986c892b39b1356b2909598))
+	ROM_LOAD16_BYTE("cgs3v1_0.rom", 0x200000, 0x100000, CRC(6cfd9fe0) SHA1(a76267f865c645648c8cb27aec2d05062a4a20b5))
+	ROM_LOAD16_BYTE("cgs4v1_0.rom", 0x400000, 0x100000, CRC(2a1980e7) SHA1(0badf27c2b8bc7b0074dc5e606d64490470bc108))
+ROM_END
+
+ROM_START(congo_11)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("cong1_30.rom", 0x00000, 0x80000, CRC(b0b0ffd9) SHA1(26343f3bfbacf85b3f4db5aa3dad39216311a2da))
 	ROM_RELOAD(0x80000, 0x80000)
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("cgs2v1_1.rom", 0x000000, 0x100000, CRC(2b7637ae) SHA1(5b5d7214c632a506b986c892b39b1356b2909598))
@@ -2815,6 +2849,16 @@ ROM_START(sc_14)
 	ROM_LOAD16_BYTE("safsnds4.rom", 0x400000, 0x100000, CRC(9c8a23eb) SHA1(a0ee1174c8af0f262f9bec950da588cc9eb8747d))
 ROM_END
 
+ROM_START(sc_091)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("sc_091.bin", 0x00000, 0x80000, CRC(b6f5307b) SHA1(93fab74db3aa62c2dd70d3a1d5664716c6548284))
+	ROM_RELOAD(0x80000, 0x80000)
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("safsnds2.rom", 0x000000, 0x100000, CRC(20e14c63) SHA1(61b1c000a7afe5d0e9c31093e3fa963d6a594d54))
+	ROM_LOAD16_BYTE("safsnds3.rom", 0x200000, 0x100000, CRC(99e318e7) SHA1(918f9013da82b29a559cb474bce93fb4ce88b731))
+	ROM_LOAD16_BYTE("safsnds4.rom", 0x400000, 0x100000, CRC(9c8a23eb) SHA1(a0ee1174c8af0f262f9bec950da588cc9eb8747d))
+ROM_END
+
 /*-----------------
 /  Scared Stiff
 /------------------*/
@@ -2981,6 +3025,8 @@ GAME(1995,  afm_11u,    afm_113,    wpc_95, afm,    wpc_95_state,   afm,    ROT0
 GAME(1995,  afm_10,     afm_113,    wpc_95, afm,    wpc_95_state,   afm,    ROT0,   "Bally",                "Attack From Mars (1.0)",                 GAME_MECHANICAL)
 GAME(1998,  cc_13,      0,          wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.3)",                    GAME_MECHANICAL)
 GAME(1998,  cc_12,      cc_13,      wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.2)",                    GAME_MECHANICAL)
+GAME(1998,  cc_10,      cc_13,      wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.0)",                    GAME_MECHANICAL)
+GAME(1998,  cc_104,     cc_13,      wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.04 Test 0.2)",          GAME_MECHANICAL)
 GAME(1997,  cv_14,      0,          wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (1.4)",                  GAME_MECHANICAL)
 GAME(1997,  cv_20h,     cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (2.0H)",                 GAME_MECHANICAL)
 GAME(1997,  cv_10,      cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (1.0)",                  GAME_MECHANICAL)
@@ -2989,6 +3035,7 @@ GAME(1997,  cv_13,      cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0
 GAME(1995,  congo_21,   0,          wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (2.1)",                            GAME_MECHANICAL)
 GAME(1995,  congo_20,   congo_21,   wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (2.0)",                            GAME_MECHANICAL)
 GAME(1995,  congo_13,   congo_21,   wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (1.3)",                            GAME_MECHANICAL)
+GAME(1995,  congo_11,   congo_21,   wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (1.1)",                            GAME_MECHANICAL)
 GAME(1996,  jy_12,      0,          wpc_95, jy,     wpc_95_state,   jy,     ROT0,   "Williams",             "Junk Yard (1.2)",                        GAME_MECHANICAL)
 GAME(1996,  jy_11,      jy_12,      wpc_95, jy,     wpc_95_state,   jy,     ROT0,   "Williams",             "Junk Yard (1.1)",                        GAME_MECHANICAL)
 GAME(1996,  jy_03,      jy_12,      wpc_95, jy,     wpc_95_state,   jy,     ROT0,   "Williams",             "Junk Yard (0.3)",                        GAME_MECHANICAL)
@@ -3019,6 +3066,7 @@ GAME(1998,  sc_18s2,    sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0
 GAME(1996,  sc_17,      sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.7)",                     GAME_MECHANICAL)
 GAME(1996,  sc_17n,     sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.7N)",                    GAME_MECHANICAL)
 GAME(1996,  sc_14,      sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.4)",                     GAME_MECHANICAL)
+GAME(1996,  sc_091,     sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (0.91)",                    GAME_MECHANICAL)
 GAME(1996,  ss_15,      0,          wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (1.5)",                     GAME_MECHANICAL)
 GAME(1996,  ss_14,      ss_15,      wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (1.4)",                     GAME_MECHANICAL)
 GAME(1996,  ss_12,      ss_15,      wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (1.2)",                     GAME_MECHANICAL)

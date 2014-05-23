@@ -319,7 +319,6 @@ ROM_END
 /*--------------------------------
 / Future World (10/78)
 /-------------------------------*/
-// Game ROMs #2 and #3 have to be swapped!
 ROM_START(futurwld)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD ( "futwld_1.lgc", 0x0000, 0x0400, CRC(d83b8793) SHA1(3bb04d8395191ecf324b6da0bcddcf7bd8d41867))

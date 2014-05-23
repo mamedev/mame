@@ -96,6 +96,17 @@ ROM_START(blackblt)
 	ROM_LOAD("blck_u7.snd", 0x8000, 0x8000, CRC(db8bce07) SHA1(6327cfbb2761f4d190e2852f3321cdd0cc1e46a8))
 ROM_END
 
+ROM_START(blackblt2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "cpu_u2.cpu", 0x8000, 0x4000, CRC(b86d16ec) SHA1(2e4601e725261aca67e4d706f310b14eb7578d8b))
+	ROM_LOAD( "cpu_u3.cpu", 0xc000, 0x4000, CRC(c63e3e6f) SHA1(cd3f66c3796eaf64c36cabba9d74cc8c690d9d8b) )
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("blb_u2.snd", 0xc000, 0x1000, NO_DUMP)
+	ROM_LOAD("blb_u3.snd", 0xd000, 0x1000, NO_DUMP)
+	ROM_LOAD("blb_u4.snd", 0xe000, 0x1000, NO_DUMP)
+	ROM_LOAD("blb_u5.snd", 0xf000, 0x1000, NO_DUMP)
+ROM_END
+
 /*------------------------------------
 / Blackwater 100
 /------------------------------------*/
@@ -263,8 +274,19 @@ ROM_START(prtyanim)
 	ROM_LOAD16_BYTE("snd_u13.512", 0x20000, 0x10000, CRC(b652597b) SHA1(8b4074a545d420319712a1fdd77a3bfb282ed9cd))
 ROM_END
 
+ROM_START(prtyanimg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "cpu_u2g.128", 0x8000, 0x4000, CRC(8abf40a2) SHA1(04ac296c99bc176faf21f1277ff59228a2031715))
+	ROM_LOAD( "cpu_u3g.128", 0xc000, 0x4000, CRC(e781dd4b) SHA1(3395ddd2d774c83cac98b6d67415d3c8cd0b04fe) )
+	ROM_REGION(0x01000000, "cpu2", 0)
+	ROM_LOAD16_BYTE("snd_u12.512", 0x00001, 0x10000, CRC(265a9494) SHA1(3b631f2b1c8c685aef32fb6c5289cd792711ff7e))
+	ROM_LOAD16_BYTE("snd_u11.512", 0x00000, 0x10000, CRC(20be998f) SHA1(7f98073d0f559e081b2d6dc8c1f3462e3fe9a713))
+	ROM_LOAD16_BYTE("snd_u14.512", 0x20001, 0x10000, CRC(639b3db1) SHA1(e07669c3186c963f2fea29bcf5675ac86eb07c86))
+	ROM_LOAD16_BYTE("snd_u13.512", 0x20000, 0x10000, CRC(b652597b) SHA1(8b4074a545d420319712a1fdd77a3bfb282ed9cd))
+ROM_END
+
 /*------------------------------------
-/ Special Force
+/ Special Force - 1st Game to use Sounds Deluxe Sound Hardware
 /------------------------------------*/
 ROM_START(specforc)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -284,6 +306,14 @@ ROM_START(strngsci)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(2ffcf284) SHA1(27d66806708c983092bab4ed6965c2e91e69acdc))
 	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(35257931) SHA1(d3d6b84e50677a4c5f9d5c13c9522ad6d3a1358d) )
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
+ROM_END
+
+ROM_START(strngscg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "cpub_u2.128", 0x8000, 0x4000, CRC(48ef1052) SHA1(afcb0520ab834c0d6ef4a73f615c48653ccedc24))
+	ROM_LOAD( "cpub_u3.128", 0xc000, 0x4000, CRC(da5b4b3b) SHA1(ff9babf2efc6622803db9ba8712dd8b76c8412b8) )
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
 ROM_END
@@ -323,6 +353,7 @@ ROM_END
 GAME( 1989, atlantip, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Atlantis", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, beatclck, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Beat the Clock", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, blackblt, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, blackblt2,blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Black Belt (Squawk and Talk)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, black100, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, black100s, black100,    by6803, by6803, by6803_state, by6803, ROT0, "Bally","Blackwater 100 (Single Ball Play)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1987, cityslck, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","City Slicker", GAME_IS_SKELETON_MECHANICAL)
@@ -336,7 +367,9 @@ GAME( 1987, hvymetap, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bal
 GAME( 1986, ladyluck, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Lady Luck", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, motrdome, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","MotorDome", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1987, prtyanim, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, prtyanimg,prtyanim, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Party Animal (German)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, specforc, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Special Force", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, strngsci, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscg, strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science (German)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, trucksp3, 0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-3)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, trucksp2, trucksp3, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Truck Stop (P-2)", GAME_IS_SKELETON_MECHANICAL)

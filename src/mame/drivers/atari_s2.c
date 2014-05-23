@@ -407,7 +407,20 @@ ROM_START(roadrunr)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ 4x4 (10/1982)
+/-------------------------------------------------------------------*/
+ROM_START(fourx4)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("8000ce65.bin", 0x8000, 0x2000, CRC(27341155) SHA1(c0da1fbf64f93ab163b2ea6bfbfc7b778cea819f)) \
+	ROM_LOAD("a0004c37.bin", 0xa000, 0x2000, CRC(6f93102f) SHA1(d6520987ed5805b0e6b5da5653fc7cb063e86dda)) \
+	ROM_LOAD("c000a70c.bin", 0xc000, 0x2000, CRC(c31ca8d3) SHA1(53f20eff0084771dc61d19db7ddae52e4423e75e)) \
+	ROM_RELOAD(0xe000, 0x2000)
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+ROM_END
 
 GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1982, fourx4,    0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "4x4", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1979, roadrunr,  0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "Road Runner", GAME_MECHANICAL | GAME_NO_SOUND)

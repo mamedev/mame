@@ -489,6 +489,20 @@ ROM_START(baywatch)
 	ROM_LOAD("bayw.u21", 0x080000, 0x80000, CRC(b7598881) SHA1(19d1dde1cb6634a7c7b5cdb4fa01cd09cc7d7777))
 ROM_END
 
+ROM_START(bay_e400)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("baycpua2.400", 0x0000, 0x10000, CRC(07b77fe2) SHA1(4f81a5b3d821907e06d6b547117ad39c238a900c))
+	ROM_REGION(0x01000000, "cpu3", 0)
+	ROM_LOAD16_BYTE("bayrom0a.400", 0x00000000, 0x00080000, CRC(43d615c6) SHA1(7c843b6d5215305b02a55c9fa1d62375ef0766ea))
+	ROM_LOAD16_BYTE("bayrom3a.400", 0x00000001, 0x00080000, CRC(41bcb66b) SHA1(e6f0a9236e14c2e919881ca1ffe3356aaa121730))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("bw-u7.u7", 0x0000, 0x10000, CRC(a5e57557) SHA1(a884c1118331b8724507b0a916127ce5df309fe4))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("bw-u17.bin", 0x000000, 0x80000, CRC(660e7f5d) SHA1(6dde294e728e596a6c455326793b65254139620e))
+	ROM_LOAD("bw-u21.bin", 0x080000, 0x80000, CRC(5ec3a889) SHA1(f355f742de137344e6e4b5d3a4b2380a876c8cc3))
+	ROM_LOAD("bw-u36.bin", 0x100000, 0x80000, CRC(1877abc5) SHA1(13ca231a486495a83cc1d9c6dde558a57eb4abe1))
+ROM_END
+
 /*-------------------------------------------------------------
 / Mary Shelley's Frankenstein - CPU Rev 3b /DMD  Type 3 2x512K Rom - 64K CPU Rom
 /------------------------------------------------------------*/
@@ -626,6 +640,7 @@ GAME(1995,  bmf_sp,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0
 GAME(1995,  bmf_jp,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Batman Forever (Japanese)",            GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,  bmf_time,   batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Batman Forever (Timed Play)",          GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,  baywatch,   0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Baywatch",                             GAME_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_e400,   baywatch,       de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Baywatch (England)",                   GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  frankst,    0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Mary Shelley's Frankenstein",          GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,  frankstg,   frankst,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Mary Shelley's Frankenstein (Germany)",GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  mav_402,    0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Maverick (Display Rev. 4.02)",         GAME_IS_SKELETON_MECHANICAL)

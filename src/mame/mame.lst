@@ -29783,6 +29783,7 @@ wrldtour
 wrldtour2
 usafootb
 mystcast
+mystcasta
 pstlpkr
 punchy
 dinoeggs
@@ -29800,6 +29801,7 @@ spcrider
 */
 supermap
 hercules
+fourx4
 /*
    Atari Generation/System 3
 */
@@ -29931,6 +29933,7 @@ kissp
 atlantip
 beatclck
 blackblt
+blackblt2
 black100
 black100s
 cityslck
@@ -29944,8 +29947,10 @@ hvymetap
 ladyluck
 motrdome
 prtyanim
+prtyanimg
 specforc
 strngsci
+strngscg
 trucksp3
 trucksp2
 
@@ -30032,6 +30037,7 @@ trek_200
 trek_120
 trek_110
 trek_11a
+stwr_104
 stwr_103
 stwr_g11
 stwr_a14
@@ -30070,6 +30076,7 @@ bmf_sp
 bmf_jp
 bmf_time
 baywatch
+bay_e400
 frankst
 frankstg
 mav_402
@@ -30086,7 +30093,8 @@ flicker
 
 // g627.c
 rotation
-
+rota_115
+rota_101
 
 // gp_1.c
 gp_110
@@ -30293,6 +30301,7 @@ canasta
 pinclown
 corsario
 mundial
+pinmoonlg
 lapbylap
 metalman
 
@@ -30309,6 +30318,7 @@ pimbal
 petaco
 petaco2
 halley
+halleya
 olympus
 
 
@@ -30418,11 +30428,13 @@ tts_l1
 f14_l1
 f14_p3
 f14_p4
+f14_p5
 fire_l3
 milln_l3
 pb_l5
 pb_l2
 pb_l3
+pb_p4
 
 
 // s11b.c
@@ -30589,6 +30601,7 @@ sshtl_l7
 alcat_l7
 szone_l5
 szone_l2
+scrzy_l1
 
 // sam.c
 
@@ -30898,6 +30911,7 @@ papillon
 
 // whitestar.c
 apollo13
+apollo13_10
 aust301
 aust300
 aust201
@@ -30940,6 +30954,7 @@ hirol_gr
 hirol_gr_210
 hirol_it
 id4
+id4_201
 lostspc
 monopolp
 monop303
@@ -30955,27 +30970,32 @@ nfl
 playboys
 playboys_401
 playboys_303
+playboys_302
 playboys_300
 playboys_203
 playnew
 playboyf
 playboyf_401
 playboyf_303
+playboyf_302
 playboyf_300
 playboyf_203
 playboyg
 playboyg_401
 playboyg_303
+playboyg_302
 playboyg_300
 playboyg_203
 playboyi
 playboyi_401
 playboyi_303
+playboyi_302
 playboyi_300
 playboyi_203
 playboyl
 playboyl_401
 playboyl_303
+playboyl_302
 playboyl_300
 playboyl_203
 rctycn
@@ -31240,6 +31260,8 @@ afm_11u
 afm_10
 cc_12
 cc_13
+cc_10
+cc_104
 cv_14
 cv_20h
 cv_10
@@ -31248,6 +31270,7 @@ cv_13
 congo_21
 congo_20
 congo_13
+congo_11
 jy_12
 jy_11
 jy_03
@@ -31278,6 +31301,7 @@ sc_18s2
 sc_17
 sc_17n
 sc_14
+sc_091
 ss_15
 ss_14
 ss_12
@@ -31329,15 +31353,20 @@ ij_l3
 jd_l7
 jd_l1
 jd_l6
+jd_l5
+jd_l4
 pop_lx5
 pop_pa3
 sttng_l7
 sttng_x7
+sttng_p8
 sttng_p5
+sttng_p4
 sttng_s7
 sttng_g7
 sttng_l1
 sttng_l2
+sttng_l3
 afv_l4
 
 
@@ -31395,6 +31424,7 @@ tafg_h3
 tafg_la2
 tafg_la3
 gw_l5
+gw_pb
 gw_pc
 gw_l1
 gw_l2
@@ -31429,6 +31459,8 @@ lc_11
 corv_21
 corv_px4
 corv_lx1
+corv_lx2
+corv_la1
 dh_lx2
 i500_11r
 i500_11b
@@ -31436,11 +31468,13 @@ jb_10r
 jb_10b
 jm_12r
 jm_12b
+jm_05r
 nf_23x
 nf_23
 nf_23f
 nf_22
 nf_20
+nf_10
 rs_l6
 rs_la5
 rs_lx5

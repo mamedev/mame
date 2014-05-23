@@ -433,6 +433,36 @@ ROM_START(jd_l6)
 	ROM_LOAD16_BYTE("jdsnd_u9.bin", 0xe00000, 0x080000, CRC(885b7c70) SHA1(be3bb42aeda3020a72c527f52c5330d0bafa9966))
 ROM_END
 
+ROM_START(jd_l5)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("jd_l5.u6", 0x00000, 0x80000, CRC(879b091e) SHA1(eaf1c86c0e72e8cdfa9ac942fc54ef4f70a65175))
+	ROM_REGION16_LE(0x1000000, "dcs",0)
+	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
+	ROM_LOAD16_BYTE("jdsnd_u3.bin", 0x200000, 0x080000, CRC(0a11f673) SHA1(ab556477a25e3493555b8a281ca86677caec8947))
+	ROM_LOAD16_BYTE("jdsnd_u4.bin", 0x400000, 0x080000, CRC(93f6ebc1) SHA1(5cb306afa693e60887069745588dfd5b930c5951))
+	ROM_LOAD16_BYTE("jdsnd_u5.bin", 0x600000, 0x080000, CRC(c9f28ba6) SHA1(8447372428e3b9fc86a98286c05f95a13abe26b0))
+	ROM_LOAD16_BYTE("jdsnd_u6.bin", 0x800000, 0x080000, CRC(ef0bf094) SHA1(c0860cecd436d352fe2c2208533ff6dc71bfced1))
+	ROM_LOAD16_BYTE("jdsnd_u7.bin", 0xa00000, 0x080000, CRC(aebab88b) SHA1(d3f1be60a6840d9d085e22b43aafea1354771980))
+	ROM_LOAD16_BYTE("jdsnd_u8.bin", 0xc00000, 0x080000, CRC(77604893) SHA1(a9a4a66412096edd88ee7adfd960eef6f5d16476))
+	ROM_LOAD16_BYTE("jdsnd_u9.bin", 0xe00000, 0x080000, CRC(885b7c70) SHA1(be3bb42aeda3020a72c527f52c5330d0bafa9966))
+ROM_END
+
+ROM_START(jd_l4)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("jd_l4.u6", 0x00000, 0x80000, CRC(cc6f1068) SHA1(aef2a2eeb9110074eebff91318179ce97aba14ba))
+	ROM_REGION16_LE(0x1000000, "dcs",0)
+	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
+	ROM_LOAD16_BYTE("jdsnd_u3.bin", 0x200000, 0x080000, CRC(0a11f673) SHA1(ab556477a25e3493555b8a281ca86677caec8947))
+	ROM_LOAD16_BYTE("jdsnd_u4.bin", 0x400000, 0x080000, CRC(93f6ebc1) SHA1(5cb306afa693e60887069745588dfd5b930c5951))
+	ROM_LOAD16_BYTE("jdsnd_u5.bin", 0x600000, 0x080000, CRC(c9f28ba6) SHA1(8447372428e3b9fc86a98286c05f95a13abe26b0))
+	ROM_LOAD16_BYTE("jdsnd_u6.bin", 0x800000, 0x080000, CRC(ef0bf094) SHA1(c0860cecd436d352fe2c2208533ff6dc71bfced1))
+	ROM_LOAD16_BYTE("jdsnd_u7.bin", 0xa00000, 0x080000, CRC(aebab88b) SHA1(d3f1be60a6840d9d085e22b43aafea1354771980))
+	ROM_LOAD16_BYTE("jdsnd_u8.bin", 0xc00000, 0x080000, CRC(77604893) SHA1(a9a4a66412096edd88ee7adfd960eef6f5d16476))
+	ROM_LOAD16_BYTE("jdsnd_u9.bin", 0xe00000, 0x080000, CRC(885b7c70) SHA1(be3bb42aeda3020a72c527f52c5330d0bafa9966))
+ROM_END
+
 /*-----------------
 / Popeye Saves The Earth
 /------------------*/
@@ -506,10 +536,38 @@ ROM_START(sttng_s7)
 	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
 ROM_END
 
+ROM_START(sttng_p8)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("sttng_p8.u6", 0x00000, 0x80000, CRC(bf599f45) SHA1(ec660f99030f89bdfe3d04cc38fd450d6bbedf7d))
+	ROM_REGION16_LE(0x1000000, "dcs",0)
+	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
+	ROM_LOAD16_BYTE("ng_u3_s.l1", 0x200000, 0x080000, CRC(9456cac7) SHA1(83e415e0f21bb5418f3677dbc13433e056c523ab))
+	ROM_LOAD16_BYTE("ng_u4_s.l1", 0x400000, 0x080000, CRC(179d22a4) SHA1(456b7189e23d4e2bd7e2a6249fa2a73bf0e12194))
+	ROM_LOAD16_BYTE("ng_u5_s.l1", 0x600000, 0x080000, CRC(231a3e72) SHA1(081b1a042e62ccb723788059d6c1e00b9b32c778))
+	ROM_LOAD16_BYTE("ng_u6_s.l1", 0x800000, 0x080000, CRC(bb21377d) SHA1(229fb42a1f8b22727a809e5d63f26f045a2adda5))
+	ROM_LOAD16_BYTE("ng_u7_s.l1", 0xa00000, 0x080000, CRC(d81b39f0) SHA1(3443e7327c755b85a5b390f7fcd0e9923890425a))
+	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
+ROM_END
+
 ROM_START(sttng_p5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "code", 0)
 	ROM_LOAD("sttng_p5.u6", 0x00000, 0x80000, CRC(c1b80a8e) SHA1(90dd99efd41ec5405c631ad374a369f9fcb7217e))
+	ROM_REGION16_LE(0x1000000, "dcs",0)
+	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
+	ROM_LOAD16_BYTE("ng_u3_s.l1", 0x200000, 0x080000, CRC(9456cac7) SHA1(83e415e0f21bb5418f3677dbc13433e056c523ab))
+	ROM_LOAD16_BYTE("ng_u4_s.l1", 0x400000, 0x080000, CRC(179d22a4) SHA1(456b7189e23d4e2bd7e2a6249fa2a73bf0e12194))
+	ROM_LOAD16_BYTE("ng_u5_s.l1", 0x600000, 0x080000, CRC(231a3e72) SHA1(081b1a042e62ccb723788059d6c1e00b9b32c778))
+	ROM_LOAD16_BYTE("ng_u6_s.l1", 0x800000, 0x080000, CRC(bb21377d) SHA1(229fb42a1f8b22727a809e5d63f26f045a2adda5))
+	ROM_LOAD16_BYTE("ng_u7_s.l1", 0xa00000, 0x080000, CRC(d81b39f0) SHA1(3443e7327c755b85a5b390f7fcd0e9923890425a))
+	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
+ROM_END
+
+ROM_START(sttng_p4)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("sttng_p4.u6", 0x00000, 0x80000, CRC(836774f0) SHA1(5784f77eaad41ccf07446874720be146fd562c68))
 	ROM_REGION16_LE(0x1000000, "dcs",0)
 	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
 	ROM_LOAD16_BYTE("ng_u3_s.l1", 0x200000, 0x080000, CRC(9456cac7) SHA1(83e415e0f21bb5418f3677dbc13433e056c523ab))
@@ -562,6 +620,21 @@ ROM_START(sttng_l2)
 	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
 ROM_END
 
+ROM_START(sttng_l3)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("trek_lx3.rom", 0x00000, 0x80000, CRC(400e7887) SHA1(23d5e9796f0c3c66121da53088df6f5275348f4a))
+	ROM_REGION16_LE(0x1000000, "dcs",0)
+	ROM_LOAD16_BYTE("ng_u2_s.l1", 0x000000, 0x080000, CRC(c3bd7bf5) SHA1(2476ff90232a52d667a407fac81ee4db028b94e5))
+	ROM_LOAD16_BYTE("ng_u3_s.l1", 0x200000, 0x080000, CRC(9456cac7) SHA1(83e415e0f21bb5418f3677dbc13433e056c523ab))
+	ROM_LOAD16_BYTE("ng_u4_s.l1", 0x400000, 0x080000, CRC(179d22a4) SHA1(456b7189e23d4e2bd7e2a6249fa2a73bf0e12194))
+	ROM_LOAD16_BYTE("ng_u5_s.l1", 0x600000, 0x080000, CRC(231a3e72) SHA1(081b1a042e62ccb723788059d6c1e00b9b32c778))
+	ROM_LOAD16_BYTE("ng_u6_s.l1", 0x800000, 0x080000, CRC(bb21377d) SHA1(229fb42a1f8b22727a809e5d63f26f045a2adda5))
+	ROM_LOAD16_BYTE("ng_u7_s.l1", 0xa00000, 0x080000, CRC(d81b39f0) SHA1(3443e7327c755b85a5b390f7fcd0e9923890425a))
+	ROM_LOAD16_BYTE("ng_u8_s.l1", 0xc00000, 0x080000, CRC(c9fb065e) SHA1(c148178ee0ea787acc88078db01d17073e75fdc7))
+ROM_END
+
+
 /*-------------
 / Addams Family Values (Coin Dropper)
 /--------------*/
@@ -589,13 +662,18 @@ GAME(1993,  ij_l3,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,
 GAME(1993,  jd_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-7)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  jd_l1,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-1)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-6)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-5)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-4)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (LX-5)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (PA-3)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7 Special)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  sttng_p8,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (P-8)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  sttng_p5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (P-5)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  sttng_p4,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (P-4)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  sttng_s7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7) SP1",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  sttng_g7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LG-7)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  sttng_l1,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-1)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  sttng_l2,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-2)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1994,  sttng_l3,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-3)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  afv_l4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Addams Family Values (Coin Dropper L-4)",              GAME_IS_SKELETON_MECHANICAL)

@@ -852,6 +852,19 @@ ROM_END
 /*-------------------------------------------------------------
 / Star Wars - CPU Rev 3 /DMD  Type 2 512K Rom - 64K CPU Rom
 /------------------------------------------------------------*/
+ROM_START(stwr_104)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("starcpua.104", 0x0000, 0x10000, CRC(12b87cfa) SHA1(12e0ab52f6784beefce8291d29b8aff01b2f2818))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("sw4mrom.a15", 0x00000, 0x80000, CRC(00c87952) SHA1(cd2f491f03fcb3e3ceff7ee7f678aa1957a5d14b))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("s-wars.u7", 0x8000, 0x8000, CRC(cefa19d5) SHA1(7ddf9cc85ab601514305bc46083a07a3d087b286))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("s-wars.u17", 0x000000, 0x80000, CRC(7950a147) SHA1(f5bcd5cf6b35f9e4f14d62b084495c3a743d92a1))
+	ROM_LOAD("s-wars.u21", 0x080000, 0x40000, CRC(7b08fdf1) SHA1(489d21a10e97e886f948d81dedd7f8de3acecd2b))
+ROM_END
+
 ROM_START(stwr_103)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("starcpua.103", 0x0000, 0x10000, CRC(318085ca) SHA1(7c35bdee52e8093fe05f0624615baabe559a1917))
@@ -1112,11 +1125,12 @@ GAME(1992,  trek_200,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,  
 GAME(1992,  trek_120,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Trek 25th Anniversary (1.20)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_110,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Trek 25th Anniversary (1.10)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  trek_11a,       trek_201,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Trek 25th Anniversary (1.10 Alpha Display)",  GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  stwr_103,       0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.03)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  stwr_g11,       stwr_103,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.01 Germany)",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  stwr_a14,       stwr_103,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (Display Rev.1.04)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  stwr_102,       stwr_103,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.02)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,  stwr_e12,       stwr_103,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.02 England)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_104,       0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.04)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_103,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.03)",		     GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_g11,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.01 Germany)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_a14,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (Display Rev.1.04)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_102,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.02)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  stwr_e12,       stwr_104,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Star Wars (1.02 England)",     GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_303,       0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Tales From the Crypt (3.03)",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_302,       tftc_303,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Tales From the Crypt (3.02 Dutch)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  tftc_300,       tftc_303,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Tales From the Crypt (3.00)",              GAME_IS_SKELETON_MECHANICAL)
