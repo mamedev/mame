@@ -462,7 +462,7 @@ public:
 
 	// used by gauss-seidel-solver
 
-	double *m_otherterm_ptr;
+	double * RESTRICT m_otherterm_ptr;
 
 protected:
 	ATTR_COLD virtual void save_register();

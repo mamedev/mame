@@ -28,7 +28,6 @@ class NETLIB_NAME(solver);
 struct netlist_solver_parameters_t
 {
 	double m_accuracy;
-	double m_convergence_factor;
 	double m_lte;
 	double m_min_timestep;
 	double m_max_timestep;
@@ -124,6 +123,7 @@ public:
 
 protected:
     ATTR_HOT virtual int vsolve_non_dynamic();
+    ATTR_HOT int solve_non_dynamic(double (* RESTRICT A)[_storage_N], double (* RESTRICT RHS));
 	ATTR_HOT inline void build_LE(double (* RESTRICT A)[_storage_N], double (* RESTRICT RHS));
 	ATTR_HOT inline void gauss_LE(double (* RESTRICT A)[_storage_N],
 			double (* RESTRICT RHS),
@@ -133,7 +133,7 @@ protected:
 			const double (* RESTRICT V));
 	ATTR_HOT inline void store(const double (* RESTRICT RHS), const double (* RESTRICT V));
 
-	double m_RHS[_storage_N]; // right hand side - contains currents
+	double m_last_RHS[_storage_N]; // right hand side - contains currents
 
 private:
 
@@ -146,7 +146,7 @@ private:
 	};
 	int m_term_num;
 	int m_rail_start;
-	terms_t m_terms[100];
+	terms_t m_terms[_storage_N * _storage_N];
 };
 
 template <int m_N, int _storage_N>
@@ -186,7 +186,6 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_param_double_t m_freq;
 		netlist_param_double_t m_sync_delay;
 		netlist_param_double_t m_accuracy;
-		netlist_param_double_t m_convergence;
 		netlist_param_double_t m_gmin;
 		netlist_param_double_t m_lte;
         netlist_param_logic_t  m_dynamic;
