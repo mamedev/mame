@@ -1478,8 +1478,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2000)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
 	MCFG_SCREEN_VBLANK_DRIVER(segac2_state, screen_eof_megadriv )
