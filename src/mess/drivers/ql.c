@@ -75,21 +75,7 @@
 */
 
 
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/printer.h"
-#include "machine/ram.h"
-#include "machine/microdrv.h"
-#include "formats/basicdsk.h"
-#include "machine/zx8302.h"
-#include "sound/speaker.h"
-#include "video/zx8301.h"
 #include "includes/ql.h"
-#include "machine/wd17xx.h"
 #include "debugger.h"
 
 #define LOG_DISK_WRITE  0
@@ -1126,6 +1112,12 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+
+	MCFG_QL_EXPANSION_SLOT_ADD("exp", ql_expansion_cards, NULL)
+	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
+	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
+	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
+	//MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK()
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

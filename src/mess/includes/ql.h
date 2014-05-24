@@ -5,11 +5,23 @@
 #ifndef __QL__
 #define __QL__
 
-#include "bus/rs232/rs232.h"
-#include "machine/ram.h"
-#include "machine/wd17xx.h"
+#include "emu.h"
 #include "bus/centronics/ctronics.h"
-
+#include "bus/ql/exp.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/mcs51/mcs51.h"
+#include "formats/basicdsk.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/printer.h"
+#include "machine/ram.h"
+#include "machine/microdrv.h"
+#include "machine/wd17xx.h"
+#include "machine/zx8302.h"
+#include "sound/speaker.h"
+#include "video/zx8301.h"
 
 #define SCREEN_TAG  "screen"
 

@@ -1133,3 +1133,17 @@ BUSOBJS += $(BUSOBJ)/zorro/a590.o
 BUSOBJS += $(BUSOBJ)/zorro/action_replay.o
 BUSOBJS += $(BUSOBJ)/zorro/buddha.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/ql/exp.h,BUSES += QL
+#-------------------------------------------------
+
+ifneq ($(filter QL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/ql
+BUSOBJS += $(BUSOBJ)/ql/exp.o
+BUSOBJS += $(BUSOBJ)/ql/qimi.o
+BUSOBJS += $(BUSOBJ)/ql/sandy_superdisk.o
+BUSOBJS += $(BUSOBJ)/ql/sandy_superqboard.o
+BUSOBJS += $(BUSOBJ)/ql/trumpcard.o
+endif
