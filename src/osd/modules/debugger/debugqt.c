@@ -2,7 +2,7 @@
 //
 //  debugqt.c - SDL/QT debug window handling
 //
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -284,41 +284,45 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 	mainQtWindow->setProcessor(&device);
 
 	// Run our own QT event loop
-	osd_sleep(50000);
-	qApp->processEvents(QEventLoop::AllEvents, 1);
-
-	// Refresh everyone if requested
-	if (mainQtWindow->wantsRefresh())
+	while (debug_cpu_is_stopped(m_osd.machine()))
 	{
-		QWidgetList allWidgets = qApp->allWidgets();
-		for (int i = 0; i < allWidgets.length(); i++)
-			allWidgets[i]->update();
-		mainQtWindow->clearRefreshFlag();
-	}
+		osd_sleep(50000);
+		qApp->processEvents(QEventLoop::AllEvents, 1);
 
-	// Hide all top level widgets if requested
-	if (mainQtWindow->wantsHide())
-	{
-		foreach (QWidget* widget, QApplication::topLevelWidgets())
+		// Refresh everyone if requested
+		if (mainQtWindow->wantsRefresh())
 		{
-			if (!widget->isWindow() || widget->windowType() != Qt::Window)
-				continue;
-			widget->hide();
+			QWidgetList allWidgets = qApp->allWidgets();
+			for (int i = 0; i < allWidgets.length(); i++)
+				allWidgets[i]->update();
+			mainQtWindow->clearRefreshFlag();
 		}
-		mainQtWindow->clearHideFlag();
-	}
 
-	// Exit if the machine has been instructed to do so (scheduled event == exit || hard_reset)
-	if (m_osd.machine().scheduled_event_pending())
-	{
-		// Keep a list of windows we want to save.
-		// We need to do this here because by the time xml_configuration_save gets called
-		// all the QT windows are already gone.
-		gather_save_configurations();
-	}
+		// Hide all top level widgets if requested
+		if (mainQtWindow->wantsHide())
+		{
+			foreach (QWidget* widget, QApplication::topLevelWidgets())
+			{
+				if (!widget->isWindow() || widget->windowType() != Qt::Window)
+					continue;
+				widget->hide();
+			}
+			mainQtWindow->clearHideFlag();
+		}
+
+		// Exit if the machine has been instructed to do so (scheduled event == exit || hard_reset)
+		if (m_osd.machine().scheduled_event_pending())
+		{
+			// Keep a list of windows we want to save.
+			// We need to do this here because by the time xml_configuration_save gets called
+			// all the QT windows are already gone.
+			gather_save_configurations();
+			break;
+		}
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
 		winwindow_update_cursor_state(m_osd.machine()); // make sure the cursor isn't hidden while in debugger
 #endif
+	}
 }
 
 
