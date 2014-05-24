@@ -123,9 +123,9 @@ static MACHINE_CONFIG_FRAGMENT( dmac_hdc )
 	MCFG_DMAC_CFGOUT_HANDLER(WRITELINE(dmac_hdc_device, dmac_cfgout_w))
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
-	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
+	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(DEVWRITELINE("^^", dmac_hdc_device, scsi_irq_w))
+	MCFG_WD33C93_IRQ_CB(WRITELINE(dmac_hdc_device, scsi_irq_w))
 MACHINE_CONFIG_END
 
 machine_config_constructor dmac_hdc_device::device_mconfig_additions() const
@@ -150,10 +150,10 @@ ROM_START( dmac_hdc )
 
 	// changelog v6.1: prevent accesses to location 0 by application programs
 	ROM_SYSTEM_BIOS(1, "v61", "Version 6.1")
-	ROMX_LOAD("390721-01.u13", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("390722-01.u12", 0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("390721-01.u13", 0x4000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("390722-01.u12", 0x4001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("390721-01.u13", 0x0000, 0x2000, CRC(00dbf615) SHA1(503940d04fb3b49eaa61100fd3a487018b35e25a), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("390722-01.u12", 0x0001, 0x2000, CRC(c460cfdb) SHA1(0de457daec3b84f75e8fb344defe24ce56cda3e0), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("390721-01.u13", 0x4000, 0x2000, CRC(00dbf615) SHA1(503940d04fb3b49eaa61100fd3a487018b35e25a), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("390722-01.u12", 0x4001, 0x2000, CRC(c460cfdb) SHA1(0de457daec3b84f75e8fb344defe24ce56cda3e0), ROM_SKIP(1) | ROM_BIOS(2))
 
 	// changelog v6.6: fixes dual scsi problems with the wd33c93a controller
 	ROM_SYSTEM_BIOS(2, "v66", "Version 6.6")
@@ -172,6 +172,10 @@ ROM_START( dmac_hdc )
 	// third-party upgrade rom, requires a small rom adapter pcb
 	ROM_SYSTEM_BIOS(4, "g614", "Guru-ROM 6.14")
 	ROMX_LOAD("gururom_v614.bin", 0x0000, 0x8000, CRC(04e52f93) SHA1(6da21b6f5e8f8837d64507cd8a4d5cdcac4f426b), ROM_GROUPWORD | ROM_BIOS(5))
+
+	// pal16l8a
+	ROM_REGION(0x104, "ram_controller", 0)
+	ROM_LOAD("390333-03.u5", 0x000, 0x104, CRC(dc4a8d9b) SHA1(761a1318106e49057f95258699076ec1079967ad))
 ROM_END
 
 const rom_entry *dmac_hdc_device::device_rom_region() const
@@ -193,7 +197,7 @@ dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
-	m_wdc(*this, "scsi:wd33c93")
+	m_wdc(*this, "wd33c93")
 {
 }
 
