@@ -98,6 +98,7 @@ static MACHINE_CONFIG_START( asst128, asst128_state )
 	MCFG_CPU_ADD("maincpu", I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(asst128_map)
 	MCFG_CPU_IO_MAP(asst128_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
 	asst128_mb_device::static_set_cputag(*device, "maincpu");
