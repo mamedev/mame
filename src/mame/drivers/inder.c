@@ -151,7 +151,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Moon Light (1987)
 /-------------------------------------------------------------------*/
-ROM_START(pinmoonlg)
+ROM_START(pinmoonl)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ci-3.bin", 0x0000, 0x2000, CRC(56b901ae) SHA1(7269d1a100c378b21454f9f80f5bd9fbb736c222))
 	ROM_REGION(0x10000, "soundcpu", 0)
@@ -188,6 +188,6 @@ GAME(1986,  canasta,    0,      inder,  inder, inder_state, inder,  ROT0,   "Ind
 GAME(1988,  pinclown,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Clown (Inder)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  corsario,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Corsario",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  mundial,    0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Mundial 90",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,  pinmoonlg,  0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Moon Light (Inder)",   GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  pinmoonl,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Moon Light (Inder)",   GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  metalman,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Metal Man",            GAME_IS_SKELETON_MECHANICAL)
 GAME(1986,  lapbylap,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Lap By Lap",           GAME_IS_SKELETON_MECHANICAL)
