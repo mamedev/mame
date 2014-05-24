@@ -29,6 +29,15 @@ The keyboards:
 
 - Philips NMS-1160
 
+
+
+TODO:
+- Implement MIDI in/out/through
+- Sample RAM
+- Implement NMS-1160 keyboard
+- HX-MU901: ENTER/SELECT keys and multi sensors
+- NMS1160: Test the keyboard
+
 **********************************************************************************/
 
 #include "emu.h"
@@ -108,8 +117,6 @@ msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mco
 
 
 static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
-	// There is a 2 MHz crystal on the PCB, where does it go?
-
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)
@@ -119,6 +126,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
 
+	// There is a 2 MHz crystal on the PCB, the 6850 TX and RX clocks are derived from it
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 MACHINE_CONFIG_END
 
@@ -126,6 +134,17 @@ MACHINE_CONFIG_END
 machine_config_constructor msx_cart_msx_audio_nms1205::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( msx_audio_nms1205 );
+}
+
+
+ROM_START( msx_nms1205 )
+	ROM_REGION(0x8000, "y8950", ROMREGION_ERASE00)
+ROM_END
+
+
+const rom_entry *msx_cart_msx_audio_nms1205::device_rom_region() const
+{
+	return ROM_NAME( msx_nms1205 );
 }
 
 
