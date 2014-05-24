@@ -4,6 +4,7 @@
 #include "bus/msx_cart/cartridge.h"
 #include "sound/8950intf.h"
 #include "machine/6850acia.h"
+#include "bus/midi/midi.h"
 
 
 extern const device_type MSX_CART_MSX_AUDIO_NMS1205;
@@ -45,9 +46,13 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 
+	DECLARE_WRITE_LINE_MEMBER(midi_in);
+
 private:
 	required_device<y8950_device> m_y8950;
 	required_device<acia6850_device> m_acia6850;
+	required_device<midi_port_device> m_mdout;
+	required_device<midi_port_device> m_mdthru;
 };
 
 
