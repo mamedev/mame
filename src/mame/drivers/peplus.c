@@ -3995,12 +3995,14 @@ ROM_END
 
 ROM_START( pepp0816 ) /* Normal board : Jackpot Bonus Poker (PP0816) */
 /*
-PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+PayTable   Js+  2PR  3K   STR  FL  FH  4K* SF  RF  (Bonus)
 ----------------------------------------------------------
-  ????      1    2    3    4    5   9  25  50 250    800
-     Programs Available: PP0816
+ P821AU     1    2    3    4    5   9  25  50 250    800
+  % Range: 94.4-96.4%  Optimum: 98.4%  Hit Frequency: 45.5%
+     Programs Available: PP0816, X002270P
 
-Treasure Chest bonus round for MAX Bet 4 of a Kind
+4K* - Treasure Chest bonus round for MAX Bet 4 of a Kind
+      Possible payouts: 140, 180, 250, 500 or 5000 Coins
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0816_a5f-a7k.u68",   0x00000, 0x10000, CRC(a1e21b56) SHA1(aa0a730b2ed48612c3b20831b1aa698a45f557c0) ) /* Game Version: A5F, Library Version: A7K */
