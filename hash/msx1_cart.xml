@@ -14583,7 +14583,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="msxaud_nms1205" />
 			<dataarea name="rom" size="32768">
-				<!-- SUM16: 53BF -->
+				<!- - SUM16: 53BF - ->
 				<rom name="nms1205_53bf.bin" size="32768" crc="6e68bd44" sha1="146d9738b6d534277dab9b41a07556ffec9065b9" status="baddump" offset="0" />
 			</dataarea>
 <!- -
