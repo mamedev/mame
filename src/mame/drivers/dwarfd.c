@@ -299,6 +299,7 @@ uPC1352C @ N3
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
+#include "video/i8275.h"
 
 class dwarfd_state : public driver_device
 {
@@ -306,256 +307,40 @@ public:
 	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_crtc(*this, "i8275"),
+		m_charmap(*this, "gfx1"),
+		m_dsw2(*this, "DSW2")
 		{ }
 
 	/* video-related */
-	int m_bank;
-	int m_line;
-	int m_idx;
 	int m_crt_access;
-
-	/* i8275 */
-	int m_i8275Command;
-	int m_i8275HorizontalCharactersRow;
-	int m_i8275CommandSeqCnt;
-	int m_i8275SpacedRows;
-	int m_i8275VerticalRows;
-	int m_i8275VerticalRetraceRows;
-	int m_i8275Underline;
-	int m_i8275Lines;
-	int m_i8275LineCounterMode;
-	int m_i8275FieldAttributeMode;
-	int m_i8275CursorFormat;
-	int m_i8275HorizontalRetrace;
 
 	/* memory */
 	UINT8    m_dw_ram[0x1000];
-	UINT8    m_videobuf[0x8000];
 
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<i8275_device> m_crtc;
+	required_memory_region m_charmap;
+	required_ioport m_dsw2;
 
-	DECLARE_WRITE8_MEMBER(i8275_preg_w);
-	DECLARE_READ8_MEMBER(i8275_preg_r);
-	DECLARE_WRITE8_MEMBER(i8275_creg_w);
-	DECLARE_READ8_MEMBER(i8275_sreg_r);
 	DECLARE_READ8_MEMBER(dwarfd_ram_r);
 	DECLARE_WRITE8_MEMBER(dwarfd_ram_w);
 	DECLARE_WRITE8_MEMBER(output1_w);
 	DECLARE_WRITE8_MEMBER(output2_w);
 	DECLARE_READ8_MEMBER(qc_b8_r);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_DRIVER_INIT(qc);
 	DECLARE_DRIVER_INIT(dwarfd);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	DECLARE_PALETTE_INIT(dwarfd);
-	UINT32 screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(dwarfd_interrupt);
-	void drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect );
+	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
 };
 
-
-//should be taken from crt params
-static const int maxy = 25;
-static const int maxx = 80;
-
-
-#define TOPLINE 7
-#define BOTTOMLINE 18
-
-#define CHARACTERS_UNDEFINED -1
-
-enum
-{
-	I8275_COMMAND_RESET=0,
-	I8275_COMMAND_START,
-	I8275_COMMAND_STOP,
-	I8275_COMMAND_READ_LIGHT_PEN,
-	I8275_COMMAND_LOAD_CURSOR,
-	I8275_COMMAND_EI,
-	I8275_COMMAND_DI,
-	I8275_COMMAND_PRESET,
-
-	NUM_I8275_COMMANDS
-};
-
-enum
-{
-	I8275_COMMAND_RESET_LENGTH = 4,
-	I8275_COMMAND_START_LENGTH = 0,
-	I8275_COMMAND_STOP_LENGTH = 0,
-	I8275_COMMAND_EI_LENGTH = 0,
-	I8275_COMMAND_DI_LENGTH = 0,
-	I8275_COMMAND_READ_LIGHT_PEN_LENGTH = 2,
-	I8275_COMMAND_LOAD_CURSOR_LENGTH = 2,
-	I8275_COMMAND_PRESET_LENGTH = 0
-};
-
-
-WRITE8_MEMBER(dwarfd_state::i8275_preg_w)//param reg
-{
-	switch (m_i8275Command)
-	{
-		case I8275_COMMAND_RESET:
-		{
-			switch (m_i8275CommandSeqCnt)
-			{
-				case 4:
-				{
-					//screen byte comp byte 1
-					m_i8275SpacedRows = data >> 7;
-					m_i8275HorizontalCharactersRow = (data & 0x7f) + 1;
-					if (m_i8275HorizontalCharactersRow > 80)
-					{
-						logerror("i8275 Undefined num of characters/Row! = %d\n", m_i8275HorizontalCharactersRow);
-						m_i8275HorizontalCharactersRow = CHARACTERS_UNDEFINED;
-					}
-					else
-					{
-						logerror("i8275 %d characters/row\n", m_i8275HorizontalCharactersRow);
-					}
-					if (m_i8275SpacedRows & 1)
-					{
-						logerror("i8275 spaced rows\n");
-					}
-					else
-					{
-						logerror("i8275 normal rows\n");
-					}
-					m_i8275CommandSeqCnt--;
-				}
-				break;
-
-				case 3:
-				{
-					//screen byte comp byte 2
-					m_i8275VerticalRows = (data & 0x3f) + 1;
-					m_i8275VerticalRetraceRows = (data >> 6) + 1;
-
-					logerror("i8275 %d rows\n", m_i8275VerticalRows);
-					logerror("i8275 %d vertical retrace rows\n", m_i8275VerticalRetraceRows);
-
-					m_i8275CommandSeqCnt--;
-				}
-				break;
-
-				case 2:
-				{
-					//screen byte comp byte 3
-					m_i8275Underline = (data >> 4) + 1;
-					m_i8275Lines = (data & 0xf) + 1;
-					logerror("i8275 underline placement: %d\n", m_i8275Underline);
-					logerror("i8275 %d lines/row\n", m_i8275Lines);
-
-					m_i8275CommandSeqCnt--;
-				}
-				break;
-
-				case 1:
-				{
-					//screen byte comp byte 4
-					m_i8275LineCounterMode = data >> 7;
-					m_i8275FieldAttributeMode = (data >> 6) & 1;
-					m_i8275CursorFormat = (data >> 4) & 3;
-					m_i8275HorizontalRetrace = ((data & 0xf) + 1) << 1;
-					logerror("i8275 line counter mode: %d\n", m_i8275LineCounterMode);
-					if (m_i8275FieldAttributeMode)
-					{
-						logerror("i8275 field attribute mode non-transparent\n");
-					}
-					else
-					{
-						logerror("i8275 field attribute mode transparent\n");
-					}
-
-					switch (m_i8275CursorFormat)
-					{
-						case 0: {logerror("i8275 cursor format - blinking reverse video block\n");} break;
-						case 1: {logerror("i8275 cursor format - blinking underline\n");}break;
-						case 2: {logerror("i8275 cursor format - nonblinking reverse video block\n");}break;
-						case 3: {logerror("i8275 cursor format - nonblinking underline\n");}break;
-					}
-
-					logerror("i8275 %d chars for horizontal retrace\n",m_i8275HorizontalRetrace );
-					m_i8275CommandSeqCnt--;
-				}
-				break;
-
-				default:
-				{
-					logerror("i8275 illegal\n");
-				}
-
-			}
-		}
-		break;
-
-		case I8275_COMMAND_START:
-		{
-		}
-		break;
-
-		case I8275_COMMAND_STOP:
-		{
-		}
-		break;
-
-	}
-
-}
-
-READ8_MEMBER(dwarfd_state::i8275_preg_r)//param reg
-{
-	return 0;
-}
-
-WRITE8_MEMBER(dwarfd_state::i8275_creg_w)//comand reg
-{
-	switch (data>>5)
-	{
-		case 0:
-		{
-			/* reset */
-			m_i8275Command = I8275_COMMAND_RESET;
-			m_i8275CommandSeqCnt = I8275_COMMAND_RESET_LENGTH;
-		}
-		break;
-
-		case 5:
-		{
-			/* enable interrupt */
-			m_i8275Command = I8275_COMMAND_EI;
-			m_i8275CommandSeqCnt = I8275_COMMAND_EI_LENGTH;
-		}
-		break;
-
-		case 6:
-		{
-			/* disable interrupt */
-			m_i8275Command = I8275_COMMAND_DI;
-			m_i8275CommandSeqCnt = I8275_COMMAND_DI_LENGTH;
-		}
-		break;
-
-		case 7:
-		{
-			/* preset counters */
-			m_i8275CommandSeqCnt = I8275_COMMAND_PRESET_LENGTH;
-
-		}
-		break;
-	}
-}
-
-READ8_MEMBER(dwarfd_state::i8275_sreg_r)//status
-{
-	return 0;
-}
 
 READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 {
@@ -565,8 +350,7 @@ READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 	}
 	else
 	{
-		m_videobuf[m_line * 256 + m_idx] = m_dw_ram[offset];
-		m_idx++;
+		m_crtc->dack_w(space, 0, m_dw_ram[offset], mem_mask);
 		return m_dw_ram[offset];
 	}
 }
@@ -622,8 +406,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 
-	AM_RANGE(0x20, 0x20) AM_READWRITE(i8275_preg_r, i8275_preg_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(i8275_sreg_r, i8275_creg_w)
+	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("i8275", i8275_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP // unknown
 	AM_RANGE(0x60, 0x60) AM_WRITE(output1_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(output2_w)
@@ -785,75 +568,43 @@ static INPUT_PORTS_START( quarterh )
 INPUT_PORTS_END
 
 
-void dwarfd_state::video_start()
+I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 {
-}
+	int i;
+	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + ((m_dsw2->read() & 4) >> 1);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT16 pixels = m_charmap->u16((linecount & 7) + ((charcode + (bank * 128)) << 3));
 
-void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
-{
-	int x, y;
-	for (y = 0; y < maxy; y++)
+	//if(!linecount)
+	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
+
+	for(i=0;i<8;i+=2)
 	{
-		int count = y * 256;
-		int bank2 = 4;
-
-		if (y < TOPLINE || y > BOTTOMLINE)
-		{
-			bank2 = 0;
-		}
-		for (x = 0; x < maxx; x++)
-		{
-			int tile = 0;
-
-			int b = 0; //end marker
-			while (b == 0)
-			{
-				if (count < 0x8000)
-					tile = m_videobuf[count++];
-				else
-						return;
-
-				if (tile & 0x80)
-				{
-					if ((tile & 0xfc) == 0xf0)
-					{
-						switch (tile & 3)
-						{
-							case 0:
-							case 1: break;
-
-							case 2:
-							case 3: return;
-						}
-					}
-					if ((tile & 0xc0) == 0x80)
-					{
-						m_bank = (tile >> 2) & 3;
-					}
-					if ((tile & 0xc0) == 0xc0)
-					{
-						b = 1;
-						tile = machine().rand() & 0x7f;//(tile >> 2) & 0xf;
-					}
-				}
-				else
-					b = 1;
-			}
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-				tile + (m_bank + bank2) * 128,
-				0,
-				0, 0,
-				x*8,y*8,0);
-		}
+		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
+		bitmap.pix32(y, x + i) = palette[pixel & 0xe];
+		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : (pixel & 0xe)];
 	}
 }
 
-
-UINT32 dwarfd_state::screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	drawCrt(bitmap, cliprect);
-	return 0;
+	int i;
+	int bank = gpa;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT16 pixels = m_charmap->u16((linecount & 7) + ((charcode + (bank * 128)) << 3));
+
+	//if(!linecount)
+	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
+
+	if(vsp)
+		pixels ^= 0xeeee; // FIXME: What is this really supposed to do?
+
+	for(i=0;i<8;i+=2)
+	{
+		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
+		bitmap.pix32(y, x + i) = palette[pixel & 0xe];
+		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : (pixel & 0xe)];
+	}
 }
 
 WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
@@ -861,26 +612,13 @@ WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
 	m_crt_access = state;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dwarfd_state::dwarfd_interrupt)
+WRITE_LINE_MEMBER(dwarfd_state::drq_w)
 {
-	int scanline = param;
+	if(state && !m_crt_access)
+		m_maincpu->set_input_line(I8085_RST65_LINE, ASSERT_LINE);
+	else if(!state)
+		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 
-	if((scanline % 8) != 0)
-		return;
-
-	if (scanline < 25*8)
-	{
-		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE); // 34 - every 8th line
-		m_line = scanline/8;
-		m_idx = 0;
-	}
-	else
-	{
-		if (scanline == 25*8)
-		{
-			m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);//2c - generated by  crt - end of frame
-		}
-	}
 }
 
 #if 0
@@ -892,7 +630,7 @@ static const gfx_layout tiles8x8_layout =
 	{ 0,1,2,3},
 	{8,0,24,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 #endif
@@ -906,7 +644,7 @@ static const gfx_layout tiles8x8_layout =
 	{8,12,0,4,24,28,16,20 },
 //  {12,8,4,0,28,24,20,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 
@@ -919,7 +657,7 @@ static const gfx_layout tiles8x8_layout0 =
 	{ 0 },
 	{8,0,24,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 
@@ -931,7 +669,7 @@ static const gfx_layout tiles8x8_layout1 =
 	{ 1 },
 	{8,0,24,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 
@@ -943,7 +681,7 @@ static const gfx_layout tiles8x8_layout2 =
 	{ 2 },
 	{8,0,24,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 
@@ -955,7 +693,7 @@ static const gfx_layout tiles8x8_layout3 =
 	{ 3 },
 	{8,0,24,16 },
 	//{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	{ 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 /*
@@ -967,7 +705,7 @@ static const gfx_layout tiles8x8_layout =
     { 1,1},
     {6,6,2,2,14,14,10,10 },
     //{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-    { 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
+    { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
     8*16
 };
 */
@@ -1001,44 +739,12 @@ PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 
 void dwarfd_state::machine_start()
 {
-	save_item(NAME(m_bank));
-	save_item(NAME(m_line));
-	save_item(NAME(m_idx));
 	save_item(NAME(m_crt_access));
-
-	/* i8275 */
-	save_item(NAME(m_i8275Command));
-	save_item(NAME(m_i8275HorizontalCharactersRow));
-	save_item(NAME(m_i8275CommandSeqCnt));
-	save_item(NAME(m_i8275SpacedRows));
-	save_item(NAME(m_i8275VerticalRows));
-	save_item(NAME(m_i8275VerticalRetraceRows));
-	save_item(NAME(m_i8275Underline));
-	save_item(NAME(m_i8275Lines));
-	save_item(NAME(m_i8275LineCounterMode));
-	save_item(NAME(m_i8275FieldAttributeMode));
-	save_item(NAME(m_i8275CursorFormat));
-	save_item(NAME(m_i8275HorizontalRetrace));
 }
 
 void dwarfd_state::machine_reset()
 {
-	m_bank = 0;
-	m_line = 0;
-	m_idx = 0;
 	m_crt_access = 0;
-	m_i8275Command = 0;
-	m_i8275HorizontalCharactersRow = 0;
-	m_i8275CommandSeqCnt = 0;
-	m_i8275SpacedRows = 0;
-	m_i8275VerticalRows = 0;
-	m_i8275VerticalRetraceRows = 0;
-	m_i8275Underline = 0;
-	m_i8275Lines = 0;
-	m_i8275LineCounterMode = 0;
-	m_i8275FieldAttributeMode = 0;
-	m_i8275CursorFormat = 0;
-	m_i8275HorizontalRetrace = 0;
 }
 
 static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
@@ -1049,16 +755,19 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_I8085A_SOD(WRITELINE(dwarfd_state,dwarfd_sod_callback))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dwarfd_state, dwarfd_interrupt, "screen", 0, 1)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(272*2, 200+4*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dwarfd_state, screen_update_dwarfd)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
+
+	MCFG_DEVICE_ADD("i8275", I8275, 10595000/3)
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, display_pixels)
+	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(dwarfd_state, drq_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -1076,6 +785,9 @@ static MACHINE_CONFIG_DERIVED( qc, dwarfd )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(qc_map)
 	MCFG_CPU_IO_MAP(qc_io_map)
+
+	MCFG_DEVICE_MODIFY("i8275")
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, qc_display_pixels)
 MACHINE_CONFIG_END
 
 /* Dwarfs den PROM explanation:
@@ -1300,10 +1012,8 @@ DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 	//      src[i] = src[i] & 0xe0;
 	}
 
-	save_item(NAME(m_videobuf));
 	save_item(NAME(m_dw_ram));
 
-	memset(m_videobuf, 0, sizeof(m_videobuf));
 	memset(m_dw_ram, 0, sizeof(m_dw_ram));
 
 }
@@ -1323,9 +1033,9 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 }
 
 /*    YEAR  NAME      PARENT     MACHINE INPUT   INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS */
-GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd_state, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1983, quarterha, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1983, quarterhb, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1995, qc,       0,         qc,     quarterh, dwarfd_state, qc,     ORIENTATION_FLIP_Y, "ArJay Exports/Prestige Games", "Quarter Horse Classic", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1983, quarterha, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1983, quarterhb, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1995, qc,       0,         qc,     quarterh, dwarfd_state, qc,     0, "ArJay Exports/Prestige Games", "Quarter Horse Classic", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
