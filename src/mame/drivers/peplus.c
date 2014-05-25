@@ -155,6 +155,9 @@ NOTE:  Do NOT use the CG+CAP combos listed below as THE definitive absolute refe
        worked to produce correct card graphics plus paytable information for many sets. So the combos listed below
        are not the "official" combo and a better or more correct combo may exist.
 
+NOTE:  International PP0xxx sets support a Tournament mode.  You can toggle back and forth between standard and
+       Tournament mode by pressing and holding Jackpot Reset (L key) and pressing Change Request (Y key)
+
 NOTE:  XP000035 supports a Tournament mode.  You can toggle back and forth between standard and Tournament mode by
        pressing and holding Jackpot Reset (L key) and pressing Change Request (Y key)
 
@@ -1429,7 +1432,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0002a ) /* Normal board : Standard Draw Poker (PP0002) - Multi Regional / Multi Currency */
+ROM_START( pepp0002a ) /* Normal board : Standard Draw Poker (PP0002) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1517,7 +1520,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0014 ) /* Normal board : Standard Draw Poker (PP0014) - Multi Regional / Multi Currency */
+ROM_START( pepp0014 ) /* Normal board : Standard Draw Poker (PP0014) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1645,7 +1648,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0043a ) /* Normal board : 10's or Better (PP0043) - Multi Regional / Multi Currency */
+ROM_START( pepp0043a ) /* Normal board : 10's or Better (PP0043) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
 PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1708,7 +1711,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0046a ) /* Normal board : 10's or Better (PP0046) - Multi Regional / Multi Currency */
+ROM_START( pepp0046a ) /* Normal board : 10's or Better (PP0046) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
 PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2208,7 +2211,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
 	ROM_LOAD( "cap1215.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
 ROM_END
 
-ROM_START( pepp0127a ) /* Normal board : Deuces Joker Wild Poker (PP0127) - Multi Regional / Multi Currency */
+ROM_START( pepp0127a ) /* Normal board : Deuces Joker Wild Poker (PP0127) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
@@ -2298,7 +2301,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0159 ) /* Normal board : Standard Draw Poker (PP0159) - Multi Regional / Multi Currency */
+ROM_START( pepp0159 ) /* Normal board : Standard Draw Poker (PP0159) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2342,7 +2345,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0171a ) /* Normal board : Joker Poker  (PP0171) - Multi Regional / Multi Currency */
+ROM_START( pepp0171a ) /* Normal board : Joker Poker  (PP0171) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
@@ -2452,7 +2455,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "cap773.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
 ROM_END
 
-ROM_START( pepp0190a ) /* Normal board : Deuces Wild Poker  (PP0190) - Multi Regional / Multi Currency */
+ROM_START( pepp0190a ) /* Normal board : Deuces Wild Poker  (PP0190) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                         w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
@@ -2474,29 +2477,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "cap773.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
 ROM_END
 
-ROM_START( pepp0197 ) /* Normal board : Standard Draw Poker (Auto Hold in options) (PP0197) */
-/*
-PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
-----------------------------------------------------------
-   BA       1    2    3    4    5   8  25  50 250    800
-  % Range: 93.8-95.8%  Optimum: 97.8%  Hit Frequency: 45.3%
-     Programs Available: PP0197, X000197P & PP0419 - Non Double-up Only
-*/
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0197_689-654.u68",   0x00000, 0x10000, CRC(84a2fbde) SHA1(0515f2693d388e29cdf0de4d29708250c671e0a4) ) /* Game Version: 689, Library Version: 654 */
-
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
-
-
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
-ROM_END
-
-ROM_START( pepp0197a ) /* Normal board : Standard Draw Poker (PP0197) - 10/23/95   @ IGT  L95-2452 */
+ROM_START( pepp0197 ) /* Normal board : Standard Draw Poker (PP0197) - 10/23/95   @ IGT  L95-2452 */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2518,7 +2499,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0197b ) /* Normal board : Standard Draw Poker (PP0197) - Multi Regional / Multi Currency */
+ROM_START( pepp0197a ) /* Normal board : Standard Draw Poker (PP0197) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2530,10 +2511,32 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0197_919-a0c.u68",   0x00000, 0x10000, CRC(ae817534) SHA1(b2454609e8275aab00797966c0f4e68eae2911cd) ) /* Game Version: 919, Library Version: A0C */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1348.u72",  0x00000, 0x8000, CRC(b2411211) SHA1(fb78da8c92be7b0ce174aecd0392875fdd3653e7) )
-	ROM_LOAD( "mgo-cg1348.u73",  0x08000, 0x8000, CRC(06e97f8a) SHA1(bcdd33aa36746d71fb6ce804eb222ecd7b27d0d6) )
-	ROM_LOAD( "mbo-cg1348.u74",  0x10000, 0x8000, CRC(5a4547fd) SHA1(ec28731253733b4ecdff341120ae8572995cffc6) )
-	ROM_LOAD( "mxo-cg1348.u75",  0x18000, 0x8000, CRC(cdd8485f) SHA1(4af2f270ed40955bb11f0e427f4ad614fcb3157c) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+ROM_END
+
+ROM_START( pepp0197b ) /* Normal board : Standard Draw Poker (Auto Hold in options) (PP0197) */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+   BA       1    2    3    4    5   8  25  50 250    800
+  % Range: 93.8-95.8%  Optimum: 97.8%  Hit Frequency: 45.3%
+     Programs Available: PP0197, X000197P & PP0419 - Non Double-up Only
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0197_689-654.u68",   0x00000, 0x10000, CRC(84a2fbde) SHA1(0515f2693d388e29cdf0de4d29708250c671e0a4) ) /* Game Version: 689, Library Version: 654 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -2541,28 +2544,6 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pepp0203 ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
-/*
-                                       5-K 2-4
-PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
-------------------------------------------------------------------
-  P90A      1    2    3    4    5   7  25  40  80  50 250    800
-  % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
-     Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
-*/
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0203_813-824.u68",   0x00000, 0x10000, CRC(49ea6fb9) SHA1(ca595e30d786d28397eeef10786a811af1a5c74d) ) /* Game Version: 813, Library Version: 824 */
-
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
-	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
-	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
-	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
-
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
-ROM_END
-
-ROM_START( pepp0203a ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -2585,7 +2566,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
-ROM_START( pepp0203b ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
+ROM_START( pepp0203a ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -2608,7 +2589,29 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
-ROM_START( pepp0203c ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) - Multi Regional / Multi Currency */
+ROM_START( pepp0203b ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
+/*
+                                       5-K 2-4
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
+------------------------------------------------------------------
+  P90A      1    2    3    4    5   7  25  40  80  50 250    800
+  % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
+     Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0203_813-824.u68",   0x00000, 0x10000, CRC(49ea6fb9) SHA1(ca595e30d786d28397eeef10786a811af1a5c74d) ) /* Game Version: 813, Library Version: 824 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
+	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
+	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
+	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
+ROM_END
+
+ROM_START( pepp0203c ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -2752,7 +2755,7 @@ ROM_START( pepp0230 ) /* Normal board : Standard Draw Poker (PP0230) */
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0242 ) /* Normal board : Deuces Wild Poker (PP0242) - Multi Regional / Multi Currency in English / Spanish */
+ROM_START( pepp0242 ) /* Normal board : Deuces Wild Poker (PP0242) - Multi Regional / Multi Currency in English / Spanish - Tournament Mode capable */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 /*
                                         w/D     w/oD
@@ -2860,7 +2863,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
-ROM_START( pepp0265b ) /* Normal board : 4 of a Kind Bonus Poker (PP0265) - Multi Regional / Multi Currency */
+ROM_START( pepp0265b ) /* Normal board : 4 of a Kind Bonus Poker (PP0265) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -3188,7 +3191,7 @@ PayTable   As+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0431 ) /* Normal board : Deuces Joker Wild Poker (PP0431) - Multi Regional / Multi Currency */
+ROM_START( pepp0431 ) /* Normal board : Deuces Joker Wild Poker (PP0431) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                          With  w/o  w/o  With
                                          Wild  JKR  Wild JKR
@@ -3295,7 +3298,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0449a ) /* Normal board : Standard Draw Poker (PP0449) - Multi Regional / Multi Currency in English / Spanish */
+ROM_START( pepp0449a ) /* Normal board : Standard Draw Poker (PP0449) - Multi Regional / Multi Currency in English / Spanish - Tournament Mode capable */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -3644,7 +3647,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
-ROM_START( pepp0516b ) /* Normal board : Double Bonus Poker (PP0516) - Multi Regional / Multi Currency */
+ROM_START( pepp0516b ) /* Normal board : Double Bonus Poker (PP0516) - Multi Regional / Multi Currency - Tournament Mode capable */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -8370,7 +8373,7 @@ GAMEL(1987, pepp0190,  pepp0055, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0190a, pepp0055, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (International)", 0, layout_pe_poker )
 GAMEL(1987, pepp0197,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 1)",   0, layout_pe_poker )
 GAMEL(1987, pepp0197a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL(1987, pepp0197b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (International)", 0, layout_pe_poker )
+GAMEL(1987, pepp0197b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 3)",   0, layout_pe_poker )
 GAMEL(1987, pepp0203,  pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 1)", 0, layout_pe_poker )
 GAMEL(1987, pepp0203a, pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 2)", 0, layout_pe_poker )
 GAMEL(1987, pepp0203b, pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 3)", 0, layout_pe_poker )
