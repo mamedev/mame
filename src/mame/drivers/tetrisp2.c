@@ -503,7 +503,7 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x104000, 0x107fff) AM_RAM                                                         // Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM                                                         // Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(rocknms_sub_priority_w) AM_SHARE("sub_priority") // Priority
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(rocknms_sub_palette_w) AM_SHARE("paletteram2")    // Palette
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(rocknms_sub_palette_w) AM_SHARE("sub_paletteram")    // Palette
 //  AM_RANGE(0x500000, 0x50ffff) AM_RAM                                                         // Line
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(rocknms_sub_vram_rot_w) AM_SHARE("sub_vram_rot") // Rotation
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(rocknms_sub_vram_fg_w) AM_SHARE("sub_vram_fg") // Foreground
@@ -640,11 +640,11 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
 	// scrambled palettes?
-	AM_RANGE(0x300000, 0x33ffff) AM_RAM/*_WRITE(stepstag_palette_w) AM_SHARE("paletteram")*/
+	AM_RANGE(0x300000, 0x33ffff) AM_RAM/*_WRITE(stepstag_palette_w)*/ AM_SHARE("paletteram")
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM/*_WRITE(stepstag_palette_w) AM_SHARE("paletteram2")*/
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM/*_WRITE(stepstag_palette_w)*/ AM_SHARE("paletteram2")
 
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM/*_WRITE(stepstag_palette_w) AM_SHARE("paletteram3")*/
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM/*_WRITE(stepstag_palette_w)*/ AM_SHARE("paletteram3")
 
 	// rgb brightness?
 	AM_RANGE(0x700000, 0x700001) AM_WRITENOP // 0-f
@@ -1219,15 +1219,11 @@ static GFXDECODE_START( tetrisp2 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( rocknms )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x0000, 0x10 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0x8000, 0x10 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx6", 0, layout_16x16x8, 0x9000, 0x10 ) // [1] Background
-	GFXDECODE_ENTRY( "gfx7", 0, layout_16x16x8, 0xa000, 0x10 ) // [2] Rotation
-	GFXDECODE_ENTRY( "gfx8", 0, layout_8x8x8,   0xe000, 0x10 ) // [3] Foreground
+static GFXDECODE_START( rocknms_sub )
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0x0000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx6", 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
+	GFXDECODE_ENTRY( "gfx7", 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
+	GFXDECODE_ENTRY( "gfx8", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
 static GFXDECODE_START( stepstag )
@@ -1462,8 +1458,12 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 
 	/* video hardware */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rocknms)
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+
+	MCFG_GFXDECODE_ADD("sub_gfxdecode", "sub_palette", rocknms_sub)
+	MCFG_PALETTE_ADD("sub_palette", 0x8000)
+
 	MCFG_DEFAULT_LAYOUT(layout_rocknms)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
