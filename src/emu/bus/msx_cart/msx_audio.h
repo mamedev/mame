@@ -65,6 +65,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const;
 
 	virtual void initialize_cartridge();
 
@@ -74,8 +76,13 @@ public:
 	DECLARE_WRITE8_MEMBER(write_y8950);
 	DECLARE_READ8_MEMBER(read_y8950);
 
+	DECLARE_WRITE8_MEMBER(y8950_io_w);
+	DECLARE_READ8_MEMBER(y8950_io_r);
+
 private:
 	required_device<y8950_device> m_y8950;
+	required_ioport m_io_config;
+	required_memory_region m_region_y8950;
 	UINT8 m_7ffe;
 	UINT8 m_7fff;
 };

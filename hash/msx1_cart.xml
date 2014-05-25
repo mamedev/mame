@@ -14508,7 +14508,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fsca1" supported="no">
+	<software name="fsca1">
 		<description>Panasonic FS-CA1 MSX-Audio + BASIC (Jpn)</description>
 		<year>1988</year>
 		<publisher>Panasonic</publisher>
@@ -14518,7 +14518,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="msx audio (japan) (fs-ca1) (program).rom" size="131072" crc="90e893ba" sha1="930eae7057af1652abae794072b296a59decd61b" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="4096">
+			<dataarea name="sram" size="4096">
 			</dataarea>
 		</part>
 	</software>

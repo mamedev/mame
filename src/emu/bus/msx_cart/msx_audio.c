@@ -28,15 +28,31 @@ The keyboards:
   - multi sensor (?)
 
 - Philips NMS-1160
+  - 61 keys: 5 full octaves + high C
+  - Different wiring, so incompatible with the other keyboards
 
+- Panasonic YK-20
+  - 49 keys: 4 full octaves + high C
 
 
 TODO:
 - Test MIDI in/out/through
-- Sample RAM
-- Implement NMS-1160 keyboard
+- Sample RAM, doesn't seem to get written to
+- Test NMS-1160 keyboard
 - HX-MU901: ENTER/SELECT keys and multi sensors
 - NMS1160: Test the keyboard
+- NMS1205: Add DAC
+- NMS1205/FSCA1: Add muting of dac and y8950 based on io config writes.
+
+
+For testing the sample ram:
+- Disable firmware on the fs-ca1
+- call audio
+- call copy pcm(#a, b)
+- call play pcm (x)
+
+See also http://www.mccm.hetlab.tk/millennium/milc/gc/topic_26.htm (dutch)
+
 
 **********************************************************************************/
 
@@ -207,6 +223,8 @@ msx_cart_msx_audio_fsca1::msx_cart_msx_audio_fsca1(const machine_config &mconfig
 	: device_t(mconfig, MSX_CART_MSX_AUDIO_FSCA1, "MSX Cartridge - MSX-AUDIO FS-CA1", tag, owner, clock, "msx_audio_fsca1", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_y8950(*this, "y8950")
+	, m_io_config(*this, "CONFIG")
+	, m_region_y8950(*this, "y8950")
 	, m_7ffe(0)
 	, m_7fff(0)
 {
@@ -220,6 +238,8 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_fsca1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
 	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
+	MCFG_Y8950_IO_READ_HANDLER(READ8(msx_cart_msx_audio_fsca1, y8950_io_r))
+	MCFG_Y8950_IO_WRITE_HANDLER(WRITE8(msx_cart_msx_audio_fsca1, y8950_io_w))
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
 MACHINE_CONFIG_END
@@ -228,6 +248,32 @@ MACHINE_CONFIG_END
 machine_config_constructor msx_cart_msx_audio_fsca1::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( msx_audio_fsca1 );
+}
+
+
+static INPUT_PORTS_START( msx_audio_fsca1 )
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x04, 0x04, "FS-CA1 Firmware switch")
+	PORT_CONFSETTING( 0x04, "On" )
+	PORT_CONFSETTING( 0x00, "Off" )
+	PORT_BIT(0xFB, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+INPUT_PORTS_END
+
+
+ioport_constructor msx_cart_msx_audio_fsca1::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( msx_audio_fsca1 );
+}
+
+
+ROM_START( msx_fsca1 )
+	ROM_REGION(0x8000, "y8950", ROMREGION_ERASE00)
+ROM_END
+
+
+const rom_entry *msx_cart_msx_audio_fsca1::device_rom_region() const
+{
+	return ROM_NAME( msx_fsca1 );
 }
 
 
@@ -242,7 +288,7 @@ void msx_cart_msx_audio_fsca1::device_start()
 
 void msx_cart_msx_audio_fsca1::initialize_cartridge()
 {
-	if (get_rom_size() != 0x20000)
+	if (get_rom_size() < 0x20000)
 	{
 		fatalerror("msx_audio_fsca1: Invalid ROM size\n");
 	}
@@ -251,15 +297,11 @@ void msx_cart_msx_audio_fsca1::initialize_cartridge()
 
 READ8_MEMBER(msx_cart_msx_audio_fsca1::read_cart)
 {
-	if (offset < 0x8000)
+	if (m_7ffe == 0 && (offset & 0xB000) == 0x3000)
 	{
-		if ((offset & 0x3000) == 0x3000)
-		{
-			return m_ram[offset & 0xfff];
-		}
-		return m_rom[offset];
+		return m_sram[offset & 0xfff];
 	}
-	return 0xff;
+	return m_rom[((m_7ffe & 0x03) << 15) | (offset & 0x7fff)];
 }
 
 
@@ -277,13 +319,13 @@ WRITE8_MEMBER(msx_cart_msx_audio_fsca1::write_cart)
 		return;
 	}
 
-	if ((offset & 0xb000) == 0x3000)
+	if (m_7ffe == 0 && (offset & 0xb000) == 0x3000)
 	{
-		m_ram[offset & 0xfff] = data;
+		m_sram[offset & 0xfff] = data;
 		return;
 	}
 
-	printf("msx_cart_msx_audio_fsca1: Unhandled write %02x to %04x\n", data, offset);
+	logerror("msx_cart_msx_audio_fsca1: Unhandled write %02x to %04x\n", data, offset);
 }
 
 
@@ -316,5 +358,17 @@ READ8_MEMBER(msx_cart_msx_audio_fsca1::read_y8950)
 	{
 		return (m_7fff & 0x01) ? m_y8950->read(space, offset) : 0xff;
 	}
+}
+
+
+WRITE8_MEMBER(msx_cart_msx_audio_fsca1::y8950_io_w)
+{
+	logerror("msx_fsca1::y8950_io_w: %02x\n", data);
+}
+
+
+READ8_MEMBER(msx_cart_msx_audio_fsca1::y8950_io_r)
+{
+	return m_io_config->read();
 }
 
