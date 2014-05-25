@@ -1053,7 +1053,9 @@ void amiga_state::update_screenmode()
 	rectangle visarea = m_screen->visible_area();
 	visarea.sety(vblank, height - 1);
 
+#if 0
 	logerror("screenmode changed: %dx%d%s\n", SCREEN_WIDTH, height, lace ? " (interlace)" : "");
+#endif
 
 	// finally set our new mode
 	m_screen->configure(SCREEN_WIDTH, height, visarea, period);
