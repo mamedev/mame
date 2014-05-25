@@ -429,7 +429,7 @@ class netlist_terminal_t : public netlist_core_terminal_t
 	NETLIST_PREVENT_COPYING(netlist_terminal_t)
 public:
 
-    typedef plinearlist_t<netlist_terminal_t *> list_t;
+    typedef plinearlist_t<netlist_terminal_t * RESTRICT> list_t;
 
 	ATTR_COLD netlist_terminal_t();
 
@@ -462,7 +462,7 @@ public:
 
 	// used by gauss-seidel-solver
 
-	double * RESTRICT m_otherterm_ptr;
+	double * RESTRICT m_new_analog_ptr;
 
 protected:
 	ATTR_COLD virtual void save_register();
@@ -732,8 +732,8 @@ public:
 
     //FIXME: needed by current solver code
     netlist_matrix_solver_t *m_solver;
-    netlist_terminal_t::list_t m_terms;
-    netlist_terminal_t::list_t m_rails;
+//    netlist_terminal_t::list_t m_terms;
+//    netlist_terminal_t::list_t m_rails;
 };
 
 // ----------------------------------------------------------------------------------------

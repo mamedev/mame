@@ -46,7 +46,8 @@ public:
 	ATTR_COLD netlist_matrix_solver_t();
 	ATTR_COLD virtual ~netlist_matrix_solver_t();
 
-	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
+    ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets,
+            NETLIB_NAME(solver) &owner) = 0;
 
 	ATTR_HOT double solve();
 
@@ -64,12 +65,25 @@ public:
 
 	netlist_solver_parameters_t m_params;
 
-	ATTR_COLD void log_stats();
+	ATTR_COLD virtual void log_stats() {};
 
 protected:
 
-    netlist_analog_net_t::list_t m_nets;
+	class net_entry
+	{
+	    NETLIST_PREVENT_COPYING(net_entry)
 
+	public:
+	    net_entry(netlist_analog_net_t *net) : m_net(net) {}
+        net_entry() : m_net(NULL) {}
+
+	    netlist_analog_net_t * RESTRICT m_net;
+	    netlist_terminal_t::list_t m_terms;
+	    netlist_terminal_t::list_t m_rails;
+	};
+
+    ATTR_COLD virtual void setup(netlist_analog_net_t::list_t &nets,
+            NETLIB_NAME(solver) &owner, net_entry *list);
 
 	NETLIB_NAME(solver) *m_owner;
 
@@ -77,8 +91,6 @@ protected:
     ATTR_HOT virtual int vsolve_non_dynamic() = 0;
 
     int m_calculations;
-    int m_gs_fail;
-    int m_gs_total;
 
 private:
 
@@ -110,7 +122,7 @@ public:
 
 	netlist_matrix_solver_direct_t()
     : netlist_matrix_solver_t()
-    , m_term_num(0)
+    , m_dim(0)
     , m_rail_start(0)
     {}
 
@@ -119,34 +131,43 @@ public:
 	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 
-	ATTR_HOT inline const int N() const { if (m_N == 0) return m_nets.count(); else return m_N; }
+	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 protected:
     ATTR_HOT virtual int vsolve_non_dynamic();
-    ATTR_HOT int solve_non_dynamic(double (* RESTRICT A)[_storage_N], double (* RESTRICT RHS));
-	ATTR_HOT inline void build_LE(double (* RESTRICT A)[_storage_N], double (* RESTRICT RHS));
-	ATTR_HOT inline void gauss_LE(double (* RESTRICT A)[_storage_N],
-			double (* RESTRICT RHS),
-			double (* RESTRICT x));
+    ATTR_HOT int solve_non_dynamic();
+	ATTR_HOT inline void build_LE();
+	ATTR_HOT inline void gauss_LE(double (* RESTRICT x));
 	ATTR_HOT inline double delta(
-			const double (* RESTRICT RHS),
 			const double (* RESTRICT V));
-	ATTR_HOT inline void store(const double (* RESTRICT RHS), const double (* RESTRICT V));
+	ATTR_HOT inline void store(const double (* RESTRICT V), bool store_RHS);
 
-	double m_last_RHS[_storage_N]; // right hand side - contains currents
+    net_entry m_nets[_storage_N];
+
+    double m_A[_storage_N][_storage_N];
+    double m_RHS[_storage_N];
+    double m_last_RHS[_storage_N]; // right hand side - contains currents
 
 private:
-
 	ATTR_COLD int get_net_idx(netlist_net_t *net);
 
 	struct terms_t{
-		int net_this;
-		int net_other;
-		netlist_terminal_t *term;
+
+	    terms_t(netlist_terminal_t *term, int net_this, int net_other)
+	    : m_term(term), m_net_this(net_this), m_net_other(net_other)
+	    {}
+        terms_t()
+        : m_term(NULL), m_net_this(-1), m_net_other(-1)
+        {}
+
+        netlist_terminal_t *m_term;
+		int m_net_this;
+		int m_net_other;
 	};
-	int m_term_num;
+
+	int m_dim;
 	int m_rail_start;
-	terms_t m_terms[_storage_N * _storage_N];
+	plinearlist_t<terms_t> m_terms;
 };
 
 template <int m_N, int _storage_N>
@@ -154,12 +175,22 @@ class netlist_matrix_solver_gauss_seidel_t: public netlist_matrix_solver_direct_
 {
 public:
 
-	netlist_matrix_solver_gauss_seidel_t() : netlist_matrix_solver_direct_t<m_N, _storage_N>() {}
+	netlist_matrix_solver_gauss_seidel_t()
+      : netlist_matrix_solver_direct_t<m_N, _storage_N>()
+      , m_gs_fail(0)
+      , m_gs_total(0)
+      {}
 
 	virtual ~netlist_matrix_solver_gauss_seidel_t() {}
 
+    ATTR_COLD virtual void log_stats();
+
 protected:
 	ATTR_HOT int vsolve_non_dynamic();
+
+private:
+    int m_gs_fail;
+    int m_gs_total;
 
 };
 

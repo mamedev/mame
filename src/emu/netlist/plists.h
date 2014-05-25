@@ -61,6 +61,7 @@ public:
 	{
 	    if (m_list != NULL)
 	        delete[] m_list;
+	    m_list = NULL;
 	}
 
 	ATTR_HOT inline void add(const _ListClass &elem)
