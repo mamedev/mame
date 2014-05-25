@@ -925,12 +925,12 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #if 0
-	if (screen.machine().input().code_pressed_once(KEYCODE_W))
+	if (machine().input().code_pressed_once(KEYCODE_W))
 	{
 		debug_randompal++;
 		popmessage("%02x",debug_randompal);
 	}
-	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		debug_randompal--;
 		popmessage("%02x",debug_randompal);

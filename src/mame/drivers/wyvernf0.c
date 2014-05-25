@@ -237,13 +237,13 @@ UINT32 wyvernf0_state::screen_update_wyvernf0(screen_device &screen, bitmap_ind1
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))   msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))   msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_A))   msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_S))   msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))   msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))   msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_A))   msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_S))   msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 
 	popmessage("fg:%02x %02x bg:%02x %02x ROM:%02x RAM:%02x",

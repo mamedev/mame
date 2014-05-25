@@ -226,7 +226,7 @@ public:
 
 UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	epic12_device::set_delay_scale(m_blitter, screen.machine().root_device().ioport(":BLITRATE")->read());
+	epic12_device::set_delay_scale(m_blitter, ioport(":BLITRATE")->read());
 
 	m_blitter->draw_screen(bitmap,cliprect);
 	return 0;

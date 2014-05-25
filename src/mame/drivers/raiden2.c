@@ -514,7 +514,7 @@ void raiden2_state::cop_take_hit_box_params(UINT8 offs)
 }
 
 
-UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine &machine)
+UINT8 raiden2_state::cop_calculate_collsion_detection()
 {
 	static UINT8 res;
 
@@ -689,7 +689,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 		/* do the math */
 		cop_take_hit_box_params(0);
-		cop_hit_status = cop_calculate_collsion_detection(space.machine());
+		cop_hit_status = cop_calculate_collsion_detection();
 		break;
 
 	case 0xb900:
@@ -699,7 +699,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 		/* do the math */
 		cop_take_hit_box_params(1);
-		cop_hit_status = cop_calculate_collsion_detection(space.machine());
+		cop_hit_status = cop_calculate_collsion_detection();
 		break;
 
 	default:
@@ -722,7 +722,7 @@ void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_m
 
 /* SPRITE DRAWING (move to video file) */
 
-void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask )
+void raiden2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask )
 {
 	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
@@ -1030,7 +1030,7 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 
 	//if (!machine().input().code_pressed(KEYCODE_S))
 	{
 		if (!(raiden2_tilemap_enable & 0x10))
-			draw_sprites(machine(), bitmap, cliprect, 0);
+			draw_sprites(bitmap, cliprect, 0);
 	}
 
 	//if (!machine().input().code_pressed(KEYCODE_A))

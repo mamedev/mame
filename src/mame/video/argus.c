@@ -893,7 +893,6 @@ void argus_state::valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitma
 #else
 void argus_state::valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	argus_state *state = screen.machine().driver_data<argus_state>();
 	int step = 0x10 - (m_valtric_mosaic & 0x0f);
 
 	if (step == 1)

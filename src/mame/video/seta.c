@@ -850,7 +850,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	flip ^= m_tilemaps_flip;
 
-	screen.machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
+	machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
 	x_0     =   m_vctrl_0[ 0/2 ];
 	y_0     =   m_vctrl_0[ 2/2 ];

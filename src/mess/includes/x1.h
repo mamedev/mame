@@ -217,11 +217,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
-	void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect);
-	void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);
-	UINT8 check_prev_height(running_machine &machine,int x,int y,int x_size);
-	UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,int height);
+	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
+	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);
+	UINT8 check_prev_height(int x,int y,int x_size);
+	UINT8 check_line_valid_height(int y,int x_size,int height);
 
 	int priority_mixer_pri(int color);
 	void cmt_command( UINT8 cmd );

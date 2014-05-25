@@ -348,7 +348,6 @@ void gaelco3d_renderer::render_alphablend(INT32 scanline, const extent_t &extent
 
 void gaelco3d_state::gaelco3d_render(screen_device &screen)
 {
-	gaelco3d_state *state = screen.machine().driver_data<gaelco3d_state>();
 	/* wait for any queued stuff to complete */
 	m_poly->wait("Time to render");
 
@@ -359,8 +358,8 @@ void gaelco3d_state::gaelco3d_render(screen_device &screen)
 }
 #endif
 
-	state->m_polydata_count = 0;
-	state->m_lastscan = -1;
+	m_polydata_count = 0;
+	m_lastscan = -1;
 }
 
 

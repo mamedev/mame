@@ -228,7 +228,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
 	void gunpey_irq_check(UINT8 irq_type);
-	UINT8 draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient);
+	UINT8 draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient);
 	UINT16 m_vram_bank;
 	UINT16 m_vreg_addr;
 
@@ -273,7 +273,7 @@ void gunpey_state::video_start()
 	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
 }
 
-UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient)
+UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient)
 {
 	int x,y;
 	int bpp_sel;
@@ -582,7 +582,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 		{
 			for(count = start_offs;count<end_offs;count+=0x10/2)
 			{
-				end_mark = draw_gfx(screen.machine(), bitmap,cliprect,count,scene_gradient);
+				end_mark = draw_gfx(bitmap,cliprect,count,scene_gradient);
 
 				if(end_mark == 0x80)
 					break;

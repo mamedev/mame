@@ -111,7 +111,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/tubep.c -----------*/
-void tubep_vblank_end(running_machine &machine);

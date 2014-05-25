@@ -295,7 +295,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void nakajies_update_irqs( running_machine &machine );
+	void nakajies_update_irqs();
 	DECLARE_READ8_MEMBER( irq_clear_r );
 	DECLARE_WRITE8_MEMBER( irq_clear_w );
 	DECLARE_READ8_MEMBER( irq_enable_r );
@@ -405,7 +405,7 @@ ADDRESS_MAP_END
   IRQ Handling
 *********************************************/
 
-void nakajies_state::nakajies_update_irqs( running_machine &machine )
+void nakajies_state::nakajies_update_irqs()
 {
 	// Hack: IRQ mask is temporarily disabled because doesn't allow the IRQ vector 0xFA
 	// and 0xFB that are used for scan the kb, this need further investigation.
@@ -442,7 +442,7 @@ READ8_MEMBER( nakajies_state::irq_clear_r )
 WRITE8_MEMBER( nakajies_state::irq_clear_w )
 {
 	m_irq_active &= ~data;
-	nakajies_update_irqs(machine());
+	nakajies_update_irqs();
 }
 
 
@@ -455,7 +455,7 @@ READ8_MEMBER( nakajies_state::irq_enable_r )
 WRITE8_MEMBER( nakajies_state::irq_enable_w )
 {
 	m_irq_enabled = data;
-	nakajies_update_irqs(machine());
+	nakajies_update_irqs();
 }
 
 
@@ -508,7 +508,7 @@ INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 	UINT8 irqs = ioport( "debug" )->read();
 
 	m_irq_active |= irqs;
-	nakajies_update_irqs(machine());
+	nakajies_update_irqs();
 }
 
 
@@ -693,7 +693,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 		m_irq_active |= 0x10;
 	}
 
-	nakajies_update_irqs(machine());
+	nakajies_update_irqs();
 }
 
 

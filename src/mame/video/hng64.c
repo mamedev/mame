@@ -1341,7 +1341,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
-	if ( screen.machine().input().code_pressed_once(KEYCODE_L) )
+	if ( machine().input().code_pressed_once(KEYCODE_L) )
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		space.write_byte(0x2f27c8, 0x2);

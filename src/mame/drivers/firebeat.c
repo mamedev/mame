@@ -603,7 +603,7 @@ UINT32 firebeat_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 {
 	bitmap.fill(0, cliprect);
 
-	if ((core_strnicmp(screen.machine().system().name, "popn", 4) == 0) || (core_strnicmp(screen.machine().system().name, "bm3", 3) == 0))
+	if ((core_strnicmp(machine().system().name, "popn", 4) == 0) || (core_strnicmp(machine().system().name, "bm3", 3) == 0))
 	{
 		gcu_exec_display_list( bitmap, cliprect, chip, 0x1f80000);
 	}
@@ -633,7 +633,7 @@ UINT32 firebeat_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 	if (m_tick >= 5)
 	{
 		m_tick = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_0))
+		if (machine().input().code_pressed(KEYCODE_0))
 		{
 			m_layer++;
 			if (m_layer > 2)
@@ -643,7 +643,7 @@ UINT32 firebeat_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 		}
 
 		/*
-		if (screen.machine().input().code_pressed_once(KEYCODE_9))
+		if (machine().input().code_pressed_once(KEYCODE_9))
 		{
 		    FILE *file = fopen("vram0.bin", "wb");
 		    int i;

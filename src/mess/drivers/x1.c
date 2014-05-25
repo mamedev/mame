@@ -229,9 +229,9 @@ VIDEO_START_MEMBER(x1_state,x1)
 	m_pal_4096 = auto_alloc_array_clear(machine(), UINT8, 0x1000*3);
 }
 
-void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
+void x1_state::x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
 {
-	if(!machine.first_screen()->visible_area().contains(x, y))
+	if(!machine().first_screen()->visible_area().contains(x, y))
 		return;
 
 	if(width && height)
@@ -274,7 +274,7 @@ void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int 
 
 
 /* adjust tile index when we are under double height condition */
-UINT8 x1_state::check_prev_height(running_machine &machine,int x,int y,int x_size)
+UINT8 x1_state::check_prev_height(int x,int y,int x_size)
 {
 	UINT8 prev_tile = m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
 	UINT8 cur_tile = m_tvram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
@@ -288,7 +288,7 @@ UINT8 x1_state::check_prev_height(running_machine &machine,int x,int y,int x_siz
 }
 
 /* Exoa II - Warroid: if double height isn't enabled on the first tile of the line then double height is disabled on everything else. */
-UINT8 x1_state::check_line_valid_height(running_machine &machine,int y,int x_size,int height)
+UINT8 x1_state::check_line_valid_height(int y,int x_size,int height)
 {
 	UINT8 line_attr = m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
@@ -298,7 +298,7 @@ UINT8 x1_state::check_line_valid_height(running_machine &machine,int y,int x_siz
 	return height;
 }
 
-void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	/*
 	    attribute table:
@@ -364,10 +364,10 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 
 				dy = 0;
 
-				height = check_line_valid_height(machine,y,x_size,height);
+				height = check_line_valid_height(y,x_size,height);
 
 				if(height && y)
-					dy = check_prev_height(machine,x,y,x_size);
+					dy = check_prev_height(x,y,x_size);
 
 				/* guess: assume that Kanji VRAM doesn't double the vertical size */
 				if(knj_enable) { height = 0; }
@@ -429,7 +429,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
-						if(color & 0x10 && machine.first_screen()->frame_number() & 0x10) //reverse flickering
+						if(color & 0x10 && machine().first_screen()->frame_number() & 0x10) //reverse flickering
 							pcg_pen^=7;
 
 						if(pcg_pen == 0 && (!(color & 8)))
@@ -447,7 +447,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 						if(res_y < cliprect.min_y || res_y > cliprect.max_y) // partial update, TODO: optimize
 							continue;
 
-						x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
+						x1_draw_pixel(bitmap,res_y,res_x,pcg_pen,width,0);
 					}
 				}
 			}
@@ -486,7 +486,7 @@ int x1_state::priority_mixer_pri(int color)
 	return pri_mask_calc;
 }
 
-void x1_state::draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri)
+void x1_state::draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri)
 {
 	int xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
@@ -530,7 +530,7 @@ void x1_state::draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,con
 					if(y*(mc6845_tile_height)+yi < cliprect.min_y || y*(mc6845_tile_height)+yi > cliprect.max_y) // partial update TODO: optimize
 						continue;
 
-					x1_draw_pixel(machine,bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
+					x1_draw_pixel(bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
 				}
 			}
 		}
@@ -547,9 +547,9 @@ UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 //  popmessage("%d %d %d %d",mc6845_h_sync_pos,mc6845_v_sync_pos,mc6845_h_char_total,mc6845_v_char_total);
 
-	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
-	draw_fgtilemap(machine(),bitmap,cliprect);
-	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri^0xff);
+	draw_gfxbitmap(bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
+	draw_fgtilemap(bitmap,cliprect);
+	draw_gfxbitmap(bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri^0xff);
 
 	return 0;
 }

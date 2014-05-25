@@ -216,7 +216,7 @@ void fuuki16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 #ifdef MAME_DEBUG
 #if 0
-if (screen.machine().input().code_pressed(KEYCODE_X))
+if (machine().input().code_pressed(KEYCODE_X))
 {   /* Display some info on each sprite */
 	char buf[40];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);
