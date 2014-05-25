@@ -460,12 +460,15 @@ public:
 	static const int CLK_E_NTSC = CLK_7M_NTSC / 10;
 
 	// screen layout
-	static const int SCREEN_WIDTH = 910;
-	static const int SCREEN_HEIGHT_PAL = 312;
-	static const int SCREEN_HEIGHT_NTSC = 262;
-	static const int VBLANK_PAL = 29; // 26
-	static const int VBLANK_NTSC = 21;
-	static const int HBLANK = 186;
+	enum
+	{
+		SCREEN_WIDTH = 910,
+		SCREEN_HEIGHT_PAL = 312,
+		SCREEN_HEIGHT_NTSC = 262,
+		VBLANK_PAL = 29, // 26
+		VBLANK_NTSC = 21,
+		HBLANK = 186
+	};
 
 	required_shared_ptr<UINT16> m_chip_ram;
 	required_shared_ptr<UINT16> m_custom_regs;
