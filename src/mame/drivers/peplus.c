@@ -2547,7 +2547,7 @@ ROM_START( pepp0203 ) /* Normal board : 4 of a Kind Bonus Poker (PP0203) */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
+------------------------------------------------------------------
   P90A      1    2    3    4    5   7  25  40  80  50 250    800
   % Range: 94.0-96.0%  Optimum: 98.0%  Hit Frequency: 45.5%
      Programs Available: PP0203, X000203P, PP0590 & PP0409 - Non Double-up Only
