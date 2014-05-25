@@ -13,8 +13,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
+#include "machine/wd_fdc.h"
 #include "unixpc.lh"
 
 
@@ -30,14 +29,14 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
 			m_wd2797(*this, "wd2797"),
-			m_floppy(*this, FLOPPY_0),
+			m_floppy(*this, "wd2797:0:525dd"),
 			m_mapram(*this, "mapram"),
 			m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<wd2797_device> m_wd2797;
-	required_device<legacy_floppy_image_device> m_floppy;
+	required_device<wd2797_t> m_wd2797;
+	required_device<floppy_image_device> m_floppy;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,10 +116,13 @@ WRITE16_MEMBER( unixpc_state::disk_control_w )
 {
 	logerror("disk_control_w: %04x\n", data);
 
-	m_floppy->floppy_mon_w(!BIT(data, 5));
+	m_floppy->mon_w(!BIT(data, 5));
 
 	// bit 6 = floppy selected / not selected
-	m_wd2797->set_drive(0);
+	if (BIT(data, 6))
+		m_wd2797->set_floppy(m_floppy);
+	else
+		m_wd2797->set_floppy(NULL);
 }
 
 WRITE_LINE_MEMBER( unixpc_state::wd2797_intrq_w )
@@ -161,7 +163,7 @@ static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x4a0000, 0x4a0001) AM_WRITE(misc_control_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd2797_device, read, write, 0x00ff)
+	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd_fdc_t, read, write, 0x00ff)
 	AM_RANGE(0xe43000, 0xe43001) AM_WRITE(romlmap_w)
 ADDRESS_MAP_END
 
@@ -178,12 +180,9 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const floppy_interface unixpc_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
+static SLOT_INTERFACE_START( unixpc_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	// basic machine hardware
@@ -207,12 +206,10 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	MCFG_RAM_EXTRA_OPTIONS("2M")
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_interface)
+	MCFG_DEVICE_ADD("wd2797", WD2797x, 1000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
