@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-Fanuc System P Model G
+Fanuc System P-Model G
 Fanuc 1983
 
 2014-03-22 Skeleton driver.
@@ -12,7 +12,7 @@ with a lot of ports and a unique keyboard.
 Also known as Fanuc P-G System, this is a dedicated 8085+8086+8087-based computer
 system running software for CNC Programming.
 The system boots up from on-board EPROM and shows a big ASCII-art boot screen
-FANUC SYSTEM P MODEL G and the ROM software version in the lower right corner.
+FANUC SYSTEM P and the ROM software version in the lower right corner.
 To initiate booting from the floppy drive hold down the LOAD key for 3-5 seconds.
 The system checks for a long LOAD key press so that it doesn't load software
 if the LOAD key is accidentally pressed quickly while using the system, which would
@@ -41,13 +41,11 @@ Fanuc PPR Unit (Paper tape Puncher/Reader with built-in printer), Fanuc Program
 File (containing a 20MB HDD, two 8" floppy drives and two RS232 ports), Fanuc Cassette
 Adapter, XY Plotter (A3 or A1), Fanuc Digitizing Tablet (A3 or A0) and Fanuc I/O Selector Box.
 
-The P-G System has an internal 12" color monitor and dual 5 1/4" floppy drives.
-A later model was released in 1986 called the Mark II using dual 3 1/2" floppy
-drives. The previous version was SYSTEM P MODEL D. It had a 12" green monochrome
-monitor and booted from, and stored to, a cassette tape or floppy disk.
+The P-G System has an internal 12" monitor and dual 5 1/4" floppy drives.
+The first model had a 12" monochrome green monitor. In 1985 a color version was released.
+In 1986 another model was released called the Mark II using dual 3 1/2" floppy drives.
 
-The screen resolution is 512 x 384 pixels.
-It can display 64 characters x 24 lines.
+The screen resolution is 512 x 384 pixels. It can display 64 characters x 24 lines.
 
 The floppy format is custom. Floppies are double sided double density and
 regular PC DSDD 360k floppies can be used after they are formatted using the
@@ -57,7 +55,7 @@ and 2 sides for a total storage capacity of 327680 bytes.
 The floppy drives are typical PC-type 5 1/4" 360k drives and were manufactured
 by Y-E DATA, model YD-580.
 
-The floppy disks can be backed-up and imaged using a DOS program called ImageDisk
+The 5 1/4" floppy disks can be backed-up and imaged using a DOS program called ImageDisk
 which is available here.....
 http://www.classiccmp.org/dunfield/img/index.htm
 With a 5 1/4" HD floppy drive, in the GUI in settings change the number of
@@ -68,7 +66,7 @@ it to the HDD.
 
 The following is a complete list of software titles available.
 The info is taken from a glossy sales brochure printed in July 1985.
-Other versions did exist so this list is not final.
+Other versions probably exist so this list is not final.
 * denotes it is dumped. All other titles are not dumped and are needed.
 
 Language Input -
@@ -90,33 +88,34 @@ Graphic Input -
 
                  Title                 Part Number
                  --------------------------------------
-                *Symbolic FAPT TURN    A08B-0033-J800#E +English
+                *Symbolic FAPT TURN    A08B-0033-J800#E Edition B V02 L03 841116
                  Symbolic FAPT MILL    A08B-0033-J840#E
                  Symbolic FAPT DRILL   A08B-0033-J860#E
                  Symbolic FAPT CUT     A08B-0033-J820#E
                  FAPT DIGITIZER        A08B-0033-J510#E
 
 + Symbolic FAPT TURN was available in English, German, French, Dutch, Finnish,
-and Swedish versions.
+and Swedish versions. Currently only the English version is archived.
 
 
 Support System -
 
                  Title          Part Number
                  -------------------------------
-                *FAPT TRACER    A08B-0033-H620#E  Edition B 85/1/16
-                *FAPT TEACHER   A08B-0033-J610#E  Edition B 85/1/12
-                *FAPT DOCTOR    A08B-0033-J600#E  Edition B 84/12/21
+                *FAPT TRACER    A08B-0033-H620#E  Edition B V02 L02 841108
+                *FAPT TEACHER   A08B-0033-J610#E  Edition B L02 V01 841101
+                *FAPT DOCTOR    A08B-0033-J600#E  Edition B V01 L03 841108
 
 
+The software listed above with (*) have been tested on both mono and color versions and works fine.
 Note: To initiate booting from the floppy drive hold down the LOAD key for 3-5 seconds.
 
-The software for the Fanuc System P Model G is extremely rare now and very
-difficult to find. If you do have any of these wanted software titles or any manuals
-listed below and want to help please contact me (Guru) via http://mamedev.org/contact.html
+The software for the Fanuc System P-Model G is extremely rare now and very difficult to find.
+If you do have any of these wanted software titles or any manuals listed below and want to help
+please contact me (Guru) via http://mamedev.org/contact.html
 
 The following is a complete list of manuals available for the first edition of the
-Fanuc System P Model G released in 1983. The info is taken from a glossy sales brochure
+Fanuc System P-Model G released in 1983. The info is taken from a glossy sales brochure
 printed in July 1985. There were other manuals released later for the Mark II and
 updated manuals (each with a different part number).
 The manuals were available in Japanese and English. The part numbers listed here
@@ -178,6 +177,7 @@ Note the handbooks are pocket-sized 8" long by 3 1/2" wide and approximately 50 
 
 
 The unit has it's own dedicated keyboard with many special keys.
+The keyboard clips to the main box and is the top cover when the main box is transported.
 The keyboard layout is shown below.
 
 |------------------------------------------------------------------------------|
@@ -257,32 +257,39 @@ R3 - Auxiliary Work
 Box Layout (top view)
 ----------
 
-A08B-0033-B001
+A08B-0033-B001 (Color Version from 1985)
+A08B-0031-B001 (Mono Version from 1983)
+A08B-0031-B002 (Mono Version from 1984)
 |--------------------------------------------|
 | ------------MAIN PCB---------------------- |
 |   -----------SUB-PCB-----------         |  |
 |                                         |  |
 | |-----------------------|               |  |
 | |                       |               |  |
-| |                       |               P  |
+| |   FANUC 12" COLOR     |               P  |
 | |       CRT UNIT        |               O  |
-| |                       |               W  |
+| |    A61L-0001-0078     |               W  |
 | |                       |               E  |
-| |      12" COLOR        |  |---------|  R  |
-| |                       |  |FDD UNIT |  |  |
-| |        SCREEN         |  |A87L-0001|  P  |
-| |                       |  |-0026    |  C  |
-| |                       |  |         |  B  |
-| |                       |  |         |  |  |
-| |                       |  |5 1/4"   |  |  |
-| |                       |  |FLOPPY   |     |
+| |                       |  |---------|  R  |
+| |                       |  |FANUC    |  |  |
+| |          OR           |  |FDD UNIT |  P  |
+| |                       |  |A87l-0001|  C  |
+| |                       |  |-0026    |  B  |
+| |   FANUC 12" MONO      |  |         |  |  |
+| |       CRT UNIT        |  |5 1/4"   |  |  |
+| |   A61L-0001-0073      |  |FLOPPY   |     |
 | |                       |  |DRIVES   |     |
 | |                       |  |x2       |     |
 | |-----------------------|  |---------|     |
 |--------------------------------------------|
+Notes:
+      The CRT tube in the color version is a Matsushita 320DHB22. Input voltage is 110V AC
+      The CRT tube in the mono version is a Hitachi 310KEB31. Input voltage is 24V DC and B+ is 11.0V
+      The mono version does not have a SUB PCB
+      The power PCB is identical for both color and mono versions
 
 
-Main PCB Layout
+Main PCB Layout (for color version)
 ---------------
 
 A20B-1000-0710/03B
@@ -301,8 +308,8 @@ A20B-1000-0710/03B
 |       CN7     CN6      CN5      CN4   CN3 |
 |-------------------------------------------|
 Notes:
-      D8086   - Intel 8086 CPU. Clock input 5.000MHz [15/3]
-      D8087   - Intel 8087 x87 Floating-Point Co-Processor. Clock input 5.000MHz [15/3]
+      D8086   - Intel 8086-2 CPU. Clock input 5.000MHz [15/3]
+      D8087   - Intel 8087-3 x87 Floating-Point Co-Processor. Clock input 5.000MHz [15/3]
       XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (72 chips total)
       MB15541 - Fujitsu MB15541 Custom Chip
       D765    - NEC D765 Single/Double Density Floppy-Disk Controller. Clock input 4.000MHz [16/4]
@@ -312,7 +319,8 @@ Notes:
       D8259   - NEC D8259 Programmable Interrupt Controller
       D8284   - Intel D8284 Clock Generator and Driver for 8086/8088 Processors
       A40_00* - Fujitsu MBM2764 8k x8-bit EPROM
-      VR1/VR2 - Potentiometer
+      VR1     - Potentiometer to adjust pulse width of floppy disk control unit
+      VR2     - Potentiometer to adjust screen brightness
       ^       - 3 chips marked Y-E Data Fujitsu
                 MB4393
                 MB14324
@@ -322,7 +330,7 @@ Notes:
       CNB     - 50-pin flat cable joining to Sub PCB
       CNC     - 6-pin power cable joining to Sub PCB
       CND     - 34-pin flat cable joining to FDD Unit
-      CNE     - Fanuc Honda MR-50 50-pin female connector for expansion (not used)
+      CNE     - Fanuc Honda MR-50 50-pin female connector for factory testing (not used)
       CNF     - Power input connector
       CN1     - 25-pin Female D-type connector. (for RS232 external peripherals \  CNC Machine,
       CN2     - 25-pin Female D-type connector. (for RS232 external peripherals  | PPR Unit, X-Y Plotter,
@@ -330,22 +338,12 @@ Notes:
       CN4     - 25-pin Female D-type connector. (for RS232 external peripherals /  Cassette Adapter etc (connections in any order)
       CN5     - Fanuc Honda MR-50 50-pin female connector (probably for external connection of the Fanuc Program File Unit)
       CN6     - Fanuc Honda MR-20 20-pin female connector for the keyboard
-      CN7     - Fanuc Honda MR-20 20-pin male. Specification says 'not used' but this appears to be a
-                Facit 4070 Parallel Reader/Puncher connector
-                Pinout: (pin 1 is top left, location key is on the opposite side)
-                       |---------------------------------------------------|
-                       |                                                   |
-                       | 1_PR   2_TE  3_ERR  4_TTY3  5_+6V  6_TTY2  7_TTY1 |
-                       |                                                   |
-                       |    8_SG   9_SD   10_0V  11_CH1  12_CH2  13_CH3    O
-                       |                                                   |
-                       | 14_CH4 15_CH5 16_CH6 17_CH7  18_CH8 19_CH9  20_PI |
-                       |                                                   |
-                       |---------------------------------------------------|
-      JUMPERS - 15 2-pin jumpers labelled S1 to S15. S2, S3 & S4 are not shorted. All others are shorted.
+      CN7     - Fanuc Honda MR-20 20-pin male connector. Specification says 'not used'. Video signals are present on
+                the connector so it is probably used for an external monitor
+      JUMPERS - 15 2-pin jumpers labelled S1 to S15. S2, S3 & S4 are open and the others are shorted
 
 
-Sub PCB Layout
+Sub PCB Layout (for color version)
 --------------
 
 A20B-1000-0720/02B
@@ -364,9 +362,9 @@ A20B-1000-0720/02B
 |               6264 A41_020A.30B|
 |--------------------------------|
 Notes:
-      D8085   - NEC D8085A-2 CPU. Clock input 8.000MHz [16/2].
+      D8085   - NEC D8085A-2 CPU. Clock input 8.000MHz [16/2]
                 Note 8085 has internal /2 divider so actual clock speed is 4.000MHz
-      HD6845S - Hitachi HD6845S / HD46505S CRT Controller. Clock input 2.000MHz [8/2]
+      HD6845S - Hitachi HD6845S / HD46505S CRT Controller. Clock input 2.000MHz [16/8]
       6264    - Hitachi HM6264P-15 8k x 8-bit SRAM
       XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (25 chips total)
       MB15542 - Fujitsu MB15542 Custom Chip
@@ -376,14 +374,72 @@ Notes:
       CNB     - 50-pin flat cable joining to Main PCB
       CNC     - 6-pin power cable joining to Main PCB
       CND     - 20-pin flat cable joining to CRT Unit (video output)
-      CNE     - Fanuc Honda MR-50 50-pin male connector for expansion (not used)
+      CNE     - Fanuc Honda MR-50 50-pin male connector for factory testing (not used)
       HSync   - 22.7273kHz
       VSync   - 54.6330Hz
 
 
+Main PCB Layout (for mono version)
+---------------
+
+A20B-1000-0140/09F
+|-------------------------------------------|
+| CN10          CN9  VR1   CN8              |
+|  6116         S3 ^                        |
+| A22_020B.5G             %  D765  XXXXXXXXX|
+|   16MHz   MB15542 MB15541  D8257 XXXXXXXXX|
+|             S4 15MHz D8284       XXXXXXXXX|
+| 8085-2    HD6845S  8087 D8259    XXXXXXXXX|
+| CN12  A21_010F.17D 8086 D8253 A25_001A.33E|
+|              CN11  S2    A25_002A.35E     |
+|                    S1 D8251 D8251   D39   |
+|                       D8251 D8251 S5 S6 S7|
+|    YYYYYYYYY       VR2   D8253  CN2   CN1 |
+|       CN7     CN6      CN5      CN4   CN3 |
+|-------------------------------------------|
+Notes:
+      D8086   - Intel 8086-2 CPU. Clock input 5.000MHz [15/3]
+      D8087   - Intel 8087-3 x87 Floating-Point Co-Processor. Clock input 5.000MHz [15/3]
+      D8085   - NEC D8085A-2 CPU. Clock input 8.000MHz [16/2]
+                Note 8085 has internal /2 divider so actual clock speed is 4.000MHz
+      HD6845S - Hitachi HD6845S / HD46505S CRT Controller. Clock input 2.000MHz [16/8]
+      XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (36 chips total)
+      YYYYYYY - Fujitsu MB8265-15 65536 x1-bit DRAM (9 chips total)
+      6116    - Hitachi HM6116P-3 2k x 8-bit SRAM
+      MB15541 - Fujitsu MB15541 Custom Chip
+      MB15542 - Fujitsu MB15542 Custom Chip
+      D765    - NEC D765 Single/Double Density Floppy-Disk Controller. Clock input 4.000MHz [16/4]
+      D8251   - Intel D8251 Programmable Communications Interface (USART)
+      D8253   - NEC D8253 Programmable Interval Timer. Clock input 1.25MHz [15/12]
+      D8257   - NEC D8257 Programmable DMA Controller. Clock input 3.000MHz [15/5]
+      D8259   - NEC D8259 Programmable Interrupt Controller
+      D8284   - Intel D8284 Clock Generator and Driver for 8086/8088 Processors
+      A2*     - Hitachi HN482764G 8k x8-bit EPROM
+      VR1     - Potentiometer to adjust pulse width of floppy disk control unit
+      VR2     - Potentiometer to adjust screen brightness
+      ^       - 3 chips marked Y-E Data Fujitsu
+                MB4393
+                MB14324
+                MB14323
+      %       - Unknown 20-pin Ceramic DIP chip with heat-sink
+      CN1     - 25-pin Female D-type connector. (for RS232 external peripherals \  CNC Machine,
+      CN2     - 25-pin Female D-type connector. (for RS232 external peripherals  | PPR Unit, X-Y Plotter,
+      CN3     - 25-pin Female D-type connector. (for RS232 external peripherals  | Tablet,
+      CN4     - 25-pin Female D-type connector. (for RS232 external peripherals /  Cassette Adapter etc (connections in any order)
+      CN5     - Fanuc Honda MR-50 50-pin female connector (probably for external connection of the Fanuc Program File Unit)
+      CN6     - Fanuc Honda MR-20 20-pin female connector for the keyboard
+      CN7     - Fanuc Honda MR-20 20-pin male. Specification says 'not used' and no signals are present on the connector
+      CN8     - 20-pin flat cable joining to CRT Unit (video output)
+      CN9     - 34-pin flat cable joining to FDD Unit
+      CN10    - Power input connector
+      CN11/12 - Fanuc Honda MR-50 50-pin female connector for factory testing (not used)
+      Sx      - 7 2-pin jumpers (S1 to S7). S2, S3 & S4 are open and the others are shorted
+      D39     - Bank of 8 2-pin jumpers vertically orientated. 2 and 7 are shorted and the others are open
+
+
 Block Diagram
 -------------
-Below is the block diagram shown in the Maintenance Manual.
+Below is the block diagram shown in the System P-Model G Maintenance Manual, relating to the mono version.
 The arrows denote direction of data flow.
 
           |-------|                                             |--------|      |----------------|
@@ -400,14 +456,14 @@ The arrows denote direction of data flow.
               |      /-->| Graphic memory|------|                             |
               |      |   |---------------|      |                             |     |----------------|
               |      |                          |         |--------|          |<--->|RS232C interface|---CN2
-              |      |                            |         | BOOT   |<-------->|     |----------------|
+              |   	 |		                    |         | BOOT   |<-------->|     |----------------|
               |      |                          |         | EPROM  |          |
               |      |   |----------------|     |         |--------|          |     |----------------|
               |<-----|-->|Character memory|--|  |                             |<--->|RS232C interface|---CN3
               |      |-->|----------------|  |  |         |--------|          |     |----------------|
               |      |                       |  |         |Main RAM|<-------->|
               |      |                       |  |         |--------|          |     |----------------|
-              |      |                       |  |                             |<--->|RS232C interface|---CN4
+              |      |	                     |  |                             |<--->|RS232C interface|---CN4
               |      |                       |  |                             |     |----------------|
 |---------|   |      |                       \/ \/                            |
 |Keyboard |   \/     \---|---------------------------|                        |     |-----------------|  CN9  |--------|
@@ -422,36 +478,22 @@ The arrows denote direction of data flow.
  |Keyboard|                       | Screen  |
  |--------|                       |---------|
 
-
   TODO:
     - Is the VRAM hookup anything like correct?
     - Hookup enough keyboard to get it to boot a floppy, the FAPT DOCTOR
       program will be invaluable to answering many questions.
     - Shared RAM is 8k, but there are 2 6264s on the sub board.  Is shared RAM
        banked?
-    - I/O is at F00xx:
-        ':maincpu' (FC15A): unmapped program memory write to F0012 = 00CE & 00FF
-        ':maincpu' (FC15D): unmapped program memory write to F0016 = 00CE & 00FF
-        ':maincpu' (FC160): unmapped program memory write to F001A = 00CE & 00FF
-        ':maincpu' (FC163): unmapped program memory write to F001E = 00CE & 00FF
-        ':maincpu' (FC16D): unmapped program memory write to F000E = 0034 & 00FF
-        ':maincpu' (FC172): unmapped program memory write to F0008 = 00D4 & 00FF
-        ':maincpu' (FC177): unmapped program memory write to F0008 = 0030 & 00FF
-        ':maincpu' (FC17C): unmapped program memory write to F000E = 0056 & 00FF
-        ':maincpu' (FC181): unmapped program memory write to F000A = 0010 & 00FF
-        ':maincpu' (FC186): unmapped program memory write to F000E = 0096 & 00FF
-        ':maincpu' (FC18B): unmapped program memory write to F000C = 0010 & 00FF
-        ':maincpu' (FC190): unmapped program memory write to F004E = 0034 & 00FF
-        ':maincpu' (FC195): unmapped program memory write to F0048 = 0020 & 00FF
-        ':maincpu' (FC19A): unmapped program memory write to F0048 = 004E & 00FF
-        ':maincpu' (FC19F): unmapped program memory write to F004E = 0056 & 00FF
-        ':maincpu' (FC1A4): unmapped program memory write to F004A = 0010 & 00FF
-        ':maincpu' (FC1A9): unmapped program memory write to F004E = 0096 & 00FF
-        ':maincpu' (FC1AE): unmapped program memory write to F004C = 0010 & 00FF
 
-        To boot a floppy put "bp fc5fa,1,{ip=c682;g}" and "bp fc6d7,1,{ip=c755;g}"
-        into the debugger.
+	To boot a floppy put "bp fc5fa,1,{ip=c682;g}" and "bp fc6d7,1,{ip=c755;g}"
+	into the debugger.
 
+	At NMI: f8008 must have bit 7 clear and bit 6 set (e008 on 8085)
+			f8009 must not equal 0x01 (e009 on 8085)
+
+			8085 sets f8008 to keyboard row 0 AND 0xf3
+			 "     "  f8009 to keyboard row 1
+ 
 ****************************************************************************/
 
 #include "emu.h"
@@ -543,11 +585,14 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(dma_page_w);
 
+	DECLARE_READ16_MEMBER(magic_r);
+
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_UPDATE_ROW(crtc_update_row_mono);
 
 	DECLARE_DRIVER_INIT(fanucspmg);
 
@@ -624,13 +669,16 @@ WRITE8_MEMBER(fanucspmg_state::dma_page_w)
 	m_dma_page = (data >> 2) & 0xf;
 }
 
+READ16_MEMBER(fanucspmg_state::magic_r)
+{
+	return 0x0041;	// 31 = memory error
+}
+
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
-	AM_RANGE(0x80000, 0x81fff) AM_RAM
 
-//	AM_RANGE(0x80000, 0x83fff) AM_READWRITE8(shared2_r, shared2_w, 0xffff) // Comms with HDD controller ?
-//	AM_RANGE(0x88000, 0x88001) AM_READ(busy_r)
-//	AM_RANGE(0x8c000, 0x8c001) AM_WRITE(signal_w)
+	AM_RANGE(0x80000, 0x81fff) AM_RAM	// believed to be shared RAM with a CPU inside the Program File
+	AM_RANGE(0x88000, 0x88001) AM_NOP	// Program File "ready" bit
 
 	AM_RANGE(0xf0000, 0xf0003) AM_DEVREADWRITE8(PIC0_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0xf0004, 0xf0007) AM_DEVICE8(FDC_TAG, upd765a_device, map, 0x00ff)
@@ -644,6 +692,7 @@ static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0xf001c, 0xf001d) AM_DEVREADWRITE8(USART3_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xf001e, 0xf001f) AM_DEVREADWRITE8(USART3_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xf0020, 0xf0029) AM_DEVREADWRITE8(DMAC_TAG, i8257_device, read, write, 0xffff)
+	AM_RANGE(0xf0042, 0xf0043) AM_READ(magic_r)
 	AM_RANGE(0xf0046, 0xf0047) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0xf0048, 0xf004f) AM_DEVREADWRITE8(PIT1_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xf2000, 0xf2003) AM_DEVREADWRITE8(PIC1_TAG, pic8259_device, read, write, 0x00ff)
@@ -700,13 +749,15 @@ READ8_MEMBER(fanucspmg_state::vblank_ack_r)
 	return 0xff;
 }
 
-// bit 1 seems to route to bit 7 of f0004 on the 8086 (signals the "LOAD" key pressed?)
+// bit 1 is unknown
 // bit 3 appears to enable vblank IRQs
 WRITE8_MEMBER(fanucspmg_state::vbl_ctrl_w)
 {
 	m_vbl_ctrl = data;
 }
 
+// row 2: raising a bit toggles the corresponding bit at 500a
+// row 3: raising a bit toggles the corresponding bit at 500b
 WRITE8_MEMBER(fanucspmg_state::keyboard_row_w)
 {
 	m_keyboard_row = data;
@@ -734,7 +785,7 @@ static ADDRESS_MAP_START(subcpu_mem, AS_PROGRAM, 8, fanucspmg_state)
 	AM_RANGE(0x5001, 0x5001) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0x5008, 0x5008) AM_WRITE(keyboard_row_w)
 	AM_RANGE(0x5009, 0x5009) AM_READ(keyboard_r)
-	AM_RANGE(0x500a, 0x500b) AM_WRITENOP    // probably keyboard related, not sure how though
+	AM_RANGE(0x500a, 0x500b) AM_WRITENOP    // keyboard rows 2 and 3 control what's written here.  dip switches?
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(vbl_ctrl_w)
 	AM_RANGE(0x500d, 0x500d) AM_WRITE(vram_bank_w)
 	AM_RANGE(0x500e, 0x500e) AM_READ(vblank_ack_r)
@@ -790,6 +841,50 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 				if (attr & 0x20) fg |= 0xff0000;
 				if (attr & 0x40) fg |= 0x00ff00;
 				if (attr & 0x80) fg |= 0x0000ff;
+
+				*p++ = ( data & 0x01 ) ? fg : bg;
+				*p++ = ( data & 0x02 ) ? fg : bg;
+				*p++ = ( data & 0x04 ) ? fg : bg;
+				*p++ = ( data & 0x08 ) ? fg : bg;
+				*p++ = ( data & 0x10 ) ? fg : bg;
+				*p++ = ( data & 0x20 ) ? fg : bg;
+				*p++ = ( data & 0x40 ) ? fg : bg;
+				*p++ = ( data & 0x80 ) ? fg : bg;
+			}
+		}
+		else
+		{
+			*p++ = 0;
+			*p++ = 0;
+			*p++ = 0;
+			*p++ = 0;
+			*p++ = 0;
+			*p++ = 0;
+			*p++ = 0;
+			*p++ = 0;
+		}
+	}
+}
+
+MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
+{
+	UINT32  *p = &bitmap.pix32(y);
+	int i;
+	UINT8 *chargen = m_chargen->base();
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16 offset = ( ma + i );
+
+		if (m_video_ctrl & 0x02)
+		{
+			if (offset <= 0x5ff)
+			{   															  
+				UINT8 chr = m_vram[offset + 0x600];
+				UINT8 attr = m_vram[offset];
+				UINT8 data = chargen[ chr + (ra * 256) ];
+				UINT32 fg = 0xff00;
+				UINT32 bg = 0;
 
 				*p++ = ( data & 0x01 ) ? fg : bg;
 				*p++ = ( data & 0x02 ) ? fg : bg;
@@ -875,6 +970,16 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fanucspmgm, fanucspmg )
+	MCFG_DEVICE_REMOVE( CRTC_TAG )
+
+	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row_mono)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( fanucspg )
 	ROM_REGION(0x4000, MAINCPU_TAG, 0)
@@ -888,6 +993,19 @@ ROM_START( fanucspg )
 	ROM_LOAD( "a42_020a.30b", 0x000000, 0x008000, CRC(33eb5962) SHA1(1157a72089ff77e8db9a9a8fcd0f6c32a1374f56) )
 ROM_END
 
+ROM_START( fanucspgm )
+	ROM_REGION(0x4000, MAINCPU_TAG, 0)
+	ROM_LOAD16_BYTE( "a25_001a.33e", 0x000000, 0x002000, CRC(81159267) SHA1(f5d53cc6e929f57e8c3747f80fc74d4b1643222d) ) 
+	ROM_LOAD16_BYTE( "a25_002a.35e", 0x000001, 0x002000, CRC(4fb82c4d) SHA1(eb75e9a2d3c8e4ad56a74624ee8c52c785bd0da6) ) 
+
+	ROM_REGION(0x4000, SUBCPU_TAG, 0)
+	ROM_LOAD( "a21_010f.17d", 0x000000, 0x002000, CRC(ef192717) SHA1(7fb3f7ca290d2437ae5956700f88c801018ce1cc) ) 
+
+	ROM_REGION(0x8000, CHARGEN_TAG, 0)
+	ROM_LOAD( "a22_020b.5g",  0x000000, 0x002000, CRC(7b5f8e20) SHA1(9de607e541d8aad2d1ea56321270bb8466b16e3d) ) 
+ROM_END
+
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
-COMP( 1983, fanucspg, 0,      0,    fanucspmg, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME       PARENT       COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
+COMP( 1983, fanucspg,  0,             0,    fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg,      0,    fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", GAME_NOT_WORKING | GAME_NO_SOUND)
