@@ -1,5 +1,5 @@
 #include "sound/okim6295.h"
-
+#include "video/excellent_spr.h"
 
 class aquarium_state : public driver_device
 {
@@ -9,19 +9,18 @@ public:
 		m_mid_videoram(*this, "mid_videoram"),
 		m_bak_videoram(*this, "bak_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
-		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sprgen(*this, "spritegen"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_mid_videoram;
 	required_shared_ptr<UINT16> m_bak_videoram;
 	required_shared_ptr<UINT16> m_txt_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_scroll;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
@@ -58,4 +57,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<excellent_spr_device> m_sprgen;
+
 };

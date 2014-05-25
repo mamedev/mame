@@ -1103,6 +1103,7 @@ $(MAMEOBJ)/excelent.a: \
 	$(DRIVERS)/d9final.o \
 	$(DRIVERS)/dblcrown.o \
 	$(DRIVERS)/gcpinbal.o $(VIDEO)/gcpinbal.o \
+	$(VIDEO)/excellent_spr.o \
 	$(DRIVERS)/lastbank.o \
 
 $(MAMEOBJ)/exidy.a: \

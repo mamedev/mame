@@ -32,7 +32,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
   - Reset the game while pressing START1 to enter the "test mode"
 
-
+  
 ***************************************************************************/
 
 #include "emu.h"
@@ -235,7 +235,7 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_SHARE("tilemapram")
-	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
+	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_SHARE("ioc_ram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM /* RAM */
@@ -441,6 +441,8 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gcpinbal)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
+	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
