@@ -15,6 +15,7 @@
 #define __SANDY_SUPER_DISK__
 
 #include "exp.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/wd_fdc.h"
 
 
@@ -45,6 +46,7 @@ protected:
 
 private:
 	required_memory_region m_rom;
+	optional_shared_ptr<UINT8> m_ram;
 };
 
 

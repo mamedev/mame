@@ -15,6 +15,7 @@
 #define __QL_TRUMP_CARD__
 
 #include "exp.h"
+#include "machine/wd_fdc.h"
 
 
 
@@ -44,6 +45,7 @@ protected:
 
 private:
 	required_memory_region m_rom;
+	optional_shared_ptr<UINT8> m_ram;
 };
 
 

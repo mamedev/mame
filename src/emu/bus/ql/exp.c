@@ -77,13 +77,11 @@ void ql_expansion_slot_t::device_start()
 //-------------------------------------------------
 
 // slot devices
-#include "qimi.h"
 #include "sandy_superdisk.h"
 #include "sandy_superqboard.h"
 #include "trumpcard.h"
 
 SLOT_INTERFACE_START( ql_expansion_cards )
-	SLOT_INTERFACE("qimi", QIMI)
 	SLOT_INTERFACE("superdisk", SANDY_SUPER_DISK)
 	SLOT_INTERFACE("superqboard", SANDY_SUPERQBOARD)
 	SLOT_INTERFACE("trumpcard", QL_TRUMP_CARD)
