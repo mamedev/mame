@@ -19,11 +19,10 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "includes/jupiter.h"
 
 #define TERMINAL_TAG "terminal"
@@ -45,7 +44,7 @@ static ADDRESS_MAP_START( jupiter_m6800_mem, AS_PROGRAM, 8, jupiter2_state )
 //  AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
 //  AM_RANGE(0xff60, 0xff76) DMA Controller
 //  AM_RANGE(0xff80, 0xff83) Floppy PIA
-//  AM_RANGE(0xff84, 0xff87) AM_DEVREADWRITE_LEGACY(INS1771N1_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xff84, 0xff87) AM_DEVREADWRITE(INS1771N1_TAG, wd_fdc_t, read, write)
 //  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
 //  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
 //  AM_RANGE(0xffb0, 0xffb3) Video PIA
@@ -178,14 +177,10 @@ UINT32 jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-#if 0
-static const floppy_interface jupiter_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
-#endif
+static SLOT_INTERFACE_START( jupiter_floppies )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+SLOT_INTERFACE_END
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -228,8 +223,9 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	MCFG_CPU_IO_MAP(jupiter_m6800_io)
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771x, 1000000)
+	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, NULL, floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 
@@ -261,8 +257,9 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771x, 1000000)
+	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, NULL, floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(jupiter3_state, kbd_put))
