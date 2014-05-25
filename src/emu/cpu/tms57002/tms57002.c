@@ -204,7 +204,7 @@ void tms57002_device::xm_init()
 	xm_adr = adr & mask;
 }
 
-void tms57002_device::xm_step_read()
+inline void tms57002_device::xm_step_read()
 {
 	UINT32 adr = xm_adr;
 	UINT8 v = data->read_byte(adr);
@@ -242,7 +242,7 @@ void tms57002_device::xm_step_read()
 		xm_adr = adr+1;
 }
 
-void tms57002_device::xm_step_write()
+inline void tms57002_device::xm_step_write()
 {
 	UINT32 adr = xm_adr;
 	UINT8 v;
