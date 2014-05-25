@@ -778,7 +778,7 @@ $(MAMEOBJ)/alpha.a: \
 
 $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/alg.o \
-	$(MACHINE)/amiga.o $(VIDEO)/amiga.o $(VIDEO)/amigaaga.o\
+	$(MACHINE)/amiga.o $(VIDEO)/amiga.o $(VIDEO)/amigaaga.o \
 	$(DRIVERS)/arcadia.o \
 	$(DRIVERS)/cubo.o \
 	$(DRIVERS)/mquake.o \
