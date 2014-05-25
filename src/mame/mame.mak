@@ -1136,7 +1136,7 @@ $(MAMEOBJ)/gaelco.a: \
 	$(DRIVERS)/atvtrack.o \
 	$(DRIVERS)/gaelco.o $(VIDEO)/gaelco.o $(MACHINE)/gaelcrpt.o \
 	$(DRIVERS)/gaelco2.o $(MACHINE)/gaelco2.o $(VIDEO)/gaelco2.o \
-	$(DRIVERS)/gaelco3d.o $(VIDEO)/gaelco3d.o $(MACHINE)/gaelco3d.o\
+	$(DRIVERS)/gaelco3d.o $(VIDEO)/gaelco3d.o $(MACHINE)/gaelco3d.o \
 	$(DRIVERS)/glass.o $(VIDEO)/glass.o \
 	$(DRIVERS)/mastboy.o \
 	$(DRIVERS)/splash.o $(VIDEO)/splash.o \
@@ -1846,7 +1846,7 @@ $(MAMEOBJ)/sure.a: \
 $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/2mindril.o \
 	$(DRIVERS)/40love.o $(VIDEO)/40love.o \
-	$(DRIVERS)/arkanoid.o $(MACHINE)/arkanoid.o $(VIDEO)/arkanoid.o\
+	$(DRIVERS)/arkanoid.o $(MACHINE)/arkanoid.o $(VIDEO)/arkanoid.o \
 	$(DRIVERS)/ashnojoe.o $(VIDEO)/ashnojoe.o \
 	$(DRIVERS)/asuka.o $(MACHINE)/bonzeadv.o $(VIDEO)/asuka.o \
 	$(DRIVERS)/bigevglf.o $(MACHINE)/bigevglf.o $(VIDEO)/bigevglf.o \
