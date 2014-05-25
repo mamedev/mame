@@ -16,7 +16,6 @@ computer to boot up (with keyboard problems).
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-#include "machine/wd17xx.h"
 #include "machine/beta.h"
 #include "machine/ram.h"
 
