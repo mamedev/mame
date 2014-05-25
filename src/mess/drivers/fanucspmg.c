@@ -881,7 +881,7 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 			if (offset <= 0x5ff)
 			{   															  
 				UINT8 chr = m_vram[offset + 0x600];
-				UINT8 attr = m_vram[offset];
+//				UINT8 attr = m_vram[offset];
 				UINT8 data = chargen[ chr + (ra * 256) ];
 				UINT32 fg = 0xff00;
 				UINT32 bg = 0;
