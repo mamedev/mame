@@ -1120,18 +1120,18 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/zorro/zorro.h,BUSES += ZORRO
+#@src/emu/bus/amiga/zorro/zorro.h,BUSES += ZORRO
 #-------------------------------------------------
 
 ifneq ($(filter ZORRO,$(BUSES)),)
-OBJDIRS += $(BUSOBJ)/zorro
-BUSOBJS += $(BUSOBJ)/zorro/zorro.o
-BUSOBJS += $(BUSOBJ)/zorro/cards.o
-BUSOBJS += $(BUSOBJ)/zorro/a2052.o
-BUSOBJS += $(BUSOBJ)/zorro/a2232.o
-BUSOBJS += $(BUSOBJ)/zorro/a590.o
-BUSOBJS += $(BUSOBJ)/zorro/action_replay.o
-BUSOBJS += $(BUSOBJ)/zorro/buddha.o
+OBJDIRS += $(BUSOBJ)/amiga/zorro
+BUSOBJS += $(BUSOBJ)/amiga/zorro/zorro.o
+BUSOBJS += $(BUSOBJ)/amiga/zorro/cards.o
+BUSOBJS += $(BUSOBJ)/amiga/zorro/a2052.o
+BUSOBJS += $(BUSOBJ)/amiga/zorro/a2232.o
+BUSOBJS += $(BUSOBJ)/amiga/zorro/a590.o
+BUSOBJS += $(BUSOBJ)/amiga/zorro/action_replay.o
+BUSOBJS += $(BUSOBJ)/amiga/zorro/buddha.o
 endif
 
 #-------------------------------------------------

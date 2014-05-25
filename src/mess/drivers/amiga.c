@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
-#include "bus/zorro/zorro.h"
+#include "bus/amiga/zorro/zorro.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
