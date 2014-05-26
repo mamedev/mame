@@ -2241,8 +2241,8 @@ $(MESS_DRIVERS)/aim65_40.o: $(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/alesis.o:   $(MESS_LAYOUT)/sr16.lh
 $(MESS_DRIVERS)/amico2k.o:  $(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/amiga.o:    $(MESS_LAYOUT)/amiga.lh
-$(MESS_VIDEO)/apollo.o:     $(MESS_LAYOUT)/apollo.lh
-$(MESS_VIDEO)/apollo.o:     $(MESS_LAYOUT)/apollo_15i.lh
+$(MESS_VIDEO)/apollo.o:     $(MESS_LAYOUT)/apollo.lh \
+							$(MESS_LAYOUT)/apollo_15i.lh
 $(MESS_DRIVERS)/apollo.o:   $(MESS_LAYOUT)/apollo_dsp.lh
 $(MESS_DRIVERS)/apricotp.o: $(MESS_LAYOUT)/apricotp.lh
 $(MESS_DRIVERS)/avigo.o:    $(MESS_LAYOUT)/avigo.lh
@@ -2330,7 +2330,8 @@ $(MESS_DRIVERS)/sym1.o:     $(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tavernie.o: $(MESS_LAYOUT)/tavernie.lh
 $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
-$(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh $(MESS_LAYOUT)/tm990189v.lh
+$(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
+							$(MESS_LAYOUT)/tm990189v.lh
 $(MESS_DRIVERS)/unixpc.o:   $(MESS_LAYOUT)/unixpc.lh
 $(MESS_DRIVERS)/ut88.o:     $(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/vboy.o:     $(MESS_LAYOUT)/vboy.lh
@@ -2344,8 +2345,8 @@ $(MESS_DRIVERS)/wicat.o:    $(MESS_LAYOUT)/wicat.lh
 $(MESS_DRIVERS)/wswan.o:    $(MESS_LAYOUT)/wswan.lh
 $(MESS_DRIVERS)/x68k.o:     $(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80dev.o:   $(MESS_LAYOUT)/z80dev.lh
-$(MESS_DRIVERS)/z80ne.o:    $(MESS_LAYOUT)/z80ne.lh   \
-							$(MESS_LAYOUT)/z80net.lh  \
+$(MESS_DRIVERS)/z80ne.o:    $(MESS_LAYOUT)/z80ne.lh \
+							$(MESS_LAYOUT)/z80net.lh \
 							$(MESS_LAYOUT)/z80netb.lh \
 							$(MESS_LAYOUT)/z80netf.lh
 
