@@ -15,18 +15,10 @@
 
 const device_type MICROTOUCH = &device_creator<microtouch_device>;
 
-microtouch_device::microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_out_tx_func(*this),
-	m_touch(*this, "TOUCH"),
-	m_touchx(*this, "TOUCH_X"),
-	m_touchy(*this, "TOUCH_Y")
-{
-}
-
-microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock, "microtouch", __FILE__),
-	m_out_tx_func(*this),
+microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock, "microtouch", __FILE__),
+	device_serial_interface(mconfig, *this),
+	m_out_stx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),
 	m_touchy(*this, "TOUCH_Y")
@@ -117,9 +109,19 @@ void microtouch_device::send_touch_packet()
 
 void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	if(id)
+	{
+		device_serial_interface::device_timer(timer, id, param, ptr);
+		return;
+	}
+
 	if ( m_tx_buffer_ptr < m_tx_buffer_num )
 	{
-		tx( m_tx_buffer[m_tx_buffer_ptr++] );
+		m_output = m_tx_buffer[m_tx_buffer_ptr++];
+		m_output_valid = true;
+		if(is_transmit_register_empty())
+			tra_complete();
+
 		if ( m_tx_buffer_ptr == m_tx_buffer_num )
 		{
 			m_tx_buffer_ptr = m_tx_buffer_num = 0;
@@ -190,13 +192,21 @@ void microtouch_device::device_start()
 	save_item(NAME(m_tx_buffer_ptr));
 	save_item(NAME(m_format));
 	save_item(NAME(m_mode));
-	m_out_tx_func.resolve_safe();
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
+	set_tra_rate(clock());
+	set_rcv_rate(clock());
+	m_out_stx_func.resolve_safe();
+	m_output_valid = false;
+
+	save_item(NAME(m_output_valid));
+	save_item(NAME(m_output));
 }
 
 
-WRITE8_MEMBER(microtouch_device::rx)
+void microtouch_device::rcv_complete()
 {
-	m_rx_buffer[m_rx_buffer_ptr] = data;
+	receive_register_extract();
+	m_rx_buffer[m_rx_buffer_ptr] = get_received_char();
 	m_rx_buffer_ptr++;
 	if(m_rx_buffer_ptr == 16)
 		return;
@@ -280,60 +290,16 @@ ioport_constructor microtouch_device::device_input_ports() const
 	return INPUT_PORTS_NAME(microtouch);
 }
 
-const device_type MICROTOUCH_SERIAL = &device_creator<microtouch_serial_device>;
-
-microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: microtouch_device(mconfig, MICROTOUCH_SERIAL, "Microtouch Serial Touchscreen", tag, owner, clock, "microtouch_serial", __FILE__),
-	device_serial_interface(mconfig, *this),
-	m_out_stx_func(*this)
-{
-}
-
-void microtouch_serial_device::device_start()
-{
-	microtouch_device::device_start();
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
-	set_tra_rate(clock());
-	set_rcv_rate(clock());
-	m_out_stx_func.resolve_safe();
-	m_output_valid = false;
-
-	save_item(NAME(m_output_valid));
-	save_item(NAME(m_output));
-}
-
-void microtouch_serial_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if(id)
-		device_serial_interface::device_timer(timer, id, param, ptr);
-	else
-		microtouch_device::device_timer(timer, id, param, ptr);
-}
-
-void microtouch_serial_device::tx(UINT8 data)
-{
-	m_output = data;
-	m_output_valid = true;
-	if(is_transmit_register_empty())
-		tra_complete();
-}
-
-void microtouch_serial_device::tra_callback()
+void microtouch_device::tra_callback()
 {
 	m_out_stx_func(transmit_register_get_data_bit());
 }
 
-void microtouch_serial_device::tra_complete()
+void microtouch_device::tra_complete()
 {
 	if(m_output_valid)
 	{
 		transmit_register_setup(m_output);
 		m_output_valid = false;
 	}
-}
-
-void microtouch_serial_device::rcv_complete()
-{
-	receive_register_extract();
-	microtouch_device::rx(machine().driver_data()->generic_space(), 0, get_received_char());
 }

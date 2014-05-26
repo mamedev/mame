@@ -166,7 +166,7 @@ public:
 	required_device<mc68681_device> m_duart40_68681;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_serial_device> m_microtouch;
+	optional_device<microtouch_device> m_microtouch;
 	required_device<nvram_device> m_nvram;
 
 	required_shared_ptr<UINT16> m_ram62256;
@@ -632,10 +632,10 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 
 	MCFG_MC68681_ADD( "duart40_68681", XTAL_3_6864MHz )  // UARTA = Touch , UARTB = Bill Acceptor
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", mc68681_device, rx_a_w) )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)

@@ -208,7 +208,7 @@ public:
 	required_device<ds1204_device> m_ds1204;
 	required_device<v9938_device> m_v9938_0;
 	required_device<v9938_device> m_v9938_1;
-	optional_device<microtouch_serial_device> m_microtouch;
+	optional_device<microtouch_device> m_microtouch;
 	optional_device<ns16550_device> m_uart;
 	DECLARE_WRITE8_MEMBER(meritm_crt250_bank_w);
 	DECLARE_WRITE8_MEMBER(meritm_psd_a15_w);
@@ -1105,8 +1105,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questi
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
@@ -1123,8 +1123,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 

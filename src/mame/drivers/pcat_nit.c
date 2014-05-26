@@ -101,7 +101,7 @@ public:
 
 	UINT8 *m_banked_nvram;
 	required_device<ns16450_device> m_uart;
-	required_device<microtouch_serial_device> m_microtouch;
+	required_device<microtouch_device> m_microtouch;
 
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
@@ -229,9 +229,9 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -248,9 +248,9 @@ static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

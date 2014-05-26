@@ -133,7 +133,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_serial_device> m_microtouch;
+	optional_device<microtouch_device> m_microtouch;
 	required_shared_ptr<UINT16> m_regs;
 	optional_shared_ptr<UINT16> m_galgames_ram;
 	required_device<okim6295_device> m_oki;
@@ -921,9 +921,9 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 
 	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -173,7 +173,7 @@ public:
 		{ }
 
 	required_device<h63484_device> m_h63484;
-	required_device<microtouch_serial_device> m_microtouch;
+	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<screen_device> m_screen;
@@ -649,10 +649,10 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
