@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER( sandy_superqboard_t::busy_w )
 
 static MACHINE_CONFIG_FRAGMENT( sandy_superqboard )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772x, XTAL_16MHz/2)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, NULL, floppy_image_device::default_floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
@@ -109,7 +109,7 @@ machine_config_constructor sandy_superqboard_t::device_mconfig_additions() const
 //-------------------------------------------------
 
 sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SANDY_SUPERQBOARD, "SANDY_SUPERQBOARD", tag, owner, clock, "sandy_superqboard", __FILE__),
+	device_t(mconfig, SANDY_SUPERQBOARD, "Sandy SuperQBoard", tag, owner, clock, "sandy_superqboard", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
 	m_floppy0(*this, WD1772_TAG":0"),
@@ -154,32 +154,42 @@ void sandy_superqboard_t::device_reset()
 
 UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 {
-	switch ((offset >> 2) & 0x03)
+	if ((offset & 0xf0000) == 0xc0000)
 	{
-	case 0:
-		data = m_fdc->read(space, offset & 0x03);
-		break;
-	
-	case 3:
-		/*
+		if ((offset & 0xffc0) == 0x3fc0)
+		{
+			switch ((offset >> 2) & 0x03)
+			{
+			case 0:
+				data = m_fdc->read(space, offset & 0x03);
+				break;
+			
+			case 3:
+				/*
 
-			bit		description
+					bit		description
 
-			0 		BUSY
-			1 		mouse pin 8
-			2 		mouse pin 1
-			3 		mouse pin 2
-			4 		mouse pin 4 flip-flop Q
-			5 		mouse pin 3 flip-flop Q
-			6 		INT3
-			7 		INT2
+					0 		BUSY
+					1 		mouse pin 8
+					2 		mouse pin 1
+					3 		mouse pin 2
+					4 		mouse pin 4 flip-flop Q
+					5 		mouse pin 3 flip-flop Q
+					6 		INT3
+					7 		INT2
 
-		*/
+				*/
 
-		data = m_busy;
-		data |= m_int3 << 6;
-		data |= m_int2 << 7;
-		break;
+				data = m_busy;
+				data |= m_int3 << 6;
+				data |= m_int2 << 7;
+				break;
+			}
+		}
+		else
+		{
+			data = m_rom->base()[offset & 0x7fff];
+		}
 	}
 
 	return data;
@@ -192,65 +202,71 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 
 void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 {
-	switch ((offset >> 2) & 0x03)
+	if ((offset & 0xf0000) == 0xc0000)
 	{
-	case 0:
-		m_fdc->write(space, offset & 0x03, data);
-		break;
-
-	case 1:
+		if ((offset & 0xffc0) == 0x3fc0)
 		{
-		/*
+			switch ((offset >> 2) & 0x03)
+			{
+			case 0:
+				m_fdc->write(space, offset & 0x03, data);
+				break;
 
-			bit		description
+			case 1:
+				{
+				/*
 
-			0 		SIDE ONE
-			1 		DSEL0
-			2 		DSEL1
-			3 		M ON0
-			4 		/DDEN
-			5 		STROBE inverted
-			6 		GAL pin 11
-			7 		GAL pin 9
+					bit		description
 
-		*/
+					0 		SIDE ONE
+					1 		DSEL0
+					2 		DSEL1
+					3 		M ON0
+					4 		/DDEN
+					5 		STROBE inverted
+					6 		GAL pin 11
+					7 		GAL pin 9
 
-		floppy_image_device *floppy = NULL;
+				*/
 
-		if (BIT(data, 1)) 
-		{
-			floppy = m_floppy0->get_device();
+				floppy_image_device *floppy = NULL;
+
+				if (BIT(data, 1)) 
+				{
+					floppy = m_floppy0->get_device();
+				}
+				else if (BIT(data, 2))
+				{
+					floppy = m_floppy1->get_device();
+				}
+
+				m_fdc->set_floppy(floppy);
+
+				if (floppy)
+				{
+					floppy->ss_w(BIT(data, 0));
+					floppy->mon_w(BIT(data, 3));
+				}
+
+				m_fdc->dden_w(BIT(data, 4));
+
+				m_centronics->write_strobe(!BIT(data, 5));
+				}
+				break;
+
+			case 2:
+				m_latch->write(data);
+				break;
+
+			case 4:
+				m_int2 = 0;
+				m_int3 = 0;
+				break;
+
+			case 5:
+				m_fdc->set_unscaled_clock(XTAL_16MHz >> !BIT(data, 0));
+				break;
+			}
 		}
-		else if (BIT(data, 2))
-		{
-			floppy = m_floppy1->get_device();
-		}
-
-		m_fdc->set_floppy(floppy);
-
-		if (floppy)
-		{
-			floppy->ss_w(BIT(data, 0));
-			floppy->mon_w(BIT(data, 3));
-		}
-
-		m_fdc->dden_w(BIT(data, 4));
-
-		m_centronics->write_strobe(!BIT(data, 5));
-		}
-		break;
-
-	case 2:
-		m_latch->write(data);
-		break;
-
-	case 4:
-		m_int2 = 0;
-		m_int3 = 0;
-		break;
-
-	case 5:
-		m_fdc->set_unscaled_clock(XTAL_16MHz >> !BIT(data, 0));
-		break;
 	}
 }
