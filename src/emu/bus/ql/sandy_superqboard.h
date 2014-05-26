@@ -49,6 +49,8 @@ protected:
     virtual void write(address_space &space, offs_t offset, UINT8 data);
 
 private:
+	void check_interrupt();
+
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -60,6 +62,8 @@ private:
 	int m_busy;
 	int m_int2;
 	int m_int3;
+	int m_fd6;
+	int m_fd7;
 };
 
 

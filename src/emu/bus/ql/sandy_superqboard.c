@@ -70,6 +70,7 @@ SLOT_INTERFACE_END
 WRITE_LINE_MEMBER( sandy_superqboard_t::busy_w )
 {
 	m_busy = state;
+	check_interrupt();
 }
 
 
@@ -120,7 +121,9 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 	m_ram(*this, "ram"),
 	m_busy(1),
 	m_int2(0),
-	m_int3(0)
+	m_int3(0),
+	m_fd6(0),
+	m_fd7(0)
 {
 }
 
@@ -141,10 +144,16 @@ void sandy_superqboard_t::device_start()
 void sandy_superqboard_t::device_reset()
 {
 	m_fdc->reset();
+	m_fdc->set_floppy(NULL);
+	m_fdc->dden_w(0);
+
 	m_latch->write(0);
+	m_centronics->write_strobe(1);
 	
 	m_int2 = 0;
 	m_int3 = 0;
+	m_fd6 = 0;
+	m_fd7 = 0;
 }
 
 
@@ -224,8 +233,8 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 					3 		M ON0
 					4 		/DDEN
 					5 		STROBE inverted
-					6 		GAL pin 11
-					7 		GAL pin 9
+					6 		enable printer interrupt (GAL pin 11)
+					7 		enable mouse interrupt (GAL pin 9)
 
 				*/
 
@@ -251,6 +260,10 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 				m_fdc->dden_w(BIT(data, 4));
 
 				m_centronics->write_strobe(!BIT(data, 5));
+
+				m_fd6 = BIT(data, 6);
+				m_fd7 = BIT(data, 7);
+				check_interrupt();
 				}
 				break;
 
@@ -261,6 +274,7 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 			case 4:
 				m_int2 = 0;
 				m_int3 = 0;
+				check_interrupt();
 				break;
 
 			case 5:
@@ -269,4 +283,11 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 			}
 		}
 	}
+}
+
+void sandy_superqboard_t::check_interrupt()
+{
+	int extint = (m_fd6 && m_busy) || (m_fd7 && (m_int2 || m_int3));
+
+	m_slot->extintl_w(extint ? ASSERT_LINE : CLEAR_LINE);
 }
