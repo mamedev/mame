@@ -581,8 +581,9 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	for(i=0;i<8;i+=2)
 	{
 		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		bitmap.pix32(y, x + i) = palette[pixel & 0xe];
-		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : (pixel & 0xe)];
+		UINT8 value = (pixel >> 1) | (rvv << 3) | (vsp << 4);
+		bitmap.pix32(y, x + i) = palette[value];
+		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 	}
 }
 
@@ -596,14 +597,12 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	//if(!linecount)
 	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
 
-	if(vsp)
-		pixels ^= 0xeeee; // FIXME: What is this really supposed to do?
-
 	for(i=0;i<8;i+=2)
 	{
 		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		bitmap.pix32(y, x + i) = palette[pixel & 0xe];
-		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : (pixel & 0xe)];
+		UINT8 value = (pixel >> 1) | (rvv << 3) | (vsp << 4);
+		bitmap.pix32(y, x + i) = palette[value];
+		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 	}
 }
 
@@ -722,19 +721,26 @@ PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 {
 	int i;
 
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 32; i++)
 	{
 		int r = machine().rand()|0x80;
 		int g = machine().rand()|0x80;
 		int b = machine().rand()|0x80;
-		if (i == 0) r = g = b = 0;
-
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
-	palette.set_pen_color(8, rgb_t(255, 255, 0));
-	palette.set_pen_color(12, rgb_t(127, 127, 255));
-	palette.set_pen_color(4, rgb_t(0, 255, 0));
-	palette.set_pen_color(6, rgb_t(255, 0, 0));
+	palette.set_pen_color(0, rgb_t(0, 0, 0));
+	palette.set_pen_color(1, rgb_t(255, 0, 0));
+	palette.set_pen_color(2, rgb_t(0, 255, 0));
+	palette.set_pen_color(3, rgb_t(255, 0, 0));
+	palette.set_pen_color(4, rgb_t(255, 255, 0));
+	palette.set_pen_color(6, rgb_t(255, 255, 255));
+	palette.set_pen_color(7, rgb_t(0, 0, 0));
+	palette.set_pen_color(8, rgb_t(0, 0, 0));
+	palette.set_pen_color(9, rgb_t(0, 0, 0));
+	palette.set_pen_color(12, rgb_t(255, 255, 0));
+	palette.set_pen_color(14, rgb_t(255, 255, 255));
+	palette.set_pen_color(16, rgb_t(0, 0, 0));
+	palette.set_pen_color(20, rgb_t(0, 0, 255));
 }
 
 void dwarfd_state::machine_start()
@@ -770,7 +776,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(dwarfd_state, drq_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -999,13 +1005,13 @@ DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 	{
 		if (src[i] & 0x10)
 		{
-			src[i] = src[i] & 0xe0;
+			src[i] = (src[i] & 0xe0) >> 1;
 	//      src[i] |= ((src[(i + 1) & 0x7fff] & 0xe0) >> 4);
 
 		}
 		else
 		{
-			src[i] = src[i] & 0xe0;
+			src[i] = (src[i] & 0xe0) >> 1;
 			src[i] |= (src[i] >> 4);
 
 		}
