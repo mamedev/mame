@@ -210,7 +210,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_write_vrtc(0);
 		}
 		
-		if (m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW))
+		if (m_scanline <= (m_vrtc_scanline - SCANLINES_PER_ROW))
 		{
 			if (lc == 0)
 			{
@@ -231,8 +231,11 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					m_buffer_idx = 0;
 					m_fifo_idx = 0;
 
-					// start DMA burst
-					m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
+					if ((m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW)))
+					{
+						// start DMA burst
+						m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
+					}
 				}
 			}
 		}
