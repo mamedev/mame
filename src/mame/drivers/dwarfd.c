@@ -584,7 +584,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	for(i=0;i<8;i+=2)
 	{
 		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 3) | (vsp << 4);
+		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -608,7 +608,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	for(i=0;i<8;i+=2)
 	{
 		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 3) | (vsp << 4);
+		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -730,28 +730,21 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 {
-	int i;
+	UINT8 rgb[3];
+	int i,j;
+	UINT8 *prom = memregion("proms")->base();
 
 	for (i = 0; i < 32; i++)
 	{
-		int r = machine().rand()|0x80;
-		int g = machine().rand()|0x80;
-		int b = machine().rand()|0x80;
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		// what are the top 2 bits?
+		rgb[0] = ((prom[i] & 0x08) >> 2) | (prom[i] & 1);
+		rgb[1] = ((prom[i] & 0x10) >> 3) | ((prom[i] & 2) >> 1);
+		rgb[2] = ((prom[i] & 0x20) >> 4) | ((prom[i] & 4) >> 2);
+		for(j = 0; j < 3; j++)
+			rgb[j] |= (rgb[j] << 6) | (rgb[j] << 4) | (rgb[j] << 2);
+
+		palette.set_pen_color(i,rgb_t(rgb[0], rgb[1], rgb[2]));
 	}
-	palette.set_pen_color(0, rgb_t(0, 0, 0));
-	palette.set_pen_color(1, rgb_t(255, 0, 0));
-	palette.set_pen_color(2, rgb_t(0, 255, 0));
-	palette.set_pen_color(3, rgb_t(255, 0, 0));
-	palette.set_pen_color(4, rgb_t(255, 255, 0));
-	palette.set_pen_color(6, rgb_t(255, 255, 255));
-	palette.set_pen_color(7, rgb_t(0, 0, 0));
-	palette.set_pen_color(8, rgb_t(0, 0, 0));
-	palette.set_pen_color(9, rgb_t(0, 0, 0));
-	palette.set_pen_color(12, rgb_t(255, 255, 0));
-	palette.set_pen_color(14, rgb_t(255, 255, 255));
-	palette.set_pen_color(16, rgb_t(0, 0, 0));
-	palette.set_pen_color(20, rgb_t(0, 0, 255));
 }
 
 void dwarfd_state::machine_start()
@@ -990,6 +983,9 @@ ROM_START( qc )
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
 	ROM_FILL(0,  0x4000*2, 0)
 
+	// borrowed from above and slightly edited
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "colors.bin",0x00, 0x20, BAD_DUMP CRC(3adeee7c) SHA1(f118ee62f84b0384316c12fc22356d43b2cfd876) )
 ROM_END
 
 DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
