@@ -53,19 +53,11 @@ public:
 	TIMER_CALLBACK_MEMBER(response_timer);
 
 protected:
-	// driver_device overrides
-	virtual void machine_start();
-
 	// amiga_state overrides
-	virtual void vblank();
-	virtual void serdat_w(UINT16 data);
 	virtual void potgo_w(UINT16 data);
 
 private:
 	required_device<sony_ldp1450_device> m_laserdisc;
-
-	emu_timer *m_serial_timer;
-	UINT8 m_serial_timer_active;
 
 	UINT16 m_input_select;
 };
@@ -97,6 +89,7 @@ static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
 
 
 
+
 /*************************************
  *
  *  Video startup
@@ -113,74 +106,6 @@ VIDEO_START_MEMBER(alg_state,alg)
 	amiga_set_genlock_color(machine(), 4096);
 }
 
-
-
-/*************************************
- *
- *  Machine start/reset
- *
- *************************************/
-
-void alg_state::machine_start()
-{
-	amiga_state::machine_start();
-
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alg_state::response_timer),this));
-	m_serial_timer_active = FALSE;
-}
-
-
-
-/*************************************
- *
- *  Laserdisc communication
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER(alg_state::response_timer)
-{
-	/* if we still have data to send, do it now */
-	if (m_laserdisc->data_available_r() == ASSERT_LINE)
-	{
-		UINT8 data = m_laserdisc->data_r();
-		if (data != 0x0a)
-			osd_printf_debug("Sending serial data = %02X\n", data);
-		serial_in_w(data);
-	}
-
-	/* if there's more to come, set another timer */
-	if (m_laserdisc->data_available_r() == ASSERT_LINE)
-		m_serial_timer->adjust(serial_char_period());
-	else
-		m_serial_timer_active = FALSE;
-}
-
-
-void alg_state::vblank()
-{
-	amiga_state::vblank();
-
-	/* if we have data available, set a timer to read it */
-	if (!m_serial_timer_active && m_laserdisc->data_available_r() == ASSERT_LINE)
-	{
-		m_serial_timer->adjust(serial_char_period());
-		m_serial_timer_active = TRUE;
-	}
-}
-
-
-void alg_state::serdat_w(UINT16 data)
-{
-	/* write to the laserdisc player */
-	m_laserdisc->data_w(data & 0xff);
-
-	/* if we have data available, set a timer to read it */
-	if (!m_serial_timer_active && m_laserdisc->data_available_r() == ASSERT_LINE)
-	{
-		m_serial_timer->adjust(serial_char_period());
-		m_serial_timer_active = TRUE;
-	}
-}
 
 
 
@@ -622,13 +547,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER( alg_state, ntsc )
 {
-	m_agnus_id = AGNUS_HR_NTSC;
+	m_agnus_id = AGNUS_NTSC;
 	m_denise_id = DENISE;
 }
 
 DRIVER_INIT_MEMBER( alg_state, pal )
 {
-	m_agnus_id = AGNUS_HR_PAL;
+	m_agnus_id = AGNUS_PAL;
 	m_denise_id = DENISE;
 }
 

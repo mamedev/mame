@@ -328,8 +328,6 @@ public:
 	m_cdda(*this, "cdda")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(microtouch_tx);
-
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
 
@@ -353,11 +351,11 @@ public:
 	UINT16 m_potgo_value;
 
 protected:
-	virtual void serdat_w(UINT16 data);
+	virtual void rs232_tx(int state);
 	virtual void potgo_w(UINT16 data);
 
 private:
-	required_device<microtouch_device> m_microtouch;
+	required_device<microtouch_serial_device> m_microtouch;
 	required_device<cdda_device> m_cdda;
 
 	typedef void (cubo_state::*input_hack_func)();
@@ -429,6 +427,11 @@ ADDRESS_MAP_END
  *  Inputs
  *
  *************************************/
+
+void cubo_state::rs232_tx(int state)
+{
+	m_microtouch->rx_w(state);
+}
 
 void cubo_state::potgo_w(UINT16 data)
 {
@@ -1070,7 +1073,7 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 
-	MCFG_MICROTOUCH_ADD("microtouch", WRITE8(cubo_state, microtouch_tx))
+	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, WRITELINE(cubo_state, rs232_rx_w))
 
 	MCFG_CDROM_ADD("cd32_cdrom")
 	MCFG_CDROM_INTERFACE("cd32_cdrom")
@@ -1340,19 +1343,6 @@ static INPUT_PORTS_START( odeontw2 )
 	PORT_DIPSETTING(    0x00, "Set" )
 
 INPUT_PORTS_END
-
-
-void cubo_state::serdat_w(UINT16 data)
-{
-	data &= 0xff;
-	if (data)
-		m_microtouch->rx(generic_space(), 0, data);
-}
-
-WRITE8_MEMBER( cubo_state::microtouch_tx )
-{
-	serial_in_w(data);
-}
 
 
 

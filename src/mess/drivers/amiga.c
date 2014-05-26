@@ -1255,6 +1255,7 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, cia_1_port_a_read))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_1_port_a_write))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("fdc", amiga_fdc, ciaaprb_w))
 
 	// audio
@@ -1272,6 +1273,14 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0, amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0, amiga_fdc::floppy_formats)
 
+	// rs232
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(amiga_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(amiga_state, rs232_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(amiga_state, rs232_dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(amiga_state, rs232_ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(amiga_state, rs232_cts_w))
+
 	// centronics
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, centronics_ack_w))
@@ -1279,8 +1288,6 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(amiga_state, centronics_perror_w))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(amiga_state, centronics_select_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	// todo: rs232
 
 	// keyboard
 	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)

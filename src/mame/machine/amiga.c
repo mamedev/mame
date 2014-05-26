@@ -22,6 +22,7 @@
 #define LOG_CUSTOM  0
 #define LOG_CIA     0
 #define LOG_BLITS   0
+#define LOG_SERIAL  1
 
 
 
@@ -239,6 +240,7 @@ void amiga_state::machine_start()
 	// setup the timers
 	m_irq_timer = timer_alloc(TIMER_AMIGA_IRQ);
 	m_blitter_timer = timer_alloc(TIMER_AMIGA_BLITTER);
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
 
 	// start the scanline timer
 	timer_set(m_screen->time_until_pos(0), TIMER_SCANLINE);
@@ -290,11 +292,12 @@ void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_AMIGA_BLITTER:
 		amiga_blitter_proc(ptr, param);
 		break;
-	case TIMER_FINISH_SERIAL_WRITE:
-		finish_serial_write(ptr, param);
+	case TIMER_SERIAL:
+		serial_shift();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in amiga_state::device_timer");
+		fatalerror("Invalid timer: %d\n", id);
+		break;
 	}
 }
 
@@ -412,6 +415,9 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 
 UINT16 amiga_state::joy0dat_r()
 {
+	if (m_input_device == NULL)
+		return m_joy0dat_port->read_safe(0xffff);
+
 	if (m_input_device->read_safe(0xff) & 0x10)
 		return m_joy0dat_port->read_safe(0xffff);
 	else
@@ -420,6 +426,9 @@ UINT16 amiga_state::joy0dat_r()
 
 UINT16 amiga_state::joy1dat_r()
 {
+	if (m_input_device == NULL)
+		return m_joy1dat_port->read_safe(0xffff);
+
 	if (m_input_device->read_safe(0xff) & 0x20)
 		return m_joy1dat_port->read_safe(0xffff);
 	else
@@ -1130,14 +1139,27 @@ READ8_MEMBER( amiga_state::cia_1_port_a_read )
 {
 	UINT8 data = 0;
 
-	// centronics
+	// bit 0 to 2, centronics
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_perror << 1;
-	data |= m_centronics_select << 2; // shared with rs232 "ring indicator" (not emulated)
+	data |= m_centronics_select << 2;
 
-	// bit 3 to 7, serial line (not emulated)
+	// bit 2 to 7, serial line
+	data |= m_rs232_ri << 2;
+	data |= m_rs232_dsr << 3;
+	data |= m_rs232_cts << 4;
+	data |= m_rs232_dcd << 5;
 
 	return data;
+}
+
+WRITE8_MEMBER( amiga_state::cia_1_port_a_write )
+{
+	if (m_rs232)
+	{
+		m_rs232->write_rts(BIT(data, 6));
+		m_rs232->write_dtr(BIT(data, 7));
+	}
 }
 
 WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
@@ -1163,7 +1185,7 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
 	CUSTOM_REG(REG_DDFSTOP) = 0xd8;
 	CUSTOM_REG(REG_INTENA) = 0x0000;
-	CUSTOM_REG(REG_SERDATR) = 0x3000;
+	CUSTOM_REG(REG_SERDATR) = SERDATR_RXD | SERDATR_TSRE | SERDATR_TBE;
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
 }
 
@@ -1193,8 +1215,9 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return amiga_gethvpos(*m_screen) & 0xffff;
 
 		case REG_SERDATR:
-			CUSTOM_REG(REG_SERDATR) &= ~0x4000;
-			CUSTOM_REG(REG_SERDATR) |= (CUSTOM_REG(REG_INTREQ) & INTENA_RBF) ? 0x4000 : 0x0000;
+			if (LOG_SERIAL)
+				logerror("r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
+
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:
@@ -1301,10 +1324,39 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			break;
 
 		case REG_SERDAT:
-			serdat_w(data);
-			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			timer_set(serial_char_period(), TIMER_FINISH_SERIAL_WRITE);
-			break;
+			if (LOG_SERIAL)
+				logerror("w SERDAT: %04x\n", data);
+
+			CUSTOM_REG(REG_SERDAT) = data;
+
+			// transmit shift register currently empty?
+			if (CUSTOM_REG(REG_SERDATR) & SERDATR_TSRE)
+			{
+				// transfer new data to shift register
+				m_tx_shift = CUSTOM_REG(REG_SERDAT);
+				CUSTOM_REG(REG_SERDAT) = 0;
+
+				// and signal transmit buffer empty
+				CUSTOM_REG(REG_SERDATR) &= ~SERDATR_TSRE;
+				CUSTOM_REG(REG_SERDATR) |= SERDATR_TBE;
+				set_interrupt(INTENA_SETCLR | INTENA_TBE);
+			}
+			else
+			{
+				// transmit buffer now full
+				CUSTOM_REG(REG_SERDATR) &= ~SERDATR_TBE;
+			}
+
+			return;
+
+		case REG_SERPER:
+			if (LOG_SERIAL)
+				logerror("w SERPER: %04x\n", data);
+
+			CUSTOM_REG(REG_SERPER) = data;
+			serial_adjust();
+
+			return;
 
 		case REG_BLTSIZE:
 			CUSTOM_REG(REG_BLTSIZE) = data;
@@ -1418,9 +1470,17 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 
 		case REG_INTREQ:
 			temp = data;
-			// update serial data line status if appropriate */
+
+			// clear receive buffer full?
 			if (!(data & INTENA_SETCLR) && (data & INTENA_RBF))
-				CUSTOM_REG(REG_SERDATR) &= ~INTENA_SETCLR;
+			{
+				CUSTOM_REG(REG_SERDATR) &= ~SERDATR_OVRUN;
+				CUSTOM_REG(REG_SERDATR) &= ~SERDATR_RBF;
+			}
+
+			// clear transmit buffer empty?
+			if (!(data & INTENA_SETCLR) && (data & INTENA_TBE))
+				CUSTOM_REG(REG_SERDATR) |= SERDATR_TBE;
 
 			data = (data & INTENA_SETCLR) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			CUSTOM_REG(offset) = data;
@@ -1519,44 +1579,161 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 //  SERIAL
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER( amiga_state::finish_serial_write )
-{
-	amiga_state *state = machine().driver_data<amiga_state>();
-
-	// mark the transfer buffer empty
-	CUSTOM_REG(REG_SERDATR) |= 0x3000;
-
-	// signal an interrupt
-	set_interrupt(INTENA_SETCLR | INTENA_TBE);
-}
-
-void amiga_state::serial_in_w(UINT16 data)
-{
-	amiga_state *state = this;
-	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
-
-	// copy the data to the low 8 bits of SERDATR and set RBF
-	CUSTOM_REG(REG_SERDATR) &= ~0x3ff;
-	CUSTOM_REG(REG_SERDATR) |= (data & mask) | (mask + 1) | 0x4000;
-
-	// set overrun if we weren't cleared
-	if (CUSTOM_REG(REG_INTREQ) & INTENA_RBF)
-	{
-		osd_printf_debug("Serial data overflow\n");
-		CUSTOM_REG(REG_SERDATR) |= 0x8000;
-	}
-
-	// signal an interrupt
-	set_interrupt(INTENA_SETCLR | INTENA_RBF);
-}
-
-attotime amiga_state::serial_char_period()
+void amiga_state::serial_adjust()
 {
 	amiga_state *state = this;
 
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = m_maincpu->unscaled_clock() / 2 / divisor;
-	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
+	UINT32 baud = m_sound->clock() / divisor;
 
-	return attotime::from_hz(baud) * numbits;
+	m_serial_timer->adjust(attotime::from_hz(baud) / 2, 0, attotime::from_hz(baud));
+}
+
+void amiga_state::serial_shift()
+{
+	amiga_state *state = this;
+
+	if (CUSTOM_REG(REG_ADKCON) & ADKCON_UARTBRK)
+	{
+		// break active, force low
+		rs232_tx(0);
+	}
+	else
+	{
+		// transmit shift register not empty?
+		if ((CUSTOM_REG(REG_SERDATR) & SERDATR_TSRE) == 0)
+		{
+			if (m_tx_state == 0)
+			{
+				// transmit start bit
+				rs232_tx(0);
+				m_tx_state++;
+			}
+			else if (m_tx_state <= 8 + BIT(CUSTOM_REG(REG_SERPER), 15))
+			{
+				// send data bits
+				rs232_tx(m_tx_shift & 1);
+				m_tx_shift >>= 1;
+				m_tx_state++;
+			}
+			else
+			{
+				// send stop bits until we run out
+				if (m_tx_shift & 1)
+				{
+					rs232_tx(m_tx_shift & 1);
+					m_tx_shift >>= 1;
+				}
+				else
+				{
+					// more data?
+					if (CUSTOM_REG(REG_SERDAT))
+					{
+						// transfer to shift register
+						m_tx_shift = CUSTOM_REG(REG_SERDAT);
+						CUSTOM_REG(REG_SERDAT) = 0;
+
+						// signal buffer empty
+						CUSTOM_REG(REG_SERDATR) |= SERDATR_TBE;
+						set_interrupt(INTENA_SETCLR | INTENA_TBE);
+					}
+					else
+					{
+						// we're done
+						CUSTOM_REG(REG_SERDATR) |= SERDATR_TSRE;
+					}
+
+					m_tx_state = 0;
+				}
+			}
+		}
+		else
+		{
+			// transmit register empty
+			rs232_tx(1);
+		}
+	}
+
+	// waiting for start bit?
+	if (m_rx_state == 0)
+	{
+		// start bit seen (high to low transition)
+		if (m_rx_previous && (CUSTOM_REG(REG_SERDATR) & SERDATR_RXD) == 0)
+		{
+			m_rx_state++;
+		}
+	}
+	else if (m_rx_state <= 8 + BIT(CUSTOM_REG(REG_SERPER), 15))
+	{
+		// receive data
+		m_rx_shift >>= 1;
+		m_rx_shift = (m_rx_shift & 0x7fff) | (BIT(CUSTOM_REG(REG_SERDATR), 11) << 15);
+		m_rx_state++;
+	}
+	else
+	{
+		// stop bit
+		m_rx_shift >>= 1;
+		m_rx_shift = (m_rx_shift & 0x7fff) | (BIT(CUSTOM_REG(REG_SERDATR), 11) << 15);
+
+		// shift to start
+		m_rx_shift >>= (15 - (8 + BIT(CUSTOM_REG(REG_SERPER), 15)));
+
+		// save data
+		CUSTOM_REG(REG_SERDATR) &= ~0x3ff;
+		CUSTOM_REG(REG_SERDATR) |= m_rx_shift & 0x3ff;
+
+		// overrun?
+		if (CUSTOM_REG(REG_SERDATR) & SERDATR_RBF)
+			CUSTOM_REG(REG_SERDATR) |= SERDATR_OVRUN;
+
+		// set ready and signal interrupt
+		CUSTOM_REG(REG_SERDATR) |= SERDATR_RBF;
+		set_interrupt(INTENA_SETCLR | INTENA_RBF);
+
+		m_rx_shift = 0;
+		m_rx_state = 0;
+	}
+}
+
+void amiga_state::rs232_tx(int state)
+{
+	if (m_rs232)
+		m_rs232->write_txd(state);
+}
+
+void amiga_state::rx_write(amiga_state *state, int level)
+{
+	m_rx_previous = BIT(CUSTOM_REG(REG_SERDATR), 11);
+	CUSTOM_REG(REG_SERDATR) &= ~SERDATR_RXD;
+	CUSTOM_REG(REG_SERDATR) |= level << 11;
+}
+
+WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
+{
+	rx_write(this, state);
+
+	// start bit received?
+	if (m_rx_state == 1)
+		serial_adjust();
+}
+
+WRITE_LINE_MEMBER( amiga_state::rs232_dcd_w )
+{
+	m_rs232_dcd = state;
+}
+
+WRITE_LINE_MEMBER( amiga_state::rs232_dsr_w )
+{
+	m_rs232_dsr = state;
+}
+
+WRITE_LINE_MEMBER( amiga_state::rs232_ri_w )
+{
+	m_rs232_ri = state;
+}
+
+WRITE_LINE_MEMBER( amiga_state::rs232_cts_w )
+{
+	m_rs232_cts = state;
 }
