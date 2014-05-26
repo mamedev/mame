@@ -498,6 +498,16 @@ ROM_START(flash_l1)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
+ROM_START(flash_l2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gamerom2.716", 0x6000, 0x0800, CRC(b7c2e4c7) SHA1(00ea34900af679b1b7e2698f4aa2fc9703d54cf2))
+	ROM_LOAD("yellow1.716", 0x7000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
+	ROM_LOAD("yellow2.716", 0x7800, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+ROM_END
+
 ROM_START(flash_t1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(287f12d6) SHA1(ede0c5b0ea2586d8bdf71ecadbd9cc8552bd6934))
@@ -691,8 +701,9 @@ ROM_START(tstrk_l1)
 ROM_END
 
 
-GAME( 1979, flash_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, flash_t1, flash_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, flash_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, flash_l1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, flash_t1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1978, trizn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (T-1)", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)

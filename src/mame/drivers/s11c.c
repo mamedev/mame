@@ -342,6 +342,16 @@ ROM_START(pool_l6)
 	ROM_LOAD("pool_u20.l2", 0x30000, 0x10000, CRC(925f62d6) SHA1(21b8d6f9a8b98fce8a3cdf7f5f2d40200544a898))
 ROM_END
 
+ROM_START(pool_l5)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("pool_u26.l5", 0x4000, 0x4000, CRC(373d18d9) SHA1(320d72777380971c16fe59cb1ed2314dec76705d))
+	ROM_LOAD("pool_u27.l5", 0x8000, 0x8000, CRC(1a2f0717) SHA1(cb8a7a62e0aac721ce68ae0bb1157b92edda62cb))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("pool_u4.l2", 0x10000, 0x10000, CRC(04e95e10) SHA1(3873b3cd6c2961b3f2f28a1e17f8a63c6db808d2))
+	ROM_LOAD("pool_u19.l2", 0x20000, 0x10000, CRC(0f45d02b) SHA1(58bbfdb3b98c43b66e11808cec7cd65a7f2dce6d))
+	ROM_LOAD("pool_u20.l2", 0x30000, 0x10000, CRC(925f62d6) SHA1(21b8d6f9a8b98fce8a3cdf7f5f2d40200544a898))
+ROM_END
+
 ROM_START(pool_le2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("pool_u26.le2", 0x4000, 0x4000, CRC(70526965) SHA1(69c7b74fff8fcc351e8bd9b8fce7655aebf7205c))
@@ -524,6 +534,7 @@ GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   
 GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Dr. Dude (PA-6)",                              GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-7)",                           GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-6)",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-5)",                           GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LE-2)",                           GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (PA-7)",                           GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (L-1)",                               GAME_IS_SKELETON_MECHANICAL)

@@ -533,6 +533,20 @@ ROM_START(jngld_l2)
 	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
+ROM_START(jngld_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic26-l1.716", 0x5800, 0x0800, CRC(df37bb45) SHA1(60a0670e73f2370d6269ef241b581f5b0ade6ea0) )
+	ROM_LOAD("ic14-l1.716", 0x6000, 0x0800, CRC(0144af0d) SHA1(2e5b6e35613decbac10f9b99c7a8cbe7f63b6b07) )
+	ROM_LOAD("ic20.716", 0x6800, 0x0800, CRC(dfb4b75a) SHA1(bcf017b01236f755cee419e398bbd8955ae3576a) )
+	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("speech7.532", 0xb000, 0x1000, CRC(83ffb695) SHA1(f9151bdfdefd5c178ca7eb5122f62b700d64f41a))
+	ROM_LOAD("speech5.532", 0xc000, 0x1000, CRC(754bd474) SHA1(c05f48bb07085683de469603880eafd28dffd9f5))
+	ROM_LOAD("speech6.532", 0xd000, 0x1000, CRC(f2ac6a52) SHA1(5b3e743eac382d571fd049f92ea9955342b9ffa0))
+	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+ROM_END
+
 /*--------------------------------
 / Pharaoh - Sys.7 (Game #504)
 /--------------------------------*/
@@ -568,7 +582,7 @@ ROM_END
 /*-----------------------------------
 / Thunderball - Sys.7 (Game #508) - Prototype
 /-----------------------------------*/
-ROM_START(thund_p1)
+ROM_START(thund_p1)  // dated 6/22
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ic20.532", 0x5000, 0x1000, CRC(aa3f07dc) SHA1(f31662972046f9a874380a8dcd1bc9259de5f6ba))
 	ROM_LOAD("ic14.532", 0x6000, 0x1000, CRC(1cd34f1f) SHA1(3f5b5a319570c26a3d34d640fef2ac6c04b83b70))
@@ -582,6 +596,35 @@ ROM_START(thund_p1)
 	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(cc70af52) SHA1(d9c2840acdcd69aab39fc647dd4819eccc06af33))
 ROM_END
 
+ROM_START(thund_p2)  // dated 8/31
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic20_831.532", 0x5000, 0x1000, CRC(91ed089b) SHA1(0e47f5a87cb227a6ee8645931bfa807219b388ef))
+	ROM_LOAD("ic14_831.532", 0x6000, 0x1000, CRC(873ccf24) SHA1(2723aa7d059a111374d8145391fbef0c81043e4b))
+	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("speech7.532", 0xb000, 0x1000, CRC(33e1b041) SHA1(f50c0311bde69fa6e8071e297a81cc3ef3dcf44f))
+	ROM_LOAD("speech5.532", 0xc000, 0x1000, CRC(11780c80) SHA1(bcc5efcd69b4f776feef32484a872863847d64cd))
+	ROM_LOAD("speech6.532", 0xd000, 0x1000, CRC(ab688698) SHA1(e0cbac44a6fe30a49da478c32500a0b43903cc2b))
+	ROM_LOAD("speech4.532", 0xe000, 0x1000, CRC(2a4d6f4b) SHA1(e6f8a1a6e6abc81f980a4938d98abb250e8e1e3b))
+	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(cc70af52) SHA1(d9c2840acdcd69aab39fc647dd4819eccc06af33))
+ROM_END
+
+ROM_START(thund_p3) // dated 9/08
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic20_908.532", 0x5000, 0x1000, CRC(21f87917) SHA1(6cfdd5aadafb2d137f2e959fa047ffbe5c09ac2c))
+	ROM_LOAD("ic14_908.532", 0x6000, 0x1000, CRC(099e798e) SHA1(38d79622b4d68c69308ee109f47509e0733828ba))
+	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("speech7.532", 0xb000, 0x1000, CRC(33e1b041) SHA1(f50c0311bde69fa6e8071e297a81cc3ef3dcf44f))
+	ROM_LOAD("speech5.532", 0xc000, 0x1000, CRC(11780c80) SHA1(bcc5efcd69b4f776feef32484a872863847d64cd))
+	ROM_LOAD("speech6.532", 0xd000, 0x1000, CRC(ab688698) SHA1(e0cbac44a6fe30a49da478c32500a0b43903cc2b))
+	ROM_LOAD("speech4.532", 0xe000, 0x1000, CRC(2a4d6f4b) SHA1(e6f8a1a6e6abc81f980a4938d98abb250e8e1e3b))
+	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(cc70af52) SHA1(d9c2840acdcd69aab39fc647dd4819eccc06af33))
+ROM_END
+
+
 /*-------------------------------
 / Hyperball - Sys.7 - (Game #509)
 /-------------------------------*/
@@ -594,6 +637,17 @@ ROM_START(hypbl_l4)
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93))
 ROM_END
+
+ROM_START(hypbl_l2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic20-l2.532", 0x5000, 0x1000, CRC(f5f66cf1) SHA1(885b4961b6ec712b7445001d448d881245be1234))
+	ROM_LOAD("ic14-l2.532", 0x6000, 0x1000, CRC(8eb82df4) SHA1(854b3f1fa2112fbdba19f4c843f67989c0572d8c))
+	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(6f4c0c4c) SHA1(1036067e2c85da867983e6e51ee2a7b5135000df))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93))
+ROM_END
+
 
 /*----------------------------
 / Barracora- Sys.7 (Game #510)
@@ -679,6 +733,17 @@ ROM_START(jst_l2)
 	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(3bbc90bf) SHA1(82154e719ceca5c72d1ab034bc4ff5e3ebb36832))
 ROM_END
 
+ROM_START(jst_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic26-l1.716", 0x5800, 0x0800, CRC(123d8ffc) SHA1(c227a53653525269ea77203d4d1b14132058c073) )
+	ROM_LOAD("ic14-l1.716", 0x6000, 0x0800, CRC(9871ebb2) SHA1(75c639a26d3bf7e05de7b5be063742f7448284ac) )
+	ROM_LOAD("ic20.716", 0x6800, 0x0800, CRC(dfb4b75a) SHA1(bcf017b01236f755cee419e398bbd8955ae3576a) )
+	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound12.532", 0xf000, 0x1000, CRC(3bbc90bf) SHA1(82154e719ceca5c72d1ab034bc4ff5e3ebb36832))
+ROM_END
+
 /*---------------------------
 / Laser Cue - Sys.7 (Game #520)
 /--------------------------*/
@@ -731,8 +796,11 @@ GAME( 1980, csmic_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic
 GAME( 1982, dfndr_l4, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1983, fpwr2_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1981, hypbl_l4, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1983, jst_l2,   0,     s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1983, jst_l1,   jst_l2,s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1981, jngld_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, jngld_l1, jngld_l2,s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1983, lsrcu_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1981, pharo_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1981, solar_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Solar Fire (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
@@ -740,3 +808,5 @@ GAME( 1984, strlt_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Star L
 GAME( 1982, tmfnt_l5, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Time Fantasy (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1982, wrlok_l3, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Warlok (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1982, thund_p1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, thund_p2, thund_p1,s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, thund_p3, thund_p1,s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)

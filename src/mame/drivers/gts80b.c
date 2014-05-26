@@ -185,6 +185,27 @@ ROM_START(bonebstr)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
 ROM_END
 
+ROM_START(bonebstrf)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom2f.cpu", 0x1000, 0x0800, CRC(73b6486e) SHA1(1baf17f31b16d564ed5e3bdf9f74b21f83ed76fa))
+	ROM_CONTINUE(0x9000, 0x0800)
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_CONTINUE(0xd000, 0x0800)
+	ROM_LOAD("prom1f.cpu", 0x2000, 0x2000, CRC(3d334065) SHA1(6d44819cf84bee375a9f62351b00375404f6d3e3))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom2.snd", 0x8000, 0x8000, CRC(d147d78d) SHA1(f8f6d6a1921685b883b224a9ea85ead52a32a4c3))
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(ec43f4e9) SHA1(77b0988700be7a597dca7e5f06ac5d3c6834ce21))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(a95eedfc) SHA1(5ced2d6869a9895f8ff26d830b21d3c9364b32e7))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Bounty Hunter (#694)
 /-------------------------------------------------------------------*/
@@ -583,6 +604,7 @@ GAME(1987,  arena,  0,      gts80b_s1,  gts80b, gts80b_state,   gts80b, ROT0,   
 GAME(1988,  badgirls,   0,      gts80b_s3,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bad Girls",            GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  bighouse,   0,      gts80b_s3,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Big House",            GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  bonebstr,   0,      bonebstr,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bone Busters Inc.",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bonebstrf,  bonebstr,bonebstr,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bone Busters Inc. (French)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,  bountyh,    0,      gts80b_s,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Bounty Hunter",            GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,  triplay,    0,      gts80b_s,   gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Triple Play",          GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  diamondp,   0,      gts80b_s2,  gts80b, gts80b_state,   gts80b, ROT0,   "Gottlieb",             "Diamond Lady",         GAME_IS_SKELETON_MECHANICAL)

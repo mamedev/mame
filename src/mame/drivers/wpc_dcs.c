@@ -491,6 +491,21 @@ ROM_START(pop_pa3)
 	ROM_LOAD16_BYTE("popsndl2.u6", 0x800000, 0x080000, CRC(84a5f317) SHA1(f1b9710d109e28fe3255e36dafa2be23656d0445))
 	ROM_LOAD16_BYTE("popsndl2.u7", 0xa00000, 0x080000, CRC(b8fde2c7) SHA1(ee82a7b1ad32e1231356ce42c4ad3109150a9992))
 ROM_END
+
+ROM_START(pop_la4)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("peye_la4.rom", 0x00000, 0x80000, CRC(11cedcf7) SHA1(e0219060cf09a757edf19875a224801b3179664c))
+	ROM_REGION16_LE(0x1000000, "dcs", 0)
+	ROM_LOAD16_BYTE("popsndl2.u2", 0x000000, 0x080000, CRC(00590f2d) SHA1(540ad9825dbaace55bf36a6cee98bef06f240e15))
+	ROM_LOAD16_BYTE("popsndl2.u3", 0x200000, 0x080000, CRC(87032b27) SHA1(9488d177418b53ceb37686cf6f4f58800b306d85))
+	ROM_LOAD16_BYTE("popsndl2.u4", 0x400000, 0x080000, CRC(b0808aa8) SHA1(bebe6ec3c3e675e096084b6ed61065ad48dc5c3f))
+	ROM_LOAD16_BYTE("popsndl2.u5", 0x600000, 0x080000, CRC(3662206b) SHA1(c2714665db18e9ae540a8f922d7ebb3058638563))
+	ROM_LOAD16_BYTE("popsndl2.u6", 0x800000, 0x080000, CRC(84a5f317) SHA1(f1b9710d109e28fe3255e36dafa2be23656d0445))
+	ROM_LOAD16_BYTE("popsndl2.u7", 0xa00000, 0x080000, CRC(b8fde2c7) SHA1(ee82a7b1ad32e1231356ce42c4ad3109150a9992))
+ROM_END
+
+
 /*-----------------
 / Star Trek: The Next Generation
 /------------------*/
@@ -665,6 +680,7 @@ GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,
 GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-5)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Judge Dredd (L-4)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (LX-5)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1994,  pop_la4,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (LA-4)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Bally",                "Popeye Saves The Earth (PA-3)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7)",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, wpc_dcs,    ROT0,   "Williams",             "Star Trek: The Next Generation (LX-7 Special)",                GAME_IS_SKELETON_MECHANICAL)

@@ -30259,6 +30259,7 @@ arena
 badgirls
 bighouse
 bonebstr
+bonebstrf
 bountyh
 triplay
 diamondp
@@ -30497,6 +30498,7 @@ dd_l2
 dd_p6
 pool_l7
 pool_l6
+pool_l5
 pool_le2
 pool_p7
 radcl_l1
@@ -30524,6 +30526,7 @@ disco_l1
 
 // s4.c
 flash_l1
+flash_l2
 flash_t1
 phnix_l1
 pkrno_l1
@@ -30574,7 +30577,9 @@ csmic_l1
 dfndr_l4
 fpwr2_l2
 hypbl_l4
+hypbl_l2
 jst_l2
+jst_l1
 jngld_l2
 lsrcu_l2
 pharo_l2
@@ -30583,6 +30588,8 @@ strlt_l1
 tmfnt_l5
 wrlok_l3
 thund_p1
+thund_p2
+thund_p3
 ratrc_l1
 
 
@@ -31356,6 +31363,7 @@ jd_l6
 jd_l5
 jd_l4
 pop_lx5
+pop_la4
 pop_pa3
 sttng_l7
 sttng_x7
@@ -31463,6 +31471,7 @@ corv_lx2
 corv_la1
 dh_lx2
 i500_11r
+i500_10r
 i500_11b
 jb_10r
 jb_10b
@@ -31508,6 +31517,7 @@ wd_10f
 wd_03r
 wd_048r
 wcs_l2
+wcs_la2
 wcs_p2
 wcs_p3
 tfs_12
