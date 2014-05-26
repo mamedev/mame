@@ -3379,7 +3379,8 @@ ROM_START( aceattac )
 	ROM_LOAD16_BYTE( "epr-11490.a2", 0x020001, 0x10000, CRC(38cb3a41) SHA1(1d74cc69907cdff2d85e965b80bf3f551465257e) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0059.key", 0x0000, 0x2000, CRC(14ce2a94) SHA1(bbf206311ac744c2b4845b33095c5a9bf8fe2014) )
+	// reconstructed key; some of the RNG-independent bits could be incorrect
+	ROM_LOAD( "317-0059.key", 0x0000, 0x2000, BAD_DUMP CRC(14ce2a94) SHA1(bbf206311ac744c2b4845b33095c5a9bf8fe2014) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "epr-11493.b9",  0x00000, 0x10000, CRC(654485d9) SHA1(b431270564c4e33fd70c8c85af1fcbff8b59ba49) )
