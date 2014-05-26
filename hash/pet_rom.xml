@@ -80,6 +80,18 @@
 		</part>
 	</software>
 
+	<software name="infopro">
+		<description>InfoPro</description>
+		<year>1982</year>
+		<publisher>Professional Software Inc.</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="infopro-9000.bin" size="0x800" crc="60437ebb" sha1="c6758163b6edc09b0f9ed9a9cb3d3470393878eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcterm120" cloneof="mcterm">
 		<description>McTerm 1.20</description>
 		<year>1981</year>
