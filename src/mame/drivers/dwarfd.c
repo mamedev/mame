@@ -315,6 +315,7 @@ public:
 
 	/* video-related */
 	int m_crt_access;
+	bool m_back_color;
 
 	/* memory */
 	UINT8    m_dw_ram[0x1000];
@@ -574,6 +575,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + ((m_dsw2->read() & 4) >> 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT16 pixels = m_charmap->u16((linecount & 7) + ((charcode + (bank * 128)) << 3));
+	if(!x)
+		m_back_color = false;
 
 	//if(!linecount)
 	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
@@ -584,6 +587,9 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 		UINT8 value = (pixel >> 1) | (rvv << 3) | (vsp << 4);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
+		if(m_back_color)
+			bitmap.pix32(y, x + i - 1) = palette[value];
+		m_back_color = pixel & 1;
 	}
 }
 
@@ -593,6 +599,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	int bank = gpa;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT16 pixels = m_charmap->u16((linecount & 7) + ((charcode + (bank * 128)) << 3));
+	if(!x)
+		m_back_color = false;
 
 	//if(!linecount)
 	//	logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
@@ -603,6 +611,9 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 		UINT8 value = (pixel >> 1) | (rvv << 3) | (vsp << 4);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
+		if(m_back_color)
+			bitmap.pix32(y, x + i - 1) = palette[value];
+		m_back_color = pixel & 1;
 	}
 }
 
@@ -751,6 +762,7 @@ void dwarfd_state::machine_start()
 void dwarfd_state::machine_reset()
 {
 	m_crt_access = 0;
+	m_back_color = false;
 }
 
 static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
