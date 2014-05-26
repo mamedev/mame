@@ -14555,26 +14555,6 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<!-- Unsure about the correctness of this dump. It boots straight into basic and you have to stasrt the internal software by doing 'call musicbox' -->
-	<software name="nms1205v11" cloneof="nms1205">
-		<description>Philips NMS-1205 Music Module v1.1</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="msxaud_nms1205" />
-			<dataarea name="rom" size="32768">
-				<!-- SUM16: DE5C -->
-				<rom name="nms1205_de5c.bin" size="32768" crc="d8a17006" sha1="f081a884505af9a1080b2b57e86b6da93b784301" offset="0" />
-			</dataarea>
-<!--
-This memory is currently declared as a memory region inside the nms1205 implementation otherwise the
-legacy FM implementations cannot find it.
-			<dataarea name="ram" size="32768">
-			</dataarea>
--->
-		</part>
-	</software>
-
 <!--
 	<software name="nms1205v10" cloneof="nms1205" supported="no">
 	<description>Philips NMS-1205 Music Module v1.0</description>
