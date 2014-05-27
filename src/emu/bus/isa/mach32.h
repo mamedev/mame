@@ -112,7 +112,6 @@ public:
 	DECLARE_READ16_MEMBER(ibm8514_pixel_xfer_r) { return m_8514a->ibm8514_pixel_xfer_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(ibm8514_pixel_xfer_w) { m_8514a->ibm8514_pixel_xfer_w(space,offset,data,mem_mask); }
 
-	// Mach32 specific handlers
 	DECLARE_READ16_MEMBER(mach32_chipid_r) { return m_8514a->mach32_chipid_r(space,offset,mem_mask);  }
 	DECLARE_READ16_MEMBER(mach8_clksel_r) { return m_8514a->mach8_clksel_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(mach32_clksel_w) { m_8514a->mach32_clksel_w(space,offset,data,mem_mask); }  // read only on the mach8
@@ -128,8 +127,46 @@ protected:
 private:
 };
 
+/*
+ *   ATi mach64
+ */
+
+// 8514/A module of the Mach64
+class mach64_8514a_device : public mach32_8514a_device
+{
+public:
+	// construction/destruction
+	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+};
+
+// main SVGA device
+class mach64_device : public mach32_device
+{
+public:
+	// construction/destruction
+	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mach64_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+	required_device<mach64_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
+
+	DECLARE_WRITE16_MEMBER(mach64_config1_w) {  }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
+	DECLARE_WRITE16_MEMBER(mach64_config2_w) {  }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
 // device type definition
 extern const device_type ATIMACH32;
 extern const device_type ATIMACH32_8514A;
+extern const device_type ATIMACH64;
+extern const device_type ATIMACH64_8514A;
 
 #endif /* MACH32_H_ */

@@ -64,10 +64,32 @@ private:
 		mach32_device *m_vga;
 };
 
+class isa16_vga_mach64_device :
+		public device_t,
+		public device_isa16_card_interface
+{
+public:
+		// construction/destruction
+		isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+		// optional information overrides
+		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual const rom_entry *device_rom_region() const;
+
+		DECLARE_READ8_MEMBER(input_port_0_r);
+protected:
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
+private:
+		mach64_device *m_vga;
+};
+
 
 // device type definition
 extern const device_type ISA16_VGA_GFXULTRA;
 extern const device_type ISA16_SVGA_GFXULTRAPRO;
+extern const device_type ISA16_SVGA_MACH64;
 
 
 #endif /* ISA_VGA_ATI_H_ */
