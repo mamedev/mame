@@ -5428,8 +5428,8 @@ initdv2j        // 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
-clubk2k3    // 2003.?? Club Kart: European Session 2003
-clubk2kf
+clubk2k3        // 2003.?? Club Kart: European Session (2003)
+clubk2kf        // 2003.?? Club Kart: European Session (2003, not protected)
 initdexp        // 2002.?? Initial D Arcade Stage (Export) (Rev A)
 initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
@@ -5509,11 +5509,11 @@ airtrix         // 2001.02 Air Trix
 triforce        // 2002.?? Triforce BIOS
 vs2002j         // 2002.10 Virtua Striker 2002 (Japan)
 vs2002ex        // 2002.10 Virtua Striker 2002 (Export)
-fzeroax			// 2003.06 F-Zero AX (Rev. E)
 fzeroaxc		// 2003.06 F-Zero AX (Rev. C)
 avalons         // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 				// 2003.10 The Key Of Avalon 1.01
 gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)
+fzeroax			// 2003.12 F-Zero AX (Rev. E)
 				// 2003.12 The Key Of Avalon 1.10
 				// 2004.04 The Key Of Avalon 1.20 - Summon The New Monsters
 avalon13        // 2004.07 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)

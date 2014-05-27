@@ -22,11 +22,11 @@ Games on this system include....
 | | 2002 | Starfox Armada (planned, but not released)               | Namco / Nintendo | Cart? |                |              |               |
 |*| 2002 | Virtua Striker 2002 (Japan)                              | Sega             | GDROM | GDT-0001       | 317-0337-JPN |               |
 |*| 2002 | Virtua Striker 2002 (Export)                             | Sega             | GDROM | GDT-0002       | 317-0337-EXP |               |
-| | 2003 | F-Zero AX                                                | Sega / Nintendo  | GDROM | GDT-0004       |              |               |
-| | 2003 | F-Zero AX (Rev A)                                        | Sega / Nintendo  | GDROM | GDT-0004A      |              |               |
-| | 2003 | F-Zero AX (Rev B)                                        | Sega / Nintendo  | GDROM | GDT-0004B      |              |               |
+| | 2003 | F-Zero AX                                                | Sega / Nintendo  | GDROM | GDT-0004       | 317-0362-COM | 253-5508-0362 |
+| | 2003 | F-Zero AX (Rev A)                                        | Sega / Nintendo  | GDROM | GDT-0004A      | 317-0362-COM | 253-5508-0362 |
+| | 2003 | F-Zero AX (Rev B)                                        | Sega / Nintendo  | GDROM | GDT-0004B      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | F-Zero AX (Rev C)                                        | Sega / Nintendo  | GDROM | GDT-0004C      | 317-0362-COM | 253-5508-0362 |
-|*| 2003 | F-Zero AX (Rev D)                                        | Sega / Nintendo  | GDROM | GDT-0004D      |              |               |
+|*| 2003 | F-Zero AX (Rev D)                                        | Sega / Nintendo  | GDROM | GDT-0004D      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | F-Zero AX (Rev E)                                        | Sega / Nintendo  | GDROM | GDT-0004E      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | The Key Of Avalon: The Wizard Master (server) (Rev C)    | Sega             | GDROM | GDT-0005C      |              |               |
 | | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev C)    | Sega             | GDROM | GDT-0006C      |              |               |
@@ -823,21 +823,21 @@ ROM_START( mkartagp )
 ROM_END
 
 
-GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
+GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
 
 // GD-ROM games
-GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
-GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
-GAME( 2003, fzeroax,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo",  "F-Zero AX (Rev E) (GDT-0004E)", GAME_IS_SKELETON )
-GAME( 2003, fzeroaxc, fzeroax,  triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo",  "F-Zero AX (Rev C) (GDT-0004C)", GAME_IS_SKELETON )
-GAME( 2003, avalons,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon - The Wizard Master (server) (Rev C) (GDT-0005C)", GAME_IS_SKELETON )
-GAME( 2003, gekpurya, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_IS_SKELETON )
-GAME( 2004, avalon13, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev C) (GDT-0010C)", GAME_IS_SKELETON )
-GAME( 2004, tfupdate, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Triforce DIMM Updater (GDT-0011)", GAME_IS_SKELETON )
-GAME( 2004, vs4j,     triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 4 (Japan) (Rev E) (GDT-0013E)", GAME_IS_SKELETON )
-GAME( 2004, vs4,      triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 4 (Export) (GDT-0015)", GAME_IS_SKELETON )
-GAME( 2004, avalon20, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (Rev B) (GDT-0017B)", GAME_IS_SKELETON )
-GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
+GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
+GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
+GAME( 2003, fzeroax,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo", "F-Zero AX (Rev E) (GDT-0004E)", GAME_IS_SKELETON )
+GAME( 2003, fzeroaxc, fzeroax,  triforcegd,    triforce, driver_device, 0, ROT0, "Nintendo", "F-Zero AX (Rev C) (GDT-0004C)", GAME_IS_SKELETON )
+GAME( 2003, avalons,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "The Key Of Avalon - The Wizard Master (server) (Rev C) (GDT-0005C)", GAME_IS_SKELETON )
+GAME( 2003, gekpurya, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_IS_SKELETON )
+GAME( 2004, avalon13, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev C) (GDT-0010C)", GAME_IS_SKELETON )
+GAME( 2004, tfupdate, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Triforce DIMM Updater (GDT-0011)", GAME_IS_SKELETON )
+GAME( 2004, vs4j,     triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Virtua Striker 4 (Japan) (Rev E) (GDT-0013E)", GAME_IS_SKELETON )
+GAME( 2004, vs4,      triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Virtua Striker 4 (Export) (GDT-0015)", GAME_IS_SKELETON )
+GAME( 2004, avalon20, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (Rev B) (GDT-0017B)", GAME_IS_SKELETON )
+GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",     "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
 
 // ROM games
-GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco", "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
+GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco",    "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )

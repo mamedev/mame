@@ -564,6 +564,7 @@ Mushiking - The King Of Beetles II ENG (Ver. 1.001) 840-0164C  not present  2 (5
 Mushiking - The King Of Beetles II ENG (Ver. 2.001) 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
 Poka Suka Ghost                                     840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
 Radirgy Noa                                         841-0062C  not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Rythm Tengoku                                       841-0177C  not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Shooting Love 2007                                  841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)                              840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
@@ -620,8 +621,8 @@ Notes:
 /Shin Nihon Prowrestling Toukon                                                                                                       /FL0 & FL1 have pin55 raised from PCB.
 \Retsuden 4 Arcade Edition (Ver. A)  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1        \They are connected togheter and go to pin89 on 2K.
 World Kicks PCB (WKC1 Ver. A)        F2    25509801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  WKC1
-World Kicks (WK2 Ver. A)             F2    25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2
-World Kicks (WK3 Ver. A)             F2    25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK3
+World Kicks (WK2 Ver. A)             F2X   25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2
+World Kicks (WK3 Ver. A)             F2X   25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK3
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
@@ -671,7 +672,7 @@ Mazan: Flash of the Blade (Ver. A)  F1X   25869812  1 (64Mb)   8 (128Mb)  presen
 Mazan: Flash of the Blade (Ver. A)  F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ3
 Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA1
 Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA2
-Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3
+Ninja Assault (Ver. A)              F2X   25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3
 Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA4
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.

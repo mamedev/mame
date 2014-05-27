@@ -7,9 +7,9 @@ Games on this system include....
    Game (Known media)                                  Manufacturer      Media               Key Chip
 +-+---------------------------------------------------+-----------------+-------------------+--------------|
 |*|The House of the Dead III                          | Sega, 2002      | GDROM  GDX-0001   | 317-0348-COM |
-| |Crazy Taxi High Roller                             | Sega, 2003      | GDROM  GDX-0002   | 317-0300-COM |
-| |Crazy Taxi High Roller (Rev A)                     | Sega, 2003      | GDROM  GDX-0002A  | 317-0300-COM |
-|*|Crazy Taxi High Roller (Rev B)                     | Sega, 2003      | GDROM  GDX-0002B  | 317-0300-COM |
+| |Crazy Taxi High Roller                             | Sega, 2003      | GDROM  GDX-0002   | 317-0353-COM |
+| |Crazy Taxi High Roller (Rev A)                     | Sega, 2003      | GDROM  GDX-0002A  | 317-0353-COM |
+|*|Crazy Taxi High Roller (Rev B)                     | Sega, 2003      | GDROM  GDX-0002B  | 317-0353-COM |
 | |Virtua Cop 3                                       | Sega, 2003      | GDROM  GDX-0003   | 317-0354-COM |
 |*|Virtua Cop 3 (Rev A)                               | Sega, 2003      | GDROM  GDX-0003A  | 317-0354-COM |
 | |Out Run 2                                          | Sega, 2003      | GDROM  GDX-0004   | 317-0372-COM |
@@ -35,17 +35,17 @@ Games on this system include....
 | |Ghost Squad                                        | Sega, 2004      | GDROM  GDX-0012   | 317-0398-COM |
 |*|Ghost Squad (Rev A)                                | Sega, 2004      | GDROM  GDX-0012A  | 317-0398-COM |
 |*|Gundam Battle Operating Simulator                  | Banpresto, 2005 | GDROM  GDX-0013   | 317-0400-JPN |
-| |Outrun 2 Special Tours                             | Sega, 2004      | GDROM  GDX-0014   |              |
-|*|Outrun 2 Special Tours (Rev A)                     | Sega, 2004      | GDROM  GDX-0014A  |              |
-|*|Wangan Midnight Maximum Tune 2 (Export)            | Namco, 2005     | GDROM  GDX-0015   | 317-5106-COM |
-| |Wangan Midnight Maximum Tune 2 (Japan)             | Namco, 2005     | GDROM  GDX-0016   | 317-5106-JPN |
-|*|Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco, 2005     | GDROM  GDX-0016A  | 317-5106-JPN |
-| |Sega Network Taisen Mahjong MJ 3                   | Sega, 2005      | GDROM  GDX-0017   |              |
-| |Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega, 2005      | GDROM  GDX-0017A  |              |
-| |Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega, 2005      | GDROM  GDX-0017B  |              |
-| |Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega, 2005      | GDROM  GDX-0017C  |              |
-|*|Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega, 2005      | GDROM  GDX-0017D  |              |
-| |Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega, 2005      | GDROM  GDX-0017E  |              |
+| |Outrun 2 Special Tours                             | Sega, 2004      | GDROM  GDX-0014   | 317-0xxx-COM |
+|*|Outrun 2 Special Tours (Rev A)                     | Sega, 2004      | GDROM  GDX-0014A  | 317-0xxx-COM |
+|*|Wangan Midnight Maximum Tune 2 (Japan)             | Namco, 2005     | GDROM  GDX-0015   | 317-5106-JPN |
+|*|Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco, 2005     | GDROM  GDX-0015A  | 317-5106-JPN |
+|*|Wangan Midnight Maximum Tune 2 (Export)            | Namco, 2005     | GDROM  GDX-0016   | 317-5106-COM |
+| |Sega Network Taisen Mahjong MJ 3                   | Sega, 2005      | GDROM  GDX-0017   | 317-0414-JPN |
+| |Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega, 2005      | GDROM  GDX-0017A  | 317-0414-JPN |
+| |Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega, 2005      | GDROM  GDX-0017B  | 317-0414-JPN |
+| |Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega, 2005      | GDROM  GDX-0017C  | 317-0414-JPN |
+|*|Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega, 2005      | GDROM  GDX-0017D  | 317-0414-JPN |
+| |Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega, 2005      | GDROM  GDX-0017E  | 317-0414-JPN |
 |*|Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega, 2005      | GDROM  GDX-0017F  | 317-0414-JPN |
 | |Sega Club Golf 2006: Next Tours                    | Sega, 2005      | GDROM  GDX-0018   |              |
 |*|Sega Club Golf 2006: Next Tours (Rev A)            | Sega, 2005      | GDROM  GDX-0018A  |              |
@@ -301,7 +301,7 @@ Notes:
       CN11/12   - Network board connectors joining to Sega Network PCB
       CN13      - Battery connector (maintains power to DIMM RAM)
       CN14S     - 100 pin connector joining to base board
-      JP4-10    - Jumpers. Settings are as follows (taken from Wangan Midnight Maximum Tune 2 Ver.B)
+      JP4-10    - Jumpers. Settings are as follows (taken from Wangan Midnight Maximum Tune 2 (Japan) (Rev A))
                   JP4 2-3
                   JP5 2-3. Sets DIMM RAM size. 1-2 = 1GB (2x 512M sticks), 2-3 = 512MB (1x 512M stick)
                   JP6 1-2
@@ -334,7 +334,7 @@ Notes:
       CN6   - 7-pin connector
       SW1/2 - test/service buttons
       DIN1  - 96-pin connector joining to Base Board
-      DIPSW - 8-position DIP switch. On this game (Wangan Midnight Maximum Tune 2 Ver.B) DIPs 3, 4, 6, 7 & 8 are set ON. The others are OFF.
+      DIPSW - 8-position DIP switch. On this game (Wangan Midnight Maximum Tune 2 (Japan) (Rev A)) DIPs 3, 4, 6, 7 & 8 are set ON. The others are OFF.
 
 Dump info:
 
@@ -4632,7 +4632,7 @@ ROM_START( gundamos )
 	DISK_IMAGE_READONLY( "gdx-0013", 0, BAD_DUMP SHA1(96b3dafcc2d2d6803fe3bf43a245d43ee5e0e5a6) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("gdx-0013.data", 0x00, 0x50, CRC(0479c383) SHA1(7e86a037d2f9d09cec61a38cb19de510bf9482b3) )
+	ROM_LOAD("317-0400-jpn.data", 0x00, 0x50, CRC(0479c383) SHA1(7e86a037d2f9d09cec61a38cb19de510bf9482b3) )
 ROM_END
 
 /*
@@ -4677,7 +4677,7 @@ ROM_START( mj2 )
 	DISK_IMAGE_READONLY( "gdx-0006c", 0, BAD_DUMP SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("gdx-0006c.pic_data", 0x00, 0x50, NO_DUMP )
+	ROM_LOAD("317-0374-jpn.data", 0x00, 0x50, NO_DUMP )
 ROM_END
 
 ROM_START( ollie )
@@ -4687,7 +4687,7 @@ ROM_START( ollie )
 	DISK_IMAGE_READONLY( "gdx-0007", 0, BAD_DUMP SHA1(8898a571a427936bffcecd3ef27cb79087d22798) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("gdx-0007.data", 0x00, 0x50, CRC(d2a8b31f) SHA1(e9ee2df30031826db6bc4bd91969e6680255dcf9) )
+	ROM_LOAD("317-0377-com.data", 0x00, 0x50, CRC(d2a8b31f) SHA1(e9ee2df30031826db6bc4bd91969e6680255dcf9) )
 ROM_END
 
 
@@ -4699,7 +4699,7 @@ ROM_START( wangmid )
 	DISK_IMAGE_READONLY( "gdx-0009b", 0, BAD_DUMP SHA1(e032b9fd8d5d09255592f02f7531a608e8179c9c) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("gdx-0009b.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
+	ROM_LOAD("317-5101-com.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
 ROM_END
 
 
@@ -4707,7 +4707,7 @@ ROM_START( wangmid2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0015", 0, BAD_DUMP SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
+	DISK_IMAGE_READONLY( "gdx-0016", 0, BAD_DUMP SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
@@ -4718,10 +4718,10 @@ ROM_START( wangmd2b )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0016a", 0, BAD_DUMP SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
+	DISK_IMAGE_READONLY( "gdx-0015a", 0, BAD_DUMP SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
+	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
 ROM_END
 
 
@@ -4732,7 +4732,7 @@ ROM_START( mj3 )
 	DISK_IMAGE_READONLY( "gdx-0017d", 0, BAD_DUMP SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("gdx-0017d.pic_data", 0x00, 0x50, NO_DUMP )
+	ROM_LOAD("317-0414-jpn.data", 0x00, 0x50, NO_DUMP )
 ROM_END
 
 ROM_START( mj3f )
@@ -4742,7 +4742,7 @@ ROM_START( mj3f )
 	DISK_IMAGE_READONLY( "gdx-0017f", 0, SHA1(a859313c80c5303bba5514ff734a7205cd12e456) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("gdx-0017f.pic_data", 0x00, 0x50, NO_DUMP )
+	ROM_LOAD("317-0414-jpn.data", 0x00, 0x50, NO_DUMP )
 ROM_END
 
 ROM_START( scg06nt )
@@ -4788,8 +4788,8 @@ GAME( 2004, wangmid,  chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "N
 GAME( 2004, ghostsqu, chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",      "Ghost Squad (Rev A) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, gundamos, chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto", "Gundam Battle Operating Simulator (GDX-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, outr2st,  chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",      "Out Run 2 Special Tours (Rev A) (GDX-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, wangmid2, chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",     "Wangan Midnight Maximum Tune 2 (Export) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, wangmd2b, chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",     "Wangan Midnight Maximum Tune 2 (Japan) (Rev A) (GDX-0016A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, wangmid2, chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",     "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, wangmd2b, chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",     "Wangan Midnight Maximum Tune 2 (Japan) (Rev A) (GDX-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, mj3,      chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",      "Sega Network Taisen Mahjong MJ 3 (Rev D) (GDX-0017D)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, mj3f,     mj3,     chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",      "Sega Network Taisen Mahjong MJ 3 (Rev F) (GDX-0017F)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, scg06nt,  chihiro, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",      "Sega Club Golf 2006 Next Tours (Rev A) (GDX-0018A)", GAME_NO_SOUND|GAME_NOT_WORKING )
