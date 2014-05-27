@@ -85,7 +85,7 @@ public:
 	DECLARE_DRIVER_INIT(quartet);
 	DECLARE_DRIVER_INIT(fantzonep);
 	DECLARE_DRIVER_INIT(sjryukoa);
-	DECLARE_DRIVER_INIT(aceattaa);
+	DECLARE_DRIVER_INIT(aceattaca);
 	DECLARE_DRIVER_INIT(passsht16a);
 	DECLARE_DRIVER_INIT(mjleague);
 	DECLARE_DRIVER_INIT(sdi);
@@ -115,7 +115,7 @@ protected:
 	void quartet_i8751_sim();
 
 	// custom I/O handlers
-	DECLARE_READ16_MEMBER( aceattaa_custom_io_r );
+	DECLARE_READ16_MEMBER( aceattaca_custom_io_r );
 	DECLARE_READ16_MEMBER( mjleague_custom_io_r );
 	DECLARE_READ16_MEMBER( passsht16a_custom_io_r );
 	DECLARE_READ16_MEMBER( sdi_custom_io_r );

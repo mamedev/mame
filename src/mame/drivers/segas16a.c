@@ -10,7 +10,7 @@
         * none at this time
 
     DIP locations verified from manual for:
-        * aceattaa
+        * aceattaca
         * aliensyn
         * aliensynj
         * passsht16a
@@ -730,11 +730,11 @@ void segas16a_state::quartet_i8751_sim()
 //**************************************************************************
 
 //-------------------------------------------------
-//  aceattaa_custom_io_r - custom I/O read handler
+//  aceattaca_custom_io_r - custom I/O read handler
 //  for Ace Attacker
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::aceattaa_custom_io_r )
+READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 {
 	switch (offset & (0x3000/2))
 	{
@@ -1069,7 +1069,7 @@ INPUT_PORTS_END
 //  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
-static INPUT_PORTS_START( aceattaa )
+static INPUT_PORTS_START( aceattaca )
 	#define TMP_PL1HAND 2
 	#define TMP_PL1BALL 1
 	#define TMP_PL2HAND 4
@@ -3433,10 +3433,10 @@ DRIVER_INIT_MEMBER(segas16a_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16a_state,aceattaa)
+DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
 {
 	DRIVER_INIT_CALL(generic);
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaa_custom_io_r), this);
+	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaca_custom_io_r), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
@@ -3502,7 +3502,7 @@ GAME( 1986, quartet2a,  quartet,  system16a,                quart2,     segas16a
 GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_SUPPORTS_SAVE )
 GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
 GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
-GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaa,   segas16a_state,aceattaa,    ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_SUPPORTS_SAVE )
+GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_SUPPORTS_SAVE )
 GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", GAME_SUPPORTS_SAVE )
 GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
