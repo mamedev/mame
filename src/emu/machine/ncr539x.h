@@ -65,7 +65,7 @@ private:
 	bool m_chipid_available, m_chipid_lock;
 
 	static const int m_fifo_size = 16;
-	UINT8 m_fifo_ptr, m_fifo[m_fifo_size];
+	UINT8 m_fifo_ptr, m_fifo_read_ptr, m_fifo[m_fifo_size];
 
 	//int m_xfer_remaining;   // amount in the FIFO when we're in data in phase
 

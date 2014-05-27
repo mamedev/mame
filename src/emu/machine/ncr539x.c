@@ -57,9 +57,9 @@ static const char *rdregs[16] = {
 	"Command",              // 3
 	"Status",               // 4
 	"Interrupt Status",     // 5
-	"Internal State",
-	"Current FIFO/Internal State",
-	"Control Register 1",
+	"Internal State",		// 6
+	"Current FIFO/Internal State",	// 7
+	"Control Register 1",	// 8
 	"0x9",
 	"0xA",
 	"Control Register 2",
@@ -143,6 +143,7 @@ void ncr539x_device::device_start()
 void ncr539x_device::device_reset()
 {
 	m_fifo_ptr = 0;
+	m_fifo_read_ptr = 0;
 	m_irq_status = 0;
 	m_status = SCSI_PHASE_STATUS;
 	m_internal_state = 0;
@@ -318,14 +319,15 @@ READ8_MEMBER( ncr539x_device::read )
 				}
 				else
 				{
-					rv = m_fifo[m_fifo_ptr++];
+					rv = m_fifo[m_fifo_read_ptr++];
+					m_fifo_read_ptr &= (m_fifo_size-1);
 
 					fifo_bytes--;
 					m_xfer_count--;
 					update_fifo_internal_state(fifo_bytes);
 
 					#if VERBOSE
-					printf("Read %02x from FIFO[%d], FIFO now contains %d bytes (PC=%x, m_buffer_remaining %x)\n", rv, m_fifo_ptr-1, fifo_bytes, space.device().safe_pc(), m_buffer_remaining);
+					printf("Read %02x from FIFO[%d], FIFO now contains %d bytes (PC=%x, m_buffer_remaining %x)\n", rv, m_fifo_read_ptr-1, fifo_bytes, space.device().safe_pc(), m_buffer_remaining);
 					#endif
 
 					if (fifo_bytes == 0)
@@ -432,7 +434,8 @@ READ8_MEMBER( ncr539x_device::read )
 WRITE8_MEMBER( ncr539x_device::write )
 {
 	#if VERBOSE
-	if (offset != 2) printf("539x: Write %02x @ %s (%02x) (PC=%x)\n", data, wrregs[offset], offset, space.device().safe_pc());
+	//if (offset != 2) 
+	printf("539x: Write %02x @ %s (%02x) (PC=%x)\n", data, wrregs[offset], offset, space.device().safe_pc());
 	#endif
 
 	switch (offset)
@@ -757,6 +760,7 @@ void ncr539x_device::fifo_write(UINT8 data)
 		printf("539x: Write %02x @ FIFO[%x]\n", data, m_fifo_ptr);
 		#endif
 		m_fifo[m_fifo_ptr++] = data;
+		update_fifo_internal_state(m_fifo_ptr);
 
 		if (m_selected)
 		{
