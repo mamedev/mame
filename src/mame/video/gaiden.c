@@ -93,26 +93,6 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
-VIDEO_START_MEMBER(gaiden_state,mastninj)
-{
-	/* set up tile layers */
-	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
-	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
-
-	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_text_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-//  m_background->set_transparent_pen(15);
-	m_foreground->set_transparent_pen(15);
-	m_text_layer->set_transparent_pen(15);
-
-	/* set up sprites */
-	m_screen->register_screen_bitmap(m_sprite_bitmap);
-
-	m_background->set_scrolldx(-248, 248);
-	m_foreground->set_scrolldx(-252, 252);
-}
 
 VIDEO_START_MEMBER(gaiden_state,raiga)
 {
@@ -235,22 +215,11 @@ WRITE16_MEMBER(gaiden_state::gaiden_videoram3_w)
 	m_background->mark_tile_dirty(offset & 0x07ff);
 }
 
-READ16_MEMBER(gaiden_state::gaiden_videoram3_r)
-{
-	return m_videoram3[offset];
-}
-
 WRITE16_MEMBER(gaiden_state::gaiden_videoram2_w)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_foreground->mark_tile_dirty(offset & 0x07ff);
 }
-
-READ16_MEMBER(gaiden_state::gaiden_videoram2_r)
-{
-	return m_videoram2[offset];
-}
-
 WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);

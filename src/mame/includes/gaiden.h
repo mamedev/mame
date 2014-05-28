@@ -75,9 +75,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gaiden_bgoffsety_w);
 	DECLARE_WRITE16_MEMBER(gaiden_sproffsety_w);
 	DECLARE_WRITE16_MEMBER(gaiden_videoram3_w);
-	DECLARE_READ16_MEMBER(gaiden_videoram3_r);
 	DECLARE_WRITE16_MEMBER(gaiden_videoram2_w);
-	DECLARE_READ16_MEMBER(gaiden_videoram2_r);
 	DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
 	DECLARE_DRIVER_INIT(raiga);
 	DECLARE_DRIVER_INIT(drgnbowl);
@@ -93,7 +91,6 @@ public:
 	DECLARE_MACHINE_RESET(raiga);
 	DECLARE_VIDEO_START(gaiden);
 	DECLARE_VIDEO_START(drgnbowl);
-	DECLARE_VIDEO_START(mastninj);
 	DECLARE_VIDEO_START(raiga);
 	UINT32 screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

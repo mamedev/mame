@@ -382,8 +382,8 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
@@ -690,20 +690,20 @@ static const gfx_layout mastninj_tile2layout =
 
 static const gfx_layout mastninj_spritelayout =
 {
-	8,8,    /* tile size */
+	16,16,    /* tile size */
 	RGN_FRAC(1,4),  /* number of tiles */
 	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* offset to next tile */
+	{ 0,1,2,3,4,5,6,7,  128+0,128+1,128+2,128+3,128+4,128+5,128+6,128+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	32*8 /* offset to next tile */
 };
 
 static GFXDECODE_START( mastninj )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x000, 16 )  /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,       0x300, 16 ) /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,       0x200, 16 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout,      0x100, 16 ) /* sprites 8x8 */
+	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout,      0x100, 16 ) /* sprites 16x16 */
 GFXDECODE_END
 
 static const gfx_layout drgnbowl_tile2layout =
@@ -909,8 +909,8 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
@@ -945,19 +945,20 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
+	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastninj)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0) // should be different
+	/* NOT using Tecmo Sprite device - signifcant changes, maybe a clone of something else */
 
-	MCFG_VIDEO_START_OVERRIDE(gaiden_state,mastninj)
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1227,7 +1228,7 @@ ROM_START( mastninj )
 	ROM_LOAD32_BYTE( "25.ic22",      0x040002, 0x10000, CRC(ca691635) SHA1(177f94a17cfaf67c764c2a2dff48475039207fae) )
 	ROM_LOAD32_BYTE( "27.ic20",      0x040003, 0x10000, CRC(2ae70f42) SHA1(aad89dbd0309a5e3a786aa028995b56859d5b5ff) )
 
-	ROM_REGION( 0x100000, "gfx4", 0) /* these will need a further descramble to be in the same format as gaiden, although the sprites on the bootleg look different anyway */
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT) /* these will need a further descramble to be in the same format as gaiden, although the sprites on the bootleg look different anyway */
 	ROM_LOAD( "36.ic50",           0x000000, 0x10000, CRC(3c117e62) SHA1(dee45d6bbe053996e0b3faaba0293a273faf1ffa) )
 	ROM_LOAD( "37.ic49",           0x010000, 0x10000, CRC(f6d6422d) SHA1(933487b09d3bcff9714fb2469b3d751b38459cfd) )
 	ROM_LOAD( "38.ic48",           0x020000, 0x10000, CRC(642f06e7) SHA1(5b30b5029884b7eddcad201224a639f94ee27823) )
@@ -1655,7 +1656,7 @@ GAME( 1988, shadowwa,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT
 GAME( 1988, gaiden,    shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Gaiden (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ryukendn,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ryukendna, shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mastninj,  shadoww,  mastninj, common, gaiden_state,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too.
+GAME( 1989, mastninj,  shadoww,  mastninj, common, gaiden_state,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
 GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",  "Dragon Bowl (set 1, encrypted program)", GAME_SUPPORTS_SAVE ) // Draogn Bowl is based on Ninja Gaiden code
 GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",  "Dragon Bowl (set 2, unencrypted program)", GAME_SUPPORTS_SAVE )
 
