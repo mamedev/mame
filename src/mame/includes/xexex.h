@@ -50,7 +50,6 @@ public:
 
 	/* misc */
 	UINT16     m_cur_control2;
-	INT32      m_cur_sound_region;
 	INT32      m_strip_0x1a;
 	int        m_suspension_active;
 	int        m_resume_trigger;
@@ -95,7 +94,6 @@ public:
 	void xexex_postload();
 	void xexex_objdma( int limiter );
 	void parse_control2(  );
-	void reset_sound_region();
 };
 
 /*----------- defined in video/xexex.c -----------*/

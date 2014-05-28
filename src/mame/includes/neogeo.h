@@ -150,12 +150,9 @@ protected:
 	void neogeo_set_display_counter_msb(UINT16 data);
 	void neogeo_set_display_counter_lsb(UINT16 data);
 	void set_video_control( UINT16 data );
-	
-
-
-
 
 	void compute_rgb_weights(  );
+	void create_rgb_lookups();
 	void regenerate_pens();
 	pen_t get_pen( UINT16 data );
 	void neogeo_set_palette_bank( UINT8 data );
@@ -349,7 +346,7 @@ protected:
 	UINT16 get_video_control(  );
 
 	// color/palette related
-	// TODO: disentangle from the rest of the video emulation
+	UINT8      m_palette_lookup[32][4];
 	double     m_rgb_weights_normal[5];
 	double     m_rgb_weights_normal_bit15[5];
 	double     m_rgb_weights_dark[5];

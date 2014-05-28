@@ -1791,6 +1791,9 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(neogeo_state, screen_update_neogeo)
 
+	/* 4096 colors * two banks * normal and shadow */
+	MCFG_PALETTE_ADD("palette", 4096*2*2)
+
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_OPTIMZIED, 0)
 	
 	/* audio hardware */

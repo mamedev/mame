@@ -48,6 +48,51 @@ void neogeo_state::compute_rgb_weights(  )
 }
 
 
+void neogeo_state::create_rgb_lookups()
+{
+	static const int resistances[] = {3900, 2200, 1000, 470, 220};
+
+	/* compute four sets of weights - with or without the pulldowns -
+	   ensuring that we use the same scaler for all */
+	double weights_normal[5];
+	double scaler = compute_resistor_weights(0, 255, -1,
+											5, resistances, weights_normal, 0, 0,
+											0, NULL, NULL, 0, 0,
+											0, NULL, NULL, 0, 0);
+
+	double weights_dark[5];
+	compute_resistor_weights(0, 255, scaler,
+							5, resistances, weights_dark, 8200, 0,
+							0, NULL, NULL, 0, 0,
+							0, NULL, NULL, 0, 0);
+
+	double weights_shadow[5];
+	compute_resistor_weights(0, 255, scaler,
+							5, resistances, weights_shadow, 150, 0,
+							0, NULL, NULL, 0, 0,
+							0, NULL, NULL, 0, 0);
+
+	double weights_dark_shadow[5];
+	compute_resistor_weights(0, 255, scaler,
+							5, resistances, weights_dark_shadow, 1.0 / ((1.0 / 8200) + (1.0 / 150)), 0,
+							0, NULL, NULL, 0, 0,
+							0, NULL, NULL, 0, 0);
+
+	for (int i = 0; i < 32; i++)
+	{
+		int i4 = (i >> 4) & 1;
+		int i3 = (i >> 3) & 1;
+		int i2 = (i >> 2) & 1;
+		int i1 = (i >> 1) & 1;
+		int i0 = (i >> 0) & 1;
+		m_palette_lookup[i][0] = combine_5_weights(weights_normal, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][1] = combine_5_weights(weights_dark, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][2] = combine_5_weights(weights_shadow, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][3] = combine_5_weights(weights_dark_shadow, i0, i1, i2, i3, i4);
+	}
+}
+
+
 pen_t neogeo_state::get_pen( UINT16 data )
 {
 	double *weights;
@@ -155,6 +200,7 @@ void neogeo_state::video_start()
 	m_pens = auto_alloc_array(machine(), pen_t, NUM_PENS);
 
 	compute_rgb_weights();
+	create_rgb_lookups();
 
 	memset(m_palettes[0], 0x00, NUM_PENS * sizeof(UINT16));
 	memset(m_palettes[1], 0x00, NUM_PENS * sizeof(UINT16));
