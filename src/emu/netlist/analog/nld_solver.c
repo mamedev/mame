@@ -23,8 +23,7 @@
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t()
-: m_owner(NULL)
-, m_calculations(0)
+: m_calculations(0)
 {
 }
 
@@ -34,10 +33,8 @@ ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
         delete m_inps[i];
 }
 
-ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
+ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets)
 {
-	m_owner = &aowner;
-
 	NL_VERBOSE_OUT(("New solver setup\n"));
 
 	m_nets.resize(nets.count());
@@ -111,7 +108,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 				    }
                     break;
 				default:
-					owner().netlist().error("unhandled element found\n");
+					netlist().error("unhandled element found\n");
 					break;
 			}
 		}
@@ -255,7 +252,7 @@ ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 ATTR_HOT double netlist_matrix_solver_t::solve()
 {
 
-	netlist_time now = owner().netlist().time();
+	netlist_time now = netlist().time();
 	netlist_time delta = now - m_last_step;
 
 	// We are already up to date. Avoid oscillations.
@@ -275,23 +272,22 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 		do
 		{
             update_dynamic();
-            while ((this_resched = vsolve_non_dynamic()) > m_params.m_gs_loops)
-                owner().netlist().warning("Dynamic Solve iterations exceeded .. Consider increasing RESCHED_LOOPS");
+            // Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
+            this_resched = vsolve_non_dynamic();
             newton_loops++;
 		} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
 
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-            owner().netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
+            netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
 	        m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 	        return 1.0;
 		}
 	}
 	else
 	{
-		while (vsolve_non_dynamic() > m_params.m_gs_loops)
-            owner().netlist().warning("Non-Dynamic Solve iterations exceeded .. Consider increasing RESCHED_LOOPS");
+		vsolve_non_dynamic();
 	}
 	const double next_time_step = compute_next_timestep(delta.as_double());
     update_inputs();
@@ -331,10 +327,10 @@ ATTR_COLD int netlist_matrix_solver_direct_t<m_N, _storage_N>::get_net_idx(netli
 }
 
 template <int m_N, int _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
 {
     m_dim = nets.count();
-	netlist_matrix_solver_t::setup(nets, owner);
+	netlist_matrix_solver_t::setup(nets);
 
 	m_terms.clear();
 	m_rail_start = 0;
@@ -1019,7 +1015,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		register_sub(*ms, pstring::sprintf("Solver %d",m_mat_solvers.count()));
 
-        ms->vsetup(groups[i], *this);
+        ms->vsetup(groups[i]);
 
         m_mat_solvers.add(ms);
 

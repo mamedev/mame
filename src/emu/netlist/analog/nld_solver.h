@@ -46,15 +46,12 @@ public:
 	ATTR_COLD netlist_matrix_solver_t();
 	ATTR_COLD virtual ~netlist_matrix_solver_t();
 
-    ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets,
-            NETLIB_NAME(solver) &owner) = 0;
+    ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
 
 	ATTR_HOT double solve();
 
 	ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
 	ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
-
-	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
 
     ATTR_HOT void update_forced();
 
@@ -95,10 +92,7 @@ protected:
 	    netlist_terminal_t::list_t m_rails;
 	};
 
-    ATTR_COLD void setup(netlist_analog_net_t::list_t &nets,
-            NETLIB_NAME(solver) &owner);
-
-	NETLIB_NAME(solver) *m_owner;
+    ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
 
     // return true if a reschedule is needed ...
     ATTR_HOT virtual int vsolve_non_dynamic() = 0;
@@ -143,7 +137,7 @@ public:
 
 	virtual ~netlist_matrix_solver_direct_t() {}
 
-	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
+	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets);
 	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
@@ -253,11 +247,6 @@ public:
 private:
 	    netlist_solver_parameters_t m_params;
 );
-
-ATTR_HOT inline const NETLIB_NAME(solver) &netlist_matrix_solver_t::owner() const
-{
-	return *m_owner;
-}
 
 
 #endif /* NLD_SOLVER_H_ */
