@@ -47,9 +47,10 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_surpratk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(surpratk_interrupt);
+
+	MCFG_K05324X_CB_MEMBER(sprite_callback);
 };
 
 /*----------- defined in video/surpratk.c -----------*/
 
 extern void surpratk_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void surpratk_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);

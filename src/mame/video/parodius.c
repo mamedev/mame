@@ -22,20 +22,19 @@ void parodius_tile_callback( running_machine &machine, int layer, int bank, int 
 
 ***************************************************************************/
 
-void parodius_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+MCFG_K05324X_CB_MEMBER(parodius_state::sprite_callback)
 {
-	parodius_state *state = machine.driver_data<parodius_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		*priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = state->m_sprite_colorbase + (*color & 0x1f);
+	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
 
@@ -72,6 +71,6 @@ UINT32 parodius_state::screen_update_parodius(screen_device &screen, bitmap_ind1
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0,2);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0,4);
 
-	m_k053245->k053245_sprites_draw(bitmap, cliprect, screen.priority());
+	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
 }

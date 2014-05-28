@@ -217,15 +217,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const k05324x_interface rollerg_k05324x_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	-3, -1,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	rollerg_sprite_callback
-};
-
 static const k051316_interface rollerg_k051316_intf =
 {
 	"gfx2", 1,
@@ -283,9 +274,13 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K053244_ADD("k053244", rollerg_k05324x_intf)
-	MCFG_K053244_GFXDECODE("gfxdecode")
-	MCFG_K053244_PALETTE("palette")
+	MCFG_DEVICE_ADD("k053244", K053244, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_GFX("k053244")
+	MCFG_K05324X_ORDER(NORMAL_PLANE_ORDER)
+	MCFG_K05324X_OFFSETS(-3, -1)
+	MCFG_K05324X_DEINTERLEAVE(KONAMI_ROM_DEINTERLEAVE_2)
+	MCFG_K05324X_CB(rollerg_state, sprite_callback)
 
 	MCFG_K051316_ADD("k051316", rollerg_k051316_intf)
 	MCFG_K051316_GFXDECODE("gfxdecode")
@@ -321,7 +316,7 @@ ROM_START( rollerg )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x200000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h06.k2",  0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
 	ROM_LOAD( "999h05.k8",  0x100000, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
@@ -341,7 +336,7 @@ ROM_START( rollergj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x200000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h06.k2",  0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
 	ROM_LOAD( "999h05.k8",  0x100000, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 

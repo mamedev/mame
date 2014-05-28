@@ -157,59 +157,55 @@ void thndrx2_sprite_callback( running_machine &machine, int *code, int *color, i
 
 ***************************************************************************/
 
-void lgtnfght_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+MCFG_K05324X_CB_MEMBER(tmnt_state::lgtnfght_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		*priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = state->m_sprite_colorbase + (*color & 0x1f);
+	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-void blswhstl_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+MCFG_K05324X_CB_MEMBER(tmnt_state::blswhstl_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 #if 0
-if (machine.input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = rand();
-if (machine.input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
-if (machine.input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = rand();
+if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = rand();
+if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
+if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = rand();
 #endif
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		*priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = state->m_sprite_colorbase + (*color & 0x1f);
+	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-void prmrsocr_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+MCFG_K05324X_CB_MEMBER(tmnt_state::prmrsocr_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		*priority = 0xf0 | 0xcc | 0xaa;
 
-	*code |= state->m_prmrsocr_sprite_bank << 14;
-
-	*color = state->m_sprite_colorbase + (*color & 0x1f);
+	*code |= m_prmrsocr_sprite_bank << 14;
+	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
 
@@ -254,7 +250,7 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 
 VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 {
-	m_k053245->k05324x_set_z_rejection(0);
+	m_k053245->set_z_rejection(0);
 
 	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
 
@@ -444,7 +440,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 		m_dim_c = data & 0x18;
 
 		/* bit 5 selects sprite ROM for testing in TMNT2 (bits 5-7, actually, according to the schematics) */
-		m_k053245->k053244_bankselect(((data & 0x20) >> 5) << 2);
+		m_k053245->bankselect(((data & 0x20) >> 5) << 2);
 	}
 }
 
@@ -477,7 +473,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 
 		/* bit 6 = sprite ROM bank */
 		m_prmrsocr_sprite_bank = (data & 0x40) >> 6;
-		m_k053245->k053244_bankselect(m_prmrsocr_sprite_bank << 2);
+		m_k053245->bankselect(m_prmrsocr_sprite_bank << 2);
 
 		/* bit 7 = 53596 region selector for ROM test */
 		m_glfgreat_roz_char_bank = (data & 0x80) >> 7;
@@ -613,7 +609,7 @@ UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &b
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	m_k053245->k053245_sprites_draw(bitmap, cliprect, screen.priority());
+	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -679,7 +675,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	m_k053245->k053245_sprites_draw(bitmap, cliprect, screen.priority());
+	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -779,6 +775,6 @@ void tmnt_state::screen_eof_blswhstl(screen_device &screen, bool state)
 	// on rising edge
 	if (state)
 	{
-		m_k053245->k053245_clear_buffer();
+		m_k053245->clear_buffer();
 	}
 }

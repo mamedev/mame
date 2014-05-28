@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "includes/lethal.h"
 
-void lethalen_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+MCFG_K05324X_CB_MEMBER(lethal_state::sprite_callback)
 {
 	int pri = (*color & 0xfff0);
 	*color = *color & 0x000f;
@@ -18,23 +18,23 @@ void lethalen_sprite_callback( running_machine &machine, int *code, int *color, 
 
 	/* this isn't ideal.. shouldn't need to hardcode it? not 100% sure about it anyway*/
 	if (pri == 0x10)
-		*priority_mask = 0xf0; // guys on first level
+		*priority = 0xf0; // guys on first level
 	else if (pri == 0x90)
-		*priority_mask = 0xf0; // car doors
+		*priority = 0xf0; // car doors
 	else if (pri == 0x20)
-		*priority_mask = 0xf0 | 0xcc; // people behind glass on 1st level
+		*priority = 0xf0 | 0xcc; // people behind glass on 1st level
 	else if (pri == 0xa0)
-		*priority_mask = 0xf0 | 0xcc; // glass on 1st/2nd level
+		*priority = 0xf0 | 0xcc; // glass on 1st/2nd level
 	else if (pri == 0x40)
-		*priority_mask = 0; // blood splats?
+		*priority = 0; // blood splats?
 	else if (pri == 0x00)
-		*priority_mask = 0; // gunshots etc
+		*priority = 0; // gunshots etc
 	else if (pri == 0x30)
-		*priority_mask = 0xf0 | 0xcc | 0xaa; // mask sprites (always in a bad colour, used to do special effects i think
+		*priority = 0xf0 | 0xcc | 0xaa; // mask sprites (always in a bad colour, used to do special effects i think
 	else
 	{
 		popmessage("unknown pri %04x\n", pri);
-		*priority_mask = 0;
+		*priority = 0;
 	}
 
 	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
@@ -106,7 +106,7 @@ UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 
-	m_k053244->k053245_sprites_draw_lethal(bitmap, cliprect, screen.priority());
+	m_k053244->sprites_draw_lethal(bitmap, cliprect, screen.priority());
 
 	// force "A" layer over top of everything
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);

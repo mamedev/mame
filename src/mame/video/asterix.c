@@ -5,7 +5,7 @@
 static void reset_spritebank( running_machine &machine )
 {
 	asterix_state *state = machine.driver_data<asterix_state>();
-	state->m_k053244->k053244_bankselect(state->m_spritebank & 7);
+	state->m_k053244->bankselect(state->m_spritebank & 7);
 	state->m_spritebanks[0] = (state->m_spritebank << 12) & 0x7000;
 	state->m_spritebanks[1] = (state->m_spritebank <<  9) & 0x7000;
 	state->m_spritebanks[2] = (state->m_spritebank <<  6) & 0x7000;
@@ -18,20 +18,19 @@ WRITE16_MEMBER(asterix_state::asterix_spritebank_w)
 	reset_spritebank(machine());
 }
 
-void asterix_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+MCFG_K05324X_CB_MEMBER(asterix_state::sprite_callback)
 {
-	asterix_state *state = machine.driver_data<asterix_state>();
 	int pri = (*color & 0x00e0) >> 2;
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
-	*color = state->m_sprite_colorbase | (*color & 0x001f);
-	*code = (*code & 0xfff) | state->m_spritebanks[(*code >> 12) & 3];
+		*priority = 0xf0 | 0xcc | 0xaa;
+	*color = m_sprite_colorbase | (*color & 0x001f);
+	*code = (*code & 0xfff) | m_spritebanks[(*code >> 12) & 3];
 }
 
 
@@ -102,7 +101,7 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
-	m_k053244->k053245_sprites_draw(bitmap, cliprect, screen.priority());
+	m_k053244->sprites_draw(bitmap, cliprect, screen.priority());
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
 	return 0;

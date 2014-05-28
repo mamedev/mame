@@ -206,15 +206,6 @@ static const k052109_interface parodius_k052109_intf =
 	parodius_tile_callback
 };
 
-static const k05324x_interface parodius_k05324x_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	0, 0,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	parodius_sprite_callback
-};
-
 void parodius_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
@@ -284,9 +275,15 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_K052109_ADD("k052109", parodius_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
-	MCFG_K053245_ADD("k053245", parodius_k05324x_intf)
-	MCFG_K053245_GFXDECODE("gfxdecode")
-	MCFG_K053245_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_GFX("k053245")
+	MCFG_K05324X_ORDER(NORMAL_PLANE_ORDER)
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_DEINTERLEAVE(KONAMI_ROM_DEINTERLEAVE_2)
+	MCFG_K05324X_CB(parodius_state, sprite_callback)
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -319,7 +316,7 @@ ROM_START( parodius )
 	ROM_LOAD( "955d07.k19", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
 	ROM_LOAD( "955d08.k24", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x100000, "k053245", 0 ) /* graphics */
 	ROM_LOAD( "955d05.k13", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) ) /* sprites */
 	ROM_LOAD( "955d06.k8",  0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) ) /* sprites */
 
@@ -339,7 +336,7 @@ ROM_START( parodiuse ) /* Earlier version? */
 	ROM_LOAD( "955d07.k19", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
 	ROM_LOAD( "955d08.k24", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x100000, "k053245", 0 ) /* graphics */
 	ROM_LOAD( "955d05.k13", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) ) /* sprites */
 	ROM_LOAD( "955d06.k8",  0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) ) /* sprites */
 
@@ -359,7 +356,7 @@ ROM_START( parodiusj )
 	ROM_LOAD( "955d07.k19", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
 	ROM_LOAD( "955d08.k24", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x100000, "k053245", 0 ) /* graphics */
 	ROM_LOAD( "955d05.k13", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) ) /* sprites */
 	ROM_LOAD( "955d06.k8",  0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) ) /* sprites */
 
@@ -379,7 +376,7 @@ ROM_START( parodiusa )
 	ROM_LOAD( "955d07.k19", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
 	ROM_LOAD( "955d08.k24", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x100000, "k053245", 0 ) /* graphics */
 	ROM_LOAD( "955d05.k13", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) ) /* sprites */
 	ROM_LOAD( "955d06.k8",  0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) ) /* sprites */
 

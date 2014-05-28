@@ -41,65 +41,41 @@ main ram and the buffer.
 
 const device_type K053244 = &device_creator<k05324x_device>;
 
+const gfx_layout k05324x_device::spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 24, 16, 8, 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+		8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+		16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
+	128*8
+};
+
+GFXDECODE_MEMBER( k05324x_device::gfxinfo )
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout, 0, 128)
+GFXDECODE_END
+
+
 k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053244, "K053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
+	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(NULL),
 	m_buffer(NULL),
-	m_gfx(NULL),
-	//m_regs[0x10],
+	m_sprite_rom(NULL),
+	m_gfx_tag(NULL),
+	m_dx(0),
+	m_dy(0),
+	m_plane_order(0),
+	m_deinterleave(0),
 	m_rombank(0),
 	m_ramsize(0),
-	m_z_rejection(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
-{
+	m_z_rejection(0)
+{	
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void k05324x_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<k05324x_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void k05324x_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<k05324x_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k05324x_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k05324x_interface *intf = reinterpret_cast<const k05324x_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k05324x_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_gfx_memory_region = "";
-		m_gfx_num = 0;
-		m_plane_order = 0;
-		m_dx = 0;
-		m_dy = 0;
-		m_deinterleave = 0;
-		m_callback = NULL;
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -107,45 +83,38 @@ void k05324x_device::device_config_complete()
 
 void k05324x_device::device_start()
 {
-	UINT32 total;
-	static const gfx_layout spritelayout =
-	{
-		16,16,
-		0,
-		4,
-		{ 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7,
-				8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
-		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-				16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-		128*8
-	};
+	m_sprite_rom = machine().root_device().memregion(m_gfx_tag)->base();
+	m_sprite_size = machine().root_device().memregion(m_gfx_tag)->bytes();
 
 	/* decode the graphics */
+	decode_gfx();
 	switch (m_plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout, 4);
+		{
+			gfx(0)->set_source_and_total(m_sprite_rom, m_sprite_size / 128);
+			gfx(0)->set_colors(palette()->entries() / gfx(0)->depth());
+		}
 		break;
 
 	default:
 		fatalerror("Unsupported plane_order\n");
 	}
 
-	if (VERBOSE && !(m_palette->shadows_enabled()))
+	if (VERBOSE && !(palette()->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
-	konami_deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
+	konami_deinterleave_gfx(machine(), m_gfx_tag, m_deinterleave);
 
 	m_ramsize = 0x800;
 
 	m_z_rejection = -1;
-	m_gfx = m_gfxdecode->gfx(m_gfx_num);
 	m_ram = auto_alloc_array_clear(machine(), UINT16, m_ramsize / 2);
-
 	m_buffer = auto_alloc_array_clear(machine(), UINT16, m_ramsize / 2);
+
+	// bind callbacks
+	m_k05324x_cb.bind_relative_to(*owner());
 
 	save_pointer(NAME(m_ram), m_ramsize / 2);
 	save_pointer(NAME(m_buffer), m_ramsize / 2);
@@ -160,23 +129,15 @@ void k05324x_device::device_start()
 
 void k05324x_device::device_reset()
 {
-	int i;
-
 	m_rombank = 0;
 
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 		m_regs[i] = 0;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
-
-void k05324x_device::k053245_set_sprite_offs( int offsx, int offsy )
-{
-	m_dx = offsx;
-	m_dy = offsy;
-}
 
 READ16_MEMBER( k05324x_device::k053245_word_r )
 {
@@ -205,7 +166,7 @@ WRITE8_MEMBER( k05324x_device::k053245_w )
 		m_ram[offset >> 1] = (m_ram[offset >> 1] & 0x00ff) | (data << 8);
 }
 
-void k05324x_device::k053245_clear_buffer( )
+void k05324x_device::clear_buffer()
 {
 	int i, e;
 
@@ -213,7 +174,7 @@ void k05324x_device::k053245_clear_buffer( )
 		m_buffer[i] = 0;
 }
 
-void k05324x_device::k053245_update_buffer( )
+void k05324x_device::update_buffer()
 {
 	memcpy(m_buffer, m_ram, m_ramsize);
 }
@@ -227,15 +188,15 @@ READ8_MEMBER( k05324x_device::k053244_r )
 		addr = (m_rombank << 19) | ((m_regs[11] & 0x7) << 18)
 			| (m_regs[8] << 10) | (m_regs[9] << 2)
 			| ((offset & 3) ^ 1);
-		addr &= machine().root_device().memregion(m_gfx_memory_region)->bytes() - 1;
+		addr &= m_sprite_size - 1;
 
 		//  popmessage("%s: offset %02x addr %06x", machine().describe_context(), offset & 3, addr);
 
-		return machine().root_device().memregion(m_gfx_memory_region)->base()[addr];
+		return m_sprite_rom[addr];
 	}
 	else if (offset == 0x06)
 	{
-		k053245_update_buffer();
+		update_buffer();
 		return 0;
 	}
 	else
@@ -260,7 +221,7 @@ WRITE8_MEMBER( k05324x_device::k053244_w )
 		break;
 
 	case 0x06:
-		k053245_update_buffer();
+		update_buffer();
 		break;
 	}
 }
@@ -290,12 +251,12 @@ WRITE16_MEMBER( k05324x_device::k053244_word_w )
 		k053244_w(space, offset * 2 + 1, data & 0xff);
 }
 
-void k05324x_device::k053244_bankselect( int bank )
+void k05324x_device::bankselect( int bank )
 {
 	m_rombank = bank;
 }
 
-void k05324x_device::k05324x_set_z_rejection( int zcode )
+void k05324x_device::set_z_rejection( int zcode )
 {
 	m_z_rejection = zcode;
 }
@@ -328,7 +289,7 @@ void k05324x_device::k05324x_set_z_rejection( int zcode )
  * The rest of the sprite remains normal.
  */
 
-void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
+void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
 {
 #define NUM_SPRITES 128
 	int offs, pri_code, i;
@@ -404,7 +365,8 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		color = m_buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
-		m_callback(machine(), &code, &color, &pri);
+		if (!m_k05324x_cb.isnull())
+			m_k05324x_cb(&code, &color, &pri);
 
 		size = (m_buffer[offs] & 0x0f00) >> 8;
 
@@ -475,7 +437,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -539,7 +501,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfx->prio_transtable(bitmap,cliprect,
+					gfx(0)->prio_transtable(bitmap,cliprect,
 							c,color,
 							fx,fy,
 							sx,sy,
@@ -548,7 +510,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 				}
 				else
 				{
-					m_gfx->prio_zoom_transtable(bitmap,cliprect,
+					gfx(0)->prio_zoom_transtable(bitmap,cliprect,
 							c,color,
 							fx,fy,
 							sx,sy,
@@ -578,7 +540,7 @@ if (machine().input().code_pressed(KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. let's cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
+void k05324x_device::sprites_draw_lethal( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
 {
 #define NUM_SPRITES 128
 	int offs, pri_code, i;
@@ -654,7 +616,8 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 		color = m_buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
-		m_callback(machine(), &code, &color, &pri);
+		if (!m_k05324x_cb.isnull())
+			m_k05324x_cb(&code, &color, &pri);
 
 		size = (m_buffer[offs] & 0x0f00) >> 8;
 
@@ -721,7 +684,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[m_gfxdecode->gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -785,7 +748,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfxdecode->gfx(0)->prio_transtable(bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					gfx(0)->prio_transtable(bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,color,
 							fx,fy,
 							sx,sy,
@@ -794,7 +757,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 				}
 				else
 				{
-					m_gfxdecode->gfx(0)->prio_zoom_transtable(bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					gfx(0)->prio_zoom_transtable(bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,color,
 							fx,fy,
 							sx,sy,

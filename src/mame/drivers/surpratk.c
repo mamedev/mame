@@ -163,15 +163,6 @@ static const k052109_interface surpratk_k052109_intf =
 	surpratk_tile_callback
 };
 
-static const k05324x_interface surpratk_k05324x_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	0, 0,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	surpratk_sprite_callback
-};
-
 void surpratk_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -231,9 +222,15 @@ static MACHINE_CONFIG_START( surpratk, surpratk_state )
 	MCFG_K052109_ADD("k052109", surpratk_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
-	MCFG_K053244_ADD("k053244", surpratk_k05324x_intf)
-	MCFG_K053244_GFXDECODE("gfxdecode")
-	MCFG_K053244_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k053244", K053244, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_GFX("k053244")
+	MCFG_K05324X_ORDER(NORMAL_PLANE_ORDER)
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_DEINTERLEAVE(KONAMI_ROM_DEINTERLEAVE_2)
+	MCFG_K05324X_CB(surpratk_state, sprite_callback)
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -262,7 +259,7 @@ ROM_START( suratk )
 	ROM_LOAD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) ) /* characters */
 	ROM_LOAD( "911d06.bin", 0x040000, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) ) /* characters */
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )  /* sprites */
 	ROM_LOAD( "911d04.bin", 0x040000, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )  /* sprites */
 ROM_END
@@ -277,7 +274,7 @@ ROM_START( suratka )
 	ROM_LOAD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) ) /* characters */
 	ROM_LOAD( "911d06.bin", 0x040000, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) ) /* characters */
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )  /* sprites */
 	ROM_LOAD( "911d04.bin", 0x040000, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )  /* sprites */
 ROM_END
@@ -292,7 +289,7 @@ ROM_START( suratkj )
 	ROM_LOAD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) ) /* characters */
 	ROM_LOAD( "911d06.bin", 0x040000, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) ) /* characters */
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )  /* sprites */
 	ROM_LOAD( "911d04.bin", 0x040000, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )  /* sprites */
 ROM_END
