@@ -310,25 +310,32 @@ void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void amiga_state::vblank()
 {
-	// signal vblank irq
-	set_interrupt(INTENA_SETCLR | INTENA_VERTB);
-
-	// clock cia a (todo: this can be connected to either a fixed 50/60hz signal from the power supply, or the vblank)
-	m_cia_0->tod_w(1);
-	m_cia_0->tod_w(0);
 }
 
+// todo: cia a clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
 TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 {
+	amiga_state *state = this;
 	int scanline = param;
 
-	// on the first scanline, we do some extra bookkeeping
+	// vblank start
 	if (scanline == 0)
-		vblank();
+	{
+		// signal vblank irq
+		set_interrupt(INTENA_SETCLR | INTENA_VERTB);
 
-	// on every scanline, clock the second cia tod
-	m_cia_1->tod_w(1);
-	m_cia_1->tod_w(0);
+		// clock tod
+		m_cia_0->tod_w(1);
+
+		// additional bookkeeping by drivers
+		vblank();
+	}
+
+	// vblank end
+	if (scanline == m_screen->visible_area().min_y)
+	{
+		m_cia_0->tod_w(0);
+	}
 
 	// render up to this scanline
 	if (!m_screen->update_partial(scanline))
@@ -336,7 +343,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 		if (IS_AGA(this))
 		{
 			bitmap_rgb32 dummy_bitmap;
-			amiga_aga_render_scanline(machine(), dummy_bitmap, scanline);
+			aga_render_scanline(dummy_bitmap, scanline);
 		}
 		else
 		{
@@ -344,6 +351,9 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 			render_scanline(dummy_bitmap, scanline);
 		}
 	}
+
+	// clock tod (if we actually render this scanline)
+	m_cia_1->tod_w((scanline & 1) ^ BIT(CUSTOM_REG(REG_VPOSR), 15));
 
 	// force a sound update
 	m_sound->update();
@@ -1523,7 +1533,6 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 				data &= ~BPLCON0_BPU0;
 			}
 			CUSTOM_REG(offset) = data;
-			update_screenmode();
 			break;
 
 		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:

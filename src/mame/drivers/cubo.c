@@ -1044,9 +1044,8 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(amiga_state::CLK_28M_PAL / 4 * 2, 910, 186, 910, 312, 29 /* 26 */, 312)
+	MCFG_FRAGMENT_ADD(pal_video)
+	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)

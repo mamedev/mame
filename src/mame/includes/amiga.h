@@ -361,6 +361,7 @@ public:
 	m_centronics_perror(0),
 	m_centronics_select(0),
 	m_gayle_reset(false),
+	m_previous_lof(true),
 	m_rx_shift(0),
 	m_tx_shift(0),
 	m_rx_state(0),
@@ -417,6 +418,7 @@ public:
 	DECLARE_PALETTE_INIT( amiga );
 
 	void render_scanline(bitmap_ind16 &bitmap, int scanline);
+	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
 	UINT32 screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
@@ -472,10 +474,10 @@ public:
 	enum
 	{
 		SCREEN_WIDTH = 910,
-		SCREEN_HEIGHT_PAL = 312,
-		SCREEN_HEIGHT_NTSC = 262,
-		VBLANK_PAL = 29, // 26
-		VBLANK_NTSC = 21,
+		SCREEN_HEIGHT_PAL = 625,
+		SCREEN_HEIGHT_NTSC = 525,
+		VBLANK_PAL = 58, // 52
+		VBLANK_NTSC = 42,
 		HBLANK = 186
 	};
 
@@ -586,6 +588,11 @@ private:
 
 	enum
 	{
+		VPOSR_LOF = 0x8000	// long frame
+	};
+
+	enum
+	{
 		ADKCON_UARTBRK = 0x800	// send break
 	};
 
@@ -613,7 +620,9 @@ private:
 
 	bool m_gayle_reset;
 
+	bool m_previous_lof;
 	bitmap_ind16 m_flickerfixer;
+	bitmap_ind32 m_flickerfixer32;
 
 	UINT16 m_rx_shift;
 	UINT16 m_tx_shift;
@@ -640,7 +649,6 @@ extern const char *const amiga_custom_names[0x100];
 void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data);
 
 
-
 /*----------- defined in video/amiga.c -----------*/
 
 extern const UINT16 amiga_expand_byte[256];
@@ -653,12 +661,12 @@ void amiga_set_genlock_color(running_machine &machine, UINT16 color);
 void amiga_sprite_dma_reset(running_machine &machine, int which);
 void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);
 
-/*----------- defined in video/amigaaga.c -----------*/
-
-void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline);
-void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
-void amiga_aga_diwhigh_written(running_machine &machine, int written);
 MACHINE_CONFIG_EXTERN( pal_video );
 MACHINE_CONFIG_EXTERN( ntsc_video );
+
+/*----------- defined in video/amigaaga.c -----------*/
+
+void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
+void amiga_aga_diwhigh_written(running_machine &machine, int written);
 
 #endif /* __AMIGA_H__ */

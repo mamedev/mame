@@ -626,13 +626,11 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, ham = 0;
-	bool lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
 	int hstart = 0, hstop = 0;
 	int vstart = 0, vstop = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
-	int x;
 	UINT16 *dst = NULL;
 	int ebitoffs = 0, obitoffs = 0;
 	int ecolmask = 0, ocolmask = 0;
@@ -646,9 +644,11 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	// we need to do a bit more work on the first scanline
 	if (scanline == 0)
 	{
-		// toggle lof if interlaced
-		if (lace)
-			CUSTOM_REG(REG_VPOSR) ^= 0x8000;
+		m_previous_lof = CUSTOM_REG(REG_VPOSR) & VPOSR_LOF;
+
+		// toggle lof if enabled
+		if (CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE)
+			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		// reset copper and ham color
 		amiga_copper_setpc(machine(), CUSTOM_REG_LONG(REG_COP1LCH));
@@ -658,18 +658,27 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	// in visible area?
 	if (bitmap.valid())
 	{
-		// if interlace is enabled and this is not our turn to draw, copy the previous scanline
-		if (lace && ((scanline & 1) ^ BIT(CUSTOM_REG(REG_VPOSR), 15)) == 0)
+		bool lof = CUSTOM_REG(REG_VPOSR) & VPOSR_LOF;
+
+		if ((scanline & 1) ^ lof)
 		{
-			memcpy(&bitmap.pix16(scanline), &m_flickerfixer.pix16(scanline), amiga_state::SCREEN_WIDTH * 2);
-			return;
+			// lof matches? then render this scanline
+			dst = &bitmap.pix16(scanline);
 		}
 		else
-			dst = &bitmap.pix16(scanline);
+		{
+			// lof doesn't match, we don't render this scanline
+			// if we didn't switch lof we have a full non-interlace screen,
+			// so we fill the black gaps with the contents of the previous scanline
+			// otherwise just render the contents of the previous frame's scanline
+			int shift = (m_previous_lof == lof) ? 1 : 0;
+
+			memcpy(&bitmap.pix16(scanline), &m_flickerfixer.pix16(scanline - shift), amiga_state::SCREEN_WIDTH * 2);
+			return;
+		}
 	}
 
-	if (lace)
-		scanline /= 2;
+	scanline /= 2;
 
 	m_last_scanline = scanline;
 
@@ -685,7 +694,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 
 	/* loop over the line */
 	next_copper_x = 0;
-	for (x = 0; x < amiga_state::SCREEN_WIDTH / 2; x++)
+	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2; x++)
 	{
 		int sprpix;
 
@@ -987,9 +996,9 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 #if GUESS_COPPER_OFFSET
 	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
-		if (machine.input().code_pressed(KEYCODE_Q))
+		if (machine().input().code_pressed(KEYCODE_Q))
 			popmessage("%d", m_wait_offset -= 1);
-		if (machine.input().code_pressed(KEYCODE_W))
+		if (machine().input().code_pressed(KEYCODE_W))
 			popmessage("%d", m_wait_offset += 1);
 	}
 #endif
@@ -1038,24 +1047,9 @@ void amiga_state::update_screenmode()
 	// frame period
 	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * SCREEN_WIDTH * height;
 
-	// interlace mode?
-	bool lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
-
-	if (lace)
-	{
-		// this doubles our vertical resolution
-		height *= 2;
-		height++;
-		vblank *= 2;
-	}
-
 	// adjust visible area
 	rectangle visarea = m_screen->visible_area();
 	visarea.sety(vblank, height - 1);
-
-#if 0
-	logerror("screenmode changed: %dx%d%s\n", SCREEN_WIDTH, height, lace ? " (interlace)" : "");
-#endif
 
 	// finally set our new mode
 	m_screen->configure(SCREEN_WIDTH, height, visarea, period);
@@ -1070,7 +1064,7 @@ MACHINE_CONFIG_FRAGMENT( pal_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS
 	(
-		amiga_state::CLK_28M_PAL / 4 * 2,
+		(amiga_state::CLK_28M_PAL / 4) * 2 * 2,
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_PAL, amiga_state::VBLANK_PAL, amiga_state::SCREEN_HEIGHT_PAL
 	)
@@ -1082,7 +1076,7 @@ MACHINE_CONFIG_FRAGMENT( ntsc_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS
 	(
-		amiga_state::CLK_28M_NTSC / 4 * 2,
+		(amiga_state::CLK_28M_NTSC / 4) * 2 * 2,
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_NTSC, amiga_state::VBLANK_NTSC, amiga_state::SCREEN_HEIGHT_NTSC
 	)

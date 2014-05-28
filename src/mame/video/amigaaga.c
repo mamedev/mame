@@ -76,6 +76,7 @@ VIDEO_START_MEMBER(amiga_state,amiga_aga)
 	VIDEO_START_CALL_MEMBER( amiga );
 
 	m_aga_diwhigh_written = 0;
+	m_screen->register_screen_bitmap(m_flickerfixer32);
 }
 
 
@@ -442,9 +443,9 @@ INLINE rgb_t update_ham(amiga_state *state, int newpix)
  *
  *************************************/
 
-void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline)
+void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
+	amiga_state *state = this;
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, ham = 0;
@@ -453,7 +454,6 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
-	int x;
 	UINT32 *dst = NULL;
 	int ebitoffs = 0, obitoffs = 0;
 	int ecolmask = 0, ocolmask = 0;
@@ -461,34 +461,63 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 	int next_copper_x;
 	int pl;
 	int defbitoffs = 0;
-	rgb_t *aga_palette = state->m_aga_palette;
+	rgb_t *aga_palette = m_aga_palette;
 
-	state->m_last_scanline = scanline;
+	int save_scanline = scanline;
 
 	/* on the first scanline, reset the COPPER and HAM color */
 	if (scanline == 0)
 	{
-		amiga_copper_setpc(machine, CUSTOM_REG_LONG(REG_COP1LCH));
-		state->m_ham_color = CUSTOM_REG(REG_COLOR00);
+		m_previous_lof = CUSTOM_REG(REG_VPOSR) & VPOSR_LOF;
+
+		// toggle lof if enabled
+		if (CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE)
+			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
+
+		amiga_copper_setpc(machine(), CUSTOM_REG_LONG(REG_COP1LCH));
+		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
+
+	// in visible area?
+	if (bitmap.valid())
+	{
+		bool lof = CUSTOM_REG(REG_VPOSR) & VPOSR_LOF;
+
+		if ((scanline & 1) ^ lof)
+		{
+			// lof matches? then render this scanline
+			dst = &bitmap.pix32(scanline);
+		}
+		else
+		{
+			// lof doesn't match, we don't render this scanline
+			// if we didn't switch lof we have a full non-interlace screen,
+			// so we fill the black gaps with the contents of the previous scanline
+			// otherwise just render the contents of the previous frame's scanline
+			int shift = (m_previous_lof == lof) ? 1 : 0;
+
+			memcpy(&bitmap.pix32(scanline), &m_flickerfixer32.pix32(scanline - shift), amiga_state::SCREEN_WIDTH * 4);
+			return;
+		}
+	}
+
+	scanline /= 2;
+
+	m_last_scanline = scanline;
 
 	/* update sprite data fetching */
 	update_sprite_dma(state, scanline);
 
-	/* start of a new line, signal we're not done with it and fill up vars */
-	if (bitmap.valid())
-		dst = &bitmap.pix32(scanline);
-
 	/* all sprites off at the start of the line */
-	memset(state->m_sprite_remain, 0, sizeof(state->m_sprite_remain));
+	memset(m_sprite_remain, 0, sizeof(m_sprite_remain));
 
 	/* temporary set color 0 to the genlock color */
-	if (state->m_genlock_color != 0xffff)
-		CUSTOM_REG(REG_COLOR00) = state->m_genlock_color;
+	if (m_genlock_color != 0xffff)
+		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
 	next_copper_x = 2;  /* copper runs on odd timeslots */
-	for (x = 0; x < 0xe8*2; x++)
+	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2; x++)
 	{
 		int sprpix;
 
@@ -497,10 +526,10 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = amiga_copper_execute_next(machine, x);
+			next_copper_x = amiga_copper_execute_next(machine(), x);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
-			if (state->m_genlock_color != 0xffff)
-				CUSTOM_REG(REG_COLOR00) = state->m_genlock_color;
+			if (m_genlock_color != 0xffff)
+				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 			/* compute update-related register values */
 			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
@@ -532,7 +561,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 			hstart = CUSTOM_REG(REG_DIWSTRT) & 0xff;
 			hstop = (CUSTOM_REG(REG_DIWSTOP) & 0xff);
 
-			if (state->m_aga_diwhigh_written)
+			if (m_aga_diwhigh_written)
 			{
 				hstart |= ((CUSTOM_REG(REG_DIWHIGH) >> 5) & 1) << 8;
 				hstop |= ((CUSTOM_REG(REG_DIWHIGH) >> 13) & 1) << 8;
@@ -550,7 +579,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 			/* compute the vertical start/stop */
 			vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
 			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);
-			if (state->m_aga_diwhigh_written)
+			if (m_aga_diwhigh_written)
 			{
 				vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
 				vstop |= ((CUSTOM_REG(REG_DIWHIGH) >> 8) & 7) << 8;
@@ -598,7 +627,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 			}
 
 			for (pl = 0; pl < 8; pl++)
-				state->m_aga_bpldat[pl] = 0;
+				m_aga_bpldat[pl] = 0;
 		}
 
 		/* need to run the sprite engine every pixel to ensure display */
@@ -758,7 +787,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 					if (pix)
 						dst[x*2+0] = aga_palette[pix];
 					else
-						dst[x*2+0] = aga_palette[state->m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]];
+						dst[x*2+0] = aga_palette[m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]];
 
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0xff;
@@ -774,7 +803,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 					if (pix)
 						dst[x*2+1] = aga_palette[pix];
 					else
-						dst[x*2+1] = aga_palette[state->m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]];
+						dst[x*2+1] = aga_palette[m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]];
 				}
 
 				/* single playfield mode */
@@ -839,6 +868,10 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 	/* restore color00 */
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
+	// save
+	if (dst != NULL)
+		memcpy(&m_flickerfixer32.pix32(save_scanline), dst, amiga_state::SCREEN_WIDTH * 4);
+
 #if GUESS_COPPER_OFFSET
 	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
@@ -860,11 +893,12 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 
 UINT32 amiga_state::screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
+	if (cliprect.min_y != cliprect.max_y)
+		return 0;
 
-	/* render each scanline in the visible region */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		amiga_aga_render_scanline(machine(), bitmap, y);
+	// render each scanline in the visible region
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		aga_render_scanline(bitmap, y);
 
 	return 0;
 }
