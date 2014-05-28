@@ -596,7 +596,7 @@ INPUT_PORTS_END
 
 void midas_state::machine_start()
 {
-	m_sprgen->set_pens((pen_t*)m_palette->pens());
+	m_sprgen->set_pens(m_palette->pens());
 	m_sprgen->set_screen(m_screen);
 	m_sprgen->set_sprite_region(memregion("sprites"));
 	m_sprgen->set_fixed_regions(memregion("tiles"), memregion("tiles"));
