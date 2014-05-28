@@ -54,8 +54,9 @@ const gfx_layout k05324x_device::spritelayout =
 	128*8
 };
 
+
 GFXDECODE_MEMBER( k05324x_device::gfxinfo )
-	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout, 0, 128)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout, 0, 1)
 GFXDECODE_END
 
 
@@ -65,11 +66,8 @@ k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, d
 	m_ram(NULL),
 	m_buffer(NULL),
 	m_sprite_rom(NULL),
-	m_gfx_tag(NULL),
 	m_dx(0),
 	m_dy(0),
-	m_plane_order(0),
-	m_deinterleave(0),
 	m_rombank(0),
 	m_ramsize(0),
 	m_z_rejection(0)
@@ -83,29 +81,15 @@ k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, d
 
 void k05324x_device::device_start()
 {
-	m_sprite_rom = machine().root_device().memregion(m_gfx_tag)->base();
-	m_sprite_size = machine().root_device().memregion(m_gfx_tag)->bytes();
+	m_sprite_rom = region()->base();
+	m_sprite_size = region()->bytes();
 
 	/* decode the graphics */
 	decode_gfx();
-	switch (m_plane_order)
-	{
-	case NORMAL_PLANE_ORDER:
-		{
-			gfx(0)->set_source_and_total(m_sprite_rom, m_sprite_size / 128);
-			gfx(0)->set_colors(palette()->entries() / gfx(0)->depth());
-		}
-		break;
-
-	default:
-		fatalerror("Unsupported plane_order\n");
-	}
+	gfx(0)->set_colors(palette()->entries() / gfx(0)->depth());
 
 	if (VERBOSE && !(palette()->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-
-	/* deinterleave the graphics, if needed */
-	konami_deinterleave_gfx(machine(), m_gfx_tag, m_deinterleave);
 
 	m_ramsize = 0x800;
 

@@ -276,10 +276,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	MCFG_DEVICE_ADD("k053244", K053244, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_GFX("k053244")
-	MCFG_K05324X_ORDER(NORMAL_PLANE_ORDER)
 	MCFG_K05324X_OFFSETS(-3, -1)
-	MCFG_K05324X_DEINTERLEAVE(KONAMI_ROM_DEINTERLEAVE_2)
 	MCFG_K05324X_CB(rollerg_state, sprite_callback)
 
 	MCFG_K051316_ADD("k051316", rollerg_k051316_intf)
@@ -317,8 +314,8 @@ ROM_START( rollerg )
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
 	ROM_REGION( 0x200000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
-	ROM_LOAD( "999h06.k2",  0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
-	ROM_LOAD( "999h05.k8",  0x100000, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
+	ROM_LOAD32_WORD( "999h06.k2", 0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
+	ROM_LOAD32_WORD( "999h05.k8", 0x000002, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
@@ -337,8 +334,8 @@ ROM_START( rollergj )
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
 	ROM_REGION( 0x200000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
-	ROM_LOAD( "999h06.k2",  0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
-	ROM_LOAD( "999h05.k8",  0x100000, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
+	ROM_LOAD32_WORD( "999h06.k2", 0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
+	ROM_LOAD32_WORD( "999h05.k8", 0x000002, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
