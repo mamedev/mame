@@ -8,7 +8,7 @@
 #include "../analog/nld_solver.h"
 
 #define R_OFF (1E20)
-#define R_ON (1)
+#define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
 
 inline double NETLIB_NAME(NE555)::clamp(const double v, const double a, const double b)
 {

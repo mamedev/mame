@@ -34,20 +34,20 @@ ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
         delete m_inps[i];
 }
 
-ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &aowner, net_entry *list)
+ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
 	m_owner = &aowner;
 
 	NL_VERBOSE_OUT(("New solver setup\n"));
 
-	for (int k = 0; k < nets.count(); k++)
-	    list[k].m_net = nets[k];
+	m_nets.resize(nets.count());
 
 	for (int k = 0; k < nets.count(); k++)
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
-		netlist_analog_net_t *net = list[k].m_net;
+        m_nets[k].m_net = nets[k];
+		netlist_analog_net_t *net = nets[k];
 
 		net->m_solver = this;
 
@@ -81,9 +81,9 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 			            pterm->m_new_analog_ptr = &pterm->m_otherterm->net().as_analog().m_new_Analog;
 
 						if (pterm->m_otherterm->net().isRailNet())
-							list[k].m_rails.add(pterm);
+							m_nets[k].m_rails.add(pterm);
 						else
-						    list[k].m_terms.add(pterm);
+						    m_nets[k].m_terms.add(pterm);
 					}
 					NL_VERBOSE_OUT(("Added terminal\n"));
 					break;
@@ -119,16 +119,33 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 	}
 }
 
-ATTR_HOT double netlist_matrix_solver_t::compute_next_timestep(const double hn)
+template <int m_N, int _storage_N>
+ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep(const double hn)
 {
     double new_solver_timestep = m_params.m_max_timestep;
 
     if (m_params.m_dynamic)
     {
+        /*
+         * FIXME: this is a reduced LTE focusing on the nets which drive other nets
+         *        The academically correct version using all nets is the one commented out
+         *        This causes really bad performance due to rounding errors.
+         */
+#if 0
         for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
         {
             netlist_analog_net_t *n = (*p)->m_proxied_net;
-            double DD_n = (n->m_cur_Analog - n->m_last_Analog) / hn;
+#else
+        for (int k = 0; k < N(); k++)
+        {
+            netlist_analog_net_t *n = m_nets[k].m_net;
+#endif
+            double DD_n = (n->m_cur_Analog - n->m_last_Analog);
+
+            if (fabs(DD_n) < 2.0 * m_params.m_accuracy)
+                DD_n = 0.0;
+            else
+                DD_n = DD_n / hn;
 
             double h_n_m_1 = n->m_h_n_m_1;
             // limit last timestep in equation.
@@ -140,10 +157,17 @@ ATTR_HOT double netlist_matrix_solver_t::compute_next_timestep(const double hn)
 
             n->m_DD_n_m_1 = DD_n;
             n->m_h_n_m_1 = hn;
-            if (fabs(DD2) > 1e-200) // avoid div-by-zero
+            if (fabs(DD2) > 1e-50) // avoid div-by-zero
                 new_net_timestep = sqrt(m_params.m_lte / fabs(0.5*DD2));
             else
+            {
                 new_net_timestep = m_params.m_max_timestep;
+
+                //if (hn > 0.0 && new_net_timestep > 100.0 * hn)
+                //    new_net_timestep = 100.0 * hn;
+            }
+            //if (N()==2)
+            //    printf("%s: k %d ts %e DD2 %e\n", name().cstr(), k, new_net_timestep, DD2);
 
             if (new_net_timestep < new_solver_timestep)
                 new_solver_timestep = new_net_timestep;
@@ -162,11 +186,19 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
     for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
         if ((*p)->m_proxied_net->m_last_Analog != (*p)->m_proxied_net->m_cur_Analog)
             (*p)->set_Q((*p)->m_proxied_net->m_cur_Analog);
-    for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+#if 1
+    for (int k = 0; k < m_nets.count(); k++)
     {
-        if ((*p)->m_proxied_net->m_last_Analog != (*p)->m_proxied_net->m_cur_Analog)
-            (*p)->m_proxied_net->m_last_Analog = (*p)->m_proxied_net->m_cur_Analog;
+        netlist_analog_net_t *p= m_nets[k].m_net;
+        p->m_last_Analog = p->m_cur_Analog;
     }
+#else
+        for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+        {
+            if ((*p)->m_proxied_net->m_last_Analog != (*p)->m_proxied_net->m_cur_Analog)
+                (*p)->m_proxied_net->m_last_Analog = (*p)->m_proxied_net->m_cur_Analog;
+        }
+#endif
 }
 
 
@@ -201,18 +233,15 @@ ATTR_COLD void netlist_matrix_solver_t::update()
 {
     const double new_timestep = solve();
 
-    if (m_params.m_dynamic && new_timestep > 0)
+    if (m_params.m_dynamic && is_timestep() && new_timestep > 0)
         m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(new_timestep));
 }
 
 ATTR_COLD void netlist_matrix_solver_t::update_forced()
 {
-    const double new_timestep = solve();
+    ATTR_UNUSED const double new_timestep = solve();
 
-    if (!m_params.m_dynamic)
-        return;
-
-     if (new_timestep > 0)
+    if (m_params.m_dynamic && is_timestep())
         m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 }
 
@@ -305,7 +334,7 @@ template <int m_N, int _storage_N>
 ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
 {
     m_dim = nets.count();
-	netlist_matrix_solver_t::setup(nets, owner, m_nets);
+	netlist_matrix_solver_t::setup(nets, owner);
 
 	m_terms.clear();
 	m_rail_start = 0;
@@ -477,17 +506,18 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 	double cerr2 = 0;
 	for (int i = 0; i < this->N(); i++)
 	{
-		double e = (V[i] - this->m_nets[i].m_net->m_cur_Analog);
-		double e2 = (m_RHS[i] - this->m_last_RHS[i]);
-		cerr += e * e;
-		cerr2 += e2 * e2;
+		const double e = (V[i] - this->m_nets[i].m_net->m_cur_Analog);
+		const double e2 = (m_RHS[i] - this->m_last_RHS[i]);
+		cerr = (fabs(e) > cerr ? fabs(e) : cerr);
+        cerr2 = (fabs(e2) > cerr2 ? fabs(e2) : cerr2);
 	}
-	return (cerr + cerr2*(100000.0 * 100000.0)) / this->N();
+	// FIXME: Review
+	return cerr + cerr2*100000.0;
 }
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
-		const double (* RESTRICT V), bool store_RHS)
+		const double (* RESTRICT V), const bool store_RHS)
 {
 	for (int i = 0; i < this->N(); i++)
 	{
@@ -515,7 +545,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 
         store(new_v, true);
 
-        if (err > this->m_params.m_accuracy * this->m_params.m_accuracy)
+        if (err > this->m_params.m_accuracy)
         {
             return 2;
         }
@@ -548,11 +578,11 @@ ATTR_HOT int netlist_matrix_solver_direct1_t::vsolve_non_dynamic()
 	double new_val =  m_RHS[0] / m_A[0][0];
 
 	double e = (new_val - net->m_cur_Analog);
-	double cerr = e * e;
+	double cerr = fabs(e);
 
 	net->m_cur_Analog = net->m_new_Analog = new_val;
 
-	if (is_dynamic() && (cerr  > m_params.m_accuracy * m_params.m_accuracy))
+	if (is_dynamic() && (cerr  > m_params.m_accuracy))
 	{
 		return 2;
 	}
@@ -578,14 +608,14 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::vsolve_non_dynamic()
 	const double d = m_A[1][1];
 
 	double new_val[2];
-	new_val[1] = a / (a * d - b * c) * (m_RHS[1] - c / a * m_RHS[0]);
+	new_val[1] = (a * m_RHS[1] - c * m_RHS[0]) / (a * d - b * c);
 	new_val[0] = (m_RHS[0] - b * new_val[1]) / a;
 
 	if (is_dynamic())
 	{
 		double err = delta(new_val);
 		store(new_val, true);
-		if (err > m_params.m_accuracy * m_params.m_accuracy)
+		if (err > m_params.m_accuracy )
 			return 2;
 		else
 			return 1;
@@ -626,21 +656,20 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 
         for (int k = 0; k < iN; k++)
         {
-            const int pk = k;
             double Idrive = 0;
 
             // loop auto-vectorized
             for (int i = 0; i < iN; i++)
-                Idrive -= this->m_A[pk][i] * new_v[i];
+                Idrive -= this->m_A[k][i] * new_v[i];
 
-            const double new_val = (this->m_RHS[pk] + Idrive + this->m_A[pk][pk] * new_v[pk]) / this->m_A[pk][pk];
+            const double new_val = (this->m_RHS[k] + Idrive + this->m_A[k][k] * new_v[k]) / this->m_A[k][k];
 
-            const double e = (new_val - new_v[k]);
-            cerr += e * e;
-
+            const double e = fabs(new_val - new_v[k]);
+            cerr = (e > cerr ? e : cerr);
             new_v[k] = new_val;
         }
-        if (cerr > this->m_params.m_accuracy * this->m_params.m_accuracy)
+
+        if (cerr > this->m_params.m_accuracy)
         {
             resched = true;
         }
@@ -745,11 +774,11 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 			const double new_val = net.m_new_Analog * one_m_w[k] + (Idrive + RHS[k]) * w[k];
 
 			const double e = (new_val - net.m_new_Analog);
-			cerr += e * e;
+			cerr = (fabs(e) > cerr ? fabs(e) : cerr);
 
 			net.m_new_Analog = new_val;
 		}
-		if (cerr > this->m_params.m_accuracy * this->m_params.m_accuracy)
+		if (cerr > this->m_params.m_accuracy)
 		{
 			resched = true;
 		}
@@ -790,13 +819,13 @@ NETLIB_START(solver)
 
 	register_param("FREQ", m_freq, 48000.0);
 
-	register_param("ACCURACY", m_accuracy, 1e-7);
+	register_param("ACCURACY", m_accuracy, 1e-4);
 	register_param("GS_LOOPS", m_gs_loops, 5);              // Gauss-Seidel loops
     register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
     register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
     register_param("DYNAMIC_TS", m_dynamic, 0);
-	register_param("LTE", m_lte, 1e-3);                     // 1mV diff/timestep
+    register_param("LTE", m_lte, 1e-2);                     // 100mV diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 2e-9);   // double timestep resolution
 
 	// internal staff
@@ -896,7 +925,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
     if (m_params.m_dynamic)
     {
-        m_params.m_max_timestep *= 100.0;
+        m_params.m_max_timestep *= 1000.0;
     }
     else
     {
@@ -1009,6 +1038,5 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 			}
 		}
 	}
-
 }
 

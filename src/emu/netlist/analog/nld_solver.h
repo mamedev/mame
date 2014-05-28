@@ -71,19 +71,32 @@ protected:
 
 	class net_entry
 	{
-	    NETLIST_PREVENT_COPYING(net_entry)
-
 	public:
 	    net_entry(netlist_analog_net_t *net) : m_net(net) {}
         net_entry() : m_net(NULL) {}
+
+        net_entry(const net_entry &rhs)
+        {
+            m_net = rhs.m_net;
+            m_terms = rhs.m_terms;
+            m_rails = rhs.m_rails;
+        }
+
+        net_entry &operator=(const net_entry &rhs)
+        {
+            m_net = rhs.m_net;
+            m_terms = rhs.m_terms;
+            m_rails = rhs.m_rails;
+            return *this;
+        }
 
 	    netlist_analog_net_t * RESTRICT m_net;
 	    netlist_terminal_t::list_t m_terms;
 	    netlist_terminal_t::list_t m_rails;
 	};
 
-    ATTR_COLD virtual void setup(netlist_analog_net_t::list_t &nets,
-            NETLIB_NAME(solver) &owner, net_entry *list);
+    ATTR_COLD void setup(netlist_analog_net_t::list_t &nets,
+            NETLIB_NAME(solver) &owner);
 
 	NETLIB_NAME(solver) *m_owner;
 
@@ -92,12 +105,14 @@ protected:
 
     int m_calculations;
 
+    plinearlist_t<net_entry> m_nets;
+    plinearlist_t<netlist_analog_output_t *> m_inps;
+
 private:
 
     netlist_time m_last_step;
     dev_list_t m_steps;
     dev_list_t m_dynamic;
-    plinearlist_t<netlist_analog_output_t *> m_inps;
 
     netlist_ttl_input_t m_fb_sync;
     netlist_ttl_output_t m_Q_sync;
@@ -108,7 +123,7 @@ private:
      * Don't schedule a new calculation time. The recalculation has to be
      * triggered by the caller after the netlist element was changed.
      */
-    ATTR_HOT double compute_next_timestep(const double hn);
+    ATTR_HOT virtual double compute_next_timestep(const double) = 0;
 
     ATTR_HOT void update_inputs();
     ATTR_HOT void update_dynamic();
@@ -140,9 +155,9 @@ protected:
 	ATTR_HOT inline void gauss_LE(double (* RESTRICT x));
 	ATTR_HOT inline double delta(
 			const double (* RESTRICT V));
-	ATTR_HOT inline void store(const double (* RESTRICT V), bool store_RHS);
+	ATTR_HOT inline void store(const double (* RESTRICT V), const bool store_RHS);
 
-    net_entry m_nets[_storage_N];
+    ATTR_HOT virtual double compute_next_timestep(const double);
 
     double m_A[_storage_N][_storage_N];
     double m_RHS[_storage_N];
@@ -160,7 +175,7 @@ private:
         : m_term(NULL), m_net_this(-1), m_net_other(-1)
         {}
 
-        netlist_terminal_t *m_term;
+        netlist_terminal_t * RESTRICT m_term;
 		int m_net_this;
 		int m_net_other;
 	};
