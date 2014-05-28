@@ -17,6 +17,7 @@ In the code:
 WRITE8_MEMBER( xxx_state::kbd_put )
 {
     (code to capture the key as it is pressed)
+    (if your machine uses function keys, add your conversion code here)
 }
 
 ***************************************************************************/
@@ -38,6 +39,8 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd5(*this, "TERM_LINE5"),
 	m_io_kbd6(*this, "TERM_LINE6"),
 	m_io_kbd7(*this, "TERM_LINE7"),
+	m_io_kbd8(*this, "TERM_LINE8"),
+	m_io_kbd9(*this, "TERM_LINE9"),
 	m_io_kbdc(*this, "TERM_LINEC"),
 	m_keyboard_cb(*this)
 {
@@ -53,6 +56,8 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd5(*this, "TERM_LINE5"),
 	m_io_kbd6(*this, "TERM_LINE6"),
 	m_io_kbd7(*this, "TERM_LINE7"),
+	m_io_kbd8(*this, "TERM_LINE8"),
+	m_io_kbd9(*this, "TERM_LINE9"),
 	m_io_kbdc(*this, "TERM_LINEC"),
 	m_keyboard_cb(*this)
 {
@@ -98,6 +103,10 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 		if (i == 6) code = m_io_kbd6->read();
 		else
 		if (i == 7) code = m_io_kbd7->read();
+		else
+		if (i == 8) code = m_io_kbd8->read();
+		else
+		if (i == 9) code = m_io_kbd9->read();
 
 		if (code != 0)
 		{
@@ -174,12 +183,28 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 					case 1: key_code = 0x08; break; // Backspace
 				}
 			}
-			retVal = key_code;
-		} else {
-			*scan_line += 1;
-			if (*scan_line==8) {
-				*scan_line = 0;
+			else
+			if (i==8)
+			{
+				key_code = row_number(code)+0x81;
+				if (ctrl) key_code+=0x10;
+				if (shift) key_code+=0x20;
 			}
+			else
+			if (i==9)
+			{
+				key_code = row_number(code)+0x89;
+				if (ctrl) key_code+=0x10;
+				if (shift) key_code+=0x20;
+			}
+
+			retVal = key_code;
+		}
+		else
+		{
+			*scan_line += 1;
+			if (*scan_line==10)
+				*scan_line = 0;
 		}
 	}
 	return retVal;
@@ -340,6 +365,22 @@ INPUT_PORTS_START( generic_keyboard )
 	PORT_START("TERM_LINE7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+
+	PORT_START("TERM_LINE8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+
+	PORT_START("TERM_LINE9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10))
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) PORT_CHAR(UCHAR_MAMEKEY(F11))
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
 INPUT_PORTS_END
 
 ioport_constructor generic_keyboard_device::device_input_ports() const

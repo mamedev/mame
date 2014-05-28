@@ -35,6 +35,8 @@ protected:
 	required_ioport m_io_kbd5;
 	required_ioport m_io_kbd6;
 	required_ioport m_io_kbd7;
+	required_ioport m_io_kbd8;
+	required_ioport m_io_kbd9;
 	required_ioport m_io_kbdc;
 
 	virtual void device_start();
