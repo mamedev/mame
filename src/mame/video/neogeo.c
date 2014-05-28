@@ -19,35 +19,6 @@
  *
  *************************************/
 
-void neogeo_state::compute_rgb_weights(  )
-{
-	static const int resistances[] = { 220, 470, 1000, 2200, 3900 };
-
-	/* compute four sets of weights - with or without the pulldowns -
-	   ensuring that we use the same scaler for all */
-
-	double scaler = compute_resistor_weights(0, 0xff, -1,
-								5, resistances, m_rgb_weights_normal, 0, 0,
-								0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0);
-
-	compute_resistor_weights(0, 0xff, scaler,
-								5, resistances, m_rgb_weights_normal_bit15, 8200, 0,
-								0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0);
-
-	compute_resistor_weights(0, 0xff, scaler,
-								5, resistances, m_rgb_weights_dark, 150, 0,
-								0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0);
-
-	compute_resistor_weights(0, 0xff, scaler,
-								5, resistances, m_rgb_weights_dark_bit15, 1 / ((1.0 / 8200) + (1.0 / 150)), 0,
-								0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0);
-}
-
-
 void neogeo_state::create_rgb_lookups()
 {
 	static const int resistances[] = {3900, 2200, 1000, 470, 220};
@@ -92,96 +63,53 @@ void neogeo_state::create_rgb_lookups()
 	}
 }
 
-
-pen_t neogeo_state::get_pen( UINT16 data )
+void neogeo_state::set_pens()
 {
-	double *weights;
-	UINT8 r, g, b;
-
-	if (m_screen_dark)
-	{
-		if (data & 0x8000)
-			weights = m_rgb_weights_dark_bit15;
-		else
-			weights = m_rgb_weights_dark;
-	}
-	else
-	{
-		if (data & 0x8000)
-			weights = m_rgb_weights_normal_bit15;
-		else
-			weights = m_rgb_weights_normal;
-	}
-
-	r = combine_5_weights(weights,
-							(data >> 11) & 0x01,
-							(data >> 10) & 0x01,
-							(data >>  9) & 0x01,
-							(data >>  8) & 0x01,
-							(data >> 14) & 0x01);
-
-	g = combine_5_weights(weights,
-							(data >>  7) & 0x01,
-							(data >>  6) & 0x01,
-							(data >>  5) & 0x01,
-							(data >>  4) & 0x01,
-							(data >> 13) & 0x01);
-
-	b = combine_5_weights(weights,
-							(data >>  3) & 0x01,
-							(data >>  2) & 0x01,
-							(data >>  1) & 0x01,
-							(data >>  0) & 0x01,
-							(data >> 12) & 0x01);
-
-	return rgb_t(r, g, b);
+	const pen_t *pen_base = m_palette->pens() + m_palette_bank + (m_screen_shadow ? 0x2000 : 0);
+	m_sprgen->set_pens(pen_base);
+	m_bg_pen = pen_base + 0xfff; 
 }
 
 
-void neogeo_state::regenerate_pens()
+void neogeo_state::neogeo_set_screen_shadow( int data )
 {
-	int i;
-
-	for (i = 0; i < NUM_PENS; i++)
-		m_pens[i] = get_pen(m_palettes[m_palette_bank][i]);
+	m_screen_shadow = data;
+	set_pens();
 }
 
 
-void neogeo_state::neogeo_set_palette_bank( UINT8 data )
+void neogeo_state::neogeo_set_palette_bank( int data )
 {
-	if (data != m_palette_bank)
-	{
-		m_palette_bank = data;
-
-		regenerate_pens();
-	}
-}
-
-
-void neogeo_state::neogeo_set_screen_dark( UINT8 data )
-{
-	if (data != m_screen_dark)
-	{
-		m_screen_dark = data;
-
-		regenerate_pens();
-	}
+	m_palette_bank = data ? 0x1000 : 0;
+	set_pens();
 }
 
 
 READ16_MEMBER(neogeo_state::neogeo_paletteram_r)
 {
-	return m_palettes[m_palette_bank][offset];
+	return m_paletteram[m_palette_bank + offset];
 }
 
 
 WRITE16_MEMBER(neogeo_state::neogeo_paletteram_w)
 {
-	UINT16 *addr = &m_palettes[m_palette_bank][offset];
+	offset += m_palette_bank;
+	data = COMBINE_DATA(&m_paletteram[offset]);
 
-	COMBINE_DATA(addr);
+	int dark = data >> 15;
+	int r = ((data >> 14) & 0x1) | ((data >> 7) & 0x1e);
+	int g = ((data >> 13) & 0x1) | ((data >> 3) & 0x1e);
+	int b = ((data >> 12) & 0x1) | ((data << 1) & 0x1e);
 
-	m_pens[offset] = get_pen(*addr);
+	m_palette->set_pen_color(offset,
+								m_palette_lookup[r][dark],
+								m_palette_lookup[g][dark],
+								m_palette_lookup[b][dark]);	// normal
+
+	m_palette->set_pen_color(offset + 0x2000,
+								m_palette_lookup[r][dark+2],
+								m_palette_lookup[g][dark+2],
+								m_palette_lookup[b][dark+2]); // shadow
 }
 
 
@@ -194,25 +122,19 @@ WRITE16_MEMBER(neogeo_state::neogeo_paletteram_w)
 
 void neogeo_state::video_start()
 {
-	/* allocate memory not directly mapped */
-	m_palettes[0] = auto_alloc_array(machine(), UINT16, NUM_PENS);
-	m_palettes[1] = auto_alloc_array(machine(), UINT16, NUM_PENS);
-	m_pens = auto_alloc_array(machine(), pen_t, NUM_PENS);
-
-	compute_rgb_weights();
 	create_rgb_lookups();
 
-	memset(m_palettes[0], 0x00, NUM_PENS * sizeof(UINT16));
-	memset(m_palettes[1], 0x00, NUM_PENS * sizeof(UINT16));
-	memset(m_pens, 0x00, NUM_PENS * sizeof(pen_t));
+	m_paletteram.resize_and_clear(0x1000 * 2);
 
-	save_pointer(NAME(m_palettes[0]), NUM_PENS);
-	save_pointer(NAME(m_palettes[1]), NUM_PENS);
-	save_item(NAME(m_screen_dark));
+	m_screen_shadow = 0;
+	m_palette_bank = 0;
+
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_screen_shadow));
 	save_item(NAME(m_palette_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_state::regenerate_pens), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_state::set_pens), this));
 
-	m_sprgen->set_pens(m_pens);
+	set_pens();
 }
 
 
@@ -239,7 +161,7 @@ void neogeo_state::video_reset()
 UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
-	bitmap.fill(m_pens[0x0fff], cliprect);
+	bitmap.fill(*m_bg_pen, cliprect);
 
 	m_sprgen->draw_sprites(bitmap, cliprect.min_y);
 

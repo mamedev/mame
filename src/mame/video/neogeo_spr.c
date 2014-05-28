@@ -234,7 +234,7 @@ void neosprite_base_device::draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline
 			int i;
 			int gfx_offset = ((code << 5) | (scanline & 0x07)) & addr_mask;
 
-			pen_t *char_pens;
+			const pen_t *char_pens;
 			
 			char_pens = &m_pens[code_and_palette >> 12 << m_bppshift];
 
@@ -252,7 +252,7 @@ void neosprite_base_device::draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline
 }
 
 
-inline void neosprite_base_device::draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, pen_t* char_pens)
+inline void neosprite_base_device::draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens)
 {
 	UINT8 data = gfx_base[offset];
 
@@ -377,7 +377,7 @@ void neosprite_base_device::draw_sprites( bitmap_rgb32 &bitmap, int scanline )
 			UINT16 attr;
 			UINT32 code;
 			const int *zoom_x_table;
-			pen_t *line_pens;
+			const pen_t *line_pens;
 			int x_inc;
 
 			int sprite_line = (scanline - y) & 0x1ff;
@@ -627,7 +627,7 @@ void neosprite_base_device::set_screen(screen_device* screen)
 	m_screen = screen;
 }
 
-void neosprite_base_device::set_pens(pen_t* pens)
+void neosprite_base_device::set_pens(const pen_t* pens)
 {
 	m_pens = pens;
 }
@@ -670,7 +670,7 @@ void neosprite_regular_device::set_sprite_region(memory_region* region_sprites)
 	m_sprite_gfx_address_mask = mask;
 }
 
-inline void neosprite_regular_device::draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens)
+inline void neosprite_regular_device::draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens)
 {
 	const UINT8* src = m_region_sprites->base() + (((romaddr &~0xff)>>1) | (((romaddr&0x8)^0x8)<<3) | ((romaddr & 0xf0)  >> 2));
 	const int x = romaddr & 0x7;
@@ -739,7 +739,7 @@ void neosprite_optimized_device::optimize_sprite_data()
 	}
 }
 
-inline void neosprite_optimized_device::draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens)
+inline void neosprite_optimized_device::draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens)
 {
 	const UINT8 gfx = m_sprite_gfx[romaddr];
 
@@ -765,7 +765,7 @@ neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, co
 }
 
 
-inline void neosprite_midas_device::draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens)
+inline void neosprite_midas_device::draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens)
 {
 	const UINT8* src = m_region_sprites->base() + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
 	const int x = romaddr & 0x7;
@@ -800,7 +800,7 @@ void neosprite_midas_device::buffer_vram()
 	memcpy(m_videoram_buffer, m_videoram, (0x8000 + 0x800) * sizeof(UINT16));
 }
 
-inline void neosprite_midas_device::draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, pen_t* char_pens)
+inline void neosprite_midas_device::draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens)
 {
 	UINT8 data;
 	

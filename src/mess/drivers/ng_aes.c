@@ -1455,7 +1455,7 @@ void ng_aes_state::NeoCDIRQUpdate(UINT8 byteValue)
 UINT32 ng_aes_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
-	bitmap.fill(m_pens[0x0fff], cliprect);
+	bitmap.fill(*m_bg_pen, cliprect);
 
 	if (m_has_sprite_bus) m_sprgen->draw_sprites(bitmap, cliprect.min_y);
 

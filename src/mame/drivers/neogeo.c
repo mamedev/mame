@@ -984,7 +984,7 @@ WRITE8_MEMBER(neogeo_state::system_control_w)
 	{
 		default:
 		case 0x00:
-			neogeo_set_screen_dark(bit);
+			neogeo_set_screen_shadow(bit);
 			break;
 
 		case 0x01:
@@ -1792,7 +1792,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(neogeo_state, screen_update_neogeo)
 
 	/* 4096 colors * two banks * normal and shadow */
-	MCFG_PALETTE_ADD("palette", 4096*2*2)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096*2*2)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_OPTIMZIED, 0)
 	

@@ -151,12 +151,10 @@ protected:
 	void neogeo_set_display_counter_lsb(UINT16 data);
 	void set_video_control( UINT16 data );
 
-	void compute_rgb_weights(  );
 	void create_rgb_lookups();
-	void regenerate_pens();
-	pen_t get_pen( UINT16 data );
-	void neogeo_set_palette_bank( UINT8 data );
-	void neogeo_set_screen_dark( UINT8 data );
+	void set_pens();
+	void neogeo_set_screen_shadow( int data );
+	void neogeo_set_palette_bank( int data );
 
 	void audio_cpu_check_nmi();
 	void select_controller( UINT8 data );
@@ -346,15 +344,11 @@ protected:
 	UINT16 get_video_control(  );
 
 	// color/palette related
-	UINT8      m_palette_lookup[32][4];
-	double     m_rgb_weights_normal[5];
-	double     m_rgb_weights_normal_bit15[5];
-	double     m_rgb_weights_dark[5];
-	double     m_rgb_weights_dark_bit15[5];
-	UINT16     *m_palettes[2]; /* 0x100*16 2 byte palette entries */
-	pen_t      *m_pens;
-	UINT8      m_palette_bank;
-	UINT8      m_screen_dark;
+	dynamic_array<UINT16> m_paletteram;
+	UINT8        m_palette_lookup[32][4];
+	const pen_t *m_bg_pen;
+	int          m_screen_shadow;
+	int          m_palette_bank;
 
 	// cartridge-specific hardware
 	// TODO: move into separate devices

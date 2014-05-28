@@ -23,7 +23,7 @@ public:
 //	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void optimize_sprite_data();
-	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, pen_t* char_pens);
+	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
 	void draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline );
 	void set_videoram_offset( UINT16 data );
 	UINT16 get_videoram_data(  );
@@ -37,7 +37,7 @@ public:
 	void start_auto_animation_timer(  );
 	void neogeo_set_fixed_layer_source( UINT8 data );
 	inline bool sprite_on_scanline(int scanline, int y, int rows);
-	virtual void draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens) = 0;
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) = 0;
 	void draw_sprites( bitmap_rgb32 &bitmap, int scanline );
 	void parse_sprites( int scanline );
 	void create_sprite_line_timer(  );
@@ -45,7 +45,7 @@ public:
 	virtual void set_sprite_region(memory_region* region_sprites);
 	void set_fixed_regions(memory_region* fix_cart, memory_region* fix_bios);
 	void set_screen(screen_device* screen);
-	void set_pens(pen_t* pens);
+	void set_pens(const pen_t* pens);
 
 	UINT16     *m_videoram;
 	UINT16     *m_videoram_drawsource;
@@ -83,7 +83,7 @@ protected:
 	memory_region* m_region_fixed;
 	memory_region* m_region_fixedbios;
 	screen_device* m_screen;
-	pen_t      *m_pens;
+	const pen_t   *m_pens;
 
 private:
 
@@ -96,7 +96,7 @@ class neosprite_regular_device : public neosprite_base_device
 {
 public:
 	neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens);
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
 	virtual void set_sprite_region(memory_region* region_sprites);
 
 };
@@ -109,7 +109,7 @@ class neosprite_optimized_device : public neosprite_base_device
 public:
 	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void optimize_sprite_data();
-	virtual void draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens);
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
 	dynamic_array<UINT8> m_sprite_gfx;
 
 };
@@ -125,11 +125,11 @@ class neosprite_midas_device : public neosprite_base_device
 public:
 	neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	virtual void draw_pixel(int romaddr, UINT32* dst, pen_t *line_pens);
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
 
 	UINT16* m_videoram_buffer;
 	void buffer_vram();
-	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, pen_t* char_pens);
+	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
 	virtual void set_sprite_region(memory_region* region_sprites);
 
 	protected:
