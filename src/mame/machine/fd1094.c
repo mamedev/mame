@@ -953,5 +953,3 @@ WRITE_LINE_MEMBER(fd1094_device::rte_callback)
 {
 	change_state(STATE_RTE);
 }
-
-endif
