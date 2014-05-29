@@ -280,11 +280,24 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
+static const gfx_layout spritelayout8 =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 0*4, 1*4, RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+1*4, 2*4, 3*4, RGN_FRAC(1,2)+2*4, RGN_FRAC(1,2)+3*4 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	64*8
+};
+
+
 static GFXDECODE_START( wc90 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       1*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       2*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,       3*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx4", 0x00000, spritelayout,     0*16*16, 16*16 ) // sprites
+	GFXDECODE_ENTRY( "gfx4", 0x00000, spritelayout8,     0*16*16, 16*16 ) // sprites (8x8 layout for once we refactor sprite drawing)
 GFXDECODE_END
 
 
@@ -323,6 +336,8 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+
+	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

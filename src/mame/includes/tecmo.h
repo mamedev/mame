@@ -1,4 +1,5 @@
 #include "sound/msm5205.h"
+#include "video/tecmo_spr.h"
 
 class tecmo_state : public driver_device
 {
@@ -13,7 +14,9 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sprgen(*this, "spritegen")
+		{ }
 
 	int m_adpcm_pos;
 	int m_adpcm_end;
@@ -64,4 +67,5 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<tecmo_spr_device> m_sprgen;
 };

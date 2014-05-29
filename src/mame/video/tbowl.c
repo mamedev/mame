@@ -119,83 +119,6 @@ void tbowl_state::video_start()
 }
 
 
-void tbowl_state::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll, UINT8* spriteram)
-{
-	int offs;
-	static const UINT8 layout[8][8] =
-	{
-		{0,1,4,5,16,17,20,21},
-		{2,3,6,7,18,19,22,23},
-		{8,9,12,13,24,25,28,29},
-		{10,11,14,15,26,27,30,31},
-		{32,33,36,37,48,49,52,53},
-		{34,35,38,39,50,51,54,55},
-		{40,41,44,45,56,57,60,61},
-		{42,43,46,47,58,59,62,63}
-	};
-
-	for (offs = 0;offs < 0x800;offs += 8)
-	{
-		if (spriteram[offs+0] & 0x80)  /* enable */
-		{
-			int code,color,sizex,sizey,flipx,flipy,xpos,ypos;
-			int x,y;//,priority,priority_mask;
-
-			code = (spriteram[offs+2])+(spriteram[offs+1]<<8);
-			color = (spriteram[offs+3])&0x1f;
-			sizex = 1 << ((spriteram[offs+0] & 0x03) >> 0);
-			sizey = 1 << ((spriteram[offs+0] & 0x0c) >> 2);
-
-			flipx = (spriteram[offs+0])&0x20;
-			flipy = 0;
-			xpos = (spriteram[offs+6])+((spriteram[offs+4]&0x03)<<8);
-			ypos = (spriteram[offs+5])+((spriteram[offs+4]&0x10)<<4);
-
-			/* bg: 1; fg:2; text: 4 */
-
-			for (y = 0;y < sizey;y++)
-			{
-				for (x = 0;x < sizex;x++)
-				{
-					int sx = xpos + 8*(flipx?(sizex-1-x):x);
-					int sy = ypos + 8*(flipy?(sizey-1-y):y);
-
-					sx -= xscroll;
-
-					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx,sy,0 );
-
-					/* wraparound */
-					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx,sy-0x200,0 );
-
-					/* wraparound */
-					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx-0x400,sy,0 );
-
-					/* wraparound */
-					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-							code + layout[y][x],
-							color,
-							flipx,flipy,
-							sx-0x400,sy-0x200,0 );
-
-
-
-				}
-			}
-		}
-	}
-}
 
 UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -208,7 +131,7 @@ UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	tbowl_draw_sprites(bitmap,cliprect, 0, m_spriteram);
+	m_sprgen->tbowl_draw_sprites(bitmap,cliprect, m_gfxdecode, 0, m_spriteram);
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
@@ -226,7 +149,7 @@ UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	tbowl_draw_sprites(bitmap,cliprect, 32*8, m_spriteram);
+	m_sprgen->tbowl_draw_sprites(bitmap,cliprect, m_gfxdecode, 32*8, m_spriteram);
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

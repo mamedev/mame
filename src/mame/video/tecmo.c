@@ -151,82 +151,6 @@ WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
 
 ***************************************************************************/
 
-void tecmo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-	static const UINT8 layout[8][8] =
-	{
-		{0,1,4,5,16,17,20,21},
-		{2,3,6,7,18,19,22,23},
-		{8,9,12,13,24,25,28,29},
-		{10,11,14,15,26,27,30,31},
-		{32,33,36,37,48,49,52,53},
-		{34,35,38,39,50,51,54,55},
-		{40,41,44,45,56,57,60,61},
-		{42,43,46,47,58,59,62,63}
-	};
-
-	for (offs = m_spriteram.bytes()-8;offs >= 0;offs -= 8)
-	{
-		int flags = spriteram[offs+3];
-		int priority = flags>>6;
-		int bank = spriteram[offs+0];
-		if (bank & 4)
-		{ /* visible */
-			int which = spriteram[offs+1];
-			int code,xpos,ypos,flipx,flipy,priority_mask,x,y;
-			int size = spriteram[offs + 2] & 3;
-
-			if (m_video_type != 0)   /* gemini, silkworm */
-				code = which + ((bank & 0xf8) << 5);
-			else                        /* rygar */
-				code = which + ((bank & 0xf0) << 4);
-
-			code &= ~((1 << (size*2)) - 1);
-			size = 1 << size;
-
-			xpos = spriteram[offs + 5] - ((flags & 0x10) << 4);
-			ypos = spriteram[offs + 4] - ((flags & 0x20) << 3);
-			flipx = bank & 1;
-			flipy = bank & 2;
-
-			if (flip_screen())
-			{
-				xpos = 256 - (8 * size) - xpos;
-				ypos = 256 - (8 * size) - ypos;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			/* bg: 1; fg:2; text: 4 */
-			switch (priority)
-			{
-				default:
-				case 0x0: priority_mask = 0; break;
-				case 0x1: priority_mask = 0xf0; break; /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0|0xcc; break; /* obscured by foreground */
-				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
-			}
-
-			for (y = 0;y < size;y++)
-			{
-				for (x = 0;x < size;x++)
-				{
-					int sx = xpos + 8*(flipx?(size-1-x):x);
-					int sy = ypos + 8*(flipy?(size-1-y):y);
-					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
-							code + layout[y][x],
-							flags & 0xf,
-							flipx,flipy,
-							sx,sy,
-							screen.priority(),
-							priority_mask,0);
-				}
-			}
-		}
-	}
-}
 
 
 UINT32 tecmo_state::screen_update_tecmo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -237,6 +161,6 @@ UINT32 tecmo_state::screen_update_tecmo(screen_device &screen, bitmap_ind16 &bit
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
 
-	draw_sprites(screen,bitmap,cliprect);
+	m_sprgen->draw_sprites_8bit(screen,bitmap,m_gfxdecode,cliprect, m_spriteram, m_spriteram.bytes(), m_video_type, flip_screen());
 	return 0;
 }
