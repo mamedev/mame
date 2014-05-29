@@ -177,102 +177,108 @@
     summary:
     --------
 
-       +------------------------------------------------- 317- part #
-       |       +----------------------------------------- IRQ state (hex)
-       |       |     +----------------------------------- global key (inverted, dec)
-       |       |     |        +-------------------------- main key seed (hex) (LCG seed = seed * 0x2F1E21)
-       |       |     |        |        +----------------- game
-       |       |     |        |        |      +---------- year
-       |       |     |        |        |      |        +- inferred key generation date
-       |       |     |        |        |      |        |
-    --------  -- --------  ------  -------- ----  --------------------------
-    0041      12 87 06 19  895963  bullet   1987  87/06/19 (atypical)
-    0045      34 97 02 39  384694  suprleag 1987  (atypical)
-    0049      F1 87 10 28  8932F7  shinobi2 1987  87/10/28 (atypical)
-    0050      F1 87 10 28  8932F7  shinobi1 1987  87/10/28 (atypical)
-    0053      00 00 00 00  020000  sonicbom 1987  atypical
-    0056      CD 80 01 23  032ABC  thndrbld 1987  88/01/23 (atypical)
-    0059                           aceattac 1988
-    0060      45 80 03 30  343210  aceattaa 1988  88/03/30 (atypical)
-    0065                           altbeaj1 1988
-    0068      20 80 06 10  880610  altbeaj3 1988  88/06/10
-    0070      59 80 08 06  880806  passshtj 1988  88/08/06
-    0074      47 80 08 06  880806  passshta 1988  88/08/06
-    0071      20 80 08 09  880809  passsht  1988  88/08/09
-    0079      98 80 09 05  880906  exctleag 1988  88/09/05-88/09/06 (atypical)
-    0080      96 80 08 26  880826  passsht  1988  88/08/26
-    0058-02C  FF 80 10 07  881007  sspirtfc 1988  88/10/07
-    0084      0E 80 10 31  881031  wb31     1988  88/10/31
-    0085      26 80 11 08  881108  wb32     1988  88/11/08
-    0087      69 80 11 08  881108  wb34     1988  88/11/08
-    0089      52 80 11 29  881129  wb33     1988  88/11/29
-    0058-03B  71 80 11 25  881125  ggroundj 1988  88/11/25
-    0058-03C  04 80 11 27  881127  gground  1988  88/11/27
-    0090      AB 80 01 27  247333  wrestwa1 1989  atypical
-    0091      68 80 11 27  881127  tetris1  1988  88/11/27
-    0092      10 80 11 28  881128  tetris2  1988  88/11/28
-    0093      25 80 11 29  881129  tetris   1988  88/11/29
-    0093A     35 02 09 17  900209  tetris3  1988  90/02/09
-    0096      21 80 11 21  881121  ddux     1988  88/11/21
-    0102      AB 80 02 03  04588A  wrestwa2 1989  atypical
-    0058-04B  27 03 27 14  032714  crkdownj 1989  89/03/27 14:xx
-    0058-04C  19 03 27 05  032705  crkdown  1989  89/03/27 05:xx
-    0058-04D  DC 03 27 06  032706  crkdownu 1989  89/03/27 06:xx
-    0110      19 81 03 29  032916  goldnax1 1989  89/03/29 16:xx
-    0115      12 04 05 11  040511  bayroutj 1989  89/04/05 11:xx
-    0116      11 03 30 09  033009  bayroute 1989  89/03/30 09:xx
-    0118      22 81 03 07  030719  toutrun  1989  89/03/07 19:xx
-    toutrun2  22 81 03 07  031113  toutrun2 1989  89/03/11 13:xx (atypical)
-    0120      0D 81 03 29  032916  goldnax3 1989  89/03/29 16:xx
-    0121      35 81 03 29  032916  goldnaxj 1989  89/03/29 16:xx
-    0122      03 81 04 04  890404  goldnaxu 1989  89/04/04
-    0058-05B  92 81 06 09  890609  sgmastj  1989  89/06/09
-    0058-05C  30 81 06 13  890613  sgmastc  1989  89/06/13
-    0058-05D                       sgmast   1989
-    0124A     80 06 21 11  890621  smgpj    1989  89/06/21 11:xx
-    0125A     DE 06 15 16  890615  smgpu    1989  89/06/15 16:xx
-    0126      54 05 28 01  890528  smgp5    1989  89/05/28 01:xx
-    0126A     74 06 16 15  890616  smgp     1989  89/06/16 15:xx
-    0127A     5F 81 07 06  890706  fpoint   1989  89/07/06
-    0128      55 00 28 20  890828  eswatj   1989  89/08/28 20:xx
-    0129      0A 00 28 20  890828  eswatu   1989  89/08/28 20:xx
-    0130      EC 00 28 19  890828  eswat    1989  89/08/28 19:xx
-    0134      DE 81 11 30  891130  loffirej 1989  89/11/30
-    0135      98 81 11 31  891131  loffireu 1989  89/11/31
-    0136      12 81 11 29  891129  loffire  1989  89/11/29
-    0139      49 03 25 15  891125  bloxeed  1990  89/11/25 15:xx
-    0142      91 01 24 17  900124  mvpj     1989  90/01/24 17:xx
-    0143      20 02 02 18  900202  mvp      1989  90/02/02 18:xx
-    0144      2E 02 23 18  022318  rachero  1989  90/02/23 18:xx
-    0058-06B  88 03 15 09  900315  roughrac 1990  90/03/15 09:xx
-    0146      10 04 26 17  900426  astormj  1990  90/04/26 17:xx
-    0147      2D 04 14 14  900414  astormu  1990  90/04/14 14:xx
-    0148      50 04 26 15  900426  astorm3  1990  90/04/26 15:xx
-    0153      FC 04 10 14  900410  pontoon  1990  90/04/10 14:xx
-    0157      20 07 20 10  900720  mwalkj   1990  90/07/20 10:xx
-    0158      DE 07 15 15  900715  mwalku   1990  90/07/15 15:xx
-    0159      39 07 20 10  900720  mwalk    1990  90/07/20 10:xx
-    0162      8F 01 14 15  900914  gprider1 1990  90/09/14 15:xx
-    0163      99 01 13 15  900913  gprider  1990  90/09/13 15:xx
-    5023      EF 04 18 05  900917  ryukyu   1990  90/09/17 12:18? (atypical)
-    0165      56 82 11 25  901125  lghostu  1990  90/11/25
-    0166      A2 82 11 24  901124  lghost   1990  90/11/24
-    0169B     48 06 35 32  901205  abcop    1990  90/12/05 14:35? (atypical)
-    0058-08B  4E 04 17 15  910206  qsww     1991  91/02/06 12:17? (atypical)
-    0175      91 83 03 22  910322  cltchtrj 1991  91/03/22
-    0176      FC 83 03 14  910314  cltchitr 1991  91/03/14
-    0179A     73 06 55 17  910318  cottonj  1991  91/03/18 14:55? (atypical)
-    0180      73 03 53 00  910403  cottonu  1991  91/04/03 11:53? (atypical)
-    0181A     73 06 55 17  910318  cotton   1991  91/03/18 14:55? (atypical)
-    0058-09D  91 83 06 26  910618  dcclubfd 1991  91/06/18-91/06/26 (atypical)
-    0182      07 07 12 14  921401  ddcrewj  1991  92/07/12 14:01? (atypical)
-    0184      07 07 12 16  921622  ddcrew2  1991  92/07/12 16:22? (atypical)
-    0186      5F 83 07 01  912030  ddcrewu  1991  92/07/01 20:30? (atypical)
-    0190      07 07 17 16  921716  ddcrew   1991  92/07/17 17:16? (atypical)
-    ddcrew1   91 84 07 42  910744  ddcrew1  1991  92/07/xx 07:44? (atypical)
-    0196      4A 20 12 22  920623  desertbr 1992  92/06/23 20:12? (atypical)
-    0197A     3F 84 06 19  920612  wwallyja 1992  92/06/12-92/06/19 (atypical)
-    0197B     3F 84 06 19  920612  wwallyj  1992  92/06/12-92/06/19 (atypical)
+       +----------------------------------------------------- 317- part #
+       |       +--------------------------------------------- IRQ state (hex)
+       |       |     +--------------------------------------- global key (inverted, dec)
+       |       |     |        +------------------------------ main key seed (hex) (LCG seed = seed * 0x2F1E21)
+       |       |     |        |        +--------------------- game
+       |       |     |        |        |        +------------ year
+       |       |     |        |        |        |          +- inferred key generation date
+       |       |     |        |        |        |          |
+    --------  -- --------  ------  --------   ----  -----------------------------
+    0041      12 87 06 19  895963  bullet     1987  87/06/19 (atypical)
+    0045      34 97 02 39  384694  suprleag   1987  (atypical)
+    0046      E3 87 10 07  012563  hwchampj   1987  87/10/07 (atypical)
+    0049      F1 87 10 28  8932F7  shinobi2   1987  87/10/28 (atypical)
+    0050      F1 87 10 28  8932F7  shinobi1   1987  87/10/28 (atypical)
+    0053      00 00 00 00  020000  sonicbom   1987  atypical
+    0056      CD 80 01 23  032ABC  thndrbld   1987  88/01/23 (atypical)
+    0059      45 80 03 30  343210  aceattac   1988  88/03/30 (atypical)
+    0060      45 80 03 30  343210  aceattaca  1988  88/03/30 (atypical)
+    0065      FC 80 06 06  880606  altbeastj1 1988  88/06/06
+    0068      20 80 06 10  880610  altbeastj3 1988  88/06/10
+    0069      20 80 06 10  880610  altbeast5  1998 88/06/10
+    0070      59 80 08 06  880806  passshtj   1988  88/08/06
+    0074      47 80 08 06  880806  passshta   1988  88/08/06
+    0071      20 80 08 09  880809  passsht    1988  88/08/09
+    0079      98 80 09 05  880906  exctleag   1988  88/09/05-88/09/06 (atypical)
+    0080      96 80 08 26  880826  passsht    1988  88/08/26
+    0058-02C  FF 80 10 07  881007  sspirtfc   1988  88/10/07
+    0084      0E 80 10 31  881031  wb31       1988  88/10/31
+    0085      26 80 11 08  881108  wb32       1988  88/11/08
+    0087      69 80 11 08  881108  wb34       1988  88/11/08
+    0089      52 80 11 29  881129  wb33       1988  88/11/29
+    0058-03B  71 80 11 25  881125  ggroundj   1988  88/11/25
+    0058-03C  04 80 11 27  881127  gground    1988  88/11/27
+    0090      AB 80 01 27  247333  wrestwar1  1989  atypical
+    0091      68 80 11 27  881127  tetris1    1988  88/11/27
+    0092      10 80 11 28  881128  tetris2    1988  88/11/28
+    0093      25 80 11 29  881129  tetris     1988  88/11/29
+    0093A     35 02 09 17  900209  tetris3    1988  90/02/09
+    0096      21 80 11 21  881121  ddux       1988  88/11/21
+    0102      AB 80 02 03  04588A  wrestwar2  1989  atypical
+    0058-04B  27 03 27 14  032714  crkdownj   1989  89/03/27 14:xx
+    0058-04C  19 03 27 05  032705  crkdown    1989  89/03/27 05:xx
+    0058-04D  DC 03 27 06  032706  crkdownu   1989  89/03/27 06:xx
+    0110      19 81 03 29  032916  goldnaxe1  1989  89/03/29 16:xx
+    0115      12 04 05 11  040511  bayroutej  1989  89/04/05 11:xx
+    0116      11 03 30 09  033009  bayroute   1989  89/03/30 09:xx
+    0118      22 81 03 07  030719  toutrun    1989  89/03/07 19:xx
+    toutrun2  22 81 03 07  031113  toutrun2   1989  89/03/11 13:xx (atypical)
+    0120      0D 81 03 29  032916  goldnaxe3  1989  89/03/29 16:xx
+    0121      35 81 03 29  032916  goldnaxej  1989  89/03/29 16:xx
+    0122      03 81 04 04  890404  goldnaxeu  1989  89/04/04
+    0058-05B  92 81 06 09  890609  sgmastj    1989  89/06/09
+    0058-05C  30 81 06 13  890613  sgmastc    1989  89/06/13
+    0058-05D  50 81 06 09  890609  sgmast     1989  89/06/09
+    0124A     80 06 21 11  890621  smgpj      1989  89/06/21 11:xx
+    0125A     DE 06 15 16  890615  smgpu      1989  89/06/15 16:xx
+    0126      54 05 28 01  890528  smgp5      1989  89/05/28 01:xx
+    0126A     74 06 16 15  890616  smgp       1989  89/06/16 15:xx
+    0127A     5F 81 07 06  890706  fpoint     1989  89/07/06
+    0127A     5F 81 07 06  890706  fpoint1    1989  89/07/06
+    0128      55 00 28 20  890828  eswatj     1989  89/08/28 20:xx
+    0129      0A 00 28 20  890828  eswatu     1989  89/08/28 20:xx
+    0130      EC 00 28 19  890828  eswat      1989  89/08/28 19:xx
+    0134      DE 81 11 30  891130  loffirej   1989  89/11/30
+    0135      98 81 11 31  891131  loffireu   1989  89/11/31
+    0136      12 81 11 29  891129  loffire    1989  89/11/29
+    0139      49 03 25 15  891125  bloxeed    1990  89/11/25 15:xx
+    0142      91 01 24 17  900124  mvpj       1989  90/01/24 17:xx
+    0143      20 02 02 18  900202  mvp        1989  90/02/02 18:xx
+    0144      2E 02 23 18  022318  rachero    1989  90/02/23 18:xx
+    0058-06B  88 03 15 09  900315  roughrac   1990  90/03/15 09:xx
+    0146      10 04 26 17  900426  astormj    1990  90/04/26 17:xx
+    0147      2D 04 14 14  900414  astormu    1990  90/04/14 14:xx
+    0148      50 04 26 15  900426  astorm3    1990  90/04/26 15:xx
+    0153      FC 04 10 14  900410  pontoon    1990  90/04/10 14:xx
+    0154      ED 05 01 13  900501  astorm     1990  90/05/01 13:xx
+    0157      20 07 20 10  900720  mwalkj     1990  90/07/20 10:xx
+    0158      DE 07 15 15  900715  mwalku     1990  90/07/15 15:xx
+    0159      39 07 20 10  900720  mwalk      1990  90/07/20 10:xx
+    0162      8F 01 14 15  900914  gprider1   1990  90/09/14 15:xx
+    0163      99 01 13 15  900913  gprider    1990  90/09/13 15:xx
+    5023      EF 04 18 05  900917  ryukyu     1990  90/09/17 12:18? (atypical)
+    0165      56 82 11 25  901125  lghostu    1990  90/11/25
+    0166      A2 82 11 24  901124  lghost     1990  90/11/24
+    0169B     48 06 35 32  901205  abcop      1990  90/12/05 14:35? (atypical)
+    0058-08B  4E 04 17 15  910206  qsww       1991  91/02/06 12:17? (atypical)
+    0175      91 83 03 22  910322  cltchitrj  1991  91/03/22
+    0176      FC 83 03 14  910314  cltchitr   1991  91/03/14
+    0179B     73 06 55 17  910318  cottonj    1991  91/03/18 14:55? (atypical)
+    0180      73 03 53 00  910403  cottonu    1991  91/04/03 11:53? (atypical)
+    0181A     73 06 55 17  910318  cotton     1991  91/03/18 14:55? (atypical)
+    0058-09D  91 83 06 26  910618  dcclubfd   1991  91/06/18-91/06/26 (atypical)
+    0182      07 07 12 14  921401  ddcrewj2   1991  92/07/12 14:01? (atypical)
+    0184      07 07 12 16  921622  ddcrew2    1991  92/07/12 16:22? (atypical)
+    0185      91 07 06 16  910704  ddcrewj    1991  91/07/04-91/07/06 16:xx (atypical)
+    0186      5F 83 07 01  912030  ddcrewu    1991  91/07/01 20:30? (atypical)
+    0187      91 84 07 42  910744  ddcrew1    1991  92/07/xx 07:44? (atypical)
+    0190      07 07 17 16  921716  ddcrew     1992  92/07/07 17:16? (atypical)
+    0194      4A 07 10 13  920623  desertbrj  1992  92/06/23 07:10? (atypical)
+    0196      4A 20 12 22  920623  desertbr   1992  92/06/23 20:12? (atypical)
+    0197A     3F 84 06 19  920612  wwallyja   1992  92/06/12-92/06/19 (atypical)
+    0197B     3F 84 06 19  920612  wwallyj    1992  92/06/12-92/06/19 (atypical)
 
     ----
 
@@ -297,130 +303,68 @@
        PC.HI @ $000004 -> mainkey = key[2], globalkey = { key[1], $00, $00 }
        PC.LO @ $000006 -> mainkey = key[3], globalkey = { key[1], key[2], $00 }
 
-    driver    FD1094    SP plain  SP enc    PC plain  PC enc    States Used
-    --------  --------  --------  --------  --------  --------  -----------
-    aceattaa  317-0060  00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC
-    altbeaj3  317-0068  FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93 A7 D8
-    altbeaj1  317-0065            C9C5F299            CCDDECDD
-    bayroute  317-0116  00504000  5EB40000  00001000  5533A184  00 04 11 18
-    bayroutj  317-0115  00504000  56150000  00001000  85948DCF  00 05 12 16
-    bullet    317-0041  00000000  57355D96  00001882  8DDC8CF4         (deduced, not 100% sure)
-    cotton    317-0181a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
-    cottonu   317-0180  00204000  5DB20000  00000716  A1840716  00 0E 73
-    cottonj   317-0179a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
-    ddux      317-0096  00000000  5F94AF59  00000406  AF5987A0  00 21 28 70 D9
-    eswat     317-0130  00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA
-    eswatu    317-0129  00000000  5537AF59  00000400  55334735  00 0A 12 C3 CC
-    eswatj    317-0128  00000000  A711AF59  00000400  55334735  00 63 CB D5
-    exctleag  317-0079? 00000000  5537AF59  00000410  83018384         (deduced, not 100% sure)
-    fpoint    317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
-    fpoint1   317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
-    goldnaxu  317-0122  FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51 72 99 F6
-    goldnaxj  317-0121  FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12 35 58 7A 9E
-    goldnax3  317-0120  FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF
-    goldnax1  317-0110  FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48 5D
-    mvp       317-0143  00000000  5F94A711  00000416  BD59DC5B  00 19 20 88 98
-    mvpj      317-0142  00000000  5F94AF59  00000416  BD599C7D  00 19 35 91 DA
-    passsht   317-0080  00000000  AF59AF59  00003202  C2003923  00 11 52 96 EE
-    passshta  317-0074  00000000  AF59AF59  000031E4  C2003F8C  00 12 47 83 A7
-    passshtj  317-0070  00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83 FE
-    ryukyu    317-5023  00203800  AF49D30B  0000042E  FC5863B5  00 DC EF
-    shinobi2  317-0049  FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 9B 9C F1
-    sonicbom  317-0053  00000000  5735AF59  00001000  FC587133  00
-    suprleag  317-0045? 00000000  A711AF59            BD59CE5B
-    tetris2   317-0092  00000000  5735AF59  00000410  AF598685  00 10 52 74 97 FC
-    tetris1   317-0091  00000000  5D92AF59  00000410  AF59AE58  99 25 42 5B 68 FC
-    wb34      317-0087  FFFFFF7E  B2978997  00000500  AF590500  00 11 64 69 82
-    wb33      317-0089  FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71
-    wb32      317-0085  FFFFFF7E  B2F78997  00000500  AF590500  00 10 13 26 77
-    wrestwa2  317-0102  00000000  5D96AF59  00000414  EE588E5B  00 12 A7 AB CC F9 FC
-    wrestwa1  317-0090  00000000  5D96AF59  00000414  8301AE18  00 12 A7 AB CC F9 FC
-
-    suprleag pc possibilities:
-      101E -> follows an RTS
-      108E -> follows 3 NOPs
-      11C4
-      11C8
-      1212
-      1214
-      1218
-      1282
-      1284
-      1288
-      1342
-      1416
-      141C
-      1486
-      148C
-      1606
-      1E52
-      1E54
-
-    bullet pc possibilities:
-      0822
-      0824
-      0882
-      0884
-      0C08
-      137C
-      1822
-      1824
-      1882
-      1884
-      1C08
-
-    tetris1:
-      410: 4ff9 0000 0000  lea $0.l, a7
-      416: 46fc 2700       move #$2700, sr
-      41a: 0c80 005b ffff  cmpi.l #$5bffff, d0
-
-      400: 4e71            nop
-      402: 4e73            rte
-
-    tetris2:
-      410: 4ff9 0000 0000  lea $0.l, a7
-      416: 46fc 2700       move #$2700, sr
-      41a: 0c80 0052 ffff  cmpi.l #$52ffff, d0
-
-      400: 4e71            nop
-      402: 4e73            rte
-
-    wrestwa1:
-      414: 4ff8 0000       lea $0.w, a7
-      418: 46fc 2700       move #$2700, sr
-      41c: 0c80 00fc ffff  cmpi.l #$fcffff, d0
-
-    mvp:
-      416: 4ff8 0000       lea $0.w, a7
-      41a: 46fc 2700       move #$2700, sr
-      41e: 7000            moveq #0, d0
-      420: 2200            move.l d0, d1
-      ...
-      42c: 2e00            move.l d0, d7
-      42e: 2040            movea.l d0, a0
-      ...
-      43a: 2c40            movea.l d0, a6
-      43c: 0c80 0098 ffff  cmpi.l #$98ffff, d0
-
-    wb34:
-      500: 46fc 2700       move #$2700, sr
-      504: 0c80 0064 ffff  cmpi.l #$64ffff, d0
-
-    goldnaxu:
-      400: 6000 000c       bra $40e
-      40e: 4ff8 ff00       lea $ff00.w, a7
-      412: 46fc 2700       move #$2700, sr
-      416: 0c80 0072 ffff  cmpi.l #$72ffff, d0
-
-    ryukyu:
-      42e: 4e71            nop
-      ...
-      440: 0c80 00dc ffff  cmpi.l #$dcffff, d0
-
-    eswat:
-      400: 4ff8 0000       lea $0.w, a7
-      404: 46fc 2700       move #$2700, sr
-      408: 0c80 000c ffff  cmpi.l #$cffff, d0
+    driver      FD1094      SP plain  SP enc    PC plain  PC enc    States Used (majority one marked with asterisk, if known)
+    --------    --------    --------  --------  --------  --------  ---------------------
+    aceattac    317-0059    00000000  A711AF59  00000414  AF59AACD  00 12 17 31 45 90 FC* 
+    aceattaca   317-0060    00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC* 
+    altbeast5   317-0069    FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93* A7 D8 
+    altbeastj1  317-0065    FFFFFF00  C9C5F299  00000400  CCDDECDD  00 09 12 67* 99 FC 
+    altbeastj3  317-0068    FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93* A7 D8 
+    astorm      317-0154    FFFFFF00  B297F23F  00000400  BD5999DD  00 1F 48* 5F 66 ED 
+    astorm3     317-0148    FFFFFF00  ED9FF23F  00000400  FC58B9DC  00 06 36 50 CC D9* 
+    astormj     317-0146    FFFFFF00  ED8CF23F  00000400  FC58BC59  00 10 29* 44 CE DF 
+    astormu     317-0147    FFFFFF00  B297F23F  00000400  55334533  00 19 2D 46 58* DF 
+    bayroute    317-0116    00504000  5EB40000  00001000  5533A184  00 04* 11 18 
+    bayroutej   317-0115    00504000  56150000  00001000  85948DCF  00 05* 12 16 
+    bloxeed     317-0139    00000000  5D92A711  00001D38  BD59FFE8  00 49 53 55 56* DF 
+    bullet      317-0041    00000000  57355D96  00001882  8DDC8CF4  00 12 21 69* FE 
+    cltchitr    317-0176    00000000  A711A711  00000416  AF59EBCD  00 01* 80 FC 
+    cltchitrj   317-0175    00000000  5F94A711  00000416  AF59AFFB  00 03 19* 91 
+    cotton      317-0181a   00204000  5DB20000  00000716  CCDD0716  00 0E* 73 
+    cottonj     317-0179b   00204000  5DB20000  00000720  CCDD0720  00 0E* 73 
+    cottonu     317-0180    00204000  5DB20000  00000716  A1840716  00 0E* 73 
+    ddcrew      317-0190    00000000  AF595D92  00000408  BD59FD7F  00 07 16* 17 
+    ddcrew1     317-0187    00000000  5F945D96  00000408  8DDCE758  00 04 07* 13 91 
+    ddcrew2     317-0184    00000000  AF595D92  00000408  5533FD7F  00 07 12* 16 22 
+    ddcrewj     317-0185    00000000  5F945D92  00000408  5533FD7F  00 06 07* 09 91 
+    ddcrewu     317-0186    00000000  AF59A711  00000408  8DDCC381  00 01 07 5F 91* 
+    ddux        317-0096    00000000  5F94AF59  00000406  AF5987A0  00 21 28 70* D9 
+    desertbr    317-0196    00000000  55335D92  00001838  5533F46A  00 3C 4A 82 DA* 
+    desertbrj   317-0194    00000000  55335D92  00001838  BD59E720  00 3C 4A 82 DA* 
+    eswat       317-0130    00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA* 
+    eswatj      317-0128    00000000  A711AF59  00000400  55334735  00 55 63 CB* D5 
+    eswatu      317-0129    00000000  5537AF59  00000400  55334735  00 0A 12 C3* CC 
+    exctleag    317-0079    00000000  5537AF59  00000410  83018384  00 02 39 4B 85 98 E5* 
+    fpoint      317-0127a   00000000  AF59AF59  00001A40  8DDC9960  00 15* 35 5F 82 DB 
+    fpoint1     317-0127a   00000000  AF59AF59  00001A40  8DDC9960  00 15* 35 5F 82 DB 
+    goldnaxe1   317-0110    FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48* 5D 
+    goldnaxe3   317-0120    FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF* 
+    goldnaxej   317-0121    FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12* 35 58 7A 9E 
+    goldnaxeu   317-0122    FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51* 72 99 F6 
+    hwchampj    317-0046    00000000  5D925D96  000008AC  AF59AA41  00 8B* E3 
+    lghost      317-0166    00000000  5F94A711  00000404  EE588241  00 A2 DC E0* 
+    lghostu     317-0165    00000000  AF59A711  00000404  EE58C340  00 56 C4 DE* 
+    mvp         317-0143    00000000  5F94A711  00000416  BD59DC5B  00 19* 20 88 98 
+    mwalk       317-0159    FFFFFF00  C9C7F23F  00000400  5533BD7F  00 39 51* AA CC 
+    mwalkj      317-0157    FFFFFF00  B2F7F23F  00000400  5533BD7F  00 20 88 99 CF* 
+    mwalku      317-0158    FFFFFF00  C572F23F  00000400  8DDC8DDD  00 49* 90 C0 DE 
+    passsht     317-0080    00000000  AF59AF59  00003202  C2003923  00 11 52* 96 EE 
+    passshta    317-0074    00000000  AF59AF59  000031E4  C2003F8C  00 12* 47 83 A7 
+    passshtj    317-0070    00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83* FE 
+    pontoon     317-0153    00000000  A7115D92  00000E0C  FC585979  00 19 70 DC* FC 
+    ryukyu      317-5023    00203800  AF49D30B  0000042E  FC5863B5  00 DC* EF 
+    shinobi2    317-0049    FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 98 9B 9C* F1 
+    sonicbom    317-0053    00000000  5735AF59  00001000  FC587133  00* 
+    suprleag    317-0045    00000000  A711AF59  0000108E  BD59CE5B  00 12* 34 56 AB CD 
+    tetris1     317-0091    00000000  5D92AF59  00000410  AF59AE58  99 25 42 5B 68 FC
+    tetris2     317-0092    00000000  5735AF59  00000410  AF598685  00 10 52 74 97* FC 
+    wb32        317-0085    FFFFFF7E  B2F78997  00000500  AF590500  00 10 13 26 77
+    wb33        317-0089    FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71* 
+    wb34        317-0087    FFFFFF7E  B2978997  00000500  AF590500  00 11* 64 69 82 
+    wrestwar1   317-0090    00000000  5D96AF59  00000414  8301AE18  00 12* A7 AB CC F9 FC 
+    wrestwar2   317-0102    00000000  5D96AF59  00000414  EE588E5B  00 12* A7 AB CC F9 FC 
+    wwallyj     317-0197b   00000000  AF595D96  00000416  CCDDCE5B  00 16* 32 3F 43 
+    wwallyja    317-0197a   00000000  AF595D96  00000416  CCDDCE5B  00 16* 32 3F 43 
 
 *****************************************************************************/
 
@@ -1010,76 +954,4 @@ WRITE_LINE_MEMBER(fd1094_device::rte_callback)
 	change_state(STATE_RTE);
 }
 
-
-
-#ifdef MAME_DEBUG
-
-/*
-
-// Possible: global=12A8F8E5 seed=0AD691 pc=1882
-// Possible: global=12AAF8E5 seed=0AD691 pc=1882
-// Possible: global=82A8F8EC seed=24921C pc=1882
-// Possible: global=82AAF8EC seed=24921C pc=1882
-// Possible: global=92A8F8EC seed=3D5C17 pc=1882
-// Possible: global=92AAF8EC seed=3D5C17 pc=1882
-static const fd1094_constraint bullet_constraints[] =
-{
-    // main entry point
-    { 0x001882, FD1094_STATE_RESET | 0x00, 0x4ff8, 0xffff },    // lea     $0.w,a7
-    { 0x001884, FD1094_STATE_RESET | 0x00, 0x0000, 0xffff },
-    { 0x001886, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
-    { 0x001888, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
-    { 0x00188a, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
-    { 0x00188c, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
-    { 0x00188e, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
-
-    // IRQ4 entry point
-    { 0x000418, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
-    { 0x00041a, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
-
-    // IRQ4 exit points
-    { 0x000612, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
-    { 0x000614, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
-    { 0x000616, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-    { 0 }
-};
-
-// Possible: global=FCAFF9F9 seed=177AC6 pc=0400
-static const fd1094_constraint altbeaj1_constraints[] =
-{
-    // main entry point
-    { 0x000400, FD1094_STATE_RESET | 0x00, 0x6000, 0xffff },    // bra     $40e
-    { 0x000402, FD1094_STATE_RESET | 0x00, 0x000c, 0xffff },
-    { 0x00040e, FD1094_STATE_RESET | 0x00, 0x4ff8, 0xffff },    // lea     $ff00.w,a7
-    { 0x000410, FD1094_STATE_RESET | 0x00, 0xff00, 0xffff },
-    { 0x000412, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
-    { 0x000414, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
-    { 0x000416, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
-    { 0x000418, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
-    { 0x00041a, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
-
-    // IRQ4 entry point
-    { 0x000404, FD1094_STATE_IRQ   | 0x00, 0x6000, 0xffff },    // bra     $2ac4
-    { 0x000406, FD1094_STATE_IRQ   | 0x00, 0x26be, 0xffff },
-    { 0x002ac4, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
-    { 0x002ac6, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
-
-    // IRQ4 exit points
-    { 0x002ca4, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
-    { 0x002ca6, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
-    { 0x002ca8, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-    { 0x002cc4, FD1094_STATE_IRQ   | 0x00, 0x3f3c, 0xffff },    // move    #$2300,-(a7)
-    { 0x002cc6, FD1094_STATE_IRQ   | 0x00, 0x2300, 0xffff },
-    { 0x002cc8, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-
-    // other IRQ entry points
-    { 0x000408, FD1094_STATE_IRQ   | 0x00, 0x6000, 0xffff },    // bra     $40c
-    { 0x00040a, FD1094_STATE_IRQ   | 0x00, 0x0002, 0xffff },
-    { 0x00040c, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-
-    { 0 }
-};
-
-*/
-
-#endif
+endif
