@@ -546,8 +546,6 @@ void ui_menu_file_selector::populate()
 
 	// open the directory
 	err = zippath_opendir(path, &directory);
-	if (err != FILERR_NONE)
-		goto done;
 
 	// clear out the menu entries
 	m_entrylist = NULL;
@@ -580,20 +578,23 @@ void ui_menu_file_selector::populate()
 	}
 
 	// build the menu for each item
-	while((dirent = zippath_readdir(directory)) != NULL)
+	if (err == FILERR_NONE)
 	{
-		// append a dirent entry
-		entry = append_dirent_entry(dirent);
-
-		if (entry != NULL)
+		while((dirent = zippath_readdir(directory)) != NULL)
 		{
-			// set the selected item to be the first non-parent directory or file
-			if ((selected_entry == NULL) && strcmp(dirent->name, ".."))
-				selected_entry = entry;
+			// append a dirent entry
+			entry = append_dirent_entry(dirent);
 
-			// do we have to select this file?
-			if (!core_stricmp(m_current_file, dirent->name))
-				selected_entry = entry;
+			if (entry != NULL)
+			{
+				// set the selected item to be the first non-parent directory or file
+				if ((selected_entry == NULL) && strcmp(dirent->name, ".."))
+					selected_entry = entry;
+
+				// do we have to select this file?
+				if (!core_stricmp(m_current_file, dirent->name))
+					selected_entry = entry;
+			}
 		}
 	}
 
@@ -608,7 +609,6 @@ void ui_menu_file_selector::populate()
 	// set up custom render proc
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
-done:
 	if (directory != NULL)
 		zippath_closedir(directory);
 }
