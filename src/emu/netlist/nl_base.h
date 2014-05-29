@@ -424,7 +424,7 @@ private:
 NETLIST_SAVE_TYPE(netlist_core_terminal_t::state_e, DT_INT);
 
 
-class netlist_terminal_t : public netlist_core_terminal_t
+class ATTR_ALIGN netlist_terminal_t : public netlist_core_terminal_t
 {
 	NETLIST_PREVENT_COPYING(netlist_terminal_t)
 public:

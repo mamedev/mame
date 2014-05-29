@@ -64,6 +64,19 @@ public:
 	    m_list = NULL;
 	}
 
+	ATTR_HOT inline operator _ListClass *  () { return m_list; }
+    ATTR_HOT inline operator const _ListClass * const () { return m_list; }
+
+    /* using the [] operator will not allow gcc to vectorize code because
+     * basically a pointer is returned.
+     * array works around this.
+     */
+
+    ATTR_HOT inline _ListClass *array() { return m_list; }
+
+    ATTR_HOT inline _ListClass& operator[](const int index) { return m_list[index]; }
+    ATTR_HOT inline const _ListClass& operator[](const int index) const { return m_list[index]; }
+
 	ATTR_HOT inline void add(const _ListClass &elem)
 	{
 		if (m_count >= m_num_elements){
@@ -139,9 +152,6 @@ public:
 		}
 		clear();
 	}
-
-	ATTR_HOT inline _ListClass& operator[](const int & index) { return m_list[index]; }
-	ATTR_HOT inline const _ListClass& operator[](const int & index) const { return m_list[index]; }
 
 private:
     ATTR_HOT inline void resize(const int new_size)

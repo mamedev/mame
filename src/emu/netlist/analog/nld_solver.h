@@ -9,6 +9,9 @@
 #include "../nl_setup.h"
 #include "../nl_base.h"
 
+//#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
+#define ATTR_ALIGNED(N) ATTR_ALIGN
+
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
@@ -37,7 +40,7 @@ struct netlist_solver_parameters_t
     netlist_time m_nt_sync_delay;
 };
 
-class netlist_matrix_solver_t : public netlist_device_t
+class ATTR_ALIGNED(64) netlist_matrix_solver_t : public netlist_device_t
 {
 public:
 	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
@@ -67,40 +70,15 @@ public:
 
 protected:
 
-	class net_entry
-	{
-	public:
-	    net_entry(netlist_analog_net_t *net) : m_net(net) {}
-        net_entry() : m_net(NULL) {}
-
-        net_entry(const net_entry &rhs)
-        {
-            m_net = rhs.m_net;
-            m_terms = rhs.m_terms;
-            m_rails = rhs.m_rails;
-        }
-
-        net_entry &operator=(const net_entry &rhs)
-        {
-            m_net = rhs.m_net;
-            m_terms = rhs.m_terms;
-            m_rails = rhs.m_rails;
-            return *this;
-        }
-
-	    netlist_analog_net_t * RESTRICT m_net;
-	    netlist_terminal_t::list_t m_terms;
-	    netlist_terminal_t::list_t m_rails;
-	};
-
     ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
 
     // return true if a reschedule is needed ...
     ATTR_HOT virtual int vsolve_non_dynamic() = 0;
 
+    ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
     int m_calculations;
 
-    plinearlist_t<net_entry> m_nets;
+    plinearlist_t<netlist_analog_net_t *> m_nets;
     plinearlist_t<netlist_analog_output_t *> m_inps;
 
 private:
@@ -126,14 +104,13 @@ private:
 };
 
 template <int m_N, int _storage_N>
-class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
+class ATTR_ALIGNED(64) netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
 
 	netlist_matrix_solver_direct_t()
     : netlist_matrix_solver_t()
     , m_dim(0)
-    , m_rail_start(0)
     {}
 
 	virtual ~netlist_matrix_solver_direct_t() {}
@@ -144,6 +121,8 @@ public:
 	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 protected:
+    ATTR_COLD virtual void add_term(int net_idx, netlist_terminal_t *term);
+
     ATTR_HOT virtual int vsolve_non_dynamic();
     ATTR_HOT int solve_non_dynamic();
 	ATTR_HOT inline void build_LE();
@@ -154,31 +133,35 @@ protected:
 
     ATTR_HOT virtual double compute_next_timestep(const double);
 
-    double m_A[_storage_N][_storage_N];
-    double m_RHS[_storage_N];
-    double m_last_RHS[_storage_N]; // right hand side - contains currents
+    ATTR_ALIGNED(64) double m_A[_storage_N][_storage_N];
+    ATTR_ALIGNED(64) double m_RHS[_storage_N];
+    ATTR_ALIGNED(64) double m_last_RHS[_storage_N]; // right hand side - contains currents
 
-	struct terms_t{
+	struct ATTR_ALIGNED(64) terms_t{
 
-	    terms_t(netlist_terminal_t *term, int net_this, int net_other)
-	    : m_term(term), m_net_this(net_this), m_net_other(net_other)
+        terms_t(netlist_terminal_t *term, int net_other)
+        : m_term(term), m_net_other(net_other)
 	    {}
         terms_t()
-        : m_term(NULL), m_net_this(-1), m_net_other(-1)
+        : m_term(NULL), m_net_other(-1)
         {}
 
-        netlist_terminal_t * RESTRICT m_term;
-		int m_net_this;
+        ATTR_ALIGNED(64) netlist_terminal_t ATTR_ALIGNED(64) *  RESTRICT m_term;
 		int m_net_other;
 	};
 
+    typedef plinearlist_t<terms_t> xlist_t;
+    xlist_t m_terms[_storage_N];
+    xlist_t m_rails[_storage_N];
+    plinearlist_t<double> xx[_storage_N];
+
+private:
+
 	int m_dim;
-	int m_rail_start;
-	plinearlist_t<terms_t> m_terms;
 };
 
 template <int m_N, int _storage_N>
-class netlist_matrix_solver_gauss_seidel_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+class ATTR_ALIGNED(64) netlist_matrix_solver_gauss_seidel_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
@@ -201,22 +184,39 @@ private:
 
 };
 
-class netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
+class ATTR_ALIGNED(64) netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
 {
 protected:
     ATTR_HOT int vsolve_non_dynamic();
 private:
 };
 
-class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
+class ATTR_ALIGNED(64) netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
 {
 protected:
     ATTR_HOT int vsolve_non_dynamic();
 private:
 };
 
-NETLIB_DEVICE_WITH_PARAMS(solver,
-		typedef netlist_core_device_t::list_t dev_list_t;
+class ATTR_ALIGNED(64) NETLIB_NAME(solver) : public netlist_device_t
+{
+public:
+    NETLIB_NAME(solver)()
+    : netlist_device_t()    { }
+
+    ATTR_COLD virtual ~NETLIB_NAME(solver)();
+
+    ATTR_COLD void post_start();
+
+    ATTR_HOT inline double gmin() { return m_gmin.Value(); }
+
+protected:
+    ATTR_HOT void update();
+    ATTR_HOT void start();
+    ATTR_HOT void reset();
+    ATTR_HOT void update_param();
+
+    //typedef netlist_core_device_t::list_t dev_list_t;
 
         netlist_ttl_input_t m_fb_step;
         netlist_ttl_output_t m_Q_step;
@@ -234,17 +234,14 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_param_int_t m_parallel;
 
 		netlist_matrix_solver_t::list_t m_mat_solvers;
-public:
-
-		ATTR_COLD virtual ~NETLIB_NAME(solver)();
-
-		ATTR_COLD void post_start();
-
-		ATTR_HOT inline double gmin() { return m_gmin.Value(); }
-
 private:
-	    netlist_solver_parameters_t m_params;
-);
+
+    netlist_solver_parameters_t m_params;
+
+    template <int m_N, int _storage_N>
+    netlist_matrix_solver_t *create_solver(int gs_threshold, bool use_specific);
+};
+
 
 
 #endif /* NLD_SOLVER_H_ */

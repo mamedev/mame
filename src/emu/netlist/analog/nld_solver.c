@@ -41,7 +41,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 	for (int k = 0; k < nets.count(); k++)
 	{
-        m_nets.add(net_entry(nets[k]));
+        m_nets.add(nets[k]);
     }
 
 	for (int k = 0; k < nets.count(); k++)
@@ -80,11 +80,13 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 						netlist_terminal_t *pterm = dynamic_cast<netlist_terminal_t *>(p);
 						// for gauss seidel
 			            pterm->m_new_analog_ptr = &pterm->m_otherterm->net().as_analog().m_new_Analog;
-
+#if 0
 						if (pterm->m_otherterm->net().isRailNet())
 							m_nets[k].m_rails.add(pterm);
 						else
 						    m_nets[k].m_terms.add(pterm);
+#endif
+						add_term(k, pterm);
 					}
 					NL_VERBOSE_OUT(("Added terminal\n"));
 					break;
@@ -139,7 +141,7 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_ti
 #else
         for (int k = 0; k < N(); k++)
         {
-            netlist_analog_net_t *n = m_nets[k].m_net;
+            netlist_analog_net_t *n = m_nets[k];
 #endif
             double DD_n = (n->m_cur_Analog - n->m_last_Analog);
 
@@ -190,7 +192,7 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 #if 1
     for (int k = 0; k < m_nets.count(); k++)
     {
-        netlist_analog_net_t *p= m_nets[k].m_net;
+        netlist_analog_net_t *p= m_nets[k];
         p->m_last_Analog = p->m_cur_Analog;
     }
 #else
@@ -323,19 +325,51 @@ void netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::log_stats()
 ATTR_COLD int netlist_matrix_solver_t::get_net_idx(netlist_net_t *net)
 {
 	for (int k = 0; k < m_nets.count(); k++)
-		if (m_nets[k].m_net == net)
+		if (m_nets[k] == net)
 			return k;
 	return -1;
 }
 
 template <int m_N, int _storage_N>
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, netlist_terminal_t *term)
+{
+    if (term->m_otherterm->net().isRailNet())
+    {
+        //m_nets[k].m_rails.add(pterm);
+        m_rails[k].add(terms_t(term, -1));
+    }
+    else
+    {
+        int ot = get_net_idx(&term->m_otherterm->net());
+        if (ot>=0)
+        {
+            m_terms[k].add(terms_t(term, ot));
+            SOLVER_VERBOSE_OUT(("Net %d Term %s %f %f\n", k, terms[i]->name().cstr(), terms[i]->m_gt, terms[i]->m_go));
+        }
+        /* Should this be allowed ? */
+        else // if (ot<0)
+        {
+           m_rails[k].add(terms_t(term, ot));
+           netlist().error("found term with missing othernet %s\n", term->name().cstr());
+        }
+    }
+}
+
+
+template <int m_N, int _storage_N>
 ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
 {
     m_dim = nets.count();
-	netlist_matrix_solver_t::setup(nets);
 
-	m_terms.clear();
-	m_rail_start = 0;
+    for (int k = 0; k < N(); k++)
+    {
+        m_terms[k].clear();
+        m_rails[k].clear();
+    }
+
+    netlist_matrix_solver_t::setup(nets);
+
+#if 0
 	for (int k = 0; k < N(); k++)
 	{
 		const netlist_terminal_t::list_t &terms = m_nets[k].m_terms;
@@ -344,31 +378,38 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 			int ot = get_net_idx(&terms[i]->m_otherterm->net());
 			if (ot>=0)
 			{
-			    m_terms.add(terms_t(terms[i], k, ot));
+			    m_terms[k].add(terms_t(terms[i], ot));
 				SOLVER_VERBOSE_OUT(("Net %d Term %s %f %f\n", k, terms[i]->name().cstr(), terms[i]->m_gt, terms[i]->m_go));
 			}
 		}
 	}
-	m_rail_start = m_terms.count();
+
+    /* Should this be allowed ? */
 	for (int k = 0; k < N(); k++)
 	{
 		const netlist_terminal_t::list_t &terms = m_nets[k].m_terms;
-		const netlist_terminal_t::list_t &rails = m_nets[k].m_rails;
 		for (int i = 0; i < terms.count(); i++)
 		{
             int ot = get_net_idx(&terms[i]->m_otherterm->net());
 			if (ot<0)
 			{
-                m_terms.add(terms_t(terms[i], k, ot));
+                m_rails[k].add(terms_t(terms[i], ot));
 				netlist().warning("found term with missing othernet %s\n", terms[i]->name().cstr());
 			}
 		}
+    }
+
+
+	for (int k = 0; k < N(); k++)
+	{
+		const netlist_terminal_t::list_t &rails = m_nets[k].m_rails;
 		for (int i = 0; i < rails.count(); i++)
 		{
-            m_terms.add(terms_t(rails[i], k, -1));
+            m_rails[k].add(terms_t(rails[i], -1));
 			SOLVER_VERBOSE_OUT(("Net %d Rail %s %f %f\n", k, rails[i]->name().cstr(), rails[i]->m_gt, rails[i]->m_go));
 		}
 	}
+#endif
 }
 
 template <int m_N, int _storage_N>
@@ -378,43 +419,35 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
         for (int i=0; i < _storage_N; i++)
             m_A[k][i] = 0.0;
 
-    for (int k=0; k < _storage_N; k++)
-        m_RHS[k] = 0.0;
-#if 0
-
-	for (int i = 0; i < m_term_num; i++)
+    for (int k = 0; k < N(); k++)
 	{
-		terms_t &t = m_terms[i];
-		m_RHS[t.m_net_this] += t.m_term->m_Idr;
-		m_A[t.m_net_this][t.m_net_this] += t.m_term->m_gt;
-		if (t.m_net_other >= 0)
+        double rhsk = 0.0;
+        double akk  = 0.0;
+        const int terms_count = m_terms[k].count();
+        const terms_t *terms = m_terms[k];
+
+        for (int i = 0; i < terms_count; i++)
 		{
-			//m_A[t.net_other][t.net_other] += t.term->m_otherterm->m_gt;
-			m_A[t.m_net_this][t.m_net_other] += -t.m_term->m_go;
-			//m_A[t.net_other][t.net_this] += -t.term->m_otherterm->m_go;
+            //printf("A %d %d %s %f %f\n",t.net_this, t.net_other, t.term->name().cstr(), t.term->m_gt, t.term->m_go);
+
+            rhsk = rhsk + terms[i].m_term->m_Idr;
+            akk = akk + terms[i].m_term->m_gt;
+            m_A[k][terms[i].m_net_other] += -terms[i].m_term->m_go;
 		}
-		else
-			m_RHS[t.m_net_this] += t.m_term->m_go * t.m_term->m_otherterm->net().as_analog().Q_Analog();
-	}
-#else
-	for (int i = 0; i < m_rail_start; i++)
-	{
-		const terms_t &t = m_terms[i];
-		//printf("A %d %d %s %f %f\n",t.net_this, t.net_other, t.term->name().cstr(), t.term->m_gt, t.term->m_go);
 
-		m_RHS[t.m_net_this] += t.m_term->m_Idr;
-		m_A[t.m_net_this][t.m_net_this] += t.m_term->m_gt;
-		m_A[t.m_net_this][t.m_net_other] += -t.m_term->m_go;
-	}
-	for (int i = m_rail_start; i < m_terms.count(); i++)
-	{
-		const terms_t &t = m_terms[i];
+        const int rails_count = m_rails[k].count();
+        const terms_t *rails = m_rails[k];
 
-		m_RHS[t.m_net_this] += t.m_term->m_Idr;
-		m_A[t.m_net_this][t.m_net_this] += t.m_term->m_gt;
-		m_RHS[t.m_net_this] += t.m_term->m_go * t.m_term->m_otherterm->net().as_analog().Q_Analog();
-	}
-#endif
+        for (int i = 0; i < rails_count; i++)
+        {
+            const terms_t t = rails[i];
+
+            rhsk = rhsk + t.m_term->m_Idr + t.m_term->m_go * t.m_term->m_otherterm->net().as_analog().Q_Analog();
+            akk = akk + t.m_term->m_gt;
+        }
+        m_RHS[k] = rhsk;
+        m_A[k][k] += akk;
+    }
 }
 
 template <int m_N, int _storage_N>
@@ -504,7 +537,7 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 	double cerr2 = 0;
 	for (int i = 0; i < this->N(); i++)
 	{
-		const double e = (V[i] - this->m_nets[i].m_net->m_cur_Analog);
+		const double e = (V[i] - this->m_nets[i]->m_cur_Analog);
 		const double e2 = (m_RHS[i] - this->m_last_RHS[i]);
 		cerr = (fabs(e) > cerr ? fabs(e) : cerr);
         cerr2 = (fabs(e2) > cerr2 ? fabs(e2) : cerr2);
@@ -519,7 +552,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
 {
 	for (int i = 0; i < this->N(); i++)
 	{
-		this->m_nets[i].m_net->m_cur_Analog = this->m_nets[i].m_net->m_new_Analog = V[i];
+		this->m_nets[i]->m_cur_Analog = this->m_nets[i]->m_new_Analog = V[i];
 	}
 	if (store_RHS)
 	{
@@ -569,7 +602,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic
 ATTR_HOT int netlist_matrix_solver_direct1_t::vsolve_non_dynamic()
 {
 
-    netlist_analog_net_t *net = m_nets[0].m_net;
+    netlist_analog_net_t *net = m_nets[0];
 	this->build_LE();
 	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
@@ -646,7 +679,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 
     for (int k = 0; k < iN; k++)
     {
-        new_v[k] = this->m_nets[k].m_net->m_cur_Analog;
+        new_v[k] = this->m_nets[k]->m_cur_Analog;
     }
     do {
         resched = false;
@@ -708,7 +741,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 
     for (int k = 0; k < iN; k++)
     {
-        this->m_nets[k].m_net->m_new_Analog = this->m_nets[k].m_net->m_cur_Analog;
+        this->m_nets[k]->m_new_Analog = this->m_nets[k]->m_cur_Analog;
     }
 
 	for (int k = 0; k < iN; k++)
@@ -717,25 +750,26 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 		double gabs_t = 0.0;
 		double RHS_t = 0.0;
 
-		//const netlist_analog_net_t &net = *this->m_nets[k];
-		const netlist_terminal_t::list_t &terms = this->m_nets[k].m_terms;
-		const netlist_terminal_t::list_t &rails = this->m_nets[k].m_rails;
+        const typename netlist_matrix_solver_direct_t<m_N, _storage_N>::xlist_t &terms = this->m_terms[k];
+        const typename netlist_matrix_solver_direct_t<m_N, _storage_N>::xlist_t &rails = this->m_rails[k];
 		const int term_count = terms.count();
 		const int rail_count = rails.count();
 
 		for (int i = 0; i < rail_count; i++)
 		{
-			gtot_t += rails[i]->m_gt;
-			gabs_t += fabs(rails[i]->m_go);
-			RHS_t += rails[i]->m_Idr;
-			RHS_t += rails[i]->m_go * rails[i]->m_otherterm->net().as_analog().Q_Analog();
+		    const netlist_terminal_t *rail = rails[i].m_term;
+            gtot_t += rail->m_gt;
+            gabs_t += fabs(rail->m_go);
+            RHS_t += rail->m_Idr;
+            RHS_t += rail->m_go * rail->m_otherterm->net().as_analog().Q_Analog();
 		}
 
 		for (int i = 0; i < term_count; i++)
 		{
-			gtot_t += terms[i]->m_gt;
-			gabs_t += fabs(terms[i]->m_go);
-			RHS_t += terms[i]->m_Idr;
+            const netlist_terminal_t *term = terms[i].m_term;
+			gtot_t += term->m_gt;
+			gabs_t += fabs(term->m_go);
+			RHS_t += term->m_Idr;
 		}
 
 		gabs_t *= 1.0;
@@ -760,13 +794,13 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 
 		for (int k = 0; k < iN; k++)
 		{
-			netlist_analog_net_t & RESTRICT net = *this->m_nets[k].m_net;
-			const netlist_terminal_t::list_t &terms = this->m_nets[k].m_terms;
+			netlist_analog_net_t & RESTRICT net = *this->m_nets[k];
+	        const typename netlist_matrix_solver_direct_t<m_N, _storage_N>::xlist_t &terms = this->m_terms[k];
 			const int term_count = terms.count();
 			double Idrive = 0;
 
             for (int i = 0; i < term_count; i++)
-                Idrive += terms[i]->m_go * *(terms[i]->m_new_analog_ptr);
+                Idrive += terms[i].m_term->m_go * *(terms[i].m_term->m_new_analog_ptr);
 
             //double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
 			const double new_val = net.m_new_Analog * one_m_w[k] + (Idrive + RHS[k]) * w[k];
@@ -796,7 +830,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 	    this->m_calculations++;
 
 	    for (int k = 0; k < this->N(); k++)
-	        this->m_nets[k].m_net->m_cur_Analog = this->m_nets[k].m_net->m_new_Analog;
+	        this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_new_Analog;
 
 	    return resched_cnt;
 	}
@@ -906,11 +940,29 @@ NETLIB_UPDATE(solver)
     }
 }
 
+template <int m_N, int _storage_N>
+netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(const int gs_threshold, const bool use_specific)
+{
+    if (use_specific && m_N == 1)
+        return new netlist_matrix_solver_direct1_t();
+    else if (use_specific && m_N == 2)
+        return new netlist_matrix_solver_direct2_t();
+    else
+    {
+        if (_storage_N >= gs_threshold)
+            return new netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N>();
+        else
+            return new netlist_matrix_solver_direct_t<m_N, _storage_N>();
+    }
+}
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
 	netlist_analog_net_t::list_t groups[100];
 	int cur_group = -1;
+	// FIXME: Turn into parameters ...
+	const int gs_threshold = 5;
+	const bool use_specific = true;
 
     m_params.m_accuracy = m_accuracy.Value();
     m_params.m_gs_loops = m_gs_loops.Value();
@@ -956,53 +1008,42 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
-#if 1
 			case 1:
-				ms = new netlist_matrix_solver_direct1_t();
+				ms = create_solver<1,1>(gs_threshold, use_specific);
 				break;
 			case 2:
-				ms = new netlist_matrix_solver_direct2_t();
+                ms = create_solver<2,2>(gs_threshold, use_specific);
 				break;
 			case 3:
-				ms = new netlist_matrix_solver_direct_t<3,3>();
-				//ms = new netlist_matrix_solver_gauss_seidel_t<3,3>();
+                ms = create_solver<3,3>(gs_threshold, use_specific);
 				break;
 			case 4:
-				ms = new netlist_matrix_solver_direct_t<4,4>();
-				//ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
+                ms = create_solver<4,4>(gs_threshold, use_specific);
 				break;
 			case 5:
-				ms = new netlist_matrix_solver_direct_t<5,5>();
-				//ms = new netlist_matrix_solver_gauss_seidel_t<5,5>();
+                ms = create_solver<5,5>(gs_threshold, use_specific);
 				break;
 			case 6:
-				ms = new netlist_matrix_solver_direct_t<6,6>();
-				//ms = new netlist_matrix_solver_gauss_seidel_t<6,6>();
+                ms = create_solver<6,6>(gs_threshold, use_specific);
 				break;
             case 7:
-                //ms = new netlist_matrix_solver_direct_t<6,6>();
-                ms = new netlist_matrix_solver_gauss_seidel_t<7,7>();
+                ms = create_solver<7,7>(gs_threshold, use_specific);
                 break;
             case 8:
-                //ms = new netlist_matrix_solver_direct_t<6,6>();
-                ms = new netlist_matrix_solver_gauss_seidel_t<8,8>();
+                ms = create_solver<8,8>(gs_threshold, use_specific);
                 break;
-#endif
 			default:
 				if (net_count <= 16)
 				{
-				    //ms = new netlist_matrix_solver_direct_t<0,16>();
-					ms = new netlist_matrix_solver_gauss_seidel_t<0,16>();
+	                ms = create_solver<0,16>(gs_threshold, use_specific);
 				}
 				else if (net_count <= 32)
 				{
-					//ms = new netlist_matrix_solver_direct_t<0,16>();
-					ms = new netlist_matrix_solver_gauss_seidel_t<0,32>();
+	                ms = create_solver<0,32>(gs_threshold, use_specific);
 				}
 				else if (net_count <= 64)
 				{
-					//ms = new netlist_matrix_solver_direct_t<0,16>();
-					ms = new netlist_matrix_solver_gauss_seidel_t<0,64>();
+	                ms = create_solver<0,64>(gs_threshold, use_specific);
 				}
 				else
 				{
