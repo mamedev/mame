@@ -76,33 +76,6 @@ public:
 		m_list[m_count++] = elem;
 	}
 
-	ATTR_HOT inline void resize(const int new_size)
-	{
-		int cnt = count();
-		if (new_size > 0)
-		{
-	        _ListClass *m_new = new _ListClass[new_size];
-	        _ListClass *pd = m_new;
-
-	        if (cnt > new_size)
-	            cnt = new_size;
-	        for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
-	            *pd = *ps;
-            if (m_list != NULL)
-                delete[] m_list;
-	        m_list = m_new;
-	        m_count = cnt;
-		}
-		else
-		{
-		    if (m_list != NULL)
-	            delete[] m_list;
-		    m_list = NULL;
-		    m_count = 0;
-		}
-		m_num_elements = new_size;
-	}
-
 	ATTR_HOT inline void remove(const _ListClass &elem)
 	{
 		for (int i = 0; i < m_count; i++)
@@ -171,7 +144,34 @@ public:
 	ATTR_HOT inline const _ListClass& operator[](const int & index) const { return m_list[index]; }
 
 private:
-	int m_count;
+    ATTR_HOT inline void resize(const int new_size)
+    {
+        int cnt = count();
+        if (new_size > 0)
+        {
+            _ListClass *m_new = new _ListClass[new_size];
+            _ListClass *pd = m_new;
+
+            if (cnt > new_size)
+                cnt = new_size;
+            for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
+                *pd = *ps;
+            if (m_list != NULL)
+                delete[] m_list;
+            m_list = m_new;
+            m_count = cnt;
+        }
+        else
+        {
+            if (m_list != NULL)
+                delete[] m_list;
+            m_list = NULL;
+            m_count = 0;
+        }
+        m_num_elements = new_size;
+    }
+
+    int m_count;
 	_ListClass * m_list;
 	int m_num_elements;
 };

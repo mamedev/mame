@@ -37,13 +37,17 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 {
 	NL_VERBOSE_OUT(("New solver setup\n"));
 
-	m_nets.resize(nets.count());
+	m_nets.clear();
+
+	for (int k = 0; k < nets.count(); k++)
+	{
+        m_nets.add(net_entry(nets[k]));
+    }
 
 	for (int k = 0; k < nets.count(); k++)
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
-        m_nets[k].m_net = nets[k];
 		netlist_analog_net_t *net = nets[k];
 
 		net->m_solver = this;
@@ -316,11 +320,9 @@ void netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::log_stats()
 // netlist_matrix_solver - Direct base
 // ----------------------------------------------------------------------------------------
 
-
-template <int m_N, int _storage_N>
-ATTR_COLD int netlist_matrix_solver_direct_t<m_N, _storage_N>::get_net_idx(netlist_net_t *net)
+ATTR_COLD int netlist_matrix_solver_t::get_net_idx(netlist_net_t *net)
 {
-	for (int k = 0; k < N(); k++)
+	for (int k = 0; k < m_nets.count(); k++)
 		if (m_nets[k].m_net == net)
 			return k;
 	return -1;

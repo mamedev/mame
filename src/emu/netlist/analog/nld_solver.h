@@ -62,6 +62,7 @@ public:
 
 	netlist_solver_parameters_t m_params;
 
+    ATTR_COLD int get_net_idx(netlist_net_t *net);
 	ATTR_COLD virtual void log_stats() {};
 
 protected:
@@ -156,9 +157,6 @@ protected:
     double m_A[_storage_N][_storage_N];
     double m_RHS[_storage_N];
     double m_last_RHS[_storage_N]; // right hand side - contains currents
-
-private:
-	ATTR_COLD int get_net_idx(netlist_net_t *net);
 
 	struct terms_t{
 
