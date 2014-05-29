@@ -3987,6 +3987,10 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0775_a44-a73.u68",   0x00000, 0x10000, CRC(79a56642) SHA1(dfde6c12551e4f12a59e31c14fbfb9edb57e4fac) ) /* Game Version: A44, Library Version: A73 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2xxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Unknown set needed for correct paytable graphics */
+	ROM_LOAD( "mgo-cg2xxx.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cg2xxx.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cg2xxx.u75",  0x18000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mro-cg2312.u77",  0x00000, 0x8000, CRC(29a9d408) SHA1(af8c18833ea268b80fabf3b539f35c6782a0309d) ) /* WRONG?!?! Use until the correct set is verified! */
 	ROM_LOAD( "mgo-cg2312.u78",  0x08000, 0x8000, CRC(b5ea2602) SHA1(82ee6d45dbc53ccf2d2a956daa83f41bb4a27384) ) /* Gives full paytable, but the hands listed are wrong */
 	ROM_LOAD( "mbo-cg2312.u79",  0x10000, 0x8000, CRC(e349202c) SHA1(ef6a904112361425aef5824ae983c15d3456dc49) )
@@ -4004,8 +4008,23 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K* SF  RF  (Bonus)
   % Range: 94.4-96.4%  Optimum: 98.4%  Hit Frequency: 45.5%
      Programs Available: PP0816
 
-4K* - Treasure Chest bonus round for MAX Bet 4 of a Kind
-      Possible payouts: 140, 180, 250, 500 or 5000 Coins
+4K* - Treasure Chest bonus round for MAX Bet 4 of a Kind. Possible payouts: 140, 180, 250, 500 or 5000 Credits
+
+ The Treasure Chest routine works as follows:
+  1. The chest picked is used for animation purposes only. The chest DOES NOT determine the payout.
+  2. A call is made to the random number generator for a number between 0 and 399 (400 possibilities)
+  3. The number generated is used through a look up table to determine the bonus prize:
+
+Number Generated  Award   Odds   Chance
+-----------------------------------------
+               0  5000   0.25%   1 in 400
+   1 through  12  500    3.00%  12 in 400
+  13 through  28  250    4.00%  16 in 400
+  29 through  88  180   15.00%  60 in 400
+  89 through 399  140   75.75% 311 in 400
+
+Overall average for the 4 of a Kind bonus is 173.35 credits
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0816_a5f-a7k.u68",   0x00000, 0x10000, CRC(a1e21b56) SHA1(aa0a730b2ed48612c3b20831b1aa698a45f557c0) ) /* Game Version: A5F, Library Version: A7K */
