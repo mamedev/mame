@@ -265,7 +265,7 @@ static const k053247_interface overdriv_k053246_intf =
 	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	77, 22,
-	KONAMI_ROM_DEINTERLEAVE_4,
+	KONAMI_ROM_DEINTERLEAVE_NONE,
 	overdriv_sprite_callback
 };
 
@@ -401,10 +401,10 @@ ROM_START( overdriv )
 	ROM_LOAD( "789.5",        0x00000, 0x10000, CRC(1085f069) SHA1(27228cedb357ff2e130a4bd6d8aa01cf537e034f) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )   /* graphics (addressable by the CPU) */
-	ROM_LOAD( "e12.r1",       0x000000, 0x100000, CRC(14a10fb2) SHA1(03fb9c15514c5ecc2d9ae4a53961c4bbb49cec73) )    /* sprites */
-	ROM_LOAD( "e13.r4",       0x100000, 0x100000, CRC(6314a628) SHA1(f8a8918998c266109348c77427a7696b503daeb3) )
-	ROM_LOAD( "e14.r10",      0x200000, 0x100000, CRC(b5eca14b) SHA1(a1c5f5e9cd8bbcfc875e2acb33be024724da63aa) )
-	ROM_LOAD( "e15.r15",      0x300000, 0x100000, CRC(5d93e0c3) SHA1(d5cb7666c0c28fd465c860c7f9dbb18a7f739a93) )
+	ROM_LOAD64_WORD( "e12.r1",       0x000000, 0x100000, CRC(14a10fb2) SHA1(03fb9c15514c5ecc2d9ae4a53961c4bbb49cec73) )    /* sprites */
+	ROM_LOAD64_WORD( "e13.r4",       0x000002, 0x100000, CRC(6314a628) SHA1(f8a8918998c266109348c77427a7696b503daeb3) )
+	ROM_LOAD64_WORD( "e14.r10",      0x000004, 0x100000, CRC(b5eca14b) SHA1(a1c5f5e9cd8bbcfc875e2acb33be024724da63aa) )
+	ROM_LOAD64_WORD( "e15.r15",      0x000006, 0x100000, CRC(5d93e0c3) SHA1(d5cb7666c0c28fd465c860c7f9dbb18a7f739a93) )
 
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* graphics (addressable by the CPU) */
 	ROM_LOAD( "e06.a21",      0x000000, 0x020000, CRC(14a085e6) SHA1(86dad6f223e13ff8af7075c3d99bb0a83784c384) )    /* zoom/rotate */
