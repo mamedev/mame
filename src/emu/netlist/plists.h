@@ -65,7 +65,7 @@ public:
 	}
 
 	ATTR_HOT inline operator _ListClass *  () { return m_list; }
-    ATTR_HOT inline operator const _ListClass * const () { return m_list; }
+    ATTR_HOT inline operator const _ListClass * () const { return m_list; }
 
     /* using the [] operator will not allow gcc to vectorize code because
      * basically a pointer is returned.

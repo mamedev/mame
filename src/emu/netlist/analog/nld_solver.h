@@ -70,6 +70,34 @@ public:
 
 protected:
 
+    class ATTR_ALIGNED(64) terms_t{
+
+    public:
+        terms_t() {}
+
+        void clear()
+        {
+            m_term.clear();
+            m_net_other.clear();
+        }
+
+        void add(netlist_terminal_t *term, int net_other)
+        {
+            m_term.add(term);
+            m_net_other.add(net_other);
+        }
+
+        inline int count() { return m_term.count(); }
+
+        inline netlist_terminal_t **terms() { return m_term; }
+        inline int *net_other() { return m_net_other; }
+
+    private:
+        plinearlist_t<netlist_terminal_t *> m_term;
+        plinearlist_t<int> m_net_other;
+
+    };
+
     ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
 
     // return true if a reschedule is needed ...
@@ -137,22 +165,8 @@ protected:
     ATTR_ALIGNED(64) double m_RHS[_storage_N];
     ATTR_ALIGNED(64) double m_last_RHS[_storage_N]; // right hand side - contains currents
 
-	struct ATTR_ALIGNED(64) terms_t{
-
-        terms_t(netlist_terminal_t *term, int net_other)
-        : m_term(term), m_net_other(net_other)
-	    {}
-        terms_t()
-        : m_term(NULL), m_net_other(-1)
-        {}
-
-        ATTR_ALIGNED(64) netlist_terminal_t ATTR_ALIGNED(64) *  RESTRICT m_term;
-		int m_net_other;
-	};
-
-    typedef plinearlist_t<terms_t> xlist_t;
-    xlist_t m_terms[_storage_N];
-    xlist_t m_rails[_storage_N];
+    terms_t m_terms[_storage_N];
+    terms_t m_rails[_storage_N];
     plinearlist_t<double> xx[_storage_N];
 
 private:

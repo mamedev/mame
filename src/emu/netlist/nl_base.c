@@ -771,7 +771,6 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 , m_go(NETLIST_GMIN_DEFAULT)
 , m_gt(NETLIST_GMIN_DEFAULT)
 , m_otherterm(NULL)
-, m_new_analog_ptr(NULL)
 {
 }
 

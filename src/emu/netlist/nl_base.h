@@ -460,10 +460,6 @@ public:
 
 	netlist_terminal_t *m_otherterm;
 
-	// used by gauss-seidel-solver
-
-	double * RESTRICT m_new_analog_ptr;
-
 protected:
 	ATTR_COLD virtual void save_register();
 
