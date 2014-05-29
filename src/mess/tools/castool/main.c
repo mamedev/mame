@@ -39,6 +39,7 @@
 #include "formats/pmd_cas.h"
 #include "formats/primoptp.h"
 #include "formats/rk_cas.h"
+#include "formats/sc3000_bit.h"
 #include "formats/sord_cas.h"
 #include "formats/svi_cas.h"
 #include "formats/thom_cas.h"
@@ -87,6 +88,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"rka", rka_cassette_formats               ,"Apogee"},
 	{"rkm", rkm_cassette_formats               ,"Mikrosha"},
 	{"rkp", rkp_cassette_formats               ,"Partner"},
+	{"sc3000", sc3000_cassette_formats		   ,"Sega SC-3000"},
 	{"sordm5", sordm5_cassette_formats         ,"Sord M5"},
 	{"svi", svi_cassette_formats               ,"SVI"},
 	{"to7", to7_cassette_formats               ,"Thomson TO"},
