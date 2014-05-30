@@ -7098,7 +7098,7 @@ WRITE16_MEMBER( isgsm_state::sound_reset_w )
 		m_soundcpu->reset();
 		m_soundcpu->resume(SUSPEND_REASON_HALT);
 	}
-	else if (data == 1)
+	else
 	{
 		m_soundcpu->reset();
 		m_soundcpu->suspend(SUSPEND_REASON_HALT, 1);
@@ -7108,7 +7108,7 @@ WRITE16_MEMBER( isgsm_state::sound_reset_w )
 WRITE16_MEMBER( isgsm_state::main_bank_change_w )
 {
 	// other values on real hw have strange results, change memory mapping etc??
-	if (data == 1)
+	if (data !=0 )
 		membank(ISGSM_MAIN_BANK)->set_base(memregion("maincpu")->base());
 }
 
