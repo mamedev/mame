@@ -39,7 +39,7 @@ private:
 	emu_options &       m_options;
 	running_machine *   m_machine;
 	struct mg_server *  m_server;
-	osd_ticks_t         m_lastupdatetime;
+	//osd_ticks_t         m_lastupdatetime;
 	bool                m_exiting_core;
 };
 

@@ -341,7 +341,7 @@ web_engine::web_engine(emu_options &options)
 	: m_options(options),
 		m_machine(NULL),
 		m_server(NULL),
-		m_lastupdatetime(0),
+		//m_lastupdatetime(0),
 		m_exiting_core(false)
 
 {
