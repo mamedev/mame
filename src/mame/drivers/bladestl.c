@@ -91,8 +91,17 @@ WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
-	/* bit 1, 2 unknown */
+	// bits 3-5 = ROM bank select
 	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
+
+	// bit 2 = SSG-C rc filter enable
+	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+
+	// bit 1 = SSG-B rc filter enable
+	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+
+	// bit 0 = SSG-A rc filter enable
+	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
@@ -340,7 +349,17 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3579545)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("upd", upd775x_device, port_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bladestl_state, bladestl_port_B_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	MCFG_SOUND_ROUTE(0, "filter1", 0.45)
+	MCFG_SOUND_ROUTE(1, "filter2", 0.45)
+	MCFG_SOUND_ROUTE(2, "filter3", 0.45)
+	MCFG_SOUND_ROUTE(3, "mono", 0.45)
+
+	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -3,6 +3,7 @@
     Blades of Steel
 
 *************************************************************************/
+#include "sound/flt_rc.h"
 #include "sound/upd7759.h"
 #include "video/k007342.h"
 #include "video/k007420.h"
@@ -20,6 +21,9 @@ public:
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
 		m_upd7759(*this, "upd"),
+		m_filter1(*this, "filter1"),
+		m_filter2(*this, "filter2"),
+		m_filter3(*this, "filter3"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_trackball(*this, trackball_tags),
 		m_rombank(*this, "rombank") { }
@@ -29,6 +33,9 @@ public:
 	required_device<k007342_device> m_k007342;
 	required_device<k007420_device> m_k007420;
 	required_device<upd7759_device> m_upd7759;
+	required_device<filter_rc_device> m_filter1;
+	required_device<filter_rc_device> m_filter2;
+	required_device<filter_rc_device> m_filter3;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport_array<4> m_trackball;
 
