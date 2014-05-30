@@ -6,7 +6,7 @@
 const device_type TECMO_MIXER = &device_creator<tecmo_mix_device>;
 
 tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TECMO_MIXER, "Teccmo 16-bit Mixer", tag, owner, clock, "tecmo_mix", __FILE__),
+	: device_t(mconfig, TECMO_MIXER, "Tecmo 16-bit Mixer", tag, owner, clock, "tecmo_mix", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_sprpri_shift(0),
 		m_sprbln_shift(0),

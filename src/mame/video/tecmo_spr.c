@@ -16,7 +16,7 @@
 const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
 
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TECMO_SPRITE, "Teccmo Chained Sprites", tag, owner, clock, "tecmo_spr", __FILE__),
+	: device_t(mconfig, TECMO_SPRITE, "Tecmo Chained Sprites", tag, owner, clock, "tecmo_spr", __FILE__),
 m_gfxregion(0),
 m_bootleg(0)
 {
