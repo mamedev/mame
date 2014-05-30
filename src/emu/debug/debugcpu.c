@@ -3006,6 +3006,18 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 			mem_mask >>= 8;
 		}
 
+		// (1<<(size*8))-1 won't work when size is 8; let's just use a lut
+		static const UINT64 masks[] = {0,
+										0xff,
+										0xffff,
+										0xffffff,
+										0xffffffff,
+									U64(0xffffffffff),
+									U64(0xffffffffffff),
+									U64(0xffffffffffffff),
+									U64(0xffffffffffffffff)};
+		value_to_write &= masks[size];
+
 		if (space.endianness() == ENDIANNESS_LITTLE)
 			address += address_offset;
 		else

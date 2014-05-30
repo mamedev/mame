@@ -1289,6 +1289,13 @@ UINT16 m68000_base_device::simple_read_immediate_16(offs_t address)
 	return m_direct->read_decrypted_word(address);
 }
 
+void m68000_base_device::m68000_write_byte(offs_t address, UINT8 data)
+{
+	static const UINT16 masks[] = {0xff00, 0x00ff};
+
+	m_space->write_word(address & ~1, data | (data << 8), masks[address & 1]);
+}
+
 void m68000_base_device::init16(address_space &space)
 {
 	m_space = &space;
@@ -1299,7 +1306,7 @@ void m68000_base_device::init16(address_space &space)
 	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
 	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
 	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
-	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
+	write8 = m68k_write8_delegate(FUNC(m68000_base_device::m68000_write_byte), this);
 	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
 	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
 }

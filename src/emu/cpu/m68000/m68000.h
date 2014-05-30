@@ -296,6 +296,7 @@ public:
 		UINT16 read_immediate_16(offs_t address);
 		UINT16 simple_read_immediate_16(offs_t address);
 
+		void m68000_write_byte(offs_t address, UINT8 data);
 
 		UINT8 read_byte_32_mmu(offs_t address);
 		void write_byte_32_mmu(offs_t address, UINT8 data);
