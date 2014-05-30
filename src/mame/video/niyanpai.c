@@ -72,7 +72,7 @@ int niyanpai_state::niyanpai_blitter_r(int vram, int offset)
 	return ret;
 }
 
-void niyanpai_state::niyanpai_blitter_w(int vram, int offset, int data)
+void niyanpai_state::niyanpai_blitter_w(int vram, int offset, UINT8 data)
 {
 	switch (offset)
 	{
@@ -105,12 +105,12 @@ void niyanpai_state::niyanpai_blitter_w(int vram, int offset, int data)
 	}
 }
 
-void niyanpai_state::niyanpai_clutsel_w(int vram, int data)
+void niyanpai_state::niyanpai_clutsel_w(int vram, UINT8 data)
 {
 	m_clutsel[vram] = data;
 }
 
-void niyanpai_state::niyanpai_clut_w(int vram, int offset, int data)
+void niyanpai_state::niyanpai_clut_w(int vram, int offset, UINT8 data)
 {
 	m_clut[vram][((m_clutsel[vram] & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -331,21 +331,21 @@ void niyanpai_state::niyanpai_gfxdraw(int vram)
 
 
 ******************************************************************************/
-WRITE16_MEMBER(niyanpai_state::niyanpai_blitter_0_w){ niyanpai_blitter_w(0, offset, data); }
-WRITE16_MEMBER(niyanpai_state::niyanpai_blitter_1_w){ niyanpai_blitter_w(1, offset, data); }
-WRITE16_MEMBER(niyanpai_state::niyanpai_blitter_2_w){ niyanpai_blitter_w(2, offset, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_blitter_0_w){ niyanpai_blitter_w(0, offset, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_blitter_1_w){ niyanpai_blitter_w(1, offset, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_blitter_2_w){ niyanpai_blitter_w(2, offset, data); }
 
-READ16_MEMBER(niyanpai_state::niyanpai_blitter_0_r){ return niyanpai_blitter_r(0, offset); }
-READ16_MEMBER(niyanpai_state::niyanpai_blitter_1_r){ return niyanpai_blitter_r(1, offset); }
-READ16_MEMBER(niyanpai_state::niyanpai_blitter_2_r){ return niyanpai_blitter_r(2, offset); }
+READ8_MEMBER(niyanpai_state::niyanpai_blitter_0_r){ return niyanpai_blitter_r(0, offset); }
+READ8_MEMBER(niyanpai_state::niyanpai_blitter_1_r){ return niyanpai_blitter_r(1, offset); }
+READ8_MEMBER(niyanpai_state::niyanpai_blitter_2_r){ return niyanpai_blitter_r(2, offset); }
 
-WRITE16_MEMBER(niyanpai_state::niyanpai_clut_0_w){ niyanpai_clut_w(0, offset, data); }
-WRITE16_MEMBER(niyanpai_state::niyanpai_clut_1_w){ niyanpai_clut_w(1, offset, data); }
-WRITE16_MEMBER(niyanpai_state::niyanpai_clut_2_w){ niyanpai_clut_w(2, offset, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_clut_0_w){ niyanpai_clut_w(0, offset, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_clut_1_w){ niyanpai_clut_w(1, offset, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_clut_2_w){ niyanpai_clut_w(2, offset, data); }
 
-WRITE16_MEMBER(niyanpai_state::niyanpai_clutsel_0_w){ niyanpai_clutsel_w(0, data); }
-WRITE16_MEMBER(niyanpai_state::niyanpai_clutsel_1_w){ niyanpai_clutsel_w(1, data); }
-WRITE16_MEMBER(niyanpai_state::niyanpai_clutsel_2_w){ niyanpai_clutsel_w(2, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_clutsel_0_w){ niyanpai_clutsel_w(0, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_clutsel_1_w){ niyanpai_clutsel_w(1, data); }
+WRITE8_MEMBER(niyanpai_state::niyanpai_clutsel_2_w){ niyanpai_clutsel_w(2, data); }
 
 /******************************************************************************
 

@@ -190,22 +190,22 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
+	AM_RANGE(0x240400, 0x240403) AM_READ8(niyanpai_blitter_0_r, 0x00ff)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE8(niyanpai_blitter_0_w, 0x00ff)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE8(niyanpai_clut_0_w, 0x00ff)
+	AM_RANGE(0x240600, 0x240603) AM_READ8(niyanpai_blitter_1_r, 0x00ff)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE8(niyanpai_blitter_1_w, 0x00ff)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE8(niyanpai_clut_1_w, 0x00ff)
+	AM_RANGE(0x240800, 0x240803) AM_READ8(niyanpai_blitter_2_r, 0x00ff)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE8(niyanpai_blitter_2_w, 0x00ff)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE8(niyanpai_clut_2_w, 0x00ff)
 	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 
 	AM_RANGE(0x280200, 0x280201) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE8(niyanpai_clutsel_0_w, 0x00ff)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE8(niyanpai_clutsel_1_w, 0x00ff)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE8(niyanpai_clutsel_2_w, 0x00ff)
 
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
@@ -226,20 +226,20 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
+	AM_RANGE(0x240400, 0x240403) AM_READ8(niyanpai_blitter_0_r, 0x00ff)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE8(niyanpai_blitter_0_w, 0x00ff)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE8(niyanpai_clut_0_w, 0x00ff)
 
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
+	AM_RANGE(0x240600, 0x240603) AM_READ8(niyanpai_blitter_1_r, 0x00ff)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE8(niyanpai_blitter_1_w, 0x00ff)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE8(niyanpai_clut_1_w, 0x00ff)
 
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240800, 0x240803) AM_READ8(niyanpai_blitter_2_r, 0x00ff)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE8(niyanpai_blitter_2_w, 0x00ff)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE8(niyanpai_clut_2_w, 0x00ff)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE8(niyanpai_clutsel_0_w, 0x00ff)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE8(niyanpai_clutsel_1_w, 0x00ff)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE8(niyanpai_clutsel_2_w, 0x00ff)
 
 	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
@@ -265,21 +265,21 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
+	AM_RANGE(0x240400, 0x240403) AM_READ8(niyanpai_blitter_0_r, 0x00ff)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE8(niyanpai_blitter_0_w, 0x00ff)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE8(niyanpai_clut_0_w, 0x00ff)
 
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
+	AM_RANGE(0x240600, 0x240603) AM_READ8(niyanpai_blitter_1_r, 0x00ff)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE8(niyanpai_blitter_1_w, 0x00ff)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE8(niyanpai_clut_1_w, 0x00ff)
 
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
+	AM_RANGE(0x240800, 0x240803) AM_READ8(niyanpai_blitter_2_r, 0x00ff)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE8(niyanpai_blitter_2_w, 0x00ff)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE8(niyanpai_clut_2_w, 0x00ff)
 
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE8(niyanpai_clutsel_0_w, 0x00ff)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE8(niyanpai_clutsel_1_w, 0x00ff)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE8(niyanpai_clutsel_2_w, 0x00ff)
 
 	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
@@ -304,21 +304,21 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
+	AM_RANGE(0x240400, 0x240403) AM_READ8(niyanpai_blitter_0_r, 0x00ff)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE8(niyanpai_blitter_0_w, 0x00ff)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE8(niyanpai_clut_0_w, 0x00ff)
 
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
+	AM_RANGE(0x240600, 0x240603) AM_READ8(niyanpai_blitter_1_r, 0x00ff)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE8(niyanpai_blitter_1_w, 0x00ff)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE8(niyanpai_clut_1_w, 0x00ff)
 
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
+	AM_RANGE(0x240800, 0x240803) AM_READ8(niyanpai_blitter_2_r, 0x00ff)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE8(niyanpai_blitter_2_w, 0x00ff)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE8(niyanpai_clut_2_w, 0x00ff)
 
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE8(niyanpai_clutsel_0_w, 0x00ff)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE8(niyanpai_clutsel_1_w, 0x00ff)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE8(niyanpai_clutsel_2_w, 0x00ff)
 
 	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
