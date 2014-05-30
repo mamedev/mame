@@ -1092,7 +1092,11 @@ void ns_server_free(struct ns_server *s) {
 #define STR(x) STRX(x)
 #define __func__ __FILE__ ":" STR(__LINE__)
 #endif
+#if defined _MSC_VER
 #define INT64_FMT  "I64d"
+#else
+#define INT64_FMT  "lld"
+#endif
 #define stat(x, y) mg_stat((x), (y))
 #define fopen(x, y) mg_fopen((x), (y))
 #define open(x, y) mg_open((x), (y))

@@ -921,15 +921,16 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 	{
 		COMBINE_DATA(m_video.gfx_pal+offset);
 		val = m_video.gfx_pal[offset];
-		m_palette->set_pen_color(offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		m_gfxpalette->set_pen_color(offset, pal555(val, 6, 11, 1));
 		return;
 	}
 
 	if(offset >= 0x100 && offset < 0x200)  // Text / Sprites / Tilemap palette
 	{
-		COMBINE_DATA(m_video.text_pal+(offset-0x100));
-		val = m_video.text_pal[offset-0x100];
-		m_palette->set_pen_color(offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		offset -= 0x100;
+		COMBINE_DATA(m_video.text_pal + offset);
+		val = m_video.text_pal[offset];
+		m_pcgpalette->set_pen_color(offset, pal555(val, 6, 11, 1));
 		return;
 	}
 
@@ -1649,6 +1650,10 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 
 	m_sysport.cputype = 0xff;  // 68000, 10MHz
 	m_is_32bit = false;
+
+	save_item(NAME(m_tvram));
+	save_item(NAME(m_gvram));
+	save_item(NAME(m_spritereg));
 }
 
 DRIVER_INIT_MEMBER(x68k_state,x68kxvi)
@@ -1724,17 +1729,19 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", x68k)
 	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
-	MCFG_SCREEN_PALETTE("palette")
+//	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "pcgpalette", empty)
 
-	MCFG_PALETTE_ADD("palette", 65536)
-	MCFG_PALETTE_INIT_OWNER(x68k_state, x68000 )
+	MCFG_PALETTE_ADD("gfxpalette", 256)
+	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_PALETTE_ADD("pcgpalette", 256)
+	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 

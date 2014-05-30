@@ -33,12 +33,12 @@
 
 
 
-inline void x68k_state::x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void x68k_state::x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, UINT32 color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix32(y, x) = (UINT16)color;
 }
 /*
-bitmap_ind16* ::x68k_get_gfx_page(int pri,int type)
+bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
 {
     if(type == GFX16)
     {
@@ -696,7 +696,7 @@ READ16_MEMBER(x68k_state::x68k_spriteram_r )
 	return m_spriteram[offset];
 }
 
-void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect)
+void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect)
 {
 	unsigned int line,pixel; // location on screen
 	UINT32 loc;  // location in TVRAM
@@ -720,10 +720,10 @@ void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectan
 			{
 				// Colour 0 is displayable if the text layer is at the priority level 2
 				if(colour == 0 && (m_video.reg[1] & 0x0c00) == 0x0800)
-					bitmap.pix16(line, pixel) = 512 + (m_video.text_pal[colour] >> 1);
+					bitmap.pix32(line, pixel) = m_pcgpalette->pen(colour);
 				else
 					if(colour != 0)
-						bitmap.pix16(line, pixel) = 512 + (m_video.text_pal[colour] >> 1);
+						bitmap.pix32(line, pixel) = m_pcgpalette->pen(colour);
 			}
 			bit--;
 			if(bit < 0)
@@ -736,7 +736,7 @@ void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectan
 	}
 }
 
-void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
+void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprect, UINT8 priority)
 {
 	int pixel;
 	int page;
@@ -776,7 +776,9 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 						break;
 					}
 					if(colour != 0)
-						bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour] >> 1);
+					{
+						bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
+					}
 					loc++;
 					loc &= 0x3ff;
 				}
@@ -800,7 +802,9 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					{
 						colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
 						if(colour != 0)
-							bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour & 0x0f] >> 1);
+						{
+							bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
+						}
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -817,7 +821,9 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 						{
 							colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
 							if(colour != 0)
-								bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour & 0xff] >> 1);
+							{
+								bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
+							}
 							loc++;
 							loc &= 0x1ff;
 						}
@@ -832,7 +838,9 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					{
 						colour = m_gvram[lineoffset + loc];
 						if(colour != 0)
-							bitmap.pix16(scanline, pixel) = 512 + (colour >> 1);
+						{
+							bitmap.pix32(scanline, pixel) = pal555(colour, 6, 11, 1);
+						}
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -843,7 +851,7 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 	}
 }
 
-void x68k_state::x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect)
+void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 {
 	int priority;
 	//rectangle rect;
@@ -860,7 +868,7 @@ void x68k_state::x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect)
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect)
+void x68k_state::x68k_draw_sprites(bitmap_rgb32 &bitmap, int priority, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
@@ -917,22 +925,8 @@ void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle
 			sx += m_crtc.bg_hshift;
 			sx += m_sprite_shift;
 
-			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour+0x10,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
+			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
 		}
-	}
-}
-
-PALETTE_INIT_MEMBER(x68k_state,x68000)
-{
-	int pal;
-	int r,g,b;
-
-	for(pal=0;pal<32768;pal++)
-	{  // create 64k colour lookup
-		g = (pal & 0x7c00) >> 7;
-		r = (pal & 0x03e0) >> 2;
-		b = (pal & 0x001f) << 3;
-		palette.set_pen_color(pal+512,r,g,b);
 	}
 }
 
@@ -964,7 +958,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(0,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
@@ -972,7 +966,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(0,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
@@ -980,7 +974,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(1,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
@@ -988,7 +982,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(1,code,colour,flags);
 }
 
 VIDEO_START_MEMBER(x68k_state,x68000)
@@ -1000,11 +994,11 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, x68k_pcg_8, memregion("user1")->base(), 0, 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_pcgpalette, x68k_pcg_8, memregion("user1")->base(), 0, 32, 0)));
 
 	gfx_index++;
 
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, x68k_pcg_16, memregion("user1")->base(), 0, 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_pcgpalette, x68k_pcg_16, memregion("user1")->base(), 0, 32, 0)));
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */
@@ -1021,7 +1015,7 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
-UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect(0,0,0,0);
 	int priority;
