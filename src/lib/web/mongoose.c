@@ -337,8 +337,10 @@ void *ns_start_thread(void *(*f)(void *), void *p) {
   (void) pthread_attr_init(&attr);
   (void) pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
+#ifdef NS_STACK_SIZE
 #if NS_STACK_SIZE > 1
   (void) pthread_attr_setstacksize(&attr, NS_STACK_SIZE);
+#endif
 #endif
 
   pthread_create(&thread_id, &attr, f, p);
