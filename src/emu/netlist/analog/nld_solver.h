@@ -79,22 +79,42 @@ protected:
         {
             m_term.clear();
             m_net_other.clear();
+            m_gt.clear();
         }
 
         void add(netlist_terminal_t *term, int net_other)
         {
             m_term.add(term);
             m_net_other.add(net_other);
+            m_gt.add(0.0);
+            m_go.add(0.0);
+            m_Idr.add(0.0);
         }
 
         inline int count() { return m_term.count(); }
 
         inline netlist_terminal_t **terms() { return m_term; }
         inline int *net_other() { return m_net_other; }
+        inline double *gt() { return m_gt; }
+        inline double *go() { return m_go; }
+        inline double *Idr() { return m_Idr; }
+
+        void set_pointers()
+        {
+            for (int i = 0; i < count(); i++)
+            {
+                m_term[i]->m_gt1 = &m_gt[i];
+                m_term[i]->m_go1 = &m_go[i];
+                m_term[i]->m_Idr1 = &m_Idr[i];
+            }
+        }
 
     private:
         plinearlist_t<netlist_terminal_t *> m_term;
         plinearlist_t<int> m_net_other;
+        plinearlist_t<double> m_gt;
+        plinearlist_t<double> m_go;
+        plinearlist_t<double> m_Idr;
 
     };
 
@@ -230,24 +250,23 @@ protected:
     ATTR_HOT void reset();
     ATTR_HOT void update_param();
 
-    //typedef netlist_core_device_t::list_t dev_list_t;
+    netlist_ttl_input_t m_fb_step;
+    netlist_ttl_output_t m_Q_step;
 
-        netlist_ttl_input_t m_fb_step;
-        netlist_ttl_output_t m_Q_step;
+    netlist_param_double_t m_freq;
+    netlist_param_double_t m_sync_delay;
+    netlist_param_double_t m_accuracy;
+    netlist_param_double_t m_gmin;
+    netlist_param_double_t m_lte;
+    netlist_param_logic_t  m_dynamic;
+    netlist_param_double_t m_min_timestep;
 
-		netlist_param_double_t m_freq;
-		netlist_param_double_t m_sync_delay;
-		netlist_param_double_t m_accuracy;
-		netlist_param_double_t m_gmin;
-		netlist_param_double_t m_lte;
-        netlist_param_logic_t  m_dynamic;
-		netlist_param_double_t m_min_timestep;
+    netlist_param_int_t m_nr_loops;
+    netlist_param_int_t m_gs_loops;
+    netlist_param_int_t m_gs_threshold;
+    netlist_param_int_t m_parallel;
 
-        netlist_param_int_t m_nr_loops;
-		netlist_param_int_t m_gs_loops;
-		netlist_param_int_t m_parallel;
-
-		netlist_matrix_solver_t::list_t m_mat_solvers;
+    netlist_matrix_solver_t::list_t m_mat_solvers;
 private:
 
     netlist_solver_parameters_t m_params;

@@ -433,28 +433,29 @@ public:
 
 	ATTR_COLD netlist_terminal_t();
 
-	double m_Idr; // drive current
-	double m_go;  // conductance for Voltage from other term
-	double m_gt;  // conductance for total conductance
+	double *m_Idr1; // drive current
+	double *m_go1;  // conductance for Voltage from other term
+	double *m_gt1;  // conductance for total conductance
 
 	ATTR_HOT inline void set(const double G)
 	{
-		m_Idr = 0;
-		m_go = m_gt = G;
+	    set_ptr(m_Idr1, 0);
+		set_ptr(m_go1, G);
+		set_ptr(m_gt1, G);
 	}
 
 	ATTR_HOT inline void set(const double GO, const double GT)
 	{
-		m_Idr = 0;
-		m_go = GO;
-		m_gt = GT;
+	    set_ptr(m_Idr1, 0);
+		set_ptr(m_go1, GO);
+		set_ptr(m_gt1, GT);
 	}
 
 	ATTR_HOT inline void set(const double GO, const double GT, const double I)
 	{
-		m_Idr = I;
-		m_go = GO;
-		m_gt = GT;
+	    set_ptr(m_Idr1, I);
+		set_ptr(m_go1, GO);
+		set_ptr(m_gt1, GT);
 	}
 
 
@@ -464,6 +465,12 @@ protected:
 	ATTR_COLD virtual void save_register();
 
 	ATTR_COLD virtual void reset();
+private:
+    inline void set_ptr(double *ptr, const double val)
+    {
+        if (ptr != NULL)
+            *ptr = val;
+    }
 };
 
 

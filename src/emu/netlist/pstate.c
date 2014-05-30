@@ -12,7 +12,7 @@ ATTR_COLD pstate_manager_t::~pstate_manager_t()
 
 
 
-ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pstate_data_type_e dt, const void *owner, const int size, const int count, void *ptr)
+ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pstate_data_type_e dt, const void *owner, const int size, const int count, void *ptr, bool is_ptr)
 {
 	pstring fullname = stname;
 	ATTR_UNUSED  pstring ts[] = {
@@ -27,7 +27,7 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 	};
 
 	NL_VERBOSE_OUT(("SAVE: <%s> %s(%d) %p\n", fullname.cstr(), ts[dt].cstr(), size, ptr));
-	pstate_entry_t *p = new pstate_entry_t(stname, dt, owner, size, count, ptr);
+	pstate_entry_t *p = new pstate_entry_t(stname, dt, owner, size, count, ptr, is_ptr);
 	m_save.add(p);
 }
 

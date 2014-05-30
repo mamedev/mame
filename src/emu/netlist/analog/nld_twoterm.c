@@ -39,8 +39,8 @@ ATTR_COLD void netlist_generic_diode::save(pstring name, netlist_object_t &paren
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily) :
-		netlist_device_t(afamily)
+ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily)
+        : netlist_device_t(afamily)
 {
 	m_P.m_otherterm = &m_N;
 	m_N.m_otherterm = &m_P;
@@ -177,7 +177,7 @@ NETLIB_START(C)
 	register_param("C", m_C, 1e-6);
 
 	// set up the element
-	set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
+	//set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
 	//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 

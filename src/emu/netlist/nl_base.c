@@ -767,9 +767,9 @@ ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, c
 
 ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 : netlist_core_terminal_t(TERMINAL, ANALOG)
-, m_Idr(0.0)
-, m_go(NETLIST_GMIN_DEFAULT)
-, m_gt(NETLIST_GMIN_DEFAULT)
+, m_Idr1(NULL)
+, m_go1(NULL)
+, m_gt1(NULL)
 , m_otherterm(NULL)
 {
 }
@@ -779,16 +779,16 @@ ATTR_COLD void netlist_terminal_t::reset()
 {
 	//netlist_terminal_core_terminal_t::reset();
 	set_state(STATE_INP_ACTIVE);
-	m_Idr = 0.0;
-	m_go = netlist().gmin();
-	m_gt = netlist().gmin();
+	set_ptr(m_Idr1, 0.0);
+	set_ptr(m_go1, netlist().gmin());
+	set_ptr(m_gt1, netlist().gmin());
 }
 
 ATTR_COLD void netlist_terminal_t::save_register()
 {
-	save(NAME(m_Idr));
-	save(NAME(m_go));
-	save(NAME(m_gt));
+	save(NAME(m_Idr1));
+	save(NAME(m_go1));
+	save(NAME(m_gt1));
 	netlist_core_terminal_t::save_register();
 }
 
