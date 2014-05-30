@@ -21,8 +21,7 @@ public:
 
 	int m_musobana_inputport;
 	int m_musobana_outcoin_flag;
-	UINT8 m_pio_dir[5];
-	UINT8 m_pio_latch[5];
+
 	int m_scrollx[VRAM_MAX];
 	int m_scrolly[VRAM_MAX];
 	int m_blitter_destx[VRAM_MAX];
@@ -49,28 +48,13 @@ public:
 	DECLARE_READ8_MEMBER(niyanpai_sound_r);
 	DECLARE_WRITE16_MEMBER(niyanpai_sound_w);
 	DECLARE_WRITE8_MEMBER(niyanpai_soundclr_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_pio_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pio_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pa_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pb_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pc_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pd_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pe_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pa_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pb_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pc_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pd_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pe_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pa_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pb_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pc_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pd_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pe_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pa_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pb_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pc_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pd_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pe_w);
+
+	DECLARE_READ8_MEMBER(cpu_portd_r);
+	DECLARE_WRITE8_MEMBER(cpu_porta_w);
+	DECLARE_WRITE8_MEMBER(cpu_portb_w);
+	DECLARE_WRITE8_MEMBER(cpu_portc_w);
+	DECLARE_WRITE8_MEMBER(cpu_porte_w);
+	
 	DECLARE_READ16_MEMBER(niyanpai_dipsw_r);
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
 	DECLARE_WRITE16_MEMBER(musobana_inputport_w);
