@@ -197,6 +197,7 @@ void amiga_copper_setpc(running_machine &machine, UINT32 pc)
 int amiga_copper_execute_next(running_machine &machine, int xpos)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
+	UINT8 ypos = state->m_last_scanline & 0xff;
 	int word0, word1;
 
 	/* bail if not enabled */
@@ -215,7 +216,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 	/* if we're waiting, check for a breakthrough */
 	if (state->m_copper_waiting)
 	{
-		int curpos = (state->m_last_scanline << 8) | (xpos >> 1);
+		int curpos = (ypos << 8) | (xpos >> 1);
 
 		/* if we're past the wait time, stop it and hold up 2 cycles */
 		if ((curpos & state->m_copper_waitmask) >= (state->m_copper_waitval & state->m_copper_waitmask) &&
@@ -283,6 +284,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 			state->m_copper_waitmask = 0xffff;
 			state->m_copper_waitblit = FALSE;
 			state->m_copper_waiting = TRUE;
+
 			return 511;
 		}
 	}
@@ -290,6 +292,12 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 	{
 		/* extract common wait/skip values */
 		state->m_copper_waitval = word0 & 0xfffe;
+
+#if 0
+		if (state->m_copper_waitval != 0xfffe)
+			state->m_copper_waitval = (word0 & 0x00fe) | ((((word0 >> 8) & 0xff) + 1) << 8);
+#endif
+
 		state->m_copper_waitmask = word1 | 0x8001;
 		state->m_copper_waitblit = (~word1 >> 15) & 1;
 
@@ -305,7 +313,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 		/* handle a skip */
 		else
 		{
-			int curpos = (state->m_last_scanline << 8) | (xpos >> 1);
+			int curpos = (ypos << 8) | (xpos >> 1);
 
 			if (LOG_COPPER)
 				logerror("  Skipping if %04x & %04x (currently %04x)\n", state->m_copper_waitval, state->m_copper_waitmask, (state->m_last_scanline << 8) | (xpos >> 1));
@@ -613,6 +621,41 @@ INLINE int update_ham(amiga_state *state, int newpix)
 }
 
 
+//**************************************************************************
+//  DISPLAY WINDOW
+//**************************************************************************
+
+void amiga_state::update_display_window()
+{
+	amiga_state *state = this;
+
+	int vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
+	int vstop = CUSTOM_REG(REG_DIWSTOP) >> 8;
+	int hstart = CUSTOM_REG(REG_DIWSTRT) & 0xff;
+	int hstop = CUSTOM_REG(REG_DIWSTOP) & 0xff;
+
+	if (m_diwhigh_valid)
+	{
+		vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
+		vstop  |= ((CUSTOM_REG(REG_DIWHIGH) >> 8) & 7) << 8;
+		hstart |= ((CUSTOM_REG(REG_DIWHIGH) >> 5) & 1) << 8;
+		hstop  |= ((CUSTOM_REG(REG_DIWHIGH) >> 13) & 1) << 8;
+	}
+	else
+	{
+		vstop |= ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);
+		hstop |= 0x100;
+	}
+
+	if (hstop < hstart)
+	{
+		hstart = 0x00;
+		hstop = 0x1ff;
+	}
+
+	m_diw.set(hstart, hstop, vstart, vstop);
+}
+
 
 /*************************************
  *
@@ -626,8 +669,6 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, ham = 0;
-	int hstart = 0, hstop = 0;
-	int vstart = 0, vstop = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
@@ -723,15 +764,8 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
 				ddf_stop_pixel += 8;
 
-			/* compute the horizontal start/stop */
-			hstart = CUSTOM_REG(REG_DIWSTRT) & 0xff;
-			hstop = (CUSTOM_REG(REG_DIWSTOP) & 0xff);
-			hstop |= 0x100;
-
-			/* compute the vertical start/stop */
-			vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
-			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);
-			vstop |= ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);
+			// display window
+			update_display_window();
 
 			/* extract playfield priorities */
 			pf1pri = CUSTOM_REG(REG_BPLCON2) & 7;
@@ -780,7 +814,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= vstart && scanline < vstop)
+			planes > 0 && scanline >= m_diw.min_y && scanline < m_diw.max_y)
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -885,7 +919,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != NULL && x >= hstart && x < hstop)
+			if (dst != NULL && x >= m_diw.min_x && x < m_diw.max_x)
 			{
 				int pix, pri;
 
@@ -975,7 +1009,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	}
 
 	// end of the line: time to add the modulos
-	if (scanline >= vstart && scanline < vstop)
+	if (scanline >= m_diw.min_y && scanline < m_diw.max_y)
 	{
 		// update odd planes
 		for (pl = 0; pl < planes; pl += 2)

@@ -399,12 +399,7 @@ INLINE void fetch_bitplane_data(amiga_state *state, int plane)
 	}
 }
 
-void amiga_aga_diwhigh_written(running_machine &machine, int written)
-{
-	amiga_state *state = machine.driver_data<amiga_state>();
 
-	state->m_aga_diwhigh_written = written;
-}
 
 /*************************************
  *
@@ -449,8 +444,6 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, ham = 0;
-	int hstart = 0, hstop = 0;
-	int vstart = 0, vstop = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
@@ -539,7 +532,6 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
-//          lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
 
 			/* get default bitoffset */
 			switch(CUSTOM_REG(REG_FMODE) & 0x3)
@@ -557,37 +549,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
 				ddf_stop_pixel += 8;
 
-			/* compute the horizontal start/stop */
-			hstart = CUSTOM_REG(REG_DIWSTRT) & 0xff;
-			hstop = (CUSTOM_REG(REG_DIWSTOP) & 0xff);
-
-			if (m_aga_diwhigh_written)
-			{
-				hstart |= ((CUSTOM_REG(REG_DIWHIGH) >> 5) & 1) << 8;
-				hstop |= ((CUSTOM_REG(REG_DIWHIGH) >> 13) & 1) << 8;
-			}
-			else
-			{
-				hstop |= 0x100;
-			}
-			if ( hstop < hstart )
-			{
-				hstart = 0x00;
-				hstop = 0x1ff;
-			}
-
-			/* compute the vertical start/stop */
-			vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
-			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);
-			if (m_aga_diwhigh_written)
-			{
-				vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
-				vstop |= ((CUSTOM_REG(REG_DIWHIGH) >> 8) & 7) << 8;
-			}
-			else
-			{
-				vstop |= ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);
-			}
+			// display window
+			update_display_window();
 
 			/* extract playfield priorities */
 			pf1pri = CUSTOM_REG(REG_BPLCON2) & 7;
@@ -636,7 +599,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= vstart && scanline < vstop)
+			planes > 0 && scanline >= m_diw.min_y && scanline < m_diw.max_y)
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -741,7 +704,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != NULL && x >= hstart && x < hstop)
+			if (dst != NULL && x >= m_diw.min_x && x < m_diw.max_x)
 			{
 				int pix, pri;
 
@@ -854,7 +817,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 #endif
 
 	/* end of the line: time to add the modulos */
-	if (scanline >= vstart && scanline < vstop)
+	if (scanline >= m_diw.min_y && scanline < m_diw.max_y)
 	{
 		/* update odd planes */
 		for (pl = 0; pl < planes; pl += 2)

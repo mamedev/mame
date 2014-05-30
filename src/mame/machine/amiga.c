@@ -1553,14 +1553,20 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
 			}
 			break;
+
+		// display window start/stop
 		case REG_DIWSTRT:
 		case REG_DIWSTOP:
-			if (IS_AGA(state))
-				amiga_aga_diwhigh_written(space.machine(), 0);
+			m_diwhigh_valid = false;
 			break;
+
+		// display window high
 		case REG_DIWHIGH:
-			if (IS_AGA(state))
-				amiga_aga_diwhigh_written(space.machine(), 1);
+			if (IS_ECS(state) || IS_AGA(state))
+			{
+				m_diwhigh_valid = true;
+				CUSTOM_REG(REG_DIWHIGH) = data;
+			}
 			break;
 
 		case REG_BEAMCON0:
