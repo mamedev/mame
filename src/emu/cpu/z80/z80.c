@@ -3736,6 +3736,17 @@ nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type NSC800 = &device_creator<nsc800_device>;
 
+
+// todo, move per-driver implementations (eg. nbmj9195.c) to here with callbacks for the ports
+
+tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80_device(mconfig, TMPZ84C011, "TMPZ84C011", tag, owner, clock, "tmpz84c011", __FILE__)
+{
+}
+
+const device_type TMPZ84C011 = &device_creator<tmpz84c011_device>;
+
+
 WRITE_LINE_MEMBER( z80_device::irq_line )
 {
 	set_input_line( INPUT_LINE_IRQ0, state );

@@ -3205,7 +3205,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
+MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -11630,3 +11630,6 @@ CONS( 1995, sfzch,  0, 0,     cps1_12MHz, sfzch,      cps_state, cps1,     "Capc
 // are these 2 legit sets, or did somebody region hack it?
 CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", 0 )
 CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", 0 )
+
+// Kensei Mogura - see kenseim.c
+

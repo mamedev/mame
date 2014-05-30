@@ -958,6 +958,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/cbasebal.o $(VIDEO)/cbasebal.o \
 	$(DRIVERS)/commando.o $(VIDEO)/commando.o \
 	$(DRIVERS)/cps1.o $(VIDEO)/cps1.o \
+	$(DRIVERS)/kenseim.o \
 	$(DRIVERS)/cps2.o \
 	$(DRIVERS)/cps3.o $(AUDIO)/cps3.o \
 	$(DRIVERS)/egghunt.o \

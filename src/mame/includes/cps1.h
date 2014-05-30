@@ -370,6 +370,8 @@ public:
 
 /*----------- defined in drivers/cps1.c -----------*/
 
+MACHINE_CONFIG_EXTERN(cps1_12MHz);
+
 ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 
 GFXDECODE_EXTERN( cps1 );

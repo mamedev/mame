@@ -1269,6 +1269,110 @@ static const struct gfx_range mapper_cps2_table[] =
 };
 
 
+
+/*
+Name     knm10b;
+PartNo   ;
+Date     ;
+Revision ;
+Designer ;
+Company  ;
+Assembly ;
+Location ;
+Device   g16v8;
+
+ Dedicated input pins
+
+pin 1   = I0;  Input 
+pin 2   = I1;  Input 
+pin 3   = I2;  Input 
+pin 4   = I3;  Input 
+pin 5   = I4;  Input 
+pin 6   = I5;  Input 
+pin 7   = I6;  Input 
+pin 8   = I7;  Input 
+pin 9   = I8;  Input 
+pin 11  = I9;  Input 
+
+ Programmable output pins 
+
+pin 12  = B0;  Combinatorial output 
+pin 13  = B1;  Combinatorial output 
+pin 14  = B2;  Combinatorial output 
+pin 15  = B3;  Combinatorial output 
+pin 16  = B4;  Combinatorial output 
+pin 17  = B5;  Combinatorial output 
+pin 18  = B6;  Combinatorial output 
+pin 19  = B7;  Combinatorial output 
+
+ Output equations 
+
+!B7 = !I0 & !I1 & !I2 & !I3 & !I4 & !I5 & !I9 
+    #  I0 & !I1 & !I2 & !I3 & !I4 & !I5 &  I9;
+!B6 = !I0 & !I1 & !I2 & !I3 & !I4 & !I5 & !I9 
+    #  I0 & !I1 & !I2 & !I3 & !I4 & !I5 &  I9;
+!B5 = !I0 & !I1 & !I2 & !I3 & !I4 &  I5 & !I9 
+    #  I0 & !I1 & !I2 & !I3 & !I4 &  I5 &  I9;
+!B4 = !I0 & !I1 & !I2 & !I3 & !I4 &  I5 & !I9 
+    #  I0 & !I1 & !I2 & !I3 & !I4 &  I5 &  I9;
+!B3 = !I0 & !I1 & !I2 & !I3 &  I4 & !I5 & !I6 & !I7 & !I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 & !I8 & !I9 
+    # !I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 & !I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 & !I8 & !I9 
+    # !I0 & !I1 & !I2 &  I3 & !I4 & !I5 & !I6 & !I7 &  I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 &  I8 & !I9 
+    # !I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 &  I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 &  I8 & !I9 
+    #  I0 & !I1 & !I2 & !I3 &  I4 & !I5 & !I6 & !I7 & !I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 & !I8 &  I9 
+    #  I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 & !I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 & !I8 &  I9 
+    #  I0 & !I1 & !I2 &  I3 & !I4 & !I5 & !I6 & !I7 &  I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 &  I8 &  I9 
+    #  I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 &  I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 &  I8 &  I9;
+!B2 = !I0 & !I1 & !I2 & !I3 &  I4 & !I5 & !I6 & !I7 & !I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 & !I8 & !I9 
+    # !I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 & !I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 & !I8 & !I9 
+    # !I0 & !I1 & !I2 &  I3 & !I4 & !I5 & !I6 & !I7 &  I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 &  I8 & !I9 
+    # !I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 &  I8 & !I9 
+    # !I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 &  I8 & !I9 
+    #  I0 & !I1 & !I2 & !I3 &  I4 & !I5 & !I6 & !I7 & !I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 & !I8 &  I9 
+    #  I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 & !I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 & !I8 &  I9 
+    #  I0 & !I1 & !I2 &  I3 & !I4 & !I5 & !I6 & !I7 &  I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 &  I8 &  I9 
+    #  I0 & !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 &  I8 &  I9 
+    #  I0 & !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 &  I8 &  I9;
+!B1 = !I1 & !I2 & !I3 &  I4 & !I5 & !I6 & !I7 & !I8 
+    # !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 & !I8 
+    # !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 & !I8 
+    # !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 & !I8 
+    # !I1 & !I2 &  I3 & !I4 & !I5 & !I6 & !I7 &  I8 
+    # !I1 &  I2 & !I3 & !I4 & !I5 &  I6 & !I7 &  I8 
+    # !I1 &  I2 &  I3 & !I4 & !I5 & !I6 &  I7 &  I8 
+    # !I1 &  I2 & !I3 & !I4 & !I5 &  I6 &  I7 &  I8;
+!B0 =  I0 &  I9;
+
+*/
+// wrong, need to figure this out from the PAL
+
+#define mapper_KNM10B    { 0x8000, 0x8000, 0x8000, 0 }, mapper_KNM10B_table
+static const struct gfx_range mapper_KNM10B_table[] =
+{
+	/* type             start    end      bank */
+	{ GFXTYPE_SPRITES , 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SCROLL2 , 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SCROLL1,  0x01000, 0x01fff, 2 },
+	{ GFXTYPE_SCROLL3 , 0x01000, 0x01fff, 2 },
+	{ 0 }
+};
+
+
+
 static const struct CPS1config cps1_config_table[]=
 {
 	/* name         CPSB          gfx mapper   in2  in3  out2   kludge */
@@ -1472,6 +1576,9 @@ static const struct CPS1config cps1_config_table[]=
 	/* CPS2 games */
 
 	{"cps2",        CPS_B_21_DEF, mapper_cps2 },
+
+	/* CPS1 board + extra support boards */
+	{"kenseim",       CPS_B_21_DEF, mapper_KNM10B }, // wrong, need to convert equations from PAL
 
 	{0}     /* End of table */
 };

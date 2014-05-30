@@ -336,4 +336,15 @@ protected:
 
 extern const device_type TLCS_Z80;
 
+
+class tmpz84c011_device : public z80_device
+{
+public:
+	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+
+protected:
+};
+
+extern const device_type TMPZ84C011;
+
 #endif /* __Z80_H__ */
