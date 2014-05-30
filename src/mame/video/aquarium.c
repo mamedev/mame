@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_txt_tile_info)
 
 WRITE16_MEMBER(aquarium_state::aquarium_txt_videoram_w)
 {
-	m_txt_videoram[offset] = data;
+	COMBINE_DATA(&m_txt_videoram[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_mid_tile_info)
 
 WRITE16_MEMBER(aquarium_state::aquarium_mid_videoram_w)
 {
-	m_mid_videoram[offset] = data;
+	COMBINE_DATA(&m_mid_videoram[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_bak_tile_info)
 
 WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
 {
-	m_bak_videoram[offset] = data;
+	COMBINE_DATA(&m_bak_videoram[offset]);
 	m_bak_tilemap->mark_tile_dirty(offset / 2);
 }
 
