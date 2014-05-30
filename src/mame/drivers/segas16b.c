@@ -1507,17 +1507,21 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 					return ioport("P2")->read();
 			}
 			break;
+
 		case 0x3000/2:
-			switch (offset & 7)
+			switch (offset & 0x1b)
 			{
-				case 0: return ioport("HANDX1")->read();
-				case 1: return ioport("TRACKX1")->read();
-				case 2: return ioport("TRACKY1")->read();
-				case 3: return ioport("HANDY1")->read();
-				case 4: return ioport("HANDX2")->read();
-				case 5: return ioport("TRACKX2")->read();
-				case 6: return ioport("TRACKY2")->read();
-				case 7: return ioport("HANDY2")->read();
+				case 0x00: return ioport("TRACKX1")->read() & 0xff;
+				case 0x01: return (ioport("TRACKX1")->read() >> 8 & 0x0f) | (ioport("HANDY1")->read() << 4 & 0xf0);
+				case 0x02: return ioport("TRACKY1")->read();
+				case 0x03: return ioport("TRACKY1")->read() >> 8 & 0x0f;
+				case 0x10: return ioport("HANDX1")->read();
+
+				case 0x08: return ioport("TRACKX2")->read() & 0xff;
+				case 0x09: return (ioport("TRACKX2")->read() >> 8 & 0x0f) | (ioport("HANDY2")->read() << 4 & 0xf0);
+				case 0x0a: return ioport("TRACKY2")->read();
+				case 0x0b: return ioport("TRACKY2")->read() >> 8 & 0xff;
+				case 0x11: return ioport("HANDX2")->read();
 			}
 			break;
 	}
@@ -1870,14 +1874,13 @@ static INPUT_PORTS_START( aceattac )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1HAND)
 
 	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(TMP_PL1BALL)
+	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1BALL) PORT_REVERSE
 
 	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(TMP_PL1BALL)
+	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1BALL)
 
 	PORT_START("HANDY1") // power of "hand" device
-	PORT_BIT( 0x7f, 0x40, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(30) PORT_PLAYER(TMP_PL1HAND)
-	// maybe, read 8 bits, and masked 0x70
+	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL1HAND)
 
 	PORT_START("DIAL1") // toss formation
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1) PORT_INVERT PORT_FULL_TURN_COUNT(10)
@@ -1891,14 +1894,13 @@ static INPUT_PORTS_START( aceattac )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2HAND)
 
 	PORT_START("TRACKX2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL) PORT_REVERSE
 
 	PORT_START("TRACKY2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL)
+	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL)
 
 	PORT_START("HANDY2") // power of "hand" device
-	PORT_BIT( 0x7f, 0x40, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(30) PORT_PLAYER(TMP_PL2HAND)
-	// maybe, read 8 bits, and masked 0x70
+	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL2HAND)
 
 	PORT_START("DIAL2") // toss formation
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_INVERT PORT_FULL_TURN_COUNT(10)
@@ -6721,7 +6723,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,             INPUT,    INIT,               MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", GAME_NOT_WORKING )
+GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
 
 GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
 GAME( 1987, aliensyn7,  aliensyn, system16b,           aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
