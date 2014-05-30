@@ -20,34 +20,6 @@
 //  WEB ENGINE
 //**************************************************************************
 
-void web_engine::websocket_ready_handler(struct mg_connection *conn) {
-	static const char *message = "update_machine";
-	mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, message, strlen(message));
-	m_websockets.append(*global_alloc(simple_list_wrapper<mg_connection>(conn)));
-}
-
-// Arguments:
-//   flags: first byte of websocket frame, see websocket RFC,
-//          http://tools.ietf.org/html/rfc6455, section 5.2
-//   data, data_len: payload data. Mask, if any, is already applied.
-int web_engine::websocket_data_handler(struct mg_connection *conn, int flags,
-									char *data, size_t data_len)
-{
-	// just Echo example for now
-	if ((flags & 0x0f) == WEBSOCKET_OPCODE_TEXT)
-		mg_websocket_write(conn, WEBSOCKET_OPCODE_TEXT, data, data_len);
-
-	// Returning zero means stoping websocket conversation.
-	// Close the conversation if client has sent us "exit" string.
-	return memcmp(data, "exit", 4);
-}
-
-static void get_qsvar(const struct mg_request_info *request_info,
-						const char *name, char *dst, size_t dst_len) {
-	const char *qs = request_info->query_string;
-	mg_get_var(qs, strlen(qs == NULL ? "" : qs), name, dst, dst_len);
-}
-
 char* websanitize_statefilename ( char* unsanitized )
 {
 	// It's important that we remove any dangerous characters from any filename
@@ -107,7 +79,8 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 
 	// Returning non-zero tells mongoose that our function has replied to
 	// the client, and mongoose should not send client any more data.
-	return 1;
+
+	return MG_TRUE;
 }
 
 int web_engine::json_slider_handler(struct mg_connection *conn)
@@ -116,7 +89,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 	astring tempstring;
 	Json::Value array(Json::arrayValue);
 
-	/* add all sliders */
+	// add all sliders
 	for (curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
@@ -130,7 +103,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 		array.append(data);
 	}
 
-	/* add all sliders */
+	// add all sliders 
 	for (curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
@@ -154,28 +127,27 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 			"%s",
 			(int)strlen(json), json);
 
-	return 1;
+	return MG_TRUE;
 }
 
 // This function will be called by mongoose on every new request.
 int web_engine::begin_request_handler(struct mg_connection *conn)
 {
-	const struct mg_request_info *request_info = mg_get_request_info(conn);
-	if (!strncmp(request_info->uri, "/json/",6))
+	if (!strncmp(conn->uri, "/json/",6))
 	{
-		if (!strcmp(request_info->uri, "/json/game"))
+		if (!strcmp(conn->uri, "/json/game"))
 		{
 			return json_game_handler(conn);
 		}
-		if (!strcmp(request_info->uri, "/json/slider"))
+		if (!strcmp(conn->uri, "/json/slider"))
 		{
 			return json_slider_handler(conn);
 		}
 	}
-	else if (!strncmp(request_info->uri, "/cmd",4))
+	else if (!strncmp(conn->uri, "/cmd",4))
 	{
 		char cmd_name[64];
-		get_qsvar(request_info, "name", cmd_name, sizeof(cmd_name));
+		mg_get_var(conn, "name", cmd_name, sizeof(cmd_name));
 
 		if(!strcmp(cmd_name,"softreset"))
 		{
@@ -199,14 +171,14 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		else if(!strcmp(cmd_name,"savestate"))
 		{
 			char cmd_val[64];
-			get_qsvar(request_info, "val", cmd_val, sizeof(cmd_val));
+			mg_get_var(conn, "val", cmd_val, sizeof(cmd_val));
 			char *filename = websanitize_statefilename(cmd_val);
 			m_machine->schedule_save(filename);
 		}
 		else if(!strcmp(cmd_name,"loadstate"))
 		{
 			char cmd_val[64];
-			get_qsvar(request_info, "val", cmd_val, sizeof(cmd_val));
+			mg_get_var(conn, "val", cmd_val, sizeof(cmd_val));
 			char *filename = cmd_val;
 			m_machine->schedule_load(filename);
 		}
@@ -226,14 +198,14 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 
 		// Returning non-zero tells mongoose that our function has replied to
 		// the client, and mongoose should not send client any more data.
-		return 1;
+		return MG_TRUE;
 	}
-	else if (!strncmp(request_info->uri, "/slider",7))
+	else if (!strncmp(conn->uri, "/slider",7))
 	{
 		char cmd_id[64];
 		char cmd_val[64];
-		get_qsvar(request_info, "id", cmd_id, sizeof(cmd_id));
-		get_qsvar(request_info, "val", cmd_val, sizeof(cmd_val));
+		mg_get_var(conn, "id", cmd_id, sizeof(cmd_id));
+		mg_get_var(conn, "val", cmd_val, sizeof(cmd_val));
 		int cnt = 0;
 		int id = atoi(cmd_id);
 		const slider_state *curslider;
@@ -260,104 +232,105 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 
 		// Returning non-zero tells mongoose that our function has replied to
 		// the client, and mongoose should not send client any more data.
-		return 1;
+		return MG_TRUE;
 	}
-	else if (!strncmp(request_info->uri, "/screenshot.png",15))
+	else if (!strncmp(conn->uri, "/screenshot.png",15))
 	{
-		screen_device_iterator iter(m_machine->root_device());
-		screen_device *screen = iter.first();
-
-		if (screen == NULL)
+		FILE *fp = (FILE *) conn->connection_param;
+		char buf[200];
+		size_t n = 0;
+		if (fp == NULL) 
 		{
-			return 0;
+			screen_device_iterator iter(m_machine->root_device());
+			screen_device *screen = iter.first();
+
+			if (screen == NULL)
+			{
+				return 0;
+			}
+
+			astring fname("screenshot.png");
+			{
+				emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				file_error filerr = file.open(fname);
+
+				if (filerr != FILERR_NONE)
+				{
+					return 0;
+				}
+
+				m_machine->video().save_snapshot(screen, file);
+				astring fullpath(file.fullpath());
+				file.close();
+			}
+			
+			{
+				emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_READ);
+				file_error filerr = file.open(fname);
+
+				if (filerr != FILERR_NONE)
+				{
+					return 0;
+				}
+							
+				file.seek(0, SEEK_SET);
+				mg_send_header(conn, "Content-Type", "image/png");
+				mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
+				mg_send_header(conn, "Pragma", "no-cache");
+				mg_send_header(conn, "Expires", "0");			 
+				do 
+				{
+					n = file.read(buf, sizeof(buf));										
+					mg_send_data(conn, buf, n);
+				}
+				while (n==sizeof(buf));
+				file.close();				
+			}
 		}
-
-		astring fname("screenshot.png");
-		emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname);
-
-		if (filerr != FILERR_NONE)
-		{
-			return 0;
-		}
-
-		m_machine->video().save_snapshot(screen, file);
-		astring fullpath(file.fullpath());
-		file.close();
-
-		mg_send_file(conn,fullpath);
-		return 1;
+		return MG_TRUE;
 	}
 	return 0;
 }
 
-void *web_engine::websocket_keepalive()
-{
-	while(!m_exiting_core)
-	{
-		osd_ticks_t curtime = osd_ticks();
-		if ((curtime - m_lastupdatetime) > osd_ticks_per_second() * 5)
-		{
-			m_lastupdatetime = curtime;
-			for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
-			{
-				int status = mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_PING, NULL, 0);
-				if (status==0) m_websockets.detach(*curitem); // remove inactive clients
-			}
-		}
-		osd_sleep(osd_ticks_per_second()/5);
+static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
+  if (ev == MG_REQUEST) {
+	if (conn->is_websocket) {
+		// This handler is called for each incoming websocket frame, one or more
+		// times for connection lifetime.
+		// Echo websocket data back to the client.
+		//const char *msg = "update_machine";
+		//mg_websocket_write(conn, 1, msg, strlen(msg));
+		return conn->content_len == 4 && !memcmp(conn->content, "exit", 4) ? MG_FALSE : MG_TRUE;
+    } else {
+		web_engine *engine = static_cast<web_engine *>(conn->server_param);	
+		return engine->begin_request_handler(conn);    
 	}
+  } else if (ev == MG_AUTH) {
+    return MG_TRUE;
+  } else {
+    return MG_FALSE;
+  }
+}
+
+static int iterate_callback(struct mg_connection *c, enum mg_event ev) {
+  if (ev == MG_POLL && c->is_websocket) {
+    char buf[20];
+    int len = snprintf(buf, sizeof(buf), "%lu",
+     (unsigned long) * (time_t *) c->callback_param);
+    mg_websocket_write(c, 1, buf, len);
+  }
+  return MG_TRUE;
+}
+
+static void *serve(void *server) {
+	time_t current_timer = 0, last_timer = time(NULL);
+	for (;;) mg_poll_server((struct mg_server *) server, 1000);
+	current_timer = time(NULL);
+	if (current_timer - last_timer > 0) {
+		last_timer = current_timer;
+		mg_iterate_over_connections((struct mg_server *)server, iterate_callback, &current_timer);
+	}  
 	return NULL;
-}
-
-//-------------------------------------------------
-//  static callbacks
-//-------------------------------------------------
-static void websocket_ready_handler_static(struct mg_connection *conn)
-{
-	const struct mg_request_info *request_info = mg_get_request_info(conn);
-	web_engine *engine = static_cast<web_engine *>(request_info->user_data);
-	engine->websocket_ready_handler(conn);
-}
-
-static int websocket_data_handler_static(struct mg_connection *conn, int flags,
-									char *data, size_t data_len)
-{
-	const struct mg_request_info *request_info = mg_get_request_info(conn);
-	web_engine *engine = static_cast<web_engine *>(request_info->user_data);
-	return engine->websocket_data_handler(conn, flags, data, data_len);
-}
-
-static int begin_request_handler_static(struct mg_connection *conn)
-{
-	const struct mg_request_info *request_info = mg_get_request_info(conn);
-	web_engine *engine = static_cast<web_engine *>(request_info->user_data);
-	return engine->begin_request_handler(conn);
-}
-
-static int begin_http_error_handler_static(struct mg_connection *conn, int status)
-{
-	//const struct mg_request_info *request_info = mg_get_request_info(conn);
-	if (status == 404) // 404 -- File Not Found
-	{
-		{
-				mg_printf(conn,
-					"HTTP/1.1 404 Not Found\r\n"
-					"Content-Type: text/plain\r\n"
-					"Content-Length: 14\r\n"        // Always set Content-Length
-					"\r\n"
-					"Nothing to do.");
-		}
-	}
-	// Returning non-zero tells mongoose that our function has replied to
-	// the client, and mongoose should not send client any more data.
-	return 1;
-}
-
-static void *websocket_keepalive_static(void *thread_func_param)
-{
-	web_engine *engine = static_cast<web_engine *>(thread_func_param);
-	return engine->websocket_keepalive();
 }
 
 //-------------------------------------------------
@@ -367,32 +340,18 @@ static void *websocket_keepalive_static(void *thread_func_param)
 web_engine::web_engine(emu_options &options)
 	: m_options(options),
 		m_machine(NULL),
-		m_ctx(NULL),
+		m_server(NULL),
 		m_lastupdatetime(0),
 		m_exiting_core(false)
 
 {
-	struct mg_callbacks callbacks;
-
-	// List of options. Last element must be NULL.
-	const char *web_options[] = {
-		"listening_ports", options.http_port(),
-		"document_root", options.http_path(),
-		NULL
-	};
-
-	// Prepare callbacks structure.
-	memset(&callbacks, 0, sizeof(callbacks));
-	callbacks.begin_request = begin_request_handler_static;
-	callbacks.websocket_ready = websocket_ready_handler_static;
-	callbacks.websocket_data = websocket_data_handler_static;
-	callbacks.http_error = begin_http_error_handler_static;
-
-	// Start the web server.
 	if (m_options.http()) {
-		m_ctx = mg_start(&callbacks, this, web_options);
-
-		mg_start_thread(websocket_keepalive_static, this);
+		m_server = mg_create_server(this, ev_handler);
+		
+		mg_set_option(m_server, "listening_port", options.http_port());
+		mg_set_option(m_server, "document_root",  options.http_path());
+		
+		mg_start_thread(serve, m_server);
 	}
 
 }
@@ -414,21 +373,20 @@ web_engine::~web_engine()
 void web_engine::close()
 {
 	m_exiting_core = 1;
-	osd_sleep(osd_ticks_per_second()/5);
-	for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
-	{
-		mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_CONNECTION_CLOSE, NULL, 0);
-	}
-	// Stop the server.
-	mg_stop(m_ctx);
+	// Cleanup, and free server instance
+	mg_destroy_server(&m_server);	
 }
 
+static int websocket_callback(struct mg_connection *c, enum mg_event ev) {
+  if (c->is_websocket) {
+    const char *message = (const char *)c->callback_param;
+    mg_websocket_write(c, 1, message, strlen(message));
+  }
+  return MG_TRUE;
+}
 
 void web_engine::push_message(const char *message)
 {
-	for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
-	{
-		int status = mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_TEXT, message, strlen(message));
-		if (status==0) m_websockets.remove(*curitem); // remove inactive clients
-	}
+	if (m_server!=NULL)
+		mg_iterate_over_connections(m_server, websocket_callback, (void*)message);
 }
