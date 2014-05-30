@@ -361,14 +361,17 @@ GFXDECODE_END
 
 /******************************************************************************/
 
+#define MASTER_CLOCK XTAL_24MHz
+#define OKI_CLOCK XTAL_8MHz
+
 static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(fstarfrc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo16_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)         /* 4MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK/6)         /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -399,12 +402,12 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 8000000/2)
+	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/6) // 4 MHz
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK/8, OKIM6295_PIN7_HIGH) // sample rate 1 MHz / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
