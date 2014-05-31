@@ -337,6 +337,15 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 		m_cia_0->tod_w(0);
 	}
 
+	// pot counters (start counting at 7 (ntsc) or 8 (pal))
+	if (BIT(CUSTOM_REG(REG_POTGO), 0) && (scanline /2 ) > 7)
+	{
+		m_pot0x += !(m_potgo_port->read() & 0x0100);
+		m_pot0y += !(m_potgo_port->read() & 0x0400);
+		m_pot1x += !(m_potgo_port->read() & 0x1000);
+		m_pot1y += !(m_potgo_port->read() & 0x4000);
+	}
+
 	// render up to this scanline
 	if (!m_screen->update_partial(scanline))
 	{
@@ -1237,16 +1246,40 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return joy1dat_r();
 
 		case REG_POTGOR:
-			if (state->m_potgo_port) return state->m_potgo_port->read();
-			else return 0x5500;
+			if (state->m_potgo_port)
+				return state->m_potgo_port->read();
+			else
+				return 0x5500;
 
 		case REG_POT0DAT:
-			if (state->m_pot0dat_port) return state->m_pot0dat_port->read();
-			else return 0x0000;
+			if (state->m_pot0dat_port)
+			{
+				return state->m_pot0dat_port->read();
+			}
+			else
+			{
+				int scale = m_agnus_id & 0x10 ? 525 : 625;
+
+				m_pot0dat  = (int) ((double) m_pot0x / scale) * 0xff;
+				m_pot0dat |= (int)(((double) m_pot0y / scale) * 0xff) << 8;
+
+				return m_pot0dat;
+			}
 
 		case REG_POT1DAT:
-			if (state->m_pot1dat_port) return state->m_pot1dat_port->read();
-			else return 0x0000;
+			if (state->m_pot1dat_port)
+			{
+				return state->m_pot1dat_port->read();
+			}
+			else
+			{
+				int scale = m_agnus_id & 0x10 ? 525 : 625;
+
+				m_pot1dat  = (int) ((double) m_pot1x / scale) * 0xff;
+				m_pot1dat |= (int)(((double) m_pot1y / scale) * 0xff) << 8;
+
+				return m_pot1dat;
+			}
 
 		case REG_DSKBYTR:
 			return state->m_fdc->dskbytr_r();
@@ -1330,6 +1363,14 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			break;
 
 		case REG_POTGO:
+			if (BIT(data, 0))
+			{
+				// start counters
+				m_pot0x = 0;
+				m_pot0y = 0;
+				m_pot1x = 0;
+				m_pot1y = 0;
+			}
 			potgo_w(data);
 			break;
 
