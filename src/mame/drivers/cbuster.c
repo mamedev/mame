@@ -126,10 +126,12 @@ static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16, cbuster_state )
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
 	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
-	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
 ADDRESS_MAP_END
+
+
 
 /******************************************************************************/
 
@@ -306,6 +308,8 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbuster)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(XBGR)
+
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)

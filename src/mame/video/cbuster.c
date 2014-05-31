@@ -9,31 +9,6 @@
 
 /******************************************************************************/
 
-/* maybe the game should just use generic palette handling, and have a darker palette by design... */
-
-void cbuster_state::update_24bitcol( int offset )
-{
-	UINT8 r, g, b; /* The highest palette value seems to be 0x8e */
-
-	r = (UINT8)((float)((m_generic_paletteram_16[offset]  >> 0) & 0xff) * 1.75);
-	g = (UINT8)((float)((m_generic_paletteram_16[offset]  >> 8) & 0xff) * 1.75);
-	b = (UINT8)((float)((m_generic_paletteram2_16[offset] >> 0) & 0xff) * 1.75);
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
-}
-
-WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_rg_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	update_24bitcol(offset);
-}
-
-WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_b_w)
-{
-	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
-	update_24bitcol(offset);
-}
-
 
 /******************************************************************************/
 
