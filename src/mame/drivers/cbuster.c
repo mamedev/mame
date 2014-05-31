@@ -528,7 +528,7 @@ ROM_START( twocrudea )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mab-00",        0x00000, 0x80000, CRC(660eaabd) SHA1(e3d614e13fdb9af159d9758a869d9dae3dbe14e0) ) /* Tiles */
-	ROM_LOAD16_BYTE( "ft05-1",     0x80000, 0x10000, CRC(b1f0d910) SHA1(a2a2ee3a99db52e77e9c108dacffb0387da131a9) ) /* Chars */ // note: different to other sets
+	ROM_LOAD16_BYTE( "ft05-1",     0x80000, 0x10000, CRC(b1f0d910) SHA1(a2a2ee3a99db52e77e9c108dacffb0387da131a9) ) /* Chars */ // note: different to other sets, changes to Japanese font only, looks intentional, see characters 0x118a / 0x118b / 0x11f9 (16x16)
 	ROM_LOAD16_BYTE( "fu06-.rom",     0x80001, 0x10000, CRC(2f914a45) SHA1(bb44ba4779e45ee77ef0006363df91aac1f4559a) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
