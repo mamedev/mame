@@ -857,7 +857,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 		m_sysport.keyctrl = data & 0x08;  // bit 3 = enable keyboard data transmission
 		break;
 	case 0x06:
-		m_sysport.sram_writeprotect = data;
+		COMBINE_DATA(&m_sysport.sram_writeprotect);
 		break;
 	default:
 //      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space.device().safe_pc(),data,offset);
