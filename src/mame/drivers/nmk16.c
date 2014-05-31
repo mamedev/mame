@@ -184,6 +184,7 @@ Afega stands for "Art-Fiction Electronic Game"
 
 WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
 {
+#if 0
 	UINT16* dstram;
 
 	dstram = m_mainram;
@@ -200,6 +201,10 @@ WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
 	{
 		dstram[offset] = data;
 	}
+#endif
+	// as of SVN 30715 the 68k core replicates the above behavior, providing mirrored bits in 'data' regardless of the value of 'mem_mask'
+	m_mainram[offset] = data;
+
 }
 
 
