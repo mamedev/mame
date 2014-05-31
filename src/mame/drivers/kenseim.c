@@ -42,6 +42,7 @@ public:
 	/* kenseim */
 	DECLARE_READ16_MEMBER(cps1_kensei_r);
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
+	DECLARE_READ16_MEMBER(kensei_dsw_r);
 	DECLARE_DRIVER_INIT(kenseim);
 
 	DECLARE_READ8_MEMBER(porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
@@ -84,13 +85,13 @@ READ8_MEMBER(kenseim_state::portc_r)
 
 READ16_MEMBER(kenseim_state::cps1_kensei_r)
 {
-	logerror("%s cps1_kensei_r (%04x)\n", machine().describe_context(), mem_mask);
+	logerror("%s cps1_kensei_r offs %04x, (%04x)\n", machine().describe_context(), offset *2, mem_mask);
 	return rand();
 }
 
 WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 {
-	logerror("%s cps1_kensei_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	logerror("%s cps1_kensei_w offs %04x, %04x (%04x)\n", machine().describe_context(), offset *2, data, mem_mask);
 }
 
 /*
@@ -188,6 +189,29 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ NULL }
 };
 
+READ16_MEMBER(kenseim_state::kensei_dsw_r)
+{
+
+
+	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
+	
+	if (offset > 0)
+	{
+		logerror("%s kensei_dsw_r offs %04x, (%04x)\n", machine().describe_context(), offset *2, mem_mask);
+
+		int in = ioport(dswname[offset])->read();
+		return (in << 8) | 0xff;
+	}
+	else
+	{  // connected to the other board instead of IN0? (or at least some bits are)
+
+		logerror("%s kensei_dsw_r offs %04x (comms?), (%04x)\n", machine().describe_context(), offset *2, mem_mask);
+		int in = ((rand() & 0xff) & ~0x20) | 0x40; // 0x20 causes 'comamnd wait' message - 0x40 is still service mode? (valid or leftover - test mode trigger should be on sub pcb?) 
+		return (in << 8) | 0xff;
+
+	}
+}
+
 
 static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
@@ -219,6 +243,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
+
 
 static INPUT_PORTS_START( kenseim )
 	// the regular CPS1 input ports are used for comms with the extra board
@@ -339,10 +364,12 @@ ROM_END
 DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x800007, read16_delegate(FUNC(kenseim_state::cps1_kensei_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(kenseim_state::kensei_dsw_r),this));
+
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
 
 	DRIVER_INIT_CALL(cps1);
-}
+} 
 
 
  // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
