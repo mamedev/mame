@@ -109,8 +109,7 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 					}
 					else
 					{
-						// key off
-						m_key &= ~(1 << i);
+						// sample end (don't force key off)
 						break;
 					}
 				}
