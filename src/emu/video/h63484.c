@@ -510,7 +510,7 @@ inline void h63484_device::dequeue_r(UINT8 *data)
 
 inline void h63484_device::recompute_parameters()
 {
-	if(m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
+	if(m_hdw < 3 || m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
 		return;
 
 	if (LOG)
@@ -1286,21 +1286,21 @@ void h63484_device::command_ptn_exec()
 	switch (sl_sd)
 	{
 		case 0x00: m_cpy += (szy + 1); break;
-		case 0x01: m_cpx -= (szx + 1); m_cpy += (szy + 1); break;
-		case 0x02: m_cpx -= (szx + 1); break;
-		case 0x03: m_cpx -= (szx + 1); m_cpy -= (szy + 1); break;
+		case 0x01: m_cpx -= (szy + 1); m_cpy += (szy + 1); break;
+		case 0x02: m_cpx -= (szy + 1); break;
+		case 0x03: m_cpx -= (szy + 1); m_cpy -= (szy + 1); break;
 		case 0x04: m_cpy -= (szy + 1); break;
-		case 0x05: m_cpx += (szx + 1); m_cpy -= (szy + 1); break;
-		case 0x06: m_cpx += (szx + 1); break;
-		case 0x07: m_cpx += (szx + 1); m_cpy += (szy + 1); break;
-		case 0x08: m_cpx += (szx + 1); m_cpy += (szy + 1); break;
+		case 0x05: m_cpx += (szy + 1); m_cpy -= (szy + 1); break;
+		case 0x06: m_cpx += (szy + 1); break;
+		case 0x07: m_cpx += (szy + 1); m_cpy += (szy + 1); break;
+		case 0x08: m_cpx += (szy + 1); m_cpy += (szy + 1); break;
 		case 0x09: m_cpy += (szy + 1); break;
-		case 0x0a: m_cpx -= (szx + 1); m_cpy += (szy + 1); break;
-		case 0x0b: m_cpx -= (szx + 1); break;
-		case 0x0c: m_cpx -= (szx + 1); m_cpy -= (szy + 1); break;
+		case 0x0a: m_cpx -= (szy + 1); m_cpy += (szy + 1); break;
+		case 0x0b: m_cpx -= (szy + 1); break;
+		case 0x0c: m_cpx -= (szy + 1); m_cpy -= (szy + 1); break;
 		case 0x0d: m_cpy -= (szy + 1); break;
-		case 0x0e: m_cpx += (szx + 1); m_cpy -= (szy + 1); break;
-		case 0x0f: m_cpx += (szx + 1); break;
+		case 0x0e: m_cpx += (szy + 1); m_cpy -= (szy + 1); break;
+		case 0x0f: m_cpx += (szy + 1); break;
 	}
 }
 
@@ -1429,6 +1429,7 @@ void h63484_device::process_fifo()
 			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag(), m_cr);
 			printf("H63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
 			m_sr |= H63484_SR_CER; // command error
+			command_end_seq();
 			break;
 
 		case COMMAND_ORG:
@@ -2055,10 +2056,9 @@ void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cl
 	UINT32 base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n];
 	UINT32 wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3];
 	int step = (m_omr & 0x08) ? 2 : 1;
-	int gai = 1 << ((m_omr>>4) & 0x07);   // TODO: GAI > 3
-	int hs = m_hsw + m_hds;
+	int gai = (m_omr>>4) & 0x07;
+	int ppmc = ppw * (1 << gai) / step;  // TODO: GAI > 3
 	int ws = m_hsw + m_hws;
-	int wsa = ws;
 
 	if (m_omr & 0x08)
 	{
@@ -2069,34 +2069,35 @@ void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cl
 		*/
 
 		if (m_hww & 1)
-		{
-			wsa++;
 			ws += step;
-		}
+
+		if ((m_hws & 1) ^ (m_hds & 1))
+			wind_offs++;
 	}
 
-	for(int mc=hs; mc<m_hc; mc+=step)
+	for(int x=cliprect.min_x; x<=cliprect.max_x; x+=ppw)
 	{
-		int sx = mc * gai * ppw / step;
-		for(int g=0; g<gai; g++)
+		UINT16 data = 0;
+		if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
 		{
-			UINT16 data = 0;
-			if (ins_window && mc >= ws && mc < ws + m_hww)
-				data = readword(wind_offs + (mc - wsa) * gai / step + g);
-			else if (active)
-				data = readword(base_offs + (mc - hs) * gai / step + g);
-
-			for (int b=0; b<ppw; b++)
-			{
-				int x = sx + g * ppw + b;
-				if (!m_display_cb.isnull())
-					m_display_cb(bitmap, cliprect, y, x, data & mask);
-				else if (cliprect.contains(x, y))
-					bitmap.pix16(y, x) = data & mask;
-
-				data >>= bpp;
-			}
+			data = readword(wind_offs);
+			wind_offs++;
 		}
+		else if (active)
+			data = readword(base_offs);
+
+		for (int b=0; b<ppw; b++)
+		{
+			int px = x + b;
+			if (!m_display_cb.isnull())
+				m_display_cb(bitmap, cliprect, y, px, data & mask);
+			else if (cliprect.contains(px, y))
+				bitmap.pix16(y, px) = data & mask;
+
+			data >>= bpp;
+		}
+
+		base_offs++;
 	}
 }
 
@@ -2106,18 +2107,18 @@ void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cl
 
 UINT32 h63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int l0 = m_vds + (BIT(m_dcr, 13) ? m_sp[0] : 0);
+	int l0 = cliprect.min_y + (BIT(m_dcr, 13) ? m_sp[0] : 0);
 	int l1 = l0 + m_sp[1];
 	int l2 = l1 + (BIT(m_dcr, 11) ? m_sp[2] : 0);
 
 	if(m_omr & 0x4000)
 	{
-		for(int y=m_vds; y<m_vc; y++)
+		for(int y=cliprect.min_y; y<=cliprect.max_y; y++)
 		{
 			bool ins_window = BIT(m_dcr, 9) && y >= m_vws && y < m_vws+m_vww;
 
-			if (BIT(m_dcr, 13) && y >= m_vds && y < l0)
-				draw_graphics_line(bitmap, cliprect, m_vds, y, 0, BIT(m_dcr, 12), ins_window);
+			if (BIT(m_dcr, 13) && y >= cliprect.min_y && y < l0)
+				draw_graphics_line(bitmap, cliprect, cliprect.min_y, y, 0, BIT(m_dcr, 12), ins_window);
 			else if (y >= l0 && y < l1)
 				draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
 			else if (BIT(m_dcr, 11) && y >= l1 && y < l2)

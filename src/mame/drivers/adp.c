@@ -158,123 +158,44 @@ Quick Jack administration/service mode:
 #include "video/h63484.h"
 #include "machine/microtch.h"
 #include "machine/mc68681.h"
+#include "machine/msm6242.h"
+#include "machine/nvram.h"
 
 class adp_state : public driver_device
 {
 public:
 	adp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_h63484(*this, "h63484"),
 		m_microtouch(*this, "microtouch"),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart68681"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in0(*this, "IN0")
 		{ }
 
-	required_device<h63484_device> m_h63484;
 	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_ioport m_in0;
 
 	/* misc */
 	UINT8 m_mux_data;
-	UINT8 m_register_active;
 	struct { int r,g,b,offs,offs_internal; } m_pal;
 
 	/* devices */
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_WRITE16_MEMBER(wh2_w);
+	DECLARE_READ16_MEMBER(input_r);
+	DECLARE_WRITE16_MEMBER(input_w);
 	DECLARE_WRITE8_MEMBER(ramdac_io_w);
-	DECLARE_READ8_MEMBER(t2_r);
 	DECLARE_MACHINE_START(skattv);
 	DECLARE_MACHINE_RESET(skattv);
 	DECLARE_PALETTE_INIT(adp);
+	DECLARE_PALETTE_INIT(fstation);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	UINT32 screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	H63484_DISPLAY_PIXELS_MEMBER( acrtc_display_pixels );
 	//INTERRUPT_GEN_MEMBER(adp_int);
 };
 
 
-H63484_DISPLAY_PIXELS_MEMBER( adp_state::acrtc_display_pixels )
-{
-	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = data;
-}
-
-UINT32 adp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	/* graphics */
-	m_h63484->update_screen(screen, bitmap, cliprect);
-
-	return 0;
-}
-
-
-#if 0
-UINT32 adp_state::screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_h63484->update_screen(bitmap, cliprect);
-
-	#if 0
-	int x, y, b, src;
-
-	b = ((m_hd63484->regs_r(0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(0xce/2, 0xffff);
-
-	for (y = 0;y < 280;y++)
-	{
-		for (x = 0 ; x < (m_hd63484->regs_r(0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
-		{
-			b &= (HD63484_RAM_SIZE - 1);
-			src = m_hd63484->ram_r(b, 0xffff);
-			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
-			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
-			bitmap.pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
-			bitmap.pix16(y, x + 3) = ((src & 0xf000) >> 12) << 0;
-			b++;
-		}
-	}
-if (!machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
-	if ((m_hd63484->regs_r(0x06/2, 0xffff) & 0x0300) == 0x0300)
-	{
-		int sy = (m_hd63484->regs_r(0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(0x88/2, 0xffff) >> 8);
-		int h = m_hd63484->regs_r(0x96/2, 0xffff) & 0x0fff;
-		int sx = ((m_hd63484->regs_r(0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(0x84/2, 0xffff) >> 8)) * 2 * 2;
-		int w = (m_hd63484->regs_r(0x92/2, 0xffff) & 0xff) * 2;
-		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
-
-		b = (((m_hd63484->regs_r(0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(0xde/2, 0xffff));
-
-		for (y = sy ; y <= sy + h && y < 280 ; y++)
-		{
-			for (x = 0 ; x < (m_hd63484->regs_r(0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
-			{
-				b &= (HD63484_RAM_SIZE - 1);
-				src = m_hd63484->ram_r(b, 0xffff);
-
-				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(0xca/2, 0xffff) & 0x0fff) * 4)
-				{
-					bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
-					bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
-					bitmap.pix16(y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
-					bitmap.pix16(y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
-				}
-				b++;
-			}
-		}
-	}
-	#endif
-
-	return 0;
-}
-#endif
 
 /***************************************************************************
 
@@ -290,38 +211,11 @@ WRITE_LINE_MEMBER(adp_state::duart_irq_handler)
 MACHINE_START_MEMBER(adp_state,skattv)
 {
 	save_item(NAME(m_mux_data));
-	save_item(NAME(m_register_active));
-
-	#if 0
-	/*
-	    ACRTC memory:
-
-	    00000-3ffff = RAM
-	    40000-7ffff = ROM
-	    80000-bffff = unused
-	    c0000-fffff = unused
-	*/
-
-	// hack to handle acrt rom
-	{
-		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
-		int i;
-
-		for(i = 0; i < 0x40000/2; ++i)
-		{
-			m_hd63484->ram_w(i + 0x00000/2, rom[i], 0xffff);
-			m_hd63484->ram_w(i + 0x40000/2, rom[i], 0xffff);
-			m_hd63484->ram_w(i + 0x80000/2, rom[i], 0xffff);
-			m_hd63484->ram_w(i + 0xc0000/2, rom[i], 0xffff);
-		}
-	}
-	#endif
 }
 
 MACHINE_RESET_MEMBER(adp_state,skattv)
 {
 	m_mux_data = 0;
-	m_register_active = 0;
 }
 
 PALETTE_INIT_MEMBER(adp_state,adp)
@@ -331,7 +225,6 @@ PALETTE_INIT_MEMBER(adp_state,adp)
 	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
-
 
 		// red component
 		bit0 = (i >> 0) & 0x01;
@@ -353,90 +246,46 @@ PALETTE_INIT_MEMBER(adp_state,adp)
 	}
 }
 
-READ16_MEMBER(adp_state::test_r)
+PALETTE_INIT_MEMBER(adp_state,fstation)
 {
-	int value = 0xffff;
+	for (int i = 0; i < palette.entries(); i++)
+		palette.set_pen_color(i, rgb_t(pal3bit(i>>5), pal3bit(i>>2), pal2bit(i>>0)));
+}
 
-	switch (m_mux_data)
-	{
-		case 0x00: value = ioport("x0")->read(); break;
-		case 0x01: value = ioport("1P_UP")->read(); break;
-		case 0x02: value = ioport("x2")->read(); break;
-		case 0x03: value = ioport("x1")->read(); break;
-		case 0x04: value = ioport("1P_RIGHT")->read(); break;
-		case 0x05: value = ioport("x5")->read(); break;
-		case 0x06: value = ioport("1P_B1")->read(); break;
-		case 0x07: value = ioport("1P_DOWN")->read(); break;
-		case 0x08: value = ioport("x10")->read(); break;
-		case 0x09: value = ioport("x9")->read(); break;
-		case 0x0a: value = ioport("1P_LEFT")->read(); break;
-		case 0x0b: value = ioport("x11")->read(); break;
-		case 0x0c: value = ioport("x12")->read(); break;
-		case 0x0d: value = ioport("x13")->read(); break;
-		case 0x0e: value = ioport("1P_START")->read(); break;
-		case 0x0f: value = ioport("1P_COIN")->read(); break;
-	}
+READ16_MEMBER(adp_state::input_r)
+{
+	UINT16 data = 0xffff;
 
+	data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
+
+	return data;
+}
+
+WRITE16_MEMBER(adp_state::input_w)
+{
 	m_mux_data++;
-	m_mux_data &= 0xf;
-/*
-    switch (machine().rand() & 3)
-    {
-        case 0:
-            return 0;
-        case 1:
-            return 0xffff;
-        default:
-            return machine().rand() & 0xffff;
-    }
-*/
-	return value | (machine().rand() & 0x0000);
-}
-
-/*???*/
-WRITE16_MEMBER(adp_state::wh2_w)
-{
-	m_register_active = data;
-}
-
-READ8_MEMBER(adp_state::t2_r)
-{
-	UINT8 res;
-	int h,w;
-	res = 0;
-	h = m_screen->height();
-	w = m_screen->width();
-
-//  popmessage("%d %d",h,w);
-
-	if (m_screen->hpos() > h)
-		res|= 0x20; //hblank
-
-	if (m_screen->vpos() > w)
-		res|= 0x40; //vblank
-
-	return res;
+	m_mux_data &= 0x0f;
 }
 
 static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
-	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
+	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-//  AM_RANGE(0x400000, 0x40001f) ?
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w) // bad
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w) // bad
 	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, adp_state )
@@ -444,7 +293,7 @@ static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x100000, 0x10003f) AM_RAM
 	AM_RANGE(0x200000, 0x20003f) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0x500000, 0x503fff) AM_RAM //work RAM
+	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("nvram") //work RAM
 	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
@@ -485,13 +334,14 @@ WRITE8_MEMBER(adp_state::ramdac_io_w)
 
 static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x800088, 0x80008d) AM_WRITE8(ramdac_io_w, 0x00ff)
-	AM_RANGE(0x800100, 0x800101) AM_RAM //???
+	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
@@ -499,10 +349,10 @@ static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
 	//400000-40001f?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
-	AM_RANGE(0x800100, 0x800101) AM_RAM //???
+	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -546,74 +396,99 @@ static INPUT_PORTS_START( skattv )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
-	PORT_START("x0") //vblank status?
-	PORT_DIPNAME( 0x0004,0x0004, "SW0" )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001,0x0001, "SW0" ) //vblank status?
+	PORT_DIPSETTING(     0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_DIPNAME( 0x0004,0x0004, "SW2" ) //another up button
 	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_DIPNAME( 0x0008,0x0008, "SW3" )
+	PORT_DIPSETTING(     0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_DIPNAME( 0x0020,0x0020, "SW5" )
+	PORT_DIPSETTING(     0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_DIPNAME( 0x0100,0x0100, "SW8" )
+	PORT_DIPSETTING(     0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200,0x0200, "SW9" )    //button 2
+	PORT_DIPSETTING(     0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_DIPNAME( 0x0800,0x0800, "SW11" )
+	PORT_DIPSETTING(     0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000,0x1000, "SW12" )   //button 3
+	PORT_DIPSETTING(     0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000,0x2000, "SW13" )
+	PORT_DIPSETTING(     0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
 
-	PORT_START("x1")
-	PORT_DIPNAME( 0x0004,0x0004, "SW1" ) //another up button
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+static INPUT_PORTS_START( fstation )
+	PORT_START("PA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("x2")
-	PORT_DIPNAME( 0x0004,0x0004, "SW2" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("1P_UP")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("1P_B1")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x5")
-	PORT_DIPNAME( 0x0004,0x0004, "SW5" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("1P_RIGHT")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("1P_DOWN")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_START("1P_LEFT")
+	PORT_START("DSW1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x9")
-	PORT_DIPNAME( 0x0004,0x0004, "SW9" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_DIPNAME( 0x0010,0x0010, "SW4" )
+	PORT_DIPSETTING(     0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x10") //button 2
-	PORT_DIPNAME( 0x0004,0x0004, "SW10" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0020,0x0020, "SW5" )
+	PORT_DIPSETTING(     0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x11")
-	PORT_DIPNAME( 0x0004,0x0004, "SW11" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0080,0x0080, "SW7" )
+	PORT_DIPSETTING(     0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x12") //button 3
-	PORT_DIPNAME( 0x0004,0x0004, "SW12" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0100,0x0100, "SW8" )
+	PORT_DIPSETTING(     0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("x13")
-	PORT_DIPNAME( 0x0004,0x0004, "SW13" )
-	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0200,0x0200, "SW9" )
+	PORT_DIPSETTING(     0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("1P_START")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
-	PORT_START("1P_COIN")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_DIPNAME( 0x0400,0x0400, "SW10" )
+	PORT_DIPSETTING(     0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800,0x0800, "SW11" )
+	PORT_DIPSETTING(     0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000,0x1000, "SW12" )
+	PORT_DIPSETTING(     0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000,0x2000, "SW13" )
+	PORT_DIPSETTING(     0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 /*
@@ -654,12 +529,17 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
+
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(adp_state, rtc_irq))
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("h63484", h63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10)
@@ -667,7 +547,6 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_map)
-	MCFG_H63484_DISPLAY_CALLBACK_OWNER(adp_state, acrtc_display_pixels)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
@@ -709,6 +588,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( fstation, funland )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fstation_mem)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(adp_state, fstation)
 MACHINE_CONFIG_END
 
 
@@ -810,4 +696,4 @@ GAME( 1995, skattva,   skattv,   skattv,      skattv, driver_device,    0, ROT0,
 GAME( 1997, fashiong,  0,        fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 1)", GAME_NOT_WORKING )
 GAME( 1997, fashiong2, fashiong, fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 2)", GAME_NOT_WORKING )
 GAME( 1999, funlddlx,  0,        funland,     skattv, driver_device,    0, ROT0,  "Stella",  "Funny Land de Luxe", GAME_NOT_WORKING )
-GAME( 2000, fstation,  0,        fstation,    skattv, driver_device,    0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", GAME_NOT_WORKING )
+GAME( 2000, fstation,  0,        fstation,    fstation, driver_device,  0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", GAME_NOT_WORKING )
