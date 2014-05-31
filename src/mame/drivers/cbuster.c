@@ -9,6 +9,14 @@
   both boards have 'export' stickers which usually indicates a World version.
   Maybe one is a UK or European version.
 
+
+  Data East 59 - 64 pin (68k)
+  Data East 55 - 160 pin (x2) (tilemaps)
+  Data East 45 (sticker) - 80 pin (Z80)
+  Data East 52 - 128 pin (sprites)
+
+  (no obvious protection chip, probably a PAL?)
+
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
   2008-07
@@ -26,6 +34,8 @@
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {
+	data &= mem_mask;
+
 	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
@@ -506,6 +516,44 @@ ROM_START( twocrude )
 	ROM_LOAD( "mb7114h.18e",   0x0000, 0x0100, CRC(3645b70f) SHA1(7d3831867362037892b43efb007e27d3bd5f6488) )   /* Priority (not used) */
 ROM_END
 
+ROM_START( twocrudea )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "ft01-1",     0x00000, 0x20000, CRC(7342ffc4) SHA1(dcf611552f0d085f0b552985970f66d1bd6e51e9) )
+	ROM_LOAD16_BYTE( "ft00-1",     0x00001, 0x20000, CRC(3f5f535f) SHA1(f5d2b12f98bfcc3426dd2596baaaeca775835e6b) )
+	ROM_LOAD16_BYTE( "ft03",     0x40000, 0x20000, CRC(28002c99) SHA1(6397b05a1a237bb17657bee6c8185f61c60c6a2c) )
+	ROM_LOAD16_BYTE( "ft02",     0x40001, 0x20000, CRC(37ea0626) SHA1(ec1822eda83829c599cad217b6d5dd34fb970101) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mab-00",        0x00000, 0x80000, CRC(660eaabd) SHA1(e3d614e13fdb9af159d9758a869d9dae3dbe14e0) ) /* Tiles */
+	ROM_LOAD16_BYTE( "ft05-1",     0x80000, 0x10000, CRC(b1f0d910) SHA1(a2a2ee3a99db52e77e9c108dacffb0387da131a9) ) /* Chars */ // note: different to other sets
+	ROM_LOAD16_BYTE( "fu06-.rom",     0x80001, 0x10000, CRC(2f914a45) SHA1(bb44ba4779e45ee77ef0006363df91aac1f4559a) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "mab-01",        0x00000, 0x80000, CRC(1080d619) SHA1(68f33a1580d33e4dd0858248c12a0a10ac117249) ) /* Tiles */
+
+	ROM_REGION( 0x180000,"gfx3", 0 )
+	ROM_LOAD( "mab-02",        0x000000, 0x80000, CRC(58b7231d) SHA1(5b51a2fa42c67f23648be205295184a1fddc00f5) ) /* Sprites */
+	/* Space for extra sprites to be copied to (0x20000) */
+	ROM_LOAD( "mab-03",        0x0a0000, 0x80000, CRC(76053b9d) SHA1(093cd01a13509701ec9dd1a806132600a5bd1915) )
+	/* Space for extra sprites to be copied to (0x20000) */
+	ROM_LOAD( "ft07",          0x140000, 0x10000, CRC(e3465c25) SHA1(5369a87847e6f881efc8460e6e8efcf8ff46e87f) )
+	ROM_LOAD( "ft08",          0x150000, 0x10000, CRC(c7f1d565) SHA1(d5dc55cf879f7feaff166a6708d60ef0bf31ddf5) )
+	ROM_LOAD( "ft09",          0x160000, 0x10000, CRC(6e3657b9) SHA1(7e6a140e33f9bc18e35c255680eebe152a5d8858) )
+	ROM_LOAD( "ft10",          0x170000, 0x10000, CRC(cdb83560) SHA1(8b258c4436ccea5a74edff1b6219ab7a5eac0328) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_LOAD( "fu12-.rom",     0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_LOAD( "fu13-.rom",     0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7114h.18e",   0x0000, 0x0100, CRC(3645b70f) SHA1(7d3831867362037892b43efb007e27d3bd5f6488) )   /* Priority (not used) */
+ROM_END
+
 /******************************************************************************/
 
 DRIVER_INIT_MEMBER(cbuster_state,twocrude)
@@ -554,4 +602,5 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 GAME( 1990, cbuster,  0,       twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", GAME_SUPPORTS_SAVE )
 GAME( 1990, cbusterw, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", GAME_SUPPORTS_SAVE )
 GAME( 1990, cbusterj, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, twocrude, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, twocrude, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, twocrudea,cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US, set 2)", GAME_SUPPORTS_SAVE )
