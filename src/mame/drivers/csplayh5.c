@@ -49,8 +49,7 @@ public:
 		{ }
 
 	UINT16 m_mux_data;
-	UINT8 m_pio_dir[5];
-	UINT8 m_pio_latch[5];
+
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -61,28 +60,13 @@ public:
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(csplayh5_sound_r);
 	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_pio_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pio_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pa_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pb_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pc_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pd_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_pe_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pa_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pb_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pc_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pd_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pe_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pa_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pb_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pc_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pd_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pe_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pa_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pb_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pc_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pd_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pe_w);
+	
+	DECLARE_READ8_MEMBER(soundcpu_portd_r);
+	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
+	DECLARE_WRITE8_MEMBER(soundcpu_dac2_w);
+	DECLARE_WRITE8_MEMBER(soundcpu_dac1_w);
+	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
+
 	DECLARE_DRIVER_INIT(mjmania);
 	DECLARE_DRIVER_INIT(csplayh5);
 	DECLARE_DRIVER_INIT(fuudol);
@@ -212,170 +196,35 @@ WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
 	soundlatch_clear_byte_w(space, 0, 0);
 }
 
-READ8_MEMBER(csplayh5_state::tmpz84c011_pio_r)
+
+READ8_MEMBER(csplayh5_state::soundcpu_portd_r)
 {
-	int portdata;
-
-	switch (offset)
-	{
-		case 0:         /* PA_0 */
-			portdata = 0xff;
-			break;
-		case 1:         /* PB_0 */
-			portdata = 0xff;
-			break;
-		case 2:         /* PC_0 */
-			portdata = 0xff;
-			break;
-		case 3:         /* PD_0 */
-			portdata = csplayh5_sound_r(space, 0);
-			break;
-		case 4:         /* PE_0 */
-			portdata = 0xff;
-			break;
-
-		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", machine().describe_context(), offset);
-			portdata = 0xff;
-			break;
-	}
-
-	return portdata;
+	return csplayh5_sound_r(space, 0);
 }
 
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_pio_w)
+WRITE8_MEMBER(csplayh5_state::soundcpu_porta_w)
 {
-	switch (offset)
-	{
-		case 0:         /* PA_0 */
-			csplayh5_soundbank_w(machine(), data & 0x03);
-			break;
-		case 1:         /* PB_0 */
-			m_dac2->DAC_WRITE(data);
-			break;
-		case 2:         /* PC_0 */
-			m_dac1->DAC_WRITE(data);
-			break;
-		case 3:         /* PD_0 */
-			break;
-		case 4:         /* PE_0 */
-			if (!(data & 0x01)) csplayh5_soundclr_w(space, 0, 0);
-			break;
+	csplayh5_soundbank_w(machine(), data & 0x03);
+}
 
-		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", machine().describe_context(), offset, data);
-			break;
-	}
+WRITE8_MEMBER(csplayh5_state::soundcpu_dac2_w)
+{
+	m_dac2->DAC_WRITE(data);
+}
+
+WRITE8_MEMBER(csplayh5_state::soundcpu_dac1_w)
+{
+	m_dac1->DAC_WRITE(data);
+}
+
+WRITE8_MEMBER(csplayh5_state::soundcpu_porte_w)
+{
+	if (!(data & 0x01)) csplayh5_soundclr_w(space, 0, 0);
 }
 
 
-/* CPU interface */
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_pa_r)
-{
-	return (tmpz84c011_pio_r(space,0) & ~m_pio_dir[0]) | (m_pio_latch[0] & m_pio_dir[0]);
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_pb_r)
-{
-	return (tmpz84c011_pio_r(space,1) & ~m_pio_dir[1]) | (m_pio_latch[1] & m_pio_dir[1]);
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_pc_r)
-{
-	return (tmpz84c011_pio_r(space,2) & ~m_pio_dir[2]) | (m_pio_latch[2] & m_pio_dir[2]);
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_pd_r)
-{
-	return (tmpz84c011_pio_r(space,3) & ~m_pio_dir[3]) | (m_pio_latch[3] & m_pio_dir[3]);
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_pe_r)
-{
-	return (tmpz84c011_pio_r(space,4) & ~m_pio_dir[4]) | (m_pio_latch[4] & m_pio_dir[4]);
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pa_w)
-{
-	m_pio_latch[0] = data;
-	tmpz84c011_pio_w(space, 0, data);
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pb_w)
-{
-	m_pio_latch[1] = data;
-	tmpz84c011_pio_w(space, 1, data);
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pc_w)
-{
-	m_pio_latch[2] = data;
-	tmpz84c011_pio_w(space, 2, data);
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pd_w)
-{
-	m_pio_latch[3] = data;
-	tmpz84c011_pio_w(space, 3, data);
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pe_w)
-{
-	m_pio_latch[4] = data;
-	tmpz84c011_pio_w(space, 4, data);
-}
 
 
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pa_r)
-{
-	return m_pio_dir[0];
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pb_r)
-{
-	return m_pio_dir[1];
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pc_r)
-{
-	return m_pio_dir[2];
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pd_r)
-{
-	return m_pio_dir[3];
-}
-
-READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pe_r)
-{
-	return m_pio_dir[4];
-}
-
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pa_w)
-{
-	m_pio_dir[0] = data;
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pb_w)
-{
-	m_pio_dir[1] = data;
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pc_w)
-{
-	m_pio_dir[2] = data;
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pd_w)
-{
-	m_pio_dir[3] = data;
-}
-
-WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pe_w)
-{
-	m_pio_dir[4] = data;
-}
 
 
 static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8, csplayh5_state )
@@ -387,16 +236,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
-	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
-	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
-	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
-	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
-	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
@@ -596,15 +435,6 @@ GFXDECODE_END
 
 void csplayh5_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-
-	// initialize TMPZ84C011 PIO
-	for (i = 0; i < 5; i++)
-	{
-		m_pio_dir[i] = m_pio_latch[i] = 0;
-		tmpz84c011_pio_w(space, i, 0);
-	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
@@ -644,10 +474,15 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
 #endif
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* TMPZ84C011, unknown clock */
+	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
 	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
 	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
+	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(csplayh5_state, soundcpu_porta_w))
+	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(csplayh5_state,soundcpu_dac2_w))
+	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(csplayh5_state,soundcpu_dac1_w))
+	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(csplayh5_state, soundcpu_portd_r))
+	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(csplayh5_state,soundcpu_porte_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 8000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
