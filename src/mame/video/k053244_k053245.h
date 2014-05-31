@@ -7,6 +7,9 @@ typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_
 #define MCFG_K05324X_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
 
 
+#define MCFG_K05324X_BPP(_bpp) \
+	k05324x_device::set_bpp(*device, _bpp);
+
 #define MCFG_K05324X_CB(_class, _method) \
 	k05324x_device::set_k05324x_callback(*device, k05324x_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
@@ -17,14 +20,17 @@ typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_
 class k05324x_device : public device_t, 
 							public device_gfx_interface
 {
+	static const gfx_layout spritelayout;
+	static const gfx_layout spritelayout_6bpp;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
+
 public:
 	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k05324x_device() {}
 
-	static const gfx_layout spritelayout;
-	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-
 	// static configuration
+	static void set_bpp(device_t &device, int bpp);
 	static void set_k05324x_callback(device_t &device, k05324x_cb_delegate callback) { downcast<k05324x_device &>(device).m_k05324x_cb = callback; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)
 	{
@@ -45,7 +51,6 @@ public:
 	DECLARE_WRITE16_MEMBER( k053244_word_w );
 	void bankselect(int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
-	void sprites_draw_lethal(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap); /* for lethal enforcers */
 	void clear_buffer();
 	void update_buffer();
 	void set_z_rejection(int zcode); // common to k053244/5
@@ -69,8 +74,6 @@ private:
 	int      m_rombank;       // 053244
 	int      m_ramsize;
 	int      m_z_rejection;
-
-	DECLARE_READ16_MEMBER( k053244_reg_word_r );    // OBJSET0 debug handler
 };
 
 
