@@ -1365,9 +1365,9 @@ static const struct gfx_range mapper_KNM10B_table[] =
 {
 	/* type             start    end      bank */
 	{ GFXTYPE_SPRITES , 0x00000, 0x07fff, 0 },
-	{ GFXTYPE_SCROLL2 , 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SCROLL2 , 0x04000, 0x07fff, 2 },
 	{ GFXTYPE_SCROLL1,  0x01000, 0x01fff, 2 },
-	{ GFXTYPE_SCROLL3 , 0x01000, 0x01fff, 2 },
+	{ GFXTYPE_SCROLL3 , 0x02000, 0x03fff, 2 },
 	{ 0 }
 };
 
