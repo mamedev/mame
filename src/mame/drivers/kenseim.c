@@ -8,7 +8,7 @@
 
   https://www.youtube.com/watch?v=wk71y7OGU-k
   https://www.youtube.com/watch?v=mV00MMyBBXM
-
+  https://www.youtube.com/watch?v=yQpMvRL0FfM
 
 
 
@@ -30,6 +30,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "includes/cps1.h"
+#include "machine/i8255.h"
+
 
 class kenseim_state : public cps_state
 {
@@ -39,12 +41,15 @@ public:
 
 	/* kenseim */
 	DECLARE_READ16_MEMBER(cps1_kensei_r);
+	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
 	DECLARE_DRIVER_INIT(kenseim);
 
 	DECLARE_READ8_MEMBER(porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(portb_default_r) { logerror("%s read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
-	DECLARE_READ8_MEMBER(portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
-	DECLARE_READ8_MEMBER(portd_default_r) { logerror("%s read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
+//	DECLARE_READ8_MEMBER(portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(portc_r);
+//	DECLARE_READ8_MEMBER(portd_default_r) { logerror("%s read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(portd_r);
 	DECLARE_READ8_MEMBER(porte_default_r) { logerror("%s read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
 
 	DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
@@ -53,14 +58,39 @@ public:
 	DECLARE_WRITE8_MEMBER(portd_default_w) { logerror("%s write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
 	DECLARE_WRITE8_MEMBER(porte_default_w) { logerror("%s write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
 
+	DECLARE_READ8_MEMBER(i8255_porta_default_r) { logerror("%s i8255 read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(i8255_portb_default_r) { logerror("%s i8255 read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(i8255_portc_default_r) { logerror("%s i8255 read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
+
+	DECLARE_WRITE8_MEMBER(i8255_porta_default_w) { logerror("%s i8255 write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(i8255_portb_default_w) { logerror("%s i8255 write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(i8255_portc_default_w) { logerror("%s i8255 write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
 };
 
 
+READ8_MEMBER(kenseim_state::portd_r)
+{
+	// comms port maybe? checks for 0x10 (bit 4,a) to be clear in a tight loop (092B) then for bit 0x80 to be set in another tight loop  (0933) then at (0947) it checks that bits 0xe0 aren't set.
+	//logerror("%s read port D\n", machine().describe_context());
+	return rand();// 0x80;
+}
+
+READ8_MEMBER(kenseim_state::portc_r)
+{
+	// bits 0x09 checked at 1171
+	return rand();
+}
 
 
 READ16_MEMBER(kenseim_state::cps1_kensei_r)
 {
+	logerror("%s cps1_kensei_r (%04x)\n", machine().describe_context(), mem_mask);
 	return rand();
+}
+
+WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
+{
+	logerror("%s cps1_kensei_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 /*
@@ -138,12 +168,17 @@ READ16_MEMBER(kenseim_state::cps1_kensei_r)
 
 static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+
+	AM_RANGE(0x8000, 0x81ff) AM_RAM // ? size unknown, code just wipes ram until the compare fails
+
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("gamecpu_ctc", z80ctc_device, read, write)
+
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -166,14 +201,23 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_default_w))	
 	MCFG_TMPZ84C011_PORTA_READ_CALLBACK(READ8(kenseim_state, porta_default_r))
 	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_default_r))
-	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_default_r))
-	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_default_r))
+	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_r))
+	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_r))
 	MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r))
 	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
 
 	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84?
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
+	
+	MCFG_DEVICE_ADD("i8255", I8255, 0) // MB89363B!
+	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_porta_default_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_portb_default_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portc_default_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_default_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_default_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_default_w))
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kenseim )
@@ -295,6 +339,8 @@ ROM_END
 DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x800007, read16_delegate(FUNC(kenseim_state::cps1_kensei_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
+
 	DRIVER_INIT_CALL(cps1);
 }
 
