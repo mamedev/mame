@@ -28,6 +28,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
 #include "includes/cps1.h"
 
 class kenseim_state : public cps_state
@@ -39,7 +40,22 @@ public:
 	/* kenseim */
 	DECLARE_READ16_MEMBER(cps1_kensei_r);
 	DECLARE_DRIVER_INIT(kenseim);
+
+	DECLARE_READ8_MEMBER(porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(portb_default_r) { logerror("%s read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(portd_default_r) { logerror("%s read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(porte_default_r) { logerror("%s read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
+
+	DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(portb_default_w) { logerror("%s write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(portc_default_w) { logerror("%s write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(portd_default_w) { logerror("%s write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(porte_default_w) { logerror("%s write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
+
 };
+
+
 
 
 READ16_MEMBER(kenseim_state::cps1_kensei_r)
@@ -127,26 +143,37 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-// tmpz84c011
-//	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r,tmpz84c011_0_pa_w)
-//	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r,tmpz84c011_0_pb_w)
-//	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r,tmpz84c011_0_pc_w)
-//	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r,tmpz84c011_0_pd_w)
-//	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r,tmpz84c011_0_pe_w)
-//	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r,tmpz84c011_0_dir_pa_w)
-//	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r,tmpz84c011_0_dir_pb_w)
-//	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r,tmpz84c011_0_dir_pc_w)
-//	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r,tmpz84c011_0_dir_pd_w)
-//	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r,tmpz84c011_0_dir_pe_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("gamecpu_ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
+
+
+static const z80_daisy_config daisy_chain_gamecpu[] =
+{
+	{ "gamecpu_ctc" },
+	{ NULL }
+};
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
-	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz) // tmpz84c011 - divider unknown
+	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011 - divider unknown
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
+	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w))
+	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w))
+	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(kenseim_state, portc_default_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(WRITE8(kenseim_state, portd_default_w))
+	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_default_w))	
+	MCFG_TMPZ84C011_PORTA_READ_CALLBACK(READ8(kenseim_state, porta_default_r))
+	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_default_r))
+	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_default_r))
+	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_default_r))
+	MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r))
+	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
+
+	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84?
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
+
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kenseim )

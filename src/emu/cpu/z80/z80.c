@@ -3737,7 +3737,8 @@ nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, dev
 const device_type NSC800 = &device_creator<nsc800_device>;
 
 
-
+// how do we actually install default handlers for logging?
+/*
 READ8_MEMBER(tmpz84c011_device::porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
 READ8_MEMBER(tmpz84c011_device::portb_default_r) { logerror("%s read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
 READ8_MEMBER(tmpz84c011_device::portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
@@ -3749,7 +3750,7 @@ WRITE8_MEMBER(tmpz84c011_device::portb_default_w) { logerror("%s write %02x to p
 WRITE8_MEMBER(tmpz84c011_device::portc_default_w) { logerror("%s write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
 WRITE8_MEMBER(tmpz84c011_device::portd_default_w) { logerror("%s write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
 WRITE8_MEMBER(tmpz84c011_device::porte_default_w) { logerror("%s write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
-
+*/
 
 READ8_MEMBER(tmpz84c011_device::tmpz84c011_pio_r)
 {
