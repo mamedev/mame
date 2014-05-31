@@ -517,10 +517,10 @@ ROM_START( twocrude )
 
 	/* Space for extra sprites to be copied to (0x20000) */
 
-	ROM_LOAD( "ft07-.4a", 0x140000, 0x10000, CRC(ca8d0bb3) SHA1(9262d6003cf0cb8c33d0f6c1d0ef35490b29f9b4) ) /* Extra sprites */
-	ROM_LOAD( "ft08-.5a", 0x150000, 0x10000, CRC(c6afc5c8) SHA1(feddd546f09884c51e4d1802477de4e152a51082) )
-	ROM_LOAD( "ft09-.7a", 0x160000, 0x10000, CRC(526809ca) SHA1(2cb9e7417211c1eb23d32e3fee71c5254d34a3ff) )
-	ROM_LOAD( "ft10-.8a", 0x170000, 0x10000, CRC(6be6d50e) SHA1(b944db4b3a7c76190f6b40f71f033e16e7964f6a) )
+	ROM_LOAD( "ft07-.4a", 0x140000, 0x10000, CRC(e3465c25) SHA1(5369a87847e6f881efc8460e6e8efcf8ff46e87f) ) /* Extra sprites */
+	ROM_LOAD( "ft08-.5a", 0x150000, 0x10000, CRC(c7f1d565) SHA1(d5dc55cf879f7feaff166a6708d60ef0bf31ddf5) )
+	ROM_LOAD( "ft09-.7a", 0x160000, 0x10000, CRC(6e3657b9) SHA1(7e6a140e33f9bc18e35c255680eebe152a5d8858) )
+	ROM_LOAD( "ft10-.8a", 0x170000, 0x10000, CRC(cdb83560) SHA1(8b258c4436ccea5a74edff1b6219ab7a5eac0328) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "ft12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
@@ -556,10 +556,10 @@ ROM_START( twocrudea )
 
 	/* Space for extra sprites to be copied to (0x20000) */
 
-	ROM_LOAD( "ft07-.4a", 0x140000, 0x10000, CRC(ca8d0bb3) SHA1(9262d6003cf0cb8c33d0f6c1d0ef35490b29f9b4) ) /* Extra sprites */
-	ROM_LOAD( "ft08-.5a", 0x150000, 0x10000, CRC(c6afc5c8) SHA1(feddd546f09884c51e4d1802477de4e152a51082) )
-	ROM_LOAD( "ft09-.7a", 0x160000, 0x10000, CRC(526809ca) SHA1(2cb9e7417211c1eb23d32e3fee71c5254d34a3ff) )
-	ROM_LOAD( "ft10-.8a", 0x170000, 0x10000, CRC(6be6d50e) SHA1(b944db4b3a7c76190f6b40f71f033e16e7964f6a) )
+	ROM_LOAD( "ft07-.4a", 0x140000, 0x10000, CRC(e3465c25) SHA1(5369a87847e6f881efc8460e6e8efcf8ff46e87f) ) /* Extra sprites */
+	ROM_LOAD( "ft08-.5a", 0x150000, 0x10000, CRC(c7f1d565) SHA1(d5dc55cf879f7feaff166a6708d60ef0bf31ddf5) )
+	ROM_LOAD( "ft09-.7a", 0x160000, 0x10000, CRC(6e3657b9) SHA1(7e6a140e33f9bc18e35c255680eebe152a5d8858) )
+	ROM_LOAD( "ft10-.8a", 0x170000, 0x10000, CRC(cdb83560) SHA1(8b258c4436ccea5a74edff1b6219ab7a5eac0328) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "ft12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
