@@ -125,6 +125,8 @@ void x68k_state::x68k_crtc_refresh_mode()
 	m_crtc.hend = (m_crtc.reg[3] * 8);
 	m_crtc.vbegin = (m_crtc.reg[6]) / m_crtc.vmultiple;
 	m_crtc.vend = (m_crtc.reg[7] - 1) / m_crtc.vmultiple;
+	if((m_crtc.vmultiple == 2) && !(m_crtc.reg[7] & 1)) // otherwise if the raster irq line == vblank line, the raster irq fires too late
+		m_crtc.vend++;
 	m_crtc.hsync_end = (m_crtc.reg[1]) * 8;
 	m_crtc.vsync_end = (m_crtc.reg[5]) / m_crtc.vmultiple;
 	m_crtc.hsyncadjust = m_crtc.reg[8];
@@ -161,7 +163,7 @@ void x68k_state::x68k_crtc_refresh_mode()
 //  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
 //      m_crtc.reg[4],m_crtc.reg[5],m_crtc.reg[6],m_crtc.reg[7],m_crtc.reg[8],m_crtc.reg[9]);
 	logerror("video_screen_configure(machine.first_screen(),%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
-	machine().first_screen()->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
+	m_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
@@ -177,31 +179,31 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 		{
 			if(m_oddscanline == 1)
 			{
-				int scan = machine().first_screen()->vpos();
+				int scan = m_screen->vpos();
 				if(scan > m_crtc.vend)
 					scan = m_crtc.vbegin;
-				hsync_time = machine().first_screen()->time_until_pos(scan,(m_crtc.htotal + m_crtc.hend) / 2);
+				hsync_time = m_screen->time_until_pos(scan,(m_crtc.htotal + m_crtc.hend) / 2);
 				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((ioport("options")->read() & 0x04))
 					{
-						machine().first_screen()->update_partial(scan);
+						m_screen->update_partial(scan);
 					}
 				}
 			}
 			else
 			{
-				int scan = machine().first_screen()->vpos();
+				int scan = m_screen->vpos();
 				if(scan > m_crtc.vend)
 					scan = m_crtc.vbegin;
-				hsync_time = machine().first_screen()->time_until_pos(scan,m_crtc.hend / 2);
+				hsync_time = m_screen->time_until_pos(scan,m_crtc.hend / 2);
 				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((ioport("options")->read() & 0x04))
 					{
-						machine().first_screen()->update_partial(scan);
+						m_screen->update_partial(scan);
 					}
 				}
 			}
@@ -210,18 +212,18 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 		{
 			if(m_oddscanline == 1)
 			{
-				int scan = machine().first_screen()->vpos();
+				int scan = m_screen->vpos();
 				if(scan > m_crtc.vend)
 					scan = m_crtc.vbegin;
 				else
 					scan++;
-				hsync_time = machine().first_screen()->time_until_pos(scan,m_crtc.hbegin / 2);
+				hsync_time = m_screen->time_until_pos(scan,m_crtc.hbegin / 2);
 				m_scanline_timer->adjust(hsync_time, 1);
 				m_oddscanline = 0;
 			}
 			else
 			{
-				hsync_time = machine().first_screen()->time_until_pos(machine().first_screen()->vpos(),(m_crtc.htotal + m_crtc.hbegin) / 2);
+				hsync_time = m_screen->time_until_pos(m_screen->vpos(),(m_crtc.htotal + m_crtc.hbegin) / 2);
 				m_scanline_timer->adjust(hsync_time, 1);
 				m_oddscanline = 1;
 			}
@@ -231,22 +233,22 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 	{
 		if(hstate == 1)
 		{
-			int scan = machine().first_screen()->vpos();
+			int scan = m_screen->vpos();
 			if(scan > m_crtc.vend)
 				scan = 0;
-			hsync_time = machine().first_screen()->time_until_pos(scan,m_crtc.hend);
+			hsync_time = m_screen->time_until_pos(scan,m_crtc.hend);
 			m_scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
 				if((ioport("options")->read() & 0x04))
 				{
-					machine().first_screen()->update_partial(scan);
+					m_screen->update_partial(scan);
 				}
 			}
 		}
 		if(hstate == 0)
 		{
-			hsync_time = machine().first_screen()->time_until_pos(machine().first_screen()->vpos()+1,m_crtc.hbegin);
+			hsync_time = m_screen->time_until_pos(m_screen->vpos()+1,m_crtc.hbegin);
 			m_scanline_timer->adjust(hsync_time, 1);
 		}
 	}
@@ -266,13 +268,13 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 	if(scan <= m_crtc.vtotal)
 	{
 		m_mfpdev->i6_w(0);
-		machine().first_screen()->update_partial(scan);
-		irq_time = machine().first_screen()->time_until_pos(scan,m_crtc.hbegin);
+		m_screen->update_partial(scan);
+		irq_time = m_screen->time_until_pos(scan,m_crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
-		end_time = machine().first_screen()->time_until_pos(scan,m_crtc.hend);
+		end_time = m_screen->time_until_pos(scan,m_crtc.hend);
 		m_raster_irq->adjust(irq_time, scan);
 		timer_set(end_time, TIMER_X68K_CRTC_RASTER_END);
-		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine().first_screen()->vpos());
+		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,m_screen->vpos());
 	}
 }
 
@@ -286,7 +288,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 	{
 		m_crtc.vblank = 1;
 		vblank_line = m_crtc.vbegin;
-		irq_time = machine().first_screen()->time_until_pos(vblank_line,2);
+		irq_time = m_screen->time_until_pos(vblank_line,2);
 		m_vblank_irq->adjust(irq_time);
 		logerror("CRTC: VBlank on\n");
 	}
@@ -296,7 +298,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 		vblank_line = m_crtc.vend;
 		if(vblank_line > m_crtc.vtotal)
 			vblank_line = m_crtc.vtotal;
-		irq_time = machine().first_screen()->time_until_pos(vblank_line,2);
+		irq_time = m_screen->time_until_pos(vblank_line,2);
 		m_vblank_irq->adjust(irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
@@ -373,7 +375,8 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			attotime irq_time;
-			irq_time = machine().first_screen()->time_until_pos((data) / m_crtc.vmultiple,2);
+			data = m_crtc.reg[9];
+			irq_time = m_screen->time_until_pos((data) / m_crtc.vmultiple,2);
 
 			if(irq_time.as_double() > 0)
 				m_raster_irq->adjust(irq_time, (data) / m_crtc.vmultiple);
@@ -716,15 +719,9 @@ void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectan
 				+ (((m_tvram[loc+0x10000] >> bit) & 0x01) ? 2 : 0)
 				+ (((m_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 				+ (((m_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
-			if(m_video.text_pal[colour] != 0x0000)  // any colour but black
-			{
-				// Colour 0 is displayable if the text layer is at the priority level 2
-				if(colour == 0 && (m_video.reg[1] & 0x0c00) == 0x0800)
-					bitmap.pix32(line, pixel) = m_pcgpalette->pen(colour);
-				else
-					if(colour != 0)
-						bitmap.pix32(line, pixel) = m_pcgpalette->pen(colour);
-			}
+			// Colour 0 is displayable if the text layer is at the priority level 2
+			if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || (m_video.text_pri == 2))
+				bitmap.pix32(line, pixel) = m_pcgpalette->pen(colour);
 			bit--;
 			if(bit < 0)
 			{
@@ -736,7 +733,7 @@ void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectan
 	}
 }
 
-void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprect, UINT8 priority)
+void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
 {
 	int pixel;
 	int page;
@@ -775,10 +772,8 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprec
 						colour = (m_gvram[(lineoffset - 0xc0000) + (loc & 0x3ff)] & 0xf000) >> 12;
 						break;
 					}
-					if(colour != 0)
-					{
-						bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
-					}
+					if(colour || (priority == 3))
+						bitmap.pix16(scanline, pixel) = colour;
 					loc++;
 					loc &= 0x3ff;
 				}
@@ -801,10 +796,8 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprec
 					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
 						colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
-						if(colour != 0)
-						{
-							bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
-						}
+						if(colour || (priority == 3))
+							bitmap.pix16(scanline, pixel) = colour;
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -820,10 +813,8 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprec
 						for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 						{
 							colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
-							if(colour != 0)
-							{
-								bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
-							}
+							if(colour || (priority == 3))
+								bitmap.pix16(scanline, pixel) = colour;
 							loc++;
 							loc &= 0x1ff;
 						}
@@ -837,10 +828,8 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprec
 					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
 						colour = m_gvram[lineoffset + loc];
-						if(colour != 0)
-						{
-							bitmap.pix32(scanline, pixel) = pal555(colour, 6, 11, 1);
-						}
+						if(colour || (priority == 3))
+							bitmap.pix16(scanline, pixel) = colour;
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -853,7 +842,7 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_rgb32 &bitmap, rectangle cliprec
 
 void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 {
-	int priority;
+	int priority, scanline, pixel;
 	//rectangle rect;
 	//int xscr,yscr;
 	//int gpage;
@@ -861,14 +850,36 @@ void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 	if(m_crtc.reg[20] & 0x0800)  // if graphic layers are set to buffer, then they aren't visible
 		return;
 
+	m_gfxbitmap->fill(0, cliprect);
+
 	for(priority=3;priority>=0;priority--)
 	{
-		x68k_draw_gfx_scanline(bitmap,cliprect,priority);
+		x68k_draw_gfx_scanline(*m_gfxbitmap,cliprect,priority);
+	}
+
+	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)
+	{
+		UINT16 colour;
+		for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
+		{
+			if((m_video.reg[0] & 0x03) == 3)
+			{
+				colour = m_gfxbitmap->pix16(scanline, pixel);
+				if(colour || (m_video.gfx_pri == 2))
+					bitmap.pix32(scanline, pixel) = pal555(colour, 6, 11, 1);
+			}
+			else
+			{
+				colour = m_gfxbitmap->pix16(scanline, pixel) & 0xff;
+				if((colour && (m_gfxpalette->pen(colour) & 0xffffff)) || (m_video.gfx_pri == 2))
+					bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
+			}
+		}
 	}
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-void x68k_state::x68k_draw_sprites(bitmap_rgb32 &bitmap, int priority, rectangle cliprect)
+void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect)
 {
 	/*
 	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
@@ -1012,6 +1023,12 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	m_bg0_16->set_transparent_pen(0);
 	m_bg1_16->set_transparent_pen(0);
 
+	m_pcgbitmap = auto_bitmap_ind16_alloc(machine(), 1024, 1024);
+	m_pcgbitmap->fill(0);
+
+	m_gfxbitmap = auto_bitmap_ind16_alloc(machine(), 1024, 1024);
+	m_gfxbitmap->fill(0);
+
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
@@ -1023,6 +1040,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 	int x;
 	tilemap_t* x68k_bg0;
 	tilemap_t* x68k_bg1;
+	int pixel, scanline;
 	//UINT8 *rom;
 
 	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
@@ -1070,7 +1088,8 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	for(priority=3;priority>=0;priority--)
+
+	for(priority=2;priority>=0;priority--)
 	{
 		// Graphics screen(s)
 		if(priority == m_video.gfx_pri)
@@ -1079,39 +1098,50 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 		// Sprite / BG Tiles
 		if(priority == m_video.sprite_pri /*&& (m_spritereg[0x404] & 0x0200)*/ && (m_video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(bitmap,1,rect);
+			m_pcgbitmap->fill(0, rect);
+			x68k_draw_sprites(*m_pcgbitmap,1,rect);
 			if((m_spritereg[0x404] & 0x0008))
 			{
 				if((m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
 				{
 					x68k_bg0->set_scrollx(0,(m_spritereg[0x402] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg0->set_scrolly(0,(m_spritereg[0x403] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg0->draw(screen, bitmap,rect,0,0);
+					x68k_bg0->draw(screen, *m_pcgbitmap,rect,0,0);
 				}
 				else
 				{
 					x68k_bg1->set_scrollx(0,(m_spritereg[0x402] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg1->set_scrolly(0,(m_spritereg[0x403] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg1->draw(screen, bitmap,rect,0,0);
+					x68k_bg1->draw(screen, *m_pcgbitmap,rect,0,0);
 				}
 			}
-			x68k_draw_sprites(bitmap,2,rect);
+			x68k_draw_sprites(*m_pcgbitmap,2,rect);
 			if((m_spritereg[0x404] & 0x0001))
 			{
 				if((m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
 				{
 					x68k_bg0->set_scrollx(0,(m_spritereg[0x400] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg0->set_scrolly(0,(m_spritereg[0x401] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg0->draw(screen, bitmap,rect,0,0);
+					x68k_bg0->draw(screen, *m_pcgbitmap,rect,0,0);
 				}
 				else
 				{
 					x68k_bg1->set_scrollx(0,(m_spritereg[0x400] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg1->set_scrolly(0,(m_spritereg[0x401] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg1->draw(screen, bitmap,rect,0,0);
+					x68k_bg1->draw(screen, *m_pcgbitmap,rect,0,0);
 				}
 			}
-			x68k_draw_sprites(bitmap,3,rect);
+			x68k_draw_sprites(*m_pcgbitmap,3,rect);
+
+			for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
+			{
+				for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
+				{
+					UINT8 colour = m_pcgbitmap->pix16(scanline, pixel) & 0xff;
+					if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || (priority == 2))
+						bitmap.pix32(scanline, pixel) = m_pcgpalette->pen(colour);
+				}
+			}
 		}
 
 		// Text screen

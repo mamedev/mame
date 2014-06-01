@@ -60,6 +60,7 @@ public:
 			m_scc(*this, "scc"),
 			m_ym2151(*this, "ym2151"),
 			m_ppi(*this, "ppi8255"),
+			m_screen(*this, "screen"),
 			m_options(*this, "options"),
 			m_mouse1(*this, "mouse1"), 
 			m_mouse2(*this, "mouse2"), 
@@ -89,6 +90,7 @@ public:
 	required_device<scc8530_t> m_scc;
 	required_device<ym2151_device> m_ym2151;
 	required_device<i8255_device> m_ppi;
+	required_device<screen_device> m_screen;
 
 	required_ioport m_options;
 	required_ioport m_mouse1;
@@ -106,6 +108,9 @@ public:
 	dynamic_array<UINT16> m_tvram;
 	dynamic_array<UINT16> m_gvram;
 	dynamic_array<UINT16> m_spritereg;
+
+	bitmap_ind16 *m_pcgbitmap;
+	bitmap_ind16 *m_gfxbitmap;
 
 	void floppy_load_unload();
 	int floppy_load(floppy_image_device *dev);
@@ -178,8 +183,6 @@ public:
 	} m_crtc;  // CRTC
 	struct
 	{   // video controller at 0xe82000
-		unsigned short text_pal[0x100];
-		unsigned short gfx_pal[0x100];
 		unsigned short reg[3];
 		int text_pri;
 		int sprite_pri;
@@ -336,9 +339,9 @@ private:
 	void x68k_crtc_text_copy(int src, int dest);
 	void x68k_crtc_refresh_mode();
 	void x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
-	void x68k_draw_gfx_scanline(bitmap_rgb32 &bitmap, rectangle cliprect, UINT8 priority);
+	void x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
 	void x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
-	void x68k_draw_sprites(bitmap_rgb32 &bitmap, int priority, rectangle cliprect);
+	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
 	bitmap_rgb32* x68k_get_gfx_page(int pri,int type);
