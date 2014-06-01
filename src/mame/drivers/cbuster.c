@@ -295,13 +295,12 @@ void cbuster_state::machine_reset()
 static MACHINE_CONFIG_START( twocrude, cbuster_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 @ 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 @ 12MHz Verified */
 	MCFG_CPU_PROGRAM_MAP(twocrude_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45, 6MHz Verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -356,18 +355,18 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 - 3.58MHz Verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* 1.0068MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) /* 2.01375MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
