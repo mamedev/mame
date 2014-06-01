@@ -14,6 +14,7 @@
 #endif
 
 #define USE_PIVOT_SEARCH (0)
+#define VECTALT 1
 
 #define SOLVER_VERBOSE_OUT(x) do {} while (0)
 //#define SOLVER_VERBOSE_OUT(x) printf x
@@ -22,7 +23,58 @@
  * the vectorizations this enables pretty expensive
  */
 
-//#pragma GCC optimize "-ffast-math"
+#if 0
+#pragma GCC optimize "-ffast-math"
+#pragma GCC optimize "-fvariable-expansion-in-unroller"
+#pragma GCC optimize "-funswitch-loops"
+#endif
+
+
+static vector_t *create_vector(const int size)
+{
+    switch (size)
+    {
+        case 1:
+            return new vector_imp_t<1>();
+        case 2:
+            return new vector_imp_t<2>();
+        case 3:
+            return new vector_imp_t<3>();
+        case 4:
+            return new vector_imp_t<4>();
+        case 5:
+            return new vector_imp_t<5>();
+        case 6:
+            return new vector_imp_t<6>();
+        case 7:
+            return new vector_imp_t<7>();
+        case 8:
+            return new vector_imp_t<8>();
+        default:
+            return new vector_imp_t<0>(size);
+    }
+}
+
+ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
+{
+    m_term.add(term);
+    m_net_other.add(net_other);
+    m_gt.add(0.0);
+    m_go.add(0.0);
+    m_Idr.add(0.0);
+}
+
+ATTR_COLD void terms_t::set_pointers()
+{
+    for (int i = 0; i < count(); i++)
+    {
+        m_term[i]->m_gt1 = &m_gt[i];
+        m_term[i]->m_go1 = &m_go[i];
+        m_term[i]->m_Idr1 = &m_Idr[i];
+    }
+
+    m_ops = create_vector(m_gt.count());
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver
@@ -68,16 +120,16 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 					switch (p->netdev().family())
 					{
 						case netlist_device_t::CAPACITOR:
-							if (!m_steps.contains(&p->netdev()))
-								m_steps.add(&p->netdev());
+							if (!m_step_devices.contains(&p->netdev()))
+								m_step_devices.add(&p->netdev());
 							break;
 						case netlist_device_t::BJT_EB:
 						case netlist_device_t::DIODE:
 						//case netlist_device_t::VCVS:
 						case netlist_device_t::BJT_SWITCH:
 							NL_VERBOSE_OUT(("found BJT/Diode\n"));
-							if (!m_dynamic.contains(&p->netdev()))
-								m_dynamic.add(&p->netdev());
+							if (!m_dynamic_devices.contains(&p->netdev()))
+								m_dynamic_devices.add(&p->netdev());
 							break;
 						default:
 							break;
@@ -142,32 +194,15 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_ti
 #endif
             double DD_n = (n->m_cur_Analog - n->m_last_Analog);
 
-            if (fabs(DD_n) < 2.0 * m_params.m_accuracy)
-                DD_n = 0.0;
-            else
-                DD_n = copysign(fabs(DD_n) - 2.0 * m_params.m_accuracy, DD_n) / hn;
-
-            double h_n_m_1 = n->m_h_n_m_1;
-            // limit last timestep in equation.
-            //if (h_n_m_1 > 3 * hn)
-            //    h_n_m_1 = 3 * hn;
-
-            double DD2 = (DD_n - n->m_DD_n_m_1) / (hn + h_n_m_1);
+            double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
             double new_net_timestep;
 
-            n->m_DD_n_m_1 = DD_n;
             n->m_h_n_m_1 = hn;
+            n->m_DD_n_m_1 = DD_n;
             if (fabs(DD2) > 1e-50) // avoid div-by-zero
                 new_net_timestep = sqrt(m_params.m_lte / fabs(0.5*DD2));
             else
-            {
                 new_net_timestep = m_params.m_max_timestep;
-
-                //if (hn > 0.0 && new_net_timestep > 100.0 * hn)
-                //    new_net_timestep = 100.0 * hn;
-            }
-            //if (N()==2)
-            //    printf("%s: k %d ts %e DD2 %e\n", name().cstr(), k, new_net_timestep, DD2);
 
             if (new_net_timestep < new_solver_timestep)
                 new_solver_timestep = new_net_timestep;
@@ -205,7 +240,7 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
-	for (netlist_core_device_t * const *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
+	for (netlist_core_device_t * const *p = m_dynamic_devices.first(); p != NULL; p = m_dynamic_devices.next(p))
 		switch ((*p)->family())
 		{
 			case netlist_device_t::DIODE:
@@ -248,8 +283,8 @@ ATTR_COLD void netlist_matrix_solver_t::update_forced()
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
 	const double dd = delta.as_double();
-	for (int k=0; k < m_steps.count(); k++)
-		m_steps[k]->step_time(dd);
+	for (int k=0; k < m_step_devices.count(); k++)
+		m_step_devices[k]->step_time(dd);
 }
 
 ATTR_HOT double netlist_matrix_solver_t::solve()
@@ -265,7 +300,6 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 	NL_VERBOSE_OUT(("Step!\n"));
 	/* update all terminals for new time step */
 	m_last_step = now;
-	//printf("usecs: %f\n", delta.as_double()*1000000.0);
 	step(delta);
 
 	if (is_dynamic())
@@ -297,10 +331,33 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 	return next_time_step;
 }
 
+__attribute__ ((noinline)) static double tx(double * ATTR_ALIGN t  , const int &N)
+{
+    double tmp=0.0;
+    for (int k = 0; k<N; k++)
+        tmp += t[k] ;
+    return tmp;
+}
+
+void ttt()
+{
+    //typedef int  tt ;
+    static double *t = (double *) malloc(128*8);
+    for (int k = 0; k<128; k++)
+        t[k] = k;
+    double tmp;
+    tmp = tx(t, 16);
+    printf("t[0] %p %f\n", &t[0], t[0]);
+    printf("t[1] %p %f\n", &t[1], t[1]);
+    printf("%f\n", tmp);
+    free(t);
+
+}
+
 template <int m_N, int _storage_N>
 void netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::log_stats()
 {
-#if 0
+#if 1
     printf("==============================================\n");
     printf("Solver %s\n", this->name().cstr());
     printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
@@ -312,6 +369,8 @@ void netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::log_stats()
             this->m_gs_fail,
             100.0 * (double) this->m_gs_fail / (double) this->m_calculations,
             (double) this->m_gs_total / (double) this->m_calculations);
+    ttt();
+
 #endif
 }
 
@@ -387,11 +446,9 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
         double akk  = 0.0;
         {
             const int terms_count = m_terms[k].count();
-            //const netlist_terminal_t * const *terms = m_terms[k].terms();
-            const int *net_other = m_terms[k].net_other();
             const double *gt = m_terms[k].gt();
-            const double *go = m_terms[k].go();
             const double *Idr = m_terms[k].Idr();
+#if VECTALT
 
             for (int i = 0; i < terms_count; i++)
             {
@@ -399,25 +456,57 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 
                 rhsk = rhsk + Idr[i];
                 akk = akk + gt[i];
-                m_A[k][net_other[i]] += -go[i];
+                //m_A[k][net_other[i]] += -go[i];
             }
+#else
+            m_terms[k].ops()->sum2(Idr, gt, rhsk, akk);
+//                    rhsk += sum(m_terms[k].Idr(), terms_count);
+//            akk += sum(m_terms[k].gt(), terms_count);
+#endif
         }
         {
             const int rails_count = m_rails[k].count();
             const netlist_terminal_t * const *rails = m_rails[k].terms();
             const double *gt = m_rails[k].gt();
-            const double *go = m_rails[k].go();
             const double *Idr = m_rails[k].Idr();
+#if VECTALT
 
             for (int i = 0; i < rails_count; i++)
             {
                 rhsk = rhsk + Idr[i];
                 akk = akk + gt[i];
+            }
+#else
+            m_rails[k].ops()->sum2(Idr, gt, rhsk, akk);
+            //rhsk += sum(m_rails[k].Idr(), rails_count);
+            //akk += sum(m_rails[k].gt(), rails_count);
+#endif
+            const double *go = m_rails[k].go();
+            for (int i = 0; i < rails_count; i++)
+            {
                 rhsk = rhsk + go[i] * rails[i]->m_otherterm->net().as_analog().Q_Analog();
             }
         }
-        m_RHS[k] = rhsk;
-        m_A[k][k] += akk;
+        /*
+         * Matrix preconditioning with 1.0 / Akk
+         *
+         * will save a number of calculations during elimination
+         *
+         */
+        akk = 1.0 / akk;
+        m_RHS[k] = rhsk * akk;
+        m_A[k][k] += 1.0;
+        {
+            const int terms_count = m_terms[k].count();
+            //const netlist_terminal_t * const *terms = m_terms[k].terms();
+            const int *net_other = m_terms[k].net_other();
+            const double *go = m_terms[k].go();
+
+            for (int i = 0; i < terms_count; i++)
+            {
+                m_A[k][net_other[i]] += -go[i] * akk;
+            }
+        }
     }
 }
 
@@ -466,12 +555,12 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 
 		for (int j = i + 1; j < kN; j++)
 		{
-            const double f1 = m_A[j][i] * f;
+            const double f1 = - m_A[j][i] * f;
 			if (f1 != 0.0)
 			{
                 for (int k = i + 1; k < kN; k++)
-                    m_A[j][k] -= m_A[i][k] * f1;
-	            m_RHS[j] -= m_RHS[i] * f1;
+                    m_A[j][k] += m_A[i][k] * f1;
+	            m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
 	}
@@ -480,9 +569,11 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 	{
         //__builtin_prefetch(&m_A[j-1][j], 0);
 		double tmp = 0;
-        for (int k = j + 1; k < kN; k++)
+
+		for (int k = j + 1; k < kN; k++)
             tmp += m_A[j][k] * x[k];
-		x[j] = (m_RHS[j] - tmp) / m_A[j][j];
+
+        x[j] = (m_RHS[j] - tmp) / m_A[j][j];
 	}
 #if 0
 	printf("Solution:\n");
@@ -627,24 +718,6 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::vsolve_non_dynamic()
 // netlist_matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template<int _N>
-static inline const double sum(const double *v)
-{
-    double tmp = 0.0;
-    for (int i=0; i < _N; i++)
-        tmp += v[i];
-    return tmp;
-}
-
-template<int _N>
-static inline const double sumabs(const double *v)
-{
-    double tmp = 0.0;
-    for (int i=0; i < _N; i++)
-        tmp += fabs(v[i]);
-    return tmp;
-}
-
 template <int m_N, int _storage_N>
 ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_dynamic()
 {
@@ -713,9 +786,7 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 #else
     const int iN = this->N();
 	bool resched = false;
-
 	int  resched_cnt = 0;
-	ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
 
 	/* over-relaxation not really works on these matrices */
 	//const double w = 1.0; //2.0 / (1.0 + sin(3.14159 / (m_nets.count()+1)));
@@ -741,46 +812,55 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 	        const netlist_terminal_t * const * rails = this->m_rails[k].terms();
 	        //const int * othernet = this->m_rails[k].m_othernet;
 	        const int rail_count = this->m_rails[k].count();
-	        const double *gt = this->m_rails[k].gt();
+	        double *gt = this->m_rails[k].gt();
             const double *go = this->m_rails[k].go();
             const double *Idr = this->m_rails[k].Idr();
-
+#if VECTALT
             for (int i = 0; i < rail_count; i++)
             {
-                RHS_t += go[i] * rails[i]->m_otherterm->net().as_analog().Q_Analog();
                 gtot_t += gt[i];
                 gabs_t += fabs(go[i]);
                 RHS_t += Idr[i];
-                // this may point to a rail net ...
+                RHS_t += go[i] * rails[i]->m_otherterm->net().as_analog().Q_Analog();
             }
+#else
+            this->m_rails[k].ops()->sum2a(gt, Idr, go, gtot_t, RHS_t, gabs_t);
+
+            for (int i = 0; i < rail_count; i++)
+                RHS_t += go[i] * rails[i]->m_otherterm->net().as_analog().Q_Analog();
+#endif
 		}
 		{
             const int term_count = this->m_terms[k].count();
             const double *gt = this->m_terms[k].gt();
             const double *go = this->m_terms[k].go();
             const double *Idr = this->m_terms[k].Idr();
-
+#if VECTALT
             for (int i = 0; i < term_count; i++)
             {
                 gtot_t += gt[i];
                 gabs_t += fabs(go[i]);
                 RHS_t += Idr[i];
             }
+#else
+            this->m_terms[k].ops()->sum2a(gt, Idr, go, gtot_t, RHS_t, gabs_t);
+#endif
 		}
-		gabs_t *= 1.0;
-		if (gabs_t > gtot_t)
+        RHS[k] = RHS_t;
+
+        gabs_t *= 0.9; // avoid rounding issues
+		if (gabs_t <= gtot_t)
 		{
-			w[k] = 1.0 / (gtot_t + gabs_t);
-            one_m_w[k] = 1.0 - 1.0 * gtot_t / (gtot_t + gabs_t);
+            const double ws = 1.0;
+            w[k] = ws / gtot_t;
+            one_m_w[k] = 1.0 - ws;
 		}
 		else
 		{
-	        const double ws = 1.0;
-			w[k] = ws / gtot_t;
-			one_m_w[k] = 1.0 - ws;
+            w[k] = 1.0 / (gtot_t + gabs_t);
+            one_m_w[k] = 1.0 - 1.0 * gtot_t / (gtot_t + gabs_t);
 		}
 
-		RHS[k] = RHS_t;
 	}
 
 	do {
@@ -815,12 +895,10 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
     for (int k = 0; k < iN; k++)
-    {
         this->m_nets[k]->m_new_Analog = this->m_nets[k]->m_cur_Analog = new_V[k];
-    }
-
 
 	this->m_gs_total += resched_cnt;
+
 	if (resched)
 	{
 	    //this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
@@ -831,9 +909,6 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve_non_d
 	}
 	else {
 	    this->m_calculations++;
-
-	    //for (int k = 0; k < this->N(); k++)
-	    //    this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_new_Analog;
 
 	    return resched_cnt;
 	}
@@ -1010,6 +1085,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
+#if 1
 			case 1:
 				ms = create_solver<1,1>(gs_threshold, use_specific);
 				break;
@@ -1034,6 +1110,10 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
             case 8:
                 ms = create_solver<8,8>(gs_threshold, use_specific);
                 break;
+            case 12:
+                ms = create_solver<12,12>(gs_threshold, use_specific);
+                break;
+#endif
 			default:
 				if (net_count <= 16)
 				{

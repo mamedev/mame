@@ -182,7 +182,7 @@ private:
     }
 
     int m_count;
-	_ListClass * m_list;
+	_ListClass * m_list /* ATTR_ALIGN */;
 	int m_num_elements;
 };
 

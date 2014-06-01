@@ -40,7 +40,132 @@ struct netlist_solver_parameters_t
     netlist_time m_nt_sync_delay;
 };
 
-class ATTR_ALIGNED(64) netlist_matrix_solver_t : public netlist_device_t
+class vector_t
+{
+public:
+
+    vector_t(int size)
+    : m_dim(size)
+    {
+    }
+
+    virtual ~vector_t() {}
+
+    ATTR_ALIGNED(64) double * RESTRICT  m_V;
+
+    virtual const double sum(const double * v) = 0;
+    virtual void sum2(const double * v1, const double * v2, double &s1, double &s2) = 0;
+    virtual void sum2a(const double * v1, const double * v2, const double * v3abs, double &s1, double &s2, double &s3abs) = 0;
+
+    virtual const double sumabs(const double * v) = 0;
+
+protected:
+    int m_dim;
+
+private:
+
+};
+
+template <int m_N>
+class vector_imp_t : public vector_t
+{
+public:
+
+    vector_imp_t()
+    : vector_t(m_N)
+    {
+    }
+
+    vector_imp_t(int size)
+    : vector_t(size)
+    {
+        assert(m_N == 0);
+    }
+
+    virtual ~vector_imp_t() {}
+
+    ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
+
+    const double sum(const double * v)
+    {
+        const double * RESTRICT vl = v;
+        double tmp = 0.0;
+        for (int i=0; i < N(); i++)
+            tmp += vl[i];
+        return tmp;
+    }
+
+    void sum2(const double * v1, const double * v2, double &s1, double &s2)
+    {
+        const double * RESTRICT v1l = v1;
+        const double * RESTRICT v2l = v2;
+        for (int i=0; i < N(); i++)
+        {
+            s1 += v1l[i];
+            s2 += v2l[i];
+        }
+    }
+
+    void sum2a(const double * v1, const double * v2, const double * v3abs, double &s1, double &s2, double &s3abs)
+    {
+        const double * RESTRICT v1l = v1;
+        const double * RESTRICT v2l = v2;
+        const double * RESTRICT v3l = v3abs;
+        for (int i=0; i < N(); i++)
+        {
+            s1 += v1l[i];
+            s2 += v2l[i];
+            s3abs += fabs(v3l[i]);
+        }
+    }
+
+    const double sumabs(const double * v)
+    {
+        const double * RESTRICT vl = v;
+        double tmp = 0.0;
+        for (int i=0; i < N(); i++)
+            tmp += fabs(vl[i]);
+        return tmp;
+    }
+
+private:
+};
+
+class ATTR_ALIGNED(64) terms_t
+{
+    public:
+    ATTR_COLD terms_t() {}
+
+    ATTR_COLD void clear()
+    {
+        m_term.clear();
+        m_net_other.clear();
+        m_gt.clear();
+    }
+
+    ATTR_COLD void add(netlist_terminal_t *term, int net_other);
+
+    ATTR_HOT inline int count() { return m_term.count(); }
+
+    ATTR_HOT inline netlist_terminal_t **terms() { return m_term; }
+    ATTR_HOT inline int *net_other() { return m_net_other; }
+    ATTR_HOT inline double *gt() { return m_gt; }
+    ATTR_HOT inline double *go() { return m_go; }
+    ATTR_HOT inline double *Idr() { return m_Idr; }
+    ATTR_HOT vector_t *ops() { return m_ops; }
+
+    ATTR_COLD void set_pointers();
+
+private:
+    plinearlist_t<netlist_terminal_t *> m_term;
+    plinearlist_t<int> m_net_other;
+    plinearlist_t<double> m_gt;
+    plinearlist_t<double> m_go;
+    plinearlist_t<double> m_Idr;
+    vector_t * m_ops;
+};
+
+class netlist_matrix_solver_t : public netlist_device_t
 {
 public:
 	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
@@ -53,8 +178,8 @@ public:
 
 	ATTR_HOT double solve();
 
-	ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
-	ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
+	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.count() > 0; }
+	ATTR_HOT inline bool is_timestep() { return m_step_devices.count() > 0; }
 
     ATTR_HOT void update_forced();
 
@@ -70,70 +195,23 @@ public:
 
 protected:
 
-    class ATTR_ALIGNED(64) terms_t{
-
-    public:
-        terms_t() {}
-
-        void clear()
-        {
-            m_term.clear();
-            m_net_other.clear();
-            m_gt.clear();
-        }
-
-        void add(netlist_terminal_t *term, int net_other)
-        {
-            m_term.add(term);
-            m_net_other.add(net_other);
-            m_gt.add(0.0);
-            m_go.add(0.0);
-            m_Idr.add(0.0);
-        }
-
-        inline int count() { return m_term.count(); }
-
-        inline netlist_terminal_t **terms() { return m_term; }
-        inline int *net_other() { return m_net_other; }
-        inline double *gt() { return m_gt; }
-        inline double *go() { return m_go; }
-        inline double *Idr() { return m_Idr; }
-
-        void set_pointers()
-        {
-            for (int i = 0; i < count(); i++)
-            {
-                m_term[i]->m_gt1 = &m_gt[i];
-                m_term[i]->m_go1 = &m_go[i];
-                m_term[i]->m_Idr1 = &m_Idr[i];
-            }
-        }
-
-    private:
-        plinearlist_t<netlist_terminal_t *> m_term;
-        plinearlist_t<int> m_net_other;
-        plinearlist_t<double> m_gt;
-        plinearlist_t<double> m_go;
-        plinearlist_t<double> m_Idr;
-
-    };
-
     ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
 
     // return true if a reschedule is needed ...
     ATTR_HOT virtual int vsolve_non_dynamic() = 0;
 
     ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
-    int m_calculations;
 
     plinearlist_t<netlist_analog_net_t *> m_nets;
     plinearlist_t<netlist_analog_output_t *> m_inps;
 
+    int m_calculations;
+
 private:
 
     netlist_time m_last_step;
-    dev_list_t m_steps;
-    dev_list_t m_dynamic;
+    dev_list_t m_step_devices;
+    dev_list_t m_dynamic_devices;
 
     netlist_ttl_input_t m_fb_sync;
     netlist_ttl_output_t m_Q_sync;
@@ -159,7 +237,10 @@ public:
 	netlist_matrix_solver_direct_t()
     : netlist_matrix_solver_t()
     , m_dim(0)
-    {}
+    {
+	    for (int k=0; k<_storage_N; k++)
+	        m_A[k] = & m_A_phys[k][0];
+    }
 
 	virtual ~netlist_matrix_solver_direct_t() {}
 
@@ -173,23 +254,22 @@ protected:
 
     ATTR_HOT virtual int vsolve_non_dynamic();
     ATTR_HOT int solve_non_dynamic();
-	ATTR_HOT inline void build_LE();
-	ATTR_HOT inline void gauss_LE(double (* RESTRICT x));
-	ATTR_HOT inline double delta(
-			const double (* RESTRICT V));
-	ATTR_HOT inline void store(const double (* RESTRICT V), const bool store_RHS);
+	ATTR_HOT void build_LE();
+	ATTR_HOT void gauss_LE(double (* RESTRICT x));
+	ATTR_HOT double delta(const double (* RESTRICT V));
+	ATTR_HOT void store(const double (* RESTRICT V), const bool store_RHS);
 
     ATTR_HOT virtual double compute_next_timestep(const double);
 
-    ATTR_ALIGNED(64) double m_A[_storage_N][_storage_N];
+    ATTR_ALIGNED(64) double * RESTRICT m_A[_storage_N];
     ATTR_ALIGNED(64) double m_RHS[_storage_N];
     ATTR_ALIGNED(64) double m_last_RHS[_storage_N]; // right hand side - contains currents
 
     terms_t m_terms[_storage_N];
     terms_t m_rails[_storage_N];
-    plinearlist_t<double> xx[_storage_N];
 
 private:
+    ATTR_ALIGNED(64) double m_A_phys[_storage_N][((_storage_N + 7) / 8) * 8];
 
 	int m_dim;
 };
