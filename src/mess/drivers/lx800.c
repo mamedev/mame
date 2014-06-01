@@ -9,8 +9,6 @@
 
     - CPU type uPD7810HG
     - CPU PORTD and PORTF are connected to the Gate Array
-    - CPU Analog Port (AN0-AN7) is not emulated (connects to DIPSW2 and
-      some other things).
     - processing gets stuck in a loop, and never gets to scan the
       input buttons and switches.
     - CPU disassembly doesn't seem to indicate conditional JR or RET.
@@ -32,13 +30,11 @@ class lx800_state : public driver_device
 {
 public:
 	lx800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_beep(*this, "beeper")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_beep(*this, "beeper")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(lx800_porta_r);
 	DECLARE_WRITE8_MEMBER(lx800_porta_w);
 	DECLARE_READ8_MEMBER(lx800_portc_r);
@@ -47,6 +43,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lx800_centronics_pe_w);
 	DECLARE_WRITE_LINE_MEMBER(lx800_paperempty_led_w);
 	DECLARE_WRITE_LINE_MEMBER(lx800_reset_w);
+	DECLARE_READ_LINE_MEMBER(an0_r);
+	DECLARE_READ_LINE_MEMBER(an1_r);
+	DECLARE_READ_LINE_MEMBER(an2_r);
+	DECLARE_READ_LINE_MEMBER(an3_r);
+	DECLARE_READ_LINE_MEMBER(an4_r);
+	DECLARE_READ_LINE_MEMBER(an5_r);
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<beep_device> m_beep;
 	virtual void machine_start();
 };
 
@@ -112,6 +117,36 @@ WRITE8_MEMBER( lx800_state::lx800_portc_w )
 
 	output_set_value("online_led", !BIT(data, 2));
 	m_beep->set_state(!BIT(data, 7));
+}
+
+READ_LINE_MEMBER( lx800_state::an0_r )
+{
+	return BIT(ioport("DIPSW2")->read(), 0);
+}
+
+READ_LINE_MEMBER( lx800_state::an1_r )
+{
+	return BIT(ioport("DIPSW2")->read(), 1);
+}
+
+READ_LINE_MEMBER( lx800_state::an2_r )
+{
+	return BIT(ioport("DIPSW2")->read(), 2);
+}
+
+READ_LINE_MEMBER( lx800_state::an3_r )
+{
+	return BIT(ioport("DIPSW2")->read(), 3); // can also read an external line AUTO_FEED_XT
+}
+
+READ_LINE_MEMBER( lx800_state::an4_r )
+{
+	return 0; // Printer select line (0=always selected)
+}
+
+READ_LINE_MEMBER( lx800_state::an5_r )
+{
+	return 1; // Monitors 24v line, should return 4.08 volts
 }
 
 
@@ -249,13 +284,19 @@ static MACHINE_CONFIG_START( lx800, lx800_state )
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
 	MCFG_CPU_IO_MAP(lx800_io)
+	MCFG_UPD7810_AN0(READLINE(lx800_state, an0_r))
+	MCFG_UPD7810_AN1(READLINE(lx800_state, an1_r))
+	MCFG_UPD7810_AN2(READLINE(lx800_state, an2_r))
+	MCFG_UPD7810_AN3(READLINE(lx800_state, an3_r))
+	MCFG_UPD7810_AN4(READLINE(lx800_state, an4_r))
+	MCFG_UPD7810_AN5(READLINE(lx800_state, an5_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_lx800)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* gate array */
 	MCFG_DEVICE_ADD("ic3b", E05A03, 0)
