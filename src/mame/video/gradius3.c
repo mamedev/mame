@@ -70,8 +70,6 @@ void gradius3_state::gradius3_postload()
 
 void gradius3_state::video_start()
 {
-	int i;
-
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
 	m_layer_colorbase[2] = 48;
