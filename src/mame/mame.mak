@@ -2638,6 +2638,8 @@ $(DRIVERS)/jpmsys5.o:   $(LAYOUT)/jpmsys5.lh
 
 $(DRIVERS)/kas89.o:     $(LAYOUT)/kas89.lh
 
+$(DRIVERS)/kenseim.o:   $(LAYOUT)/kenseim.lh
+
 $(DRIVERS)/kingdrby.o:  $(LAYOUT)/kingdrby.lh
 
 $(DRIVERS)/kungfur.o:   $(LAYOUT)/kungfur.lh

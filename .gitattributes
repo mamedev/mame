@@ -6365,6 +6365,7 @@ src/mame/layout/jpms80.lay svneol=native#text/xml
 src/mame/layout/jpmsru.lay svneol=native#text/xml
 src/mame/layout/jpmsys5.lay svneol=native#text/xml
 src/mame/layout/kas89.lay svneol=native#text/xml
+src/mame/layout/kenseim.lay svneol=native#text/plain
 src/mame/layout/kgbird.lay svneol=native#text/xml
 src/mame/layout/kingdrby.lay svneol=native#text/xml
 src/mame/layout/konamigt.lay svneol=native#text/xml

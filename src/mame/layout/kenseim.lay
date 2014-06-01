@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="powerled">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="1.0" green="0.2" blue="0.2" />
+		</rect>
+
+	</element>
+
+
+	<view name="Adder,VFD and Lamps">
+
+		<backdrop name="lamp1" element="powerled" state="0">
+			<bounds x="10" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp2" element="powerled" state="0">
+			<bounds x="20" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp3" element="powerled" state="0">
+			<bounds x="30" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp4" element="powerled" state="0">
+			<bounds x="40" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp5" element="powerled" state="0">
+			<bounds x="50" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp6" element="powerled" state="0">
+			<bounds x="60" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp7" element="powerled" state="0">
+			<bounds x="70" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp8" element="powerled" state="0">
+			<bounds x="80" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp9" element="powerled" state="0">
+			<bounds x="90" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp10" element="powerled" state="0">
+			<bounds x="100" y="245" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp11" element="powerled" state="0">
+			<bounds x="210" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp12" element="powerled" state="0">
+			<bounds x="220" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp13" element="powerled" state="0">
+			<bounds x="230" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp14" element="powerled" state="0">
+			<bounds x="240" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp15" element="powerled" state="0">
+			<bounds x="250" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp16" element="powerled" state="0">
+			<bounds x="260" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp17" element="powerled" state="0">
+			<bounds x="270" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp18" element="powerled" state="0">
+			<bounds x="280" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp19" element="powerled" state="0">
+			<bounds x="290" y="245" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp20" element="powerled" state="0">
+			<bounds x="300" y="245" width="7" height="7"/>
+		</backdrop>
+
+
+
+		<screen index="0">
+			<bounds x="0" y="0" width="320" height="240" />
+		</screen>
+	</view>
+</mamelayout>

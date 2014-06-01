@@ -31,7 +31,7 @@
 #include "machine/z80ctc.h"
 #include "includes/cps1.h"
 #include "machine/i8255.h"
-
+#include "kenseim.lh"
 
 class kenseim_state : public cps_state
 {
@@ -45,8 +45,8 @@ public:
 	DECLARE_READ16_MEMBER(kensei_dsw_r);
 	DECLARE_DRIVER_INIT(kenseim);
 
-	DECLARE_READ8_MEMBER(porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
-	DECLARE_READ8_MEMBER(portb_default_r) { logerror("%s read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0x00; }
+	DECLARE_READ8_MEMBER(portb_default_r) { logerror("%s read port B but no handler assigned\n", machine().describe_context()); return 0x00; }
 //	DECLARE_READ8_MEMBER(portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(portc_r);
 //	DECLARE_READ8_MEMBER(portd_default_r) { logerror("%s read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
@@ -63,35 +63,120 @@ public:
 	DECLARE_READ8_MEMBER(i8255_portb_default_r) { logerror("%s i8255 read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(i8255_portc_default_r) { logerror("%s i8255 read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
 
-	DECLARE_WRITE8_MEMBER(i8255_porta_default_w) { logerror("%s i8255 write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(i8255_portb_default_w) { logerror("%s i8255 write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(i8255_portc_default_w) { logerror("%s i8255 write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(i8255_porta_default_w) { logerror("%s i8255 write %02x to port A but no handler assigned\n", machine().describe_context(), data); } // maybe molesa output? (6-bits?)
+	DECLARE_WRITE8_MEMBER(i8255_portb_default_w) { logerror("%s i8255 write %02x to port B but no handler assigned\n", machine().describe_context(), data); } // maybe molesb output? (6-bits?)
+//	DECLARE_WRITE8_MEMBER(i8255_portc_default_w) { logerror("%s i8255 write %02x to port C but no handler assigned\n", machine().describe_context(), data); } // leds??
+	DECLARE_WRITE8_MEMBER(i8255_portc_w);
+
+	DECLARE_READ8_MEMBER(i8255_portd_default_r) { logerror("%s i8255 read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(i8255_porte_default_r) { logerror("%s i8255 read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(i8255_portf_default_r) { logerror("%s i8255 read port F but no handler assigned\n", machine().describe_context()); return 0xff; }
+
+	DECLARE_WRITE8_MEMBER(i8255_portd_default_w) { logerror("%s i8255 write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(i8255_porte_default_w) { logerror("%s i8255 write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(i8255_portf_default_w) { logerror("%s i8255 write %02x to port F but no handler assigned\n", machine().describe_context(), data); }
+
+
+	UINT32 m_led_serial_data;
+	int m_led_clock;
+	int m_led_latch;
+	void set_leds(UINT32 ledstates);
 };
+
+void kenseim_state::set_leds(UINT32 ledstates)
+{
+	for (int i=0; i<20; i++)
+		output_set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));	
+}
+
+// could be wrong
+WRITE8_MEMBER(kenseim_state::i8255_portc_w)
+{
+	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 tiles, with the last write being some terminator?)
+
+//	printf("%s i8255 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
+
+	if (data & 0x08)
+	{
+
+		if (data & 0x02)
+		{
+			if (data & 0x04)
+			{
+				// send and reset? maybe?
+				//printf("led write reset?\n");
+				m_led_latch = 0;
+				set_leds(m_led_serial_data);
+				m_led_serial_data = 0;
+			}
+			else if (!(m_led_clock & 0x02))
+			{
+				//printf("write data bit %d\n", m_led_latch & 1);
+				m_led_serial_data = (m_led_serial_data << 1) | (m_led_latch & 1);
+			}
+
+		}
+		else
+		{
+			m_led_latch = data & 0x5;
+			//printf("set latch %02x\n", m_led_latch);
+		}
+
+		m_led_clock = data & 0x02;
+	}
+
+}
 
 
 READ8_MEMBER(kenseim_state::portd_r)
 {
 	// comms port maybe? checks for 0x10 (bit 4,a) to be clear in a tight loop (092B) then for bit 0x80 to be set in another tight loop  (0933) then at (0947) it checks that bits 0xe0 aren't set.
-	//logerror("%s read port D\n", machine().describe_context());
-	return rand();// 0x80;
+	logerror("%s read port D\n", machine().describe_context());
+	return 0x00;// rand();// 0x80;
 }
 
 READ8_MEMBER(kenseim_state::portc_r)
 {
 	// bits 0x09 checked at 1171
-	return rand();
+	logerror("%s read port C\n", machine().describe_context());
+
+	return 0x00;//
+	//return 0x09;// rand();
 }
 
 
 READ16_MEMBER(kenseim_state::cps1_kensei_r)
 {
-	logerror("%s cps1_kensei_r offs %04x, (%04x)\n", machine().describe_context(), offset *2, mem_mask);
-	return rand();
+	//
+	static int i = 0;
+	
+	int ret;
+
+	ret = ((i & 0xf0) >> 4) | ((i & 0x0f) << 8);
+
+	if (mem_mask & 0xff00) i++;
+
+	logerror("%s cps1_kensei_r offs %04x, (%04x) (68k reading command port %04x)\n", machine().describe_context(), offset *2, mem_mask, ret);
+
+	return ret | 0xf0f0;
 }
 
 WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 {
-	logerror("%s cps1_kensei_w offs %04x, %04x (%04x)\n", machine().describe_context(), offset *2, data, mem_mask);
+	if (mem_mask == 0xff00)
+	{
+
+		data >>= 8;;
+
+		logerror("%s cps1_kensei_w offs %04x, %02x (from 68k?)\n", machine().describe_context(), offset * 2, data);
+
+		if ((data != 0x02) && (data != 0x03) && (data != 0x04) && (data != 0x05) && (data != 0x83))
+			logerror("  ^^ (unknown?)\n");
+	}
+	else
+	{
+		logerror("%s cps1_kensei_w offs %04x, %04x (%04x) (other byte)\n", machine().describe_context(), offset * 2, data, mem_mask);
+	}
 }
 
 /*
@@ -170,16 +255,18 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x8000, 0x81ff) AM_RAM // ? size unknown, code just wipes ram until the compare fails
+//	AM_RANGE(0x8000, 0x81ff) AM_RAM // ? size unknown, code just wipes ram until the compare fails
 
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("gamecpu_ctc", z80ctc_device, read, write)
 
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("i8255", i8255_device, read, write)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("i8255",   i8255_device, read, write)
+	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("i8255_2", i8255_device, read, write)
+
 ADDRESS_MAP_END
 
 
@@ -197,7 +284,7 @@ READ16_MEMBER(kenseim_state::kensei_dsw_r)
 	
 	if (offset > 0)
 	{
-		logerror("%s kensei_dsw_r offs %04x, (%04x)\n", machine().describe_context(), offset *2, mem_mask);
+		//logerror("%s kensei_dsw_r offs %04x, (%04x)\n", machine().describe_context(), offset *2, mem_mask);
 
 		int in = ioport(dswname[offset])->read();
 		return (in << 8) | 0xff;
@@ -205,8 +292,27 @@ READ16_MEMBER(kenseim_state::kensei_dsw_r)
 	else
 	{  // connected to the other board instead of IN0? (or at least some bits are)
 
-		logerror("%s kensei_dsw_r offs %04x (comms?), (%04x)\n", machine().describe_context(), offset *2, mem_mask);
-		int in = ((rand() & 0xff) & ~0x20) | 0x40; // 0x20 causes 'comamnd wait' message - 0x40 is still service mode? (valid or leftover - test mode trigger should be on sub pcb?) 
+		static int togglecount = 0;
+		
+		togglecount++;
+
+
+
+		int in = 0x00;
+		in |= 0x40; // don't want cps1 test mode (leftover)
+		
+		if (togglecount == 3)
+		{
+			in |= 0x10; // won't read commands otherwise?
+			togglecount = 0;
+		}	
+		
+		
+		//in |= 0x20;
+
+		logerror("%s kensei_dsw_r offs %04x (comms?), (%04x) (returning %02x)\n", machine().describe_context(), offset *2, mem_mask, in);
+
+
 		return (in << 8) | 0xff;
 
 	}
@@ -233,13 +339,23 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84?
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
 	
+	// the MB89363B seems to be 2 * i8255?
 	MCFG_DEVICE_ADD("i8255", I8255, 0) // MB89363B!
 	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_porta_default_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_portb_default_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portc_default_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_default_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_default_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_default_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_w))
+
+	MCFG_DEVICE_ADD("i8255_2", I8255, 0) // MB89363B!
+	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_portd_default_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_porte_default_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portf_default_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_portd_default_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_porte_default_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portf_default_w))
+
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
@@ -369,10 +485,15 @@ DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
 
 	DRIVER_INIT_CALL(cps1);
+
+	m_led_serial_data = 0;
+	m_led_clock = 0;
+	m_led_latch = 0;
+
 } 
 
 
  // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
  // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
- GAME( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Kensei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING )
+ GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Kensei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING, layout_kenseim )
 
