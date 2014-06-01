@@ -51,7 +51,6 @@ public:
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
 	int k051960_is_irq_enabled();
 	int k051960_is_nmi_enabled();
-	void k051960_set_sprite_offsets(int dx, int dy);
 
 protected:
 	// device-level overrides
@@ -65,7 +64,6 @@ private:
 	gfx_element *m_gfx;
 
 	UINT8    m_spriterombank[3];
-	int      m_dx, m_dy;
 	int      m_romoffset;
 	int      m_spriteflip, m_readroms;
 	int      m_irq_enabled, m_nmi_enabled;

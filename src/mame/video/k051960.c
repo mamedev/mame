@@ -68,8 +68,6 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	m_ram(NULL),
 	m_gfx(NULL),
 	//m_spriterombank[3],
-	m_dx(0),
-	m_dy(0),
 	m_romoffset(0),
 	m_spriteflip(0),
 	m_readroms(0),
@@ -208,8 +206,6 @@ void k051960_device::device_start()
 	save_pointer(NAME(m_ram), 0x400);
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_nmi_enabled));
-	save_item(NAME(m_dx));
-	save_item(NAME(m_dy));
 
 	save_item(NAME(m_k051937_counter));
 }
@@ -220,7 +216,6 @@ void k051960_device::device_start()
 
 void k051960_device::device_reset()
 {
-	m_dx = m_dy = 0;
 	m_k051937_counter = 0;
 
 	m_romoffset = 0;
@@ -358,12 +353,6 @@ int k051960_device::k051960_is_nmi_enabled( )
 	return m_nmi_enabled;
 }
 
-void k051960_device::k051960_set_sprite_offsets( int dx, int dy )
-{
-	m_dx = dx;
-	m_dy = dy;
-}
-
 
 READ16_MEMBER( k051960_device::k051937_word_r )
 {
@@ -480,8 +469,6 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 		ox = (256 * m_ram[offs + 6] + m_ram[offs + 7]) & 0x01ff;
 		oy = 256 - ((256 * m_ram[offs + 4] + m_ram[offs + 5]) & 0x01ff);
-		ox += m_dx;
-		oy += m_dy;
 		flipx = m_ram[offs + 6] & 0x02;
 		flipy = m_ram[offs + 4] & 0x02;
 		zoomx = (m_ram[offs + 6] & 0xfc) >> 2;

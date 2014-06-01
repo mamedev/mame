@@ -149,7 +149,6 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_has_extra_video_ram(0),
 	m_rmrd_line(0),
 	m_irq_enabled(0),
-	//m_dx[3], m_dy[3],
 	m_romsubbank(0),
 	m_scrollctrl(0),
 	m_gfxdecode(*this),
@@ -280,8 +279,6 @@ void k052109_device::device_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
-	save_item(NAME(m_dx));
-	save_item(NAME(m_dy));
 	save_item(NAME(m_has_extra_video_ram));
 	machine().save().register_postload(save_prepost_delegate(FUNC(k052109_device::tileflip_reset), this));
 }
@@ -300,9 +297,6 @@ void k052109_device::device_reset()
 	m_scrollctrl = 0;
 
 	m_has_extra_video_ram = 0;
-
-	for (i = 0; i < 3; i++)
-		m_dx[i] = m_dy[i] = 0;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -550,12 +544,12 @@ popmessage("%x %x %x %x",
 		m_tilemap[1]->set_scroll_rows(256);
 		m_tilemap[1]->set_scroll_cols(1);
 		yscroll = m_ram[0x180c];
-		m_tilemap[1]->set_scrolly(0, yscroll + m_dy[1]);
+		m_tilemap[1]->set_scrolly(0, yscroll);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * (offs & 0xfff8) + 0] + 256 * scrollram[2 * (offs & 0xfff8) + 1];
 			xscroll -= 6;
-			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll + m_dx[1]);
+			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll);
 		}
 	}
 	else if ((m_scrollctrl & 0x03) == 0x03)
@@ -565,12 +559,12 @@ popmessage("%x %x %x %x",
 		m_tilemap[1]->set_scroll_rows(256);
 		m_tilemap[1]->set_scroll_cols(1);
 		yscroll = m_ram[0x180c];
-		m_tilemap[1]->set_scrolly(0, yscroll + m_dy[1]);
+		m_tilemap[1]->set_scrolly(0, yscroll);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
 			xscroll -= 6;
-			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll + m_dx[1]);
+			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll);
 		}
 	}
 	else if ((m_scrollctrl & 0x04) == 0x04)
@@ -581,11 +575,11 @@ popmessage("%x %x %x %x",
 		m_tilemap[1]->set_scroll_cols(512);
 		xscroll = m_ram[0x1a00] + 256 * m_ram[0x1a01];
 		xscroll -= 6;
-		m_tilemap[1]->set_scrollx(0, xscroll + m_dx[1]);
+		m_tilemap[1]->set_scrollx(0, xscroll);
 		for (offs = 0; offs < 512; offs++)
 		{
 			yscroll = scrollram[offs / 8];
-			m_tilemap[1]->set_scrolly((offs + xscroll) & 0x1ff, yscroll + m_dy[1]);
+			m_tilemap[1]->set_scrolly((offs + xscroll) & 0x1ff, yscroll);
 		}
 	}
 	else
@@ -597,8 +591,8 @@ popmessage("%x %x %x %x",
 		xscroll = scrollram[0] + 256 * scrollram[1];
 		xscroll -= 6;
 		yscroll = m_ram[0x180c];
-		m_tilemap[1]->set_scrollx(0, xscroll + m_dx[1]);
-		m_tilemap[1]->set_scrolly(0, yscroll + m_dy[1]);
+		m_tilemap[1]->set_scrollx(0, xscroll);
+		m_tilemap[1]->set_scrolly(0, yscroll);
 	}
 
 	if ((m_scrollctrl & 0x18) == 0x10)
@@ -608,12 +602,12 @@ popmessage("%x %x %x %x",
 		m_tilemap[2]->set_scroll_rows(256);
 		m_tilemap[2]->set_scroll_cols(1);
 		yscroll = m_ram[0x380c];
-		m_tilemap[2]->set_scrolly(0, yscroll + m_dy[2]);
+		m_tilemap[2]->set_scrolly(0, yscroll);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * (offs & 0xfff8) + 0] + 256 * scrollram[2 * (offs & 0xfff8) + 1];
 			xscroll -= 6;
-			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll + m_dx[2]);
+			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll);
 		}
 	}
 	else if ((m_scrollctrl & 0x18) == 0x18)
@@ -623,12 +617,12 @@ popmessage("%x %x %x %x",
 		m_tilemap[2]->set_scroll_rows(256);
 		m_tilemap[2]->set_scroll_cols(1);
 		yscroll = m_ram[0x380c];
-		m_tilemap[2]->set_scrolly(0, yscroll + m_dy[2]);
+		m_tilemap[2]->set_scrolly(0, yscroll);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
 			xscroll -= 6;
-			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll + m_dx[2]);
+			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll);
 		}
 	}
 	else if ((m_scrollctrl & 0x20) == 0x20)
@@ -639,11 +633,11 @@ popmessage("%x %x %x %x",
 		m_tilemap[2]->set_scroll_cols(512);
 		xscroll = m_ram[0x3a00] + 256 * m_ram[0x3a01];
 		xscroll -= 6;
-		m_tilemap[2]->set_scrollx(0, xscroll + m_dx[2]);
+		m_tilemap[2]->set_scrollx(0, xscroll);
 		for (offs = 0; offs < 512; offs++)
 		{
 			yscroll = scrollram[offs / 8];
-			m_tilemap[2]->set_scrolly((offs + xscroll) & 0x1ff, yscroll + m_dy[2]);
+			m_tilemap[2]->set_scrolly((offs + xscroll) & 0x1ff, yscroll);
 		}
 	}
 	else
@@ -655,8 +649,8 @@ popmessage("%x %x %x %x",
 		xscroll = scrollram[0] + 256 * scrollram[1];
 		xscroll -= 6;
 		yscroll = m_ram[0x380c];
-		m_tilemap[2]->set_scrollx(0, xscroll + m_dx[2]);
-		m_tilemap[2]->set_scrolly(0, yscroll + m_dy[2]);
+		m_tilemap[2]->set_scrollx(0, xscroll);
+		m_tilemap[2]->set_scrolly(0, yscroll);
 	}
 
 #if 0
@@ -689,12 +683,6 @@ void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, 
 int k052109_device::is_irq_enabled( )
 {
 	return m_irq_enabled;
-}
-
-void k052109_device::set_layer_offsets( int layer, int dx, int dy )
-{
-	m_dx[layer] = dx;
-	m_dy[layer] = dy;
 }
 
 
