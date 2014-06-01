@@ -3172,6 +3172,28 @@ ROM_START( tazzmang )
 	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( tazzmang2 )  // Original Sparcade set
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tazmania.1",   0x000000, 0x000800, CRC(6ecc84a2) SHA1(6f31e69bd613b93e1fac26163f39676299c65a76) ) 
+	ROM_LOAD( "tazmania.2",   0x000800, 0x000800, CRC(e27b09f6) SHA1(1a419c8f45639e2c2351eeb94bf62fca35d5928e) ) 
+	ROM_LOAD( "tazmania.3",   0x001000, 0x000800, CRC(954868f3) SHA1(3882e17ffd9bcfcff383ed95279606962f89dafd) ) 
+	ROM_LOAD( "tazmania.4",   0x001800, 0x000800, CRC(238520e6) SHA1(eec76b54058a6a6139f13f188d243f20d1a7aa12) ) 
+	ROM_LOAD( "tazmania.5",   0x002000, 0x000800, CRC(0527e513) SHA1(20175c293f1cf45fa21dd400cb2718dd8ee0dcea) ) 
+	ROM_LOAD( "tazmania.6",   0x002800, 0x000800, CRC(af2b92d8) SHA1(5642666eb66d549390cd5b13a7029daede6d3ff8) ) 
+	ROM_LOAD( "tazmania.7",   0x003000, 0x000800, CRC(bbdc41d3) SHA1(17de825efd56541dbdbacdc83f77f3ccaef2d07f) ) 
+	ROM_LOAD( "tazmania.8",   0x003800, 0x000800, CRC(eb35f49c) SHA1(0f2bf1043092e746fdbc5d2e0292aeaa7b7f0218) ) 
+	ROM_LOAD( "tazmania.a",   0x004000, 0x001000, CRC(38f326f8) SHA1(5c5463666b6ed15cbcc874faf79cc06ae1cba59a) ) 
+	ROM_LOAD( "tazmania.b",   0x005000, 0x001000, CRC(2a22a9dc) SHA1(07aecdff852065671e488682cf710fd48273b88c) ) 
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "tazm8.1lk",    0x0000, 0x0800, CRC(2c5b612b) SHA1(32e3a41a9a4a8b1285b6a195213ff0d98012360a) ) // tazmania.g1
+	ROM_LOAD( "tazzm7.1jh",   0x0800, 0x0800, CRC(3f5ff3ac) SHA1(bc70eef54a45b52c14e35464e5f06b5eec554eb6) ) // tazmania.g2
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+
 ROM_START( bongo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
@@ -3513,6 +3535,7 @@ GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  driver_device,  0,       
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  driver_device,  0,         ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, porter,    dockman,  porter,    porter,    driver_device,  0,         ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  driver_device,  0,         ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  driver_device,  0,         ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, bongo,     0,        bongo,     bongo,     driver_device,  0,         ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
 GAME( 1983, ozon1,     0,        ozon1,     ozon1,     driver_device,  0,         ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg,  ladybug,  batman2,   ladybugg,  galaxold_state, ladybugg,  ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
