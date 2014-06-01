@@ -958,6 +958,32 @@ ROM_START( midnrun )
 	ROM_LOAD( "477a10.5n", 0x400000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
 ROM_END
 
+ROM_START( midnruna )
+	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
+	ROM_LOAD32_BYTE( "477aaa01.20u", 0x000003, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) /* Program version AAA, v1.10 (ASA) */
+	ROM_LOAD32_BYTE( "477aaa02.17u", 0x000002, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
+	ROM_LOAD32_BYTE( "477aaa03.15u", 0x000001, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
+	ROM_LOAD32_BYTE( "477aaa04.13u", 0x000000, 0x80000, CRC(0eb264b7) SHA1(179a3d58c0f554fd1b283ee3640ce09d5142b288) )
+
+	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
+	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
+
+	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
+	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
+
+	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
+	ROM_LOAD32_BYTE( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD32_BYTE( "477a14.7h", 0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD32_BYTE( "477a15.5h", 0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD32_BYTE( "477a16.2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+
+	ROM_REGION(0x600000, "shared", 0)   /* Sound data */
+	ROM_LOAD( "477a08.5r", 0x000000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
+	ROM_LOAD( "477a09.3r", 0x200000, 0x200000, CRC(f431e29f) SHA1(e6082d88f86abb63d02ac34e70873b58f88b0ddc) )
+	ROM_LOAD( "477a10.5n", 0x400000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
+ROM_END
+
 ROM_START( windheat )
 	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
 	ROM_LOAD32_BYTE( "677eaa01.20u", 0x000003, 0x080000, CRC(500b61f4) SHA1(ec39165412978c0dbd3cbf1f7b6989b5d7ba20a0) ) /* Program version EAA, v2.11 (EUR) */
@@ -1142,7 +1168,8 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run (Euro v1.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (Euro v1.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (Asia v1.10)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", GAME_IMPERFECT_GRAPHICS )
