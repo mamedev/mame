@@ -41,24 +41,19 @@
 */
 READ8_MEMBER( p2000t_state::p2000t_port_000f_r )
 {
-	static const char *const keynames[] = {
-		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
-		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
-	};
-
 	if (m_port_101f & P2000M_101F_KEYINT)
 	{
 		return (
-		ioport("KEY0")->read() & ioport("KEY1")->read() &
-		ioport("KEY2")->read() & ioport("KEY3")->read() &
-		ioport("KEY4")->read() & ioport("KEY5")->read() &
-		ioport("KEY6")->read() & ioport("KEY7")->read() &
-		ioport("KEY8")->read() & ioport("KEY9")->read());
+		m_keyboard[0]->read() & m_keyboard[1]->read() &
+		m_keyboard[2]->read() & m_keyboard[3]->read() &
+		m_keyboard[4]->read() & m_keyboard[5]->read() &
+		m_keyboard[6]->read() & m_keyboard[7]->read() &
+		m_keyboard[8]->read() & m_keyboard[9]->read());
 	}
 	else
 	if (offset < 10)
 	{
-		return (ioport(keynames[offset])->read());
+		return m_keyboard[offset]->read();
 	}
 	else
 		return 0xff;
