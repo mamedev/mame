@@ -12,6 +12,7 @@
 #include "nomapper.h"
 #include "rtype.h"
 #include "superloderunner.h"
+#include "super_swangi.h"
 #include "yamaha.h"
 
 
@@ -40,6 +41,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("msxaud_hxmu900", MSX_CART_MSX_AUDIO_HXMU900)
 	SLOT_INTERFACE_INTERNAL("msxaud_fsca1", MSX_CART_MSX_AUDIO_FSCA1)
 	SLOT_INTERFACE_INTERNAL("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205)
+	SLOT_INTERFACE_INTERNAL("super_swangi", MSX_CART_SUPER_SWANGI)
 SLOT_INTERFACE_END
 
 

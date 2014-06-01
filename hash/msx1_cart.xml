@@ -192,7 +192,6 @@ Super Bioman II - Hello Soft
 Super Bioman III - Hello Soft
 Super Bros. World 1 ~ 슈퍼 브로스 월드 1 - Clover
 Super Penguin ~ 슈퍼 펭귄 - Sieco
-Super Suwanggi - Clover
 Tetris - Saeron
 Tom &amp; Jerry ~ 톰과 제리 - Static Soft/Aproman
 
@@ -16717,6 +16716,21 @@ legacy FM implementations cannot find it.
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="treasure (barq, 1987).rom" size="32768" crc="4aa4f14f" sha1="fd4def0c4c352d97d576cac3be03ab6139d1d1dd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- CLOVER -->
+
+	<software name="superswa">
+		<description>Super Swangi - Super Altered Beast</description>
+		<year>1990</year>
+		<publisher>Clover</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="super_swangi" />
+			<dataarea name="rom" size="65536">
+				<rom name="super_swangi.rom" size="65536" crc="c59b86a1" sha1="3d330e3c97ee3e2e362c8a0fc2cfac69af5ace81" offset="0x0" />
 			</dataarea>
 		</part>
 	</software>
