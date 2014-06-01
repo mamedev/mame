@@ -3,12 +3,15 @@
 
 
 SLOT_INTERFACE_EXTERN(msx_cart);
+SLOT_INTERFACE_EXTERN(msx_yamaha_60pin);   // 60 pin expansion slots as found in yamaha machines
 
 
 class msx_cart_interface : public device_slot_card_interface
 {
 public:
 	msx_cart_interface(const machine_config &mconfig, device_t &device);
+
+	template<class _Object> void set_out_irq_cb(_Object object) { m_out_irq_cb.set_callback(object); m_out_irq_cb.resolve_safe(); }
 
 	// This is called after loading cartridge contents and allows the cartridge
 	// implementation to perform some additional initialization based on the
@@ -36,6 +39,7 @@ protected:
 	dynamic_buffer m_rom;
 	dynamic_buffer m_ram;
 	dynamic_buffer m_sram;
+	devcb_write_line m_out_irq_cb;
 };
 
 

@@ -12,6 +12,7 @@
 #include "nomapper.h"
 #include "rtype.h"
 #include "superloderunner.h"
+#include "yamaha.h"
 
 
 SLOT_INTERFACE_START(msx_cart)
@@ -44,6 +45,7 @@ SLOT_INTERFACE_END
 
 msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
+	, m_out_irq_cb(*this)
 {
 }
 
@@ -61,3 +63,12 @@ void msx_cart_interface::sram_alloc(UINT32 size)
 {
 	m_sram.resize(size);
 }
+
+
+// Several yamaha machines had 60 pin expansion slots. The pinouts of these slots was
+// exactly the same as the regular 50 pin cartridge slots. The lowest 10 pins are simply
+// not connected.
+SLOT_INTERFACE_START(msx_yamaha_60pin)
+	SLOT_INTERFACE("sfg01", MSX_CART_SFG01)
+SLOT_INTERFACE_END
+

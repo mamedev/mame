@@ -6,11 +6,19 @@
 
 
 extern const device_type MSX_SLOT_CARTRIDGE;
+extern const device_type MSX_SLOT_YAMAHA_EXPANSION;
 
 
-#define MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag) \
+#define MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, _devcb) \
 	MCFG_DEVICE_ADD(_tag, MSX_SLOT_CARTRIDGE, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(msx_cart, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(msx_cart, NULL, false) \
+	devcb = &msx_slot_cartridge_device::set_irq_handler(*device, DEVCB_##_devcb);
+
+
+#define MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, _devcb) \
+	MCFG_DEVICE_ADD(_tag, MSX_SLOT_YAMAHA_EXPANSION, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(msx_yamaha_60pin, NULL, false) \
+	devcb = &msx_slot_cartridge_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 
 class msx_slot_cartridge_device : public device_t
@@ -20,7 +28,11 @@ class msx_slot_cartridge_device : public device_t
 {
 public:
 	// construction/destruction
+	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<msx_slot_cartridge_device &>(device).m_irq_handler.set_callback(object); }
 
 	// device-level overrides
 	virtual void device_start();
@@ -47,11 +59,25 @@ public:
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 
-private:
+	DECLARE_WRITE_LINE_MEMBER(irq_out);
+
+protected:
+	devcb_write_line m_irq_handler;
 	msx_cart_interface *m_cartridge;
 
 	int get_cart_type(UINT8 *rom, UINT32 length);
 };
+
+
+class msx_slot_yamaha_expansion_device : public msx_slot_cartridge_device
+{
+public:
+	// construction/destruction
+	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void device_start();
+};
+
 
 #endif
 

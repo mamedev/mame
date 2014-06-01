@@ -16,15 +16,40 @@
 #define VERBOSE 0
 
 
-WRITE_LINE_MEMBER(msx_state::msx_vdp_interrupt)
+void msx_state::msx_irq_source(int source, int level)
 {
-	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
+	assert(source >= 0 && source < ARRAY_LENGTH(m_irq_state));
+
+	m_irq_state[source] = level;
+	check_irq();
 }
+
+
+void msx_state::check_irq()
+{
+	int state = CLEAR_LINE;
+
+	for (int i = 0; i < ARRAY_LENGTH(m_irq_state); i++)
+	{
+		if (m_irq_state[i] != CLEAR_LINE)
+		{
+			state = ASSERT_LINE;
+		}
+	}
+
+	m_maincpu->set_input_line(0, state);
+}
+
 
 void msx_state::msx_ch_reset_core ()
 {
 	msx_memory_reset ();
 	msx_memory_map_all ();
+	for (int i = 0; i < ARRAY_LENGTH(m_irq_state); i++)
+	{
+		m_irq_state[i] = CLEAR_LINE;
+	}
+	check_irq();
 }
 
 MACHINE_START_MEMBER(msx_state,msx)

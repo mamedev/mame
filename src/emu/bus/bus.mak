@@ -420,6 +420,7 @@ BUSOBJS += $(BUSOBJ)/msx_cart/msxdos2.o
 BUSOBJS += $(BUSOBJ)/msx_cart/nomapper.o
 BUSOBJS += $(BUSOBJ)/msx_cart/rtype.o
 BUSOBJS += $(BUSOBJ)/msx_cart/superloderunner.o
+BUSOBJS += $(BUSOBJ)/msx_cart/yamaha.o
 endif
 
 

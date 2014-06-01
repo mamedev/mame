@@ -1244,7 +1244,7 @@ static MACHINE_CONFIG_DERIVED( msx_ntsc, msx )
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
  	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1254,7 +1254,7 @@ static MACHINE_CONFIG_DERIVED( msx_pal, msx )
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
  	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1285,7 +1285,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1353,7 +1353,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -2774,12 +2774,14 @@ static MACHINE_CONFIG_DERIVED( cx5m, msx_pal )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// 1 Expansion slot (60 pins interface instead of regular 50 pin cartridge interface)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 2, 2)   /* 32KB RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
-	MCFG_MSX_LAYOUT_ROM("sfg", 3, 0, 0, 2, "maincpu", 0x8000)  /* SFG */
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 0)
+//	MCFG_MSX_LAYOUT_ROM("sfg", 3, 0, 0, 2, "maincpu", 0x8000)  /* SFG */
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
 MACHINE_CONFIG_END

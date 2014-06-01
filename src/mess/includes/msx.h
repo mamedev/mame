@@ -53,7 +53,11 @@
 	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
 
 #define MCFG_MSX_LAYOUT_CARTRIDGE(_tag, _prim, _sec) \
-	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag) \
+	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, WRITELINE(msx_state, msx_irq_source1)) \
+	msx_state::install_slot_pages(*owner, _prim, _sec, 0, 4, device);
+
+#define MCFG_MSX_LAYOUT_YAMAHA_EXPANSION(_tag, _prim, _sec) \
+	MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, WRITELINE(msx_state, msx_irq_source2)) \
 	msx_state::install_slot_pages(*owner, _prim, _sec, 0, 4, device);
 
 #define MCFG_MSX_LAYOUT_RAM_MM(_tag, _prim, _sec, _total_size) \
@@ -148,6 +152,10 @@ public:
 		}
 		m_mouse[0] = m_mouse[1] = 0;
 		m_mouse_stat[0] = m_mouse_stat[1] = 0;
+		for (int i = 0; i < ARRAY_LENGTH(m_irq_state); i++)
+		{
+			m_irq_state[i] = CLEAR_LINE;
+		}
 	}
 
 	// static configuration helpers
@@ -218,7 +226,10 @@ public:
 	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
 	void msx_memory_init();
 
-	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
 
 protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : NULL; }
@@ -237,6 +248,12 @@ protected:
 	required_ioport m_io_key3;
 	required_ioport m_io_key4;
 	required_ioport m_io_key5;
+
+private:
+	int m_irq_state[4];
+
+	void msx_irq_source(int source, int level);
+	void check_irq();
 };
 
 

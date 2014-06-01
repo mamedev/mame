@@ -136,11 +136,13 @@ msx_cart_msx_audio_nms1205::msx_cart_msx_audio_nms1205(const machine_config &mco
 
 static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
+	// At the same time the sound is also output on two output on the nms1205 cartridge itself
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
 	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
+	MCFG_Y8950_IRQ_HANDLER(WRITELINE(msx_cart_msx_audio_nms1205, irq_write))
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
 
@@ -171,6 +173,16 @@ ROM_END
 const rom_entry *msx_cart_msx_audio_nms1205::device_rom_region() const
 {
 	return ROM_NAME( msx_nms1205 );
+}
+
+
+WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205::irq_write)
+{
+	// Trigger IRQ on the maincpu
+	// The 8950 seems to trigger an irq on reset, this causes an infinite loop of continuously triggering
+    // the MSX's interrupt handler. The 8950 irq will never be cleared the nms1205's irq handler hook hasn't
+	// been installed yet.
+//	m_out_irq_cb(state);
 }
 
 

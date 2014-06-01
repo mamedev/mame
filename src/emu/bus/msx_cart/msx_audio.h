@@ -47,6 +47,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart);
 
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
+	DECLARE_WRITE_LINE_MEMBER(irq_write);
 
 private:
 	required_device<y8950_device> m_y8950;
