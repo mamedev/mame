@@ -2647,34 +2647,34 @@ ROM_END
 
 ROM_START( mysticmp )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "cpu_2732_ic9_rom2_proto6.d4", 0x0e000, 0x1000, CRC(3e4f53dd) SHA1(ebe36af7367b7f1037f5d7d55817e5580db6f10f) )    /* ic9  */ // different
-	ROM_LOAD( "cpu_2732_ic10_rom3_proto6.f4", 0x0f000, 0x1000, CRC(6a25ee4b) SHA1(0668a0f3d6ddcf413d8b1f4f8f5b9a2dc9c4edc1) )   /* ic10 */ // different
+	ROM_LOAD( "cpu_2732_ic9_rom2_proto6.d4",    0x0e000, 0x1000, CRC(3e4f53dd) SHA1(ebe36af7367b7f1037f5d7d55817e5580db6f10f) ) /* ic9  */ // different
+	ROM_LOAD( "cpu_2732_ic10_rom3_proto6.f4",   0x0f000, 0x1000, CRC(6a25ee4b) SHA1(0668a0f3d6ddcf413d8b1f4f8f5b9a2dc9c4edc1) ) /* ic10 */ // different
 
-	ROM_LOAD( "cpu_2764_ic18_rom11_proto5.j8", 0x10000, 0x2000, CRC(f537968e) SHA1(2660a480d0bba5fe25885453115ef1015f8bdea9) )  /* ic18 */
-	ROM_LOAD( "cpu_2764_ic16_rom9_proto5.h8", 0x12000, 0x2000, CRC(3bd12f6c) SHA1(7925a92c486c994e8f34c8ed52bf81a34cf44f68) )   /* ic16 */
-	ROM_LOAD( "cpu_2764_ic14_rom7_proto5.j6", 0x14000, 0x2000, CRC(ea2a2a68) SHA1(71855c874cd5032f47fafc67e2d1667f956cd9b5) )   /* ic14 */
-	ROM_LOAD( "cpu_2764_ic12_rom5_proto5.h6", 0x16000, 0x2000, CRC(b514eef3) SHA1(0f9309768c416dd98e9c02121cc750993a2923ea) )   /* ic12 */
+	ROM_LOAD( "cpu_2764_ic18_rom11_proto5.j8",  0x10000, 0x2000, CRC(f537968e) SHA1(2660a480d0bba5fe25885453115ef1015f8bdea9) ) /* ic18 */
+	ROM_LOAD( "cpu_2764_ic16_rom9_proto5.h8",   0x12000, 0x2000, CRC(3bd12f6c) SHA1(7925a92c486c994e8f34c8ed52bf81a34cf44f68) ) /* ic16 */
+	ROM_LOAD( "cpu_2764_ic14_rom7_proto5.j6",   0x14000, 0x2000, CRC(ea2a2a68) SHA1(71855c874cd5032f47fafc67e2d1667f956cd9b5) ) /* ic14 */
+	ROM_LOAD( "cpu_2764_ic12_rom5_proto5.h6",   0x16000, 0x2000, CRC(b514eef3) SHA1(0f9309768c416dd98e9c02121cc750993a2923ea) ) /* ic12 */
 
 	ROM_LOAD( "cpu_2764_ic26_rom18_proto5.j10", 0x20000, 0x2000, CRC(9b391a81) SHA1(b3f34e5d468fe4a4de2d4e771e2fa08de6596f26) ) /* ic26 */
 	ROM_LOAD( "cpu_2764_ic24_rom16_proto5.h10", 0x22000, 0x2000, CRC(399e175d) SHA1(e17301e4159e5a6d83c3ca62c93eb70f34b948df) ) /* ic24 */
-	ROM_LOAD( "cpu_2764_ic22_rom14_proto5.j9", 0x24000, 0x2000, CRC(191153b1) SHA1(fcd8aa6ad6506ba51a01f777f6a3b94e9c051b1c) )  /* ic22 */
+	ROM_LOAD( "cpu_2764_ic22_rom14_proto5.j9",  0x24000, 0x2000, CRC(191153b1) SHA1(fcd8aa6ad6506ba51a01f777f6a3b94e9c051b1c) ) /* ic22 */
 
-	ROM_LOAD( "cpu_2764_ic17_rom10_proto4.i8", 0x30000, 0x2000, CRC(d6a37509) SHA1(4b1f52954ca208ccc040c017873777fbf7fbd1f2) )  /* ic17 */
-	ROM_LOAD( "cpu_2764_ic15_rom8_proto4.g8", 0x32000, 0x2000, CRC(6f1a64f2) SHA1(4183b658b257d7fe35e1d7271f76d3358df5a7a2) )   /* ic15 */
-	ROM_LOAD( "cpu_2764_ic13_rom6_proto4.i6", 0x34000, 0x2000, CRC(2e6795d4) SHA1(8b074f6a7a4b5a9705de498684180815581faea2) )   /* ic13 */
-	ROM_LOAD( "cpu_2764_ic11_rom4_proto4.g6", 0x36000, 0x2000, CRC(c222fb64) SHA1(b4c51d2b1664ef3267df1dee9e4888acf847c286) )   /* ic11 */
+	ROM_LOAD( "cpu_2764_ic17_rom10_proto4.i8",  0x30000, 0x2000, CRC(d6a37509) SHA1(4b1f52954ca208ccc040c017873777fbf7fbd1f2) ) /* ic17 */
+	ROM_LOAD( "cpu_2764_ic15_rom8_proto4.g8",   0x32000, 0x2000, CRC(6f1a64f2) SHA1(4183b658b257d7fe35e1d7271f76d3358df5a7a2) ) /* ic15 */
+	ROM_LOAD( "cpu_2764_ic13_rom6_proto4.i6",   0x34000, 0x2000, CRC(2e6795d4) SHA1(8b074f6a7a4b5a9705de498684180815581faea2) ) /* ic13 */
+	ROM_LOAD( "cpu_2764_ic11_rom4_proto4.g6",   0x36000, 0x2000, CRC(c222fb64) SHA1(b4c51d2b1664ef3267df1dee9e4888acf847c286) ) /* ic11 */
 
 	ROM_LOAD( "cpu_2764_ic25_rom17_proto6.i10", 0x40000, 0x2000, CRC(7acc9995) SHA1(a996cbd65cf7efd1cdf9b5750b5c743c5edda4dd) ) /* ic25 */ // different
 	ROM_LOAD( "cpu_2764_ic23_rom15_proto6.g10", 0x42000, 0x2000, CRC(c32d1ce5) SHA1(0df3eafbb558699382eb729a3059e99305e2e8c8) ) /* ic23 */ // different
-	ROM_LOAD( "cpu_2764_ic21_rom13_proto6.i9", 0x44000, 0x2000, CRC(e387a785) SHA1(de98d503f4d2c947c701ff96628114b34da45f93) )  /* ic21 */ // different
-	ROM_LOAD( "cpu_2764_ic19_rom12_proto6.g9", 0x46000, 0x2000, CRC(a1f04bf0) SHA1(389bdb7c9e395af9275abfb20c3ab51bc12dc4db) )  /* ic19 */
+	ROM_LOAD( "cpu_2764_ic21_rom13_proto6.i9",  0x44000, 0x2000, CRC(e387a785) SHA1(de98d503f4d2c947c701ff96628114b34da45f93) ) /* ic21 */ // different
+	ROM_LOAD( "cpu_2764_ic19_rom12_proto6.g9",  0x46000, 0x2000, CRC(a1f04bf0) SHA1(389bdb7c9e395af9275abfb20c3ab51bc12dc4db) ) /* ic19 */
 
 	/* sound cpu */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "cpu_2764_ic8_rom1_proto4.f0", 0x0e000, 0x2000, CRC(65339512) SHA1(144625d2905c953383bcc90cd2435d332394883f) )    /* ic8  */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "ram_2764_ic57_rom20_rev1.f9", 0x00000, 0x2000, CRC(5c0f4f46) SHA1(7dedbbeda2f34a2eac9fb14277874d9d66f468c7) )    /* ic57 */
+	ROM_LOAD( "ram_2764_ic57_rom20_rev1.f9",  0x00000, 0x2000, CRC(5c0f4f46) SHA1(7dedbbeda2f34a2eac9fb14277874d9d66f468c7) )   /* ic57 */
 	ROM_LOAD( "ram_2764_ic58_rom21_rev1.f10", 0x02000, 0x2000, CRC(cb90b3c5) SHA1(f28cca2c3ff23d6c9e2952a1b08ab2875655ec70) )   /* ic58 */
 	ROM_LOAD( "ram_2764_ic41_rom19_rev1.d10", 0x04000, 0x2000, CRC(e274df86) SHA1(9876a487c5efa350ced31acbc39df22c8d414677) )   /* ic41 */
 ROM_END
@@ -2719,13 +2719,13 @@ ROM_END
 
 ROM_START( inferno )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "ic9.inf",  0x0e000, 0x1000, CRC(1a013185) SHA1(9079c082ec043714f9d8ea92bc81d0b93d2ce715) )       /* IC9  */
+	ROM_LOAD( "ic9.inf",  0x0e000, 0x1000, CRC(1a013185) SHA1(9079c082ec043714f9d8ea92bc81d0b93d2ce715) )   /* IC9  */
 	ROM_LOAD( "ic10.inf", 0x0f000, 0x1000, CRC(dbf64a36) SHA1(54326bc527797f0a3a55764073eb40030aec1aae) )   /* IC10 */
 
-	ROM_LOAD( "ic18.inf", 0x10000, 0x2000, CRC(95bcf7b1) SHA1(66687a3962109a25e26ae00bddd33ed973981b91) )       /* IC18 */
-	ROM_LOAD( "ic16.inf", 0x12000, 0x2000, CRC(8bc4f935) SHA1(12da6faa71e5984047fa14f32af5bb865f228cb2) )       /* IC16 */
-	ROM_LOAD( "ic14.inf", 0x14000, 0x2000, CRC(a70508a7) SHA1(930bb9af3b6ba9fdf3e7c32f6b5ffae9acd6cee3) )       /* IC14 */
-	ROM_LOAD( "ic12.inf", 0x16000, 0x2000, CRC(7ffb87f9) SHA1(469f5ae39ad8531c4c11e9d10ab57686e7f54aef) )       /* IC12 */
+	ROM_LOAD( "ic18.inf", 0x10000, 0x2000, CRC(95bcf7b1) SHA1(66687a3962109a25e26ae00bddd33ed973981b91) )   /* IC18 */
+	ROM_LOAD( "ic16.inf", 0x12000, 0x2000, CRC(8bc4f935) SHA1(12da6faa71e5984047fa14f32af5bb865f228cb2) )   /* IC16 */
+	ROM_LOAD( "ic14.inf", 0x14000, 0x2000, CRC(a70508a7) SHA1(930bb9af3b6ba9fdf3e7c32f6b5ffae9acd6cee3) )   /* IC14 */
+	ROM_LOAD( "ic12.inf", 0x16000, 0x2000, CRC(7ffb87f9) SHA1(469f5ae39ad8531c4c11e9d10ab57686e7f54aef) )   /* IC12 */
 
 	ROM_LOAD( "ic17.inf", 0x30000, 0x2000, CRC(b4684139) SHA1(c1d6ecd3dc8191250ef70e6972dad234c0d8f739) )   /* IC17 */
 	ROM_LOAD( "ic15.inf", 0x32000, 0x2000, CRC(128a6ad6) SHA1(357438e50663d6cb96dabfa5110c17836584e15f) )   /* IC15 */
@@ -2739,7 +2739,7 @@ ROM_START( inferno )
 
 	/* sound CPU */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ic8.inf", 0x0e000, 0x2000, CRC(4e3123b8) SHA1(f453feed3ae3b6430db49eb4325f62eecfee9f5e) )        /* IC8  */
+	ROM_LOAD( "ic8.inf", 0x0e000, 0x2000, CRC(4e3123b8) SHA1(f453feed3ae3b6430db49eb4325f62eecfee9f5e) )    /* IC8  */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "ic57.inf", 0x00000, 0x2000, CRC(65a4ef79) SHA1(270c58901e83665bc388cd9cb92022c55e8eae50) )   /* IC57 */
@@ -2750,28 +2750,28 @@ ROM_END
 
 ROM_START( joust2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "cpu_2732_ic55_rom2_rev1.4c", 0x0d000, 0x1000, CRC(08b0d5bd) SHA1(b58da478aef36ae20fcfee48151d5d556e16b7b9) )
-	ROM_LOAD( "cpu_2732_ic9_rom3_rev2.4d", 0x0e000, 0x1000, CRC(951175ce) SHA1(ac70df125bb438f9fccc082276df4a76ff693e16) )
-	ROM_LOAD( "cpu_2732_ic10_rom4_rev2.4f", 0x0f000, 0x1000, CRC(ba6e0f6c) SHA1(431cbf38e919011d030f41008e1ad45e7e0ec38b) )
+	ROM_LOAD( "cpu_2732_ic55_rom2_rev1.4c",   0x0d000, 0x1000, CRC(08b0d5bd) SHA1(b58da478aef36ae20fcfee48151d5d556e16b7b9) )
+	ROM_LOAD( "cpu_2732_ic9_rom3_rev2.4d",    0x0e000, 0x1000, CRC(951175ce) SHA1(ac70df125bb438f9fccc082276df4a76ff693e16) )
+	ROM_LOAD( "cpu_2732_ic10_rom4_rev2.4f",   0x0f000, 0x1000, CRC(ba6e0f6c) SHA1(431cbf38e919011d030f41008e1ad45e7e0ec38b) )
 
-	ROM_LOAD( "cpu_2732_ic18_rom11_rev1.8j", 0x10000, 0x2000, CRC(9dc986f9) SHA1(5ce479936536ef713cdfc8fc8190d338c46d171e) )
-	ROM_LOAD( "cpu_2732_ic16_rom9_rev2.8h", 0x12000, 0x2000, CRC(56e2b550) SHA1(01211d389ca384987d56c26596aa8c1adffdf8dd) )
-	ROM_LOAD( "cpu_2732_ic14_rom7_rev2.6j", 0x14000, 0x2000, CRC(f3bce576) SHA1(30ee1b212879b3b55b47c9064f123fb77c8f3089) )
-	ROM_LOAD( "cpu_2732_ic12_rom5_rev2.6h", 0x16000, 0x2000, CRC(5f8b4919) SHA1(1215a314c07ef4f244e862743035626cac1d9538) )
+	ROM_LOAD( "cpu_2732_ic18_rom11_rev1.8j",  0x10000, 0x2000, CRC(9dc986f9) SHA1(5ce479936536ef713cdfc8fc8190d338c46d171e) )
+	ROM_LOAD( "cpu_2732_ic16_rom9_rev2.8h",   0x12000, 0x2000, CRC(56e2b550) SHA1(01211d389ca384987d56c26596aa8c1adffdf8dd) )
+	ROM_LOAD( "cpu_2732_ic14_rom7_rev2.6j",   0x14000, 0x2000, CRC(f3bce576) SHA1(30ee1b212879b3b55b47c9064f123fb77c8f3089) )
+	ROM_LOAD( "cpu_2732_ic12_rom5_rev2.6h",   0x16000, 0x2000, CRC(5f8b4919) SHA1(1215a314c07ef4f244e862743035626cac1d9538) )
 
 	ROM_LOAD( "cpu_2732_ic26_rom19_rev1.10j", 0x20000, 0x2000, CRC(4ef5e805) SHA1(98b93388ab4a4fa6eeceee3386fa46f5a307b8cb) )
 	ROM_LOAD( "cpu_2732_ic24_rom17_rev1.10h", 0x22000, 0x2000, CRC(4861f063) SHA1(6db00cce230bf4bdfdfbfe59e0dc2d916b84d0dc) )
-	ROM_LOAD( "cpu_2732_ic22_rom15_rev1.9j", 0x24000, 0x2000, CRC(421aafa8) SHA1(06187ba8fef3e89eb399d7040015212bd5f86853) )
-	ROM_LOAD( "cpu_2732_ic20_rom13_rev1.9h", 0x26000, 0x2000, CRC(3432ff55) SHA1(aec0f83b92369de8a830ec298ac490a51bc29f26) )
+	ROM_LOAD( "cpu_2732_ic22_rom15_rev1.9j",  0x24000, 0x2000, CRC(421aafa8) SHA1(06187ba8fef3e89eb399d7040015212bd5f86853) )
+	ROM_LOAD( "cpu_2732_ic20_rom13_rev1.9h",  0x26000, 0x2000, CRC(3432ff55) SHA1(aec0f83b92369de8a830ec298ac490a51bc29f26) )
 
-	ROM_LOAD( "cpu_2732_ic17_rom10_rev1.8i", 0x30000, 0x2000, CRC(3e01b597) SHA1(17d09482636d6cda2f3266152396f0461121e748) )
-	ROM_LOAD( "cpu_2732_ic15_rom8_rev1.8g", 0x32000, 0x2000, CRC(ff26fb29) SHA1(5ad498db71c384c1928ec965ba3cad48af428f19) )
-	ROM_LOAD( "cpu_2732_ic13_rom6_rev2.6i", 0x34000, 0x2000, CRC(5f107db5) SHA1(c413a2e58853ccda602515b9668a6a620294ba49) )
+	ROM_LOAD( "cpu_2732_ic17_rom10_rev1.8i",  0x30000, 0x2000, CRC(3e01b597) SHA1(17d09482636d6cda2f3266152396f0461121e748) )
+	ROM_LOAD( "cpu_2732_ic15_rom8_rev1.8g",   0x32000, 0x2000, CRC(ff26fb29) SHA1(5ad498db71c384c1928ec965ba3cad48af428f19) )
+	ROM_LOAD( "cpu_2732_ic13_rom6_rev2.6i",   0x34000, 0x2000, CRC(5f107db5) SHA1(c413a2e58853ccda602515b9668a6a620294ba49) )
 
 	ROM_LOAD( "cpu_2732_ic25_rom18_rev1.10i", 0x40000, 0x2000, CRC(47580af5) SHA1(d2728f32f02b549c7e9691c668f0097e327a1d2d) )
 	ROM_LOAD( "cpu_2732_ic23_rom16_rev1.10g", 0x42000, 0x2000, CRC(869b5942) SHA1(a3f4bab4c0db71589e9be2bbf1f94052ef2f56da) )
-	ROM_LOAD( "cpu_2732_ic21_rom14_rev1.9i", 0x44000, 0x2000, CRC(0bbd867c) SHA1(f2db9fc57b6afb762715617345e8c3dcb89b6cc2) )
-	ROM_LOAD( "cpu_2732_ic19_rom12_rev1.9g", 0x46000, 0x2000, CRC(b9221ed1) SHA1(428ea8f3e2fa58d875f581f5de6e0d05ed855a45) )
+	ROM_LOAD( "cpu_2732_ic21_rom14_rev1.9i",  0x44000, 0x2000, CRC(0bbd867c) SHA1(f2db9fc57b6afb762715617345e8c3dcb89b6cc2) )
+	ROM_LOAD( "cpu_2732_ic19_rom12_rev1.9g",  0x46000, 0x2000, CRC(b9221ed1) SHA1(428ea8f3e2fa58d875f581f5de6e0d05ed855a45) )
 
 	/* sound CPU */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2779,7 +2779,7 @@ ROM_START( joust2 )
 
 	/* sound board */
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
-	ROM_LOAD( "snd_27256_rom23_rev1.u4", 0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
+	ROM_LOAD( "snd_27256_rom23_rev1.u4",  0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
 	ROM_RELOAD(             0x18000, 0x8000 )
 	ROM_RELOAD(             0x20000, 0x8000 )
 	ROM_RELOAD(             0x28000, 0x8000 )
@@ -2805,28 +2805,28 @@ ROM_END
 
 ROM_START( joust2r1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "cpu_2732_ic55_rom2_rev1.4c", 0x0d000, 0x1000, CRC(08b0d5bd) SHA1(b58da478aef36ae20fcfee48151d5d556e16b7b9) )
-	ROM_LOAD( "cpu_2732_ic9_rom3_rev1.4d", 0x0e000, 0x1000,  CRC(6f319644) SHA1(1a9bc121b830277c42bac816ec26758c915b49dd) )
-	ROM_LOAD( "cpu_2732_ic10_rom4_rev1.4f", 0x0f000, 0x1000, CRC(027b9f0c) SHA1(8c4631fc42ed0b87b2bb0326c48b92d73cdd2f42) )
+	ROM_LOAD( "cpu_2732_ic55_rom2_rev1.4c",   0x0d000, 0x1000, CRC(08b0d5bd) SHA1(b58da478aef36ae20fcfee48151d5d556e16b7b9) )
+	ROM_LOAD( "cpu_2732_ic9_rom3_rev1.4d",    0x0e000, 0x1000, CRC(6f319644) SHA1(1a9bc121b830277c42bac816ec26758c915b49dd) )
+	ROM_LOAD( "cpu_2732_ic10_rom4_rev1.4f",   0x0f000, 0x1000, CRC(027b9f0c) SHA1(8c4631fc42ed0b87b2bb0326c48b92d73cdd2f42) )
 
-	ROM_LOAD( "cpu_2732_ic18_rom11_rev1.8j", 0x10000, 0x2000, CRC(9dc986f9) SHA1(5ce479936536ef713cdfc8fc8190d338c46d171e) )
-	ROM_LOAD( "cpu_2732_ic16_rom9_rev1.8h", 0x12000, 0x2000, CRC(0c77e22f) SHA1(db024b8d2fe79f9230c07398bcade1c75e772541) )
-	ROM_LOAD( "cpu_2732_ic14_rom7_rev1.6j", 0x14000, 0x2000, CRC(fb9455ca) SHA1(8963832f2ab6f5b2f31611e768cab636672f398c) )
-	ROM_LOAD( "cpu_2732_ic12_rom5_rev1.6h", 0x16000, 0x2000, CRC(31248a0d) SHA1(a27a252b353f99748aacfeb29c8bbbd8b3a833f2) )
+	ROM_LOAD( "cpu_2732_ic18_rom11_rev1.8j",  0x10000, 0x2000, CRC(9dc986f9) SHA1(5ce479936536ef713cdfc8fc8190d338c46d171e) )
+	ROM_LOAD( "cpu_2732_ic16_rom9_rev1.8h",   0x12000, 0x2000, CRC(0c77e22f) SHA1(db024b8d2fe79f9230c07398bcade1c75e772541) )
+	ROM_LOAD( "cpu_2732_ic14_rom7_rev1.6j",   0x14000, 0x2000, CRC(fb9455ca) SHA1(8963832f2ab6f5b2f31611e768cab636672f398c) )
+	ROM_LOAD( "cpu_2732_ic12_rom5_rev1.6h",   0x16000, 0x2000, CRC(31248a0d) SHA1(a27a252b353f99748aacfeb29c8bbbd8b3a833f2) )
 
 	ROM_LOAD( "cpu_2732_ic26_rom19_rev1.10j", 0x20000, 0x2000, CRC(4ef5e805) SHA1(98b93388ab4a4fa6eeceee3386fa46f5a307b8cb) )
 	ROM_LOAD( "cpu_2732_ic24_rom17_rev1.10h", 0x22000, 0x2000, CRC(4861f063) SHA1(6db00cce230bf4bdfdfbfe59e0dc2d916b84d0dc) )
-	ROM_LOAD( "cpu_2732_ic22_rom15_rev1.9j", 0x24000, 0x2000, CRC(421aafa8) SHA1(06187ba8fef3e89eb399d7040015212bd5f86853) )
-	ROM_LOAD( "cpu_2732_ic20_rom13_rev1.9h", 0x26000, 0x2000, CRC(3432ff55) SHA1(aec0f83b92369de8a830ec298ac490a51bc29f26) )
+	ROM_LOAD( "cpu_2732_ic22_rom15_rev1.9j",  0x24000, 0x2000, CRC(421aafa8) SHA1(06187ba8fef3e89eb399d7040015212bd5f86853) )
+	ROM_LOAD( "cpu_2732_ic20_rom13_rev1.9h",  0x26000, 0x2000, CRC(3432ff55) SHA1(aec0f83b92369de8a830ec298ac490a51bc29f26) )
 
-	ROM_LOAD( "cpu_2732_ic17_rom10_rev1.8i", 0x30000, 0x2000, CRC(3e01b597) SHA1(17d09482636d6cda2f3266152396f0461121e748) )
-	ROM_LOAD( "cpu_2732_ic15_rom8_rev1.8g", 0x32000, 0x2000, CRC(ff26fb29) SHA1(5ad498db71c384c1928ec965ba3cad48af428f19) )
-	ROM_LOAD( "cpu_2732_ic13_rom6_rev1.6i", 0x34000, 0x2000, CRC(6a8c87d7) SHA1(ba66cd8f23a249470c612890829d40d070bbd1e9) )
+	ROM_LOAD( "cpu_2732_ic17_rom10_rev1.8i",  0x30000, 0x2000, CRC(3e01b597) SHA1(17d09482636d6cda2f3266152396f0461121e748) )
+	ROM_LOAD( "cpu_2732_ic15_rom8_rev1.8g",   0x32000, 0x2000, CRC(ff26fb29) SHA1(5ad498db71c384c1928ec965ba3cad48af428f19) )
+	ROM_LOAD( "cpu_2732_ic13_rom6_rev1.6i",   0x34000, 0x2000, CRC(6a8c87d7) SHA1(ba66cd8f23a249470c612890829d40d070bbd1e9) )
 
 	ROM_LOAD( "cpu_2732_ic25_rom18_rev1.10i", 0x40000, 0x2000, CRC(47580af5) SHA1(d2728f32f02b549c7e9691c668f0097e327a1d2d) )
 	ROM_LOAD( "cpu_2732_ic23_rom16_rev1.10g", 0x42000, 0x2000, CRC(869b5942) SHA1(a3f4bab4c0db71589e9be2bbf1f94052ef2f56da) )
-	ROM_LOAD( "cpu_2732_ic21_rom14_rev1.9i", 0x44000, 0x2000, CRC(0bbd867c) SHA1(f2db9fc57b6afb762715617345e8c3dcb89b6cc2) )
-	ROM_LOAD( "cpu_2732_ic19_rom12_rev1.9g", 0x46000, 0x2000, CRC(b9221ed1) SHA1(428ea8f3e2fa58d875f581f5de6e0d05ed855a45) )
+	ROM_LOAD( "cpu_2732_ic21_rom14_rev1.9i",  0x44000, 0x2000, CRC(0bbd867c) SHA1(f2db9fc57b6afb762715617345e8c3dcb89b6cc2) )
+	ROM_LOAD( "cpu_2732_ic19_rom12_rev1.9g",  0x46000, 0x2000, CRC(b9221ed1) SHA1(428ea8f3e2fa58d875f581f5de6e0d05ed855a45) )
 
 	/* sound CPU */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2834,7 +2834,7 @@ ROM_START( joust2r1 )
 
 	/* sound board */
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
-	ROM_LOAD( "snd_27256_rom23_rev1.u4", 0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
+	ROM_LOAD( "snd_27256_rom23_rev1.u4",  0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
 	ROM_RELOAD(             0x18000, 0x8000 )
 	ROM_RELOAD(             0x20000, 0x8000 )
 	ROM_RELOAD(             0x28000, 0x8000 )
