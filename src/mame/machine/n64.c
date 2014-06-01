@@ -2412,10 +2412,10 @@ void n64_state::machine_start()
 	rsp_imem = reinterpret_cast<UINT32 *>(memshare("rsp_imem")->ptr());
 	rsp_dmem = reinterpret_cast<UINT32 *>(memshare("rsp_dmem")->ptr());
 
-	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
+	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
+	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
 
 	rspdrc_set_options(machine().device("rsp"), RSPDRC_STRICT_VERIFY);
 	rspdrc_flush_drc_cache(machine().device("rsp"));

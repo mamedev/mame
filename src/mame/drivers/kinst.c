@@ -177,7 +177,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
 
@@ -201,12 +201,12 @@ protected:
 void kinst_state::machine_start()
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(m_maincpu, 0x08000000, 0x087fffff, FALSE, m_rambase2);
-	mips3drc_add_fastram(m_maincpu, 0x00000000, 0x0007ffff, FALSE, m_rambase);
-	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->mips3drc_add_fastram(0x08000000, 0x087fffff, FALSE, m_rambase2);
+	m_maincpu->mips3drc_add_fastram(0x00000000, 0x0007ffff, FALSE, m_rambase);
+	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 }
 
 
@@ -669,17 +669,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config r4600_config =
-{
-	16384,              /* code cache size */
-	16384               /* data cache size */
-};
-
 static MACHINE_CONFIG_START( kinst, kinst_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
-	MCFG_CPU_CONFIG(r4600_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 

@@ -810,19 +810,14 @@ static INPUT_PORTS_START( srmvs )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* ?? */
-static const mips3_config vr4300_config =
-{
-	16384,              /* code cache size */
-	8192,               /* data cache size */
-	62500000            /* system clock */
-};
 
 static MACHINE_CONFIG_START( aleck64, aleck64_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
-	MCFG_CPU_CONFIG(vr4300_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(8192)
+	MCFG_MIPS3_SYSTEM_CLOCK(62500000)
 	MCFG_CPU_PROGRAM_MAP(n64_map)
 
 	MCFG_CPU_ADD("rsp", RSP, 62500000)

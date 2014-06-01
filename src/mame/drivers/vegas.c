@@ -466,7 +466,7 @@ public:
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_device<m48t37_device> m_timekeeper;
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<smc91c94_device> m_ethernet;
@@ -593,11 +593,11 @@ void vegas_state::machine_start()
 		m_dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(m_maincpu, 0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
-	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	m_maincpu->mips3drc_add_fastram(0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
+	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_nile_irq_state));
@@ -2206,18 +2206,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config r5000_config =
-{
-	16384,          /* code cache size */
-	16384,          /* data cache size */
-	SYSTEM_CLOCK    /* system clock rate */
-};
-
 static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*2)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MCFG_M48T37_ADD("timekeeper")
@@ -2276,7 +2271,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m )
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
@@ -2290,7 +2287,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( denver, vegascore )
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
@@ -2602,37 +2601,37 @@ ROM_END
 DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 {
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x80015430, 0x8CC38060, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80015464, 0x3C09801E, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800C8918, 0x8FA2004C, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800C8890, 0x8FA20024, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80015430, 0x8CC38060, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80015464, 0x3C09801E, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800C8918, 0x8FA2004C, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800C8890, 0x8FA20024, 250);     /* confirmed */
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 {
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800158EC, 0x3C0C8022, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800D40C0, 0x8FA2004C, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800D4038, 0x8FA20024, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800158EC, 0x3C0C8022, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800D40C0, 0x8FA2004C, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800D4038, 0x8FA20024, 250);     /* confirmed */
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,warfa)
 {
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x8009436C, 0x0C031663, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8009436C, 0x0C031663, 250);     /* confirmed */
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 {
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x80051CD8, 0x0C023C15, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x8005E674, 0x3C028017, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x8002DBCC, 0x8FA2002C, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80015930, 0x8FC20244, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80051CD8, 0x0C023C15, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8005E674, 0x3C028017, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8002DBCC, 0x8FA2002C, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80015930, 0x8FC20244, 250);     /* confirmed */
 }
 
 

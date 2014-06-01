@@ -21,9 +21,9 @@
 //  mips3_frontend - constructor
 //-------------------------------------------------
 
-mips3_frontend::mips3_frontend(mips3_state &state, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
-	: drc_frontend(*state.device, window_start, window_end, max_sequence),
-		m_context(state)
+mips3_frontend::mips3_frontend(mips3_device *mips3, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
+	: drc_frontend(*mips3, window_start, window_end, max_sequence),
+		m_mips3(mips3)
 {
 }
 
@@ -39,7 +39,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	// compute the physical PC
 	assert((desc.physpc & 3) == 0);
-	if (!mips3com_translate_address(&m_context, AS_PROGRAM, TRANSLATE_FETCH, &desc.physpc))
+	if (!m_mips3->memory_translate(AS_PROGRAM, TRANSLATE_FETCH, desc.physpc))
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here
@@ -49,7 +49,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	// fetch the opcode
 	assert((desc.physpc & 3) == 0);
-	op = desc.opptr.l[0] = m_context.direct->read_decrypted_dword(desc.physpc);
+	op = desc.opptr.l[0] = m_mips3->m_direct->read_decrypted_dword(desc.physpc);
 
 	// all instructions are 4 bytes and default to a single cycle each
 	desc.length = 4;
@@ -75,7 +75,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			return describe_cop2(op, desc);
 
 		case 0x13:  // COP1X - MIPS IV
-			if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
 			return describe_cop1x(op, desc);
 
@@ -214,7 +214,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			return true;
 
 		case 0x33:  // PREF
-			if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
 		case 0x2f:  // CACHE
 			// effective no-op
@@ -249,7 +249,7 @@ bool mips3_frontend::describe_special(UINT32 op, opcode_desc &desc)
 
 		case 0x0a:  // MOVZ - MIPS IV
 		case 0x0b:  // MOVN - MIPS IV
-			if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
 			desc.regin[0] |= REGFLAG_R(RDREG);
 		case 0x04:  // SLLV
@@ -292,7 +292,7 @@ bool mips3_frontend::describe_special(UINT32 op, opcode_desc &desc)
 			return true;
 
 		case 0x01:  // MOVF - MIPS IV
-			if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
 			desc.regin[0] |= REGFLAG_R(RSREG);
 			desc.regin[2] |= REGFLAG_FCC;
@@ -441,7 +441,7 @@ bool mips3_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 bool mips3_frontend::describe_idt(UINT32 op, opcode_desc &desc)
 {
 	// only on the R4650
-	if (m_context.flavor != MIPS3_TYPE_R4650)
+	if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_R4650)
 		return false;
 
 	switch (op & 0x1f)
@@ -593,7 +593,7 @@ bool mips3_frontend::describe_cop1(UINT32 op, opcode_desc &desc)
 			{
 				case 0x12:  // MOVZ - MIPS IV
 				case 0x13:  // MOVN - MIPS IV
-					if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+					if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 						return false;
 				case 0x00:  // ADD
 				case 0x01:  // SUB
@@ -605,7 +605,7 @@ bool mips3_frontend::describe_cop1(UINT32 op, opcode_desc &desc)
 
 				case 0x15:  // RECIP - MIPS IV
 				case 0x16:  // RSQRT - MIPS IV
-					if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+					if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 						return false;
 				case 0x04:  // SQRT
 				case 0x05:  // ABS
@@ -628,7 +628,7 @@ bool mips3_frontend::describe_cop1(UINT32 op, opcode_desc &desc)
 					return true;
 
 				case 0x11:  // MOVT/F - MIPS IV
-					if (m_context.flavor < MIPS3_TYPE_MIPS_IV)
+					if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 						return false;
 					desc.regin[1] |= REGFLAG_CPR1(FSREG);
 					desc.regin[2] |= REGFLAG_FCC;

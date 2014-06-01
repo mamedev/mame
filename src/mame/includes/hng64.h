@@ -1,4 +1,5 @@
 #include "machine/msm6242.h"
+#include "cpu/mips/mips3.h"
 
 enum
 {
@@ -41,7 +42,7 @@ public:
 		m_generic_paletteram_32(*this, "paletteram")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;

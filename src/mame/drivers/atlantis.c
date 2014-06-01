@@ -51,7 +51,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_device<dcs2_audio_denver_device> m_dcs;
 };
 
@@ -65,7 +65,7 @@ public:
 void atlantis_state::machine_start()
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 }
 
 
@@ -130,17 +130,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config r4310_config =
-{
-	16384,              /* code cache size */
-	16384               /* data cache size */
-};
-
 static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED
-	MCFG_CPU_CONFIG(r4310_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 

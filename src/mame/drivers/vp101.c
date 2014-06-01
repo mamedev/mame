@@ -34,7 +34,7 @@ public:
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void video_start();
@@ -74,16 +74,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vp101 )
 INPUT_PORTS_END
 
-static const mips3_config r5000_config =
-{
-	32768,              /* code cache size */
-	32768,              /* data cache size */
-	100000000           /* system (bus) clock */
-};
 
 static MACHINE_CONFIG_START( vp101, vp10x_state )
 	MCFG_CPU_ADD("maincpu", R5000LE, 300000000) /* actually VR5500 with added NEC VR-series custom instructions */
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(32768)
+	MCFG_MIPS3_DCACHE_SIZE(32768)
+	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

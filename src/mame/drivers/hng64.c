@@ -1833,13 +1833,6 @@ DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
 }
 
 
-/* ?? */
-static const mips3_config vr4300_config =
-{
-	16384,              /* code cache size */
-	16384               /* data cache size */
-};
-
 void hng64_state::m_set_irq(UINT32 irq_vector)
 {
 	/*
@@ -1902,12 +1895,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 void hng64_state::machine_start()
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(m_maincpu, 0x00000000, 0x00ffffff, FALSE, m_mainram);
-	mips3drc_add_fastram(m_maincpu, 0x04000000, 0x05ffffff, TRUE,  m_cart);
-	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->mips3drc_add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
+	m_maincpu->mips3drc_add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
+	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	m_comm_rom = memregion("user2")->base();
 	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
@@ -1942,7 +1935,8 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK)     // actually R4300
-	MCFG_CPU_CONFIG(vr4300_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_CPU_PROGRAM_MAP(hng_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
 

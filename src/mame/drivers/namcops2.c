@@ -128,16 +128,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
-static const mips3_config r5000_config =
-{
-	16384,              /* code cache size - probably wrong */
-	16384               /* data cache size */
-};
-
 static MACHINE_CONFIG_START( system246, namcops2_state )
 	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_CPU_PROGRAM_MAP(ps2_map)
-	MCFG_CPU_CONFIG(r5000_config)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -446,7 +446,7 @@ public:
 	required_shared_ptr<UINT32> m_interrupt_config;
 	required_shared_ptr<UINT32> m_asic_reset;
 	required_shared_ptr<UINT32> m_rombase;
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_device<bus_master_ide_controller_device> m_ide;
 	optional_device<smc91c94_device> m_ethernet;
 	optional_device<atari_cage_seattle_device> m_cage;
@@ -564,11 +564,11 @@ void seattle_state::machine_start()
 	m_galileo.timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(m_maincpu, 0x00000000, 0x007fffff, FALSE, m_rambase);
-	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->mips3drc_add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
+	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_galileo.reg));
@@ -2506,18 +2506,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config r5000_config =
-{
-	16384,      /* code cache size */
-	16384,      /* data cache size */
-	SYSTEM_CLOCK    /* system clock rate */
-};
-
 static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -2546,14 +2541,18 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( phoenixsa, seattle_common )
 	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
@@ -2566,7 +2565,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( seattle200, seattle_common )
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
@@ -2578,7 +2579,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
 	MCFG_SMC91C94_ADD("ethernet")
@@ -3003,9 +3006,9 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 	init_common(PHOENIX_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x8004413C, 0x0C0054B4, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80094930, 0x00A2102B, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80092984, 0x3C028011, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8004413C, 0x0C0054B4, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80094930, 0x00A2102B, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80092984, 0x3C028011, 250);     /* confirmed */
 }
 
 
@@ -3014,7 +3017,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 	init_common(SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x800108F8, 0x8C420000, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800108F8, 0x8C420000, 250);     /* confirmed */
 }
 
 
@@ -3023,9 +3026,9 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 	init_common(FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x80059F34, 0x3C028012, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800A5AF4, 0x8E300010, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x8004C260, 0x3C028012, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80059F34, 0x3C028012, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800A5AF4, 0x8E300010, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8004C260, 0x3C028012, 250);     /* confirmed */
 }
 
 
@@ -3034,10 +3037,10 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 	init_common(FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x800343E8, 0x3C028012, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x8008F4F0, 0x3C028012, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800A365C, 0x8E300014, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80051DAC, 0x3C028012, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800343E8, 0x3C028012, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8008F4F0, 0x3C028012, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800A365C, 0x8E300014, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80051DAC, 0x3C028012, 250);     /* confirmed */
 }
 
 
@@ -3046,8 +3049,8 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 	init_common(SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x80032534, 0x02221024, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800B1BE4, 0x8E110014, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80032534, 0x02221024, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800B1BE4, 0x8E110014, 250);     /* confirmed */
 }
 
 
@@ -3056,9 +3059,9 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 	init_common(SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x80049F14, 0x3C028020, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x8004859C, 0x3C028020, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x8005922C, 0x8E020014, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80049F14, 0x3C028020, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8004859C, 0x3C028020, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8005922C, 0x8E020014, 250);     /* confirmed */
 }
 
 
@@ -3076,8 +3079,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 	m_rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x80135510, 0x3C028024, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x800087DC, 0x8E820010, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80135510, 0x3C028024, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x800087DC, 0x8E820010, 250);     /* confirmed */
 }
 
 
@@ -3086,8 +3089,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 	init_common(SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x8014E41C, 0x3C038025, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80011F10, 0x8E020018, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8014E41C, 0x3C038025, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80011F10, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -3096,8 +3099,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 	init_common(SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x8015773C, 0x3C038025, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80012CA8, 0x8E020018, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8015773C, 0x3C038025, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80012CA8, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -3109,8 +3112,8 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x8015176C, 0x3C03801A, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80011FBC, 0x8E020018, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x8015176C, 0x3C03801A, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80011FBC, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -3119,9 +3122,9 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 	init_common(SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(m_maincpu, 0x801643BC, 0x3C03801B, 250);     /* confirmed */
-	mips3drc_add_hotspot(m_maincpu, 0x80011FB8, 0x8E020018, 250);     /* confirmed */
-	//mips3drc_add_hotspot(m_maincpu, 0x80136A80, 0x3C02801D, 250);      /* potential */
+	m_maincpu->mips3drc_add_hotspot(0x801643BC, 0x3C03801B, 250);     /* confirmed */
+	m_maincpu->mips3drc_add_hotspot(0x80011FB8, 0x8E020018, 250);     /* confirmed */
+	//m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250);      /* potential */
 }
 
 

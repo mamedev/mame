@@ -112,7 +112,7 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
 	required_shared_ptr<UINT32> m_unkpbus0;
 	required_shared_ptr<UINT32> m_mainram;
@@ -1222,7 +1222,7 @@ void ip22_state::machine_reset()
 
 	m_PBUS_DMA.nActive = 0;
 
-	mips3drc_set_options(m_maincpu, MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 void ip22_state::dump_chain(address_space &space, UINT32 ch_base)

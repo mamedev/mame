@@ -16,6 +16,55 @@
 
 
 /***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define PRINTF_TLB              (0)
+#define USE_ABI_REG_NAMES       (1)
+
+#define LOG_UML                         (0)
+#define LOG_NATIVE                      (0)
+
+#define DISABLE_FAST_REGISTERS          (0)
+#define SINGLE_INSTRUCTION_MODE         (0)
+
+#define PRINTF_EXCEPTIONS               (0)
+#define PRINTF_MMU                      (0)
+
+#define PROBE_ADDRESS                   ~0
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* map variables */
+#define MAPVAR_PC                       M0
+#define MAPVAR_CYCLES                   M1
+
+/* modes */
+#define MODE_KERNEL                     0
+#define MODE_SUPER                      1
+#define MODE_USER                       2
+
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES         128
+#define COMPILE_FORWARDS_BYTES          512
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define COMPILE_MAX_SEQUENCE            64
+
+/* exit codes */
+#define EXECUTE_OUT_OF_CYCLES           0
+#define EXECUTE_MISSING_CODE            1
+#define EXECUTE_UNMAPPED_CODE           2
+#define EXECUTE_RESET_CACHE             3
+
+
+
+#define LOPTR(x)                ((UINT32 *)(x) + NATIVE_ENDIAN_VALUE_LE_BE(0,1))
+
+
+/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
@@ -24,28 +73,10 @@
 #define MIPS3_MIN_PAGE_SIZE         (1 << MIPS3_MIN_PAGE_SHIFT)
 #define MIPS3_MIN_PAGE_MASK         (MIPS3_MIN_PAGE_SIZE - 1)
 #define MIPS3_MAX_PADDR_SHIFT       32
-#define MIPS3_MAX_TLB_ENTRIES       48
 
 /* cycle parameters */
 #define MIPS3_COUNT_READ_CYCLES     250
 #define MIPS3_CAUSE_READ_CYCLES     250
-
-/* MIPS flavors */
-enum mips3_flavor
-{
-	/* MIPS III variants */
-	MIPS3_TYPE_MIPS_III,
-	MIPS3_TYPE_VR4300,
-	MIPS3_TYPE_R4600,
-	MIPS3_TYPE_R4650,
-	MIPS3_TYPE_R4700,
-
-	/* MIPS IV variants */
-	MIPS3_TYPE_MIPS_IV,
-	MIPS3_TYPE_R5000,
-	MIPS3_TYPE_QED5271,
-	MIPS3_TYPE_RM7000
-};
 
 /* TLB bits */
 #define TLB_GLOBAL              0x01
@@ -157,110 +188,5 @@ enum mips3_flavor
 #define UIMMVAL         ((UINT16)op)
 #define LIMMVAL         (op & 0x03ffffff)
 
-
-
-/***************************************************************************
-    STRUCTURES & TYPEDEFS
-***************************************************************************/
-
-/* MIPS3 TLB entry */
-struct mips3_tlb_entry
-{
-	UINT64          page_mask;
-	UINT64          entry_hi;
-	UINT64          entry_lo[2];
-};
-
-
-/* forward declaration of implementation-specific state */
-struct mips3imp_state;
-
-
-/* MIPS3 state */
-struct mips3_state
-{
-	/* core registers */
-	UINT32          pc;
-	int             icount;
-	UINT64          r[35];
-
-	/* COP registers */
-	UINT64          cpr[3][32];
-	UINT64          ccr[3][32];
-	UINT32          llbit;
-
-	/* internal stuff */
-	mips3_flavor    flavor;
-	device_irq_acknowledge_delegate irq_callback;
-	legacy_cpu_device * device;
-	address_space *program;
-	direct_read_data *direct;
-	UINT32          system_clock;
-	UINT32          cpu_clock;
-	UINT64          count_zero_time;
-	UINT32          compare_armed;
-	emu_timer *     compare_int_timer;
-
-	/* derived info based on flavor */
-	UINT32          pfnmask;
-	UINT8           tlbentries;
-
-	/* memory accesses */
-	UINT8           bigendian;
-	data_accessors  memory;
-
-	/* cache memory */
-	size_t          icache_size;
-	size_t          dcache_size;
-
-	/* MMU */
-	vtlb_state *    vtlb;
-	mips3_tlb_entry tlb[MIPS3_MAX_TLB_ENTRIES];
-
-	/* for use by specific implementations */
-	mips3imp_state *impstate;
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_acknowledge_delegate irqcallback);
-void mips3com_exit(mips3_state *mips);
-
-void mips3com_reset(mips3_state *mips);
-offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-void mips3com_update_cycle_counting(mips3_state *mips);
-
-void mips3com_asid_changed(mips3_state *mips);
-int mips3com_translate_address(mips3_state *mips, address_spacenum space, int intention, offs_t *address);
-void mips3com_tlbr(mips3_state *mips);
-void mips3com_tlbwi(mips3_state *mips);
-void mips3com_tlbwr(mips3_state *mips);
-void mips3com_tlbp(mips3_state *mips);
-
-void mips3com_set_info(mips3_state *mips, UINT32 state, cpuinfo *info);
-void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    mips3com_set_irq_line - set or clear the given
-    IRQ line
--------------------------------------------------*/
-
-INLINE void mips3com_set_irq_line(mips3_state *mips, int irqline, int state)
-{
-	if (state != CLEAR_LINE)
-		mips->cpr[0][COP0_Cause] |= 0x400 << irqline;
-	else
-		mips->cpr[0][COP0_Cause] &= ~(0x400 << irqline);
-}
 
 #endif /* __MIPS3COM_H__ */
