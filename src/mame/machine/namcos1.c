@@ -500,7 +500,7 @@ READ8_MEMBER( namcos1_state::key_type3_r )
 	if (op == m_key_rng)     return machine().rand();
 	if (op == m_key_swap4)   return (m_key[m_key_swap4_arg] << 4) | (m_key[m_key_swap4_arg] >> 4);
 	if (op == m_key_bottom4) return (offset << 4) | (m_key[m_key_swap4_arg] & 0x0f);
-	if (op == m_key_top4)        return (offset << 4) | (m_key[m_key_swap4_arg] >> 4);
+	if (op == m_key_top4)    return (offset << 4) | (m_key[m_key_swap4_arg] >> 4);
 
 	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag(), space.device().safe_pc(), offset);
 
@@ -746,28 +746,30 @@ WRITE8_MEMBER(namcos1_state::namcos1_subcpu_bank_w)
 *                                                                              *
 *******************************************************************************/
 
-void namcos1_state::namcos1_install_bank(int start,int end,read8_delegate hr,write8_delegate hw, int offset,UINT8 *pointer)
+void namcos1_state::namcos1_install_bank(int start, int end,read8_delegate hr, write8_delegate hw, int offset, UINT8 *pointer)
 {
-	int i;
-	for(i=start;i<=end;i++)
+	for (int i = start; i <= end; i++)
 	{
 		m_bank_element[i].bank_handler_r = hr;
 		m_bank_element[i].bank_handler_w = hw;
 		m_bank_element[i].bank_offset    = offset;
 		m_bank_element[i].bank_pointer   = pointer;
-		offset  += 0x2000;
-		if(pointer) pointer += 0x2000;
+
+		offset += 0x2000;
+
+		if (pointer)
+			pointer += 0x2000;
 	}
 }
 
 
 
-void namcos1_state::namcos1_build_banks(read8_delegate key_r,write8_delegate key_w)
+void namcos1_state::namcos1_build_banks(read8_delegate key_r, write8_delegate key_w)
 {
 	int i;
 
 	/**** kludge alert ****/
-	UINT8 *dummyrom = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_dummyrom = auto_alloc_array(machine(), UINT8, 0x2000);
 
 	/* when the games want to reset because the test switch has been flipped (or
 	   because the protection checks failed!) they just set the top bits of bank #7
@@ -778,16 +780,16 @@ void namcos1_state::namcos1_build_banks(read8_delegate key_r,write8_delegate key
 	   so misaligned entry points get immediatly corrected. */
 	for (i = 0;i < 0x2000;i+=2)
 	{
-		dummyrom[i]   = 0x20;
-		dummyrom[i+1] = 0xfe;
+		m_dummyrom[i]   = 0x20;
+		m_dummyrom[i+1] = 0xfe;
 	}
 	/* also provide a valid IRQ vector */
-	dummyrom[0x1ff8] = 0xff;
-	dummyrom[0x1ff9] = 0x00;
+	m_dummyrom[0x1ff8] = 0xff;
+	m_dummyrom[0x1ff9] = 0x00;
 
 	/* clear all banks to unknown area */
 	for(i = 0;i < NAMCOS1_MAX_BANK;i++)
-		namcos1_install_bank(i,i,read8_delegate(),write8_delegate(FUNC(namcos1_state::unknown_w),this),0,dummyrom);
+		namcos1_install_bank(i,i,read8_delegate(),write8_delegate(FUNC(namcos1_state::unknown_w),this),0,m_dummyrom);
 	/**** end of kludge alert ****/
 
 
@@ -807,34 +809,31 @@ void namcos1_state::namcos1_build_banks(read8_delegate key_r,write8_delegate key
 	namcos1_install_bank(0x180,0x183,read8_delegate(),write8_delegate(),0,m_s1ram);
 
 	/* PRG0-PRG7 */
+	UINT8 *rom = machine().root_device().memregion("user1")->base();
+
+	namcos1_install_bank(0x200,0x3ff,read8_delegate(),write8_delegate(FUNC(namcos1_state::rom_w),this),0,rom);
+
+	/* bit 16 of the address is inverted for PRG7 (and bits 17,18 just not connected) */
+	for (i = 0x380000;i < 0x400000;i++)
 	{
-		UINT8 *rom = machine().root_device().memregion("user1")->base();
-
-		namcos1_install_bank(0x200,0x3ff,read8_delegate(),write8_delegate(FUNC(namcos1_state::rom_w),this),0,rom);
-
-		/* bit 16 of the address is inverted for PRG7 (and bits 17,18 just not connected) */
-		for (i = 0x380000;i < 0x400000;i++)
+		if ((i & 0x010000) == 0)
 		{
-			if ((i & 0x010000) == 0)
-			{
-				UINT8 t = rom[i];
-				rom[i] = rom[i + 0x010000];
-				rom[i + 0x010000] = t;
-			}
+			UINT8 t = rom[i];
+			rom[i] = rom[i + 0x010000];
+			rom[i + 0x010000] = t;
 		}
 	}
 }
 
 void namcos1_state::machine_reset()
 {
-	static const bankhandler unknown_handler = { read8_delegate(FUNC(namcos1_state::unknown_r),this), write8_delegate(FUNC(namcos1_state::unknown_w),this), 0, NULL };
-	int bank;
+	memset(m_chip, 0, sizeof(m_chip));
 
 	/* Point all of our bankhandlers to the error handlers */
-	for (bank = 0; bank < 2*8 ; bank++)
-		set_bank(bank, &unknown_handler);
+	static const bankhandler unknown_handler = { read8_delegate(FUNC(namcos1_state::unknown_r),this), write8_delegate(FUNC(namcos1_state::unknown_w),this), 0, NULL };
 
-	memset(m_chip, 0, sizeof(m_chip));
+	for (int bank = 0; bank < 2*8 ; bank++)
+		set_bank(bank, &unknown_handler);
 
 	/* Default MMU setup for Cpu 0 */
 	namcos1_bankswitch(0, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
@@ -864,6 +863,9 @@ void namcos1_state::machine_reset()
 
 	namcos1_init_DACs();
 	memset(m_key, 0, sizeof(m_key));
+	m_key_quotient = 0;
+	m_key_reminder = 0;
+	m_key_numerator_high_word = 0;
 	m_wdog = 0;
 }
 
@@ -953,9 +955,9 @@ void namcos1_state::namcos1_driver_init(const struct namcos1_specific *specific 
 	m_key_top4      = specific->key_reg6;
 
 	/* S1 RAM pointer set */
-	m_s1ram = auto_alloc_array(machine(), UINT8, 0x8000);
-	m_triram = auto_alloc_array(machine(), UINT8, 0x800);
-	m_paletteram = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_s1ram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_triram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_paletteram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
 
 	/* Register volatile user memory for save state */
 	save_pointer(NAME(m_s1ram), 0x8000);
@@ -963,11 +965,12 @@ void namcos1_state::namcos1_driver_init(const struct namcos1_specific *specific 
 	save_pointer(NAME(m_paletteram), 0x8000);
 
 	/* Point mcu & sound shared RAM to destination */
-	membank("bank18")->set_base(m_triram );
-	membank("bank19")->set_base(m_triram );
+	membank("bank18")->set_base(m_triram);
+	membank("bank19")->set_base(m_triram);
 
 	/* build bank elements */
 	namcos1_build_banks(specific->key_r,specific->key_w);
+	memset(m_active_bank, 0, sizeof(m_active_bank));
 }
 
 

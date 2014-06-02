@@ -1099,7 +1099,6 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

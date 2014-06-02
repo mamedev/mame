@@ -8,7 +8,7 @@ struct bankhandler
 {
 	read8_delegate bank_handler_r;
 	write8_delegate bank_handler_w;
-	int           bank_offset;
+	int bank_offset;
 	UINT8 *bank_pointer;
 };
 
@@ -42,6 +42,7 @@ public:
 	UINT8 *m_paletteram;
 	UINT8 *m_triram;
 	UINT8 *m_s1ram;
+	UINT8 *m_dummyrom;
 	bankhandler m_bank_element[NAMCOS1_MAX_BANK];
 	bankhandler m_active_bank[16];
 	int m_key_id;

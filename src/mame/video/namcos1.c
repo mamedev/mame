@@ -115,8 +115,8 @@ void namcos1_state::video_start()
 	m_tilemap_maskdata = (UINT8 *)memregion("gfx1")->base();
 
 	/* allocate videoram */
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x8000);
-	m_spriteram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_videoram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_spriteram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
 
 	/* initialize playfields */
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
