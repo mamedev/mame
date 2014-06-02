@@ -45,8 +45,15 @@ public:
 	DECLARE_READ16_MEMBER(kensei_dsw_r);
 	DECLARE_DRIVER_INIT(kenseim);
 
-	DECLARE_READ8_MEMBER(porta_default_r) { logerror("%s read port A but no handler assigned\n", machine().describe_context()); return 0x00; }
-	DECLARE_READ8_MEMBER(portb_default_r) { logerror("%s read port B but no handler assigned\n", machine().describe_context()); return 0x00; }
+	// certain
+
+	DECLARE_READ8_MEMBER(porta_r); // dsw1
+	DECLARE_READ8_MEMBER(portb_r); // dsw2
+
+	DECLARE_WRITE8_MEMBER(i8255_portc_w); // 20x LEDs
+
+	// uncertain
+
 //	DECLARE_READ8_MEMBER(portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(portc_r);
 //	DECLARE_READ8_MEMBER(portd_default_r) { logerror("%s read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
@@ -55,8 +62,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
 	DECLARE_WRITE8_MEMBER(portb_default_w) { logerror("%s write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(portc_default_w) { logerror("%s write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(portd_default_w) { logerror("%s write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
+//	DECLARE_WRITE8_MEMBER(portc_default_w) { logerror("%s write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(portc_w);
+//	DECLARE_WRITE8_MEMBER(portd_default_w) { logerror("%s write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
+	DECLARE_WRITE8_MEMBER(portd_w);
 	DECLARE_WRITE8_MEMBER(porte_default_w) { logerror("%s write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
 
 	DECLARE_READ8_MEMBER(i8255_porta_default_r) { logerror("%s i8255 read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
@@ -65,8 +74,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(i8255_porta_default_w) { logerror("%s i8255 write %02x to port A but no handler assigned\n", machine().describe_context(), data); } // maybe molesa output? (6-bits?)
 	DECLARE_WRITE8_MEMBER(i8255_portb_default_w) { logerror("%s i8255 write %02x to port B but no handler assigned\n", machine().describe_context(), data); } // maybe molesb output? (6-bits?)
-//	DECLARE_WRITE8_MEMBER(i8255_portc_default_w) { logerror("%s i8255 write %02x to port C but no handler assigned\n", machine().describe_context(), data); } // leds??
-	DECLARE_WRITE8_MEMBER(i8255_portc_w);
 
 	DECLARE_READ8_MEMBER(i8255_portd_default_r) { logerror("%s i8255 read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(i8255_porte_default_r) { logerror("%s i8255 read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
@@ -92,7 +99,7 @@ void kenseim_state::set_leds(UINT32 ledstates)
 // could be wrong
 WRITE8_MEMBER(kenseim_state::i8255_portc_w)
 {
-	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 tiles, with the last write being some terminator?)
+	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
 //	printf("%s i8255 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
 
@@ -127,12 +134,23 @@ WRITE8_MEMBER(kenseim_state::i8255_portc_w)
 
 }
 
+WRITE8_MEMBER(kenseim_state::portc_w)
+{
+	logerror("%s write %02x to port C\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(kenseim_state::portd_w)
+{
+	logerror("%s write %02x to port D\n", machine().describe_context(), data);
+}
+
+
 
 READ8_MEMBER(kenseim_state::portd_r)
 {
 	// comms port maybe? checks for 0x10 (bit 4,a) to be clear in a tight loop (092B) then for bit 0x80 to be set in another tight loop  (0933) then at (0947) it checks that bits 0xe0 aren't set.
 	logerror("%s read port D\n", machine().describe_context());
-	return 0x00;// rand();// 0x80;
+	return rand();// rand();// 0x80;
 }
 
 READ8_MEMBER(kenseim_state::portc_r)
@@ -140,8 +158,18 @@ READ8_MEMBER(kenseim_state::portc_r)
 	// bits 0x09 checked at 1171
 	logerror("%s read port C\n", machine().describe_context());
 
-	return 0x00;//
+	return rand();//
 	//return 0x09;// rand();
+}
+
+READ8_MEMBER(kenseim_state::porta_r)
+{
+	return ioport("DSW1")->read(); // confirmed by code
+}
+
+READ8_MEMBER(kenseim_state::portb_r)
+{
+	return ioport("DSW2")->read(); // confirmed by code
 }
 
 
@@ -326,11 +354,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_CPU_IO_MAP(kenseim_io_map)
 	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w))
 	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w))
-	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(kenseim_state, portc_default_w))
-	MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(WRITE8(kenseim_state, portd_default_w))
+	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(kenseim_state, portc_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(WRITE8(kenseim_state, portd_w))
 	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_default_w))	
-	MCFG_TMPZ84C011_PORTA_READ_CALLBACK(READ8(kenseim_state, porta_default_r))
-	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_default_r))
+	MCFG_TMPZ84C011_PORTA_READ_CALLBACK(READ8(kenseim_state, porta_r))
+	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_r))
 	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_r))
 	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_r))
 	MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r))
@@ -408,24 +436,47 @@ static INPUT_PORTS_START( kenseim )
 
 	// the extra board has 2 dip banks used for most game options
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x03, 0x00, "Coinage" )                            PORT_DIPLOCATION("DRV SW(1):1,2")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPNAME( 0x0c, 0x00, "Head Appear Once Ratio" )             PORT_DIPLOCATION("DRV SW(1):3,4")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPNAME( 0x30, 0x00, "Strength of Computer" )               PORT_DIPLOCATION("DRV SW(1):5,6")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPNAME( 0x40, 0x00, "Game Time" )                          PORT_DIPLOCATION("DRV SW(1):7")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPNAME( 0x80, 0x00, "VS Bison" )                           PORT_DIPLOCATION("DRV SW(1):8")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x80, "1" )
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED( 0x01, 0x01 )
-	PORT_DIPUNUSED( 0x02, 0x02 )
-	PORT_DIPUNUSED( 0x04, 0x04 )
-	PORT_DIPUNUSED( 0x08, 0x08 )
-	PORT_DIPUNUSED( 0x10, 0x10 )
-	PORT_DIPUNUSED( 0x20, 0x20 )
-	PORT_DIPUNUSED( 0x40, 0x40 )
-	PORT_DIPUNUSED( 0x80, 0x80 )
+	PORT_DIPNAME( 0x01, 0x00, "Unknown 1 (1-bit)" )                           PORT_DIPLOCATION("DRV SW(2):1")  // manual lists unused, but see code at  0x0E9E
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPNAME( 0x06, 0x00, "Unknown 2 (2-bit)" )                           PORT_DIPLOCATION("DRV SW(2):2,3")  // ^^
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x06, "3" )
+	PORT_DIPNAME( 0x18, 0x00, "Unknown 3 (2-bit)" )                           PORT_DIPLOCATION("DRV SW(2):4,5")  // ^^
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPUNUSED( 0x20, 0x20 )                                      PORT_DIPLOCATION("DRV SW(2):6") // appears unused
+	PORT_DIPUNUSED( 0x40, 0x40 )                                      PORT_DIPLOCATION("DRV SW(2):7") // apeears unused
+	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )                           PORT_DIPLOCATION("DRV SW(2):8")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x80, "1" )
 INPUT_PORTS_END
 
 ROM_START( kenseim )
