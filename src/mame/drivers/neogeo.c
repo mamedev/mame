@@ -708,7 +708,7 @@ WRITE8_MEMBER(neogeo_state::io_control_w)
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
 //  case 0x32: break; // coin lockout
-//  case 0x33: break; // coui lockout
+//  case 0x33: break; // coin lockout
 
 		default:
 			logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset, data);

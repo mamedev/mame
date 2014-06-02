@@ -376,8 +376,8 @@ READ8_MEMBER(namcos1_state::dsw_r)
 WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
 {
 	coin_lockout_global_w(machine(), ~data & 1);
-	coin_counter_w(machine(), 0,data & 2);
-	coin_counter_w(machine(), 1,data & 4);
+	coin_counter_w(machine(), 0, data & 2);
+	coin_counter_w(machine(), 1, data & 4);
 }
 
 void namcos1_state::namcos1_update_DACs()
@@ -389,8 +389,8 @@ void namcos1_state::namcos1_init_DACs()
 {
 	m_dac0_value = 0;
 	m_dac1_value = 0;
-	m_dac0_gain=0x80;
-	m_dac1_gain=0x80;
+	m_dac0_gain = 0x80;
+	m_dac1_gain = 0x80;
 }
 
 WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
@@ -2685,39 +2685,39 @@ ROM_END
 
 
 
-GAME( 1987, shadowld, 0,        ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Shadowland (YD3)", 0 )
-GAME( 1987, youkaidk2,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version (YD2, Rev B))", 0 )
-GAME( 1987, youkaidk1,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version (YD1))", 0 )
-GAME( 1987, dspirit,  0,        ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (new version (DS3))", 0 )
-GAME( 1987, dspirit2, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", 0 ) /* Atari had rights to US market */
-GAME( 1987, dspirit1, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", 0 )
-GAME( 1987, blazer,   0,        ns1,     ns1, namcos1_state,      blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
-GAME( 1987, quester,  0,        ns1,     quester, namcos1_state,  quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
-GAME( 1987, questers, quester,  ns1,     quester, namcos1_state,  quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", 0 )
-GAME( 1987, pacmania, 0,        ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania", 0 )
-GAME( 1987, pacmaniaj,pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
-GAME( 1987, galaga88, 0,        ns1,     galaga88, namcos1_state, galaga88, ROT270, "Namco", "Galaga '88", 0 )
-GAME( 1987, galaga88j,galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", 0 )
-GAME( 1988, ws,       0,        ns1,     ns1, namcos1_state,      ws,       ROT180, "Namco", "World Stadium (Japan)", 0 )
-GAME( 1988, berabohm, 0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", 0 )
-GAME( 1988, berabohmb,berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", 0 )
-GAME( 1988, mmaze,    0,        ns1,     mmaze, namcos1_state,    alice,    ROT180, "Namco", "Marchen Maze (Japan)", 0 )
-GAME( 1988, bakutotu, 0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", 0 )
-GAME( 1988, wldcourt, 0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", 0 )
-GAME( 1988, splatter, 0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", 0 )
-GAME( 1988, splatter2,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", 0 )
-GAME( 1988, splatterj,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", 0 )
-GAME( 1988, faceoff,  0,        ns1,     faceoff, namcos1_state,  faceoff,  ROT180, "Namco", "Face Off (Japan)", 0 )
-GAME( 1989, rompers,  0,        ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", 0 )
-GAME( 1989, romperso, rompers,  ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", 0 )
-GAME( 1989, blastoff, 0,        ns1,     ns1, namcos1_state,      blastoff, ROT90,  "Namco", "Blast Off (Japan)", 0 )
-GAME( 1989, ws89,     ws,       ns1,     ws89, namcos1_state,     ws89,     ROT180, "Namco", "World Stadium '89 (Japan)", 0 )
-GAME( 1989, dangseed, 0,        ns1,     dangseed, namcos1_state, dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", 0 )
-GAME( 1990, ws90,     ws,       ns1,     ws90, namcos1_state,     ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", 0 )
-GAME( 1990, pistoldm, 0,        ns1,     ns1, namcos1_state,      pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", 0 )
-GAME( 1990, boxyboy,  0,        ns1,     boxyboy, namcos1_state,  soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", 0 )
-GAME( 1990, soukobdx, boxyboy,  ns1,     boxyboy, namcos1_state,  soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", 0 )
-GAME( 1990, puzlclub, 0,        ns1,     puzlclub, namcos1_state, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", 0 )
-GAME( 1991, tankfrce, 0,        ns1,     ns1, namcos1_state,      tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
-GAME( 1991, tankfrce4,tankfrce, ns1,     tankfrc4, namcos1_state, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", 0 )
-GAME( 1991, tankfrcej,tankfrce, ns1,     ns1, namcos1_state,      tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )
+GAME( 1987, shadowld,  0,        ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Shadowland (YD3)", 0 )
+GAME( 1987, youkaidk2, shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version (YD2, Rev B))", 0 )
+GAME( 1987, youkaidk1, shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version (YD1))", 0 )
+GAME( 1987, dspirit,   0,        ns1,     dspirit,  namcos1_state, dspirit,  ROT90,  "Namco", "Dragon Spirit (new version (DS3))", 0 )
+GAME( 1987, dspirit2,  dspirit,  ns1,     dspirit,  namcos1_state, dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", 0 ) /* Atari had rights to US market */
+GAME( 1987, dspirit1,  dspirit,  ns1,     dspirit,  namcos1_state, dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", 0 )
+GAME( 1987, blazer,    0,        ns1,     ns1,      namcos1_state, blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
+GAME( 1987, quester,   0,        ns1,     quester,  namcos1_state, quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
+GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", 0 )
+GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania", 0 )
+GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
+GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, galaga88, ROT270, "Namco", "Galaga '88", 0 )
+GAME( 1987, galaga88j, galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", 0 )
+GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, ws,       ROT180, "Namco", "World Stadium (Japan)", 0 )
+GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", 0 )
+GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", 0 )
+GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, alice,    ROT180, "Namco", "Marchen Maze (Japan)", 0 )
+GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", 0 )
+GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", 0 )
+GAME( 1988, splatter,  0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", 0 )
+GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", 0 )
+GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", 0 )
+GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, faceoff,  ROT180, "Namco", "Face Off (Japan)", 0 )
+GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", 0 )
+GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", 0 )
+GAME( 1989, blastoff,  0,        ns1,     ns1,      namcos1_state, blastoff, ROT90,  "Namco", "Blast Off (Japan)", 0 )
+GAME( 1989, ws89,      ws,       ns1,     ws89,     namcos1_state, ws89,     ROT180, "Namco", "World Stadium '89 (Japan)", 0 )
+GAME( 1989, dangseed,  0,        ns1,     dangseed, namcos1_state, dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", 0 )
+GAME( 1990, ws90,      ws,       ns1,     ws90,     namcos1_state, ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", 0 )
+GAME( 1990, pistoldm,  0,        ns1,     ns1,      namcos1_state, pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", 0 )
+GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", 0 )
+GAME( 1990, soukobdx,  boxyboy,  ns1,     boxyboy,  namcos1_state, soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", 0 )
+GAME( 1990, puzlclub,  0,        ns1,     puzlclub, namcos1_state, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", 0 )
+GAME( 1991, tankfrce,  0,        ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
+GAME( 1991, tankfrce4, tankfrce, ns1,     tankfrc4, namcos1_state, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", 0 )
+GAME( 1991, tankfrcej, tankfrce, ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )
