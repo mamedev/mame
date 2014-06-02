@@ -2539,8 +2539,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not work in any driver, apparently... -->
-	<software name="mirai" supported="no">
+	<software name="mirai">
 		<description>Mirai (Jpn)</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
