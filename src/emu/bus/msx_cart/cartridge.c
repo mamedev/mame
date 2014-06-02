@@ -4,6 +4,7 @@
 #include "ascii.h"
 #include "crossblaim.h"
 #include "fmpac.h"
+#include "hfox.h"
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
@@ -42,6 +43,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("msxaud_fsca1", MSX_CART_MSX_AUDIO_FSCA1)
 	SLOT_INTERFACE_INTERNAL("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205)
 	SLOT_INTERFACE_INTERNAL("super_swangi", MSX_CART_SUPER_SWANGI)
+	SLOT_INTERFACE_INTERNAL("hfox", MSX_CART_HFOX)
 SLOT_INTERFACE_END
 
 

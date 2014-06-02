@@ -6535,13 +6535,13 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="hfox2" cloneof="hfox" supported="no">
+	<software name="hfox2" cloneof="hfox">
 		<description>Hurry Fox - Yuki no Maou hen (Jpn)</description>
 		<year>1985</year>
 		<publisher>MicroCabin</publisher>
 		<info name="alt_title" value="は～りぃふぉっくす雪の魔王編" />
 		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="ascii16" />
+			<feature name="slot" value="hfox" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="harryfox yki no maoh (japan).rom" size="65536" crc="c7fe3ee1" sha1="3626b5dd3188ec2a16e102d05c79f8f242fbd892" offset="0" />
