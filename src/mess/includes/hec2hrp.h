@@ -74,16 +74,24 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this,"videoram"),
-		m_hector_videoram(*this,"hector_videoram") ,
 		m_maincpu(*this, "maincpu"),
 		m_disc2cpu(*this, "disc2cpu"),
 		m_cassette(*this, "cassette"),
 		m_sn(*this, "sn76477"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_videoram(*this,"videoram"),
+		m_hector_videoram(*this,"hector_videoram") ,
+		m_keyboard(*this, "KEY") { }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_disc2cpu;
+	required_device<cassette_image_device> m_cassette;
+	required_device<sn76477_device> m_sn;
+	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_hector_videoram;
+	required_ioport_array<9> m_keyboard;
+	
 	UINT8 m_hector_flag_hr;
 	UINT8 m_hector_flag_80c;
 	UINT8 m_hector_color[4];
@@ -148,11 +156,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_dma_irq );
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_disc2cpu;
-	required_device<cassette_image_device> m_cassette;
-	required_device<sn76477_device> m_sn;
-	required_device<palette_device> m_palette;
 	int isHectorWithDisc2();
 	int isHectorWithMiniDisc();
 	int isHectorHR();
