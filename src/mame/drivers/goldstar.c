@@ -115,6 +115,7 @@
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 #include "includes/goldstar.h"
 
 #include "goldstar.lh"
@@ -216,6 +217,235 @@ static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, goldstar_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(sangho_fg_vidram_w ) AM_SHARE("fg_vidram")	// videoram 1
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sangho_fg_atrram_w ) AM_SHARE("fg_atrram")	// atrram 1
+
+	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("reel1_scroll")
+	AM_RANGE(0xd840, 0xd9ff) AM_RAM
+	AM_RANGE(0xda00, 0xda3f) AM_RAM AM_SHARE("reel2_scroll")
+	AM_RANGE(0xda40, 0xdbff) AM_RAM
+	AM_RANGE(0xdc00, 0xdc3f) AM_RAM AM_SHARE("reel3_scroll")
+	AM_RANGE(0xdc40, 0xdfff) AM_RAM
+
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
+	AM_RANGE(0xe200, 0xe3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+
+	AM_RANGE(0xe600, 0xe7ff) AM_RAM_WRITE(sangho_bg_vidram_w ) AM_SHARE("bg_vidram")	// videoram 2
+
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(sangho_reel1_attrram_w ) AM_SHARE("reel1_attrram")
+	AM_RANGE(0xea00, 0xebff) AM_RAM_WRITE(sangho_reel2_attrram_w ) AM_SHARE("reel2_attrram")
+	AM_RANGE(0xec00, 0xedff) AM_RAM_WRITE(sangho_reel3_attrram_w ) AM_SHARE("reel3_attrram")
+
+	AM_RANGE(0xee00, 0xefff) AM_RAM_WRITE(sangho_bg_atrram_w ) AM_SHARE("bg_atrram")	// atrram 2
+
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+
+	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+
+ADDRESS_MAP_END
+
+
+WRITE8_MEMBER(goldstar_state::sangho_coincount_w)
+{
+/*
+  7654 3210
+  ---- ---x  Coin Out counter.
+  ---- x---  Coin A counter..
+  ---x ----  Coin B counter.
+  --x- ----  Key In counter.
+  -x-- ----  Coin C counter.
+  x--- -xx-  Unknown.
+
+*/
+	coin_counter_w(machine(), 0, data & 0x08);  /* counter1 coin a */
+	coin_counter_w(machine(), 1, data & 0x10);  /* counter2 coin b */
+	coin_counter_w(machine(), 2, data & 0x20);  /* counter3 key in */
+	coin_counter_w(machine(), 3, data & 0x40);  /* counter4 coin c */
+	coin_counter_w(machine(), 4, data & 0x01);  /* counter5 payout */
+}
+
+WRITE8_MEMBER(goldstar_state::sangho_enable_w)
+{
+	m_sangho_enable_reg = data;
+}
+
+static ADDRESS_MAP_START( star100_readport, AS_IO, 8, goldstar_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
+	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW1")
+
+	AM_RANGE(0x1c, 0x1c) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x1d ,0x1d) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE(0x1e ,0x1e) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW4-0")		// the first 4 bits map to DSW4 1 to 4.
+	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW4-1")		// the first 4 bits map to DSW4 5 to 8.
+
+	AM_RANGE(0x24, 0x24) AM_WRITE(sangho_coincount_w)	// coin counters.
+
+	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW2")
+	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW3")
+
+	AM_RANGE(0xe0, 0xe0) AM_WRITENOP				// writting 0's and 1's constantly. seems watchdog feeder.
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(sangho_enable_w)	// enable/disable reels register.
+
+ADDRESS_MAP_END
+
+/*
+  08:  W (3F)	AY8910 data
+  0C:  W (07)	AY8910 address
+
+  10: R		Input #0
+  11: R		Input #1
+  12: R		Input #2
+  13: R		Input #3
+  
+  14: R		DSW #1
+
+  17:  W
+
+  1C:  W	\ these looks like RAMDAC commands. After write to 1C, there are 3 writes to 1D.
+  1D:  W	/ bp: 6c5b.
+  1E:  W (FF) --> seems the RAMDAC mask.
+
+  20: R    DSW #4-0
+  21: R    DSW #4-1
+  22:  W
+  24:  W
+  25: R    DSW #2
+  26: R    DSW #3
+
+  2F:  W (9C)
+
+  E0:  W
+  E1:  W	Reels enable/disable register
+ */
+
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, goldstar_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
+ADDRESS_MAP_END 
+
+/*  
+  RAMDAC written commands:
+
+  1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D
+  -------------       -------------       -------------       -------------
+  00   00 00 00       10   00 00 00       20   00 00 00       30   00 00 00
+  01   E8 18 06       11   E8 18 06       21   E8 18 06       31   E8 18 06
+  02   FC EA 00       12   FC EA 00       22   FC EA 00       32   FC EA 00
+  03   FF FF 00       13   FF FF 00       23   FF FF 00       33   FF FF 00
+  04   FF 00 00       14   FF 00 00       24   FF 00 00       34   FF 00 00
+  05   00 00 FF       15   00 00 FF       25   00 00 FF       35   00 00 FF
+  06   00 E6 00       16   00 E6 00       26   00 E6 00       36   00 E6 00
+  07   01 F0 02       17   01 F0 02       27   01 F0 02       37   01 F0 02
+  08   EF FF E8       18   EF FF E8       28   EF FF E8       38   EF FF E8
+  09   12 08 F2       19   12 08 F2       29   12 08 F2       39   12 08 F2
+  0A   1A 12 FF       1A   1A 12 FF       2A   1A 12 FF       3A   1A 12 FF
+  0B   1F 1F F9       1B   1F 1F F9       2B   1F 1F F9       3B   1F 1F F9
+  0C   F9 F9 F9       1C   F9 F9 F9       2C   F9 F9 F9       3C   F9 F9 F9
+  0D   EF 18 00       1D   EF 18 00       2D   EF 18 00       3D   EF 18 00
+  0E   F0 F0 F0       1E   F0 F0 F0       2E   F0 F0 F0       3E   F0 F0 F0
+  0F   FF FF FF       1F   FF 00 00       2F   00 FF FF       3F   00 FF 00
+
+
+  1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D
+  -------------       -------------       -------------       -------------
+  40   00 00 00       50   00 00 00       60   00 00 00       70   00 00 00
+  41   E8 18 06       51   E8 18 06       61   E8 18 06       71   E8 18 06
+  42   FC EA 00       52   FC EA 00       62   FC EA 00       72   FC EA 00
+  43   FF FF 00       53   FF FF 00       63   FF FF 00       73   FF FF 00
+  44   FF 00 00       54   FF 00 00       64   FF 00 00       74   FF 00 00
+  45   00 00 FF       55   00 00 FF       65   00 00 FF       75   00 00 FF
+  46   00 E6 00       56   00 E6 00       66   00 E6 00       76   00 E6 00
+  47   01 F0 02       57   01 F0 02       67   01 F0 02       77   01 F0 02
+  48   EF FF E8       58   EF FF E8       68   EF FF E8       78   EF FF E8
+  49   12 08 F2       59   12 08 F2       69   12 08 F2       79   12 08 F2
+  4A   1A 12 FF       5A   1A 12 FF       6A   1A 12 FF       7A   1A 12 FF
+  4B   1F 1F F9       5B   1F 1F F9       6B   1F 1F F9       7B   1F 1F F9
+  4C   F9 F9 F9       5C   F9 F9 F9       6C   F9 F9 F9       7C   F9 F9 F9
+  4D   EF 18 00       5D   EF 18 00       6D   EF 18 00       7D   EF 18 00
+  4E   F0 F0 F0       5E   01 EC FF       6E   00 00 00       7E   00 00 00
+  4F   FF FF 00       5F   00 00 00       6F   01 EC FF       7F   00 00 00
+
+
+  1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D
+  -------------       -------------       -------------       -------------
+  80   28 28 28       90   28 28 28       A0   28 28 28       B0   28 28 28
+  81   FF ED E3       91   0B 00 00       A1   18 11 00       B1   02 16 00
+  82   FF F7 1E       92   13 00 00       A2   00 E1 00       B2   02 E1 00
+  83   FF F8 18       93   1C 00 00       A3   00 E8 00       B3   01 ED 02
+  84   14 0B 0B       94   E5 00 00       A4   13 F0 00       B4   02 FA 09
+  85   1F 10 0A       95   ED 00 00       A5   FF F7 1E       B5   F1 1A 00
+  86   E3 13 08       96   F6 00 00       A6   FF F0 EE       B6   F1 EA 00
+  87   E8 18 06       97   FF 05 0D       A7   EF 18 00       B7   1F 00 00
+  88   EC 1E 03       98   FF 0C 13       A8   F4 1B 00       B8   F2 00 00
+  89   F0 E3 02       99   FF 13 19       A9   FD 1F 00       B9   FF 00 00
+  8A   F5 E9 01       9A   FF 1A 1F       AA   FF E3 00       BA   FF 0C 02
+  8B   FA EF 01       9B   FF E2 E6       AB   FF EA 00       BB   FF 18 06
+  8C   FF F6 00       9C   FF E9 EC       AC   FF F1 00       BC   FF E3 0A
+  8D   FF FF 00       9D   FF F0 F2       AD   FF F8 00       BD   FF EC 19
+  8E   FF FF 1F       9E   FF F7 F8       AE   FF FF 00       BE   FF F4 1F
+  8F   FF FF FF       9F   FF FF FF       AF   FF FF 1F       BF   FF FF FF
+
+
+  1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D       1C   1D 1D 1D
+  -------------       -------------       -------------       -------------
+  C0   28 28 28       D0   28 28 28       E0   28 28 28       F0   12 12 E0
+  C1   F1 E6 00       D1   00 00 E4       E1   00 05 00       F1   1B 00 00
+  C2   F8 F1 00       D2   00 00 FF       E2   00 0A 00       F2   E0 10 04
+  C3   FF FF 00       D3   00 13 FF       E3   00 10 00       F3   E9 14 05
+  C4   14 07 E7       D4   00 1A FF       E4   00 15 00       F4   EF 1E 12
+  C5   15 0C EF       D5   00 E8 FF       E5   00 1B 00       F5   EC E3 1A
+  C6   1A 12 FA       D6   16 0B 00       E6   00 E0 00       F6   EE 05 04
+  C7   1B 16 FA       D7   19 0F 00       E7   00 E6 00       F7   F4 05 04
+  C8   1D 1A FB       D8   1D 14 00       E8   04 EC 05       F8   FE 04 04
+  C9   1F 1E FC       D9   E5 1A 00       E9   0C F2 0E       F9   F6 E4 15
+  CA   E2 E2 FC       DA   EE E0 00       EA   15 F8 18       FA   F8 EC E0
+  CB   E6 E7 FD       DB   F6 E6 00       EB   E0 FF E3       FB   FD F0 E4
+  CC   EA EC FE       DC   FF ED 00       EC   FD 0C 02       FC   FF F6 E7
+  CD   EF F1 FF       DD   FF F6 00       ED   FD 12 0D       FD   FF FA EA
+  CE   F6 F8 FF       DE   FF FF 00       EE   FE 1A 18       FE   FF FF F2
+  CF   FF FF FF       DF   FF FF FF       EF   FF E4 E4       FF   FF FF FF
+
+
+  And set again....
+
+  1C   1D 1D 1D       1C   1D 1D 1D
+  -------------       -------------
+  70   00 00 00       F0   12 12 E0
+  71   18 0C F6       F1   1B 00 00
+  72   1B 13 0B       F2   E0 10 04
+  73   E1 15 1E       F3   E9 14 05
+  74   F3 E9 E4       F4   EF 1E 12
+  75   F3 E7 00       F5   EC E3 1A
+  76   FE 17 E3       F6   EE 05 04
+  77   FE 0C F1       F7   F4 05 04
+  78   FD E3 13       F8   FE 04 04
+  79   FE ED 05       F9   F6 E4 15
+  7A   FF F5 03       FA   F8 EC E0
+  7B   FF FB 14       FB   FD F0 E4
+  7C   FC FB FA       FC   FF F6 E7
+  7D   FF FC E0       FD   FF FA EA
+  7E   FE FE FC       FE   FF FF F2
+  7F   FF 00 FF       FF   FF FF FF
+
+*/
+
+
 
 WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
 {
@@ -373,11 +603,11 @@ static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xfc80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( nfm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
-
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
@@ -743,41 +973,53 @@ static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, goldstar_state )
 
 	AM_RANGE(0x0000, 0xbfff) AM_ROM		// ok
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM //AM_SHARE("nvram")
-
-	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM //AM_SHARE("nvram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
 
+/* just placeholders */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
 	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
 	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+
+	AM_RANGE(0xf640, 0xf67f) AM_RAM AM_SHARE("reel1_scroll")
+	AM_RANGE(0xf680, 0xf6bf) AM_RAM AM_SHARE("reel2_scroll")
+	AM_RANGE(0xf700, 0xf73f) AM_RAM AM_SHARE("reel3_scroll")
+
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(unkch_reel1_attrram_w ) AM_SHARE("reel1_attrram")
 	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(unkch_reel2_attrram_w ) AM_SHARE("reel2_attrram")
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(unkch_reel3_attrram_w ) AM_SHARE("reel3_attrram")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
 
 ADDRESS_MAP_END
 
 /* Bonus Chance W-8
+
+  clean 20h, 30h & 40h
 
   50h = SN76489 #1
   51h = SN76489 #2
   52h = SN76489 #3
   53h = SN76489 #4
 
+  10h = RW
+  20h = RW
+  30h =  W
+  40h =  W
+
+  60h = R
+
 */
 static ADDRESS_MAP_START( bonusch_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
-	AM_RANGE(0x51, 0x51) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE("sn3", sn76489_device, write)                      /* SN76489 #3 */
-	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn4", sn76489_device, write)                      /* SN76489 #4 */
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1")
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("sn1", sn76489_device, write)		/* SN76489 #1 */
+	AM_RANGE(0x51, 0x51) AM_DEVWRITE("sn2", sn76489_device, write)		/* SN76489 #2 */
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE("sn3", sn76489_device, write)		/* SN76489 #3 */
+	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn4", sn76489_device, write)		/* SN76489 #4 */
+	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN3")
 ADDRESS_MAP_END
 
 
@@ -5899,6 +6141,465 @@ static INPUT_PORTS_START( bonusch )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( star100 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Take / Select Card")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Small")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+
+//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3: BIG")
+//	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4: DOUBLE UP")
+//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5: TAKE")
+//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6: BET")
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7: SMALL")
+//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8: START")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)                            /* Coin A */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)                            /* Coin B */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )										/* Key In */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)                            /* Coin C */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Limited Payout")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Settings / Test Mode") PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Statistics")
+
+	PORT_START("IN3")	// reflected in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")	// reflected in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Key Out" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x01, "x100" )
+	PORT_DIPNAME( 0x02, 0x02, "Bonus Rate" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "1/24" )
+	PORT_DIPSETTING(    0x02, "1/32" )
+	PORT_DIPNAME( 0x04, 0x04, "Spin Rate" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x18, 0x18, "Double Up Rate" )		PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, "60%" )
+	PORT_DIPSETTING(    0x10, "70%" )
+	PORT_DIPSETTING(    0x08, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Game Rate" )				PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0xe0, "50%" )
+	PORT_DIPSETTING(    0xc0, "60%" )
+	PORT_DIPSETTING(    0xa0, "65%" )
+	PORT_DIPSETTING(    0x80, "70%" )
+	PORT_DIPSETTING(    0x60, "75%" )
+	PORT_DIPSETTING(    0x40, "80%" )
+	PORT_DIPSETTING(    0x20, "85%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Bonus Min Bet" )			PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x02, 0x02, "Number of Jackpot" )		PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, "3 2" )
+	PORT_DIPSETTING(    0x02, "6 3" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Up" )				PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x18, 0x18, "Payout Limit" )			PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "1000" )
+	PORT_DIPSETTING(    0x10, "2000" )
+	PORT_DIPSETTING(    0x08, "5000" )
+	PORT_DIPSETTING(    0x00, "No Limit" )
+	PORT_DIPNAME( 0x20, 0x20, "Bonus" )					PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, "Normal" )
+	PORT_DIPSETTING(    0x00, "Random" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Number of Clown" )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0xc0, "60%" )
+	PORT_DIPSETTING(    0x80, "70%" )
+	PORT_DIPSETTING(    0x40, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )			PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x00, "100 Credits" )
+	PORT_DIPSETTING(    0x01, "110 Credits" )
+	PORT_DIPSETTING(    0x02, "120 Credits" )
+	PORT_DIPSETTING(    0x03, "130 Credits" )
+	PORT_DIPSETTING(    0x04, "200 Credits" )
+	PORT_DIPSETTING(    0x05, "400 Credits" )
+	PORT_DIPSETTING(    0x06, "500 Credits" )
+	PORT_DIPSETTING(    0x07, "1000 Credits" )
+	PORT_DIPNAME( 0x18, 0x00, "Bet Limit" )				PORT_DIPLOCATION("SW3:4,5")
+	PORT_DIPSETTING(    0x18, "32 (Limit of Bonus: 1/4)" )
+	PORT_DIPSETTING(    0x10, "64 (Limit of Bonus: 1/2)" )
+	PORT_DIPSETTING(    0x08, "72 (Limit of Bonus: All)" )
+	PORT_DIPSETTING(    0x00, "80 (Limit of Bonus: All)" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4-0")
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )		PORT_DIPLOCATION("SW4:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
+
+	/* the following two are 'bonus', and need conditional port since they are in different banks */
+	PORT_DIPNAME( 0x08, 0x08, "Bonus (switch-1)" )			PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, "20000" )    PORT_CONDITION("DSW4-1", 0x01, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "40000" )    PORT_CONDITION("DSW4-1", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "30000" )    PORT_CONDITION("DSW4-1", 0x01, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "50000" )    PORT_CONDITION("DSW4-1", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW4-1")
+	PORT_DIPNAME( 0x01, 0x01, "Bonus (switch-2)" )			PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x02, 0x02, "Max Bonus" )					PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x00, "100000" )
+	PORT_DIPSETTING(    0x02, "200000" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )				PORT_DIPLOCATION("SW4:7,8")
+	PORT_DIPSETTING(    0x0c, "0" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x04, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW5")	// phisically tied to ay8910 port A, but unused...
+	PORT_DIPNAME( 0x01, 0x01, "DSW5" )					PORT_DIPLOCATION("SW5:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW6")	// phisically tied to ay8910 port B, but unused...
+	PORT_DIPNAME( 0x01, 0x01, "DSW6" )					PORT_DIPLOCATION("SW6:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( crazybon )	// to analyze...
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3: BIG")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4: DOUBLE UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5: TAKE")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6: BET")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7: SMALL")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8: START")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5: COIN A")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6: COIN B")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7: NOTE IN")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8: COIN C")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5: KEYOUT")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6: HOPPER LIMITED PAYOUT")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F2) PORT_NAME("IN2-7: TEST MODE") PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8: STATISTICS")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )					PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )					PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )					PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4-0")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4-0" )				PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4-1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4-1" )				PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, "DSW5" )					PORT_DIPLOCATION("SW5:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW5:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW6")
+	PORT_DIPNAME( 0x01, 0x01, "DSW6" )					PORT_DIPLOCATION("SW6:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -6146,6 +6847,21 @@ static const gfx_layout tiles8x8x4_layout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
+static const gfx_layout sangho_tilelayout =
+{
+	8,32,    /* 8*32 characters */
+	1024,    /* 256 tiles */
+	4,      /* 4 bits per pixel */
+	{ 0, 2, 4, 6 },
+	{ 0, 1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
+	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
+			32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+			64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+			96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+	128*8   /* every char takes 128 consecutive bytes */
+};
+
+
 
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
@@ -6231,6 +6947,18 @@ GFXDECODE_END
 static GFXDECODE_START( megaline )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( sangho )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   24, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 128 + (2 * 16),  16 )
+/* 7*16,16 title girl in 1st color
+   6*16,16 watermelon in game
+   4*16,16 blueberry in game
+   3*16,16 cherries in game
+   2*16,16 oranges and title girl in game
+   1*16,16 nines in game
+*/   
 GFXDECODE_END
 
 
@@ -6473,6 +7201,45 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 
 	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( star100, goldstar_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(star100_map)
+	MCFG_CPU_IO_MAP(star100_readport)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_sangho)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sangho)
+
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, sangho)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW5"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW6"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 
@@ -7809,6 +8576,55 @@ ROM_START( goldstbl )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+
+/*
+  Star 100, by Sang Ho.
+
+  PCB SANGHO PM-003 (VER-B2).
+  Different hardware, but seems to be close to GoldStar.
+  Also different memory map.
+
+  27C020 socket for OKI samples is unpopulated.
+
+*/
+ROM_START( star100 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "str-100_051212__27c512.1e",  0x00000, 0x10000, CRC(6c73ae4e) SHA1(8476b77a190a653b2a47682072bc9b4db594c02e) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "str_l3__flash29c011a-15.3l", 0x00000, 0x20000, CRC(89bf5935) SHA1(f8af107e21a9157ea5056eedbda36a1b99c5df5b) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "str_m3__flash29c011a-15.3m", 0x00000, 0x20000, CRC(fff9ea0e) SHA1(6125c99e684ac639a0f85cbb00c26131a23324aa) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "27c020.bin",  0x0000, 0x20000, NO_DUMP )
+ROM_END
+
+
+/*
+  Crazy Bonus, by Sang Ho.
+
+  PCB SANGHO PM-001 SW-008.
+  Close to star100 hardware, but with 5x DSW banks.
+
+  27C020 socket place for OKI samples is blind.
+
+*/
+ROM_START( crazybon )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "crazy_14_030418.bin",  0x00000, 0x10000, CRC(0071fb2a) SHA1(771b9b2b9fdf11dafc5ec0dbababc181d2ce4c75) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "crazy_h3.bin", 0x00000, 0x20000, CRC(6b3692b5) SHA1(ffdcd4e59d7c009fd76a65e8f87642da35f996f4) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "crazy_j3.bin", 0x00000, 0x20000, CRC(e375cd4b) SHA1(68888126ff9743cd589f3426205231bc3a896588) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "27c020.bin",  0x0000, 0x20000, NO_DUMP )
 ROM_END
 
 
@@ -11852,10 +12668,10 @@ ROM_END
   Board similar to Mega Lines, but with slightly
   different layout and some extra additions...
 
-  CPU:   1x Z80
-  MCU:   1x M80C51F-711 Intel'80/OKI'83 (CMOS 8-Bit Microcontroller).
+  CPU:   1x Z80 @ 6MHz. (measured)
+  MCU:   1x M80C51F-711 (8-Bit Microcontroller) @ 12MHz. (measured).
 
-  Sound: 4x SN76489.
+  Sound: 4x SN76489 @ 3MHz. (measured).
 
   ROMs:  1x 27C512 for program.
          2x 27C512 for fg graphics.
@@ -11867,7 +12683,7 @@ ROM_END
 
 
   Other: 1x DIP-40 custom IC silkscreened '06B30P' (I/O?).
-         1x DIP-28 custom IC silkscreened '06B49P' (clock divider).
+         1x DIP-28 custom IC silkscreened '06B49P' (clock divider, measured).
          2x DIP-28 custom IC silkscreened '06B53P' (video).
          1x 3.6V lithium battery.
          5x 8 DIP switches banks.
@@ -11898,21 +12714,19 @@ ROM_START( bonusch )
 	ROM_LOAD( "3.1m",  0x00000, 0x10000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
 	ROM_LOAD( "4.1p",  0x10000, 0x10000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "u4.bin", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
-	ROM_LOAD( "u5.bin", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "tbp24s10.3e", 0x0000, 0x0100, CRC(f8d160c5) SHA1(a3cb9c4337f4f030d62e74ccc882052959b1fa4f) )
+	ROM_LOAD( "tbp24s10.3f", 0x0100, 0x0100, CRC(bbc03eb2) SHA1(c0e44df0ec8268344f59965e3b9d62a4dca2ebb2) )
+	ROM_LOAD( "tbp24s10.3h", 0x0200, 0x0100, CRC(77b2585d) SHA1(898302f9a0bd8e354794087461f8f1103bb63783) )
 
-	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "u2.bin", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "u3.bin", 0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "u1.bin", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_REGION( 0x300, "proms2", 0 )
+	ROM_LOAD( "tbp24s10.4e", 0x0000, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
+	ROM_LOAD( "tbp24s10.4f", 0x0100, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
+	ROM_LOAD( "tbp24s10.4h", 0x0200, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
 
 ROM_END
-  
+
+
 /*
   Win Cherry (ver 0.16 - 19990219)
 
@@ -12672,6 +13486,8 @@ GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,   
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)    // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING)
+GAME(  199?, star100,   0,        star100,  star100,  driver_device,  0,         ROT0, "Sang Ho",           "Star 100",                                    GAME_IMPERFECT_COLORS )
+GAME(  1997, crazybon,  0,        star100,  crazybon, driver_device,  0,         ROT0, "Sang Ho",           "Crazy Bonus 2000",                            GAME_NOT_WORKING)
 
 
 // are these really dyna, or bootlegs?
