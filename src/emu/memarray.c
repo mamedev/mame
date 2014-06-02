@@ -53,8 +53,6 @@ void memory_array::set(void *base, UINT32 bytes, int membits, endianness_t endia
 	// derive data
 	switch (bpe*1000 + membits*10 + endianness)
 	{
-		case 0*1000 + 8*10 + ENDIANNESS_LITTLE:     m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
-		case 0*1000 + 8*10 + ENDIANNESS_BIG:        m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
 		case 1*1000 + 8*10 + ENDIANNESS_LITTLE:     m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
 		case 1*1000 + 8*10 + ENDIANNESS_BIG:        m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
 		case 1*1000 + 16*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read8_from_16le;    m_write_entry = &memory_array::write8_to_16le;     break;
