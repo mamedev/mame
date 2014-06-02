@@ -108,7 +108,7 @@
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
       PacLand:       Leftover garbage on title screen
-      Akumajo Drac:  Missing transparency, no sfx starting on second stage (m68000 only, 030 is fine), text layer not being cleared properly
+      Akumajo Drac:  no sfx starting on second stage (m68000 only, 030 is fine), text layer not being cleared properly
 
 
     More detailed documentation at http://x68kdev.emuvibes.com/iomap.html - if you can stand broken english :)

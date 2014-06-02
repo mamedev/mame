@@ -733,7 +733,7 @@ void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectan
 	}
 }
 
-void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
+bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
 {
 	int pixel;
 	int page;
@@ -743,6 +743,8 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 	UINT16 colour = 0;
 	int shift;
 	int scanline;
+	bool blend, ret = false;
+	UINT16 *pal = (UINT16 *)m_gfxpalette->basemem().base();
 
 	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)  // per scanline
 	{
@@ -793,11 +795,30 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					lineoffset = (((scanline - m_crtc.vbegin) + yscr) & 0x1ff) * 512;
 					loc = xscr & 0x1ff;
 					shift = 4;
+					if((m_video.reg[2] & 0x1a00) == 0x1a00)
+						ret = true;
 					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
 						colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
+						if(ret && (colour & 1))
+						{
+							blend = true;
+							colour &= 0xfe;
+						}
+						else
+							blend = false;
 						if(colour || (priority == 3))
-							bitmap.pix16(scanline, pixel) = colour;
+						{
+							if(ret)
+							{
+								if(blend)
+									bitmap.pix16(scanline, pixel) = ((bitmap.pix16(scanline, pixel) >> 1) & 0x7bde) + ((pal[colour] >> 1) & 0x7bde) + 1;
+								else
+									bitmap.pix16(scanline, pixel) = pal[colour] & 0xfffe;
+							}
+							else
+								bitmap.pix16(scanline, pixel) = colour;
+						}
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -810,11 +831,30 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 						lineoffset = (((scanline - m_crtc.vbegin) + yscr) & 0x1ff) * 512;
 						loc = xscr & 0x1ff;
 						shift = 4;
+						if((m_video.reg[2] & 0x1a00) == 0x1a00)
+							ret = true;
 						for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 						{
 							colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
+							if(ret && (colour & 1))
+							{
+								blend = true;
+								colour &= 0xfe;
+							}
+							else
+								blend = false;
 							if(colour || (priority == 3))
-								bitmap.pix16(scanline, pixel) = colour;
+							{
+								if(ret)
+								{
+									if(blend)
+										bitmap.pix16(scanline, pixel) = ((bitmap.pix16(scanline, pixel) >> 1) & 0x7bde) + ((pal[colour] >> 1) & 0x7bde) + 1;
+									else
+										bitmap.pix16(scanline, pixel) = pal[colour] & 0xfffe;
+								}
+								else
+									bitmap.pix16(scanline, pixel) = colour;
+							}
 							loc++;
 							loc &= 0x1ff;
 						}
@@ -838,11 +878,13 @@ void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 			}
 		}
 	}
+	return ret;
 }
 
 void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 {
 	int priority, scanline, pixel;
+	bool gfxblend;
 	//rectangle rect;
 	//int xscr,yscr;
 	//int gpage;
@@ -854,12 +896,13 @@ void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 
 	for(priority=3;priority>=0;priority--)
 	{
-		x68k_draw_gfx_scanline(*m_gfxbitmap,cliprect,priority);
+		gfxblend = x68k_draw_gfx_scanline(*m_gfxbitmap,cliprect,priority);
 	}
 
 	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)
 	{
 		UINT16 colour;
+		bool blend = false;
 		for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 		{
 			if((m_video.reg[0] & 0x03) == 3)
@@ -868,11 +911,38 @@ void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 				if(colour || (m_video.gfx_pri == 2))
 					bitmap.pix32(scanline, pixel) = pal555(colour, 6, 11, 1);
 			}
+			else if(gfxblend)
+			{
+				colour = m_gfxbitmap->pix16(scanline, pixel);
+				if(((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2) && (colour & 1))
+					blend = true;
+				else
+					blend = false;
+				if(colour || (m_video.gfx_pri == 2))
+				{
+					if(blend)
+						bitmap.pix32(scanline, pixel) = ((bitmap.pix32(scanline, pixel) >> 1) & 0xff7f7f7f) + ((pal555(colour, 6, 11, 1) >> 1) & 0x7f7f7f);
+					else
+						bitmap.pix32(scanline, pixel) = pal555(colour, 6, 11, 1);
+				}
+			}
 			else
 			{
 				colour = m_gfxbitmap->pix16(scanline, pixel) & 0xff;
+				if(((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2) && (colour & 1))
+				{
+					blend = true;
+					colour &= 0xfe;
+				}
+				else
+					blend = false;
 				if((colour && (m_gfxpalette->pen(colour) & 0xffffff)) || (m_video.gfx_pri == 2))
-					bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
+				{
+					if(blend)
+						bitmap.pix32(scanline, pixel) = ((bitmap.pix32(scanline, pixel) >> 1) & 0xff7f7f7f) + ((m_gfxpalette->pen(colour) >> 1) & 0x7f7f7f);
+					else
+						bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour);
+				}
 			}
 		}
 	}
@@ -1138,7 +1208,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 				for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 				{
 					UINT8 colour = m_pcgbitmap->pix16(scanline, pixel) & 0xff;
-					if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || (priority == 2))
+					if(colour && (m_pcgpalette->pen(colour) & 0xffffff))
 						bitmap.pix32(scanline, pixel) = m_pcgpalette->pen(colour);
 				}
 			}

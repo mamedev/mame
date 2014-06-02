@@ -339,7 +339,7 @@ private:
 	void x68k_crtc_text_copy(int src, int dest);
 	void x68k_crtc_refresh_mode();
 	void x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
-	void x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
+	bool x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
 	void x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
