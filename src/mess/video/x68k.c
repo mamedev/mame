@@ -23,15 +23,29 @@
          2 tilemapped layers - can be 8x8 or 16x16, 16 colours per tile, max 256 colours overall
          1 sprite layer - up to 128 16x16 sprites, 16 colours per sprite, maximum 16 sprites per scanline (not yet implemented).
 
+         Questions: What do the other bits in m_video.reg[2] do?
+                    How is the intensity applied during blending if at all?
+                    Black appears to be opaque only at priority 2 but not 3, is that right?
+                    How is the gfx layer cleared in pacland and text layer in akumajo?
+                    Are the gfx layers blended from the bottom up or all at once?
+
 */
 
 #include "emu.h"
+
 #include "machine/mc68901.h"
 #include "includes/x68k.h"
 #include "machine/ram.h"
 
 
-
+rgb_t x68k_state::GGGGGRRRRRBBBBBI_decoder(UINT32 raw)
+{
+	UINT8 i = raw & 1;
+	UINT8 r = pal6bit(((raw >> 5) & 0x3e) | i);
+	UINT8 g = pal6bit(((raw >> 10) & 0x3e) | i);
+	UINT8 b = pal6bit(((raw >> 0) & 0x3e) | i);
+	return rgb_t(r, g, b);
+}
 
 inline void x68k_state::x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, UINT32 color)
 {
@@ -720,7 +734,7 @@ void x68k_state::x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectan
 				+ (((m_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 				+ (((m_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
 			// Colour 0 is displayable if the text layer is at the priority level 2
-			if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || (m_video.text_pri == 2))
+			if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || ((m_video.reg[1] & 0x0c00) == 0x0800))
 				bitmap.pix32(line, pixel) = m_pcgpalette->pen(colour);
 			bit--;
 			if(bit < 0)
@@ -847,10 +861,10 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 							{
 								if(ret)
 								{
-									if(blend)
+									if(blend && bitmap.pix16(scanline, pixel))
 										bitmap.pix16(scanline, pixel) = ((bitmap.pix16(scanline, pixel) >> 1) & 0x7bde) + ((pal[colour] >> 1) & 0x7bde) + 1;
 									else
-										bitmap.pix16(scanline, pixel) = pal[colour] & 0xfffe;
+										bitmap.pix16(scanline, pixel) = (pal[colour] & 0xfffe) + blend;
 								}
 								else
 									bitmap.pix16(scanline, pixel) = colour;
@@ -909,7 +923,7 @@ void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 			{
 				colour = m_gfxbitmap->pix16(scanline, pixel);
 				if(colour || (m_video.gfx_pri == 2))
-					bitmap.pix32(scanline, pixel) = pal555(colour, 6, 11, 1);
+					bitmap.pix32(scanline, pixel) = GGGGGRRRRRBBBBBI_decoder(colour);
 			}
 			else if(gfxblend)
 			{
@@ -1208,7 +1222,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 				for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 				{
 					UINT8 colour = m_pcgbitmap->pix16(scanline, pixel) & 0xff;
-					if(colour && (m_pcgpalette->pen(colour) & 0xffffff))
+					if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || ((m_video.reg[1] & 0x3000) == 0x2000))
 						bitmap.pix32(scanline, pixel) = m_pcgpalette->pen(colour);
 				}
 			}
