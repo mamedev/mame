@@ -20,6 +20,8 @@
 
 #define LOG 0
 
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -54,7 +56,7 @@ const address_space_config *tms3556_device::memory_space_config(address_spacenum
 
 inline UINT8 tms3556_device::readbyte(offs_t address)
 {
-	return space().read_byte(address);
+	return space().read_byte(address&0xFFFF);
 }
 
 
@@ -64,7 +66,7 @@ inline UINT8 tms3556_device::readbyte(offs_t address)
 
 inline void tms3556_device::writebyte(offs_t address, UINT8 data)
 {
-	space().write_byte(address, data);
+	space().write_byte(address&0xFFFF, data);
 }
 
 
@@ -80,10 +82,14 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, TMS3556, "Texas Instruments VDP TMS3556", tag, owner, clock, "tms3556", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(tms3556)),
-		m_write_ptr(0),
-		m_reg_ptr(0),
 		m_reg_access_phase(0),
-		m_magical_mystery_flag(0),
+	    m_row_col_written(0),
+	    m_bamp_written(0),
+        m_colrow(0),
+        m_vdp_acmpxy_mode(dma_write),
+        m_vdp_acmpxy(0),
+        m_vdp_acmp(0),
+        m_init_read(0),
 		m_scanline(0),
 		m_blink(0),
 		m_blink_count(0),
@@ -92,7 +98,7 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 	for (int i = 0; i < 8; i++)
 	{
 		m_control_regs[i] = 0;
-		m_address_regs[i] = 0;
+		m_address_regs[i] = 0xFFFF;
 	}
 }
 
@@ -106,10 +112,13 @@ void tms3556_device::device_start()
 	// register for state saving
 	save_item(NAME(m_control_regs));
 	save_item(NAME(m_address_regs));
-	save_item(NAME(m_write_ptr));
-	save_item(NAME(m_reg_ptr));
 	save_item(NAME(m_reg_access_phase));
-	save_item(NAME(m_magical_mystery_flag));
+    save_item(NAME(m_row_col_written));
+    save_item(NAME(m_bamp_written));
+    save_item(NAME(m_colrow));
+//    save_item(NAME(m_vdp_acmpxy_mode)); // FIXME : mame cannot save enum
+    save_item(NAME(m_vdp_acmpxy));
+    save_item(NAME(m_vdp_acmp)); 
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_blink));
 	save_item(NAME(m_blink_count));
@@ -139,15 +148,36 @@ UINT32 tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 READ8_MEMBER( tms3556_device::vram_r )
 {
-	if (LOG) logerror("TMS3556 VRAM Read: %06x\n", offset);
+    UINT8 ret;
+    if (m_bamp_written) {
+        m_bamp_written=false;
+        m_vdp_acmpxy_mode=dma_write;
+        if (m_init_read)
+            m_vdp_acmp=VDP_BAMP;
+        else
+            m_vdp_acmp=(VDP_BAMP-1)&0xFFFF;
+    }
 
-	if (m_magical_mystery_flag)
-	{
-		m_write_ptr = ((m_control_regs[2] << 8) | m_control_regs[1]) + 1;
-		m_magical_mystery_flag = 0;
-	}
+    if (m_row_col_written) {
+        m_row_col_written=0;
+        m_vdp_acmpxy_mode=dma_read;
+        if (m_init_read)
+            m_vdp_acmpxy=m_colrow;
+        else
+            m_vdp_acmpxy=(m_colrow-1)&0xFFFF;
+    }
 
-	return readbyte(m_address_regs[1]++);
+    m_init_read=false;
+    if (m_vdp_acmpxy_mode==dma_read) {
+        ret=readbyte(m_vdp_acmpxy);
+        m_vdp_acmpxy++;
+        if (m_vdp_acmpxy==VDP_BAMTF) m_vdp_acmpxy=VDP_BAMP;
+    } else {
+        ret=readbyte(m_vdp_acmp);
+        m_vdp_acmp++;
+        if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
+    }
+    return ret;
 }
 
 //-------------------------------------------------
@@ -156,15 +186,28 @@ READ8_MEMBER( tms3556_device::vram_r )
 
 WRITE8_MEMBER( tms3556_device::vram_w )
 {
-	if (LOG) logerror("TMS3556 VRAM Write: %06x = %02x\n", offset, data);
+   if (m_bamp_written) {
+       m_bamp_written=false;
+       m_vdp_acmpxy_mode=dma_read;
+       m_vdp_acmp=VDP_BAMP;
+    }
 
-	if (m_magical_mystery_flag)
-	{
-		m_write_ptr = (m_control_regs[2] << 8) | m_control_regs[1];
-		m_magical_mystery_flag = 0;
-	}
+    if (m_row_col_written) {
+       m_row_col_written=0;
+       m_vdp_acmpxy_mode=dma_write;
+       m_vdp_acmpxy=m_colrow;
+    }
 
-	writebyte(m_write_ptr++, data);
+    if (m_vdp_acmpxy_mode==dma_write) {
+       writebyte(m_vdp_acmpxy,data);
+       m_vdp_acmpxy++;
+       if (m_vdp_acmpxy==VDP_BAMTF) m_vdp_acmpxy=VDP_BAMP;
+    } else {
+       writebyte(m_vdp_acmp,data);
+       m_vdp_acmp++;
+       if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
+    }
+
 }
 
 
@@ -176,18 +219,8 @@ READ8_MEMBER( tms3556_device::reg_r )
 {
 	if (LOG) logerror("TMS3556 Reg Read: %06x\n", offset);
 
-	int reply = 0;
-
-	if (m_reg_ptr < 8)
-	{
-		reply = m_control_regs[m_reg_ptr];
-		m_reg_access_phase = 0;
-	}
-	else
-	{
-		// ???
-	}
-
+	int reply = 0; // FIXME : will send internal status (VBL, HBL...)
+    m_reg_access_phase=0; 
 	return reply;
 }
 
@@ -197,54 +230,85 @@ READ8_MEMBER( tms3556_device::reg_r )
 
 WRITE8_MEMBER( tms3556_device::reg_w )
 {
+    static int reg2=0; // FIXME : this static makes that only one TMS3556 will be present in one system...
+    static int reg=0;
+
 	if (LOG) logerror("TMS3556 Reg Write: %06x = %02x\n", offset, data);
 
-	if ((m_reg_access_phase == 3) && (data))
-		m_reg_access_phase = 0; /* ???????????? */
+    switch (m_reg_access_phase) {
+    case 0:
+       reg=data&0x0F;
+       reg2=(data&0xF0)>>4;
+       if (reg!=0)
+          m_reg_access_phase=1;
+       return;
 
-	switch (m_reg_access_phase)
-	{
-	case 0:
-		m_reg_ptr = data & 0x0f;
-		m_reg_access_phase = 1;
-		break;
+    case 1:
+       if (reg<8) {
+                  m_control_regs[reg]=data;
+                  // leve un flag si le dernier registre ecrit est row ou col
+                  if ((reg==2) || (reg==1)) {
+                     m_colrow=(m_control_regs[2]<<8)|m_control_regs[1];
+                     m_row_col_written=true;
+                     }
 
-	case 1:
-		if (m_reg_ptr < 8)
-		{
-			m_control_regs[m_reg_ptr] = data;
-			m_reg_access_phase = 0;
-			if (m_reg_ptr == 2)
-				m_magical_mystery_flag = 1;
-		}
-		else if (m_reg_ptr == 9)
-		{   /* I don't understand what is going on, but it is the only way to
-            get this to work */
-			m_address_regs[m_reg_ptr - 8] = ((m_control_regs[2] << 8) | m_control_regs[1]) + 1;
-			m_reg_access_phase = 0;
-			m_magical_mystery_flag = 0;
-		}
-		else
-		{
-			m_address_regs[m_reg_ptr - 8] = (m_control_regs[m_reg_ptr - 8] & 0xff00) | m_control_regs[1];
-			m_reg_access_phase = 2;
-			m_magical_mystery_flag = 0;
-		}
-		break;
+                  if (reg2==0) {
+                     m_reg_access_phase=0;
+                     return;
+                  }
+                  else {
+                       m_reg_access_phase=1;
+                       reg=reg2;
+                       reg2=0;
+                       return;
+                  }
+        } else {
+               m_address_regs[reg-8]=(m_control_regs[2]<<8)|m_control_regs[1];
+               // cas speciaux de decalage pour les generateurs
+               if ((reg>=0xB) && (reg<=0xE)) {
+                  m_address_regs[reg-8]+=2;
+                  m_address_regs[reg-8]&=0xFFFF;
+               } else {
+                 m_address_regs[reg-8]+=1;
+                 m_address_regs[reg-8]&=0xFFFF;
+               }
+               if (reg==9) {
+                  m_row_col_written=false;
+                  m_bamp_written=true;
+                  m_reg_access_phase=0;
+                  return;
+               } else {
+                  m_row_col_written=0;
+                  m_bamp_written=false;
+                  m_reg_access_phase=2;//???
+                  return;
+               }
+               logerror("VDP16[%d] = x%x",reg,m_address_regs[reg-8]);
+               if (reg2==0) {
+                  m_reg_access_phase=0;
+                  return;
+               }
+               else {
+                    m_reg_access_phase=1;
+                    reg=reg2;
+                    reg2=0;
+                    return;
+               }
+       }
+       case 2:
+            m_reg_access_phase=0;
+            return;
+    }
+}
 
-	case 2:
-		m_address_regs[m_reg_ptr - 8] = (m_control_regs[m_reg_ptr - 8] & 0x00ff) | (m_control_regs[2] << 8);
-		if ((m_reg_ptr <= 10) || (m_reg_ptr == 15))
-			m_address_regs[m_reg_ptr - 8]++;
-		else
-			m_address_regs[m_reg_ptr - 8] += 2;
-		m_reg_access_phase = 3;
-		break;
+//--------------------------------------------------------------------------
+//  initptr_r - set VDP in read mode (not exacly on the VDP but on the TAL)
+//--------------------------------------------------------------------------
 
-	case 3:
-		m_reg_access_phase = 0;
-		break;
-	}
+READ8_MEMBER( tms3556_device::initptr_r )
+{
+    m_init_read=true;
+    return 0xff;
 }
 
 
@@ -509,6 +573,7 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 	{
 		/* draw top and bottom borders */
 		draw_line_empty(ln);
+		m_cg_flag=0; // FIXME : forme text mode for 1st line in mixed
 	}
 	else
 	{

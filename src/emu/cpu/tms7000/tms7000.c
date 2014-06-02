@@ -43,6 +43,7 @@
 #define WM(Addr,Value) (m_program->write_byte(Addr, Value))
 
 #define IMMBYTE(b)  b = ((unsigned)m_direct->read_raw_byte(pPC)); pPC++
+#define SKIPBYTE()  ((unsigned)m_direct->read_raw_byte(pPC)); pPC++
 #define SIMMBYTE(b) b = ((signed)m_direct->read_raw_byte(pPC)); pPC++
 #define IMMWORD(w)  w.b.h = (unsigned)m_direct->read_raw_byte(pPC++); w.b.l = (unsigned)m_direct->read_raw_byte(pPC++)
 
@@ -59,7 +60,7 @@ const device_type TMS7000_EXL = &device_creator<tms7000_exl_device>;
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
 	AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w) /* tms7000 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_NOP                                               /* reserved */
-	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
+	AM_RANGE(0x0100, 0x010f) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
 
@@ -118,6 +119,8 @@ offs_t tms7000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 #define SET_Z8(a)   SET_Z((UINT8)a)
 #define SET_Z16(a)  SET_Z((UINT8)a>>8)
 #define GET_C       (pSR >> 7)
+
+#define SET_N16(a)	pSR|=(((a)&0x008000)>>9)
 
 /* Not working */
 #define SET_C16(a)  pSR|=((a&0x010000)>>9)

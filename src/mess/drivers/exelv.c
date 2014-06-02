@@ -21,7 +21,7 @@
 
 Specs:
     * main CPU is a variant of tms7020 (exl100) or tms7040 (exeltel).  AFAIK,
-      the only difference compared to a stock tms7020/7040 is the SWAP R0
+      the only difference compared to a stock tms7020/7040 is the SWAP register
       instruction is replaced by a custom microcoded LVDP instruction that
       reads a byte from the VDP VRAM read port; it seems that the first 6 bytes
       of internal ROM (0xF000-0xF005 on an exeltel) are missing, too.
@@ -37,7 +37,7 @@ Specs:
       CPU
     * keyboard and joystick: an I/R interface controlled by the I/O CPU enables
       to use a keyboard and two joysticks
-    * mass storage: tape interface controlled by the I/O CPU
+    * mass storage: tape interface controlled by the main CPU
 
 STATUS:
     * EXL 100 cannot be emulated because the ROMs are not dumped
@@ -55,7 +55,7 @@ TODO:
 #include "video/tms3556.h"
 #include "sound/tms5220.h"
 #include "machine/spchrom.h"
-//#include "imagedev/cartslot.h"
+#include "imagedev/cartslot.h"
 //#include "imagedev/cassette.h"
 
 
@@ -105,7 +105,35 @@ public:
 	UINT8   m_wx319;    /* data of 74sl374 labeled wx319 */
 	DECLARE_PALETTE_INIT(exelv);
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
+	
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
+	
 };
+
+
+DEVICE_IMAGE_LOAD_MEMBER( exelv_state, exelvision_cartridge )
+{
+	UINT8* pos = memregion("user1")->base();
+	offs_t size;
+
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
+
+
+	if (image.software_entry() == NULL)
+	{
+		image.fread( pos, size );
+	}
+	else
+	{
+		memcpy(pos, image.get_software_region("rom"), size);
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
@@ -184,7 +212,7 @@ static DEVICE_IMAGE_UNLOAD( exelv_cart )
         >0a: synthesizer data
         >0b: standard generator request
         >0c: I/O CPU CRC (EXELTEL only?)
-        >0d: send exelvision logo (EXL 100 only?), start speech ROM sound (EXELTEL only?)
+        >0d: send exelvision logo (EXL 100 only), start speech ROM sound (EXELTEL only?)
         >0e: data for speech on ROM (EXELTEL only?)
         >0f: do not decode joystick 0 keys (EXELTEL only?)
         >10: do not decode joystick 1 keys (EXELTEL only?)
@@ -201,6 +229,7 @@ static DEVICE_IMAGE_UNLOAD( exelv_cart )
 
 READ8_MEMBER(exelv_state::mailbox_wx319_r)
 {
+    logerror("[TMS7220] reading mailbox %d", m_wx319);
 	return m_wx319;
 }
 
@@ -276,14 +305,23 @@ WRITE8_MEMBER(exelv_state::tms7020_portb_w)
 READ8_MEMBER(exelv_state::tms7041_porta_r)
 {
 	UINT8 data = 0x00;
+    static UINT8 data_last=0;
 
-	logerror("tms7041_porta_r\n");
+    // TMS5220 OK
+	data |= m_tms5220c->intq_r() ? 0x08 : 0x00; // A3
+	data |= m_tms5220c->readyq_r() ? 0x80 : 0x00; // A7
 
-	data |= (m_tms7020_portb & 0x01 ) ? 0x04 : 0x00;
-	data |= m_tms5220c->intq_r() ? 0x08 : 0x00;
-	data |= (m_tms7020_portb & 0x02) ? 0x10 : 0x00;
-	data |= m_tms5220c->readyq_r() ? 0x80 : 0x00;
+    // TMS7220
+	data |= (m_tms7020_portb & 0x01 ) ? 0x04 : 0x00; // A2
+	data |= (m_tms7020_portb & 0x02) ? 0x10 : 0x00; // A4
+	
+	// SERIAL PORT
 
+    if (data!=data_last) {
+	    logerror("tms7041_porta_r %x\n",data);
+    }
+    data_last=data;
+    
 	return data;
 }
 
@@ -321,6 +359,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 	m_tms5220c->wsq_w((data & 0x01) ? 1 : 0);
 	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
 
+    logerror("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
 	m_maincpu->set_input_line(TMS7000_IRQ1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
@@ -371,6 +410,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
 READ8_MEMBER(exelv_state::tms7041_portd_r)
 {
 	UINT8 data = 0xff;
+	data=m_tms5220c->status_r(space, 0, data); 
 	logerror("tms7041_portd_r\n");
 	return data;
 }
@@ -380,7 +420,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	m_tms5220c->data_w(space, 0, BITSWAP8(data,0,1,2,3,4,5,6,7));
+	m_tms5220c->data_w(space, 0, data);
 	m_tms7041_portd = data;
 }
 
@@ -410,12 +450,13 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 */
 
 static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
-	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
-	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
-	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
-	AM_RANGE(0x012d, 0x0012d) AM_DEVREADWRITE("tms3556", tms3556_device, reg_r/*right???*/, reg_w)
-	AM_RANGE(0x012e, 0x0012e) AM_DEVREADWRITE("tms3556", tms3556_device, vram_r/*right???*/, vram_w)
+    AM_RANGE(0x0124, 0x00124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
+    AM_RANGE(0x0125, 0x00125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
+    AM_RANGE(0x0128, 0x00128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
+    AM_RANGE(0x012d, 0x0012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
+    AM_RANGE(0x012e, 0x0012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
+
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
@@ -445,12 +486,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
-	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7040 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
-	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
-	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
-	AM_RANGE(0x012d, 0x0012d) AM_DEVREADWRITE("tms3556", tms3556_device, reg_r/*right???*/, reg_w)
-	AM_RANGE(0x012e, 0x0012e) AM_DEVREADWRITE("tms3556", tms3556_device, vram_r/*right???*/, vram_w)
+    AM_RANGE(0x0124, 0x00124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
+    AM_RANGE(0x0125, 0x00125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
+    AM_RANGE(0x0128, 0x00128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
+    AM_RANGE(0x012d, 0x0012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
+    AM_RANGE(0x012e, 0x0012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
@@ -461,8 +502,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(tms7042_map, AS_PROGRAM, 8, exelv_state)
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("tms7042",0x0000)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7042",0x0000)     /* Duplicated until a proper dump surfaces */
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7042",0x0000)  
 ADDRESS_MAP_END
 
 
@@ -533,7 +573,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH*2-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #else
 	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT-1)
 #endif
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -542,13 +582,22 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(exelv_state, exelv)
 
-	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5220c", TMS5220C, 640000)
-	MCFG_TMS52XX_SPEECHROM("vsm")
+	// MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+/* cartridge */
+        MCFG_CARTSLOT_ADD("cart")
+        MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+        MCFG_CARTSLOT_NOT_MANDATORY
+        MCFG_CARTSLOT_LOAD(exelv_state,exelvision_cartridge)
+        MCFG_CARTSLOT_INTERFACE("exelvision_cart")
+        MCFG_SOFTWARE_LIST_ADD("cart_list","exelvision_cart")
+	
 MACHINE_CONFIG_END
 
 
@@ -577,7 +626,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH*2-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #else
 	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT-1)
 #endif
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -601,16 +650,13 @@ MACHINE_CONFIG_END
 */
 ROM_START(exl100)
 	ROM_REGION(0x800, "maincpu", 0)
-	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, verification would be welcome */
+	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, correct */
 
 	ROM_REGION(0x1000, "tms7041", 0)
-	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))           /* TMS7041 internal ROM, verification would be welcome  */
+	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
+//	ROM_REGION(0x8000, "vsm", 0)
 
 	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)         /* cartridge area */
-
-	/* is this correct for exl100? */
-	ROM_REGION(0x8000, "vsm", 0)
-	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */
 ROM_END
 
 
@@ -635,3 +681,4 @@ ROM_END
 /*   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
 COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  GAME_NOT_WORKING)
 COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  GAME_NOT_WORKING)
+

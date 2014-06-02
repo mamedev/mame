@@ -761,7 +761,7 @@ void tms7000_device::btjz_b2a()
 {
 	UINT8   t;
 
-	t = RDB & ~RDA;
+	t = RDB & (~RDA);
 
 	CLR_NZC;
 	SET_N8(t);
@@ -787,7 +787,7 @@ void tms7000_device::btjz_r2a()
 	UINT8   t,r;
 
 	IMMBYTE( r );
-	t = RM( r ) & ~RDA;
+	t = RM( r ) & (~RDA);
 
 	CLR_NZC;
 	SET_N8(t);
@@ -813,7 +813,7 @@ void tms7000_device::btjz_r2b()
 	UINT8   t,r;
 
 	IMMBYTE(r);
-	t = RM(r) & ~RDB;
+	t = RM(r) & (~RDB);
 
 	CLR_NZC;
 	SET_N8(t);
@@ -840,7 +840,7 @@ void tms7000_device::btjz_r2r()
 
 	IMMBYTE(r);
 	IMMBYTE(s);
-	t = RM(r) & ~RM(s);
+	t = RM(r) & (~RM(s));
 
 	CLR_NZC;
 	SET_N8(t);
@@ -866,7 +866,7 @@ void tms7000_device::btjz_i2a()
 	UINT8   t,r;
 
 	IMMBYTE(r);
-	t = r & ~RDA;
+	t = r & (~RDA);
 
 	CLR_NZC;
 	SET_N8(t);
@@ -892,7 +892,7 @@ void tms7000_device::btjz_i2b()
 	UINT8   t,i;
 
 	IMMBYTE(i);
-	t = i & ~RDB;
+	t = i & (~RDB);
 
 	CLR_NZC;
 	SET_N8(t);
@@ -919,7 +919,7 @@ void tms7000_device::btjz_i2r()
 
 	IMMBYTE(i);
 	IMMBYTE(r);
-	t = i & ~RM(r);
+	t = i & (~RM(r));
 
 	CLR_NZC;
 	SET_N8(t);
@@ -946,7 +946,7 @@ void tms7000_device::btjzp_ap()
 
 	IMMBYTE(p);
 
-	t = RDA & ~RM(0x100+p);
+	t = RDA & (~RM(0x100+p));
 
 	CLR_NZC;
 	SET_N8(t);
@@ -973,7 +973,7 @@ void tms7000_device::btjzp_bp()
 
 	IMMBYTE(p);
 
-	t = RDB & ~RM(0x100+p);
+	t = RDB & (~RM(0x100+p));
 
 	CLR_NZC;
 	SET_N8(t);
@@ -1001,7 +1001,7 @@ void tms7000_device::btjzp_ip()
 	IMMBYTE(i);
 	IMMBYTE(p);
 
-	t = i & ~RM(0x100+p);
+	t = i & (~RM(0x100+p));
 
 	CLR_NZC;
 	SET_N8(t);
@@ -1057,12 +1057,16 @@ void tms7000_device::call_inx()
 void tms7000_device::clr_a()
 {
 	WRA(0);
+    CLR_NZC;
+    SETZ;
 	m_icount -= 5;
 }
 
 void tms7000_device::clr_b()
 {
 	WRB(0);
+    CLR_NZC;
+    SETZ;
 	m_icount -= 5;
 }
 
@@ -1072,6 +1076,8 @@ void tms7000_device::clr_r()
 
 	IMMBYTE(r);
 	WM(r,0);
+	CLR_NZC;
+    SETZ;
 	m_icount -= 7;
 }
 
@@ -1098,11 +1104,7 @@ void tms7000_device::cmp_ba()
 	SET_N8(t);
 	SET_Z8(t);
 
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
-
+	SET_C8( ~t );
 	m_icount -= 5;
 }
 
@@ -1118,10 +1120,7 @@ void tms7000_device::cmp_ra()
 	SET_N8(t);
 	SET_Z8(t);
 
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 8;
 }
@@ -1137,11 +1136,8 @@ void tms7000_device::cmp_rb()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+ 
+	SET_C8( ~t );
 
 	m_icount -= 8;
 }
@@ -1159,10 +1155,7 @@ void tms7000_device::cmp_rr()
 	SET_N8(t);
 	SET_Z8(t);
 
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 10;
 }
@@ -1179,10 +1172,7 @@ void tms7000_device::cmp_ia()
 	SET_N8(t);
 	SET_Z8(t);
 
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 7;
 }
@@ -1198,11 +1188,7 @@ void tms7000_device::cmp_ib()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 7;
 }
@@ -1219,11 +1205,7 @@ void tms7000_device::cmp_ir()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 9;
 }
@@ -1239,11 +1221,7 @@ void tms7000_device::cmpa_dir()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 12;
 }
@@ -1261,11 +1239,7 @@ void tms7000_device::cmpa_ind()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 11;
 }
@@ -1281,11 +1255,7 @@ void tms7000_device::cmpa_inx()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-
-	if( t==0 )
-		SETC;
-	else
-		SET_C8( ~t );
+	SET_C8( ~t );
 
 	m_icount -= 14;
 }
@@ -1370,7 +1340,7 @@ void tms7000_device::dec_a()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-	SET_C8(~t);
+    if ((t&0xFF)!=0xFF) SETC;
 
 	m_icount -= 5;
 }
@@ -1386,7 +1356,7 @@ void tms7000_device::dec_b()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-	SET_C8(~t);
+    if ((t&0xFF)!=0xFF) SETC;
 
 	m_icount -= 5;
 }
@@ -1405,7 +1375,7 @@ void tms7000_device::dec_r()
 	CLR_NZC;
 	SET_N8(t);
 	SET_Z8(t);
-	SET_C8(~t);
+    if ((t&0xFF)!=0xFF) SETC;
 
 	m_icount -= 7;
 }
@@ -1420,11 +1390,13 @@ void tms7000_device::decd_a()
 	WRF16(0,t);
 
 	CLR_NZC;
-	SET_N8(t.b.h);
-	SET_Z8(t.b.h);
+	
+	SET_N16(t.d);
 
-	SET_C16(~(t.d));
-
+    if ((t.d&0xFF00)==0) SETZ;
+    if ((t.d&0xFFFF)!=0xFFFF) SETC;
+    
+      
 	m_icount -= 9;
 }
 
@@ -1438,10 +1410,10 @@ void tms7000_device::decd_b()
 	WRF16(1,t);
 
 	CLR_NZC;
-	SET_N8(t.b.h);
-	SET_Z8(t.b.h);
+	SET_N16(t.d);
 
-	SET_C16(~(t.d));
+    if ((t.d&0xFF00)==0) SETZ;
+    if ((t.d&0xFFFF)!=0xFFFF) SETC;
 
 	m_icount -= 9;
 }
@@ -1458,10 +1430,10 @@ void tms7000_device::decd_r()
 	WRF16(r,t);
 
 	CLR_NZC;
-	SET_N8(t.b.h);
-	SET_Z8(t.b.h);
+	SET_N16(t.d);
 
-	SET_C16(~(t.d));
+    if ((t.d&0xFF00)==0) SETZ;
+    if ((t.d&0xFFFF)!=0xFFFF) SETC;
 
 	m_icount -= 11;
 }
@@ -1479,10 +1451,6 @@ void tms7000_device::djnz_a()
 	t = RDA - 1;
 
 	WRA( t );
-
-	CLR_NZC;
-	SET_N8(t);
-	SET_Z8(t);
 
 	if( t != 0 )
 	{
@@ -1506,10 +1474,6 @@ void tms7000_device::djnz_b()
 	t = RDB - 1;
 
 	WRB( t );
-
-	CLR_NZC;
-	SET_N8(t);
-	SET_Z8(t);
 
 	if( t != 0 )
 	{
@@ -1536,11 +1500,6 @@ void tms7000_device::djnz_r()
 	t = RM(r) - 1;
 
 	WM(r,t);
-
-	CLR_NZC;
-	SET_N8(t);
-	SET_Z8(t);
-
 	if( t != 0 )
 	{
 		INT8    s;
@@ -2117,7 +2076,7 @@ void tms7000_device::movd_inx()
 	UINT8   r;
 
 	IMMWORD(t);
-	t.w.l += RDB;
+	t.w.l = (t.w.l+RDB)&0xFFFF;
 	IMMBYTE(r);
 	WRF16(r,t);
 
@@ -3461,42 +3420,23 @@ void tms7000_device::swap_r()
 
 void tms7000_device::swap_r_exl()
 {
-	UINT8   a,b,r;
-	UINT16  t;
+	UINT16	t;
 
-	IMMBYTE(r);
+	SKIPBYTE();
 
-	if (r == 0)
-	{   /* opcode D7 00 (LVDP) mostly equivalent to MOVP P46,A??? (timings must
-        be different, possibly the microcode polls the state of the VDP RDY
-        line prior to doing the transfer) */
-		t=RM(0x012e);
-		WRA(t);
+    /* opcode D7 ?? (LVDP) mostly equivalent to 
+     * MOVP P40,xx
+     * MOVP P36,A
+     */
+    RM(0x0128);
+    t=RM(0x0124);
+    WM(0,t);
 
-		CLR_NZC;
-		SET_N8(t);
-		SET_Z8(t);
+    CLR_NZC;
+    SET_N8(t);
+    SET_Z8(t);
 
-		m_icount -= 9;  /* ?????? */
-	}
-	else
-	{   /* stright swap Rn instruction */
-		a = b = RM(r);
-
-		a <<= 4;
-		b >>= 4;
-		t = a+b;
-
-		WM(r,t);
-
-		CLR_NZC;
-
-		pSR|=((t&0x0001)<<7);
-		SET_N8(t);
-		SET_Z8(t);
-
-		m_icount -=8;
-	}
+    m_icount -= 9;	/* FIXME : check real timing */
 }
 
 void tms7000_device::tstb()
@@ -3532,13 +3472,8 @@ void tms7000_device::xchb_a()
 void tms7000_device::xchb_b()
 {
 	UINT16  t;
-/*  UINT16  u;  */
 
 	t = RDB;
-/*  u = RDB;    */
-
-/*  WRB(t);     */
-/*  WRB(u);     */
 
 	CLR_NZC;
 	SET_N8(t);
@@ -3557,7 +3492,7 @@ void tms7000_device::xchb_r()
 	t = RDB;
 	u = RM(r);
 
-	WRA(t);
+    WM(r,t);
 	WRB(u);
 
 	CLR_NZC;

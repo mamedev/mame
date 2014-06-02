@@ -22,13 +22,29 @@
 #define TMS3556_TOTAL_HEIGHT (250 + TMS3556_TOP_BORDER + TMS3556_BOTTOM_BORDER)
 
 /* if DOUBLE_WIDTH set, the horizontal resolution is doubled */
-#define TMS3556_DOUBLE_WIDTH 1
+#define TMS3556_DOUBLE_WIDTH 0
 
 #define TMS3556_MODE_OFF    0
 #define TMS3556_MODE_TEXT   1
 #define TMS3556_MODE_BITMAP 2
 #define TMS3556_MODE_MIXED  3
 
+#define VDP_POINTER m_control_regs[0]
+#define VDP_COL     m_control_regs[1]
+#define VDP_ROW     m_control_regs[2]
+#define VDP_STAT    m_control_regs[3]
+#define VDP_CM1     m_control_regs[4]
+#define VDP_CM2     m_control_regs[5]
+#define VDP_CM3     m_control_regs[6]
+#define VDP_CM4     m_control_regs[7]
+#define VDP_BAMT    m_address_regs[0]
+#define VDP_BAMP    m_address_regs[1]
+#define VDP_BAPA    m_address_regs[2]
+#define VDP_BAGC0   m_address_regs[3]
+#define VDP_BAGC1   m_address_regs[4]
+#define VDP_BAGC2   m_address_regs[5]
+#define VDP_BAGC3   m_address_regs[6]
+#define VDP_BAMTF   m_address_regs[7]
 
 ///*************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -40,6 +56,9 @@
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
+
+typedef enum { dma_read, dma_write } dma_mode_tt;
+
 
 // ======================> tms3556_device
 
@@ -54,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( reg_r );
 	DECLARE_WRITE8_MEMBER( reg_w );
+	DECLARE_READ8_MEMBER( initptr_r );
 
 	void interrupt(running_machine &machine);
 
@@ -85,12 +105,17 @@ private:
 	// registers
 	UINT8 m_control_regs[8];
 	UINT16 m_address_regs[8];
-	UINT16 m_write_ptr;
 
 	// register interface
-	int m_reg_ptr;
 	int m_reg_access_phase;
-	int m_magical_mystery_flag;
+	
+	int m_row_col_written;
+	int m_bamp_written;
+	int m_colrow;
+    dma_mode_tt m_vdp_acmpxy_mode;
+    UINT16 m_vdp_acmpxy;
+    UINT16 m_vdp_acmp;
+    int m_init_read;
 
 	int m_scanline;             // scanline counter
 	int m_blink, m_blink_count; // blinking
