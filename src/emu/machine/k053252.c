@@ -25,18 +25,18 @@ dbz2:      01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00 384x256 ~ 384x256
 xexex:     01 FF 00 21 00 37 01 00 00 20 0C 0E 54 00 00 00 384x256 ~ 384x256 (*)
 (all konamigx, cowboys of moo mesa, run & gun, dj main)
 
-(*) hblank duration 512 (0x200), hdisp 384 (0x180), vblank duration 288 (0x120), vdisp 256 (0x100)
+(*) hcount total 512 (0x200), hdisp 384 (0x180), vcount total 289 (0x121), vdisp 256 (0x100)
 
      Definitions from GX, look similar, all values big-endian, write-only:
 
-    0-1: bits 9-0: HC        - Total hblank duration (-1)     Hres ~ (HC+1) - HFP - HBP - 8*(HSW+1)
+    0-1: bits 9-0: HC        - Total horizontal count (-1)  Hres ~ (HC+1) - HFP - HBP - 8*(HSW+1)
     2-3: bits 8-0: HFP       - HBlank front porch
     4-5: bits 8-0: HBP       - HBlank back porch
     6  : bits 7-0: INT1EN
     7  : bits 7-0: INT2EN
-    8-9: bits 8-0: VC        - Total vblank duration
-    a  : bits 7-0: VFP       - VBlank front porch             Vres ~ VC - VFP - VBP - (VSW+1)
-    b  : bits 7-0: VBP       - VBlank back porch
+    8-9: bits 8-0: VC        - Total vertical count (-1)    Vres ~ (VC+1) - VFP - (VBP+1) - (VSW+1)
+    a  : bits 7-0: VFP       - VBlank front porch
+    b  : bits 7-0: VBP       - VBlank back porch (-1) (?)
     c  : bits 7-4: VSW       - V-Sync Width
     c  : bits 3-0: HSW       - H-Sync Width
     d  : bits 7-0: INT-TIME
@@ -49,6 +49,7 @@ xexex:     01 FF 00 21 00 37 01 00 00 20 0C 0E 54 00 00 00 384x256 ~ 384x256 (*)
 TODO:
 - xexex sets up 0x20 as the VC? default value?
 - xexex layers are offsetted if you try to use the CCU
+- according to p.14-15 both HBP and VBP have +1 added, but to get correct visible areas you have to add it only to VBP
 - understand how to interpret the back / front porch values, and remove the offset x/y hack
 - dual screen support (for Konami GX types 3/4)
 - viostorm and dbz reads the VCT port, but their usage is a side effect to send an irq ack thru the same port:
@@ -171,7 +172,7 @@ WRITE8_MEMBER( k053252_device::write )
 		case 0x01:
 			m_hc  = (m_regs[1]&0xff);
 			m_hc |= ((m_regs[0]&0x03)<<8);
-			m_hc ++;
+			m_hc++;
 			logerror("%d (%04x) HC set\n",m_hc,m_hc);
 			res_change();
 			break;
@@ -195,6 +196,7 @@ WRITE8_MEMBER( k053252_device::write )
 		case 0x09:
 			m_vc  = (m_regs[9]&0xff);
 			m_vc |= ((m_regs[8]&0x01)<<8);
+			m_vc++;
 			logerror("%d (%04x) VC set\n",m_vc,m_vc);
 			res_change();
 			break;
@@ -205,6 +207,7 @@ WRITE8_MEMBER( k053252_device::write )
 			break;
 		case 0x0b:
 			m_vbp  = (m_regs[0x0b]&0xff);
+			m_vbp++;
 			logerror("%d (%04x) VBP set\n",m_vbp,m_vbp);
 			res_change();
 			break;
