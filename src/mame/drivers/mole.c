@@ -59,16 +59,22 @@ public:
 	mole_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int          m_tile_bank;
+	tilemap_t *m_bg_tilemap;
+	int m_tile_bank;
 
 	/* memory */
-	UINT16       m_tileram[0x400];
+	UINT16 m_tileram[0x400];
+
 	DECLARE_WRITE8_MEMBER(mole_tileram_w);
 	DECLARE_WRITE8_MEMBER(mole_tilebank_w);
+	DECLARE_WRITE8_MEMBER(mole_irqack_w);
 	DECLARE_WRITE8_MEMBER(mole_flipscreen_w);
 	DECLARE_READ8_MEMBER(mole_protection_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -77,8 +83,6 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(mole);
 	UINT32 screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -90,9 +94,7 @@ public:
 
 PALETTE_INIT_MEMBER(mole_state, mole)
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 }
 
@@ -120,6 +122,11 @@ WRITE8_MEMBER(mole_state::mole_tileram_w)
 WRITE8_MEMBER(mole_state::mole_tilebank_w)
 {
 	m_tile_bank = data;
+}
+
+WRITE8_MEMBER(mole_state::mole_irqack_w)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mole_state::mole_flipscreen_w)
@@ -208,7 +215,7 @@ static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
 	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
 	AM_RANGE(0x8c81, 0x8c81) AM_WRITENOP // ???
-	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE(mole_irqack_w)
 	AM_RANGE(0x8d40, 0x8d40) AM_READ_PORT("IN0")
 	AM_RANGE(0x8d80, 0x8d80) AM_READ_PORT("IN1")
 	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)
@@ -319,13 +326,12 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???
 	MCFG_CPU_PROGRAM_MAP(mole_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mole_state,  irq0_line_hold)
-
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mole_state, irq0_line_assert)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
