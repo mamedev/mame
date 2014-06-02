@@ -71,7 +71,7 @@ WRITE8_MEMBER(msx_cart_hfox::write_cart)
 			break;
 
 		default:
-			printf("msx_cart_hfox: unhandled write %02x to %04x\n", data, offset);
+			logerror("msx_cart_hfox: unhandled write %02x to %04x\n", data, offset);
 			break;
 	}
 }
