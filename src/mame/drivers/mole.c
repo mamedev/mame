@@ -153,11 +153,11 @@ READ8_MEMBER(mole_state::mole_protection_r)
 	/*  Following are all known examples of Mole Attack
 	**  code reading from the protection circuitry:
 	**
-	**  5b0b:
+	**  5b09:
 	**  ram[0x0361] = (ram[0x885+ram[0x8a5])&ram[0x886]
 	**  ram[0x0363] = ram[0x886]
 	**
-	**  53c9:
+	**  53c7:
 	**  ram[0xe0] = ram[0x800]+ram[0x802]+ram[0x804]
 	**  ram[0xea] = ram[0x828]
 	**
@@ -175,12 +175,12 @@ READ8_MEMBER(mole_state::mole_protection_r)
 	{
 	case 0x08: return 0xb0; /* random mole placement */
 	case 0x26:
-		if (space.device().safe_pc() == 0x53d7)
+		if (space.device().safe_pc() == 0x53d5)
 		{
 			return 0x06; /* bonus round */
 		}
 		else
-		{ // pc == 0x515b, 0x5162
+		{ // pc == 0x5159, 0x5160
 			return 0xc6; /* game start */
 		}
 	case 0x86: return 0x91; /* game over */
