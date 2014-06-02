@@ -282,11 +282,11 @@ void gradius3_state::machine_reset()
 static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(gradius3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gradius3_state,  cpuA_interrupt)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz */
+	MCFG_CPU_ADD("sub", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(gradius3_map2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gradius3_state, gradius3_sub_scanline, "screen", 0, 1)
 																				/* 4 is triggered by cpu A, the others are unknown but */

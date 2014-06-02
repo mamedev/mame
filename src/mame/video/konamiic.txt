@@ -18,7 +18,6 @@ TODO:
 
 - scrollcontrol = 30 in Golfing Greats (leader board)
 
-- detatwin: sprites are left on screen during attract mode
 
 
                       Emulated
@@ -177,9 +176,7 @@ Gang Busters        pass
 Devastators         pass
 Bottom of the Ninth pass
 Punk Shot           pass
-Surprise Attack     fails D05-6 (052109) because it uses mirror addresses to
-                    select banks, and supporting those addresses breaks the
-                    normal game ;-(
+Surprise Attack     pass
 Lightning Fighters  pass
 Gradius 3           pass
 Parodius            pass
