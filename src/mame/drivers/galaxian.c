@@ -6910,6 +6910,23 @@ ROM_START( zerotime )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+// Late-to-market bootleg with PCB mods to use a single program rom
+// Datamat is the old name of Datasat, a technical service and distributor of arcade PCB's from the 80's and 90's.
+// A lot of the bootleg PCB's around Spain have Datamat stickers on the roms. It was one of the most important PCB sellers/distributors in the country from the era.
+// Datamat still operate today as Datasat http://datasat.info/
+ROM_START( zerotimed )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "zerotime_datamat.bin",  0x0000, 0x4000, CRC(be60834b) SHA1(426cb27a38fd99485481cb74c7372df8b7c8832a) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ztc-2.016",    0x0000, 0x0800, CRC(1b13ca05) SHA1(6999068771dacc6bf6c17eb858af593a929d09af) )
+	ROM_LOAD( "ztc-1.016",    0x0800, 0x0800, CRC(5cd7df03) SHA1(77873408c89546a17b1da3f64b7e96e314fadb17) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+
 ROM_START( starfght )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "ja.1",         0x0000, 0x0400, CRC(c6ab558b) SHA1(2b707e332c57b9ec6a61220ab2b79ed5076d0628) )
@@ -10584,6 +10601,7 @@ GAME( 1979, galap4,   galaxian, galaxian, superg, galaxian_state,   galaxian, RO
 GAME( 1979, swarm,    galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg? (Subelectro)", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1980, astrians, galaxian, galaxian, swarm,  galaxian_state,   galaxian, ROT90,  "bootleg (BGV Ltd.)", "Astrians (clone of Swarm)", GAME_SUPPORTS_SAVE )
 GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian_state, galaxian, ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", GAME_SUPPORTS_SAVE )
+GAME( 1979, zerotimed,galaxian, galaxian, zerotime, galaxian_state, galaxian, ROT90,  "bootleg (Datamat)", "Zero Time (Datamat)", GAME_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, starfght, galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,galaxian,galaxian, galaxianbl,galaxian_state,galaxian, ROT90,  "bootleg", "Galaxian (bootleg, set 2)", GAME_SUPPORTS_SAVE )
