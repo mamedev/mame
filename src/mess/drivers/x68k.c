@@ -1718,9 +1718,9 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcgpalette", empty)
 
 	MCFG_PALETTE_ADD("gfxpalette", 256)
-	palette_device::static_set_format(*device, raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
+	MCFG_PALETTE_FORMAT_CLASS(2, x68k_state, GGGGGRRRRRBBBBBI)
 	MCFG_PALETTE_ADD("pcgpalette", 256)
-	palette_device::static_set_format(*device, raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
+	MCFG_PALETTE_FORMAT_CLASS(2, x68k_state, GGGGGRRRRRBBBBBI)
 
 	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 

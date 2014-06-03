@@ -180,6 +180,9 @@
 #define MCFG_PALETTE_FORMAT(_format) \
 	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
 
+#define MCFG_PALETTE_FORMAT_CLASS(_bytes_per_entry, _class, _format) \
+	palette_device::static_set_format(*device, raw_to_rgb_converter(_bytes_per_entry, &_class::_format##_decoder));
+
 #define MCFG_PALETTE_MEMBITS(_width) \
 	palette_device::static_set_membits(*device, _width);
 
