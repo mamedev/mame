@@ -1763,6 +1763,7 @@ $(MESSOBJ)/sinclair.a:          \
 	$(MESS_MACHINE)/beta.o      \
 	$(MESS_MACHINE)/spec_snqk.o \
 	$(MESS_DRIVERS)/ql.o        \
+	$(MESS_MACHINE)/qimi.o      \
 	$(MESS_VIDEO)/zx8301.o      \
 	$(MESS_MACHINE)/zx8302.o    \
 

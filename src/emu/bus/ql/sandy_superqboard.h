@@ -16,6 +16,7 @@
 
 #include "exp.h"
 #include "bus/centronics/ctronics.h"
+#include "formats/ql_dsk.h"
 #include "machine/wd_fdc.h"
 
 
@@ -38,6 +39,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	WRITE_LINE_MEMBER( busy_w );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides

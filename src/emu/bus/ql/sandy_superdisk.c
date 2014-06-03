@@ -59,6 +59,15 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
+//  FLOPPY_FORMATS( floppy_formats )
+//-------------------------------------------------
+
+FLOPPY_FORMATS_MEMBER( sandy_super_disk_t::floppy_formats )
+	FLOPPY_QL_FORMAT
+FLOPPY_FORMATS_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( sandy_super_disk )
 //-------------------------------------------------
 
@@ -66,8 +75,8 @@ static MACHINE_CONFIG_FRAGMENT( sandy_super_disk )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772x, 8000000)
 	//MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(sandy_super_disk_t, fdc_intrq_w))
 	//MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(sandy_super_disk_t, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_super_disk_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_super_disk_floppies, "35dd", sandy_super_disk_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, NULL, sandy_super_disk_t::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 MACHINE_CONFIG_END

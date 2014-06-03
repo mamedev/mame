@@ -16,6 +16,7 @@
 
 #include "exp.h"
 #include "machine/wd_fdc.h"
+#include "formats/ql_dsk.h"
 
 
 
@@ -35,6 +36,8 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides

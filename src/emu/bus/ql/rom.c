@@ -32,7 +32,7 @@ const device_type QL_ROM_CARTRIDGE_SLOT = &device_creator<ql_rom_cartridge_slot_
 device_ql_rom_cartridge_card_interface::device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
 	m_rom(*this, "rom"),
-	m_romoeh(1)
+	m_romoeh(0)
 {
 	m_slot = dynamic_cast<ql_rom_cartridge_slot_t *>(device.owner());
 }

@@ -30,7 +30,8 @@ const device_type QL_EXPANSION_SLOT = &device_creator<ql_expansion_slot_t>;
 //-------------------------------------------------
 
 device_ql_expansion_card_interface::device_ql_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_slot_card_interface(mconfig, device),
+	m_romoeh(0)
 {
 	m_slot = dynamic_cast<ql_expansion_slot_t *>(device.owner());
 }

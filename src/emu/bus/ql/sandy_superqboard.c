@@ -39,7 +39,7 @@ ROM_START( sandy_superqboard )
 	ROM_LOAD( "sandy_disk_controller_v1.18y_1984.ic2", 0x0000, 0x8000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd) )
 
 	ROM_REGION( 0x100, "plds", 0 )
-	ROM_LOAD( "gal16v8.ic5", 0x000, 0x000, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic5", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -64,6 +64,15 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
+//  FLOPPY_FORMATS( floppy_formats )
+//-------------------------------------------------
+
+FLOPPY_FORMATS_MEMBER( sandy_superqboard_t::floppy_formats )
+	FLOPPY_QL_FORMAT
+FLOPPY_FORMATS_END
+
+
+//-------------------------------------------------
 //  centronics
 //-------------------------------------------------
 
@@ -80,8 +89,8 @@ WRITE_LINE_MEMBER( sandy_superqboard_t::busy_w )
 
 static MACHINE_CONFIG_FRAGMENT( sandy_superqboard )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772x, XTAL_16MHz/2)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", sandy_superqboard_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, NULL, sandy_superqboard_t::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_superqboard_t, busy_w))

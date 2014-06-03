@@ -13,7 +13,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 #define MDV_SECTOR_COUNT            255
 #define MDV_SECTOR_LENGTH           686
