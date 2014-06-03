@@ -14,13 +14,71 @@
 
   Additional PCB  (todo, ascii layout)
 
-  --------------------------
-  |
-  |
+  --------------------------------------------------------------------------------------------------------------|
+  |                                                                                                             |
+  |                                              CN1 (20 pin)                                                   |
   | KENSEI MOGURA
   |  9401-TS280
   | TOGO JAPAN
   |
+
+
+Jamma (on CPS board)
+
+(connection)     (unusual use)             (unusual use)    (connection)
+--------------------------------|----|----|----------------|----------------|
+GND             |GROUND         | 1  | A  | GROUND         | GND            |
+GND             |GROUND         | 2  | B  | GROUND         | GND            |
++5              |+5VDC          | 3  | C  | +5VDC          | +5             |
++5              |+5VDC          | 4  | D  | +5VDC          | +5             |
+n/c             |-5VDC          | 5  | E  | -5VDC          | n/c            |
++12             |+12VDC         | 6  | F  | +12VDC         | +12            |
+n/c             |KEY SLOT       | 7  | H  | KEY SLOT       | n/c            |
+ACK   (to CN2)  |COIN COUNTER 1 | 8  | J  | COIN COUNTER 2 | ST4 (to CN2)   |
+ST2   (to CN2)  |COIN LOCK 1    | 9  | K  | COIN LOCK 2    | ST3 (to CN2)   |
+SPK+            |SPEAKER +      | 10 | L  | SPEAKER -      | SPK-           |
+n/c             |N/C            | 11 | M  | N/C            | n/c            |
+VR              |VIDEO RED      | 12 | N  | VIDEO GREEN    | VG             |
+VB              |VIDEO BLUE     | 13 | O  | VIDEO SYNC     | VSYNC          |
+VGnd            |VIDEO GROUND   | 14 | R  | SERVICE SWITCH | D9 (from CN2)  |
+n/c             |TEST SWITCH    | 15 | S  | TILT SWITCH    | n/c            |
+n/c             |COIN 1         | 16 | T  | COIN 2         | n/c            |
+REQ  (from CN2) |P1 START       | 17 | U  | P2 START       | LVm (from CN2) |
+D8   (from CN2) |P1 UP          | 18 | V  | P2 UP          | D4 (from CN2)  |
+D7   (from CN2) |P1 DOWN        | 19 | W  | P2 DOWN        | D3 (from CN2)  |
+D6   (from CN2) |P1 LEFT        | 20 | X  | P2 LEFT        | D2 (from CN2)  |
+D5   (from CN2) |P1 RIGHT       | 21 | Y  | P2 RIGHT       | D1 (from CN2)  |
+n/c             |P1 B1          | 22 | Z  | P2 B1          | n/c            |
+n/c             |P1 B2          | 23 | a  | P2 B2          | n/c            |
+n/c             |P1 B3          | 24 | b  | P2 B3          | n/c            |
+n/c             |N/C            | 25 | c  | N/C            | n/c            |
+n/c             |N/C            | 26 | d  | N/C            | n/c            |
+GND             |GROUND         | 27 | e  | GROUND         | GND            |
+GND             |GROUND         | 28 | f  | GROUND         | GND            |
+----------------|------------------------------------------|----------------|
+
+CN2 - 20 pin connector, goes from DRIVE PCB to the JAMMA on CPS board
+
+ST4 | 1
+ST3 | 2
+ST2 | 3
+ACK | 4
+n/c | 5
+LVm | 6
+REQ | 7
+D9  | 8
+D8  | 9
+D7  | 10
+D6  | 11
+D5  | 12 
+D4  | 13
+D3  | 14
+D2  | 15
+D1  | 16
+GND | 17
++12 | 18
++5  | 19
+GND | 20
 
 */
 
