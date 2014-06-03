@@ -107,8 +107,7 @@
       Dragon Buster: Text is black and unreadable. (Text layer actually covers it)
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
-      PacLand:       Leftover garbage on title screen
-      Akumajo Drac:  no sfx starting on second stage (m68000 only, 030 is fine), text layer not being cleared properly
+      Akumajo Drac:  no sfx starting on second stage (m68000 only, 030 is fine), simon sprite flickers
 
 
     More detailed documentation at http://x68kdev.emuvibes.com/iomap.html - if you can stand broken english :)
@@ -1712,12 +1711,9 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", x68k)
 	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
-//	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcgpalette", empty)
 

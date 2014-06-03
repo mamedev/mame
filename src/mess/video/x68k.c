@@ -187,6 +187,10 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 
 	m_crtc.hblank = hstate;
 	m_mfpdev->i7_w(!m_crtc.hblank);
+
+	if(m_crtc.operation & 8) // is this supposed to happen when the src or dest line is scanned?
+		x68k_crtc_text_copy((m_crtc.reg[22] & 0xff00) >> 8,(m_crtc.reg[22] & 0x00ff));
+
 	if(m_crtc.vmultiple == 2) // 256-line (doublescan)
 	{
 		if(hstate == 1)
@@ -441,11 +445,6 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		break;
 	case 576:  // operation register
 		m_crtc.operation = data;
-		if(data & 0x08)  // text screen raster copy
-		{
-			x68k_crtc_text_copy((m_crtc.reg[22] & 0xff00) >> 8,(m_crtc.reg[22] & 0x00ff));
-			timer_set(attotime::from_msec(1), TIMER_X68K_CRTC_OPERATION_END, 0x02);  // time taken to do operation is a complete guess.
-		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
 			memset(m_gvram,0,0x40000);
@@ -506,7 +505,7 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 	*/
 
 	// handle different G-VRAM page setups
-	if(m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
+	if(m_crtc.reg[20] & 0x0800)  // G-VRAM set to buffer
 	{
 		if(offset < 0x40000)
 			COMBINE_DATA(m_gvram+offset);
@@ -587,7 +586,7 @@ READ16_MEMBER(x68k_state::x68k_gvram_r )
 {
 	UINT16 ret = 0;
 
-	if(m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
+	if(m_crtc.reg[20] & 0x0800)  // G-VRAM set to buffer
 		return m_gvram[offset];
 
 	switch(m_crtc.reg[20] & 0x0300)  // colour setup determines G-VRAM use
@@ -825,10 +824,10 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 						{
 							if(ret)
 							{
-								if(blend)
+								if(blend && bitmap.pix16(scanline, pixel))
 									bitmap.pix16(scanline, pixel) = ((bitmap.pix16(scanline, pixel) >> 1) & 0x7bde) + ((pal[colour] >> 1) & 0x7bde) + 1;
 								else
-									bitmap.pix16(scanline, pixel) = pal[colour] & 0xfffe;
+									bitmap.pix16(scanline, pixel) = (pal[colour] & 0xfffe) + blend;
 							}
 							else
 								bitmap.pix16(scanline, pixel) = colour;
