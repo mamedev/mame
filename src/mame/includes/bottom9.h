@@ -23,9 +23,6 @@ public:
 		m_k051316(*this, "k051316"),
 		m_palette(*this, "palette") { }
 
-	/* memory pointers */
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
-
 	/* video-related */
 	int        m_layer_colorbase[3];
 	int        m_sprite_colorbase;
@@ -65,10 +62,10 @@ public:
 	INTERRUPT_GEN_MEMBER(bottom9_sound_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	K051316_CB_MEMBER(zoom_callback);
 };
 
 /*----------- defined in video/bottom9.c -----------*/
 
 extern void bottom9_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void bottom9_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
-extern void bottom9_zoom_callback(running_machine &machine, int *code,int *color,int *flags);

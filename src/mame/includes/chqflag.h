@@ -62,10 +62,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(chqflag_scanline);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
 };
 
 /*----------- defined in video/chqflag.c -----------*/
 
 extern void chqflag_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
-extern void chqflag_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
-extern void chqflag_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);

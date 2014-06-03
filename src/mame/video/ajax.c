@@ -53,11 +53,10 @@ void ajax_sprite_callback( running_machine &machine, int *code, int *color, int 
 
 ***************************************************************************/
 
-void ajax_zoom_callback( running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(ajax_state::zoom_callback)
 {
-	ajax_state *state = machine.driver_data<ajax_state>();
 	*code |= ((*color & 0x07) << 8);
-	*color = state->m_zoom_colorbase + ((*color & 0x08) >> 3);
+	*color = m_zoom_colorbase + ((*color & 0x08) >> 3);
 }
 
 

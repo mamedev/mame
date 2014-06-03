@@ -287,14 +287,6 @@ static const k051960_interface bottom9_k051960_intf =
 	bottom9_sprite_callback
 };
 
-static const k051316_interface bottom9_k051316_intf =
-{
-	"gfx3", 2,
-	4, FALSE, 0,
-	0, 0, 0,
-	bottom9_zoom_callback
-};
-
 void bottom9_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -347,9 +339,11 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 	MCFG_K051960_ADD("k051960", bottom9_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
-	MCFG_K051316_ADD("k051316", bottom9_k051316_intf)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k051316", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(4)
+	MCFG_K051316_CB(bottom9_state, zoom_callback)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -409,7 +403,7 @@ ROM_START( bottom9 )
 	ROM_LOAD16_BYTE( "891e05h", 0xe0000, 0x10000, CRC(b0aba53b) SHA1(e76b345ae354533959ed06217b91ce3c93b22a23) )
 	ROM_LOAD16_BYTE( "891e05d", 0xe0001, 0x10000, CRC(f6d3f886) SHA1(b8bdcc9470aa93849b8c8a1f03971281cacc6d44) )
 
-	ROM_REGION( 0x020000, "gfx3", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x020000, "k051316", 0 )
 	ROM_LOAD( "891e07a",      0x00000, 0x10000, CRC(b8d8b939) SHA1(ee91fb46d70db2d17f5909c4ea7ee1cf2d317d10) )  /* zoom/rotate */
 	ROM_LOAD( "891e07b",      0x10000, 0x10000, CRC(83b2f92d) SHA1(c4972018e1f8109656784fae3e023a5522622c4b) )
 
@@ -466,7 +460,7 @@ ROM_START( bottom9n )
 	ROM_LOAD16_BYTE( "891e05h", 0xe0000, 0x10000, CRC(b0aba53b) SHA1(e76b345ae354533959ed06217b91ce3c93b22a23) )
 	ROM_LOAD16_BYTE( "891e05d", 0xe0001, 0x10000, CRC(f6d3f886) SHA1(b8bdcc9470aa93849b8c8a1f03971281cacc6d44) )
 
-	ROM_REGION( 0x020000, "gfx3", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x020000, "k051316", 0 )
 	ROM_LOAD( "891e07a",      0x00000, 0x10000, CRC(b8d8b939) SHA1(ee91fb46d70db2d17f5909c4ea7ee1cf2d317d10) )  /* zoom/rotate */
 	ROM_LOAD( "891e07b",      0x10000, 0x10000, CRC(83b2f92d) SHA1(c4972018e1f8109656784fae3e023a5522622c4b) )
 
@@ -523,7 +517,7 @@ ROM_START( mstadium )
 	ROM_LOAD16_BYTE( "891e05h", 0xe0000, 0x10000, CRC(b0aba53b) SHA1(e76b345ae354533959ed06217b91ce3c93b22a23) )
 	ROM_LOAD16_BYTE( "891e05d", 0xe0001, 0x10000, CRC(f6d3f886) SHA1(b8bdcc9470aa93849b8c8a1f03971281cacc6d44) )
 
-	ROM_REGION( 0x020000, "gfx3", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x020000, "k051316", 0 )
 	ROM_LOAD( "891e07a",      0x00000, 0x10000, CRC(b8d8b939) SHA1(ee91fb46d70db2d17f5909c4ea7ee1cf2d317d10) )  /* zoom/rotate */
 	ROM_LOAD( "891e07b",      0x10000, 0x10000, CRC(83b2f92d) SHA1(c4972018e1f8109656784fae3e023a5522622c4b) )
 

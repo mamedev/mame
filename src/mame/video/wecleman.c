@@ -962,17 +962,18 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 
 //  Callbacks for the K051316
 
-void hotchase_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags)
+K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_1)
 {
 	*code |= (*color & 0x03) << 8;
 	*color = (*color & 0xfc) >> 2;
 }
 
-void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags)
+K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_2)
 {
 	*code |= (*color & 0x01) << 8;
 	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);
 }
+
 
 VIDEO_START_MEMBER(wecleman_state,hotchase)
 {

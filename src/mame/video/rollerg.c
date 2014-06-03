@@ -26,14 +26,12 @@ MCFG_K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 
 ***************************************************************************/
 
-void rollerg_zoom_callback( running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(rollerg_state::zoom_callback)
 {
-	rollerg_state *state = machine.driver_data<rollerg_state>();
 	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
-	*color = state->m_zoom_colorbase + ((*color & 0x30) >> 4);
+	*color = m_zoom_colorbase + ((*color & 0x30) >> 4);
 }
-
 
 
 /***************************************************************************
@@ -47,7 +45,6 @@ void rollerg_state::video_start()
 	m_sprite_colorbase = 16;
 	m_zoom_colorbase = 0;
 }
-
 
 
 /***************************************************************************

@@ -38,12 +38,11 @@ void bottom9_sprite_callback( running_machine &machine, int *code, int *color, i
 
 ***************************************************************************/
 
-void bottom9_zoom_callback( running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(bottom9_state::zoom_callback)
 {
-	bottom9_state *state = machine.driver_data<bottom9_state>();
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
-	*color = state->m_zoom_colorbase + ((*color & 0x3c) >> 2);
+	*color = m_zoom_colorbase + ((*color & 0x3c) >> 2);
 }
 
 

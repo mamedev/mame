@@ -1092,22 +1092,6 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static const k051316_interface hotchase_k051316_intf_0 =
-{
-	"gfx2", 1,
-	4, FALSE, 0,
-	1, -0xb0 / 2, -16,
-	hotchase_zoom_callback_0
-};
-
-static const k051316_interface hotchase_k051316_intf_1 =
-{
-	"gfx3", 2,
-	4, FALSE, 0,
-	0, -0xb0 / 2, -16,
-	hotchase_zoom_callback_1
-};
-
 MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 {
 	int i;
@@ -1152,15 +1136,20 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotchase)
 	MCFG_PALETTE_ADD("palette", 2048*2)
 
-	MCFG_VIDEO_START_OVERRIDE(wecleman_state,hotchase)
+	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
-	MCFG_K051316_ADD("k051316_1", hotchase_k051316_intf_0)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(4)
+	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
+	MCFG_K051316_WRAP(1)
+	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_1)
 
-	MCFG_K051316_ADD("k051316_2", hotchase_k051316_intf_1)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(4)
+	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
+	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1381,10 +1370,10 @@ ROM_START( hotchase )
 	ROM_LOAD16_WORD_SWAP( "763e19", 0x200000, 0x080000, CRC(a2622e56) SHA1(0a0ed9713882b987518e6f06a02dba417c1f4f32) )
 	ROM_LOAD16_WORD_SWAP( "763e22", 0x280000, 0x080000, CRC(967c49d1) SHA1(01979d216a9fd8085298445ac5f7870d1598db74) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* bg */
+	ROM_REGION( 0x20000, "k051316_1", 0 )    /* bg */
 	ROM_LOAD( "763e14", 0x000000, 0x020000, CRC(60392aa1) SHA1(8499eb40a246587e24f6fd00af2eaa6d75ee6363) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )    /* fg (patched) */
+	ROM_REGION( 0x10000, "k051316_2", 0 )    /* fg (patched) */
 	ROM_LOAD( "763a13", 0x000000, 0x010000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
 
 	ROM_REGION( 0x20000, "gfx4", 0 )    /* road */
@@ -1471,7 +1460,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 	hotchase_sprite_decode(3,0x80000*2);  // num banks, bank len
 
 	/* Let's copy the second half of the fg layer gfx (charset) over the first */
-	RAM = memregion("gfx3")->base();
+	RAM = memregion("k051316_2")->base();
 	memcpy(&RAM[0], &RAM[0x10000/2], 0x10000/2);
 
 	m_spr_color_offs = 0;

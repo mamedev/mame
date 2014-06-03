@@ -52,7 +52,5 @@ public:
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	K051316_CB_MEMBER(zoom_callback);
 };
-
-/*----------- defined in video/tail2nos.c -----------*/
-extern void tail2nos_zoom_callback(running_machine &machine, int *code,int *color,int *flags);

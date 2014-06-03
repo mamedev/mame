@@ -23,25 +23,22 @@ void ultraman_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-void ultraman_zoom_callback_0(running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(ultraman_state::zoom_callback_1)
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
-	*code |= ((*color & 0x07) << 8) | (state->m_bank0 << 11);
-	*color = state->m_zoom_colorbase[0] + ((*color & 0xf8) >> 3);
+	*code |= ((*color & 0x07) << 8) | (m_bank0 << 11);
+	*color = m_zoom_colorbase[0] + ((*color & 0xf8) >> 3);
 }
 
-void ultraman_zoom_callback_1(running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(ultraman_state::zoom_callback_2)
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
-	*code |= ((*color & 0x07) << 8) | (state->m_bank1 << 11);
-	*color = state->m_zoom_colorbase[1] + ((*color & 0xf8) >> 3);
+	*code |= ((*color & 0x07) << 8) | (m_bank1 << 11);
+	*color = m_zoom_colorbase[1] + ((*color & 0xf8) >> 3);
 }
 
-void ultraman_zoom_callback_2(running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(ultraman_state::zoom_callback_3)
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
-	*code |= ((*color & 0x07) << 8) | (state->m_bank2 << 11);
-	*color = state->m_zoom_colorbase[2] + ((*color & 0xf8) >> 3);
+	*code |= ((*color & 0x07) << 8) | (m_bank2 << 11);
+	*color = m_zoom_colorbase[2] + ((*color & 0xf8) >> 3);
 }
 
 

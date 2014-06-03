@@ -38,13 +38,11 @@ void _88games_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-void _88games_zoom_callback( running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(_88games_state::zoom_callback)
 {
-	_88games_state *state = machine.driver_data<_88games_state>();
-
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x07) << 8);
-	*color = state->m_zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
+	*color = m_zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
 }
 
 /***************************************************************************

@@ -180,14 +180,6 @@ WRITE_LINE_MEMBER(tail2nos_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const k051316_interface tail2nos_k051316_intf =
-{
-	"gfx3", 2,
-	-4, TRUE, 0,
-	1, -89, -14,
-	tail2nos_zoom_callback
-};
-
 void tail2nos_state::machine_start()
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
@@ -236,10 +228,13 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-
-	MCFG_K051316_ADD("k051316", tail2nos_k051316_intf)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051316", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(-4)
+	MCFG_K051316_OFFSETS(-89, -14)
+	MCFG_K051316_SETUP_PENS(true, 0)
+	MCFG_K051316_WRAP(1)
+	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -283,7 +278,7 @@ ROM_START( tail2nos )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
 	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    /* gfx data for the 051316 */
+	ROM_REGION( 0x20000, "k051316", ROMREGION_ERASE00 )
 	/* RAM, not ROM - handled at run time */
 
 	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
@@ -318,7 +313,7 @@ ROM_START( sformula )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
 	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    /* gfx data for the 051316 */
+	ROM_REGION( 0x20000, "k051316", ROMREGION_ERASE00 )
 	/* RAM, not ROM - handled at run time */
 
 	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */

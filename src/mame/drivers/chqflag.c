@@ -276,22 +276,6 @@ static const k051960_interface chqflag_k051960_intf =
 	chqflag_sprite_callback
 };
 
-static const k051316_interface chqflag_k051316_intf_1 =
-{
-	"gfx2", 1,
-	4, FALSE, 0,
-	0, 7, 0,
-	chqflag_zoom_callback_0
-};
-
-static const k051316_interface chqflag_k051316_intf_2 =
-{
-	"gfx3", 2,
-	8, TRUE, 0xc0,
-	1, 0, 0,
-	chqflag_zoom_callback_1
-};
-
 void chqflag_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -349,12 +333,20 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
-	MCFG_K051316_ADD("k051316_1", chqflag_k051316_intf_1)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
-	MCFG_K051316_ADD("k051316_2", chqflag_k051316_intf_2)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(4)
+	MCFG_K051316_OFFSETS(7, 0)
+	MCFG_K051316_CB(chqflag_state, zoom_callback_1)
+
+	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(8)
+	MCFG_K051316_SETUP_PENS(true, 0xc0)
+	MCFG_K051316_WRAP(1)
+	MCFG_K051316_CB(chqflag_state, zoom_callback_2)
+
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
@@ -392,10 +384,10 @@ ROM_START( chqflag )
 	ROM_LOAD( "717e04",     0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )  /* sprites */
 	ROM_LOAD( "717e05",     0x080000, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )  /* sprites */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x020000, "k051316_1", 0 )
 	ROM_LOAD( "717e06",     0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )  /* zoom/rotate (N16) */
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "k051316_2", 0 )
 	ROM_LOAD( "717e07",     0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )  /* zoom/rotate (L20) */
 	ROM_LOAD( "717e08",     0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )  /* zoom/rotate (L22) */
 	ROM_LOAD( "717e11",     0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )  /* zoom/rotate (N20) */
@@ -422,10 +414,10 @@ ROM_START( chqflagj )
 	ROM_LOAD( "717e04",     0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )  /* sprites */
 	ROM_LOAD( "717e05",     0x080000, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )  /* sprites */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x020000, "k051316_1", 0 )
 	ROM_LOAD( "717e06",     0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )  /* zoom/rotate (N16) */
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "k051316_2", 0 )
 	ROM_LOAD( "717e07",     0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )  /* zoom/rotate (L20) */
 	ROM_LOAD( "717e08",     0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )  /* zoom/rotate (L22) */
 	ROM_LOAD( "717e11",     0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )  /* zoom/rotate (N20) */

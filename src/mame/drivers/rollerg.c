@@ -217,14 +217,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const k051316_interface rollerg_k051316_intf =
-{
-	"gfx2", 1,
-	4, FALSE, 0,
-	0, 22, 1,
-	rollerg_zoom_callback
-};
-
 WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -272,16 +264,16 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k053244", K053244, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K05324X_OFFSETS(-3, -1)
 	MCFG_K05324X_CB(rollerg_state, sprite_callback)
 
-	MCFG_K051316_ADD("k051316", rollerg_k051316_intf)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051316", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(4)
+	MCFG_K051316_OFFSETS(22, 1)
+	MCFG_K051316_CB(rollerg_state, zoom_callback)
 
 	MCFG_DEVICE_ADD("k053252", K053252, 3000000*2)
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
@@ -313,11 +305,11 @@ ROM_START( rollerg )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
-	ROM_REGION( 0x200000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x200000, "k053244", 0 )
 	ROM_LOAD32_WORD( "999h06.k2", 0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
 	ROM_LOAD32_WORD( "999h05.k8", 0x000002, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "k051316", 0 )
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
 	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
 
@@ -333,11 +325,11 @@ ROM_START( rollergj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
-	ROM_REGION( 0x200000, "k053244", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x200000, "k053244", 0 )
 	ROM_LOAD32_WORD( "999h06.k2", 0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
 	ROM_LOAD32_WORD( "999h05.k8", 0x000002, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "k051316", 0 )
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
 	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
 

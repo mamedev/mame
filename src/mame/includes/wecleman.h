@@ -107,6 +107,8 @@ public:
 	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
 	void wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	K051316_CB_MEMBER(hotchase_zoom_callback_1);
+	K051316_CB_MEMBER(hotchase_zoom_callback_2);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -122,7 +124,3 @@ public:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 };
-
-/*----------- defined in video/wecleman.c -----------*/
-void hotchase_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
-void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);

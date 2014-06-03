@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
 
 ***************************************************************************/
 
-void tail2nos_zoom_callback( running_machine &machine, int *code, int *color, int *flags )
+K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 {
 	*code |= ((*color & 0x03) << 8);
 	*color = 32 + ((*color & 0x38) >> 3);
@@ -56,7 +56,7 @@ void tail2nos_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(15);
 
-	m_zoomdata = (UINT16 *)memregion("gfx3")->base();
+	m_zoomdata = (UINT16 *)memregion("k051316")->base();
 
 	save_pointer(NAME(m_zoomdata), 0x20000 / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::tail2nos_postload), this));
@@ -86,8 +86,9 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 	int oldword = m_zoomdata[offset];
 
 	COMBINE_DATA(&m_zoomdata[offset]);
+	// mark dirty the tilemap inside K051316 device
 	if (oldword != m_zoomdata[offset])
-		m_gfxdecode->gfx(2)->mark_dirty(offset / 64);
+		m_k051316->zoomram_updated(offset / 64);
 }
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)

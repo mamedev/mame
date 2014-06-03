@@ -183,14 +183,6 @@ static const k051960_interface ajax_k051960_intf =
 	ajax_sprite_callback
 };
 
-static const k051316_interface ajax_k051316_intf =
-{
-	"gfx3", 2,
-	7, FALSE, 0,
-	0, 0, 0,
-	ajax_zoom_callback
-};
-
 static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	/* basic machine hardware */
@@ -228,9 +220,11 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	MCFG_K051960_ADD("k051960", ajax_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
-	MCFG_K051316_ADD("k051316", ajax_k051316_intf)
-	MCFG_K051316_GFXDECODE("gfxdecode")
-	MCFG_K051316_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k051316", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(7)
+	MCFG_K051316_CB(ajax_state, zoom_callback)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -306,7 +300,7 @@ ROM_START( ajax )
 	ROM_LOAD16_BYTE( "770c08-d.c10",    0x0e0000, 0x010000, CRC(91591777) SHA1(53f416a51f7075f070168bced7b6f925f54c7b84) )
 	ROM_LOAD16_BYTE( "770c08-h.c11",    0x0e0001, 0x010000, CRC(d97d4b15) SHA1(e3d7d7adeec8c8c808acb9f84641fd3a6bf249be) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x080000, "k051316", 0 )
 	ROM_LOAD( "770c06",     0x000000, 0x040000, CRC(d0c592ee) SHA1(c1be73dd259f2779d715659b177e47513776a0d4) )  /* zoom/rotate (F4) */
 	ROM_LOAD( "770c07",     0x040000, 0x040000, CRC(0b399fb1) SHA1(fbe26f9aa9a655d08bebcdd79719d35134ca4dd5) )  /* zoom/rotate (H4) */
 
@@ -352,7 +346,7 @@ ROM_START( typhoon )
 	ROM_LOAD( "770c09",     0x000000, 0x080000, CRC(1ab4a7ff) SHA1(fa007b41027f95d29d2a9f931a2fe235844db637) )  /* sprites (N4) */
 	ROM_LOAD( "770c08",     0x080000, 0x080000, CRC(a8e80586) SHA1(0401f59baa691905287cef94427f39e0c3f0adc6) )  /* sprites (K4) */
 
-	ROM_REGION( 0x080000, "gfx3", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x080000, "k051316", 0 )
 	ROM_LOAD( "770c06",     0x000000, 0x040000, CRC(d0c592ee) SHA1(c1be73dd259f2779d715659b177e47513776a0d4) )  /* zoom/rotate (F4) */
 	ROM_LOAD( "770c07",     0x040000, 0x040000, CRC(0b399fb1) SHA1(fbe26f9aa9a655d08bebcdd79719d35134ca4dd5) )  /* zoom/rotate (H4) */
 
@@ -388,7 +382,7 @@ ROM_START( ajaxj )
 	ROM_LOAD( "770c09",     0x000000, 0x080000, CRC(1ab4a7ff) SHA1(fa007b41027f95d29d2a9f931a2fe235844db637) )  /* sprites (N4) */
 	ROM_LOAD( "770c08",     0x080000, 0x080000, CRC(a8e80586) SHA1(0401f59baa691905287cef94427f39e0c3f0adc6) )  /* sprites (K4) */
 
-	ROM_REGION( 0x080000, "gfx3", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x080000, "k051316", 0 )
 	ROM_LOAD( "770c06",     0x000000, 0x040000, CRC(d0c592ee) SHA1(c1be73dd259f2779d715659b177e47513776a0d4) )  /* zoom/rotate (F4) */
 	ROM_LOAD( "770c07",     0x040000, 0x040000, CRC(0b399fb1) SHA1(fbe26f9aa9a655d08bebcdd79719d35134ca4dd5) )  /* zoom/rotate (H4) */
 

@@ -44,10 +44,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
+	K051316_CB_MEMBER(zoom_callback_3);
 };
 
 /*----------- defined in video/ultraman.c -----------*/
 extern void ultraman_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
-extern void ultraman_zoom_callback_0(running_machine &machine, int *code,int *color,int *flags);
-extern void ultraman_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);
-extern void ultraman_zoom_callback_2(running_machine &machine, int *code,int *color,int *flags);
