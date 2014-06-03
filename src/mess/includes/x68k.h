@@ -349,7 +349,7 @@ public:
 	void mfp_trigger_irq(int irq);
 	void mfp_set_timer(int timer, unsigned char data);
 	void mfp_recv_data(int data);
-	static rgb_t GGGGGRRRRRBBBBBI_decoder(UINT32 raw);
+	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

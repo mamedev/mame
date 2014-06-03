@@ -111,6 +111,10 @@
 #define DECLARE_PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &palette)
 #define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
 
+#define PALETTE_DECODER_NAME(_Name) _Name##_decoder
+#define DECLARE_PALETTE_DECODER(_Name) static rgb_t PALETTE_DECODER_NAME(_Name)(UINT32 raw)
+#define PALETTE_DECODER_MEMBER(_Class, _Name) rgb_t _Class::PALETTE_DECODER_NAME(_Name)(UINT32 raw)
+
 // standard 3-3-2 formats
 #define PALETTE_FORMAT_BBGGGRRR raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>)
 #define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
@@ -180,8 +184,8 @@
 #define MCFG_PALETTE_FORMAT(_format) \
 	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
 
-#define MCFG_PALETTE_FORMAT_CLASS(_bytes_per_entry, _class, _format) \
-	palette_device::static_set_format(*device, raw_to_rgb_converter(_bytes_per_entry, &_class::_format##_decoder));
+#define MCFG_PALETTE_FORMAT_CLASS(_bytes_per_entry, _class, _method) \
+	palette_device::static_set_format(*device, raw_to_rgb_converter(_bytes_per_entry, &_class::PALETTE_DECODER_NAME(_method)));
 
 #define MCFG_PALETTE_MEMBITS(_width) \
 	palette_device::static_set_membits(*device, _width);

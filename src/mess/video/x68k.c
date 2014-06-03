@@ -38,7 +38,7 @@
 #include "machine/ram.h"
 
 
-rgb_t x68k_state::GGGGGRRRRRBBBBBI_decoder(UINT32 raw)
+PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)
 {
 	UINT8 i = raw & 1;
 	UINT8 r = pal6bit(((raw >> 5) & 0x3e) | i);
