@@ -12,15 +12,43 @@
 
 
 
-  Additional PCB  (todo, ascii layout)
+  Additional 'DRIVE BOARD' PCB  (todo, improve ascii layout)
 
   --------------------------------------------------------------------------------------------------------------|
   |                                                                                                             |
-  |                                              CN1 (20 pin)                                                   |
-  | KENSEI MOGURA
-  |  9401-TS280
-  | TOGO JAPAN
-  |
+  |                                              CN2 (20 pin)                                                   |
+  | KENSEI MOGURA                                                                                               |
+  |  9401-TS280                                                                                                 |
+  | TOGO JAPAN                                                                                                  |
+  |                                                                                                         C   |
+  |                                                                                                         N   |
+  |                                                                                                         8   |
+  |           PROGRAM ROM                                                                                 (8    |
+  |            (label KENSEI                                                                               pin) |
+  |                   MOGURA                                                                                    |
+  |                   Ver1.0)                                                                               C   |
+  |                                                                                                         N   |
+  |                                                                                                         5   |
+  |                                                                                                       (6    |
+  |                                                           MB89363B                                     pin) |
+  |                    TMPZ84C011                                                                               |
+  |         16.00Mhz    (rotated 180                                                                        C   |
+  |                       degress)                                                                          N   |
+  |                                                                                                         4   |
+  |                                                                                                       (4    |
+  |                                                                                                        pin) |
+  |                  DIPSW1 DIPSW2                                                                              |
+  |                                                                                    LEDS4,3,2,1              |
+  |                                                                                                         C   |
+  |                                                                                                         N   |
+  |    LEDS7,6,5                                                                                            1   |
+  |                                                                                                       (12   |
+  |    CN9                                                                                                 pin) |
+  |    (2*3 pin)  CN6 (2pin)                     CN7 (15 pin)          CN3 (14 pin)                             |
+  |                                                                                                             |
+  --------------------------------------------------------------------------------------------------------------|
+
+
 
 
 Jamma (on CPS board)
