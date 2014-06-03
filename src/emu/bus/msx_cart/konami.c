@@ -7,6 +7,7 @@ const device_type MSX_CART_GAMEMASTER2 = &device_creator<msx_cart_gamemaster2>;
 const device_type MSX_CART_SYNTHESIZER = &device_creator<msx_cart_synthesizer>;
 const device_type MSX_CART_SOUND_SNATCHER = &device_creator<msx_cart_konami_sound_snatcher>;
 const device_type MSX_CART_SOUND_SDSNATCHER = &device_creator<msx_cart_konami_sound_sdsnatcher>;
+const device_type MSX_CART_KEYBOARD_MASTER = &device_creator<msx_cart_keyboard_master>;
 
 
 msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -864,5 +865,72 @@ void msx_cart_konami_sound_sdsnatcher::initialize_cartridge()
 		m_ram_bank[8+i] = get_ram_base() + i * 0x2000;
 	}
 
+}
+
+
+
+msx_cart_keyboard_master::msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, "MSX Cartridge - Keyboard Master", tag, owner, clock, "msx_cart_keyboard_master", __FILE__)
+	, msx_cart_interface(mconfig, *this)
+	, m_vlm5030(*this, "vlm5030")
+{
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( msx_cart_keyboard_master )
+	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("vlm5030", VLM5030, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_CONFIG_END
+
+
+machine_config_constructor msx_cart_keyboard_master::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( msx_cart_keyboard_master );
+}
+
+
+void msx_cart_keyboard_master::device_start()
+{
+	// Install IO read/write handlers
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	space.install_write_handler(0x00, 0x00, write8_delegate(FUNC(vlm5030_device::data_w), m_vlm5030.target()));
+	space.install_write_handler(0x20, 0x20, write8_delegate(FUNC(msx_cart_keyboard_master::io_20_w), this));
+	space.install_read_handler(0x00, 0x00, read8_delegate(FUNC(msx_cart_keyboard_master::io_00_r), this));
+}
+
+
+void msx_cart_keyboard_master::initialize_cartridge()
+{
+	if (get_rom_size() != 0x4000)
+	{
+		fatalerror("keyboard_master: Invalid ROM size\n");
+	}
+	m_vlm5030->set_rom(m_rom_vlm5030);
+}
+
+
+READ8_MEMBER(msx_cart_keyboard_master::read_cart)
+{
+	if (offset >= 0x4000 && offset < 0x8000)
+	{
+		return m_rom[offset & 0x3fff];
+	}
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(msx_cart_keyboard_master::io_20_w)
+{
+	m_vlm5030->rst((data & 0x01) ? 1 : 0);
+	m_vlm5030->vcu((data & 0x04) ? 1 : 0);
+	m_vlm5030->st((data & 0x02) ? 1 : 0);
+}
+
+
+READ8_MEMBER(msx_cart_keyboard_master::io_00_r)
+{
+	return m_vlm5030->bsy() ? 0x10 : 0x00;
 }
 

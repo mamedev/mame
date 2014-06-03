@@ -3,6 +3,7 @@
 
 #include "bus/msx_cart/cartridge.h"
 #include "sound/k051649.h"
+#include "sound/vlm5030.h"
 #include "sound/dac.h"
 
 
@@ -12,6 +13,7 @@ extern const device_type MSX_CART_GAMEMASTER2;
 extern const device_type MSX_CART_SYNTHESIZER;
 extern const device_type MSX_CART_SOUND_SNATCHER;
 extern const device_type MSX_CART_SOUND_SDSNATCHER;
+extern const device_type MSX_CART_KEYBOARD_MASTER;
 
 
 class msx_cart_konami : public device_t
@@ -164,6 +166,30 @@ public:
 
 	virtual void initialize_cartridge();
 };
+
+
+
+class msx_cart_keyboard_master : public device_t
+						, public msx_cart_interface
+{
+public:
+	msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+
+	virtual void initialize_cartridge();
+
+	virtual DECLARE_READ8_MEMBER(read_cart);
+
+	DECLARE_WRITE8_MEMBER(io_20_w);
+	DECLARE_READ8_MEMBER(io_00_r);
+
+private:
+	required_device<vlm5030_device> m_vlm5030;
+};
+
 
 
 #endif

@@ -106,12 +106,25 @@ bool msx_slot_cartridge_device::call_load()
 	{
 		if ( software_entry() )
 		{
-			// Allocate and copy rom contents
-			UINT32 length = get_software_region_length("rom");
+			UINT32 length;
 
+			// Allocate and copy rom contents
+			length = get_software_region_length("rom");
 			m_cartridge->rom_alloc( length );
-			UINT8 *rom_base = m_cartridge->get_rom_base();
-			memcpy(rom_base, get_software_region("rom"), length);
+			if (length > 0)
+			{
+				UINT8 *rom_base = m_cartridge->get_rom_base();
+				memcpy(rom_base, get_software_region("rom"), length);
+			}
+
+			// Allocate and copy vlm5030 rom contents
+			length = get_software_region_length("vlm5030");
+			m_cartridge->rom_vlm5030_alloc(length);
+			if (length > 0)
+			{
+				UINT8 *rom_base = m_cartridge->get_rom_vlm5030_base();
+				memcpy(rom_base, get_software_region("vlm5030"), length);
+			}
 
 			// Allocate ram
 			length = get_software_region_length("ram");

@@ -44,6 +44,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205)
 	SLOT_INTERFACE_INTERNAL("super_swangi", MSX_CART_SUPER_SWANGI)
 	SLOT_INTERFACE_INTERNAL("hfox", MSX_CART_HFOX)
+	SLOT_INTERFACE_INTERNAL("keyboard_master", MSX_CART_KEYBOARD_MASTER)
 SLOT_INTERFACE_END
 
 
@@ -56,6 +57,11 @@ msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &
 void msx_cart_interface::rom_alloc(UINT32 size)
 {
 	m_rom.resize(size);
+}
+
+void msx_cart_interface::rom_vlm5030_alloc(UINT32 size)
+{
+	m_rom_vlm5030.resize(size);
 }
 
 void msx_cart_interface::ram_alloc(UINT32 size)

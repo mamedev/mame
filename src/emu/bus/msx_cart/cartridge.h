@@ -26,18 +26,22 @@ public:
 	// Mainly used by the cartridge slot when loading images
 	void rom_alloc(UINT32 size);
 	void ram_alloc(UINT32 size);
+	void rom_vlm5030_alloc(UINT32 size);
 	void sram_alloc(UINT32 size);
 
 	UINT8* get_rom_base() { return m_rom; }
+	UINT8* get_rom_vlm5030_base() { return m_rom_vlm5030; }
 	UINT8* get_ram_base() { return m_ram; }
 	UINT8* get_sram_base() { return m_sram; }
 	UINT32 get_rom_size() { return m_rom.count(); }
+	UINT32 get_rom_vlm5030_size() { return m_rom_vlm5030.count(); }
 	UINT32 get_ram_size() { return m_ram.count(); }
 	UINT32 get_sram_size() { return m_sram.count(); }
 
 protected:
 	dynamic_buffer m_rom;
 	dynamic_buffer m_ram;
+	dynamic_buffer m_rom_vlm5030;
 	dynamic_buffer m_sram;
 	devcb_write_line m_out_irq_cb;
 };

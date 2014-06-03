@@ -7147,6 +7147,22 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="keybmstr">
+		<description>Keyboard Master (Prototype)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RC-719" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="keyboard_master" />
+			<dataarea name="rom" size="16384">
+				<rom name="keyboard_master_prototype.rom" size="16384" crc="a076a5ab" sha1="2308dd0f15fb5395a1d8a08489daff65ead8e0f2" offset="0" />
+			</dataarea>
+			<dataarea name="vlm5030" size="16384">
+				<rom name="keyboard_master_vlm5030.rom" size="16384" crc="3ae325dc" sha1="4f36d139ee4baa7d5980f765de9895570ee05f40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="legkage">
 		<description>Kage no Densetsu - The Legend of Kage (Jpn)</description>
 		<year>1986</year>
