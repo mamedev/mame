@@ -138,36 +138,38 @@ public:
 
 	DECLARE_WRITE8_MEMBER(i8255_portc_w); // 20x LEDs
 
-	// uncertain
+	// likely
 
-//	DECLARE_READ8_MEMBER(portc_default_r) { logerror("%s read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
+	DECLARE_READ8_MEMBER(i8255_portd_r); // mole input 1?
+	DECLARE_READ8_MEMBER(i8255_porte_r); // mole input 2?
+
+	// uncertain
+	DECLARE_WRITE8_MEMBER(portc_w);
+	DECLARE_WRITE8_MEMBER(portd_w);
 	DECLARE_READ8_MEMBER(portc_r);
-//	DECLARE_READ8_MEMBER(portd_default_r) { logerror("%s read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(portd_r);
+	DECLARE_WRITE8_MEMBER(porte_w);
+
+	WRITE8_MEMBER(i8255_porta_w); // maybe molesa output? (6-bits?)
+	WRITE8_MEMBER(i8255_portb_w); // maybe molesb output? (6-bits?)
+	WRITE8_MEMBER(i8255_portf_w); // maybe strobe output?
+
 	DECLARE_READ8_MEMBER(porte_default_r) { logerror("%s read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
 
 	DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
 	DECLARE_WRITE8_MEMBER(portb_default_w) { logerror("%s write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
-//	DECLARE_WRITE8_MEMBER(portc_default_w) { logerror("%s write %02x to port C but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(portc_w);
-//	DECLARE_WRITE8_MEMBER(portd_default_w) { logerror("%s write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(portd_w);
-	DECLARE_WRITE8_MEMBER(porte_default_w) { logerror("%s write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
+
+
 
 	DECLARE_READ8_MEMBER(i8255_porta_default_r) { logerror("%s i8255 read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(i8255_portb_default_r) { logerror("%s i8255 read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(i8255_portc_default_r) { logerror("%s i8255 read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
 
-	DECLARE_WRITE8_MEMBER(i8255_porta_default_w) { logerror("%s i8255 write %02x to port A but no handler assigned\n", machine().describe_context(), data); } // maybe molesa output? (6-bits?)
-	DECLARE_WRITE8_MEMBER(i8255_portb_default_w) { logerror("%s i8255 write %02x to port B but no handler assigned\n", machine().describe_context(), data); } // maybe molesb output? (6-bits?)
 
-	DECLARE_READ8_MEMBER(i8255_portd_default_r) { logerror("%s i8255 read port D but no handler assigned\n", machine().describe_context()); return 0xff; }
-	DECLARE_READ8_MEMBER(i8255_porte_default_r) { logerror("%s i8255 read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
 	DECLARE_READ8_MEMBER(i8255_portf_default_r) { logerror("%s i8255 read port F but no handler assigned\n", machine().describe_context()); return 0xff; }
 
 	DECLARE_WRITE8_MEMBER(i8255_portd_default_w) { logerror("%s i8255 write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
 	DECLARE_WRITE8_MEMBER(i8255_porte_default_w) { logerror("%s i8255 write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(i8255_portf_default_w) { logerror("%s i8255 write %02x to port F but no handler assigned\n", machine().describe_context(), data); }
 
 
 	UINT32 m_led_serial_data;
@@ -220,6 +222,38 @@ WRITE8_MEMBER(kenseim_state::i8255_portc_w)
 
 }
 
+// i8255 ports D and E tend to be used together in the code, and the input gets masked with 6 bits (0x3f)
+READ8_MEMBER(kenseim_state::i8255_portd_r)
+{
+	logerror("%s i8255 read port D (mole matrix / sensors input 1?)\n", machine().describe_context());
+	//return 0xff;
+	return rand();// 0x00;
+}
+
+READ8_MEMBER(kenseim_state::i8255_porte_r)
+{
+	logerror("%s i8255 read port E (mole matrix / sensors input 2?)\n", machine().describe_context());
+	//return 0xff;
+	return rand();// 0x00;
+}
+
+WRITE8_MEMBER(kenseim_state::i8255_porta_w) // maybe molesa output? (6-bits?)
+{
+	logerror("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+} 
+
+WRITE8_MEMBER(kenseim_state::i8255_portb_w) // maybe molesb output? (6-bits?)
+{
+	logerror("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(kenseim_state::i8255_portf_w)
+{
+	// typically written when the 'moles' output is, maybe the 2 strobes?
+	logerror("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+}
+
+
 WRITE8_MEMBER(kenseim_state::portc_w)
 {
 	logerror("%s write %02x to port C\n", machine().describe_context(), data);
@@ -230,7 +264,11 @@ WRITE8_MEMBER(kenseim_state::portd_w)
 	logerror("%s write %02x to port D\n", machine().describe_context(), data);
 }
 
-
+WRITE8_MEMBER(kenseim_state::porte_w)
+{
+	// only access is at 0ABE, surrounded by port D reads / writes
+	logerror("%s write %02x to port E\n", machine().describe_context(), data);
+}
 
 READ8_MEMBER(kenseim_state::portd_r)
 {
@@ -282,10 +320,11 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 
 		data >>= 8;;
 
-		logerror("%s cps1_kensei_w offs %04x, %02x (from 68k?)\n", machine().describe_context(), offset * 2, data);
+		logerror("%s cps1_kensei_w offs %04x (from 68k to DRIVE BOARD via CN2) (%02x) (%d ACK,  %d ST4,  %d ST3,  %d ST2) \n", machine().describe_context(), offset * 2, data, (data & 0x01), ((data & 0x02)>>1),((data & 0x04)>>2),((data & 0x08)>>3)   );
 
-		if ((data != 0x02) && (data != 0x03) && (data != 0x04) && (data != 0x05) && (data != 0x83))
-			logerror("  ^^ (unknown?)\n");
+
+		if (data & 0xf0)
+			logerror("  ^^ (unknown? %02x)\n", data & 0xf0);
 	}
 	else
 	{
@@ -411,18 +450,19 @@ READ16_MEMBER(kenseim_state::kensei_dsw_r)
 		togglecount++;
 
 
-
 		int in = 0x00;
-		in |= 0x40; // don't want cps1 test mode (leftover)
+		in |= 0x40; // don't want cps1 test mode (leftover) (not connected)
 		
+		in |= 0x04;// line D9
+
 		if (togglecount == 3)
 		{
-			in |= 0x10; // won't read commands otherwise?
+			in |= 0x10; // won't read commands otherwise? (REQ line)
 			togglecount = 0;
 		}	
 		
 		
-		//in |= 0x20;
+		//in |= 0x20; // LVm line
 
 		logerror("%s kensei_dsw_r offs %04x (comms?), (%04x) (returning %02x)\n", machine().describe_context(), offset *2, mem_mask, in);
 
@@ -438,16 +478,16 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011 - divider unknown
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
-	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w))
+	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w)) // unused?
+	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w)) // unused?
 	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(kenseim_state, portc_w))
 	MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(WRITE8(kenseim_state, portd_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_default_w))	
+	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_w))	
 	MCFG_TMPZ84C011_PORTA_READ_CALLBACK(READ8(kenseim_state, porta_r))
 	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_r))
 	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_r))
 	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_r))
-	MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r))
+	MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r)) // unused?
 	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
 
 	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84?
@@ -458,22 +498,52 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_porta_default_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_portb_default_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portc_default_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_default_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_default_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_w))
 
 	MCFG_DEVICE_ADD("i8255_2", I8255, 0) // MB89363B!
-	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_portd_default_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_porte_default_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_portd_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_porte_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portf_default_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_portd_default_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_porte_default_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portf_default_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portf_w))
 
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
+/* how the DRIVE PCB connects to the inputs, see comments after each line
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // n/c
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // n/c
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) // n/c
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) // D5
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // n/c
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // n/c
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // n/c
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) // D1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // n/c
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // n/c
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // n/c
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
+*/
 
 static INPUT_PORTS_START( kenseim )
 	// the regular CPS1 input ports are used for comms with the extra board
