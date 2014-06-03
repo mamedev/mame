@@ -188,7 +188,7 @@ UINT8 sandy_super_disk_t::read(address_space &space, offs_t offset, UINT8 data)
 				break;
 			}
 		}
-		else
+		else if (offset < 0xc4000)
 		{
 			data = m_rom->base()[offset & 0x3fff];
 		}

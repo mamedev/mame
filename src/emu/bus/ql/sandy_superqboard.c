@@ -36,7 +36,13 @@ const device_type SANDY_SUPERQBOARD = &device_creator<sandy_superqboard_t>;
 
 ROM_START( sandy_superqboard )
 	ROM_REGION( 0x8000, "rom", 0 )
-	ROM_LOAD( "sandy_disk_controller_v1.18y_1984.ic2", 0x0000, 0x8000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd) )
+	ROM_DEFAULT_BIOS("v121n")
+	ROM_SYSTEM_BIOS( 0, "v118y", "v1.18" )
+	ROMX_LOAD( "sandy_disk_controller_v1.18y_1984.ic2", 0x0000, 0x8000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v119", "v1.19N" )
+	ROMX_LOAD( "sandysuperqboard_119n.ic2", 0x0000, 0x8000, CRC(5df04059) SHA1(51403f82a2eed3ef689e880936d1613e2b29c218), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v121n", "v1.21N" )
+	ROMX_LOAD( "sandy_disk_controller_v1.21n_1984_tk2.ic2", 0x0000, 0x8000, CRC(6a7a6a12) SHA1(a3a233e4f6c8450055fa537601a2a2eef143edca), ROM_BIOS(3) )
 
 	ROM_REGION( 0x100, "plds", 0 )
 	ROM_LOAD( "gal16v8.ic5", 0x000, 0x100, NO_DUMP )
@@ -204,7 +210,7 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 				break;
 			}
 		}
-		else
+		else if (offset < 0xc8000)
 		{
 			data = m_rom->base()[offset & 0x7fff];
 		}
