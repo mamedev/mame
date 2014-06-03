@@ -1021,7 +1021,7 @@ ROM_START( cgangpzl )
 	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 ) // default eeprom, otherwise game would lock up on 1st boot
-	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(5f8dfe9e) SHA1(81cc9cdbd8b5d6092a292309f78e3037233078f9) )
+	ROM_LOAD( "eeprom_cgangpzl", 0x0000, 0x0800, CRC(5f8dfe9e) SHA1(81cc9cdbd8b5d6092a292309f78e3037233078f9) )
 ROM_END
 
 ROM_START( cgangpzlj )
@@ -1037,7 +1037,7 @@ ROM_START( cgangpzlj )
 	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 ) // default eeprom, otherwise game would lock up on 1st boot
-	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(ef5ddff2) SHA1(ea3f8e4da119e27c27f66f169bbf19bc37499048) )
+	ROM_LOAD( "eeprom_cgangpzlj", 0x0000, 0x0800, CRC(ef5ddff2) SHA1(ea3f8e4da119e27c27f66f169bbf19bc37499048) )
 ROM_END
 
 ROM_START( emeraldaj ) /* NA-1 Game PCB, parent is NA-2 version listed below */

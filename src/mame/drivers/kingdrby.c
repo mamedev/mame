@@ -1156,8 +1156,7 @@ ROM_START( kingdrbb2 )
 	ROM_LOAD( "h6", 0x2000, 0x1000, CRC(257f4e0d) SHA1(cd61f3cf70c536aa207ebfdd28be54ac586b5249) ) // = im6_d.b6 kingdrby
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
-	// not in this set, using kingdrby one...
-	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, NO_DUMP CRC(92ef3c13) SHA1(1bf1e4106b37aadfc02822184510740e18a54d5c) )
+	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, BAD_DUMP CRC(92ef3c13) SHA1(1bf1e4106b37aadfc02822184510740e18a54d5c) )  	// not in this set, using kingdrby one...
 
 	ROM_REGION( 0x4000, "slave", 0 )
 	ROM_LOAD( "h1", 0x0000, 0x1000, CRC(444aa020) SHA1(0d40e9499892177b4d8123ad7b6909e8f6e0c8ab) )

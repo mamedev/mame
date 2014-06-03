@@ -3493,7 +3493,7 @@ ROM_START( jolycdid )   /* Altera EP910PC CPLD */
 	ROM_LOAD( "jolycdid_nvram.bin", 0x0000, 0x0800, CRC(6eb66015) SHA1(39490cf5d404c9e9fb58439f6d9876a3e9b29ba0) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) )
+	ROM_LOAD( "82s147(__jolycdid).bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) )
 ROM_END
 
 
@@ -3521,7 +3521,7 @@ ROM_START( jolycdie )   /* Bootleg PCB, NON encrypted graphics */
 	ROM_LOAD( "jolycdie_nvram.bin", 0x0000, 0x0800, CRC(1b2fba44) SHA1(be5c956517072581edaebe9ae440a542964c8490) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) )
+	ROM_LOAD( "82s147(__jolycdie).bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) )
 ROM_END
 
 ROM_START( sjcd2kx3 )   /* Super Joly 2000 3x */
@@ -3979,7 +3979,7 @@ ROM_END
 
 ROM_START( pool10c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a.u2", 0x8000, 0x8000, CRC(ac157b17) SHA1(f2b7eb940273bc404d3e0d8dd0f00ca757cebf69) )
+	ROM_LOAD( "a(__pool10c).u2", 0x8000, 0x8000, CRC(ac157b17) SHA1(f2b7eb940273bc404d3e0d8dd0f00ca757cebf69) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
@@ -4128,7 +4128,7 @@ ROM_END
 
 ROM_START( pool10f )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cmc-pool10+a+.u2", 0x8000, 0x8000, CRC(e8087fb8) SHA1(c012a81f561978bd97708a52f656e7b13e41a3e2) )
+	ROM_LOAD( "cmc-pool10+a+(__pool10f).u2", 0x8000, 0x8000, CRC(e8087fb8) SHA1(c012a81f561978bd97708a52f656e7b13e41a3e2) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "cmc-pool10-b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
@@ -4165,7 +4165,7 @@ ROM_END
 
 ROM_START( pool10h )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cmc-pool10+a+.u2", 0x8000, 0x8000, CRC(b671c6dd) SHA1(070617bbe304469deb98504e3ee73800bff225bb) )
+	ROM_LOAD( "cmc-pool10+a+(__pool10h).u2", 0x8000, 0x8000, CRC(b671c6dd) SHA1(070617bbe304469deb98504e3ee73800bff225bb) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "cmc-pool10+b+.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
@@ -4181,13 +4181,13 @@ ROM_END
 
 ROM_START( pool10i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a.u2", 0x8000, 0x8000, CRC(566bc05d) SHA1(eec88c8ba6cb664f38ebf8b71f99b4e7d04a9601) )
+	ROM_LOAD( "a(__pool10i).u2", 0x8000, 0x8000, CRC(566bc05d) SHA1(eec88c8ba6cb664f38ebf8b71f99b4e7d04a9601) )
 	ROM_IGNORE(                 0x8000 )    /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(581c4878) SHA1(5ae61af090feea1745e22f46b33b2c01e6013fbe) )
+	ROM_LOAD( "b(__pool10i).u21", 0x0000, 0x8000, CRC(581c4878) SHA1(5ae61af090feea1745e22f46b33b2c01e6013fbe) )
 	ROM_IGNORE(                0x8000 )    /* Identical halves. Discarding 2nd half */
-	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) )
+	ROM_LOAD( "c(__pool10i).u20", 0x8000, 0x8000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) )
 	ROM_IGNORE(                0x8000 )    /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
@@ -4205,20 +4205,20 @@ ROM_END
 
 ROM_START( royal )    /* brute hack of pool 10 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "3.u2", 0x8000, 0x8000, CRC(d4f36273) SHA1(2049257ea9ee52fde9cabfe40e809e00526a960e) )
+	ROM_LOAD( "3(__royal).u2", 0x8000, 0x8000, CRC(d4f36273) SHA1(2049257ea9ee52fde9cabfe40e809e00526a960e) )
 
 	/* GFX ROMs are the same of pool10, but double sized with identical halves. */
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(439eec10) SHA1(500139c16a883f0a5b0b8d91f4f067ba428d2d11) )
+	ROM_LOAD( "2(__royal).u21", 0x0000, 0x8000, CRC(439eec10) SHA1(500139c16a883f0a5b0b8d91f4f067ba428d2d11) )
 	ROM_IGNORE(                0x8000 )   /* Identical halves. Discarding 2nd half */
-	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9b59e72d) SHA1(96217272ce5abb78ff45ff116a5d921c57717ed9) )
+	ROM_LOAD( "1(__royal).u20", 0x8000, 0x8000, CRC(9b59e72d) SHA1(96217272ce5abb78ff45ff116a5d921c57717ed9) )
 	ROM_IGNORE(                0x8000 )   /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royal_nvram.bin",   0x0000, 0x0800, CRC(9df190d5) SHA1(4be0f5c6f89f822568e45e0e8457cf51ced2dcfe) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u25",   0x0000, 0x0200, CRC(d922d4e5) SHA1(d1541eabfd9cedd9eaa4fc48a3f64b078ea456be) )
+	ROM_LOAD( "82s147(__royal).u25",   0x0000, 0x0200, CRC(d922d4e5) SHA1(d1541eabfd9cedd9eaa4fc48a3f64b078ea456be) )
 ROM_END
 
 
@@ -4665,7 +4665,7 @@ ROM_START( royalcrdf )  /* encrypted program rom */
 	ROM_LOAD( "rc_2.bin", 0x8000, 0x8000, CRC(7f934488) SHA1(c537a09ef7e88a81ee9c2e1d971b3caf9d3dba0e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(44dbf086) SHA1(43a2d615c00605db75a4fd4d57d9e056c0356f10) )
+	ROM_LOAD( "82s147(__royalcrdf).bin", 0x0000, 0x0200, CRC(44dbf086) SHA1(43a2d615c00605db75a4fd4d57d9e056c0356f10) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8.bin",    0x0000, 0x0117, NO_DUMP ) /* not present in the set */
@@ -4679,14 +4679,14 @@ ROM_START( royalcrdg )   /* CMC C1030 PCB, EP910EC-30 CPLD, NON encrypted graphi
 	ROM_LOAD( "3.cpu", 0x8000, 0x8000, CRC(829a6a1d) SHA1(b7064e4d60e33d0875eb73525230ea3b99f10542) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
-	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+	ROM_LOAD( "2(__royalcrdg).bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "1(__royalcrdg).bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrdg_nvram.bin", 0x0000, 0x0800, CRC(853c7da9) SHA1(e275b22a9f470672bfc71425fcc44f547ba38b6d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(a762ee84) SHA1(40883a7c0f4365e2725eb0b29d45467e1b7a1a31) )
+	ROM_LOAD( "82s147(__royalcrdg).bin", 0x0000, 0x0200, CRC(a762ee84) SHA1(40883a7c0f4365e2725eb0b29d45467e1b7a1a31) )
 ROM_END
 
 
@@ -4718,11 +4718,11 @@ ROM_END
 */
 ROM_START( royalcdfr )   /* Seems bootleg PCB, non encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(69b944c1) SHA1(6ef76bff01f20376117dd7f67e5890eca754fcfb) )
+	ROM_LOAD( "3(__royalcdfr).bin", 0x8000, 0x8000, CRC(69b944c1) SHA1(6ef76bff01f20376117dd7f67e5890eca754fcfb) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
-	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+	ROM_LOAD( "2(__royalcdfr).bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "1(__royalcdfr).bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcdfr_nvram.bin", 0x0000, 0x0800, CRC(bda344d4) SHA1(7793d289147bf03c0d8256d4023252c9677ac8ff) )

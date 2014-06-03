@@ -6984,7 +6984,7 @@ ROM_START( galaxbsf2 )
 	ROM_LOAD( "gal09.ic13",        0x2400, 0x0400, CRC(5876f695) SHA1(e8c0d13066cfe4a409293b9e1380513099b35330) )
 
 	ROM_REGION( 0x0400, "unknown", 0 )
-	ROM_LOAD( "gal00eg.ic4",       0x0000, 0x0400, CRC(1038467f) SHA1(e34cc53a1203335cf9c9a94c3f96cab5a444a34a) )   // the first 0x100 bytes of this is ic41, the rest is different? should it bank in somehow to give extra features??
+	ROM_LOAD( "gal00eg(__galaxbsf2).ic4", 0x0000, 0x0400, CRC(1038467f) SHA1(e34cc53a1203335cf9c9a94c3f96cab5a444a34a) )   // the first 0x100 bytes of this is ic41, the rest is different? should it bank in somehow to give extra features??
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "galaxian.1h",       0x0000, 0x0800, CRC(39fb43a4) SHA1(4755609bd974976f04855d51e08ec0d62ab4bc07) )

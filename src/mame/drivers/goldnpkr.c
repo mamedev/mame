@@ -4014,8 +4014,8 @@ ROM_END
 
 ROM_START( videtron2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* different from videtron */
-	ROM_LOAD( "4.bin", 0x5000, 0x1000, CRC(4a7dab42) SHA1(7fcdab985b783d90879a99b2a53a6814ca4278eb) )
-	ROM_LOAD( "5.bin", 0x6000, 0x1000, CRC(c70e8127) SHA1(7db2d4a29cba7c336f254393955fad71f30a539a) )
+	ROM_LOAD( "4.bin(__videtron2)", 0x5000, 0x1000, CRC(4a7dab42) SHA1(7fcdab985b783d90879a99b2a53a6814ca4278eb) )
+	ROM_LOAD( "5.bin(__videtron2)", 0x6000, 0x1000, CRC(c70e8127) SHA1(7db2d4a29cba7c336f254393955fad71f30a539a) )
 	ROM_LOAD( "6.bin", 0x7000, 0x1000, CRC(490c7304) SHA1(1a6c6112571fd0e35b640ed58f66582a2d99c58b) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
@@ -4326,7 +4326,7 @@ ROM_START( ngoldb )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(           0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "0.bin",  0x1000, 0x0800, BAD_DUMP CRC(396ac32f) SHA1(14106f4c8765abd0192342de930b1f6656adb1b2) )    /* char ROM. need to be redumped */
+	ROM_LOAD( "0(__baddump).bin",  0x1000, 0x0800, BAD_DUMP CRC(396ac32f) SHA1(14106f4c8765abd0192342de930b1f6656adb1b2) )    /* char ROM. need to be redumped */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "7.bin",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */

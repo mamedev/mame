@@ -463,7 +463,7 @@ ROM_START( bombjackt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9.1j",    0x0000, 0x4000, CRC(4b59a3bb) SHA1(dae45985d2575821c86757ead14b8313e922570d) ) // == 09_j01b.bin + 10_l01b.bin
 	ROM_LOAD( "12.1n",   0x4000, 0x4000, CRC(0a32506a) SHA1(2fb3ce695caebbae3ca7dd9f3d34ac5b734d77ed) ) // == 11_m01b.bin + (97.229004%) 12_n01b.bin
-	ROM_LOAD( "13.1r",   0xc000, 0x2000, CRC(964ac5c5) SHA1(8d235ae91aea1ae86411671c5aa050c146a52026) ) // (99.877930%) 13_r01b.bin
+	ROM_LOAD( "13(__bombjackt).1r",   0xc000, 0x2000, CRC(964ac5c5) SHA1(8d235ae91aea1ae86411671c5aa050c146a52026) ) // (99.877930%) 13_r01b.bin
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "1.6h",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )

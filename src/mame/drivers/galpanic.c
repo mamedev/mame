@@ -758,7 +758,7 @@ scr*   - gfx
 // fantasy 95 - derived from new fantasia?
 ROM_START( fantsy95 )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "prog2.12",  0x000000, 0x80000, CRC(1e684da7) SHA1(2104a6fb5f019011009f4faa769afcada90cff97) )
+	ROM_LOAD16_BYTE( "prog2(__fantsy95).12",  0x000000, 0x80000, CRC(1e684da7) SHA1(2104a6fb5f019011009f4faa769afcada90cff97) ) // prog2.12
 	ROM_LOAD16_BYTE( "prog1.7",   0x000001, 0x80000, CRC(dc4e4f6b) SHA1(9934121692a6d32164bef03c72c25dc727438e54) )
 	ROM_LOAD16_BYTE( "i-scr2.10", 0x100000, 0x80000, CRC(ab8756ff) SHA1(0a7aa977151962e67b15a7e0f819b1412ff8dbdc) )
 	ROM_LOAD16_BYTE( "i-scr1.5",  0x100001, 0x80000, CRC(d8e2ef77) SHA1(ec2c1dcc13e281288b5df43fa7a0b3cdf7357459) )
