@@ -11,6 +11,9 @@
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
+//#undef RESTRICT
+//#define RESTRICT
+
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -40,22 +43,23 @@ struct netlist_solver_parameters_t
     netlist_time m_nt_sync_delay;
 };
 
-class vector_t
+class vector_ops_t
 {
 public:
 
-    vector_t(int size)
+    vector_ops_t(int size)
     : m_dim(size)
     {
     }
 
-    virtual ~vector_t() {}
+    virtual ~vector_ops_t() {}
 
     ATTR_ALIGNED(64) double * RESTRICT  m_V;
 
     virtual const double sum(const double * v) = 0;
-    virtual void sum2(const double * v1, const double * v2, double &s1, double &s2) = 0;
-    virtual void sum2a(const double * v1, const double * v2, const double * v3abs, double &s1, double &s2, double &s3abs) = 0;
+    virtual void sum2(const double * RESTRICT v1, const double * RESTRICT v2, double & RESTRICT  s1, double & RESTRICT s2) = 0;
+    virtual void addmult(double * RESTRICT v1, const double * RESTRICT v2, const double &mult) = 0;
+    virtual void sum2a(const double * RESTRICT v1, const double * RESTRICT v2, const double * RESTRICT v3abs, double & RESTRICT s1, double & RESTRICT s2, double & RESTRICT s3abs) = 0;
 
     virtual const double sumabs(const double * v) = 0;
 
@@ -67,35 +71,35 @@ private:
 };
 
 template <int m_N>
-class vector_imp_t : public vector_t
+class vector_ops_impl_t : public vector_ops_t
 {
 public:
 
-    vector_imp_t()
-    : vector_t(m_N)
+    vector_ops_impl_t()
+    : vector_ops_t(m_N)
     {
     }
 
-    vector_imp_t(int size)
-    : vector_t(size)
+    vector_ops_impl_t(int size)
+    : vector_ops_t(size)
     {
         assert(m_N == 0);
     }
 
-    virtual ~vector_imp_t() {}
+    virtual ~vector_ops_impl_t() {}
 
     ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
 
     const double sum(const double * v)
     {
-        const double * RESTRICT vl = v;
+        const double *  RESTRICT vl = v;
         double tmp = 0.0;
         for (int i=0; i < N(); i++)
             tmp += vl[i];
         return tmp;
     }
 
-    void sum2(const double * v1, const double * v2, double &s1, double &s2)
+    void sum2(const double * RESTRICT v1, const double * RESTRICT v2, double & RESTRICT s1, double & RESTRICT s2)
     {
         const double * RESTRICT v1l = v1;
         const double * RESTRICT v2l = v2;
@@ -106,7 +110,17 @@ public:
         }
     }
 
-    void sum2a(const double * v1, const double * v2, const double * v3abs, double &s1, double &s2, double &s3abs)
+    void addmult(double * RESTRICT v1, const double * RESTRICT v2, const double &mult)
+    {
+        double * RESTRICT v1l = v1;
+        const double * RESTRICT v2l = v2;
+        for (int i=0; i < N(); i++)
+        {
+            v1l[i] += v2l[i] * mult;
+        }
+    }
+
+    void sum2a(const double * RESTRICT v1, const double * RESTRICT v2, const double * RESTRICT v3abs, double & RESTRICT s1, double & RESTRICT s2, double & RESTRICT s3abs)
     {
         const double * RESTRICT v1l = v1;
         const double * RESTRICT v2l = v2;
@@ -133,6 +147,8 @@ private:
 
 class ATTR_ALIGNED(64) terms_t
 {
+    NETLIST_PREVENT_COPYING(terms_t)
+
     public:
     ATTR_COLD terms_t() {}
 
@@ -152,9 +168,12 @@ class ATTR_ALIGNED(64) terms_t
     ATTR_HOT inline double *gt() { return m_gt; }
     ATTR_HOT inline double *go() { return m_go; }
     ATTR_HOT inline double *Idr() { return m_Idr; }
-    ATTR_HOT vector_t *ops() { return m_ops; }
+    ATTR_HOT inline double **other_curanalog() { return m_other_curanalog; }
+    ATTR_HOT vector_ops_t *ops() { return m_ops; }
 
     ATTR_COLD void set_pointers();
+
+    int m_railstart;
 
 private:
     plinearlist_t<netlist_terminal_t *> m_term;
@@ -162,7 +181,8 @@ private:
     plinearlist_t<double> m_gt;
     plinearlist_t<double> m_go;
     plinearlist_t<double> m_Idr;
-    vector_t * m_ops;
+    plinearlist_t<double *> m_other_curanalog;
+    vector_ops_t * m_ops;
 };
 
 class netlist_matrix_solver_t : public netlist_device_t
@@ -230,19 +250,13 @@ private:
 };
 
 template <int m_N, int _storage_N>
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
+class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
 
-	netlist_matrix_solver_direct_t()
-    : netlist_matrix_solver_t()
-    , m_dim(0)
-    {
-	    for (int k=0; k<_storage_N; k++)
-	        m_A[k] = & m_A_phys[k][0];
-    }
+	netlist_matrix_solver_direct_t(int size);
 
-	virtual ~netlist_matrix_solver_direct_t() {}
+	virtual ~netlist_matrix_solver_direct_t();
 
 	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets);
 	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
@@ -261,15 +275,16 @@ protected:
 
     ATTR_HOT virtual double compute_next_timestep(const double);
 
-    ATTR_ALIGNED(64) double * RESTRICT m_A[_storage_N];
-    ATTR_ALIGNED(64) double m_RHS[_storage_N];
-    ATTR_ALIGNED(64) double m_last_RHS[_storage_N]; // right hand side - contains currents
+    double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+    double m_RHS[_storage_N];
+    double m_last_RHS[_storage_N]; // right hand side - contains currents
 
-    terms_t m_terms[_storage_N];
-    terms_t m_rails[_storage_N];
+    terms_t **m_terms;
+
+    terms_t *m_rails_temp;
 
 private:
-    ATTR_ALIGNED(64) double m_A_phys[_storage_N][((_storage_N + 7) / 8) * 8];
+    vector_ops_t *m_row_ops[_storage_N + 1];
 
 	int m_dim;
 };
@@ -279,8 +294,8 @@ class ATTR_ALIGNED(64) netlist_matrix_solver_gauss_seidel_t: public netlist_matr
 {
 public:
 
-	netlist_matrix_solver_gauss_seidel_t()
-      : netlist_matrix_solver_direct_t<m_N, _storage_N>()
+	netlist_matrix_solver_gauss_seidel_t(int size)
+      : netlist_matrix_solver_direct_t<m_N, _storage_N>(size)
       , m_gs_fail(0)
       , m_gs_total(0)
       {}
@@ -300,6 +315,11 @@ private:
 
 class ATTR_ALIGNED(64) netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
 {
+public:
+
+    netlist_matrix_solver_direct1_t()
+      : netlist_matrix_solver_direct_t<1, 1>(1)
+      {}
 protected:
     ATTR_HOT int vsolve_non_dynamic();
 private:
@@ -307,6 +327,11 @@ private:
 
 class ATTR_ALIGNED(64) netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
 {
+public:
+
+    netlist_matrix_solver_direct2_t()
+      : netlist_matrix_solver_direct_t<2, 2>(2)
+      {}
 protected:
     ATTR_HOT int vsolve_non_dynamic();
 private:
@@ -352,7 +377,7 @@ private:
     netlist_solver_parameters_t m_params;
 
     template <int m_N, int _storage_N>
-    netlist_matrix_solver_t *create_solver(int gs_threshold, bool use_specific);
+    netlist_matrix_solver_t *create_solver(int size, int gs_threshold, bool use_specific);
 };
 
 

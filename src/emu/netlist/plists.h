@@ -116,6 +116,15 @@ public:
 		}
 	}
 
+    ATTR_HOT inline void swap(const int pos1, const int pos2)
+    {
+        assert((pos1>=0) && (pos1<m_count));
+        assert((pos2>=0) && (pos2<m_count));
+        _ListClass tmp = m_list[pos1];
+        m_list[pos1] = m_list[pos2];
+        m_list[pos2] =tmp;
+    }
+
 	ATTR_HOT inline bool contains(const _ListClass &elem) const
 	{
 		for (_ListClass *i = m_list; i < m_list + m_count; i++)
