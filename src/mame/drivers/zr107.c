@@ -1168,8 +1168,8 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (Euro v1.11)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (Asia v1.10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", GAME_IMPERFECT_GRAPHICS )
