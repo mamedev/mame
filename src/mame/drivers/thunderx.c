@@ -640,7 +640,7 @@ MACHINE_RESET_MEMBER(thunderx_state,thunderx)
 static MACHINE_CONFIG_START( scontra, thunderx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* Verified on pcb, CPU is 052001 */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(scontra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  scontra_interrupt)
 
@@ -688,11 +688,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( thunderx, thunderx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(thunderx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  scontra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)      /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(thunderx_state,thunderx)
