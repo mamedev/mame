@@ -83,6 +83,8 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_split_bank));
 	save_item(NAME(m_vcount));
 	save_item(NAME(m_exram));
+	save_item(NAME(m_ram_hi_banks));
+
 }
 
 void nes_exrom_device::pcb_reset()
@@ -129,6 +131,11 @@ void nes_exrom_device::pcb_reset()
 	m_prg_ram_mapped[1] = 0;
 	m_prg_ram_mapped[2] = 0;
 	m_prg_ram_mapped[3] = 0;
+
+	m_ram_hi_banks[0] = 0;
+	m_ram_hi_banks[1] = 0;
+	m_ram_hi_banks[2] = 0;
+	m_ram_hi_banks[3] = 0;
 }
 
 
@@ -144,28 +151,9 @@ void nes_exrom_device::pcb_reset()
 
  iNES: mapper 5
 
- MESS status: Mostly Unsupported
+ MESS status: Partially supported
 
  -------------------------------------------------*/
-
-/* MMC5 can map PRG RAM to 0x8000-0xdfff */
-void nes_exrom_device::prgram_bank8_x(int start, int bank)
-{
-	assert(start < 4);
-	assert(bank >= 0);
-	assert(m_prgram.count() + m_battery.count());
-
-	// currently we use 4x8k BWRAM + 4x8k WRAM banks, independently from the actual PRG-RAM size
-	// mirroring of the actual size is taken care of at bank setup (even if no known commercial game relies on it!)
-	//bank &= (m_prgram.count() / 0x2000) - 1;
-	if (!m_prgram.count() || !m_battery.count())
-		bank &= 3;
-
-	// PRG RAM is mapped after PRG ROM
-	m_prg_bank[start] = m_prg_chunks + bank;
-	m_prg_bank_mem[start]->set_entry(m_prg_bank[start]);
-}
-
 
 void nes_exrom_device::update_prg()
 {
@@ -184,8 +172,8 @@ void nes_exrom_device::update_prg()
 
 			if (m_prg_ram_mapped[1])
 			{
-				prgram_bank8_x(0, ((bank1 << 1) & 0x07));
-				prgram_bank8_x(1, ((bank1 << 1) & 0x07) | 1);
+				m_ram_hi_banks[0] = ((bank1 << 1) & 0x07);
+				m_ram_hi_banks[1] = ((bank1 << 1) & 0x07) | 1;
 			}
 			else
 				prg16_89ab(bank1);
@@ -200,14 +188,14 @@ void nes_exrom_device::update_prg()
 
 			if (m_prg_ram_mapped[1])
 			{
-				prgram_bank8_x(0, ((bank1 << 1) & 0x07));
-				prgram_bank8_x(1, ((bank1 << 1) & 0x07) | 1);
+				m_ram_hi_banks[0] = ((bank1 << 1) & 0x07);
+				m_ram_hi_banks[1] = ((bank1 << 1) & 0x07) | 1;
 			}
 			else
 				prg16_89ab(bank1);
 
 			if (m_prg_ram_mapped[2])
-				prgram_bank8_x(2, bank2 & 0x07);
+				m_ram_hi_banks[2] = (bank2 & 0x07);
 			else
 				prg8_cd(bank2);
 
@@ -221,17 +209,17 @@ void nes_exrom_device::update_prg()
 			bank3 = m_prg_regs[3];
 
 			if (m_prg_ram_mapped[0])
-				prgram_bank8_x(0, bank0 & 0x07);
+				m_ram_hi_banks[0] = (bank0 & 0x07);
 			else
 				prg8_89(bank0);
 
 			if (m_prg_ram_mapped[1])
-				prgram_bank8_x(1, bank1 & 0x07);
+				m_ram_hi_banks[1] = (bank1 & 0x07);
 			else
 				prg8_ab(bank1);
 
 			if (m_prg_ram_mapped[2])
-				prgram_bank8_x(2, bank2 & 0x07);
+				m_ram_hi_banks[2] = (bank2 & 0x07);
 			else
 				prg8_cd(bank2);
 
@@ -631,10 +619,10 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 // 3bits are used to access the "WRAM" banks
 // bit3 select the chip (2 of them can be accessed, each up to 32KB)
 // bit1 & bit2 select the 8KB banks inside the chip
-// same mechanism is used also when "WRAM" is mapped in higher banks, but there we setup the bank map in a smart
-// way so to access the correct bank as if the 3 bits were directly selecting the bank in a 64KB RAM area
+// same mechanism is used also when "WRAM" is mapped in higher banks
 READ8_MEMBER(nes_exrom_device::read_m)
 {
+	LOG_MMC(("exrom read_m, offset: %04x\n", offset));
 	if (m_battery && m_prgram)  // 2 chips present: first is BWRAM, second is WRAM
 	{
 		if (m_wram_base & 0x04)
@@ -652,6 +640,7 @@ READ8_MEMBER(nes_exrom_device::read_m)
 
 WRITE8_MEMBER(nes_exrom_device::write_m)
 {
+	LOG_MMC(("exrom write_m, offset: %04x, data: %02x\n", offset, data));
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01)
 		return;
 
@@ -662,16 +651,31 @@ WRITE8_MEMBER(nes_exrom_device::write_m)
 }
 
 // some games (e.g. Bandit Kings of Ancient China) write to PRG-RAM through 0x8000-0xdfff
-// it does not work well yet!
+READ8_MEMBER(nes_exrom_device::read_h)
+{
+	LOG_MMC(("exrom read_h, offset: %04x\n", offset));
+	int bank = offset / 0x2000;
+
+	if (bank < 3 && offset >= bank * 0x2000 && offset < (bank + 1) * 0x2000 && m_prg_ram_mapped[bank])
+	{
+		if (m_battery && m_ram_hi_banks[bank] < 4)
+			return m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.count() - 1)];
+		else if (m_prgram)
+			return m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.count() - 1)];
+	}
+
+	return hi_access_rom(offset);
+}
+
 WRITE8_MEMBER(nes_exrom_device::write_h)
 {
+	LOG_MMC(("exrom write_h, offset: %04x, data: %02x\n", offset, data));
 	int bank = offset / 0x2000;
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01 || bank == 3 || !m_prg_ram_mapped[bank])
 		return;
 
-	bank = m_prg_bank[bank] - m_prg_chunks;
-	if (m_battery && m_prg_bank[bank] < m_prg_chunks + 4)
-		m_battery[((bank * 0x2000) + (offset & 0x1fff)) & (m_battery.count() - 1)] = data;
+	if (m_battery && m_ram_hi_banks[bank] < 4)
+		m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.count() - 1)] = data;
 	else if (m_prgram)
-		m_prgram[(((bank & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.count() - 1)] = data;
+		m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.count() - 1)] = data;
 }

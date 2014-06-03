@@ -672,52 +672,7 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 	m_prg_bank_mem[3] = machine.root_device().membank("prg3");
 	for (int i = 0; i < 4; i++)
 	{
-		int next_bank = m_prg.count() / 0x2000;
 		m_prg_bank_mem[i]->configure_entries(0, m_prg.count() / 0x2000, m_prg, 0x2000);
-		// MMC5 (and a few other PCBs) can also map WRAM/BWRAM in these banks, so we add here 4x8K banks for each RAM chip
-		// No boards with 64Kb of WRAM/BWRAM has been found so far, otherwise the code has to be updated!
-		if (m_battery)
-		{
-			if (m_battery.count() / 0x2000 == 4)
-			{
-				m_prg_bank_mem[i]->configure_entries(next_bank, 4, m_battery, 0x2000);
-			}
-			if (m_battery.count() / 0x2000 == 2)
-			{
-				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 2, m_battery, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 2, 2, m_battery, 0x2000);
-			}
-			if (m_battery.count() / 0x2000 == 1)
-			{
-				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 1, m_battery, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 1, 1, m_battery, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 2, 1, m_battery, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 3, 1, m_battery, 0x2000);
-			}
-			next_bank += 4;
-		}
-		if (m_prgram)
-		{
-			if (m_prgram.count() / 0x2000 == 4)
-			{
-				m_prg_bank_mem[i]->configure_entries(next_bank, 4, m_prgram, 0x2000);
-			}
-			if (m_prgram.count() / 0x2000 == 2)
-			{
-				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 2, m_prgram, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 2, 2, m_prgram, 0x2000);
-			}
-			if (m_prgram.count() / 0x2000 == 1)
-			{
-				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 1, m_prgram, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 1, 1, m_prgram, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 2, 1, m_prgram, 0x2000);
-				m_prg_bank_mem[i]->configure_entries(next_bank + 3, 1, m_prgram, 0x2000);
-			}
-			next_bank += 4;
-		}
-
-		// ...but we always map the banks to PRG at start
 		m_prg_bank_mem[i]->set_entry(i);
 		m_prg_bank[i] = i;
 	}

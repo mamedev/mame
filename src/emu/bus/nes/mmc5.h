@@ -16,6 +16,7 @@ public:
 	virtual void device_start();
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_m);
+	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
@@ -29,7 +30,6 @@ public:
 
 protected:
 	void set_mirror(int page, int src);
-	void prgram_bank8_x(int start, int bank);
 	void update_render_mode();
 	void update_prg();
 
@@ -78,6 +78,8 @@ protected:
 
 	// MMC-5 contains 1K of internal ram
 	UINT8 m_exram[0x400];
+	
+	UINT8 m_ram_hi_banks[4];
 
 	//  int m_nes_vram_sprite[8];
 };
