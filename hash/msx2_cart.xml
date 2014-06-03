@@ -890,7 +890,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-<!-- This features an A/D converter for audio playback -->
+	<!-- This features a upd7756 for audio playback -->
 	<software name="moeronet">
 		<description>Moero! Nettou Yakyuu '88 (Jpn)</description>
 		<year>1988</year>
@@ -902,6 +902,9 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="d23c2001c" size="262144" crc="68745c64" sha1="1cbd5c7849f97dea1e3375a842f784ff9283310c" offset="0" />
+			</dataarea>
+			<dataarea name="upd7756" size="32768">
+				<rom name="upd7756.bin" size="32768" status="nodump" offset="0" />
 			</dataarea>
 		</part>
 	</software>

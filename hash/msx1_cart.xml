@@ -10304,7 +10304,8 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="playball">
+	<!-- This game should also play some samples from a uPD7756C which doesn't seem to be dumped yet. -->
+	<software name="playball" supported="partial">
 		<description>Play Ball (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
@@ -10314,6 +10315,9 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="play ball (japan).rom" size="32768" crc="d178833b" sha1="e6fbfb4b10dc393953211dda4b114080a08302a1" offset="0" />
+			</dataarea>
+			<dataarea name="upd7756" size="32768">
+				<rom name="upd7756.bin" size="32768" status="nodump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
