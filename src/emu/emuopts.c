@@ -373,22 +373,9 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 
 bool emu_options::parse_command_line(int argc, char *argv[], astring &error_string)
 {
-	// remember the original system name
-	astring old_system_name(system_name());
-
 	// parse as normal
-	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-
-	// if the system name changed, fix up the device options
-	if (old_system_name != system_name())
-	{
-		// remove any existing device options
-		remove_device_options();
-		result = parse_slot_devices(argc, argv, error_string, NULL, NULL);
-		if (exists(OPTION_RAMSIZE) && old_system_name.len()!=0)
-			set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
-	}
-	return result;
+	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	return parse_slot_devices(argc, argv, error_string, NULL, NULL);
 }
 
 

@@ -180,7 +180,13 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		// check the state of the machine
 		if (new_driver_pending)
 		{
+			astring old_system_name(options.system_name());
 			options.set_system_name(new_driver_pending->name);
+			astring error_string;
+			if (old_system_name != options.system_name()) {
+				options.remove_device_options();
+				options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
+			}
 			firstrun = true;
 		} 
 		else 
