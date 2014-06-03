@@ -112,6 +112,8 @@ ROM_START(cue)
 	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, NO_DUMP)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
+
+//GAME(1982,    cue,        0,      st_mp200,   st_mp200, st_mp200_state,   st_mp200,   ROT0,   "Stern",                "Cue",              GAME_IS_SKELETON_MECHANICAL)
 #endif
 
 /*--------------------------------
@@ -349,7 +351,6 @@ ROM_START(st_game)
 ROM_END
 
 
-//GAME(1982,    cue,        0,      st_mp200,   st_mp200, st_mp200_state,   st_mp200,   ROT0,   "Stern",                "Cue",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  ali,        0,          st_mp200,   st_mp200, st_mp200_state,   st_mp200,   ROT0,   "Stern",                "Ali",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  biggame,    0,          st_mp200,   st_mp200, st_mp200_state,   st_mp200,   ROT0,   "Stern",                "Big Game",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1981,  catacomp,   0,          st_mp200,   st_mp200, st_mp200_state,   st_mp200,   ROT0,   "Stern",                "Catacomb (Pinball)",               GAME_IS_SKELETON_MECHANICAL)

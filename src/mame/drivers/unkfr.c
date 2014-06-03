@@ -25,6 +25,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
+
+#if 0
+
 static INPUT_PORTS_START( unkfr )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0:01" )
@@ -55,7 +58,6 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( unkfr, unkfr_state )
 MACHINE_CONFIG_END
-
 
 ROM_START( unkfr )
 	ROM_REGION( 0x800000, "unkroms", 0 )
@@ -739,6 +741,7 @@ ROM_START( unkfra )
 	ROM_LOAD( "taker-over-008.bin", 0x0000, 0x008000, CRC(2dad1088) SHA1(b8bdf5bf4e0ef5bee44d1f7031b08e4e6a8ae5ca) )//looks a bit ACE ish, but no strings to make sure
 ROM_END
 
-
 GAME(19??,  unkfr,   0,  unkfr,  unkfr, driver_device,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 1)",     GAME_IS_SKELETON_MECHANICAL)
 GAME(19??,  unkfra,  0,  unkfr,  unkfr, driver_device,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 2)",     GAME_IS_SKELETON_MECHANICAL)
+
+#endif

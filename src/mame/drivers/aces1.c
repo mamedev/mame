@@ -337,13 +337,16 @@ ROM_START( ac1taklv )
 	ROM_LOAD( "430tlp14.bin", 0x6000, 0x2000, CRC(09008e12) SHA1(f3f6dd3bafdcf7187148fed914d7c43caf53d48a) )
 ROM_END
 
-/*
+#if 0
 
 ROM_START( ac1cshtw ) // Cash Towers, same ROM as above, original machine apparently plays the same, reskinned machine?
     ROM_REGION( 0x8000, "maincpu", 0 )
     ROM_LOAD( "ctp1.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
 ROM_END
-*/
+
+//GAME( 199?, ac1cshtw      ,0          ,aces1  ,aces1  , aces1_state,aces1  ,ROT0   ,"Ace", "Cash Towers (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL ) // same ROM as above, original machine apparently plays the same, reskinned machine?
+
+#endif
 
 
 ROM_START( ac1bbclb )
@@ -660,7 +663,6 @@ GAME( 199?, ac1pster        ,0          ,aces1  ,aces1  , aces1_state,aces1 ,ROT
 GAME( 199?, ac1pstrt        ,0          ,aces1  ,aces1  , aces1_state,aces1 ,ROT0   ,"Pcp", "Pound Stretcher (Pcp) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1primt        ,0          ,aces1  ,aces1  , aces1_state,aces1 ,ROT0   ,"Ace", "Primetime (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1taklv        ,0          ,aces1  ,aces1  , aces1_state,aces1 ,ROT0   ,"Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-//GAME( 199?, ac1cshtw      ,0          ,aces1  ,aces1  , aces1_state,aces1  ,ROT0   ,"Ace", "Cash Towers (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL ) // same ROM as above, original machine apparently plays the same, reskinned machine?
 GAME( 199?, ac1bbclb        ,0          ,aces1  ,aces1  , aces1_state,aces1 ,ROT0   ,"Ace", "Big Break Club (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1bbclba       ,ac1bbclb   ,aces1  ,aces1  , aces1_state,aces1 ,ROT0   ,"Ace", "Big Break Club (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1clbsv        ,0          ,aces1  ,aces1  , aces1_state,aces1 ,ROT0   ,"Ace", "Club Sovereign (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL )

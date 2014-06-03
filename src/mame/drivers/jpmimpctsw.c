@@ -2149,6 +2149,8 @@ ROM_START( j6gldday )
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "gdsound.bin", 0x000000, 0x04a018, CRC(796e1b35) SHA1(e9c8e5a350823275c9ba9238781872ea359d5049) )
 ROM_END
+
+// GAME( 199?, j6gldday , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Golden Day (JPM) (IMPACT)", GAME_FLAGS ) // this is the same as j6dmnjkra
 #endif
 
 
@@ -8148,8 +8150,7 @@ GAME( 199?, j6dmnjkr    , 0         , impctawp, tbirds, driver_device, 0, ROT0, 
 GAME( 199?, j6dmnjkra   , j6dmnjkr  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Demon Jokers (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6dmnjkrb   , j6dmnjkr  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Demon Jokers (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME( 199?, j6dmnjkrc   , j6dmnjkr  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Demon Jokers (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-// GAME( 199?, j6gldday , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Golden Day (JPM) (IMPACT)", GAME_FLAGS ) // this is the same as j6dmnjkra
-	GAME( 199?, j6reddmn    , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Red Demon (JPM) (IMPACT)", GAME_FLAGS ) // the same as Demon Jokers but with a different sound rom?
+GAME( 199?, j6reddmn    , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Red Demon (JPM) (IMPACT)", GAME_FLAGS ) // the same as Demon Jokers but with a different sound rom?
 
 
 

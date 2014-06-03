@@ -189,8 +189,8 @@ ROM_START(ator)
 	ROM_LOAD("ator.u5", 0x2000, 0x2000, NO_DUMP)
 	ROM_LOAD("ator.u6", 0x4000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
 ROM_END
+//GAME(19??, ator,     0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Ator", GAME_IS_SKELETON_MECHANICAL)
 #endif
 
 GAME(1986, break86,  0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Break '86", GAME_IS_SKELETON_MECHANICAL)
 GAME(1986, papillon, 0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Papillon", GAME_IS_SKELETON_MECHANICAL)
-//GAME(19??, ator,     0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Ator", GAME_IS_SKELETON_MECHANICAL)
