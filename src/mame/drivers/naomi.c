@@ -5531,7 +5531,7 @@ ROM_START( mushi2ea )
 
 	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "fpr-24333.ic8", 0x0000000, 0x4000000, CRC(a467b69c) SHA1(66a841b72ef1bb8cbabbfb1d14081b4dff14b1d3) )
-	ROM_LOAD(" epr-24357.ic7", 0x0000000, 0x0400000, CRC(a2236d58) SHA1(3746b9d3c0f7ecf6340619bb8bf01f170ac4efb7) ) // EPR mode, overwrite FPR data
+	ROM_LOAD( "epr-24357.ic7", 0x0000000, 0x0400000, CRC(a2236d58) SHA1(3746b9d3c0f7ecf6340619bb8bf01f170ac4efb7) ) // EPR mode, overwrite FPR data
 	ROM_LOAD( "fpr-24334.ic9", 0x4000000, 0x4000000, CRC(13d2d1dc) SHA1(6a47cfaddf006e6ff46837fac956fbcc20619d79) )
 
 	ROM_REGION( 4, "rom_key", 0 )
