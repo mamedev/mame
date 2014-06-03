@@ -127,3 +127,22 @@ void sandy_super_disk_t::device_start()
 void sandy_super_disk_t::device_reset()
 {
 }
+
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+UINT8 sandy_super_disk_t::read(address_space &space, offs_t offset, UINT8 data)
+{
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+void sandy_super_disk_t::write(address_space &space, offs_t offset, UINT8 data)
+{
+}

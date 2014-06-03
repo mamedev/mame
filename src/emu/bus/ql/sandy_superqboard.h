@@ -48,8 +48,8 @@ protected:
 	virtual void device_reset();
 
 	// device_ql_expansion_card_interface overrides
-    virtual UINT8 read(address_space &space, offs_t offset, UINT8 data);
-    virtual void write(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data);
+	virtual void write(address_space &space, offs_t offset, UINT8 data);
 
 private:
 	void check_interrupt();
