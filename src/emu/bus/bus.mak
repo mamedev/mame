@@ -1148,4 +1148,6 @@ BUSOBJS += $(BUSOBJ)/ql/exp.o
 BUSOBJS += $(BUSOBJ)/ql/sandy_superdisk.o
 BUSOBJS += $(BUSOBJ)/ql/sandy_superqboard.o
 BUSOBJS += $(BUSOBJ)/ql/trumpcard.o
+BUSOBJS += $(BUSOBJ)/ql/rom.o
+BUSOBJS += $(BUSOBJ)/ql/std.o
 endif
