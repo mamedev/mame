@@ -197,8 +197,6 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_FATALERROR, NULL);
 			}
 		}
-		
-		m_options.parse_standard_inis(option_errors);
 		// parse the command line, adding any system-specific options
 		if (!m_options.parse_command_line(argc, argv, option_errors))
 		{
