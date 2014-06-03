@@ -384,7 +384,7 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 template <int m_N, int _storage_N>
 void netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::log_stats()
 {
-#if 1
+#if 0
     printf("==============================================\n");
     printf("Solver %s\n", this->name().cstr());
     printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
