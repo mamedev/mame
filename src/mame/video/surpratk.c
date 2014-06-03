@@ -23,7 +23,7 @@ void surpratk_tile_callback( running_machine &machine, int layer, int bank, int 
 
 ***************************************************************************/
 
-MCFG_K05324X_CB_MEMBER(surpratk_state::sprite_callback)
+K05324X_CB_MEMBER(surpratk_state::sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])

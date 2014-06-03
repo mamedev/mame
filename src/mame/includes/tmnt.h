@@ -169,9 +169,9 @@ public:
 	inline UINT32 tmnt2_get_word( UINT32 addr );
 	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );
 	DECLARE_WRITE8_MEMBER(volume_callback);
-	MCFG_K05324X_CB_MEMBER(lgtnfght_sprite_callback);
-	MCFG_K05324X_CB_MEMBER(blswhstl_sprite_callback);
-	MCFG_K05324X_CB_MEMBER(prmrsocr_sprite_callback);
+	K05324X_CB_MEMBER(lgtnfght_sprite_callback);
+	K05324X_CB_MEMBER(blswhstl_sprite_callback);
+	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

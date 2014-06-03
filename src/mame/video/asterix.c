@@ -18,7 +18,7 @@ WRITE16_MEMBER(asterix_state::asterix_spritebank_w)
 	reset_spritebank(machine());
 }
 
-MCFG_K05324X_CB_MEMBER(asterix_state::sprite_callback)
+K05324X_CB_MEMBER(asterix_state::sprite_callback)
 {
 	int pri = (*color & 0x00e0) >> 2;
 	if (pri <= m_layerpri[2])

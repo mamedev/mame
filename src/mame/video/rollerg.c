@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-MCFG_K05324X_CB_MEMBER(rollerg_state::sprite_callback)
+K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 {
 #if 0
 	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x80)) *color = rand();

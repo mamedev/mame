@@ -4,7 +4,7 @@
 
 
 typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_delegate;
-#define MCFG_K05324X_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
+#define K05324X_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
 
 
 #define MCFG_K05324X_BPP(_bpp) \

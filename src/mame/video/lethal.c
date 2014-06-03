@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "includes/lethal.h"
 
-MCFG_K05324X_CB_MEMBER(lethal_state::sprite_callback)
+K05324X_CB_MEMBER(lethal_state::sprite_callback)
 {
 	int pri = (*color & 0xfff0);
 	*color = *color & 0x000f;
