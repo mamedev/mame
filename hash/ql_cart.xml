@@ -38,32 +38,4 @@
 		</part>
 	</software>
 
-	<software name="trumpcrd">
-		<description>Trump Card (v2.15)</description>
-		<year>198?</year>
-		<publisher>Miracle Systems</publisher>
-
-		<part name="cart" interface="ql_cart">
-			<feature name="slot" value="trumpcard" />
-
-			<dataarea name="rom" size="0x8000">
-				<rom name="trumpcard-125.rom" size="0x8000" crc="938eaa46" sha1="9b3458cf3a279ed86ba395dc45c8f26939d6c44d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="superdsk">
-		<description>Super Disk</description>
-		<year>198?</year>
-		<publisher>Sandy</publisher>
-
-		<part name="cart" interface="ql_cart">
-			<feature name="slot" value="superdisk" />
-
-			<dataarea name="rom" size="0x4000">
-				<rom name="sandysuperdisk.rom" size="0x4000" crc="b52077da" sha1="bf531758145ffd083e01c1cf9c45d0e9264a3b53" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 </softwarelist>
