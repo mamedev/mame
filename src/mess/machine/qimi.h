@@ -68,7 +68,6 @@ private:
 	required_ioport m_mousex;
 	required_ioport m_mousey;
 	required_ioport m_mouseb;
-	required_ioport m_config;
 
 	UINT8   m_mouse_int;
 

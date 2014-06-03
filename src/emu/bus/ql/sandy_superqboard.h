@@ -25,7 +25,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sandy_superqboard_device
+// ======================> sandy_superqboard_t
 
 class sandy_superqboard_t : public device_t,
 			   				public device_ql_expansion_card_interface
@@ -33,6 +33,7 @@ class sandy_superqboard_t : public device_t,
 public:
 	// construction/destruction
 	sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -62,6 +63,7 @@ private:
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_ram;
 
+	int m_ram_size;
 	int m_busy;
 	int m_int2;
 	int m_int3;
@@ -70,8 +72,19 @@ private:
 };
 
 
+// ======================> sandy_superqboard_512k_t
+
+class sandy_superqboard_512k_t :  public sandy_superqboard_t
+{
+public:
+	// construction/destruction
+	sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // device type definition
 extern const device_type SANDY_SUPERQBOARD;
+extern const device_type SANDY_SUPERQBOARD_512K;
 
 
 #endif

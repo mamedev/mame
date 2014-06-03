@@ -17,11 +17,6 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define QL_CONFIG_PORT          "config"
-#define QIMI_PORT_MASK          0x01
-#define QIMI_NONE               0x00
-#define QIMI_MOUSE              0x01
-
 #define MOUSEX_TAG              "MOUSEX"
 #define MOUSEY_TAG              "MOUSEY"
 #define MOUSEB_TAG              "MOUSEB"
@@ -58,11 +53,6 @@ const device_type QIMI = &device_creator<qimi_t>;
 //-------------------------------------------------
 
 INPUT_PORTS_START( qimi )
-	PORT_START(QL_CONFIG_PORT)
-	PORT_CONFNAME( QIMI_PORT_MASK, QIMI_NONE, "QIMI enabled")
-	PORT_CONFSETTING( QIMI_NONE, "No" )
-	PORT_CONFSETTING( QIMI_MOUSE, "Yes" )
-
 	PORT_START(MOUSEX_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
@@ -100,8 +90,7 @@ qimi_t::qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, 
 	m_write_extint(*this),
 	m_mousex(*this, MOUSEX_TAG),
 	m_mousey(*this, MOUSEY_TAG),
-	m_mouseb(*this, MOUSEB_TAG),
-	m_config(*this, QL_CONFIG_PORT)
+	m_mouseb(*this, MOUSEB_TAG)
 {
 }
 

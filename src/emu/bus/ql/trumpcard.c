@@ -9,6 +9,14 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- RAM always 128KB on boot screen
+
+*/
+
 #include "trumpcard.h"
 
 
@@ -115,7 +123,7 @@ machine_config_constructor ql_trump_card_t::device_mconfig_additions() const
 //-------------------------------------------------
 
 ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, QL_TRUMP_CARD, "QL Trump Card", tag, owner, clock, "trump", __FILE__),
+	device_t(mconfig, QL_TRUMP_CARD, "QL Trump Card", tag, owner, clock, "ql_trump", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
 	m_floppy0(*this, WD1772_TAG":0"),
@@ -127,7 +135,7 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, const char *tag,
 }
 
 ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size) :
-	device_t(mconfig, QL_TRUMP_CARD, "QL Trump Card", tag, owner, clock, "trump", __FILE__),
+	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
 	m_floppy0(*this, WD1772_TAG":0"),
@@ -139,13 +147,13 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type
 }
 
 ql_trump_card_256k_t::ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_256K, "QL Trump Card 256K", tag, owner, clock, "trump256k", __FILE__, 256*1024) { }
+	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_256K, "QL Trump Card 256K", tag, owner, clock, "ql_trump", __FILE__, 256*1024) { }
 
 ql_trump_card_512k_t::ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_512K, "QL Trump Card 512K", tag, owner, clock, "trump512k", __FILE__, 512*1024) { }
+	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_512K, "QL Trump Card 512K", tag, owner, clock, "ql_trump", __FILE__, 512*1024) { }
 
 ql_trump_card_768k_t::ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_768K, "QL Trump Card 768K", tag, owner, clock, "trump768k", __FILE__, 768*1024) { }
+	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_768K, "QL Trump Card 768K", tag, owner, clock, "ql_trump", __FILE__, 768*1024) { }
 
 
 //-------------------------------------------------
@@ -154,7 +162,12 @@ ql_trump_card_768k_t::ql_trump_card_768k_t(const machine_config &mconfig, const 
 
 void ql_trump_card_t::device_start()
 {
+	// allocate memory
 	m_ram.allocate(m_ram_size);
+
+	// state saving
+	save_item(NAME(m_rom_en));
+	save_item(NAME(m_ram_en));
 }
 
 

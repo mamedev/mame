@@ -9,6 +9,14 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- mouse
+
+*/
+
 #include "sandy_superqboard.h"
 
 
@@ -28,6 +36,7 @@
 //**************************************************************************
 
 const device_type SANDY_SUPERQBOARD = &device_creator<sandy_superqboard_t>;
+const device_type SANDY_SUPERQBOARD_512K = &device_creator<sandy_superqboard_512k_t>;
 
 
 //-------------------------------------------------
@@ -125,7 +134,7 @@ machine_config_constructor sandy_superqboard_t::device_mconfig_additions() const
 //-------------------------------------------------
 
 sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SANDY_SUPERQBOARD, "Sandy SuperQBoard", tag, owner, clock, "sandy_superqboard", __FILE__),
+	device_t(mconfig, SANDY_SUPERQBOARD, "Sandy SuperQBoard 256K", tag, owner, clock, "ql_sqboard", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
 	m_floppy0(*this, WD1772_TAG":0"),
@@ -134,6 +143,7 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
 	m_ram(*this, "ram"),
+	m_ram_size(256*1024),
 	m_busy(1),
 	m_int2(0),
 	m_int3(0),
@@ -142,6 +152,28 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 {
 }
 
+sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+	device_ql_expansion_card_interface(mconfig, *this),
+	m_fdc(*this, WD1772_TAG),
+	m_floppy0(*this, WD1772_TAG":0"),
+	m_floppy1(*this, WD1772_TAG":1"),
+	m_centronics(*this, CENTRONICS_TAG),
+	m_latch(*this, TTL74273_TAG),
+	m_rom(*this, "rom"),
+	m_ram(*this, "ram"),
+	m_ram_size(ram_size),
+	m_busy(1),
+	m_int2(0),
+	m_int3(0),
+	m_fd6(0),
+	m_fd7(0)
+{
+}
+
+sandy_superqboard_512k_t::sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sandy_superqboard_t(mconfig, SANDY_SUPERQBOARD_512K, "Sandy SuperQBoard 512K", tag, owner, clock, "ql_sqboard", __FILE__, 512*1024) { }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -149,6 +181,15 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 
 void sandy_superqboard_t::device_start()
 {
+	// allocate memory
+	m_ram.allocate(m_ram_size);
+
+	// state saving
+	save_item(NAME(m_busy));
+	save_item(NAME(m_int2));
+	save_item(NAME(m_int3));
+	save_item(NAME(m_fd6));
+	save_item(NAME(m_fd7));
 }
 
 
@@ -213,6 +254,14 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 		else if (offset < 0xc8000)
 		{
 			data = m_rom->base()[offset & 0x7fff];
+		}
+	}
+
+	if (offset >= 0x60000 && offset < 0xc0000)
+	{
+		if ((offset - 0x60000) < m_ram_size)
+		{
+			data = m_ram[offset - 0x60000];
 		}
 	}
 
@@ -296,6 +345,14 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 				m_fdc->set_unscaled_clock(XTAL_16MHz >> !BIT(data, 0));
 				break;
 			}
+		}
+	}
+
+	if (offset >= 0x60000 && offset < 0xc0000)
+	{
+		if ((offset - 0x60000) < m_ram_size)
+		{
+			m_ram[offset - 0x60000] = data;
 		}
 	}
 }
