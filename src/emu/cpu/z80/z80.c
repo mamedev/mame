@@ -3955,6 +3955,19 @@ void tmpz84c011_device::device_start()
 	m_inports2.resolve_safe(0);
 	m_inports3.resolve_safe(0);
 	m_inports4.resolve_safe(0);
+
+	save_item(NAME(m_pio_dir[0]));
+	save_item(NAME(m_pio_latch[0]));
+	save_item(NAME(m_pio_dir[1]));
+	save_item(NAME(m_pio_latch[1]));
+	save_item(NAME(m_pio_dir[2]));
+	save_item(NAME(m_pio_latch[2]));
+	save_item(NAME(m_pio_dir[3]));
+	save_item(NAME(m_pio_latch[3]));
+	save_item(NAME(m_pio_dir[4]));
+	save_item(NAME(m_pio_latch[4]));
+
+
 }
 
 void tmpz84c011_device::device_reset()

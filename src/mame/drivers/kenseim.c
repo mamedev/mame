@@ -85,6 +85,21 @@ GND             |GROUND         | 27 | e  | GROUND         | GND            |
 GND             |GROUND         | 28 | f  | GROUND         | GND            |
 ----------------|------------------------------------------|----------------|
 
+CN1 - 12 pin connector, various cabinnet inputs / outputs
+
+2P Start Lamp | 1
+1P Start Lamp | 2
+Coin Lock     | 3
+Coin Counter  | 4
+GND           | 5
+GND           | 6
+Service Sw    | 7
+2P Start Sw   | 8
+1P Start Sw   | 9
+Coin Sw       | 10
++24V          | 11
++24V          | 12
+
 CN2 - 20 pin connector, goes from DRIVE PCB to the JAMMA on CPS board
 
 ST4 | 1
@@ -133,8 +148,8 @@ public:
 
 	// certain
 
-	DECLARE_READ8_MEMBER(porta_r); // dsw1
-	DECLARE_READ8_MEMBER(portb_r); // dsw2
+	DECLARE_READ8_MEMBER(porta_r); // dsw1 - 8 bit in
+	DECLARE_READ8_MEMBER(portb_r); // dsw2 - 8 bit in
 
 	DECLARE_WRITE8_MEMBER(i8255_portc_w); // 20x LEDs
 
@@ -144,20 +159,16 @@ public:
 	DECLARE_READ8_MEMBER(i8255_porte_r); // mole input 2?
 
 	// uncertain
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(portd_w);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_READ8_MEMBER(portd_r);
-	DECLARE_WRITE8_MEMBER(porte_w);
+	DECLARE_WRITE8_MEMBER(portc_w); // 4 bit out
+	DECLARE_WRITE8_MEMBER(portd_w); // 4 bit out
+	DECLARE_READ8_MEMBER(portc_r);  // 4 bit in
+	DECLARE_READ8_MEMBER(portd_r);  // 4 bit in
+	DECLARE_WRITE8_MEMBER(porte_w); // 8 bit out
 
 	WRITE8_MEMBER(i8255_porta_w); // maybe molesa output? (6-bits?)
 	WRITE8_MEMBER(i8255_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(i8255_portf_w); // maybe strobe output?
 
-	DECLARE_READ8_MEMBER(porte_default_r) { logerror("%s read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
-
-	DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(portb_default_w) { logerror("%s write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
 
 
 
@@ -171,6 +182,11 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_portd_default_w) { logerror("%s i8255 write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
 	DECLARE_WRITE8_MEMBER(i8255_porte_default_w) { logerror("%s i8255 write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
 
+
+	// unused based on port direction assignments
+	//DECLARE_READ8_MEMBER(porte_default_r) { logerror("%s read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
+	//DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
+	//DECLARE_WRITE8_MEMBER(portb_default_w) { logerror("%s write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
 
 	UINT32 m_led_serial_data;
 	int m_led_clock;
@@ -256,12 +272,14 @@ WRITE8_MEMBER(kenseim_state::i8255_portf_w)
 
 WRITE8_MEMBER(kenseim_state::portc_w)
 {
-	logerror("%s write %02x to port C\n", machine().describe_context(), data);
+	// port direction is set to 4-in 4-out
+	logerror("%s write %02x to port C (%02x masked)\n", machine().describe_context(), data, data & 0xf0);
 }
 
 WRITE8_MEMBER(kenseim_state::portd_w)
 {
-	logerror("%s write %02x to port D\n", machine().describe_context(), data);
+	// port direction is set to 4-in 4-out
+	logerror("%s write %02x to port D (%02x masked)\n", machine().describe_context(), data, data & 0x0f);
 }
 
 WRITE8_MEMBER(kenseim_state::porte_w)
@@ -272,18 +290,23 @@ WRITE8_MEMBER(kenseim_state::porte_w)
 
 READ8_MEMBER(kenseim_state::portd_r)
 {
+	// port direction is set to 4-in 4-out
+	int ret = rand() & 0xf0;
+
 	// comms port maybe? checks for 0x10 (bit 4,a) to be clear in a tight loop (092B) then for bit 0x80 to be set in another tight loop  (0933) then at (0947) it checks that bits 0xe0 aren't set.
 	logerror("%s read port D\n", machine().describe_context());
-	return rand();// rand();// 0x80;
+	return ret;
 }
 
 READ8_MEMBER(kenseim_state::portc_r)
 {
+	// port direction is set to 4-in 4-out
+	int ret = rand() & 0x0f;
+
 	// bits 0x09 checked at 1171
 	logerror("%s read port C\n", machine().describe_context());
 
-	return rand();//
-	//return 0x09;// rand();
+	return ret;
 }
 
 READ8_MEMBER(kenseim_state::porta_r)
@@ -478,8 +501,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011 - divider unknown
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
-	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w)) // unused?
-	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w)) // unused?
+	//MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w)) // unused?
+	//MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w)) // unused?
 	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(kenseim_state, portc_w))
 	MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(WRITE8(kenseim_state, portd_w))
 	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_w))	
@@ -487,7 +510,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_r))
 	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_r))
 	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_r))
-	MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r)) // unused?
+	//MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r)) // unused?
 	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
 
 	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84?
