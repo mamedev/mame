@@ -5,6 +5,7 @@
 #include "crossblaim.h"
 #include "dooly.h"
 #include "fmpac.h"
+#include "halnote.h"
 #include "hfox.h"
 #include "holy_quran.h"
 #include "konami.h"
@@ -49,6 +50,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("keyboard_master", MSX_CART_KEYBOARD_MASTER)
 	SLOT_INTERFACE_INTERNAL("holy_quran", MSX_CART_HOLY_QURAN)
 	SLOT_INTERFACE_INTERNAL("dooly", MSX_CART_DOOLY)
+	SLOT_INTERFACE_INTERNAL("halnote", MSX_CART_HALNOTE)
 SLOT_INTERFACE_END
 
 

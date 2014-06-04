@@ -333,8 +333,7 @@ The following floppies came with the machines.
 	</software>
 
 
-<!-- Needs system disk + specific mapper -->
-	<software name="halnote" supported="no">
+	<software name="halnote">
 		<description>HalNote (Jpn)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -353,6 +352,8 @@ The following floppies came with the machines.
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="1048576">
 				<rom name="hal note (japan) (program).rom" size="1048576" crc="40313fec" sha1="1af617bfd11b10a71936c606174a80019762ea71" status="baddump" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
