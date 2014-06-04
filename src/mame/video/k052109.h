@@ -87,7 +87,6 @@ private:
 	UINT8    m_has_extra_video_ram;
 	INT32    m_rmrd_line;
 	UINT8    m_irq_enabled;
-	//INT32    m_dx[3], m_dy[3];
 	UINT8    m_romsubbank, m_scrollctrl;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

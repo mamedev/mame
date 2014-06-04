@@ -1,5 +1,5 @@
 /*
-Konami 051316
+Konami 051316 PSAC
 ------
 Manages a 32x32 tilemap (16x16 tiles, 512x512 pixels) which can be zoomed,
 distorted and rotated.
@@ -83,21 +83,6 @@ const gfx_layout k051316_device::charlayout8 =
 	256*8
 };
 
-const gfx_layout k051316_device::charlayout_tail2nos =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ WORD_XOR_BE(0)*4, WORD_XOR_BE(1)*4, WORD_XOR_BE(2)*4, WORD_XOR_BE(3)*4, 
-		WORD_XOR_BE(4)*4, WORD_XOR_BE(5)*4, WORD_XOR_BE(6)*4, WORD_XOR_BE(7)*4,
-		WORD_XOR_BE(8)*4, WORD_XOR_BE(9)*4, WORD_XOR_BE(10)*4, WORD_XOR_BE(11)*4, 
-		WORD_XOR_BE(12)*4, WORD_XOR_BE(13)*4, WORD_XOR_BE(14)*4, WORD_XOR_BE(15)*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
 
 GFXDECODE_MEMBER( k051316_device::gfxinfo )
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, charlayout4, 0, 1)
@@ -111,22 +96,21 @@ GFXDECODE_MEMBER( k051316_device::gfxinfo8 )
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, charlayout8, 0, 1)
 GFXDECODE_END
 
-GFXDECODE_MEMBER( k051316_device::gfxinfo4_tail2nos )
-	GFXDECODE_DEVICE(DEVICE_SELF, 0, charlayout_tail2nos, 0, 1)
+GFXDECODE_MEMBER( k051316_device::gfxinfo4_ram )
+	GFXDECODE_DEVICE_RAM(DEVICE_SELF, 0, charlayout4, 0, 1)
 GFXDECODE_END
 
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051316, "K051316 Video Controller", tag, owner, clock, "k051316", __FILE__),
+	: device_t(mconfig, K051316, "K051316 PSAC", tag, owner, clock, "k051316", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
-		m_ram(NULL),
 		m_zoom_rom(NULL),
 		m_zoom_size(0),
 		m_dx(0),
 		m_dy(0),
 		m_wrap(0),
-		m_pen_is_mask(false), 
-		m_bpp(0), 
+		m_pen_is_mask(false),
+		m_pixels_per_byte(2), // 4bpp layout is default
 		m_transparent_pen(0)
 {
 }
@@ -134,22 +118,24 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 void k051316_device::set_bpp(device_t &device, int bpp)
 {
 	k051316_device &dev = downcast<k051316_device &>(device);
-	dev.m_bpp = bpp;
 
 	switch(bpp)
 	{
 		case 4:
 			device_gfx_interface::static_set_info(dev, gfxinfo);
+			dev.m_pixels_per_byte = 2;
 			break;
 		case 7:
 			device_gfx_interface::static_set_info(dev, gfxinfo7);
+			dev.m_pixels_per_byte = 1;
 			break;
 		case 8:
 			device_gfx_interface::static_set_info(dev, gfxinfo8);
+			dev.m_pixels_per_byte = 1;
 			break;
 		case -4:
-			device_gfx_interface::static_set_info(dev, gfxinfo4_tail2nos);
-			dev.m_bpp = 4;
+			device_gfx_interface::static_set_info(dev, gfxinfo4_ram);
+			dev.m_pixels_per_byte = 2;
 			break;
 		default:
 			fatalerror("Unsupported bpp\n");
@@ -164,18 +150,18 @@ void k051316_device::set_bpp(device_t &device, int bpp)
 
 void k051316_device::device_start()
 {
-	m_zoom_rom = region()->base();
-	m_zoom_size = region()->bytes();
+	memory_region *ROM = region();
+	if (ROM != NULL)
+	{
+		m_zoom_rom = ROM->base();
+		m_zoom_size = ROM->bytes();
+	}
 
 	decode_gfx();
 	gfx(0)->set_colors(palette()->entries() / gfx(0)->depth());
-	if (m_bpp == 4)
-		gfx(0)->set_source_and_total(m_zoom_rom, m_zoom_size / 128);
-	else
-		gfx(0)->set_source_and_total(m_zoom_rom, m_zoom_size / 256);
 
 	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_ram.resize_and_clear(0x800);
 
 	if (!m_pen_is_mask)
 		m_tmap->set_transparent_pen(m_transparent_pen);
@@ -188,7 +174,7 @@ void k051316_device::device_start()
 	// bind callbacks
 	m_k051316_cb.bind_relative_to(*owner());
 
-	save_pointer(NAME(m_ram), 0x800);
+	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_wrap));
 
@@ -221,11 +207,12 @@ WRITE8_MEMBER( k051316_device::write )
 
 READ8_MEMBER( k051316_device::rom_r )
 {
+	assert (m_zoom_size != 0);
+
 	if ((m_ctrlram[0x0e] & 0x01) == 0)
 	{
 		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
-		if (m_bpp <= 4)
-			addr /= 2;
+		addr /= m_pixels_per_byte;
 		addr &= m_zoom_size - 1;
 
 		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
@@ -245,7 +232,7 @@ WRITE8_MEMBER( k051316_device::ctrl_w )
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);
 }
 
-// a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start
+// some games (ajax, rollerg, ultraman, etc.) have external logic that can enable or disable wraparound dynamically
 void k051316_device::wraparound_enable( int status )
 {
 	m_wrap = status;

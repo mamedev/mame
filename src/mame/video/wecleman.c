@@ -970,7 +970,6 @@ K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_1)
 
 K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_2)
 {
-	*code |= (*color & 0x01) << 8;
 	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);
 }
 

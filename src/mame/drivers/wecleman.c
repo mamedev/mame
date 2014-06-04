@@ -1373,8 +1373,10 @@ ROM_START( hotchase )
 	ROM_REGION( 0x20000, "k051316_1", 0 )    /* bg */
 	ROM_LOAD( "763e14", 0x000000, 0x020000, CRC(60392aa1) SHA1(8499eb40a246587e24f6fd00af2eaa6d75ee6363) )
 
-	ROM_REGION( 0x10000, "k051316_2", 0 )    /* fg (patched) */
-	ROM_LOAD( "763a13", 0x000000, 0x010000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
+	ROM_REGION( 0x08000, "k051316_2", 0 )    /* fg */
+	/* first half empty - PCB silkscreen reads "27256/27512" */
+	ROM_LOAD( "763a13", 0x000000, 0x008000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
+	ROM_CONTINUE( 0x000000, 0x008000 )
 
 	ROM_REGION( 0x20000, "gfx4", 0 )    /* road */
 	ROM_LOAD( "763e15", 0x000000, 0x020000, CRC(7110aa43) SHA1(639dc002cc1580f0530bb5bb17f574e2258d5954) )
@@ -1449,19 +1451,8 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 //  UINT16 *RAM1 = (UINT16) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
-	UINT8 *RAM;
-
-	/* Decode GFX Roms */
-
-	/* Let's swap even and odd bytes of the sprites gfx roms */
-	RAM = memregion("gfx1")->base();
-
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	hotchase_sprite_decode(3,0x80000*2);  // num banks, bank len
-
-	/* Let's copy the second half of the fg layer gfx (charset) over the first */
-	RAM = memregion("k051316_2")->base();
-	memcpy(&RAM[0], &RAM[0x10000/2], 0x10000/2);
 
 	m_spr_color_offs = 0;
 }

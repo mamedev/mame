@@ -44,10 +44,7 @@ void tail2nos_state::tail2nos_postload()
 
 	m_bg_tilemap->mark_all_dirty();
 
-	for (i = 0; i < 0x20000; i += 64)
-	{
-		m_gfxdecode->gfx(2)->mark_dirty(i / 64);
-	}
+	m_k051316->gfx(0)->mark_all_dirty();
 }
 
 void tail2nos_state::video_start()
@@ -56,9 +53,6 @@ void tail2nos_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(15);
 
-	m_zoomdata = (UINT16 *)memregion("k051316")->base();
-
-	save_pointer(NAME(m_zoomdata), 0x20000 / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::tail2nos_postload), this));
 }
 
@@ -76,19 +70,13 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_bgvideoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(tail2nos_state::tail2nos_zoomdata_r)
-{
-	return m_zoomdata[offset];
-}
-
 WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 {
-	int oldword = m_zoomdata[offset];
-
-	COMBINE_DATA(&m_zoomdata[offset]);
-	// mark dirty the tilemap inside K051316 device
-	if (oldword != m_zoomdata[offset])
-		m_k051316->zoomram_updated(offset / 64);
+	int oldword = m_zoomram[offset];
+	COMBINE_DATA(&m_zoomram[offset]);
+	// tell the K051316 device the data changed
+	if (oldword != m_zoomram[offset])
+		m_k051316->mark_gfx_dirty(offset * 2);
 }
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)

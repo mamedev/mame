@@ -32,11 +32,10 @@ public:
 	static const gfx_layout charlayout4;
 	static const gfx_layout charlayout7;
 	static const gfx_layout charlayout8;
-	static const gfx_layout charlayout_tail2nos;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo7);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo8);
-	DECLARE_GFXDECODE_MEMBER(gfxinfo4_tail2nos);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
 	
 	// static configuration
 	static void set_k051316_callback(device_t &device, k051316_cb_delegate callback) { downcast<k051316_device &>(device).m_k051316_cb = callback; }
@@ -74,7 +73,7 @@ public:
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
 	void wraparound_enable(int status);
 
-	void zoomram_updated(UINT32 offs) { gfx(0)->mark_dirty(offs); }
+	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
 
 protected:
 	// device-level overrides
@@ -83,7 +82,7 @@ protected:
 
 private:
 	// internal state
-	UINT8 *m_ram;
+	dynamic_array<UINT8> m_ram;
 	UINT8 m_ctrlram[16];
 	tilemap_t *m_tmap;
 
@@ -93,7 +92,8 @@ private:
 	int m_dx, m_dy;
 	int m_wrap;
 	bool m_pen_is_mask;
-	int m_bpp, m_transparent_pen;
+	int m_pixels_per_byte;
+	int m_transparent_pen;
 	k051316_cb_delegate m_k051316_cb;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
