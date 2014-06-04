@@ -6441,7 +6441,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap4" cloneof="snapshot">
+	<software name="supsnap4" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v4.0, NTSC)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
@@ -6458,7 +6458,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap4p" cloneof="snapshot">
+	<software name="supsnap4p" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v4.0, PAL)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
