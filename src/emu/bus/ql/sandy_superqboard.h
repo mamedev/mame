@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
     Sandy SuperQBoard (with HD upgrade) emulation

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
     Sandy SuperQBoard (with HD upgrade) emulation
@@ -257,11 +257,11 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 		}
 	}
 
-	if (offset >= 0x60000 && offset < 0xc0000)
+	if (offset >= 0x40000 && offset < 0xc0000)
 	{
-		if ((offset - 0x60000) < m_ram_size)
+		if ((offset - 0x40000) < m_ram_size)
 		{
-			data = m_ram[offset - 0x60000];
+			data = m_ram[offset - 0x40000];
 		}
 	}
 
@@ -348,11 +348,11 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 		}
 	}
 
-	if (offset >= 0x60000 && offset < 0xc0000)
+	if (offset >= 0x40000 && offset < 0xc0000)
 	{
-		if ((offset - 0x60000) < m_ram_size)
+		if ((offset - 0x40000) < m_ram_size)
 		{
-			m_ram[offset - 0x60000] = data;
+			m_ram[offset - 0x40000] = data;
 		}
 	}
 }

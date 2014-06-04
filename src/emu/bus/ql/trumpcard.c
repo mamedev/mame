@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
     Miracle Systems QL Trump Card emulation
@@ -8,14 +8,6 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
-
-/*
-
-	TODO:
-
-	- RAM always 128KB on boot screen
-
-*/
 
 #include "trumpcard.h"
 
@@ -167,7 +159,6 @@ void ql_trump_card_t::device_start()
 
 	// state saving
 	save_item(NAME(m_rom_en));
-	save_item(NAME(m_ram_en));
 }
 
 
@@ -181,7 +172,6 @@ void ql_trump_card_t::device_reset()
 	m_fdc->dden_w(0);
 
 	m_rom_en = false;
-	m_ram_en = false;
 }
 
 
@@ -191,19 +181,14 @@ void ql_trump_card_t::device_reset()
 
 UINT8 ql_trump_card_t::read(address_space &space, offs_t offset, UINT8 data)
 {
-	if (!m_rom_en && offset >= 0xc000 && offset < 0x10000)
+	if (offset >= 0xc000 && offset < 0x10000)
 	{
 		m_rom_en = true;
-
-		data = m_rom->base()[offset & 0x3fff];
 	}
 
 	if (offset >= 0x10000 && offset < 0x18000)
 	{
-		if (m_ram_size == 768*1024)
-		{
-			m_ram_en = true;
-		}
+		m_rom_en = false;
 
 		data = m_rom->base()[offset & 0x7fff];
 	}
@@ -213,24 +198,29 @@ UINT8 ql_trump_card_t::read(address_space &space, offs_t offset, UINT8 data)
 		data = m_fdc->read(space, offset & 0x03);
 	}
 
-	if (offset >= 0x60000 && offset < 0xc0000)
+	if (offset >= 0x40000 && offset < 0xc0000)
 	{
-		if ((offset - 0x60000) < m_ram_size)
+		if ((offset - 0x40000) < m_ram_size)
 		{
-			data = m_ram[offset - 0x60000];
+			data = m_ram[offset - 0x40000];
 		}
 	}
 
 	if (offset >= 0xc0000)
 	{
-		if (m_rom_en && offset < 0xc8000)
+		if (m_rom_en)
 		{
-			data = m_rom->base()[offset & 0x7fff];
+			if (offset < 0xc8000)
+			{
+				data = m_rom->base()[offset & 0x7fff];
+			}
 		}
-
-		if (m_ram_en)
+		else
 		{
-			data = m_ram[offset - 0x60000];
+			if ((offset - 0x40000) < m_ram_size)
+			{
+				data = m_ram[offset - 0x40000];
+			}
 		}
 	}
 
@@ -286,19 +276,19 @@ void ql_trump_card_t::write(address_space &space, offs_t offset, UINT8 data)
 		}
 	}
 
-	if (offset >= 0x60000 && offset < 0xc0000)
+	if (offset >= 0x40000 && offset < 0xc0000)
 	{
-		if ((offset - 0x60000) < m_ram_size)
+		if ((offset - 0x40000) < m_ram_size)
 		{
-			m_ram[offset - 0x60000] = data;
+			m_ram[offset - 0x40000] = data;
 		}
 	}
 
 	if (offset >= 0xc0000)
 	{
-		if (m_ram_en)
+		if (!m_rom_en)
 		{
-			m_ram[offset - 0x60000] = data;
+			m_ram[offset - 0x40000] = data;
 		}
 	}
 }

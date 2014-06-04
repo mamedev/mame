@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
     Miracle Systems QL Trump Card emulation
@@ -58,7 +58,6 @@ private:
 
 	int m_ram_size;
 	bool m_rom_en;
-	bool m_ram_en;
 };
 
 
