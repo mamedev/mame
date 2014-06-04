@@ -412,6 +412,7 @@ BUSOBJS += $(BUSOBJ)/msx_cart/cartridge.o
 BUSOBJS += $(BUSOBJ)/msx_cart/crossblaim.o
 BUSOBJS += $(BUSOBJ)/msx_cart/fmpac.o
 BUSOBJS += $(BUSOBJ)/msx_cart/hfox.o
+BUSOBJS += $(BUSOBJ)/msx_cart/holy_quran.o
 BUSOBJS += $(BUSOBJ)/msx_cart/konami.o
 BUSOBJS += $(BUSOBJ)/msx_cart/korean.o
 BUSOBJS += $(BUSOBJ)/msx_cart/majutsushi.o

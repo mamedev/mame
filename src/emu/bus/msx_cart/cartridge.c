@@ -5,6 +5,7 @@
 #include "crossblaim.h"
 #include "fmpac.h"
 #include "hfox.h"
+#include "holy_quran.h"
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
@@ -45,6 +46,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("super_swangi", MSX_CART_SUPER_SWANGI)
 	SLOT_INTERFACE_INTERNAL("hfox", MSX_CART_HFOX)
 	SLOT_INTERFACE_INTERNAL("keyboard_master", MSX_CART_KEYBOARD_MASTER)
+	SLOT_INTERFACE_INTERNAL("holy_quran", MSX_CART_HOLY_QURAN)
 SLOT_INTERFACE_END
 
 

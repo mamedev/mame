@@ -15242,18 +15242,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-<!-- FIXME: proper HOLYQURAN mapper needs to be implemented! -->
-	<software name="quran" supported="no">
+	<software name="quran">
 		<description>The Holy Quran</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="R052" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="ascii16" />
-			<feature name="mapper" value="M60002-0125SP-16" />  <!-- WRONG MAPPER (but in this way no crash of the emulator) -->
+			<feature name="slot" value="holy_quran" />
 			<dataarea name="rom" size="1048576">
-				<rom name="holyquran.rom" size="1048576" crc="83f28ad3" sha1="0dbc7defd96b71c1fe2d63cbc725f5e58aea2db0" offset="0x0000" />
+				<!-- there are 2 ROMs on the cartridge -->
+				<rom name="holyquran.rom" size="1048576" crc="3b003e5c" sha1="7d439080b43d94385fd4c426d4f6fee884bc2926" status="baddump" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
