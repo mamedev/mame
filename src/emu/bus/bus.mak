@@ -410,6 +410,7 @@ OBJDIRS += $(BUSOBJ)/msx_cart
 BUSOBJS += $(BUSOBJ)/msx_cart/ascii.o
 BUSOBJS += $(BUSOBJ)/msx_cart/cartridge.o
 BUSOBJS += $(BUSOBJ)/msx_cart/crossblaim.o
+BUSOBJS += $(BUSOBJ)/msx_cart/dooly.o
 BUSOBJS += $(BUSOBJ)/msx_cart/fmpac.o
 BUSOBJS += $(BUSOBJ)/msx_cart/hfox.o
 BUSOBJS += $(BUSOBJ)/msx_cart/holy_quran.o

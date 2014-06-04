@@ -17101,6 +17101,17 @@ legacy FM implementations cannot find it.
 
 	<!-- SORT -->
 
+	<software name="dooly">
+		<description>Baby Dinosaur Dooly</description>
+		<year>1991</year>
+		<publisher>Daou</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="dooly" />
+			<dataarea name="rom" size="32768">
+				<rom name="dooly.rom" size="32768" crc="71a1b1ec" sha1="dbac346f03950fbef81a003b4a42b2898a4e54c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 
 </softwarelist>
