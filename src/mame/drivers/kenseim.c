@@ -139,12 +139,19 @@ class kenseim_state : public cps_state
 public:
 	kenseim_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cps_state(mconfig, type, tag),
-		m_to_68k_cmd(0)
+		m_to_68k_cmd_low(0),
+		m_to_68k_cmd_d9(0),
+		m_to_68k_cmd_req(0),
+		m_to_68k_cmd_LVm(0),	
+		m_from68k_ack(0),
+		m_from68k_st4(0),
+		m_from68k_st3(0),
+		m_from68k_st2(0)
+
 	{ }
 
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
-	DECLARE_READ16_MEMBER(kensei_dsw_r);
 	DECLARE_DRIVER_INIT(kenseim);
 
 	// certain
@@ -161,10 +168,12 @@ public:
 	DECLARE_READ8_MEMBER(portc_r);  // 4 bit in - coins + start btns
 
 	// uncertain
-	DECLARE_WRITE8_MEMBER(portc_w); // 4 bit out
-	DECLARE_WRITE8_MEMBER(portd_w); // 4 bit out
-	DECLARE_READ8_MEMBER(portd_r);  // 4 bit in
-	DECLARE_WRITE8_MEMBER(porte_w); // 8 bit out
+	DECLARE_WRITE8_MEMBER(portc_w); // 4 bit out (lamps, coinlock etc.?)
+
+	DECLARE_READ8_MEMBER(portd_r);  // 4 bit in (comms flags from 68k)
+
+	DECLARE_WRITE8_MEMBER(portd_w); // 4 bit out (command flags to 68k?)
+	DECLARE_WRITE8_MEMBER(porte_w); // 8 bit out (command to 68k?)
 
 	WRITE8_MEMBER(i8255_porta_w); // maybe molesa output? (6-bits?)
 	WRITE8_MEMBER(i8255_portb_w); // maybe molesb output? (6-bits?)
@@ -187,7 +196,17 @@ public:
 	//DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
 	//DECLARE_WRITE8_MEMBER(portb_default_w) { logerror("%s write %02x to port B but no handler assigned\n", machine().describe_context(), data); }
 
-	int m_to_68k_cmd;
+	UINT8 m_to_68k_cmd_low;
+	UINT8 m_to_68k_cmd_d9;
+	UINT8 m_to_68k_cmd_req;
+	UINT8 m_to_68k_cmd_LVm;
+
+	int m_from68k_ack;
+	int m_from68k_st4;
+	int m_from68k_st3;
+	int m_from68k_st2;
+
+
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
@@ -294,13 +313,14 @@ WRITE8_MEMBER(kenseim_state::portc_w)
 WRITE8_MEMBER(kenseim_state::portd_w)
 {
 	// port direction is set to 4-in 4-out
-	logerror("%s write %01x to port D (%02x unmasked)\n", machine().describe_context(), data & 0x0f, data) ;
+	printf("%s write %01x to port D (%02x unmasked) (to 68k command flags?)\n", machine().describe_context(), data & 0x0f, data) ;
 }
 
 WRITE8_MEMBER(kenseim_state::porte_w)
 {
 	// only access is at 0ABE, surrounded by port D reads / writes
-	logerror("%s write %02x to port E\n", machine().describe_context(), data);
+	m_to_68k_cmd_low = data;
+	printf("%s write %02x to port E (to 68k command bits?)\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(kenseim_state::portd_r)
@@ -308,12 +328,21 @@ READ8_MEMBER(kenseim_state::portd_r)
 	// port direction is set to 4-in 4-out
 //	int ret = rand() & 0xf0;
 
-	int ret = 0xf0;
+	int ret;
+
+	int in10 = m_from68k_ack; // loop at 0x929 - 0x92e waits for this to be 0
+	int in80 = m_from68k_st4; // loop at 0x931 - 0x936 then waits for this to be 1
+
+	int in20 = m_from68k_st3;
+	int in40 = m_from68k_st2;
+
+	ret = (in10 << 4) | (in20 << 5) | (in40 << 6) | (in80 << 7);
 
 	// comms port maybe? checks for 0x10 (bit 4,a) to be clear in a tight loop (092B) then for bit 0x80 to be set in another tight loop  (0933) then at (0947) it checks that bits 0xe0 aren't set.
-	logerror("%s read port D\n", machine().describe_context());
+	logerror("%s read port D (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
+
 
 READ8_MEMBER(kenseim_state::portc_r)
 {
@@ -342,16 +371,23 @@ READ8_MEMBER(kenseim_state::portb_r)
 
 WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 {
-	if (mem_mask == 0xff00)
+
+	if (ACCESSING_BITS_8_15)
 	{
+	//	coin_counter_w(machine(), 0, data & 0x0100);
+	//	coin_counter_w(machine(), 1, data & 0x0200);
+	//	coin_lockout_w(machine(), 0, ~data & 0x0400);
+	//	coin_lockout_w(machine(), 1, ~data & 0x0800);
 
-		data >>= 8;;
+		// bit 15 = CPS-A custom reset?
 
-		logerror("%s cps1_kensei_w offs %04x (from 68k to DRIVE BOARD via CN2) (%02x) (%d ACK,  %d ST4,  %d ST3,  %d ST2) \n", machine().describe_context(), offset * 2, data, (data & 0x01), ((data & 0x02)>>1),((data & 0x04)>>2),((data & 0x08)>>3)   );
+		m_from68k_ack = (data & 0x0100) >> 8;
+		m_from68k_st4 = (data & 0x0200) >> 9;
+		m_from68k_st2 = (data & 0x0400) >> 10;
+		m_from68k_st3 = (data & 0x0800) >> 11;
+	
+		logerror("%s cps1_kensei_w offs %04x (from 68k to DRIVE BOARD via CN2) (%02x) (%d ACK,  %d ST4,  %d ST2,  %d ST3) \n", machine().describe_context(), offset * 2, data, m_from68k_ack, m_from68k_st4, m_from68k_st2, m_from68k_st3 );
 
-
-		if (data & 0xf0)
-			logerror("  ^^ (unknown? %02x)\n", data & 0xf0);
 	}
 	else
 	{
@@ -498,39 +534,38 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-/* how the DRIVE PCB connects to the inputs, see comments after each line
-
-
-*/
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_1234_r)
 {
 //	printf("kenseim_cmd_1234_r\n")
-	return (m_to_68k_cmd & 0x00f)>>0;
+	return (m_to_68k_cmd_low & 0x0f)>>0;
 }
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_5678_r)
 {
 //	printf("kenseim_cmd_5678_r\n")
-	m_to_68k_cmd++; // hack
-	return (m_to_68k_cmd & 0x0f0)>>4;
+	m_to_68k_cmd_low = rand();// hack;
+
+	return (m_to_68k_cmd_low & 0xf0)>>4;
 }
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_9_r)
 {
-	return (m_to_68k_cmd & 0x100) >> 8; // bit 9 of command?
+	return (m_to_68k_cmd_d9 & 0x1); // bit 9 of command?
 }
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_req_r)
 {
-	// hack
-	return rand();
+	m_to_68k_cmd_req = rand()&1; // hack
+
+	return m_to_68k_cmd_req;
 }
+
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_LVm_r)
 {
 	// needed for COMMAND WAIT message..
-	return 0;
+	return m_to_68k_cmd_LVm;
 }
 
 
