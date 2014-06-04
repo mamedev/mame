@@ -3120,20 +3120,6 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-<!-- Needs system disk + specific mapper? -->
-	<software name="halnote" supported="no">
-		<description>HalNote (Jpn)</description>
-		<year>1987</year>
-		<publisher>HAL Kenkyuujo</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="ascii8" />
-			<feature name="mapper" value="M60002-0125SP" />
-			<dataarea name="rom" size="1048576">
-				<rom name="hal note (japan) (program).rom" size="1048576" crc="40313fec" sha1="1af617bfd11b10a71936c606174a80019762ea71" status="baddump" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- Needs Kanji rom? -->
 	<software name="msxwrit2" supported="no">
 		<description>Japanese MSX-Write II (Jpn)</description>

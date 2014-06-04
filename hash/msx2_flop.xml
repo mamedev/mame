@@ -309,4 +309,52 @@ The following floppies came with the machines.
 	</software>
 -->
 
+	<!-- Needs specific mapper -->
+	<software name="arc" supported="no">
+		<description>Arc</description>
+		<year>1990</year>
+		<publisher>Parallax</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ARC_disk_A.dsk" size="737280" crc="dfd9c28d" sha1="ddff24b17fd4fcaecd8197fb8a20099483924565" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ARC_disk_B.dsk" size="737280" crc="af2bd084" sha1="8d91f61e28c0d813f16adb06e019da911aa84b2c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="arc" />
+			<dataarea name="rom" size="32768">
+				<rom name="arc.rom" size="32768" crc="3f47382f" sha1="ac43445c9e0a097b6d8116017645fe96b054a111" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Needs system disk + specific mapper -->
+	<software name="halnote" supported="no">
+		<description>HalNote (Jpn)</description>
+		<year>1987</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="halnote1.dsk" size="737280" crc="2ec98b57" sha1="671570b2cd6ce6ae1542bc74d895a0c6780850a1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="halnote2.dsk" size="737280" crc="5899d0ae" sha1="74b41d39e525f0e5259bfbab06cdc5a0d41b8f95" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="halnote" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="1048576">
+				<rom name="hal note (japan) (program).rom" size="1048576" crc="40313fec" sha1="1af617bfd11b10a71936c606174a80019762ea71" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
