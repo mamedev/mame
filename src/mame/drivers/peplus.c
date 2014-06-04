@@ -4021,7 +4021,7 @@ Number Generated  Award   Odds   Chance
    1 through  12  500    3.00%  12 in 400
   13 through  28  250    4.00%  16 in 400
   29 through  88  180   15.00%  60 in 400
-  89 through 399  140   75.75% 311 in 400
+  89 through 399  140   77.75% 311 in 400
 
 Overall average for the 4 of a Kind bonus is 173.35 credits
 
