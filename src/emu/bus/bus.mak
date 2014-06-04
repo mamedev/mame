@@ -1145,9 +1145,19 @@ endif
 ifneq ($(filter QL,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/ql
 BUSOBJS += $(BUSOBJ)/ql/exp.o
+BUSOBJS += $(BUSOBJ)/ql/cst_qdisc.o
+BUSOBJS += $(BUSOBJ)/ql/cst_q_plus4.o
+BUSOBJS += $(BUSOBJ)/ql/cumana_fdi.o
+BUSOBJS += $(BUSOBJ)/ql/kempston_di.o
+BUSOBJS += $(BUSOBJ)/ql/miracle_gold_card.o
+BUSOBJS += $(BUSOBJ)/ql/mp_fdi.o
+BUSOBJS += $(BUSOBJ)/ql/opd_basic_master.o
+BUSOBJS += $(BUSOBJ)/ql/pcml_qdisk.o
+BUSOBJS += $(BUSOBJ)/ql/qubide.o
 BUSOBJS += $(BUSOBJ)/ql/sandy_superdisk.o
 BUSOBJS += $(BUSOBJ)/ql/sandy_superqboard.o
 BUSOBJS += $(BUSOBJ)/ql/trumpcard.o
 BUSOBJS += $(BUSOBJ)/ql/rom.o
+BUSOBJS += $(BUSOBJ)/ql/miracle_hd.o
 BUSOBJS += $(BUSOBJ)/ql/std.o
 endif

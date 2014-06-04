@@ -128,9 +128,12 @@ void ql_rom_cartridge_slot_t::get_default_card_software(astring &result)
 //-------------------------------------------------
 
 // slot devices
+#include "miracle_hd.h"
 #include "std.h"
 
 SLOT_INTERFACE_START( ql_rom_cartridge_cards )
+	SLOT_INTERFACE("mhd", MIRACLE_HARD_DISK)
+	
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", QL_STANDARD_ROM_CARTRIDGE)
 SLOT_INTERFACE_END
