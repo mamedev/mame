@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Phill Harvey-Smith
 /*
 
     Sinclair QL
@@ -12,7 +12,7 @@
 
     TODO:
 
-    - slotify cartridges
+	- QIMI/Sandy mice
     - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette
@@ -46,7 +46,7 @@
 
         The trump card has some interesting memory mapping and re-mapping during initialisation which goes like this
 
-        On rest the card ram is mapped into the entire $40000-$fffff area, this is the official 512K expansion ram area
+        On reset the card ram is mapped into the entire $40000-$fffff area, this is the official 512K expansion ram area
         plus the area set aside for addon card roms. The trump card onboard rom is also mapped in at $10000-$17fff.
 
         The main bios then performs a series of loops that initialise and size the ram, this will find either
@@ -74,24 +74,124 @@
 
 */
 
-
 #include "includes/ql.h"
-#include "debugger.h"
 
-#define LOG_DISK_WRITE  0
-#define LOG_DISK_READ   0
 
-void ql_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+
+//**************************************************************************
+//  ADDRESS DECODING
+//**************************************************************************
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( ql_state::read )
 {
-	switch (id)
+	UINT8 data = 0;
+	int cart_romoeh = 0;
+	int exp_romoeh = 0;
+
+	if (offset < 0xc000)
 	{
-		case TIMER_MOUSE_TICK:
-			mouse_tick();
-			break;
-		default:
-			assert_always(FALSE, "Unknown id in ql_state::device_timer");
+		data = m_rom->base()[offset];
 	}
+	if (offset >= 0xc000 && offset < 0x10000)
+	{
+		cart_romoeh = 1;
+	}
+	if (offset >= 0x18000 && offset <= 0x18003)
+	{
+		data = m_zx8302->rtc_r(space, offset & 0x03);
+	}
+	if (offset == 0x18020)
+	{
+		data = m_zx8302->status_r(space, 0);
+	}
+	if (offset == 0x18021)
+	{
+		data = m_zx8302->irq_status_r(space, 0);
+	}
+	if (offset >= 0x18022 && offset <= 0x18023)
+	{
+		data = m_zx8302->mdv_track_r(space, offset & 0x01);
+	}
+	if (offset >= 0x20000 && offset < 0x40000)
+	{
+		data = m_zx8301->data_r(space, offset & 0x1ffff);
+	}
+	if (offset >= 0xc0000)
+	{
+		exp_romoeh = 1;
+	}
+	if (m_qimi_enabled && offset >= QIMI_IO_BASE && offset <= QIMI_IO_END)
+	{
+		data = m_qimi->read(space, offset - QIMI_IO_BASE);
+	}
+
+	m_cart->romoeh_w(cart_romoeh);
+	data = m_cart->read(space, offset & 0x7fff, data);
+	m_cart->romoeh_w(0);
+
+	m_exp->romoeh_w(exp_romoeh);
+	data = m_exp->read(space, offset, data);
+	m_exp->romoeh_w(0);
+
+	return data;
 }
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( ql_state::write )
+{
+	if (offset >= 0x18000 && offset <= 0x18001)
+	{
+		m_zx8302->rtc_w(space, offset & 0x01, data);
+	}
+	if (offset == 0x18002)
+	{
+		m_zx8302->control_w(space, 0, data);
+	}
+	if (offset == 0x18003)
+	{
+		m_zx8302->ipc_command_w(space, 0, data);
+	}
+	if (offset == 0x18020)
+	{
+		m_zx8302->mdv_control_w(space, 0, data);
+	}
+	if (offset == 0x18021)
+	{
+		m_zx8302->irq_acknowledge_w(space, 0, data);
+	}
+	if (offset == 0x18022)
+	{
+		m_zx8302->data_w(space, 0, data);
+	}
+	if (offset == 0x18063)
+	{
+		m_zx8301->control_w(space, 0, data);
+	}
+	if (offset >= 0x20000 && offset < 0x40000)
+	{
+		 m_zx8301->data_w(space, offset & 0x1ffff, data);
+	}
+	if (m_qimi_enabled && offset >= QIMI_IO_BASE && offset <= QIMI_IO_END)
+	{
+		m_qimi->write(space, offset - QIMI_IO_BASE, data);
+	}
+
+	m_cart->romoeh_w(0);
+	m_cart->write(space, offset & 0x7fff, data);
+
+	m_exp->romoeh_w(0);
+	m_exp->write(space, offset, data);
+}
+
+
 
 //**************************************************************************
 //  INTELLIGENT PERIPHERAL CONTROLLER
@@ -261,238 +361,8 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 	return data;
 }
 
-READ8_MEMBER( ql_state::disk_io_r )
-{
-	UINT8   result = 0;
 
-	if(LOG_DISK_READ)
-		logerror("%s DiskIO:Read of %08X\n",machine().describe_context(),m_disk_io_base+offset);
 
-	switch (offset)
-	{
-		case 0x0000 : result=m_fdc->read(space, offset); break;
-		case 0x0001 : result=m_fdc->read(space, offset); break;
-		case 0x0002 : result=m_fdc->read(space, offset); break;
-		case 0x0003 : result=m_fdc->read(space, offset); break;
-		case 0x000C : if(IS_SANDY_DISK(m_disk_type))
-						result = (m_mouse_int ^ MOUSE_DIRX) | m_mouseb->read() | 0x01; break;
-		case 0x0010 : if(IS_SANDY_DISK(m_disk_type))
-						m_mouse_int &= ~MOUSE_INT_MASK; break;
-		default     : logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
-	}
-
-	return result;
-}
-
-WRITE8_MEMBER( ql_state::disk_io_w )
-{
-	if(LOG_DISK_WRITE)
-		logerror("%s DiskIO:Write %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset);
-
-	switch (offset)
-	{
-		case 0x0000 : m_fdc->write(space, offset, data); break;
-		case 0x0001 : m_fdc->write(space, offset, data); break;
-		case 0x0002 : m_fdc->write(space, offset, data); break;
-		case 0x0003 : m_fdc->write(space, offset, data); break;
-		case 0x0004 : if(IS_SANDY_DISK(m_disk_type))
-						sandy_set_control(data);break;
-		case 0x0008 : if(IS_SANDY_DISK(m_disk_type))
-						sandy_print_char(data); break;
-		case 0x0010 : if(IS_SANDY_DISK(m_disk_type))
-						m_mouse_int &= ~MOUSE_INT_MASK; break;
-		case 0x2000 : if(m_disk_type==DISK_TYPE_TRUMP)
-						trump_card_set_control(data);break;
-		default     : logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;
-	}
-}
-
-READ8_MEMBER( ql_state::trump_card_rom_r )
-{
-	// If we have more than 640K them map extra ram into top 256K
-	// else just map to unmap.
-	if (m_ram->size()>(640*1024))
-		space.install_ram(0x0c0000, 0x0fffff, NULL);
-	else
-		space.unmap_readwrite(0x0c0000, 0x0fffff);
-
-	// Setup trumcard rom mapped to rom so unlink us
-	space.install_rom(0x010000, 0x018000, &memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
-
-	return memregion(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];
-}
-
-READ8_MEMBER( ql_state::cart_rom_r )
-{
-	// Setup trumcard rom mapped in at $c0000
-	space.install_rom(0x0c0000, 0x0c8000, &memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
-
-	// Setup cart rom to rom handler, so unlink us
-	space.install_rom(0x0c000, 0x0ffff, &memregion(M68008_TAG)->base()[CART_ROM_BASE]);
-
-	return memregion(M68008_TAG)->base()[CART_ROM_BASE+offset];
-}
-
-void ql_state::trump_card_set_control(UINT8 data)
-{
-	if(data & TRUMP_DRIVE0_MASK)
-		m_fdc->set_drive(0);
-
-	if(data & TRUMP_DRIVE1_MASK)
-		m_fdc->set_drive(1);
-
-	m_fdc->set_side((data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
-}
-
-void ql_state::sandy_set_control(UINT8 data)
-{
-	//logerror("sandy_set_control:%02X\n",data);
-
-	if(data & SANDY_DRIVE0_MASK)
-		m_fdc->set_drive(0);
-
-	if(data & SANDY_DRIVE1_MASK)
-		m_fdc->set_drive(1);
-
-	m_fdc->set_side((data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
-	if ((data & SANDY_SIDE_MASK) && (LOG_DISK_READ | LOG_DISK_WRITE))
-	{
-		logerror("Accessing side 1\n");
-	}
-
-	if (m_printer->is_ready())
-	{
-		if(data & SANDY_PRINTER_STROBE)
-			m_printer->output(m_printer_char);
-
-		if(data & SANDY_PRINTER_INTMASK)
-			m_zx8302->extint_w(ASSERT_LINE);
-	}
-
-	m_disk_io_byte=data;
-}
-
-void ql_state::sandy_print_char(UINT8 data)
-{
-	// latch the data until it's  strobed out
-	m_printer_char=data;
-
-//  m_centronics->write(data);
-}
-
-WRITE_LINE_MEMBER( ql_state::sandy_printer_busy )
-{
-	if ((state == ASSERT_LINE) && (m_disk_io_byte & SANDY_PRINTER_INTMASK))
-	{
-		logerror("sandy_print_char : triggering extint\n");
-		m_zx8302->extint_w(ASSERT_LINE);
-	}
-}
-
-READ_LINE_MEMBER(ql_state::disk_io_dden_r)
-{
-	if(IS_SANDY_DISK(m_disk_type))
-		return ((m_disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
-	else
-		return 0;
-}
-
-WRITE_LINE_MEMBER(ql_state::disk_io_intrq_w)
-{
-	//logerror("DiskIO:intrq = %d\n",state);
-}
-
-WRITE_LINE_MEMBER(ql_state::disk_io_drq_w)
-{
-	//logerror("DiskIO:drq = %d\n",state);
-}
-
-void ql_state::mouse_tick()
-{
-	UINT8 x         = m_mousex->read();
-	UINT8 y         = m_mousey->read();
-	UINT8 do_int    = 0;
-
-	//m_mouse_int = 0;
-
-	// Set X interupt flag and direction if x has changed
-	if (x > m_ql_mouse_x)
-	{
-		m_mouse_int |= MOUSE_INTX;
-		m_mouse_int |= MOUSE_DIRX;
-	}
-	else if (x < m_ql_mouse_x)
-	{
-		m_mouse_int |= MOUSE_INTX;
-		m_mouse_int &= ~MOUSE_DIRX;
-	}
-
-	// Set Y interupt flag and direction if y has changed
-	if (y > m_ql_mouse_y)
-	{
-		m_mouse_int |= MOUSE_INTY;
-		m_mouse_int &= ~MOUSE_DIRY;
-	}
-	else if (y < m_ql_mouse_y)
-	{
-		m_mouse_int |= MOUSE_INTY;
-		m_mouse_int |= MOUSE_DIRY;
-	}
-
-	// Update saved location
-	m_ql_mouse_x = x;
-	m_ql_mouse_y = y;
-
-	// if it is a QIMI, then always do int if triggered.
-	// if this is a Sandy mouse, only trigger an int if it is enabled in the mask register
-	if (m_config->read() & QIMI_MOUSE)
-		do_int = 1;
-	else
-		do_int = IS_SANDY_DISK(m_disk_type) && (m_disk_io_byte & SANDY_MOUSE_INTMASK);
-
-	//logerror("m_mouse_int=%02X, MOUSE_INT_MASK=%02X, m_disk_io_byte=%02X, (m_disk_io_byte & SANDY_MOUSE_INTMASK)=%02x\n",m_mouse_int,MOUSE_INT_MASK,m_disk_io_byte,(m_disk_io_byte & SANDY_MOUSE_INTMASK));
-
-	// if mouse moved trigger external int
-	if((m_mouse_int & MOUSE_INT_MASK) && do_int)
-	{
-		m_zx8302->extint_w(ASSERT_LINE);
-	}
-}
-
-READ8_MEMBER( ql_state::qimi_io_r )
-{
-	UINT8 result = 0;
-	UINT8 buttons;
-
-	switch (offset)
-	{
-		// 0x1bf9c, button status
-		case 0x00   :
-			buttons = m_mouseb->read();
-			result = ((buttons & MOUSE_RIGHT) << 2) | ((buttons & MOUSE_LEFT) << 2);
-			break;
-
-		// 0x1bfbc, direction status
-		case 0x20   :
-			result = ((m_mouse_int & MOUSE_INTX) >> 5) | ((m_mouse_int & MOUSE_INTY) >> 1) |
-						((m_mouse_int & MOUSE_DIRX) >> 1) | ((m_mouse_int & MOUSE_DIRY) >> 4);
-			break;
-		case 0x22   :
-			m_mouse_int &= ~MOUSE_INT_MASK;
-			break;
-	}
-
-	return result;
-}
-
-WRITE8_MEMBER( ql_state::qimi_io_w )
-{
-	// write to 0x1bfbe resets int status
-	if (offset == 0x22)
-	{
-		m_mouse_int = 0;
-	}
-}
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -503,21 +373,7 @@ WRITE8_MEMBER( ql_state::qimi_io_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
-	AM_RANGE(0x000000, 0x00bfff) AM_ROM // 48K System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP                         // 16K Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_UNMAP                                   // Trump card ROM is mapped in here
-	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
-	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
-	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
-	AM_RANGE(0x018003, 0x018003) AM_DEVWRITE(ZX8302_TAG, zx8302_device, ipc_command_w)
-	AM_RANGE(0x018020, 0x018020) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, status_r, mdv_control_w)
-	AM_RANGE(0x018021, 0x018021) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, irq_status_r, irq_acknowledge_w)
-	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
-	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
-	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP                                   // 16K Expansion I/O
-	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
-	AM_RANGE(0x040000, 0x0fffff) AM_RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -645,30 +501,10 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_PLAYER(2) PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
 
-
-	PORT_START(QL_CONFIG_PORT)
-	PORT_CONFNAME( QIMI_PORT_MASK, QIMI_NONE, "QIMI enabled")
-	PORT_CONFSETTING( QIMI_NONE, "No" )
-	PORT_CONFSETTING( QIMI_MOUSE, "Yes" )
-
-	PORT_CONFNAME( DISK_TYPE_MASK, DISK_TYPE_NONE, "Disk interface select" )
-	PORT_CONFSETTING(DISK_TYPE_NONE,     DEF_STR( None ))
-	PORT_CONFSETTING(DISK_TYPE_TRUMP,    "Miracle Trump card")
-	PORT_CONFSETTING(DISK_TYPE_SANDY_SD, "Sandy Superdisk")
-	PORT_CONFSETTING(DISK_TYPE_SANDY_SQB,"Sandy SuperQBoard")
-
-
-	PORT_START(MOUSEX_TAG)
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
-
-	PORT_START(MOUSEY_TAG)
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
-
-	PORT_START(MOUSEB_TAG)  /* Mouse buttons */
-	PORT_BIT( MOUSE_RIGHT, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( MOUSE_LEFT,  IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT( MOUSE_MIDDLE, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3)
-
+	PORT_START("config")
+	PORT_CONFNAME( 0x01, 0x00, "QL Internal Mouse Interface (QIMI)")
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -886,71 +722,11 @@ READ_LINE_MEMBER( ql_state::zx8302_raw2_r )
 	return m_mdv1->data2_r() | m_mdv2->data2_r();
 }
 
-//-------------------------------------------------
-//  floppy_interface ql_floppy_interface
-//-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( ql )
-	LEGACY_FLOPPY_OPTION(ql, "dsk", "SSDD 40 track disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ql, "dsk", "DSDD 40 track disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ql, "dsk", "DSDD 80 track disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ql, "dsk", "DSHD 80 track disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([18])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ql, "dsk", "DSED disk 80 track image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([40])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ql, "img", "QDOS 800KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface ql_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(ql),
-	NULL
-};
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  MACHINE_START( ql )
-//-------------------------------------------------
-
-//
-// The 896K option is dealt with once the machine is up and running as
-// the Trump Card ROM is initally mapped in at $C0000-$C8000, as this is
-// officially the expansion card rom area. Once the Trump Card has initialised
-// it maps the last 256K of ram into this area (asuming that it has 768K
-// onboard).
-//
 
 void ql_state::machine_start()
 {
@@ -959,91 +735,15 @@ void ql_state::machine_start()
 	save_item(NAME(m_ipl));
 	save_item(NAME(m_comdata_to_ipc));
 	save_item(NAME(m_baudx4));
-	save_item(NAME(m_printer_char));
-	save_item(NAME(m_disk_io_byte));
-
-	// QIMI QL Internal Mouse Interface
-	if (m_mousex)
-	{
-		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
-		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
-	}
 }
 
 void ql_state::machine_reset()
 {
-	address_space   &program    = m_maincpu->space(AS_PROGRAM);
-
-	m_disk_type=m_config->read() & DISK_TYPE_MASK;
-	logerror("disktype=%d\n",m_disk_type);
-
-	m_printer_char=0;
-	m_disk_io_byte=0;
-	m_mouse_int = 0;
-
-	logerror("Configuring RAM %d\n",m_ram->size() / 1024);
-
-	// configure RAM
-	switch (m_ram->size())
-	{
-		case 128*1024:
-			program.unmap_readwrite(0x040000, 0x0fffff);
-			break;
-
-		case 192*1024:
-			program.unmap_readwrite(0x050000, 0x0fffff);
-			break;
-
-		case 256*1024:
-			program.unmap_readwrite(0x060000, 0x0fffff);
-			break;
-
-		case 384*1024:
-			program.unmap_readwrite(0x080000, 0x0fffff);
-			break;
-
-		case 640*1024:
-			program.unmap_readwrite(0x0c0000, 0x0fffff);
-			break;
-	}
-
-	switch (m_disk_type)
-	{
-		case DISK_TYPE_SANDY_SD :
-			logerror("Configuring Sandy SuperDisk\n");
-			program.install_rom(0x0c0000, 0x0c3fff, &memregion(M68008_TAG)->base()[SANDY_ROM_BASE_SD]);
-			program.install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
-			program.install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
-			m_disk_io_base=SANDY_IO_BASE;
-			break;
-
-		case DISK_TYPE_SANDY_SQB :
-			logerror("Configuring Sandy SuperQBoard\n");
-			program.install_rom(0x0c0000, 0x0c7fff, &memregion(M68008_TAG)->base()[SANDY_ROM_BASE_SQB]);
-			program.install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
-			program.install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
-			m_disk_io_base=SANDY_IO_BASE;
-			break;
-
-		case DISK_TYPE_TRUMP :
-			logerror("Configuring TrumpCard\n");
-			program.install_read_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::cart_rom_r), this));
-			program.install_read_handler(TRUMP_ROM_MBASE, TRUMP_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::trump_card_rom_r), this));
-			program.install_read_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
-			program.install_write_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
-			m_disk_io_base=TRUMP_IO_BASE;
-			break;
-	}
-
-
-	// QIMI QL Internal Mouse Interface
-	if (m_config->read() & QIMI_MOUSE)
-	{
-		logerror("QIMI enabled\n");
-		program.install_read_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, read8_delegate(FUNC(ql_state::qimi_io_r), this));
-		program.install_write_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, write8_delegate(FUNC(ql_state::qimi_io_w), this));
-	}
+	// QIMI
+	m_qimi_enabled = (m_config->read() & 0x01) ? true : false;
 }
+
+
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -1098,17 +798,10 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
 	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
-
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(ql_state, disk_io_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(ql_state, disk_io_drq_w))
-	MCFG_WD17XX_DDEN_CALLBACK(READLINE(ql_state, disk_io_dden_r))
-
 	MCFG_MICRODRIVE_ADD(MDV_1)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
@@ -1121,11 +814,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 
 	MCFG_QL_ROM_CARTRIDGE_SLOT_ADD("rom", ql_rom_cartridge_cards, NULL)
 
-	// cartridge
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("ql_cart")
+	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")
@@ -1135,10 +824,6 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
-
-	// Parallel printer port on Sandy disk interface
-	MCFG_DEVICE_ADD(PRINTER_TAG, PRINTER, 0)
 MACHINE_CONFIG_END
 
 
@@ -1189,7 +874,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ql )
-	ROM_REGION( 0x28000, M68008_TAG, 0 )
+	ROM_REGION( 0x10000, M68008_TAG, 0 )
 	ROM_DEFAULT_BIOS("js")
 	ROM_SYSTEM_BIOS( 0, "fb", "v1.00 (FB)" )
 	ROMX_LOAD( "fb.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(1) )
@@ -1214,11 +899,6 @@ ROM_START( ql )
 	ROMX_LOAD( "tyche.rom", 0x0000, 0x010000, CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "min189", "Minerva v1.89" )
 	ROMX_LOAD( "minerva.rom", 0x0000, 0x00c000, BAD_DUMP CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
-
-	ROM_LOAD( "trumpcard-125.rom", TRUMP_ROM_BASE, 0x08000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d))
-	ROM_LOAD( "sandysuperdisk.rom", SANDY_ROM_BASE_SD, 0x04000, CRC(b52077da) SHA1(bf531758145ffd083e01c1cf9c45d0e9264a3b53))
-	ROM_LOAD( "sandy_disk_controller_v1.18y_1984.rom", SANDY_ROM_BASE_SQB, 0x08000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd))
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1236,10 +916,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_us )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "jsu.ic33", 0x0000, 0x8000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
 	ROM_LOAD( "jsu.ic34", 0x8000, 0x4000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1254,10 +933,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_es )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "mge.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
 	ROM_LOAD( "mge.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1272,10 +950,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_fr )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "mgf.ic33", 0x0000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mgf.ic34", 0x8000, 0x4000, NO_DUMP )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1290,7 +967,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_de )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "mg", "v1.10 (MG)" )
 	ROMX_LOAD( "mgg.ic33", 0x0000, 0x8000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e), ROM_BIOS(1) )
 	ROMX_LOAD( "mgg.ic34", 0x8000, 0x4000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f), ROM_BIOS(1) )
@@ -1299,7 +976,6 @@ ROM_START( ql_de )
 	ROMX_LOAD( "mf.ic34", 0x8000, 0x4000, BAD_DUMP CRC(5974616b) SHA1(c3603768c08535c25f077eed02fb80128aff13d9), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ultramg", "Ultrasoft" )
 	ROMX_LOAD( "ultramg.rom", 0x0000, 0x00c000, BAD_DUMP CRC(ad12463b) SHA1(0561b3bc7ce090f3101b2142ee957c18c250eefa), ROM_BIOS(3) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1314,10 +990,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_it )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "mgi.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
 	ROM_LOAD( "mgi.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1332,10 +1007,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_se )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "mgs.ic33", 0x0000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mgs.ic34", 0x8000, 0x4000, NO_DUMP )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1350,10 +1024,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_gr )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "efp.ic33", 0x0000, 0x8000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
 	ROM_LOAD( "efp.ic34", 0x8000, 0x4000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -1368,10 +1041,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_dk )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0xc000, M68008_TAG, 0 )
 	ROM_LOAD( "mgd.ic33",  0x0000, 0x8000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
 	ROM_LOAD( "mgd.ic34",  0x8000, 0x4000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
-	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x4000, "extra", 0 )
 	ROM_LOAD( "extra.rom", 0x0000, 0x4000, NO_DUMP ) // located at 0x1c000 in M68008 memory map
@@ -1389,7 +1061,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( tonto )
-	ROM_REGION( 0x400000, M68008_TAG, 0 )
+	ROM_REGION( 0x20000, M68008_TAG, 0 )
 	ROM_LOAD( "xbaa02.ic4", 0x000000, 0x008000, CRC(86e7915b) SHA1(a4d8369052eaea93d2174cfd3b14e6cf777f54b4) )
 	ROM_LOAD( "xbab03.ic5", 0x008000, 0x008000, CRC(97ef393c) SHA1(450c708e8dfbd42d939a9af6a72ef2a33a3dd3b5) )
 	ROM_LOAD( "xbac02.ic6", 0x010000, 0x008000, CRC(a7950897) SHA1(7cd4d6e33a350420a9ebd5c1b32708c29cb20799) )
@@ -1419,7 +1091,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( megaopd )
-	ROM_REGION( 0x400000, M68008_TAG, 0 )
+	ROM_REGION( 0x20000, M68008_TAG, 0 )
 	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-3.rom", 0x010000, 0x008000, NO_DUMP )
