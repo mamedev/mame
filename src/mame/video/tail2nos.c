@@ -40,8 +40,6 @@ K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 
 void tail2nos_state::tail2nos_postload()
 {
-	int i;
-
 	m_bg_tilemap->mark_all_dirty();
 
 	m_k051316->gfx(0)->mark_all_dirty();
