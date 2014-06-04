@@ -250,7 +250,7 @@ void sandy_super_disk_t::write(address_space &space, offs_t offset, UINT8 data)
 				if (floppy)
 				{
 					floppy->ss_w(BIT(data, 0));
-					floppy->mon_w(BIT(data, 3));
+					floppy->mon_w(!BIT(data, 3));
 				}
 
 				m_fdc->dden_w(BIT(data, 4));
