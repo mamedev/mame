@@ -27,7 +27,9 @@ OBJDIRS += \
 	$(LIBOBJ)/web \
 	$(LIBOBJ)/web/json \
 
-
+ifdef USE_SQLITE
+OBJDIRS += $(LIBOBJ)/sqlite3
+endif
 #-------------------------------------------------
 # utility library objects
 #-------------------------------------------------
@@ -536,3 +538,16 @@ $(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.cpp | $(OSPREBUILD)
 $(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -DNS_STACK_SIZE=0 -c $< -o $@
+
+#-------------------------------------------------
+# SQLite3 library objects
+#-------------------------------------------------
+
+SQLITEOBJS = \
+	$(LIBOBJ)/sqlite3/sqlite3.o \
+
+$(OBJ)/libsqlite3.a: $(SQLITEOBJS)
+
+$(LIBOBJ)/sqlite3/sqlite3.o: $(LIBSRC)/sqlite3/sqlite3.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 -c $< -o $@
