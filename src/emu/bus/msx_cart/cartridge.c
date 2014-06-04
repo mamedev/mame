@@ -1,6 +1,7 @@
 
 #include "emu.h"
 #include "cartridge.h"
+#include "arc.h"
 #include "ascii.h"
 #include "crossblaim.h"
 #include "dooly.h"
@@ -51,6 +52,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("holy_quran", MSX_CART_HOLY_QURAN)
 	SLOT_INTERFACE_INTERNAL("dooly", MSX_CART_DOOLY)
 	SLOT_INTERFACE_INTERNAL("halnote", MSX_CART_HALNOTE)
+	SLOT_INTERFACE_INTERNAL("arc", MSX_CART_ARC)
 SLOT_INTERFACE_END
 
 

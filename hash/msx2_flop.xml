@@ -309,19 +309,20 @@ The following floppies came with the machines.
 	</software>
 -->
 
-	<!-- Needs specific mapper -->
-	<software name="arc" supported="no">
+	<software name="arc">
 		<description>Arc</description>
 		<year>1990</year>
 		<publisher>Parallax</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="ARC_disk_A.dsk" size="737280" crc="dfd9c28d" sha1="ddff24b17fd4fcaecd8197fb8a20099483924565" offset="0" />
-			</dataarea>
-		</part>
+		<!-- Floppy #2 is the game disk -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ARC_disk_B.dsk" size="737280" crc="af2bd084" sha1="8d91f61e28c0d813f16adb06e019da911aa84b2c" offset="0" />
+			</dataarea>
+		</part>
+		<!-- Floppy #1 contains the manual -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ARC_disk_A.dsk" size="737280" crc="dfd9c28d" sha1="ddff24b17fd4fcaecd8197fb8a20099483924565" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cart" interface="msx_cart">

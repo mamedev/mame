@@ -407,6 +407,7 @@ BUSOBJS += $(BUSOBJ)/msx_slot/ram_mm.o
 BUSOBJS += $(BUSOBJ)/msx_slot/slot.o
 BUSOBJS += $(BUSOBJ)/msx_slot/sony08.o
 OBJDIRS += $(BUSOBJ)/msx_cart
+BUSOBJS += $(BUSOBJ)/msx_cart/arc.o
 BUSOBJS += $(BUSOBJ)/msx_cart/ascii.o
 BUSOBJS += $(BUSOBJ)/msx_cart/cartridge.o
 BUSOBJS += $(BUSOBJ)/msx_cart/crossblaim.o
