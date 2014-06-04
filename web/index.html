@@ -187,6 +187,7 @@
 
 			// Now, actually update the status bar..
 			updateStatusBar('',statusbar_ispaused.join(''),statusbar_runningdriver.join(''));
+			takeScreenshot();
 		  },
 		  error: function (request, status, error) { alert(status + ", " + error); }
 		});	

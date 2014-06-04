@@ -236,58 +236,31 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 	}
 	else if (!strncmp(conn->uri, "/screenshot.png",15))
 	{
-		FILE *fp = (FILE *) conn->connection_param;
-		char buf[200];
-		size_t n = 0;
-		if (fp == NULL) 
+		screen_device_iterator iter(m_machine->root_device());
+		screen_device *screen = iter.first();
+
+		if (screen == NULL)
 		{
-			screen_device_iterator iter(m_machine->root_device());
-			screen_device *screen = iter.first();
-
-			if (screen == NULL)
-			{
-				return 0;
-			}
-
-			astring fname("screenshot.png");
-			{
-				emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				file_error filerr = file.open(fname);
-
-				if (filerr != FILERR_NONE)
-				{
-					return 0;
-				}
-
-				m_machine->video().save_snapshot(screen, file);
-				astring fullpath(file.fullpath());
-				file.close();
-			}
-			
-			{
-				emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_READ);
-				file_error filerr = file.open(fname);
-
-				if (filerr != FILERR_NONE)
-				{
-					return 0;
-				}
-							
-				file.seek(0, SEEK_SET);
-				mg_send_header(conn, "Content-Type", "image/png");
-				mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
-				mg_send_header(conn, "Pragma", "no-cache");
-				mg_send_header(conn, "Expires", "0");			 
-				do 
-				{
-					n = file.read(buf, sizeof(buf));										
-					mg_send_data(conn, buf, n);
-				}
-				while (n==sizeof(buf));
-				file.close();				
-			}
+			return 0;
 		}
-		return MG_TRUE;
+
+		astring fname("screenshot.png");
+		emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		file_error filerr = file.open(fname);
+
+		if (filerr != FILERR_NONE)
+		{
+			return 0;
+		}
+
+		m_machine->video().save_snapshot(screen, file);
+		astring fullpath(file.fullpath());
+		file.close();
+		mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
+		mg_send_header(conn, "Pragma", "no-cache");
+		mg_send_header(conn, "Expires", "0");			 
+		mg_send_file(conn, fullpath.cstr());
+		return MG_MORE; // It is important to return MG_MORE after mg_send_file!
 	}
 	return 0;
 }
