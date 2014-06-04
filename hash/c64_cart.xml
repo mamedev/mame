@@ -1240,7 +1240,7 @@
 		</part>
 	</software>
 
-	<software name="c64link">
+	<software name="c64link" supported="no">
 		<description>C64-Link</description>
 		<year>1982</year>
 		<publisher>Richvale Telecommunications</publisher>
@@ -1254,7 +1254,7 @@
 		</part>
 	</software>
 
-	<software name="c64link2">
+	<software name="c64link2" supported="no">
 		<description>C64-Link II</description>
 		<year>1984</year>
 		<publisher>Richvale Telecommunications</publisher>
@@ -1516,7 +1516,7 @@
 		</part>
 	</software>
 
-	<software name="mmcr">
+	<software name="mmcr" supported="no">
 		<description>MMC Replay v0.55</description>
 		<year>2008</year>
 		<publisher>Protovision</publisher>
@@ -1530,7 +1530,7 @@
 		</part>
 	</software>
 
-	<software name="mmc64">
+	<software name="mmc64" supported="no">
 		<description>MMC64 v1.10</description>
 		<year>2007</year>
 		<publisher>Protovision</publisher>
@@ -1544,7 +1544,7 @@
 		</part>
 	</software>
 
-	<software name="rr">
+	<software name="rr" supported="no">
 		<description>Retro Replay v3.8P</description>
 		<year>2006</year>
 		<publisher>CyberpunX</publisher>
@@ -5452,7 +5452,7 @@
 		</part>
 	</software>
 
-	<software name="backup13">
+	<software name="backup13" supported="no">
 		<description>One-Pass Backup v1.3</description>
 		<year>19??</year>
 		<publisher>Datel Electronics</publisher>
@@ -5466,7 +5466,7 @@
 		</part>
 	</software>
 
-	<software name="ar2">
+	<software name="ar2" supported="no">
 		<description>Action Replay MK2</description>
 		<year>1986</year>
 		<publisher>Datel Electronics</publisher>
@@ -5481,7 +5481,7 @@
 		</part>
 	</software>
 
-	<software name="ar2v2" cloneof="ar2">
+	<software name="ar2v2" cloneof="ar2" supported="no">
 		<description>Action Replay MK2 (v2)</description>
 		<year>1986</year>
 		<publisher>Datel Electronics</publisher>
@@ -5496,7 +5496,7 @@
 		</part>
 	</software>
 
-	<software name="ar3">
+	<software name="ar3" supported="no">
 		<description>Action Replay MK3 (v1)</description>
 		<year>1987</year>
 		<publisher>Datel Electronics</publisher>
@@ -5511,7 +5511,7 @@
 		</part>
 	</software>
 
-	<software name="ar3v2" cloneof="ar3">
+	<software name="ar3v2" cloneof="ar3" supported="no">
 		<description>Action Replay MK3 (v2)</description>
 		<year>1987</year>
 		<publisher>Datel Electronics</publisher>
@@ -5526,7 +5526,7 @@
 		</part>
 	</software>
 
-	<software name="ar3dm" cloneof="ar3">
+	<software name="ar3dm" cloneof="ar3" supported="no">
 		<description>Action Replay MK3 (Diskmate)</description>
 		<year>1987</year>
 		<publisher>Datel Electronics</publisher>
@@ -5541,7 +5541,7 @@
 		</part>
 	</software>
 
-	<software name="niki" cloneof="ar3">
+	<software name="niki" cloneof="ar3" supported="no">
 		<description>Niki Cartridge Fast-Disktool</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5556,7 +5556,7 @@
 		</part>
 	</software>
 
-	<software name="ar4">
+	<software name="ar4" supported="no">
 		<description>Action Replay MK4</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5571,7 +5571,7 @@
 		</part>
 	</software>
 
-	<software name="cmiky2" cloneof="ar4">
+	<software name="cmiky2" cloneof="ar4" supported="no">
 		<description>Captain Miky II</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5586,7 +5586,7 @@
 		</part>
 	</software>
 
-	<software name="cmiky2a" cloneof="ar4">
+	<software name="cmiky2a" cloneof="ar4" supported="no">
 		<description>Captain Miky II (Alt)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5601,7 +5601,7 @@
 		</part>
 	</software>
 
-	<software name="ar41">
+	<software name="ar41" supported="no">
 		<description>Action Replay v4.1</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5616,7 +5616,7 @@
 		</part>
 	</software>
 
-	<software name="ar42" cloneof="ar41">
+	<software name="ar42" cloneof="ar41" supported="no">
 		<description>Action Replay v4.2 (v1)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5631,7 +5631,7 @@
 		</part>
 	</software>
 
-	<software name="ar42v2" cloneof="ar41">
+	<software name="ar42v2" cloneof="ar41" supported="no">
 		<description>Action Replay v4.2 (v2)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5646,7 +5646,7 @@
 		</part>
 	</software>
 
-	<software name="ar4250" cloneof="ar41">
+	<software name="ar4250" cloneof="ar41" supported="no">
 		<description>Action Replay v4.2 (v5.0 v1)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5661,7 +5661,7 @@
 		</part>
 	</software>
 
-	<software name="ar4250v2" cloneof="ar41">
+	<software name="ar4250v2" cloneof="ar41" supported="no">
 		<description>Action Replay v4.2 (v5.0 v2)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5676,7 +5676,7 @@
 		</part>
 	</software>
 
-	<software name="acp53" cloneof="ar41">
+	<software name="acp53" cloneof="ar41" supported="no">
 		<description>Action Cartridge Plus 5 (Ger)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5691,7 +5691,7 @@
 		</part>
 	</software>
 
-	<software name="acp6" cloneof="ar41">
+	<software name="acp6" cloneof="ar41" supported="no">
 		<description>Action Cartridge Plus 6.0</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5706,7 +5706,7 @@
 		</part>
 	</software>
 
-	<software name="acp6g" cloneof="ar41">
+	<software name="acp6g" cloneof="ar41" supported="no">
 		<description>Action Cartridge Plus 6.0 (Ger)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5721,7 +5721,7 @@
 		</part>
 	</software>
 
-	<software name="ar73" cloneof="ar41">
+	<software name="ar73" cloneof="ar41" supported="no">
 		<description>Action Replay v7.3</description>
 		<year>1991</year>
 		<publisher>Atrax</publisher>
@@ -5736,7 +5736,7 @@
 		</part>
 	</software>
 
-	<software name="ar5">
+	<software name="ar5" supported="no">
 		<description>Action Replay v5.0</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5751,7 +5751,7 @@
 		</part>
 	</software>
 
-	<software name="ar5n" cloneof="ar5">
+	<software name="ar5n" cloneof="ar5" supported="no">
 		<description>Action Replay v5.0 (NTSC)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5766,7 +5766,7 @@
 		</part>
 	</software>
 
-	<software name="ar51" cloneof="ar5">
+	<software name="ar51" cloneof="ar5" supported="no">
 		<description>Action Replay v5.1a</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
@@ -5781,7 +5781,7 @@
 		</part>
 	</software>
 
-	<software name="acp7" cloneof="ar5">
+	<software name="acp7" cloneof="ar5" supported="no">
 		<description>Action Cartridge Plus v7.0 (Derko)</description>
 		<year>1991</year>
 		<publisher>Derko</publisher>
@@ -5796,7 +5796,7 @@
 		</part>
 	</software>
 
-	<software name="acp7t" cloneof="ar5">
+	<software name="acp7t" cloneof="ar5" supported="no">
 		<description>Action Cartridge Plus v7.0 (Triumwyrat)</description>
 		<year>1990</year>
 		<publisher>Triumwyrat</publisher>
@@ -5811,7 +5811,7 @@
 		</part>
 	</software>
 
-	<software name="ar75" cloneof="ar5">
+	<software name="ar75" cloneof="ar5" supported="no">
 		<description>Action Replay v7.5</description>
 		<year>1989</year>
 		<publisher>Triumwyrat</publisher>
@@ -5826,7 +5826,7 @@
 		</part>
 	</software>
 
-	<software name="ar84" cloneof="ar5">
+	<software name="ar84" cloneof="ar5" supported="no">
 		<description>Action Replay v8.4</description>
 		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5841,7 +5841,7 @@
 		</part>
 	</software>
 
-	<software name="ar5flt" cloneof="ar5">
+	<software name="ar5flt" cloneof="ar5" supported="no">
 		<description>The Fairlight Cracking Cartridge</description>
 		<year>1990</year>
 		<publisher>Fairlight</publisher>
@@ -5856,7 +5856,7 @@
 		</part>
 	</software>
 
-	<software name="ar6t" cloneof="ar5">
+	<software name="ar6t" cloneof="ar5" supported="no">
 		<description>Action Replay v6.0 (Triad)</description>
 		<year>1993</year>
 		<publisher>Triad</publisher>
@@ -5871,7 +5871,7 @@
 		</part>
 	</software>
 
-	<software name="ar6">
+	<software name="ar6" supported="no">
 		<description>Action Replay v6.0</description>
 		<year>1989</year>
 		<publisher>Datel Electronics</publisher>
@@ -5886,7 +5886,7 @@
 		</part>
 	</software>
 
-	<software name="frzframe">
+	<software name="frzframe" supported="no">
 		<description>Freeze Frame MK1 (v1)</description>
 		<year>1986</year>
 		<publisher>Evesham Micros</publisher>
@@ -5903,7 +5903,7 @@
 		</part>
 	</software>
 
-	<software name="frzframev2" cloneof="frzframe">
+	<software name="frzframev2" cloneof="frzframe" supported="no">
 		<description>Freeze Frame MK1 (v2)</description>
 		<year>1986</year>
 		<publisher>Evesham Micros</publisher>
@@ -5920,7 +5920,7 @@
 		</part>
 	</software>
 
-	<software name="frzframe4" cloneof="frzframe">
+	<software name="frzframe4" cloneof="frzframe" supported="no">
 		<description>Freeze Frame MK4</description>
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
@@ -5937,7 +5937,7 @@
 		</part>
 	</software>
 
-	<software name="frzmach">
+	<software name="frzmach" supported="no">
 		<description>Freeze Machine (Aus) (v1)</description>
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
@@ -5954,7 +5954,7 @@
 		</part>
 	</software>
 
-	<software name="frzmachu" cloneof="frzmach">
+	<software name="frzmachu" cloneof="frzmach" supported="no">
 		<description>Freeze Machine (UK) (v1)</description>
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
@@ -5971,7 +5971,7 @@
 		</part>
 	</software>
 
-	<software name="frzmachu2" cloneof="frzmach">
+	<software name="frzmachu2" cloneof="frzmach" supported="no">
 		<description>Freeze Machine (UK) (v2)</description>
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
@@ -6030,7 +6030,7 @@
 		</part>
 	</software>
 
-	<software name="finalint" cloneof="final">
+	<software name="finalint" cloneof="final" supported="no">
 		<description>The Final Cartridge (Proto)</description>
 		<year>198?</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -6115,7 +6115,7 @@
 		</part>
 	</software>
 
-	<software name="finalpls">
+	<software name="finalpls" supported="no">
 		<description>Final Cartridge Plus (v2)</description>
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -6129,7 +6129,7 @@
 		</part>
 	</software>
 
-	<software name="finalplsv1" cloneof="finalpls">
+	<software name="finalplsv1" cloneof="finalpls" supported="no">
 		<description>Final Cartridge Plus (v1)</description>
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -6143,7 +6143,7 @@
 		</part>
 	</software>
 
-	<software name="finalplsv1a" cloneof="finalpls">
+	<software name="finalplsv1a" cloneof="finalpls" supported="no">
 		<description>Final Cartridge Plus (v1, Alt)</description>
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -6306,7 +6306,7 @@
 		</part>
 	</software>
 
-	<software name="nordic72">
+	<software name="nordic72" supported="no">
 		<description>Nordic Power: Action Cartridge v7.2</description>
 		<year>1991</year>
 		<publisher>Gameworks</publisher>
@@ -6320,7 +6320,7 @@
 		</part>
 	</software>
 
-	<software name="atomic" cloneof="nordic72">
+	<software name="atomic" cloneof="nordic72" supported="no">
 		<description>Atomic Power Cartridge v1.1</description>
 		<year>1990</year>
 		<publisher>Frank &amp; Joe</publisher>
@@ -6334,7 +6334,7 @@
 		</part>
 	</software>
 
-	<software name="nordic10" cloneof="nordic72">
+	<software name="nordic10" cloneof="nordic72" supported="no">
 		<description>Nordic Power v1.0</description>
 		<year>1989</year>
 		<publisher>D&amp;E, Venlo</publisher>
@@ -6348,7 +6348,7 @@
 		</part>
 	</software>
 
-	<software name="codebust">
+	<software name="codebust" supported="no">
 		<description>Codebuster</description>
 		<year>198?</year>
 		<publisher>LMS Tech</publisher>
@@ -6424,7 +6424,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap3" cloneof="snapshot">
+	<software name="supsnap3" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v3.0, NTSC)</description>
 		<year>1988</year>
 		<publisher>LMS Tech</publisher>
@@ -6475,7 +6475,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap501" cloneof="snapshot">
+	<software name="supsnap501" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v5.01, NTSC)</description>
 		<year>1990</year>
 		<publisher>LMS Tech</publisher>

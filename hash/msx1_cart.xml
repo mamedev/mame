@@ -17087,7 +17087,7 @@ legacy FM implementations cannot find it.
 	<!-- Devices -->
 
 	<!-- mounting this should add the floppy drive, rather than it always being there? -->
-	<software name="diskbas">
+	<software name="diskbas" supported="no">
 	<description>Disk BASIC v1.0 for FS-FD1 (Japan)</description>
 	<year>1987</year>
 	<publisher>Matsushita</publisher>
