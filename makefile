@@ -759,6 +759,9 @@ LUA_LIB = $(OBJ)/liblua.a
 # add web library
 WEB_LIB = $(OBJ)/libweb.a
 
+# add SQLite3 library
+SQLITE3_LIB = $(OBJ)/libsqlite3.a
+
 # add PortMidi MIDI library
 ifeq ($(BUILD_MIDILIB),1)
 INCPATH += -I$(SRC)/lib/portmidi
