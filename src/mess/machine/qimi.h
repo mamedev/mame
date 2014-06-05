@@ -58,10 +58,10 @@ protected:
 private:
 	enum
 	{
-		ST_VERT_DIR = 0x01,
-		ST_HORZ_MOVE = 0x04,
-		ST_HORZ_DIR = 0x10,
-		ST_VERT_MOVE = 0x20
+		ST_Y_DIR = 0x01,
+		ST_X_INT = 0x04,
+		ST_X_DIR = 0x10,
+		ST_Y_INT = 0x20
 	};
 
 	devcb_write_line m_write_extint;

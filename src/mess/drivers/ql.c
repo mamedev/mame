@@ -12,7 +12,6 @@
 
     TODO:
 
-	- Sandy mouse
     - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette

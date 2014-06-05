@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
-    Sandy SuperQBoard (with HD upgrade) emulation
+    Sandy SuperQBoard/SuperQMouse (with HD upgrade) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -43,6 +43,9 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -53,6 +56,18 @@ protected:
 	virtual void write(address_space &space, offs_t offset, UINT8 data);
 
 private:
+	enum
+	{
+		ST_BUSY = 0x01,
+		ST_MIDDLE = 0x02,
+		ST_RIGHT = 0x04,
+		ST_LEFT = 0x08,
+		ST_Y_DIR = 0x10,
+		ST_X_DIR = 0x20,
+		ST_Y_INT = 0x40,
+		ST_X_INT = 0x80
+	};
+
 	void check_interrupt();
 
 	required_device<wd1772_t> m_fdc;
@@ -62,13 +77,13 @@ private:
 	required_device<output_latch_device> m_latch;
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_ram;
+	optional_ioport m_buttons;
 
 	int m_ram_size;
-	int m_busy;
-	int m_int2;
-	int m_int3;
 	int m_fd6;
 	int m_fd7;
+
+	UINT8 m_status;
 };
 
 
@@ -82,9 +97,38 @@ public:
 };
 
 
+// ======================> sandy_superqmouse_t
+
+class sandy_superqmouse_t :  public sandy_superqboard_t
+{
+public:
+	// construction/destruction
+	sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
+// ======================> sandy_superqmouse_512k_t
+
+class sandy_superqmouse_512k_t :  public sandy_superqboard_t
+{
+public:
+	// construction/destruction
+	sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
 // device type definition
 extern const device_type SANDY_SUPERQBOARD;
 extern const device_type SANDY_SUPERQBOARD_512K;
+extern const device_type SANDY_SUPERQMOUSE;
+extern const device_type SANDY_SUPERQMOUSE_512K;
+
 
 
 #endif

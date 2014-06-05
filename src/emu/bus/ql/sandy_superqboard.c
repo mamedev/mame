@@ -2,20 +2,12 @@
 // copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
-    Sandy SuperQBoard (with HD upgrade) emulation
+    Sandy SuperQBoard/SuperQMouse (with HD upgrade) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
-
-/*
-
-	TODO:
-
-	- mouse
-
-*/
 
 #include "sandy_superqboard.h"
 
@@ -37,6 +29,8 @@
 
 const device_type SANDY_SUPERQBOARD = &device_creator<sandy_superqboard_t>;
 const device_type SANDY_SUPERQBOARD_512K = &device_creator<sandy_superqboard_512k_t>;
+const device_type SANDY_SUPERQMOUSE = &device_creator<sandy_superqmouse_t>;
+const device_type SANDY_SUPERQMOUSE_512K = &device_creator<sandy_superqmouse_512k_t>;
 
 
 //-------------------------------------------------
@@ -93,7 +87,15 @@ FLOPPY_FORMATS_END
 
 WRITE_LINE_MEMBER( sandy_superqboard_t::busy_w )
 {
-	m_busy = state;
+	if (state)
+	{
+		m_status |= ST_BUSY;
+	}
+	else
+	{
+		m_status &= ~ST_BUSY;
+	}
+
 	check_interrupt();
 }
 
@@ -124,6 +126,86 @@ machine_config_constructor sandy_superqboard_t::device_mconfig_additions() const
 }
 
 
+//-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( mouse_x_changed )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_x_changed )
+{
+	if (newval > oldval)
+	{
+		m_status |= ST_X_DIR;
+	}
+	else
+	{
+		m_status &= ~ST_X_DIR;
+	}
+
+	m_status |= ST_X_INT;
+
+	check_interrupt();
+}
+
+
+//-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( mouse_y_changed )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_y_changed )
+{
+	if (newval < oldval)
+	{
+		m_status |= ST_Y_DIR;
+	}
+	else
+	{
+		m_status &= ~ST_Y_DIR;
+	}
+
+	m_status |= ST_Y_INT;
+
+	check_interrupt();
+}
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( sandy_superqmouse )
+//-------------------------------------------------
+
+INPUT_PORTS_START( sandy_superqmouse )
+	PORT_START("mouse_x")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqmouse_t, mouse_x_changed, 0)
+
+	PORT_START("mouse_y")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqmouse_t, mouse_y_changed, 0)
+
+	PORT_START("mouse_buttons")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor sandy_superqmouse_t::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( sandy_superqmouse );
+}
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor sandy_superqmouse_512k_t::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( sandy_superqmouse );
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -143,12 +225,11 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
 	m_ram(*this, "ram"),
+	m_buttons(*this, "mouse_buttons"),
 	m_ram_size(256*1024),
-	m_busy(1),
-	m_int2(0),
-	m_int3(0),
 	m_fd6(0),
-	m_fd7(0)
+	m_fd7(0),
+	m_status(0)
 {
 }
 
@@ -162,17 +243,22 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_t
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
 	m_ram(*this, "ram"),
+	m_buttons(*this, "mouse_buttons"),
 	m_ram_size(ram_size),
-	m_busy(1),
-	m_int2(0),
-	m_int3(0),
 	m_fd6(0),
-	m_fd7(0)
+	m_fd7(0),
+	m_status(0)
 {
 }
 
 sandy_superqboard_512k_t::sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQBOARD_512K, "Sandy SuperQBoard 512K", tag, owner, clock, "ql_sqboard", __FILE__, 512*1024) { }
+
+sandy_superqmouse_t::sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sandy_superqboard_t(mconfig, SANDY_SUPERQMOUSE, "Sandy SuperQMouse", tag, owner, clock, "ql_sqboard", __FILE__, 256*1024) { }
+
+sandy_superqmouse_512k_t::sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sandy_superqboard_t(mconfig, SANDY_SUPERQMOUSE_512K, "Sandy SuperQMouse 512K", tag, owner, clock, "ql_sqboard", __FILE__, 512*1024) { }
 
 
 //-------------------------------------------------
@@ -185,11 +271,9 @@ void sandy_superqboard_t::device_start()
 	m_ram.allocate(m_ram_size);
 
 	// state saving
-	save_item(NAME(m_busy));
-	save_item(NAME(m_int2));
-	save_item(NAME(m_int3));
 	save_item(NAME(m_fd6));
 	save_item(NAME(m_fd7));
+	save_item(NAME(m_status));
 }
 
 
@@ -206,10 +290,11 @@ void sandy_superqboard_t::device_reset()
 	m_latch->write(0);
 	m_centronics->write_strobe(1);
 	
-	m_int2 = 0;
-	m_int3 = 0;
 	m_fd6 = 0;
 	m_fd7 = 0;
+	m_status = 0;
+
+	check_interrupt();
 }
 
 
@@ -235,19 +320,18 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 					bit		description
 
 					0 		BUSY
-					1 		mouse pin 8
-					2 		mouse pin 1
-					3 		mouse pin 2
-					4 		mouse pin 4 flip-flop Q
-					5 		mouse pin 3 flip-flop Q
-					6 		INT3
-					7 		INT2
+					1 		mouse pin 8 (middle button)
+					2 		mouse pin 1 (right button)
+					3 		mouse pin 2 (left button)
+					4 		mouse pin 4 flip-flop Q (Y direction)
+					5 		mouse pin 3 flip-flop Q (X direction)
+					6 		INT3 (Y interrupt)
+					7 		INT2 (X interrupt)
 
 				*/
 
-				data = m_busy;
-				data |= m_int3 << 6;
-				data |= m_int2 << 7;
+				data = m_buttons->read() & 0x0e;
+				data |= m_status & 0xf1;
 				break;
 			}
 		}
@@ -327,6 +411,7 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 
 				m_fd6 = BIT(data, 6);
 				m_fd7 = BIT(data, 7);
+
 				check_interrupt();
 				}
 				break;
@@ -336,8 +421,7 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 				break;
 
 			case 4:
-				m_int2 = 0;
-				m_int3 = 0;
+				m_status &= ~(ST_Y_INT | ST_X_INT);
 				check_interrupt();
 				break;
 
@@ -359,7 +443,9 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 
 void sandy_superqboard_t::check_interrupt()
 {
-	int extint = (m_fd6 && m_busy) || (m_fd7 && (m_int2 || m_int3));
+	bool busy_int = m_fd6 && (m_status & ST_BUSY);
+	bool mouse_int = m_fd7 && (m_status & (ST_Y_INT | ST_X_INT));
+	bool extint = busy_int || mouse_int;
 
 	m_slot->extintl_w(extint ? ASSERT_LINE : CLEAR_LINE);
 }

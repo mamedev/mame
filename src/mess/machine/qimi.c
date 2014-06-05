@@ -28,14 +28,14 @@ INPUT_CHANGED_MEMBER( qimi_t::mouse_x_changed )
 {
 	if (newval > oldval)
 	{
-		m_status |= ST_HORZ_DIR;
+		m_status |= ST_X_DIR;
 	}
 	else
 	{
-		m_status &= ~ST_HORZ_DIR;
+		m_status &= ~ST_X_DIR;
 	}
 
-	m_status |= ST_HORZ_MOVE;
+	m_status |= ST_X_INT;
 
 	if (m_extint_en)
 	{
@@ -52,14 +52,14 @@ INPUT_CHANGED_MEMBER( qimi_t::mouse_y_changed )
 {
 	if (newval < oldval)
 	{
-		m_status |= ST_VERT_DIR;
+		m_status |= ST_Y_DIR;
 	}
 	else
 	{
-		m_status &= ~ST_VERT_DIR;
+		m_status &= ~ST_Y_DIR;
 	}
 
-	m_status |= ST_VERT_MOVE;
+	m_status |= ST_Y_INT;
 
 	if (m_extint_en)
 	{
@@ -156,7 +156,7 @@ UINT8 qimi_t::read(address_space &space, offs_t offset, UINT8 data)
 		break;
 
 	case 0x1bfbe:
-		m_status &= ~(ST_VERT_MOVE | ST_HORZ_MOVE);
+		m_status &= ~(ST_Y_INT | ST_X_INT);
 		m_extint_en = true;
 
 		m_write_extint(CLEAR_LINE);
@@ -176,7 +176,7 @@ WRITE8_MEMBER( qimi_t::write )
 	// write to 0x1bfbe resets int status
 	if (offset == 0x1bfbe)
 	{
-		m_status &= ~(ST_VERT_MOVE | ST_HORZ_MOVE);
+		m_status &= ~(ST_Y_INT | ST_X_INT);
 		m_extint_en = true;
 
 		m_write_extint(CLEAR_LINE);
