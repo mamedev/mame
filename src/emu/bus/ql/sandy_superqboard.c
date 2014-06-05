@@ -39,7 +39,7 @@ const device_type SANDY_SUPERQMOUSE_512K = &device_creator<sandy_superqmouse_512
 
 ROM_START( sandy_superqboard )
 	ROM_REGION( 0x8000, "rom", 0 )
-	ROM_DEFAULT_BIOS("v121n")
+	ROM_DEFAULT_BIOS("v118y")
 	ROM_SYSTEM_BIOS( 0, "v118y", "v1.18" )
 	ROMX_LOAD( "sandy_disk_controller_v1.18y_1984.ic2", 0x0000, 0x8000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v119", "v1.19N" )
@@ -132,7 +132,7 @@ machine_config_constructor sandy_superqboard_t::device_mconfig_additions() const
 
 INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_x_changed )
 {
-	if (newval > oldval)
+	if (newval < oldval)
 	{
 		m_status |= ST_X_DIR;
 	}
@@ -174,10 +174,10 @@ INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_y_changed )
 
 INPUT_PORTS_START( sandy_superqmouse )
 	PORT_START("mouse_x")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqmouse_t, mouse_x_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqmouse_t, mouse_x_changed, 0)
 
 	PORT_START("mouse_y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqmouse_t, mouse_y_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqmouse_t, mouse_y_changed, 0)
 
 	PORT_START("mouse_buttons")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
@@ -308,7 +308,7 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 	{
 		if ((offset & 0xffc0) == 0x3fc0)
 		{
-			switch ((offset >> 2) & 0x03)
+			switch ((offset >> 2) & 0x07)
 			{
 			case 0:
 				data = m_fdc->read(space, offset & 0x03);
@@ -332,6 +332,11 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 
 				data = m_buttons->read() & 0x0e;
 				data |= m_status & 0xf1;
+				break;
+
+			case 4:
+				m_status &= ~(ST_Y_INT | ST_X_INT);
+				check_interrupt();
 				break;
 			}
 		}
@@ -363,7 +368,7 @@ void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
 	{
 		if ((offset & 0xffc0) == 0x3fc0)
 		{
-			switch ((offset >> 2) & 0x03)
+			switch ((offset >> 2) & 0x07)
 			{
 			case 0:
 				m_fdc->write(space, offset & 0x03, data);
