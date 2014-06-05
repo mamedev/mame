@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="tdv2324" description="Tandberg TDV 2324 disk images">
 
-	<software name="basicc">
+	<software name="basicc" supported="no">
 		<description>Microsoft BASIC Compiler v5.30</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
@@ -13,7 +13,7 @@
 		</part>
 	</software>
 
-	<software name="bdsc">
+	<software name="bdsc" supported="no">
 		<description>BDS-C-COMPILER v1.50A</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30,7 +30,7 @@
 		</part>
 	</software>
 
-	<software name="fortran">
+	<software name="fortran" supported="no">
 		<description>Microsoft Fortran-80 Compiler v3.43</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
@@ -41,7 +41,7 @@
 		</part>
 	</software>
 
-	<software name="mbasic">
+	<software name="mbasic" supported="no">
 		<description>Microsoft BASIC v5.21</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
@@ -52,7 +52,7 @@
 		</part>
 	</software>
 
-	<software name="multplan">
+	<software name="multplan" supported="no">
 		<description>Multiplan 1.05</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
@@ -63,7 +63,7 @@
 		</part>
 	</software>
 
-	<software name="tos21">
+	<software name="tos21" supported="no">
 		<description>TOS 21 v1.81</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -74,7 +74,7 @@
 		</part>
 	</software>
 
-	<software name="tos21a" cloneof="tos21">
+	<software name="tos21a" cloneof="tos21" supported="no">
 		<description>TOS 21 v1.81 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -6364,7 +6364,7 @@
 		</part>
 	</software>
 
-	<software name="snapshot">
+	<software name="snapshot" supported="no">
 		<description>Snapshot 64 (v1)</description>
 		<year>1985</year>
 		<publisher>LMS Tech</publisher>
@@ -6386,7 +6386,7 @@
 		</part>
 	</software>
 
-	<software name="snapshot2" cloneof="snapshot">
+	<software name="snapshot2" cloneof="snapshot" supported="no">
 		<description>Snapshot 64 (v2)</description>
 		<year>1985</year>
 		<publisher>LMS Tech</publisher>
@@ -6408,7 +6408,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap2" cloneof="snapshot">
+	<software name="supsnap2" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v2.0)</description>
 		<year>198</year>
 		<publisher>LMS Tech</publisher>
@@ -6504,7 +6504,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap522" cloneof="snapshot">
+	<software name="supsnap522" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v5.22, NTSC)</description>
 		<year>1990</year>
 		<publisher>LMS Tech</publisher>
@@ -6533,7 +6533,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap522p1" cloneof="snapshot">
+	<software name="supsnap522p1" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v5.22 v1, PAL)</description>
 		<year>1990</year>
 		<publisher>LMS Tech</publisher>
@@ -6562,7 +6562,7 @@
 		</part>
 	</software>
 
-	<software name="supsnap522p2" cloneof="snapshot">
+	<software name="supsnap522p2" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v5.22 v2, PAL)</description>
 		<year>1990</year>
 		<publisher>LMS Tech</publisher>

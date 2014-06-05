@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="abc80" description="Luxor ABC 80 diskettes">
 
-	<software name="cpm">
+	<software name="cpm" supported="no">
 		<description>CP/M BIOS 3.7</description>
 		<year>19??</year>
 		<publisher>Myab</publisher>

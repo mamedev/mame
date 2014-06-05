@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pyl601" description="Pyldin-601 disk images">
 
-	<software name="arch1">
+	<software name="arch1" supported="no">
 		<description>arch1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13,7 +13,7 @@
 		</part>
 	</software>
 
-	<software name="arch2">
+	<software name="arch2" supported="no">
 		<description>arch2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24,7 +24,7 @@
 		</part>
 	</software>
 
-	<software name="arch3">
+	<software name="arch3" supported="no">
 		<description>arch3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35,7 +35,7 @@
 		</part>
 	</software>
 
-	<software name="arch4">
+	<software name="arch4" supported="no">
 		<description>arch4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -46,7 +46,7 @@
 		</part>
 	</software>
 
-	<software name="arch5">
+	<software name="arch5" supported="no">
 		<description>arch5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57,7 +57,7 @@
 		</part>
 	</software>
 
-	<software name="arch6">
+	<software name="arch6" supported="no">
 		<description>arch6</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -68,7 +68,7 @@
 		</part>
 	</software>
 
-	<software name="arch7">
+	<software name="arch7" supported="no">
 		<description>arch7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -134,7 +134,7 @@
 		</part>
 	</software>
 
-	<software name="sys1">
+	<software name="sys1" supported="no">
 		<description>sys1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

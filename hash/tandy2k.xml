@@ -10,7 +10,7 @@
 
 	-->
 
-	<software name="lotus123">
+	<software name="lotus123" supported="partial">
 		<description>Lotus 1-2-3</description>
 		<year>1983</year>
 		<publisher>Lotus</publisher>
@@ -112,7 +112,7 @@
 		</part>
 	</software>
 
-	<software name="wordstar">
+	<software name="wordstar" supported="partial">
 		<description>WordStar v3.31</description>
 		<year>1984</year>
 		<publisher>MicroPro</publisher>
