@@ -1,9 +1,9 @@
 /******************************************************************************
 
-K1GE/K2GE graphics emulation
+  K1GE/K2GE graphics emulation
 
-The K1GE graphics were used in the Neogeo pocket mono; the K2GE graphics were
-used in the Neogeo pocket color.
+  The K1GE graphics were used in the Neogeo pocket mono; the K2GE graphics were
+  used in the Neogeo pocket color.
 
 ******************************************************************************/
 
@@ -41,9 +41,11 @@ PALETTE_INIT_MEMBER(k2ge_device, k2ge)
 }
 
 
-READ8_MEMBER( k1ge_device::reg_read )
+READ8_MEMBER( k1ge_device::read )
 {
-	UINT8   data = m_vram[offset & 0x7ff];
+	assert(offset < 0x4000);
+	
+	UINT8 data = m_vram[offset];
 
 	switch( offset )
 	{
@@ -58,8 +60,10 @@ READ8_MEMBER( k1ge_device::reg_read )
 }
 
 
-WRITE8_MEMBER( k1ge_device::reg_write )
+WRITE8_MEMBER( k1ge_device::write )
 {
+	assert(offset < 0x4000);
+	
 	switch( offset )
 	{
 	case 0x000:
@@ -77,7 +81,7 @@ WRITE8_MEMBER( k1ge_device::reg_write )
 		data &= 0x07;
 		break;
 	case 0x7e2:
-		if ( m_vram[0x7f0] != 0xAA )
+		if ( m_vram[0x7f0] != 0xaa )
 			return;
 		data &= 0x80;
 		break;
@@ -89,21 +93,7 @@ WRITE8_MEMBER( k1ge_device::reg_write )
 		data &= 0x0f;
 	}
 
-	m_vram[offset & 0x7ff] = data;
-}
-
-// TODO: these i/o handlers can probably be merged with the above...
-READ8_MEMBER( k1ge_device::vram_read )
-{
-	assert(offset < 0x3800);
-	return m_vram[0x800 + offset];
-}
-
-
-WRITE8_MEMBER( k1ge_device::vram_write )
-{
-	assert(offset < 0x3800);
-	m_vram[0x800 + offset] = data;
+	m_vram[offset] = data;
 }
 
 
@@ -888,7 +878,7 @@ k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const 
 }
 
 static MACHINE_CONFIG_FRAGMENT( k1ge )
-	MCFG_PALETTE_ADD("palette",  8 )
+	MCFG_PALETTE_ADD("palette", 8 )
 	MCFG_PALETTE_INIT_OWNER(k1ge_device, k1ge)
 MACHINE_CONFIG_END
 
@@ -911,7 +901,7 @@ k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_
 }
 
 static MACHINE_CONFIG_FRAGMENT( k2ge )
-	MCFG_PALETTE_ADD("palette",  4096 )
+	MCFG_PALETTE_ADD("palette", 4096 )
 	MCFG_PALETTE_INIT_OWNER(k2ge_device, k2ge)
 MACHINE_CONFIG_END
 

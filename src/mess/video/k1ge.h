@@ -1,3 +1,8 @@
+/******************************************************************************
+
+  K1GE/K2GE graphics emulation
+
+******************************************************************************/
 
 #ifndef __K2GE_H_
 #define __K2GE_H_
@@ -23,10 +28,8 @@ public:
 	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	DECLARE_READ8_MEMBER( reg_read );
-	DECLARE_WRITE8_MEMBER( reg_write );
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_PALETTE_INIT(k1ge);
 
