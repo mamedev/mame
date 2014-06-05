@@ -45,10 +45,6 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_I8257_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, I8257, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
 #define MCFG_I8257_OUT_HRQ_CB(_devcb) \
 	devcb = &i8257_device::set_out_hrq_callback(*device, DEVCB_##_devcb);
 

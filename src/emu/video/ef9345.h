@@ -15,10 +15,6 @@
 #define __EF9345_H__
 
 
-#define MCFG_EF9345_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, EF9345, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
 #define MCFG_EF9345_PALETTE(_palette_tag) \
 	ef9345_device::static_set_palette_tag(*device, "^" _palette_tag);
 

@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", vg5k_state, z80_irq, attotime::from_msec(20))
 
-	MCFG_EF9345_ADD("ef9345", "screen")
+	MCFG_DEVICE_ADD("ef9345", EF9345, 0)
 	MCFG_EF9345_PALETTE("palette")
 
 	/* video hardware */

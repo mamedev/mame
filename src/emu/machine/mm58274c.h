@@ -69,10 +69,6 @@ extern const device_type MM58274C;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_MM58274C_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MM58274C, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
 #define MCFG_MM58274C_MODE24(_mode) \
 	mm58274c_device::set_mode24(*device, _mode);
 

@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 	MCFG_PALETTE_ADD("palette", 8)
 
-	MCFG_EF9345_ADD("ef9345", "screen")
+	MCFG_DEVICE_ADD("ef9345", EF9345, 0)
 	MCFG_EF9345_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 

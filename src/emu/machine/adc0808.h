@@ -34,21 +34,6 @@
 #include "emu.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ADC0808_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, ADC0808, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define ADC0808_INTERFACE(name) \
-	const adc0808_interface (name) =
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

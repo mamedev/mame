@@ -142,10 +142,6 @@ private:
 extern const device_type K001005;
 
 
-#define MCFG_K001005_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K001005, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
 #define MCFG_K001005_TEXEL_CHIP(_tag) \
 	k001005_device::set_texel_chip(*device, _tag);
 
