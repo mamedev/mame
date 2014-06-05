@@ -6359,7 +6359,7 @@ GAME( 1980, newpuc2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT
 GAME( 1980, newpuc2b, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Newpuc2 (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, newpuckx, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "New Puck-X", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacheart, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Pac-Man (Hearts)", GAME_SUPPORTS_SAVE )
-GAME( 19??, bucaner,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Buccaneer", GAME_SUPPORTS_SAVE )
+GAME( 198?, bucaner,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Buccaneer", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )
