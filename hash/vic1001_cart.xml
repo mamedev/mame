@@ -1324,7 +1324,7 @@
 		</part>
 	</software>
 
-	<software name="fe3">
+	<software name="fe3" supported="no">
 		<description>Final Expansion 3</description>
 		<year>2011</year>
 		<publisher>Denial</publisher>
@@ -3528,7 +3528,7 @@
 		</part>
 	</software>
 
-	<software name="fp">
+	<software name="fp" supported="no">
 		<description>Vic Flash Plugin</description>
 		<year>2008</year>
 		<publisher>Marko Mäkelä</publisher>
