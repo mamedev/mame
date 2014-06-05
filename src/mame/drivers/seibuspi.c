@@ -2142,11 +2142,14 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 	/* rdftj */
 	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
 
-	/* rdftdi */
+	/* rdfta, rdftadi, rdftam, rdftit */
 	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdftu */
 	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdftauge */
+	if (space.device().safe_pc()==0x0203f6e) space.device().execute().spin_until_interrupt(); // idle
 
 //  osd_printf_debug("%08x\n",space.device().safe_pc());
 
@@ -2845,6 +2848,40 @@ ROM_START( rdftau )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region9e.u1053", 0x000000, 0x100000, CRC(7ad6f17e) SHA1(9a2cc77a4f86c00208f739bd53aca4f55adf7ea7) )
+ROM_END
+
+ROM_START( rdftauge )  /* SPI Cart "SXX2C ROM SUB2", Australia region (Tuning license - Evaluation Software For Show, Germany) ~~ SPI PCB "(C)1995 SXX2C-MAIN V2.0" */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("seibu.1.u0211", 0x000000, 0x80000, CRC(3e79da3c) SHA1(8d33da1dadb791ff97b353532ca647eb462c2ae4) )
+	ROM_LOAD32_BYTE("seibu.2.u0212", 0x000001, 0x80000, CRC(a6fbf98c) SHA1(ce0f5f6f1f5656dbac0a6b977795026276c8fa86) )
+	ROM_LOAD32_BYTE("seibu.3.u0210", 0x000002, 0x80000, CRC(ad31cc17) SHA1(12b735519cad190887cdbc6680d879f791ab3726) )
+	ROM_LOAD32_BYTE("seibu.4.u029",  0x000003, 0x80000, CRC(756d99ae) SHA1(38c234acf3e8204a29a9adb077328d37d97cfd6d) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_BYTE("seibu.5.u0423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
+	ROM_LOAD24_BYTE("seibu.6.u0424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
+	ROM_LOAD24_BYTE("seibu.7.u048",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("gun_dogs_bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
+	ROM_LOAD24_BYTE("gun_dogs_bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) )
+	ROM_LOAD24_WORD("gun_dogs_bg2-d.u0416", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) )
+	ROM_LOAD24_BYTE("gun_dogs_bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("gun_dogs_obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
+	ROM_LOAD("gun_dogs_obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
+	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("gun_dogs_pcm.u0217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
+	ROM_CONTINUE(                         0x400000, 0x100000 )
+	ROM_LOAD32_BYTE("seibu.8.u0216",      0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region9e.u1053", 0x000000, 0x100000, CRC(7ad6f17e) SHA1(9a2cc77a4f86c00208f739bd53aca4f55adf7ea7) )
@@ -3695,6 +3732,7 @@ GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, rdft,   
 GAME( 1996, rdftam,     rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters (Hong Kong)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftadi,    rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Australia)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftauge,   rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Evaluation Software For Show, Germany)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftit,     rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Italy)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, rdfta,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Austria)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
