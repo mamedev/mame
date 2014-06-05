@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
-    QL Internal Mouse Interface emulation
+    QJump/Quanta QL Internal Mouse Interface emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -15,16 +15,6 @@
 #define __QIMI__
 
 #include "emu.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define QIMI_IO_BASE            0x1bf9c
-#define QIMI_IO_LEN             0x22
-#define QIMI_IO_END             (QIMI_IO_BASE + QIMI_IO_LEN )
 
 
 
@@ -54,27 +44,32 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_READ8_MEMBER( read );
+	UINT8 read(address_space &space, offs_t offset, UINT8 data);
 	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_reset();
 
 private:
+	enum
+	{
+		ST_VERT_DIR = 0x01,
+		ST_HORZ_MOVE = 0x04,
+		ST_HORZ_DIR = 0x10,
+		ST_VERT_MOVE = 0x20
+	};
+
 	devcb_write_line m_write_extint;
 
-	required_ioport m_mousex;
-	required_ioport m_mousey;
-	required_ioport m_mouseb;
+	required_ioport m_buttons;
 
-	UINT8   m_mouse_int;
-
-	emu_timer *m_mouse_timer;
-
-	UINT8 m_ql_mouse_x;
-	UINT8 m_ql_mouse_y;
+	UINT8 m_status;
+	bool m_extint_en;
 };
 
 

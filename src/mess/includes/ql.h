@@ -63,7 +63,14 @@ public:
 		m_y7(*this, "Y7"),
 		m_joy0(*this, "JOY0"),
 		m_joy1(*this, "JOY1"),
-		m_config(*this, "config")
+		m_config(*this, "config"),
+		m_extintl(CLEAR_LINE),
+		m_keylatch(0),
+		m_ipl(0),
+		m_comdata_to_ipc(0),
+		m_baudx4(0),
+		m_qimi_enabled(false),
+		m_qimi_extint(CLEAR_LINE)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -115,6 +122,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( zx8302_raw1_r );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_raw2_w );
 	DECLARE_READ_LINE_MEMBER( zx8302_raw2_r );
+	DECLARE_WRITE_LINE_MEMBER( exp_extintl_w );
+	DECLARE_WRITE_LINE_MEMBER( qimi_extintl_w );
+
+	void update_interrupt();
+
+	int m_extintl;
 
 	// IPC
 	UINT8 m_keylatch;
@@ -124,6 +137,7 @@ public:
 
 	// QIMI
 	bool m_qimi_enabled;
+	int m_qimi_extint;
 };
 
 #endif

@@ -12,7 +12,7 @@
 
     TODO:
 
-	- QIMI/Sandy mice
+	- Sandy mouse
     - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette
@@ -124,9 +124,9 @@ READ8_MEMBER( ql_state::read )
 	{
 		exp_romoeh = 1;
 	}
-	if (m_qimi_enabled && offset >= QIMI_IO_BASE && offset <= QIMI_IO_END)
+	if (m_qimi_enabled)
 	{
-		data = m_qimi->read(space, offset - QIMI_IO_BASE);
+		data = m_qimi->read(space, offset, data);
 	}
 
 	m_cart->romoeh_w(cart_romoeh);
@@ -179,9 +179,9 @@ WRITE8_MEMBER( ql_state::write )
 	{
 		 m_zx8301->data_w(space, offset & 0x1ffff, data);
 	}
-	if (m_qimi_enabled && offset >= QIMI_IO_BASE && offset <= QIMI_IO_END)
+	if (m_qimi_enabled)
 	{
-		m_qimi->write(space, offset - QIMI_IO_BASE, data);
+		m_qimi->write(space, offset, data);
 	}
 
 	m_cart->romoeh_w(0);
@@ -722,6 +722,26 @@ READ_LINE_MEMBER( ql_state::zx8302_raw2_r )
 	return m_mdv1->data2_r() | m_mdv2->data2_r();
 }
 
+void ql_state::update_interrupt()
+{
+	m_zx8302->extint_w(m_extintl || m_qimi_extint);
+}
+
+WRITE_LINE_MEMBER( ql_state::exp_extintl_w )
+{
+	m_extintl = state;
+	update_interrupt();
+}
+
+WRITE_LINE_MEMBER( ql_state::qimi_extintl_w )
+{
+	if (m_qimi_enabled)
+	{
+		m_qimi_extint = state;
+		update_interrupt();
+	}
+}
+
 
 
 //**************************************************************************
@@ -810,11 +830,12 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, extint_w))
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(ql_state, exp_extintl_w))
 
 	MCFG_QL_ROM_CARTRIDGE_SLOT_ADD("rom", ql_rom_cartridge_cards, NULL)
 
 	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
+	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(ql_state, qimi_extintl_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder, Phill Harvey-Smith
 /**********************************************************************
 
-    QL Internal Mouse Interface emulation
+    QJump/Quanta QL Internal Mouse Interface emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -14,34 +14,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define MOUSEX_TAG              "MOUSEX"
-#define MOUSEY_TAG              "MOUSEY"
-#define MOUSEB_TAG              "MOUSEB"
-
-// Mouse bits in Sandy port order
-#define MOUSE_MIDDLE            0x02
-#define MOUSE_RIGHT             0x04
-#define MOUSE_LEFT              0x08
-#define MOUSE_DIRY              0x10
-#define MOUSE_DIRX              0x20
-#define MOUSE_INTY              0x40
-#define MOUSE_INTX              0x80
-#define MOUSE_INT_MASK          (MOUSE_INTX | MOUSE_INTY)
-
-#define QIMI_INTX               0x04
-#define QIMI_INTY               0x20
-#define QIMI_DIRX               0x10
-#define QIMI_DIRY               0x01
-#define QIMI_LEFT               0x20
-#define QIMI_RIGHT              0x10
-#define QIMI_INT_MASK           (QIMI_INTX | QIMI_INTY)
-
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -49,20 +21,68 @@ const device_type QIMI = &device_creator<qimi_t>;
 
 
 //-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( mouse_x_changed )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( qimi_t::mouse_x_changed )
+{
+	if (newval > oldval)
+	{
+		m_status |= ST_HORZ_DIR;
+	}
+	else
+	{
+		m_status &= ~ST_HORZ_DIR;
+	}
+
+	m_status |= ST_HORZ_MOVE;
+
+	if (m_extint_en)
+	{
+		m_write_extint(ASSERT_LINE);
+	}
+}
+
+
+//-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( mouse_y_changed )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( qimi_t::mouse_y_changed )
+{
+	if (newval < oldval)
+	{
+		m_status |= ST_VERT_DIR;
+	}
+	else
+	{
+		m_status &= ~ST_VERT_DIR;
+	}
+
+	m_status |= ST_VERT_MOVE;
+
+	if (m_extint_en)
+	{
+		m_write_extint(ASSERT_LINE);
+	}
+}
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( qimi )
 //-------------------------------------------------
 
 INPUT_PORTS_START( qimi )
-	PORT_START(MOUSEX_TAG)
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_START("mouse_x")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, qimi_t, mouse_x_changed, 0)
 
-	PORT_START(MOUSEY_TAG)
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_START("mouse_y")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, qimi_t, mouse_y_changed, 0)
 
-	PORT_START(MOUSEB_TAG)  /* Mouse buttons */
-	PORT_BIT( MOUSE_RIGHT, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( MOUSE_LEFT,  IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT( MOUSE_MIDDLE, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_START("mouse_buttons")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -88,9 +108,9 @@ ioport_constructor qimi_t::device_input_ports() const
 qimi_t::qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, QIMI, "QL Internal Mouse Interface", tag, owner, clock, "qimi", __FILE__),
 	m_write_extint(*this),
-	m_mousex(*this, MOUSEX_TAG),
-	m_mousey(*this, MOUSEY_TAG),
-	m_mouseb(*this, MOUSEB_TAG)
+	m_buttons(*this, "mouse_buttons"),
+	m_status(0),
+	m_extint_en(false)
 {
 }
 
@@ -103,64 +123,17 @@ void qimi_t::device_start()
 {
 	// resolve callbacks
 	m_write_extint.resolve_safe();
-
-	// allocate timer
-	m_mouse_timer = timer_alloc();
-	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-void qimi_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void qimi_t::device_reset()
 {
-	UINT8 x         = m_mousex->read();
-	UINT8 y         = m_mousey->read();
-	UINT8 do_int    = 0;
-
-	//m_mouse_int = 0;
-
-	// Set X interupt flag and direction if x has changed
-	if (x > m_ql_mouse_x)
-	{
-		m_mouse_int |= MOUSE_INTX;
-		m_mouse_int |= MOUSE_DIRX;
-	}
-	else if (x < m_ql_mouse_x)
-	{
-		m_mouse_int |= MOUSE_INTX;
-		m_mouse_int &= ~MOUSE_DIRX;
-	}
-
-	// Set Y interupt flag and direction if y has changed
-	if (y > m_ql_mouse_y)
-	{
-		m_mouse_int |= MOUSE_INTY;
-		m_mouse_int &= ~MOUSE_DIRY;
-	}
-	else if (y < m_ql_mouse_y)
-	{
-		m_mouse_int |= MOUSE_INTY;
-		m_mouse_int |= MOUSE_DIRY;
-	}
-
-	// Update saved location
-	m_ql_mouse_x = x;
-	m_ql_mouse_y = y;
-
-	// if it is a QIMI, then always do int if triggered.
-	// if this is a Sandy mouse, only trigger an int if it is enabled in the mask register
-	do_int = 1;
-
-	//logerror("m_mouse_int=%02X, MOUSE_INT_MASK=%02X, m_disk_io_byte=%02X, (m_disk_io_byte & SANDY_MOUSE_INTMASK)=%02x\n",m_mouse_int,MOUSE_INT_MASK,m_disk_io_byte,(m_disk_io_byte & SANDY_MOUSE_INTMASK));
-
-	// if mouse moved trigger external int
-	if((m_mouse_int & MOUSE_INT_MASK) && do_int)
-	{
-		m_write_extint(ASSERT_LINE);
-	}
+	m_status = 0;
+	m_extint_en = false;
 }
 
 
@@ -168,30 +141,29 @@ void qimi_t::device_timer(emu_timer &timer, device_timer_id id, int param, void 
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( qimi_t::read )
+UINT8 qimi_t::read(address_space &space, offs_t offset, UINT8 data)
 {
-	UINT8 result = 0;
-	UINT8 buttons;
-
 	switch (offset)
 	{
-		// 0x1bf9c, button status
-		case 0x00   :
-			buttons = m_mouseb->read();
-			result = ((buttons & MOUSE_RIGHT) << 2) | ((buttons & MOUSE_LEFT) << 2);
-			break;
+	// button status
+	case 0x1bf9c:
+		data = m_buttons->read();
+		break;
 
-		// 0x1bfbc, direction status
-		case 0x20   :
-			result = ((m_mouse_int & MOUSE_INTX) >> 5) | ((m_mouse_int & MOUSE_INTY) >> 1) |
-						((m_mouse_int & MOUSE_DIRX) >> 1) | ((m_mouse_int & MOUSE_DIRY) >> 4);
-			break;
-		case 0x22   :
-			m_mouse_int &= ~MOUSE_INT_MASK;
-			break;
+	// direction status
+	case 0x1bfbc:
+		data = m_status;
+		break;
+
+	case 0x1bfbe:
+		m_status &= ~(ST_VERT_MOVE | ST_HORZ_MOVE);
+		m_extint_en = true;
+
+		m_write_extint(CLEAR_LINE);
+		break;
 	}
 
-	return result;
+	return data;
 }
 
 
@@ -202,8 +174,11 @@ READ8_MEMBER( qimi_t::read )
 WRITE8_MEMBER( qimi_t::write )
 {
 	// write to 0x1bfbe resets int status
-	if (offset == 0x22)
+	if (offset == 0x1bfbe)
 	{
-		m_mouse_int = 0;
+		m_status &= ~(ST_VERT_MOVE | ST_HORZ_MOVE);
+		m_extint_en = true;
+
+		m_write_extint(CLEAR_LINE);
 	}
 }
