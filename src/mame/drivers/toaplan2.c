@@ -676,40 +676,39 @@ WRITE16_MEMBER(toaplan2_state::ghox_mcu_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT16 *toaplan2_shared_ram16 = m_shared_ram16;
-
+		data &= 0xff;
 		m_mcu_data = data;
 		if ((data >= 0xd0) && (data < 0xe0))
 		{
 			offset = ((data & 0x0f) * 2) + (0x38 / 2);
-			toaplan2_shared_ram16[offset  ] = 0x0005;   // Return address for
-			toaplan2_shared_ram16[offset-1] = 0x0056;   //   RTS instruction
+			m_shared_ram16[offset  ] = 0x0005;   // Return address for
+			m_shared_ram16[offset-1] = 0x0056;   //   RTS instruction
 		}
 		else
 		{
 			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n", space.device().safe_pcbase(), m_mcu_data);
 		}
-		toaplan2_shared_ram16[0x56 / 2] = 0x004e;   // Return a RTS instruction
-		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
+		m_shared_ram16[0x56 / 2] = 0x004e;   // Return a RTS instruction
+		m_shared_ram16[0x58 / 2] = 0x0075;
 
 		if (data == 0xd3)
 		{
-		toaplan2_shared_ram16[0x56 / 2] = 0x003a;   //  move.w  d1,d5
-		toaplan2_shared_ram16[0x58 / 2] = 0x0001;
-		toaplan2_shared_ram16[0x5a / 2] = 0x0008;   //  bclr.b  #0,d5
-		toaplan2_shared_ram16[0x5c / 2] = 0x0085;
-		toaplan2_shared_ram16[0x5e / 2] = 0x0000;
-		toaplan2_shared_ram16[0x60 / 2] = 0x0000;
-		toaplan2_shared_ram16[0x62 / 2] = 0x00cb;   //  muls.w  #3,d5
-		toaplan2_shared_ram16[0x64 / 2] = 0x00fc;
-		toaplan2_shared_ram16[0x66 / 2] = 0x0000;
-		toaplan2_shared_ram16[0x68 / 2] = 0x0003;
-		toaplan2_shared_ram16[0x6a / 2] = 0x0090;   //  sub.w   d5,d0
-		toaplan2_shared_ram16[0x6c / 2] = 0x0045;
-		toaplan2_shared_ram16[0x6e / 2] = 0x00e5;   //  lsl.b   #2,d1
-		toaplan2_shared_ram16[0x70 / 2] = 0x0009;
-		toaplan2_shared_ram16[0x72 / 2] = 0x004e;   //  rts
-		toaplan2_shared_ram16[0x74 / 2] = 0x0075;
+		m_shared_ram16[0x56 / 2] = 0x003a;   //  move.w  d1,d5
+		m_shared_ram16[0x58 / 2] = 0x0001;
+		m_shared_ram16[0x5a / 2] = 0x0008;   //  bclr.b  #0,d5
+		m_shared_ram16[0x5c / 2] = 0x0085;
+		m_shared_ram16[0x5e / 2] = 0x0000;
+		m_shared_ram16[0x60 / 2] = 0x0000;
+		m_shared_ram16[0x62 / 2] = 0x00cb;   //  muls.w  #3,d5
+		m_shared_ram16[0x64 / 2] = 0x00fc;
+		m_shared_ram16[0x66 / 2] = 0x0000;
+		m_shared_ram16[0x68 / 2] = 0x0003;
+		m_shared_ram16[0x6a / 2] = 0x0090;   //  sub.w   d5,d0
+		m_shared_ram16[0x6c / 2] = 0x0045;
+		m_shared_ram16[0x6e / 2] = 0x00e5;   //  lsl.b   #2,d1
+		m_shared_ram16[0x70 / 2] = 0x0009;
+		m_shared_ram16[0x72 / 2] = 0x004e;   //  rts
+		m_shared_ram16[0x74 / 2] = 0x0075;
 		}
 	}
 }
