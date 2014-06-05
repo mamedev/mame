@@ -22,12 +22,14 @@ public:
 		m_lumaram(*this, "lumaram"),
 		m_soundram(*this, "soundram"),
 		m_tgp_program(*this, "tgp_program"),
+		m_tgpx4_program(*this, "tgpx4_program"),
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_m1audio(*this, "m1audio"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tgp(*this, "tgp"),
 		m_dsp(*this, "dsp"),
+		m_tgpx4(*this, "tgpx4"),
 		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
@@ -43,6 +45,7 @@ public:
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
 	optional_shared_ptr<UINT32> m_tgp_program;
+	optional_shared_ptr<UINT32> m_tgpx4_program;
 
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
@@ -50,6 +53,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_tgpx4;
 	optional_device<cpu_device> m_drivecpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;

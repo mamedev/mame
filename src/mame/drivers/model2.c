@@ -119,6 +119,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86233/mb86233.h"
+#include "cpu/mb86235/mb86235.h"
 #include "cpu/z80/z80.h"
 #include "sound/2612intf.h"
 #include "includes/model2.h"
@@ -459,6 +460,8 @@ MACHINE_RESET_MEMBER(model2_state,model2c)
 	MACHINE_RESET_CALL_MEMBER(model2_common);
 	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
+	m_tgpx4->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
 	m_dsp_type = DSP_TYPE_TGPX4;
 }
 
@@ -684,11 +687,13 @@ READ32_MEMBER(model2_state::copro_prg_r)
 	return 0xffffffff;
 }
 
+
 WRITE32_MEMBER(model2_state::copro_prg_w)
 {
 	if (m_coproctl & 0x80000000)
 	{
 		logerror("copro_prg_w: %08X:   %08X\n", m_coprocnt, data);
+		m_tgpx4_program[m_coprocnt] = data;
 		m_coprocnt++;
 	}
 	else
@@ -715,12 +720,17 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 		else
 		{
 			logerror("Boot copro, %d dwords\n", m_coprocnt);
-			if (m_dsp_type != DSP_TYPE_TGPX4)
+			switch(m_dsp_type)
 			{
-				if (m_dsp_type == DSP_TYPE_SHARC)
-					m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-				else
+				case DSP_TYPE_TGP:
 					m_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					break;
+				case DSP_TYPE_SHARC:
+					m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					break;
+				case DSP_TYPE_TGPX4:
+					m_tgpx4->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					break;
 			}
 		}
 	}
@@ -2625,11 +2635,18 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( copro_tgpx4_map, AS_PROGRAM, 32, model2_state )
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
+ADDRESS_MAP_END
+
 /* 2C-CRX */
 static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2c_interrupt, "screen", 0, 1)
+
+	MCFG_CPU_ADD("tgpx4", MB86235, 40000000)
+	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
