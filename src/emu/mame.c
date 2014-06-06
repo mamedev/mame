@@ -105,7 +105,7 @@ machine_manager* machine_manager::instance()
 {
     if(!m_manager)
 	{
-        throw emu_fatalerror("machine_manager must be instanced already!");		
+        return NULL;
     }
     return m_manager;
 }
@@ -293,8 +293,8 @@ void CLIB_DECL logerror(const char *format, ...)
 -------------------------------------------------*/
 
 void CLIB_DECL vlogerror(const char *format, va_list arg)
-{
-	if (machine_manager::instance()->machine() != NULL)
+{	
+	if (machine_manager::instance()!=NULL && machine_manager::instance()->machine() != NULL)
 		machine_manager::instance()->machine()->vlogerror(format, arg);
 }
 
