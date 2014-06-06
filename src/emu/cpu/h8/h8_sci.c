@@ -63,7 +63,7 @@ READ8_MEMBER(h8_sci_device::brr_r)
 
 bool h8_sci_device::is_sync_start() const
 {
-	return (ssr & SMR_CA) && ((scr & (SCR_TE|SCR_RE)) == (SCR_TE|SCR_RE));
+	return (smr & SMR_CA) && ((scr & (SCR_TE|SCR_RE)) == (SCR_TE|SCR_RE));
 }
 
 bool h8_sci_device::has_recv_error() const
