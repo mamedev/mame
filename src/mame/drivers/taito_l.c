@@ -1767,7 +1767,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,fhawk)
