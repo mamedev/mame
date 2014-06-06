@@ -548,6 +548,10 @@ SQLITEOBJS = \
 
 $(OBJ)/libsqlite3.a: $(SQLITEOBJS)
 
+ifeq ($(TARGETOS),linux)
+LIBS += -ldl
+endif
+
 $(LIBOBJ)/sqlite3/sqlite3.o: $(LIBSRC)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 -c $< -o $@
