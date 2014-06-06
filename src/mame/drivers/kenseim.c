@@ -18,10 +18,10 @@
   |                                                                                                             |
   |                                              CN2 (20 pin)                                                   |
   | KENSEI MOGURA                                                                                               |
-  |  9401-TS280                                                                                                 |
+  |  9401-TS280                                    62381 62381                                                  |
   | TOGO JAPAN                                                                                                  |
   |                                                                                                         C   |
-  |                                                                                                         N   |
+  |           TC55257BFL                                                                                    N   |
   |                                                                                                         8   |
   |           PROGRAM ROM                                                                                 (8    |
   |            (label KENSEI                                                                               pin) |
@@ -31,23 +31,29 @@
   |                                                                                                         5   |
   |                                                                                                       (6    |
   |                                                           MB89363B                                     pin) |
-  |                    TMPZ84C011                                                                               |
+  |                    TMPZ84C011-8                                                    TLP521-4                 |
   |         16.00Mhz    (rotated 180                                                                        C   |
   |                       degress)                                                                          N   |
   |                                                                                                         4   |
   |                                                                                                       (4    |
   |                                                                                                        pin) |
-  |                  DIPSW1 DIPSW2                                                                              |
+  |                  DIPSW1 DIPSW2                                            TLP521-4                          |
   |                                                                                    LEDS4,3,2,1              |
   |                                                                                                         C   |
   |                                                                                                         N   |
   |    LEDS7,6,5                                                                                            1   |
-  |                                                                                                       (12   |
+  |                                              62064 62064 62064                     62064              (12   |
   |    CN9                                                                                                 pin) |
   |    (2*3 pin)  CN6 (2pin)                     CN7 (15 pin)          CN3 (14 pin)                             |
   |                                                                                                             |
   --------------------------------------------------------------------------------------------------------------|
 
+  TMPZ84C011 - Toshiba Z80 + CTC + custom I/O, chip is rated 8MHz
+  MB89363B   - Fujitsu 6-port I/O chip, basically two 8255. See below for more info!
+  TC55257BFL - Toshiba 32KB SRAM
+  62381      - Toshiba TD62381F, common LED driver
+  62064      - Toshiba TD62064AF, 4ch high current darlington sink driver
+  TLP521-4   - Toshiba opto-isolator
 
 
 
@@ -85,7 +91,7 @@ GND             |GROUND         | 27 | e  | GROUND         | GND            |
 GND             |GROUND         | 28 | f  | GROUND         | GND            |
 ----------------|------------------------------------------|----------------|
 
-CN1 - 12 pin connector, various cabinnet inputs / outputs
+CN1 - 12 pin connector, various cabinet inputs / outputs
 
 2P Start Lamp | 1
 1P Start Lamp | 2
@@ -533,9 +539,6 @@ READ8_MEMBER(kenseim_state::portd_r)
 
 static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-
-//	AM_RANGE(0x8000, 0x81ff) AM_RAM // ? size unknown, code just wipes ram until the compare fails
-
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -558,7 +561,7 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 
 static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
-	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011 - divider unknown
+	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
 	//MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w)) // unused?
@@ -573,7 +576,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	//MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r)) // unused?
 	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
 
-	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84?
+	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
 	
 	// the MB89363B seems to be 2 * i8255?
