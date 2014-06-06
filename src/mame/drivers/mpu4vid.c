@@ -1507,7 +1507,7 @@ Characteriser (CHR)
 WRITE16_MEMBER(mpu4vid_state::characteriser16_w )
 {
 	int x;
-	int call=data;
+	int call=(data&0xff);
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space.device().safe_pcbase(),offset,data));
 
 	if (!m_current_chr_table)
@@ -1577,7 +1577,7 @@ Precedent suggests this is not that dangerous an assumption to make.
 WRITE16_MEMBER(mpu4vid_state::bwb_characteriser16_w )
 {
 	int x;
-	int call=data &0xff;
+	int call=(data &0xff);
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space.device().safe_pcbase(),offset,data));
 	if (!m_current_chr_table)
 	{
