@@ -368,11 +368,13 @@ GFXDECODE_END
 void _3x3puzzle_state::machine_start()
 {
 	save_item(NAME(m_oki_bank));
+	save_item(NAME(m_gfx_control));
 }
 
 void _3x3puzzle_state::machine_reset()
 {
 	m_oki_bank = 0;
+	m_gfx_control = 0;
 }
 
 
@@ -497,6 +499,6 @@ ROM_END
 
 
 
-GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", 0 ) // 1998. 5. 28
-GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", 0 ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "<unknown>",           "Casanova", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", GAME_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", GAME_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "<unknown>",           "Casanova", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
