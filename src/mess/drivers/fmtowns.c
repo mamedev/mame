@@ -1045,16 +1045,16 @@ READ8_MEMBER(towns_state::towns_padport_r)
 			switch(m_towns_mouse_output)
 			{
 				case MOUSE_X_HIGH:
-					ret |= ((m_towns_mouse_x & 0xf0));
+					ret |= ((m_towns_mouse_x & 0xf0) >> 4);
 					break;
 				case MOUSE_X_LOW:
-					ret |= ((m_towns_mouse_x & 0x0f));
+					ret |= (m_towns_mouse_x & 0x0f);
 					break;
 				case MOUSE_Y_HIGH:
-					ret |= ((m_towns_mouse_y & 0xf0));
+					ret |= ((m_towns_mouse_y & 0xf0) >> 4);
 					break;
 				case MOUSE_Y_LOW:
-					ret |= ((m_towns_mouse_y & 0x0f));
+					ret |= (m_towns_mouse_y & 0x0f);
 					break;
 				case MOUSE_START:
 				case MOUSE_SYNC:
