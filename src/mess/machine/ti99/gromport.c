@@ -1144,7 +1144,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	if (m_pcb->m_grom_size > 0)
 	{
 		regg = memregion(CARTGROM_TAG);
-		grom_ptr = m_softlist? get_software_region("grom_socket") : (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
+		grom_ptr = m_softlist? get_software_region("grom_socket") : m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 		m_pcb->m_grom_ptr = regg->base();   // for gromemu
 		m_pcb->m_grom_address = 0;          // for gromemu
@@ -1162,7 +1162,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	{
 		if (VERBOSE>6) LOG("gromport: rom_socket.size=0x%04x\n", m_pcb->m_rom_size);
 		regr = memregion(CARTROM_TAG);
-		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
+		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), m_pcb->m_rom_ptr, m_pcb->m_rom_size);
 		// Set both pointers to the same region for now
 		m_pcb->m_rom_ptr = m_pcb->m_rom2_ptr = regr->base();
@@ -1173,7 +1173,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	{
 		// sizes do not differ between rom and rom2
 		regr2 = memregion(CARTROM2_TAG);
-		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
+		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : m_rpk->get_contents_of_socket("rom2_socket");
 		memcpy(regr2->base(), m_pcb->m_rom2_ptr, rom2_length);
 		m_pcb->m_rom2_ptr = regr2->base();
 	}
@@ -1185,7 +1185,7 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->m_ram_size > 0)
 		{
 			// TODO: Consider to use a region as well. If so, do not forget to memcpy.
-			m_pcb->m_ram_ptr = (UINT8*)m_rpk->get_contents_of_socket("ram_socket");
+			m_pcb->m_ram_ptr = m_rpk->get_contents_of_socket("ram_socket");
 		}
 	}
 }
@@ -2076,7 +2076,7 @@ rpk::~rpk()
 /*
     Deliver the contents of the socket by name of the socket.
 */
-void* rpk::get_contents_of_socket(const char *socket_name)
+UINT8* rpk::get_contents_of_socket(const char *socket_name)
 {
 	rpk_socket *socket = m_sockets.find(socket_name);
 	if (socket==NULL) return NULL;
@@ -2123,12 +2123,12 @@ void rpk::close()
     not a network socket)
 ***************************************************************/
 
-rpk_socket::rpk_socket(const char* id, int length, void* contents, const char *pathname)
+rpk_socket::rpk_socket(const char* id, int length, UINT8* contents, const char *pathname)
 : m_id(id), m_length(length), m_next(NULL), m_contents(contents), m_pathname(pathname)
 {
 };
 
-rpk_socket::rpk_socket(const char* id, int length, void* contents)
+rpk_socket::rpk_socket(const char* id, int length, UINT8* contents)
 : m_id(id), m_length(length), m_next(NULL), m_contents(contents), m_pathname(NULL)
 {
 };
@@ -2171,7 +2171,7 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 	zip_error ziperr;
 	UINT32 crc;
 	int length;
-	void* contents;
+	UINT8* contents;
 	const zip_file_header *header;
 
 	// find the file attribute (required)
@@ -2197,7 +2197,7 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 	length = header->uncompressed_length;
 
 	// Allocate storage
-	contents = malloc(length);
+	contents = global_alloc_array_clear(UINT8, length);
 	if (contents==NULL) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
 	// and unzip file from the zip file
@@ -2231,7 +2231,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 	const char* ram_filename;
 	const char* ram_pname;
 	int length;
-	void* contents;
+	UINT8* contents;
 
 	// find the length attribute
 	length_string = xml_get_attribute_string(ram_resource_node, "length", NULL);
@@ -2259,7 +2259,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 	}
 
 	// Allocate memory for this resource
-	contents = malloc(length);
+	contents = global_alloc_array_clear(UINT8, length);
 	if (contents==NULL) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
 	if (VERBOSE>6) LOG("gromport/RPK: Allocating RAM buffer (%d bytes) for socket '%s'\n", length, socketname);
@@ -2278,7 +2278,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 			ram_filename = xml_get_attribute_string(ram_resource_node, "file", NULL);
 			if (ram_filename==NULL)
 			{
-				free(contents);
+				global_free_array(contents);
 				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
 			}
 			astring ram_pathname(system_name, PATH_SEPARATOR, ram_filename);

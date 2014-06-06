@@ -406,22 +406,22 @@ class rpk_socket
 	friend class rpk;
 
 public:
-	rpk_socket(const char *id, int length, void *contents);
-	rpk_socket(const char *id, int length, void *contents, const char *pathname);
+	rpk_socket(const char *id, int length, UINT8 *contents);
+	rpk_socket(const char *id, int length, UINT8 *contents, const char *pathname);
 
 	const char*     id() { return m_id; }
 	int             get_content_length() { return m_length; }
-	void*           get_contents() { return m_contents; }
+	UINT8*          get_contents() { return m_contents; }
 	bool            persistent_ram() { return m_pathname != NULL; }
 	const char*     get_pathname() { return m_pathname; }
-	void            cleanup() { if (m_contents != NULL) free(m_contents); }
+	void            cleanup() { if (m_contents != NULL) global_free_array(m_contents); }
 
 private:
-	const char      *m_id;
+	const char*     m_id;
 	UINT32          m_length;
-	rpk_socket      *m_next;
-	void            *m_contents;
-	const char      *m_pathname;
+	rpk_socket*     m_next;
+	UINT8*          m_contents;
+	const char*     m_pathname;
 };
 
 class rpk_reader
@@ -447,7 +447,7 @@ public:
 	~rpk();
 
 	int         get_type(void) { return m_type; }
-	void*       get_contents_of_socket(const char *socket_name);
+	UINT8*      get_contents_of_socket(const char *socket_name);
 	int         get_resource_length(const char *socket_name);
 	void        close();
 
