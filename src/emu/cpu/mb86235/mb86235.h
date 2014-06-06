@@ -11,13 +11,13 @@
 #ifndef __MB86235_H__
 #define __MB86235_H__
 
+#if 0
 enum
 {
-	#if 0
 	MB86235_R0=1, MB86235_R1, MB86235_R2, MB86235_R3,
 	MB86235_R4, MB86235_R5, MB86235_R6, MB86235_R7
-	#endif
 };
+#endif
 
 
 class mb86235_cpu_device :  public cpu_device
