@@ -31,8 +31,8 @@
 #include <assert.h>
 
 #define LUA_LIB
-#include "..\lua.h"
-#include "..\lauxlib.h"
+#include "lua/lua.h"
+#include "lua/lauxlib.h"
 
 #if LUA_VERSION_NUM > 501
 //
@@ -47,7 +47,7 @@
 #define luaL_openlib(L,name,reg,nup) luaL_setfuncs(L,reg,nup)
 #endif
 
-#include "sqlite3\sqlite3.h"
+#include "sqlite3/sqlite3.h"
 
 /* compile time features */
 #if !defined(SQLITE_OMIT_PROGRESS_CALLBACK)
