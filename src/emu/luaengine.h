@@ -23,30 +23,25 @@ class lua_engine
 {
 public:
 	// construction/destruction
-	lua_engine(running_machine &machine);
+	lua_engine();
 	~lua_engine();
 
-	// getters
-	running_machine &machine() const { return m_machine; }
-
 	void initialize();
-	void lua_execute();
-	void report_errors(int status);
-
-	void createvm();
 	void execute(const char *filename);
 	void execute_string(const char *value);
 	void close();
 
-	//static
-	static int emu_gamename(lua_State *L);
-	static int emu_keypost(lua_State *L);
+	void serve_lua();
+private:	
+	int report(int status);
+	int docall(int narg, int nres);
+	const char *get_prompt(int firstline);
+	int incomplete(int status) ;
+	int pushline(int firstline);
+	int loadline();
 private:
 	// internal state
-	running_machine &   m_machine;                          // reference to our machine
 	lua_State*          m_lua_state;
-
-	static lua_engine*  luaThis;
 };
 
 #endif  /* __LUA_ENGINE_H__ */

@@ -175,6 +175,7 @@ enum
 #define OPTION_HTTP                 "http"
 #define OPTION_HTTP_PORT            "http_port"
 #define OPTION_HTTP_PATH            "http_path"
+#define OPTION_CONSOLE              "console"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -333,6 +334,7 @@ public:
 	bool http() const { return bool_value(OPTION_HTTP); }
 	const char *http_port() const { return value(OPTION_HTTP_PORT); }
 	const char *http_path() const { return value(OPTION_HTTP_PATH); }
+	bool console() const { return bool_value(OPTION_CONSOLE); }
 
 	// device-specific options
 	const char *device_option(device_image_interface &image);

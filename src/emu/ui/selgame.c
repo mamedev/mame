@@ -158,7 +158,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
 		{
-			mame_schedule_new_driver(*driver);
+			machine().manager().schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
 			ui_menu::stack_reset(machine());
 		}

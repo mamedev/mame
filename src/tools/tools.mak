@@ -64,10 +64,6 @@ TOOLS += \
 	pngcmp$(EXE) \
 	nltool$(EXE) \
 
-ifdef USE_SQLITE
-TOOLS += sqlite3$(EXE)
-endif
-
 
 #-------------------------------------------------
 # romcmp
@@ -225,17 +221,3 @@ nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-#-------------------------------------------------
-# SQLite3
-#-------------------------------------------------
-
-SQLITESHELLOBJS = \
-	$(LIBOBJ)/sqlite3/shell.o
-
-sqlite3$(EXE): $(SQLITESHELLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(SQLITE3_LIB)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-$(LIBOBJ)/sqlite3/shell.o: $(LIBSRC)/sqlite3/shell.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@ -DUSE_SYSTEM_SQLITE=0 -Wno-write-strings

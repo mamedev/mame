@@ -150,14 +150,15 @@ class running_machine
 
 public:
 	// construction/destruction
-	running_machine(const machine_config &config, osd_interface &osd);
+	running_machine(const machine_config &config, machine_manager &manager);
 	~running_machine();
 
 	// getters
 	const machine_config &config() const { return m_config; }
 	device_t &root_device() const { return m_config.root_device(); }
 	const game_driver &system() const { return m_system; }
-	osd_interface &osd() const { return m_osd; }
+	osd_interface &osd() const { return m_manager.osd(); }
+	machine_manager &manager() const { return m_manager; }
 	resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
@@ -276,8 +277,7 @@ private:
 	// internal state
 	const machine_config &  m_config;               // reference to the constructed machine_config
 	const game_driver &     m_system;               // reference to the definition of the game machine
-	osd_interface &         m_osd;                  // reference to OSD system
-
+	machine_manager &       m_manager;              // reference to machine manager system
 	// managers
 	auto_pointer<cheat_manager> m_cheat;            // internal data from cheat.c
 	auto_pointer<render_manager> m_render;          // internal data from render.c
@@ -358,7 +358,6 @@ private:
 	ioport_manager          m_ioport;               // I/O port manager
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer               *m_autoboot_timer;      // autoboot timer
-	lua_engine              m_lua_engine;           // LUA engine
 };
 
 

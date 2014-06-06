@@ -20,6 +20,7 @@
 
 #include <time.h>
 
+#include "webengine.h"
 
 
 //**************************************************************************
@@ -74,6 +75,43 @@ public:
 };
 
 
+// ======================> machine_manager
+
+class machine_manager
+{
+	DISABLE_COPYING(machine_manager);
+private:
+	// construction/destruction
+	machine_manager(emu_options &options, osd_interface &osd);
+public:
+	static machine_manager *instance(emu_options &options, osd_interface &osd);
+	static machine_manager *instance();
+	~machine_manager();
+
+	osd_interface &osd() const { return m_osd; }
+	emu_options &options() const { return m_options; }
+	web_engine *web() { return &m_web; }
+	lua_engine *lua() { return &m_lua; }
+	
+	running_machine *machine() { return m_machine; }
+
+	void set_machine(running_machine *machine) { m_machine = machine; }
+	
+	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
+	int execute();
+	void schedule_new_driver(const game_driver &driver);
+private:
+	osd_interface &         m_osd;                  // reference to OSD system
+	emu_options &           m_options;              // reference to options
+	
+	web_engine 				m_web;
+	lua_engine 		  		m_lua;
+	
+	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver	
+	
+	running_machine *m_machine;	
+	static machine_manager* m_manager;	
+};
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -87,13 +125,6 @@ extern const char build_version[];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-
-/* ----- core system management ----- */
-
-/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
-int mame_execute(emu_options &options, osd_interface &osd);
-
-void mame_schedule_new_driver(const game_driver &driver);
 /* ----- miscellaneous bits & pieces ----- */
 
 // pop-up a user visible message

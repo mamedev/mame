@@ -110,7 +110,7 @@ static char giant_string_buffer[65536] = { 0 };
 //  running_machine - constructor
 //-------------------------------------------------
 
-running_machine::running_machine(const machine_config &_config, osd_interface &osd)
+running_machine::running_machine(const machine_config &_config, machine_manager &manager)
 	: firstcpu(NULL),
 		primary_screen(NULL),
 		debug_flags(0),
@@ -120,7 +120,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		generic_machine_data(NULL),
 		m_config(_config),
 		m_system(_config.gamedrv()),
-		m_osd(osd),
+		m_manager(manager),
 		m_current_phase(MACHINE_PHASE_PREINIT),
 		m_paused(false),
 		m_hard_reset_pending(false),
@@ -137,8 +137,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_save(*this),
 		m_memory(*this),
 		m_ioport(*this),
-		m_scheduler(*this),
-		m_lua_engine(*this)
+		m_scheduler(*this)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
@@ -196,13 +195,13 @@ const char *running_machine::describe_context()
 TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 {
 	if (strlen(options().autoboot_script())!=0) {
-		m_lua_engine.execute(options().autoboot_script());
+		manager().lua()->execute(options().autoboot_script());
 	}
 	if (strlen(options().autoboot_command())!=0) {
 		astring cmd = astring(options().autoboot_command());
 		cmd.replace("'","\\'");
 		astring val = astring("emu.keypost('",cmd,"')");
-		m_lua_engine.execute_string(val);
+		manager().lua()->execute_string(val);
 	}
 }
 
@@ -223,7 +222,7 @@ void running_machine::start()
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
 	// init the osd layer
-	m_osd.init(*this);
+	m_manager.osd().init(*this);
 
 	// create the video manager
 	m_video.reset(global_alloc(video_manager(*this)));
@@ -293,9 +292,6 @@ void running_machine::start()
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
-
-	// initialize lua
-	m_lua_engine.initialize();
 }
 
 

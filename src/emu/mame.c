@@ -84,32 +84,67 @@
 #include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"
-#include "webengine.h"
 #include <time.h>
 
+//**************************************************************************
+//  MACHINE MANAGER
+//**************************************************************************
+
+machine_manager* machine_manager::m_manager = NULL;
+
+machine_manager* machine_manager::instance(emu_options &options,osd_interface &osd)
+{
+    if(!m_manager)
+	{
+        m_manager = global_alloc(machine_manager(options,osd));
+    }
+    return m_manager;
+}
+
+machine_manager* machine_manager::instance()
+{
+    if(!m_manager)
+	{
+        throw emu_fatalerror("machine_manager must be instanced already!");		
+    }
+    return m_manager;
+}
+
+//-------------------------------------------------
+//  machine_manager - constructor
+//-------------------------------------------------
+
+machine_manager::machine_manager(emu_options &options,osd_interface &osd)
+       : m_osd(osd),
+	   m_options(options),
+	   m_web(options),
+	   m_new_driver_pending(NULL)
+{
+}
+
+
+//-------------------------------------------------
+//  ~machine_manager - destructor
+//-------------------------------------------------
+
+machine_manager::~machine_manager()
+{
+}
 
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* started empty? */
-static bool started_empty;
-
-static running_machine *global_machine;
-
-const game_driver *     new_driver_pending = NULL;   // pointer to the next pending driver
-
 //-------------------------------------------------
 //  mame_schedule_new_driver - schedule a new game to
 //  be loaded
 //-------------------------------------------------
 
-void mame_schedule_new_driver(const game_driver &driver)
+void machine_manager::schedule_new_driver(const game_driver &driver)
 {
-	new_driver_pending = &driver;
+	m_new_driver_pending = &driver;
 }
-
 
 
 /***************************************************************************
@@ -117,11 +152,13 @@ void mame_schedule_new_driver(const game_driver &driver)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mame_execute - run the core emulation
+    execute - run the core emulation
 -------------------------------------------------*/
 
-int mame_execute(emu_options &options, osd_interface &osd)
+int machine_manager::execute()
 {
+	bool started_empty = false;
+
 	bool firstgame = true;
 	bool firstrun = true;
 
@@ -129,14 +166,15 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
 
-	web_engine web(options);
-
+	if (m_options.console()) {
+		m_lua.initialize();
+	}
 	while (error == MAMERR_NONE && !exit_pending)
 	{
-		new_driver_pending = NULL;
+		m_new_driver_pending = NULL;
 
 		// if no driver, use the internal empty driver
-		const game_driver *system = options.system();
+		const game_driver *system = m_options.system();
 		if (system == NULL)
 		{
 			system = &GAME_NAME(___empty);
@@ -147,58 +185,57 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		firstgame = false;
 
 		// parse any INI files as the first thing
-		if (options.read_config())
+		if (m_options.read_config())
 		{
-			options.revert(OPTION_PRIORITY_INI);
+			m_options.revert(OPTION_PRIORITY_INI);
 			astring errors;
-			options.parse_standard_inis(errors);
+			m_options.parse_standard_inis(errors);
 		}
 
 		// otherwise, perform validity checks before anything else
 		if (system != NULL)
 		{
-			validity_checker valid(options);
+			validity_checker valid(m_options);
 			valid.check_shared_source(*system);
 		}
 
 		// create the machine configuration
-		machine_config config(*system, options);
+		machine_config config(*system, m_options);
 
 		// create the machine structure and driver
-		running_machine machine(config, osd);
+		running_machine machine(config, *this);
 
-		// looooong term: remove this
-		global_machine = &machine;
+		set_machine(&machine);
 
-		web.set_machine(machine);
-		web.push_message("update_machine");
+		m_web.set_machine(machine);
+		m_web.push_message("update_machine");
 
 		// run the machine
 		error = machine.run(firstrun);
 		firstrun = false;
 
 		// check the state of the machine
-		if (new_driver_pending)
+		if (m_new_driver_pending)
 		{
-			astring old_system_name(options.system_name());
-			options.set_system_name(new_driver_pending->name);
+			astring old_system_name(m_options.system_name());
+			m_options.set_system_name(m_new_driver_pending->name);
 			astring error_string;
-			if (old_system_name != options.system_name()) {
-				options.remove_device_options();
-				options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
+			if (old_system_name != m_options.system_name()) {
+				m_options.remove_device_options();
+				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			firstrun = true;
 		} 
 		else 
 		{
-			if (machine.exit_pending()) options.set_system_name("");
+			if (machine.exit_pending()) m_options.set_system_name("");
 		}
 		
 		if (machine.exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))
 			exit_pending = true;
 
 		// machine will go away when we exit scope
-		global_machine = NULL;
+		set_machine(NULL);
 	}
 	// return an error
 	return error;
@@ -217,7 +254,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 {
 	// if the format is NULL, it is a signal to clear the popmessage
 	if (format == NULL)
-		global_machine->ui().popup_time(0, " ");
+		machine_manager::instance()->machine()->ui().popup_time(0, " ");
 
 	// otherwise, generate the buffer and call the UI to display the message
 	else
@@ -231,7 +268,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 		va_end(arg);
 
 		// pop it in the UI
-		global_machine->ui().popup_time(temp.len() / 40 + 2, "%s", temp.cstr());
+		machine_manager::instance()->machine()->ui().popup_time(temp.len() / 40 + 2, "%s", temp.cstr());
 	}
 }
 
@@ -257,7 +294,7 @@ void CLIB_DECL logerror(const char *format, ...)
 
 void CLIB_DECL vlogerror(const char *format, va_list arg)
 {
-	if (global_machine != NULL)
-		global_machine->vlogerror(format, arg);
+	if (machine_manager::instance()->machine() != NULL)
+		machine_manager::instance()->machine()->vlogerror(format, arg);
 }
 

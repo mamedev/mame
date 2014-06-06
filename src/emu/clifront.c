@@ -239,7 +239,9 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			// otherwise just run the game
-			m_result = mame_execute(m_options, m_osd);
+			machine_manager *manager = machine_manager::instance(m_options, m_osd);
+			m_result = manager->execute();
+			global_free(manager);
 		}
 	}
 

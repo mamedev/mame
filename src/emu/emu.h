@@ -97,9 +97,9 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "luaengine.h"
 
 // the running machine
+#include "mame.h"
 #include "machine.h"
 #include "driver.h"
-#include "mame.h"
 
 // video-related
 #include "drawgfx.h"
