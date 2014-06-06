@@ -139,13 +139,13 @@ ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type
 }
 
 ql_trump_card_256k_t::ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_256K, "QL Trump Card 256K", tag, owner, clock, "ql_trump", __FILE__, 256*1024) { }
+	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_256K, "QL Trump Card 256K", tag, owner, clock, "ql_trump256", __FILE__, 256*1024) { }
 
 ql_trump_card_512k_t::ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_512K, "QL Trump Card 512K", tag, owner, clock, "ql_trump", __FILE__, 512*1024) { }
+	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_512K, "QL Trump Card 512K", tag, owner, clock, "ql_trump512", __FILE__, 512*1024) { }
 
 ql_trump_card_768k_t::ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_768K, "QL Trump Card 768K", tag, owner, clock, "ql_trump", __FILE__, 768*1024) { }
+	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_768K, "QL Trump Card 768K", tag, owner, clock, "ql_trump768", __FILE__, 768*1024) { }
 
 
 //-------------------------------------------------
