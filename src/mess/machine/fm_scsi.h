@@ -75,6 +75,7 @@ private:
 	static const device_timer_id TIMER_PHASE = 1;
 
 	int get_scsi_cmd_len(UINT8 cbyte);
+	void stop_transfer();
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;

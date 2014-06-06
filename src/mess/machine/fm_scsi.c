@@ -71,6 +71,9 @@ void fmscsi_device::device_reset()
 	m_target = 0;
 	m_result_length = 0;
 	m_result_index = 0;
+	stop_transfer();
+	set_input_line(FMSCSI_LINE_INT,0);
+	m_irq_handler(0);
 
 	m_phase = SCSI_PHASE_BUS_FREE;
 }
@@ -109,6 +112,17 @@ void fmscsi_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
+void fmscsi_device::stop_transfer()
+{
+	m_transfer_timer->adjust(attotime::never);  // stop timer
+	m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
+	if(m_output_lines & FMSCSI_LINE_DMAE)
+	{
+		m_drq_handler(0);
+	}
+	logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
+}
+
 UINT8 fmscsi_device::fmscsi_data_r(void)
 {
 	// read from data bus
@@ -126,13 +140,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 		if(m_result_index >= m_result_length)
 		{
 			// end of data transfer
-			m_transfer_timer->adjust(attotime::never);  // stop timer
-			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
-			if(m_output_lines & FMSCSI_LINE_DMAE)
-			{
-				m_drq_handler(0);
-			}
-			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
+			stop_transfer();
 		}
 		return m_data;
 	}
@@ -147,7 +155,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 
 	if(m_phase == SCSI_PHASE_STATUS)
 	{
-		m_data = 0;  // GOOD status
+		m_data = get_status();
 		// no command complete message?
 		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_MESSAGE_IN);
 		m_command_index = 0;
@@ -210,10 +218,7 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 			send_command(m_command,m_command_index);
 			m_result_length = get_length();
 			phase = legacy_scsi_host_adapter::get_phase();
-			if(m_command[0] == 1)  // rezero unit command - not implemented in SCSI code
-				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
-			else
-				m_phase_timer->adjust(attotime::from_usec(800),phase);
+			m_phase_timer->adjust(attotime::from_usec(800),phase);
 
 			logerror("FMSCSI: Command %02x sent, result length = %i\n",m_command[0],m_result_length);
 		}
@@ -264,7 +269,7 @@ void fmscsi_device::set_phase(int phase)
 		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
 		read_data(m_buffer,512);
 		m_result_index = 0;
-		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
+		logerror("FMSCSI: Starting transfer in (%i)\n",m_result_length);
 		break;
 	case SCSI_PHASE_DATAOUT:
 		set_input_line(FMSCSI_LINE_CD,0);
@@ -274,7 +279,7 @@ void fmscsi_device::set_phase(int phase)
 		// start transfer timer
 		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
 		m_result_index = 0;
-		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
+		logerror("FMSCSI: Starting transfer out (%i)\n",m_result_length);
 		break;
 	case SCSI_PHASE_MESSAGE_IN:
 		set_input_line(FMSCSI_LINE_CD,1);
