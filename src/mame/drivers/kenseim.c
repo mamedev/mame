@@ -185,18 +185,6 @@ public:
 	WRITE8_MEMBER(i8255_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(i8255_portf_w); // maybe strobe output?
 
-
-	DECLARE_READ8_MEMBER(i8255_porta_default_r) { logerror("%s i8255 read port A but no handler assigned\n", machine().describe_context()); return 0xff; }
-	DECLARE_READ8_MEMBER(i8255_portb_default_r) { logerror("%s i8255 read port B but no handler assigned\n", machine().describe_context()); return 0xff; }
-	DECLARE_READ8_MEMBER(i8255_portc_default_r) { logerror("%s i8255 read port C but no handler assigned\n", machine().describe_context()); return 0xff; }
-
-
-	DECLARE_READ8_MEMBER(i8255_portf_default_r) { logerror("%s i8255 read port F but no handler assigned\n", machine().describe_context()); return 0xff; }
-
-	DECLARE_WRITE8_MEMBER(i8255_portd_default_w) { logerror("%s i8255 write %02x to port D but no handler assigned\n", machine().describe_context(), data); }
-	DECLARE_WRITE8_MEMBER(i8255_porte_default_w) { logerror("%s i8255 write %02x to port E but no handler assigned\n", machine().describe_context(), data); }
-
-
 	// unused based on port direction assignments
 	//DECLARE_READ8_MEMBER(porte_default_r) { logerror("%s read port E but no handler assigned\n", machine().describe_context()); return 0xff; }
 	//DECLARE_WRITE8_MEMBER(porta_default_w) { logerror("%s write %02x to port A but no handler assigned\n", machine().describe_context(), data); }
@@ -207,7 +195,6 @@ public:
 	UINT8 m_to_68k_cmd_req;
 	UINT8 m_to_68k_cmd_LVm;
 	
-	UINT8 m_to_68k_cmd_flags;
 
 	int m_from68k_ack;
 	int m_from68k_st4;
@@ -279,6 +266,8 @@ WRITE8_MEMBER(kenseim_state::i8255_portc_w)
 // i8255 ports D and E tend to be used together in the code, and the input gets masked with 6 bits (0x3f)
 READ8_MEMBER(kenseim_state::i8255_portd_r)
 {
+	return 0xff;
+	
 	logerror("%s i8255 read port D (mole matrix / sensors input 1?)\n", machine().describe_context());
 	static int i = 0;
 	i++;
@@ -290,6 +279,8 @@ READ8_MEMBER(kenseim_state::i8255_portd_r)
 
 READ8_MEMBER(kenseim_state::i8255_porte_r)
 {
+	return 0xff;
+	
 	logerror("%s i8255 read port E (mole matrix / sensors input 2?)\n", machine().describe_context());
 	static int i = 0;
 	i++;
@@ -301,18 +292,18 @@ READ8_MEMBER(kenseim_state::i8255_porte_r)
 
 WRITE8_MEMBER(kenseim_state::i8255_porta_w) // maybe molesa output? (6-bits?)
 {
-	logerror("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+	//logerror("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
 } 
 
 WRITE8_MEMBER(kenseim_state::i8255_portb_w) // maybe molesb output? (6-bits?)
 {
-	logerror("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+	//logerror("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(kenseim_state::i8255_portf_w)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
-	logerror("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+	//logerror("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
 }
 
 
@@ -369,18 +360,17 @@ CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_5678_r)
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_9_r)
 {
-	return (m_to_68k_cmd_d9 & 0x1); // bit 9 of command?
+	return m_to_68k_cmd_d9; // bit 9 of command?
 }
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_req_r)
 {
-	logerror("%s kenseim_cmd_req_r\n", machine().describe_context());
+	//logerror("%s kenseim_cmd_req_r\n", machine().describe_context());
 	return m_to_68k_cmd_req;
 }
 
 CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_LVm_r)
 {
-	// needed for COMMAND WAIT message..
 	return m_to_68k_cmd_LVm;;
 }
 
@@ -404,7 +394,7 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 		m_from68k_st2 = (data & 0x0400) >> 10;
 		m_from68k_st3 = (data & 0x0800) >> 11;
 	
-		printf("%s cps1_kensei_w offs %04x (from 68k to DRIVE BOARD via CN2) (%02x) (%d ACK,  %d ST4,  %d ST2,  %d ST3) \n", machine().describe_context(), offset * 2, data, m_from68k_ack, m_from68k_st4, m_from68k_st2, m_from68k_st3 );
+		//printf("%s cps1_kensei_w offs %04x (from 68k to DRIVE BOARD via CN2) (%02x) (%d ACK,  %d ST4,  %d ST2,  %d ST3) \n", machine().describe_context(), offset * 2, data, m_from68k_ack, m_from68k_st4, m_from68k_st2, m_from68k_st3 );
 
 	}
 	else
@@ -420,23 +410,19 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 WRITE8_MEMBER(kenseim_state::portd_w)
 {
 	// port direction is set to 4-in 4-out
-	m_to_68k_cmd_flags = data & 0xf;
-
-	// bit 0x4, 0x02 bit 0x1 used.
-	// wrong
-
-	m_to_68k_cmd_req = (m_to_68k_cmd_flags&0x2)>>1;
-	m_to_68k_cmd_LVm = ((m_to_68k_cmd_flags & 0x4) >> 2) ^ 1;
-	m_to_68k_cmd_d9 = (m_to_68k_cmd_flags&0x1)>>0;
-
-	printf("%s write %01x to port D (%02x unmasked) (from DRIVE BOARD to 68k command flags?)\n", machine().describe_context(), data & 0x0f, data) ;
+	// d0: D9
+	// d1: REQ
+	// d2: LVm
+	// d3: N/C
+	m_to_68k_cmd_d9 = data >> 0 & 1;
+	m_to_68k_cmd_req = data >> 1 & 1;
+	m_to_68k_cmd_LVm = data >> 2 & 1;
 }
 
 WRITE8_MEMBER(kenseim_state::porte_w)
 {
-	// only access is at 0ABE, surrounded by port D reads / writes
+	// DT1-DT8
 	m_to_68k_cmd_low = data;
-	printf("%s write %02x to port E (from DRIVE BOARD to 68k command bits?)\n", machine().describe_context(), data);
 }
 
 /* Z80 side COMMS reads */
@@ -444,21 +430,11 @@ WRITE8_MEMBER(kenseim_state::porte_w)
 READ8_MEMBER(kenseim_state::portd_r)
 {
 	// port direction is set to 4-in 4-out
-//	int ret = rand() & 0xf0;
-
-	int ret;
-
-	int in10 = m_from68k_ack; // loop at 0x929 - 0x92e waits for this to be 0
-	int in80 = m_from68k_st4; // loop at 0x931 - 0x936 then waits for this to be 1
-
-	int in20 = m_from68k_st3;
-	int in40 = m_from68k_st2;
-
-	ret = (in10 << 4) | (in20 << 5) | (in40 << 6) | (in80 << 7);
-
-	// comms port maybe? checks for 0x10 (bit 4,a) to be clear in a tight loop (092B) then for bit 0x80 to be set in another tight loop  (0933) then at (0947) it checks that bits 0xe0 aren't set.
-	logerror("%s read port D (returning %02x)\n", machine().describe_context(), ret);
-	return ret;
+	// d4: ACK
+	// d5: ST2
+	// d6: ST3
+	// d7: ST4
+	return (m_from68k_ack << 4) | (m_from68k_st2 << 5) | (m_from68k_st3 << 6) | (m_from68k_st4 << 7);
 }
 
 
@@ -581,19 +557,15 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	
 	// the MB89363B seems to be 2 * i8255?
 	MCFG_DEVICE_ADD("i8255", I8255, 0) // MB89363B!
-	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_porta_default_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_portb_default_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portc_default_r))
+	// always $80: all ports set as output
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_w))
 
 	MCFG_DEVICE_ADD("i8255_2", I8255, 0) // MB89363B!
+	// always $92: port A and B as input, port C as output
 	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_portd_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_porte_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kenseim_state, i8255_portf_default_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_portd_default_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_porte_default_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portf_w))
 
 
@@ -605,10 +577,10 @@ static INPUT_PORTS_START( kenseim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, NULL) //	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, NULL) //	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, NULL) //	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, NULL) //	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, NULL) //	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, NULL) //	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
@@ -617,7 +589,7 @@ static INPUT_PORTS_START( kenseim )
 //	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
 //	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
 //	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
-	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, NULL)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, NULL)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
@@ -627,7 +599,7 @@ static INPUT_PORTS_START( kenseim )
 //	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
 //	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
 //	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, NULL)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, NULL)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c
@@ -654,7 +626,7 @@ static INPUT_PORTS_START( kenseim )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "CPSA SW(B):7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "CPSA SW(B):8" )
 
-	PORT_START("DSWC")                         
+	PORT_START("DSWC")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "CPSA SW(C):1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "CPSA SW(C):2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "CPSA SW(C):3" )
@@ -672,47 +644,45 @@ static INPUT_PORTS_START( kenseim )
 
 	// the extra board has 2 dip banks used for most game options
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Coinage" )                            PORT_DIPLOCATION("DRV SW(1):1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Coinage" )                            PORT_DIPLOCATION("DRV SW(1):1,2")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPNAME( 0x0c, 0x00, "Head Appear Once Ratio" )             PORT_DIPLOCATION("DRV SW(1):3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Head Appear Once Ratio" )             PORT_DIPLOCATION("DRV SW(1):3,4")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPNAME( 0x30, 0x00, "Strength of Computer" )               PORT_DIPLOCATION("DRV SW(1):5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Strength of Computer" )               PORT_DIPLOCATION("DRV SW(1):5,6")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPNAME( 0x40, 0x00, "Game Time" )                          PORT_DIPLOCATION("DRV SW(1):7")
+	PORT_DIPNAME( 0x40, 0x40, "Game Time" )                          PORT_DIPLOCATION("DRV SW(1):7")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x40, "1" )
-	PORT_DIPNAME( 0x80, 0x00, "VS Bison" )                           PORT_DIPLOCATION("DRV SW(1):8")
+	PORT_DIPNAME( 0x80, 0x80, "VS Bison" )                           PORT_DIPLOCATION("DRV SW(1):8")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x80, "1" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "Unknown 1 (1-bit)" )                           PORT_DIPLOCATION("DRV SW(2):1")  // manual lists unused, but see code at  0x0E9E
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 1 (1-bit)" )                           PORT_DIPLOCATION("DRV SW(2):1")  // manual lists unused, but see code at  0x0E9E
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPNAME( 0x06, 0x00, "Unknown 2 (2-bit)" )                           PORT_DIPLOCATION("DRV SW(2):2,3")  // ^^
+	PORT_DIPNAME( 0x06, 0x06, "Unknown 2 (2-bit)" )                           PORT_DIPLOCATION("DRV SW(2):2,3")  // ^^
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x06, "3" )
-	PORT_DIPNAME( 0x18, 0x00, "Unknown 3 (2-bit)" )                           PORT_DIPLOCATION("DRV SW(2):4,5")  // ^^
+	PORT_DIPNAME( 0x18, 0x18, "Unknown 3 (2-bit)" )                           PORT_DIPLOCATION("DRV SW(2):4,5")  // ^^
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPUNUSED( 0x20, 0x20 )                                      PORT_DIPLOCATION("DRV SW(2):6") // appears unused
 	PORT_DIPUNUSED( 0x40, 0x40 )                                      PORT_DIPLOCATION("DRV SW(2):7") // apeears unused
-	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )                           PORT_DIPLOCATION("DRV SW(2):8")
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x80, "1" )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DRV SW(2):8" )
 
 	PORT_START("CAB-IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -779,11 +749,10 @@ DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 	m_led_serial_data = 0;
 	m_led_clock = 0;
 	m_led_latch = 0;
+}
 
-} 
 
-
- // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
- // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
- GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Kensei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING, layout_kenseim )
+// 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
+// the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
+GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Ken Sei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING, layout_kenseim )
 
