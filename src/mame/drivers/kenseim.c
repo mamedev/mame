@@ -310,7 +310,13 @@ WRITE8_MEMBER(kenseim_state::i8255_portf_w)
 WRITE8_MEMBER(kenseim_state::portc_w)
 {
 	// port direction is set to 4-in 4-out
-	logerror("%s write %01x to port C (%02x unmasked)\n", machine().describe_context(), (data & 0xf0)>>4, data );
+//	printf("%s write %01x to port C (%02x unmasked)\n", machine().describe_context(), (data & 0x30)>>4, data );
+
+	output_set_value("startlamp1", (data & 0x80) ? 0 : 1);
+	output_set_value("startlamp2", (data & 0x40) ? 0 : 1);
+	coin_counter_w(machine(), 0, (data & 0x20) ? 0 : 1);
+	coin_lockout_w(machine(), 0, (data & 0x10) ? 0 : 1); // toggles if you attempt to insert a coin when there are already 15 coins inserted
+
 }
 
 
@@ -686,8 +692,8 @@ static INPUT_PORTS_START( kenseim )
 
 	PORT_START("CAB-IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Ryu Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Chun-Li Start")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
@@ -728,7 +734,7 @@ ROM_START( kenseim )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", ROMREGION_ERASE00 )
-	ROM_LOAD( "knm10b.1a",    0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "cps1-knm10b.bin",    0x0000, 0x0117, CRC(e40131d4) SHA1(47e9f67ecacdf1d946838815dfe7396c9c698f04) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
@@ -754,5 +760,5 @@ DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
 // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
-GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Ken Sei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING, layout_kenseim )
+GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Ken Sei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_kenseim )
 
