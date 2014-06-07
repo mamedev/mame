@@ -48,34 +48,34 @@
 		</backdrop>
 
 		<backdrop name="lamp11" element="powerled" state="0">
-			<bounds x="210" y="245" width="7" height="7"/>
+			<bounds x="303" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp12" element="powerled" state="0">
-			<bounds x="220" y="245" width="7" height="7"/>
+			<bounds x="293" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp13" element="powerled" state="0">
-			<bounds x="230" y="245" width="7" height="7"/>
+			<bounds x="283" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp14" element="powerled" state="0">
-			<bounds x="240" y="245" width="7" height="7"/>
+			<bounds x="273" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp15" element="powerled" state="0">
-			<bounds x="250" y="245" width="7" height="7"/>
+			<bounds x="263" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp16" element="powerled" state="0">
-			<bounds x="260" y="245" width="7" height="7"/>
+			<bounds x="253" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp17" element="powerled" state="0">
-			<bounds x="270" y="245" width="7" height="7"/>
+			<bounds x="243" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp18" element="powerled" state="0">
-			<bounds x="280" y="245" width="7" height="7"/>
+			<bounds x="233" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp19" element="powerled" state="0">
-			<bounds x="290" y="245" width="7" height="7"/>
+			<bounds x="223" y="245" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp20" element="powerled" state="0">
-			<bounds x="300" y="245" width="7" height="7"/>
+			<bounds x="213" y="245" width="7" height="7"/>
 		</backdrop>
 
 
