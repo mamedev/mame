@@ -1140,14 +1140,12 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
 	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_1)
 
 	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
 	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
 	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
 

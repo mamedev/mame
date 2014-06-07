@@ -83,7 +83,7 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 		if (m_bank0 != ((data & 0x02) >> 1))
 		{
 			m_bank0 = (data & 0x02) >> 1;
-			machine().tilemap().mark_all_dirty();   /* should mark only zoom0 */
+			m_k051316_1->mark_tmap_dirty();
 		}
 
 		m_k051316_2->wraparound_enable(data & 0x04);
@@ -91,7 +91,7 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 		if (m_bank1 != ((data & 0x08) >> 3))
 		{
 			m_bank1 = (data & 0x08) >> 3;
-			machine().tilemap().mark_all_dirty();   /* should mark only zoom1 */
+			m_k051316_2->mark_tmap_dirty();
 		}
 
 		m_k051316_3->wraparound_enable(data & 0x10);
@@ -99,7 +99,7 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 		if (m_bank2 != ((data & 0x20) >> 5))
 		{
 			m_bank2 = (data & 0x20) >> 5;
-			machine().tilemap().mark_all_dirty();   /* should mark only zoom2 */
+			m_k051316_3->mark_tmap_dirty();
 		}
 
 		coin_counter_w(machine(), 0, data & 0x40);
@@ -117,7 +117,7 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 
 UINT32 ultraman_state::screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k051316_3->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	m_k051316_3->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);

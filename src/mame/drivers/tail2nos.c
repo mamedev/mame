@@ -228,7 +228,6 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K051316_BPP(-4)
 	MCFG_K051316_OFFSETS(-89, -14)
-	MCFG_K051316_SETUP_PENS(true, 0)
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 

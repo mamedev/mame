@@ -271,7 +271,6 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	MCFG_DEVICE_ADD("k051316", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
 	MCFG_K051316_OFFSETS(22, 1)
 	MCFG_K051316_CB(rollerg_state, zoom_callback)
 

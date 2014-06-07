@@ -213,20 +213,16 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
 	MCFG_K051316_OFFSETS(8, 0)
 	MCFG_K051316_CB(ultraman_state, zoom_callback_1)
 
 	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
 	MCFG_K051316_OFFSETS(8, 0)
 	MCFG_K051316_CB(ultraman_state, zoom_callback_2)
 
 	MCFG_DEVICE_ADD("k051316_3", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
-	MCFG_K051316_SETUP_PENS(true, 0)
 	MCFG_K051316_OFFSETS(8, 0)
 	MCFG_K051316_CB(ultraman_state, zoom_callback_3)
 

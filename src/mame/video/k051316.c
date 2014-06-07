@@ -109,9 +109,8 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 		m_dx(0),
 		m_dy(0),
 		m_wrap(0),
-		m_pen_is_mask(false),
 		m_pixels_per_byte(2), // 4bpp layout is default
-		m_transparent_pen(0)
+		m_layermask(0)
 {
 }
 
@@ -163,13 +162,13 @@ void k051316_device::device_start()
 	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_ram.resize_and_clear(0x800);
 
-	if (!m_pen_is_mask)
-		m_tmap->set_transparent_pen(m_transparent_pen);
-	else
+	if (m_layermask)
 	{
 		m_tmap->map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER1);
-		m_tmap->map_pens_to_layer(0, m_transparent_pen, m_transparent_pen, TILEMAP_PIXEL_LAYER0);
+		m_tmap->map_pens_to_layer(0, m_layermask, m_layermask, TILEMAP_PIXEL_LAYER0);
 	}
+	else
+		m_tmap->set_transparent_pen(0);
 
 	// bind callbacks
 	m_k051316_cb.bind_relative_to(*owner());

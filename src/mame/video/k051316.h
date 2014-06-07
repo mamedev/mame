@@ -15,8 +15,8 @@ typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_del
 #define MCFG_K051316_BPP(_bpp) \
 	k051316_device::set_bpp(*device, _bpp);
 
-#define MCFG_K051316_SETUP_PENS(_mask, _pen) \
-	k051316_device::set_pens(*device, _mask, _pen);
+#define MCFG_K051316_LAYER_MASK(_mask) \
+	k051316_device::set_layermask(*device, _mask);
 
 #define MCFG_K051316_WRAP(_wrap) \
 	k051316_device::set_wrap(*device, _wrap);
@@ -41,12 +41,7 @@ public:
 	static void set_k051316_callback(device_t &device, k051316_cb_delegate callback) { downcast<k051316_device &>(device).m_k051316_cb = callback; }
 	static void set_wrap(device_t &device, int wrap) { downcast<k051316_device &>(device).m_wrap = wrap; }
 	static void set_bpp(device_t &device, int bpp);
-	static void set_pens(device_t &device, bool mask, int transp)
-	{
-		k051316_device &dev = downcast<k051316_device &>(device);
-		dev.m_pen_is_mask = mask;
-		dev.m_transparent_pen = transp;
-	}
+	static void set_layermask(device_t &device, int mask) { downcast<k051316_device &>(device).m_layermask = mask; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)
 	{
 		k051316_device &dev = downcast<k051316_device &>(device);
@@ -74,6 +69,7 @@ public:
 	void wraparound_enable(int status);
 
 	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
+	void mark_tmap_dirty() { m_tmap->mark_all_dirty(); }
 
 protected:
 	// device-level overrides
@@ -91,9 +87,8 @@ private:
 
 	int m_dx, m_dy;
 	int m_wrap;
-	bool m_pen_is_mask;
 	int m_pixels_per_byte;
-	int m_transparent_pen;
+	int m_layermask;
 	k051316_cb_delegate m_k051316_cb;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);

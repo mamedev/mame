@@ -342,7 +342,6 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 
 	MCFG_DEVICE_ADD("k051316", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(4)
 	MCFG_K051316_CB(bottom9_state, zoom_callback)
 
 	/* sound hardware */
