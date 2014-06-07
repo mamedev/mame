@@ -3,6 +3,7 @@
 #include "cartridge.h"
 #include "arc.h"
 #include "ascii.h"
+#include "bm_012.h"
 #include "crossblaim.h"
 #include "dooly.h"
 #include "fmpac.h"
@@ -53,6 +54,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("dooly", MSX_CART_DOOLY)
 	SLOT_INTERFACE_INTERNAL("halnote", MSX_CART_HALNOTE)
 	SLOT_INTERFACE_INTERNAL("arc", MSX_CART_ARC)
+	SLOT_INTERFACE("bm_012", MSX_CART_BM_012)
 SLOT_INTERFACE_END
 
 

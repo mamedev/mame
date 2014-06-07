@@ -660,6 +660,12 @@ void z80pio_device::pio_port::control_write(UINT8 data)
 					// next word is mask control
 					m_next_control_word = MASK;
 				}
+				else
+				{
+					// set interrupt enable
+					m_ie = BIT(m_icw, 7) ? true : false;
+					check_interrupts();
+				}
 				break;
 
 			case 0x03: // set interrupt enable flip-flop
