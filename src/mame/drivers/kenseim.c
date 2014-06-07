@@ -10,6 +10,11 @@
   https://www.youtube.com/watch?v=mV00MMyBBXM
   https://www.youtube.com/watch?v=yQpMvRL0FfM
 
+  todo:
+   we have no way of telling the physical order of the moles on the control panel vs. the reads / writes
+   so our moles could be in the wrong positions - maybe there are fixed patterns in the video we can use
+   to figure it out? * the big mole appears to be worth 2 points so that one we can identify
+
 
 
   Additional 'DRIVE BOARD' PCB  (todo, improve ascii layout)
@@ -310,28 +315,20 @@ WRITE8_MEMBER(kenseim_state::i8255_portc_w)
 // i8255 ports D and E tend to be used together in the code, and the input gets masked with 6 bits (0x3f)
 READ8_MEMBER(kenseim_state::i8255_portd_r)
 {
-	return 0xff;
-	
-	logerror("%s i8255 read port D (mole matrix / sensors input 1?)\n", machine().describe_context());
-	static int i = 0;
-	i++;
+	int retvalue = 0xc0; // todo, check if upper bits are used
 
-	//return 0xff;
-	if (i&8) return 0x3f;
-	else return 0x00;
+	retvalue |= ioport("MOLEA")->read() & 0x3f;
+
+	return retvalue;
 }
 
 READ8_MEMBER(kenseim_state::i8255_porte_r)
 {
-	return 0xff;
-	
-	logerror("%s i8255 read port E (mole matrix / sensors input 2?)\n", machine().describe_context());
-	static int i = 0;
-	i++;
+	int retvalue = 0xc0; // todo, check if upper bits are used
 
-	//return 0xff;
-	if (i&8) return 0x3f;
-	else return 0x00;
+	retvalue |= ioport("MOLEB")->read() & 0x3f;
+
+	return retvalue;
 }
 
 WRITE8_MEMBER(kenseim_state::i8255_porta_w) // maybe molesa output? (6-bits?)
@@ -739,9 +736,9 @@ static INPUT_PORTS_START( kenseim )
 	PORT_DIPNAME( 0x40, 0x40, "Game Time" )                          PORT_DIPLOCATION("DRV SW(1):7")
 	PORT_DIPSETTING(    0x00, "Long (59 seconds)" )
 	PORT_DIPSETTING(    0x40, "Short (49 seconds)" )
-	PORT_DIPNAME( 0x80, 0x80, "VS Bison" )                           PORT_DIPLOCATION("DRV SW(1):8")
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPNAME( 0x80, 0x80, "Winner of 2 Player faces Vega" )      PORT_DIPLOCATION("DRV SW(1):8")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1 (1-bit)" )                           PORT_DIPLOCATION("DRV SW(2):1")  // manual lists unused, but see code at  0x0E9E
@@ -766,6 +763,22 @@ static INPUT_PORTS_START( kenseim )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Ryu Start")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Chun-Li Start")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("MOLEA")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_W) // big mole (2pts)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Q) 
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_E) 
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_A) 
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_S) 
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_D) 
+
+	PORT_START("MOLEB")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_8_PAD) // big mole (2pts)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_6_PAD)
 INPUT_PORTS_END
 
 ROM_START( kenseim )

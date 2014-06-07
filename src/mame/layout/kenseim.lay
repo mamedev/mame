@@ -195,19 +195,25 @@
 		</backdrop> 
       
   
-   	<backdrop name="molea_0" element="mole_sim" state="0"><bounds x="15.0" y="275" width="25" height="25"/></backdrop> 
-    <backdrop name="molea_3" element="mole_sim" state="0"><bounds x="15.0" y="305" width="25" height="25"/></backdrop> 
-    <backdrop name="molea_1" element="mole_sim" state="0"><bounds x="40.0" y="260" width="30" height="30"/></backdrop> <!-- big mole -->  
-    <backdrop name="molea_4" element="mole_sim" state="0"><bounds x="42.5" y="300" width="25" height="25"/></backdrop>
-    <backdrop name="molea_2" element="mole_sim" state="0"><bounds x="70.0" y="275" width="25" height="25"/></backdrop>   
-    <backdrop name="molea_5" element="mole_sim" state="0"><bounds x="70.0" y="305" width="25" height="25"/></backdrop>   
+    <!-- top row -->
+   	<backdrop name="molea_1" element="mole_sim" state="0" inputtag="MOLEA" inputmask="0x02" ><bounds x="15.0" y="275" width="25" height="25"/></backdrop> 
+    <backdrop name="molea_0" element="mole_sim" state="0" inputtag="MOLEA" inputmask="0x01" ><bounds x="40.0" y="260" width="30" height="30"/></backdrop> <!-- big mole -->  
+    <backdrop name="molea_2" element="mole_sim" state="0" inputtag="MOLEA" inputmask="0x04" ><bounds x="70.0" y="275" width="25" height="25"/></backdrop>   
+    <!-- bottom row -->
+    <backdrop name="molea_3" element="mole_sim" state="0" inputtag="MOLEA" inputmask="0x08" ><bounds x="15.0" y="305" width="25" height="25"/></backdrop> 
+    <backdrop name="molea_4" element="mole_sim" state="0" inputtag="MOLEA" inputmask="0x10" ><bounds x="42.5" y="300" width="25" height="25"/></backdrop>
+    <backdrop name="molea_5" element="mole_sim" state="0" inputtag="MOLEA" inputmask="0x20" ><bounds x="70.0" y="305" width="25" height="25"/></backdrop>   
   
-   	<backdrop name="moleb_0" element="mole_sim" state="0"><bounds x="225.0" y="275" width="25" height="25"/></backdrop> 
-    <backdrop name="moleb_3" element="mole_sim" state="0"><bounds x="225.0" y="305" width="25" height="25"/></backdrop> 
-    <backdrop name="moleb_1" element="mole_sim" state="0"><bounds x="250.0" y="260" width="30" height="30"/></backdrop> <!-- big mole -->  
-    <backdrop name="moleb_4" element="mole_sim" state="0"><bounds x="252.5" y="300" width="25" height="25"/></backdrop>
-    <backdrop name="moleb_2" element="mole_sim" state="0"><bounds x="280.0" y="275" width="25" height="25"/></backdrop>   
-    <backdrop name="moleb_5" element="mole_sim" state="0"><bounds x="280.0" y="305" width="25" height="25"/></backdrop>   
+      
+    <!-- top row -->
+   	<backdrop name="moleb_1" element="mole_sim" state="0" inputtag="MOLEB" inputmask="0x02" ><bounds x="225.0" y="275" width="25" height="25"/></backdrop> 
+    <backdrop name="moleb_0" element="mole_sim" state="0" inputtag="MOLEB" inputmask="0x01" ><bounds x="250.0" y="260" width="30" height="30"/></backdrop> <!-- big mole -->  
+    <backdrop name="moleb_2" element="mole_sim" state="0" inputtag="MOLEB" inputmask="0x04" ><bounds x="280.0" y="275" width="25" height="25"/></backdrop>   
+  
+    <!-- bottom row -->
+    <backdrop name="moleb_3" element="mole_sim" state="0" inputtag="MOLEB" inputmask="0x08" ><bounds x="225.0" y="305" width="25" height="25"/></backdrop> 
+    <backdrop name="moleb_4" element="mole_sim" state="0" inputtag="MOLEB" inputmask="0x10" ><bounds x="252.5" y="300" width="25" height="25"/></backdrop>
+    <backdrop name="moleb_5" element="mole_sim" state="0" inputtag="MOLEB" inputmask="0x20" ><bounds x="280.0" y="305" width="25" height="25"/></backdrop>   
     
       
 		<screen index="0">
