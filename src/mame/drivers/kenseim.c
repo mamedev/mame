@@ -154,7 +154,47 @@ public:
 		m_from68k_st3(0),
 		m_from68k_st2(0)
 
-	{ }
+	{ 
+		for (int i = 0; i < 6; i++)
+		{
+			mole_state_a[i] = 0x00;
+			mole_state_b[i] = 0x00;
+		}
+	}
+
+	void mole_up(int side, int mole)
+	{
+		if (side == 0)
+			mole_state_a[mole] = 80;
+		else
+			mole_state_b[mole] = 80;
+	}
+
+	void mole_down(int side, int mole)
+	{
+		if (side == 0)
+			mole_state_a[mole] = 0x00;
+		else
+			mole_state_b[mole] = 0x00;
+	}
+
+	void update_moles()
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			char temp[32];
+			sprintf(temp, "molea_%d", i);
+			output_set_value(temp, mole_state_a[i]);
+		}
+		
+		for (int i = 0; i < 6; i++)
+		{
+			char temp[32];
+			sprintf(temp, "moleb_%d", i);
+			output_set_value(temp, mole_state_b[i]);
+		}
+	}
+
 
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
@@ -212,6 +252,10 @@ public:
 	int m_led_latch;
 	int m_led_serial_data;
 	int m_led_clock;
+
+	int mole_state_a[6];
+	int mole_state_b[6];
+
 };
 
 
@@ -292,18 +336,45 @@ READ8_MEMBER(kenseim_state::i8255_porte_r)
 
 WRITE8_MEMBER(kenseim_state::i8255_porta_w) // maybe molesa output? (6-bits?)
 {
-	//logerror("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+	if (data&0xc0) printf("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+
+
+	for (int i = 0; i < 6; i++)
+	{
+		int bit = (data >> i) & 1;
+
+		if (bit)
+			mole_down(0, i);
+		else
+			mole_up(0, i);
+	}
+
+	update_moles();
+
 } 
 
 WRITE8_MEMBER(kenseim_state::i8255_portb_w) // maybe molesb output? (6-bits?)
 {
-	//logerror("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+	if (data&0xc0) printf("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+
+	for (int i = 0; i < 6; i++)
+	{
+		int bit = (data >> i) & 1;
+
+		if (bit)
+			mole_down(1, i);
+		else
+			mole_up(1, i);
+	}
+
+	update_moles();
+
 }
 
 WRITE8_MEMBER(kenseim_state::i8255_portf_w)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
-	//logerror("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+	printf("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
 }
 
 

@@ -24,7 +24,90 @@
   <element name="start2"><text string="Chun-Li"><color red="1.0" green="1.0" blue="1.0" /></text></element>
   <element name="start3"><text string="Start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
  
-
+ 	<element name="mole_sim">
+		<disk state ="0"><color red="0.20" green="0.20" blue="0.20" /></disk>
+		<disk state ="1"><color red="0.20" green="0.20" blue="0.21" /></disk>
+		<disk state ="2"><color red="0.20" green="0.20" blue="0.22" /></disk>
+		<disk state ="3"><color red="0.20" green="0.20" blue="0.23" /></disk>
+		<disk state ="4"><color red="0.20" green="0.20" blue="0.24" /></disk>
+		<disk state ="5"><color red="0.20" green="0.20" blue="0.25" /></disk>
+		<disk state ="6"><color red="0.20" green="0.20" blue="0.26" /></disk>
+		<disk state ="7"><color red="0.20" green="0.20" blue="0.27" /></disk>
+		<disk state ="8"><color red="0.20" green="0.20" blue="0.28" /></disk>
+		<disk state ="9"><color red="0.20" green="0.20" blue="0.29" /></disk>
+ 		<disk state ="10"><color red="0.20" green="0.20" blue="0.30" /></disk>
+		<disk state ="11"><color red="0.20" green="0.20" blue="0.31" /></disk>
+		<disk state ="12"><color red="0.20" green="0.20" blue="0.32" /></disk>
+		<disk state ="13"><color red="0.20" green="0.20" blue="0.33" /></disk>
+		<disk state ="14"><color red="0.20" green="0.20" blue="0.34" /></disk>
+		<disk state ="15"><color red="0.20" green="0.20" blue="0.35" /></disk>
+		<disk state ="16"><color red="0.20" green="0.20" blue="0.36" /></disk>
+		<disk state ="17"><color red="0.20" green="0.20" blue="0.37" /></disk>
+		<disk state ="18"><color red="0.20" green="0.20" blue="0.38" /></disk>
+		<disk state ="19"><color red="0.20" green="0.20" blue="0.39" /></disk>
+ 		<disk state ="20"><color red="0.20" green="0.20" blue="0.40" /></disk>
+		<disk state ="21"><color red="0.20" green="0.20" blue="0.41" /></disk>
+		<disk state ="22"><color red="0.20" green="0.20" blue="0.42" /></disk>
+		<disk state ="23"><color red="0.20" green="0.20" blue="0.43" /></disk>
+		<disk state ="24"><color red="0.20" green="0.20" blue="0.44" /></disk>
+		<disk state ="25"><color red="0.20" green="0.20" blue="0.45" /></disk>
+		<disk state ="26"><color red="0.20" green="0.20" blue="0.46" /></disk>
+		<disk state ="27"><color red="0.20" green="0.20" blue="0.47" /></disk>
+		<disk state ="28"><color red="0.20" green="0.20" blue="0.48" /></disk>
+		<disk state ="29"><color red="0.20" green="0.20" blue="0.49" /></disk>
+ 		<disk state ="30"><color red="0.20" green="0.20" blue="0.50" /></disk>
+		<disk state ="31"><color red="0.20" green="0.20" blue="0.51" /></disk>
+		<disk state ="32"><color red="0.20" green="0.20" blue="0.52" /></disk>
+		<disk state ="33"><color red="0.20" green="0.20" blue="0.53" /></disk>
+		<disk state ="34"><color red="0.20" green="0.20" blue="0.54" /></disk>
+		<disk state ="35"><color red="0.20" green="0.20" blue="0.55" /></disk>
+		<disk state ="36"><color red="0.20" green="0.20" blue="0.56" /></disk>
+		<disk state ="37"><color red="0.20" green="0.20" blue="0.57" /></disk>
+		<disk state ="38"><color red="0.20" green="0.20" blue="0.58" /></disk>
+		<disk state ="39"><color red="0.20" green="0.20" blue="0.59" /></disk>
+ 		<disk state ="40"><color red="0.20" green="0.20" blue="0.60" /></disk>
+		<disk state ="41"><color red="0.20" green="0.20" blue="0.61" /></disk>
+		<disk state ="42"><color red="0.20" green="0.20" blue="0.62" /></disk>
+		<disk state ="43"><color red="0.20" green="0.20" blue="0.63" /></disk>
+		<disk state ="44"><color red="0.20" green="0.20" blue="0.64" /></disk>
+		<disk state ="45"><color red="0.20" green="0.20" blue="0.65" /></disk>
+		<disk state ="46"><color red="0.20" green="0.20" blue="0.66" /></disk>
+		<disk state ="47"><color red="0.20" green="0.20" blue="0.67" /></disk>
+		<disk state ="48"><color red="0.20" green="0.20" blue="0.68" /></disk>
+		<disk state ="49"><color red="0.20" green="0.20" blue="0.69" /></disk>
+  	<disk state ="50"><color red="0.20" green="0.20" blue="0.70" /></disk>
+		<disk state ="51"><color red="0.20" green="0.20" blue="0.71" /></disk>
+		<disk state ="52"><color red="0.20" green="0.20" blue="0.72" /></disk>
+		<disk state ="53"><color red="0.20" green="0.20" blue="0.73" /></disk>
+		<disk state ="54"><color red="0.20" green="0.20" blue="0.74" /></disk>
+		<disk state ="55"><color red="0.20" green="0.20" blue="0.75" /></disk>
+		<disk state ="56"><color red="0.20" green="0.20" blue="0.76" /></disk>
+		<disk state ="57"><color red="0.20" green="0.20" blue="0.77" /></disk>
+		<disk state ="58"><color red="0.20" green="0.20" blue="0.78" /></disk>
+		<disk state ="59"><color red="0.20" green="0.20" blue="0.79" /></disk>
+  	<disk state ="60"><color red="0.20" green="0.20" blue="0.80" /></disk>
+		<disk state ="61"><color red="0.20" green="0.20" blue="0.81" /></disk>
+		<disk state ="62"><color red="0.20" green="0.20" blue="0.82" /></disk>
+		<disk state ="63"><color red="0.20" green="0.20" blue="0.83" /></disk>
+		<disk state ="64"><color red="0.20" green="0.20" blue="0.84" /></disk>
+		<disk state ="65"><color red="0.20" green="0.20" blue="0.85" /></disk>
+		<disk state ="66"><color red="0.20" green="0.20" blue="0.86" /></disk>
+		<disk state ="67"><color red="0.20" green="0.20" blue="0.87" /></disk>
+		<disk state ="68"><color red="0.20" green="0.20" blue="0.88" /></disk>
+		<disk state ="69"><color red="0.20" green="0.20" blue="0.89" /></disk>
+ 		<disk state ="70"><color red="0.20" green="0.20" blue="0.90" /></disk>
+		<disk state ="71"><color red="0.20" green="0.20" blue="0.91" /></disk>
+		<disk state ="72"><color red="0.20" green="0.20" blue="0.92" /></disk>
+		<disk state ="73"><color red="0.20" green="0.20" blue="0.93" /></disk>
+		<disk state ="74"><color red="0.20" green="0.20" blue="0.94" /></disk>
+		<disk state ="75"><color red="0.20" green="0.20" blue="0.95" /></disk>
+		<disk state ="76"><color red="0.20" green="0.20" blue="0.96" /></disk>
+		<disk state ="77"><color red="0.20" green="0.20" blue="0.97" /></disk>
+		<disk state ="78"><color red="0.20" green="0.20" blue="0.98" /></disk>
+		<disk state ="79"><color red="0.20" green="0.20" blue="0.99" /></disk>
+		<disk state ="80"><color red="0.20" green="0.20" blue="1.00" /></disk> 
+  </element> 
+  
 
 	<view name="Cabinet Lamps and Screen">
 
@@ -111,7 +194,22 @@
 			<bounds x="180" y="263" width="30" height="8"/>
 		</backdrop> 
       
+  
+   	<backdrop name="molea_0" element="mole_sim" state="0"><bounds x="15.0" y="275" width="25" height="25"/></backdrop> 
+    <backdrop name="molea_3" element="mole_sim" state="0"><bounds x="15.0" y="305" width="25" height="25"/></backdrop> 
+    <backdrop name="molea_1" element="mole_sim" state="0"><bounds x="40.0" y="260" width="30" height="30"/></backdrop> <!-- big mole -->  
+    <backdrop name="molea_4" element="mole_sim" state="0"><bounds x="42.5" y="300" width="25" height="25"/></backdrop>
+    <backdrop name="molea_2" element="mole_sim" state="0"><bounds x="70.0" y="275" width="25" height="25"/></backdrop>   
+    <backdrop name="molea_5" element="mole_sim" state="0"><bounds x="70.0" y="305" width="25" height="25"/></backdrop>   
+  
+   	<backdrop name="moleb_0" element="mole_sim" state="0"><bounds x="225.0" y="275" width="25" height="25"/></backdrop> 
+    <backdrop name="moleb_3" element="mole_sim" state="0"><bounds x="225.0" y="305" width="25" height="25"/></backdrop> 
+    <backdrop name="moleb_1" element="mole_sim" state="0"><bounds x="250.0" y="260" width="30" height="30"/></backdrop> <!-- big mole -->  
+    <backdrop name="moleb_4" element="mole_sim" state="0"><bounds x="252.5" y="300" width="25" height="25"/></backdrop>
+    <backdrop name="moleb_2" element="mole_sim" state="0"><bounds x="280.0" y="275" width="25" height="25"/></backdrop>   
+    <backdrop name="moleb_5" element="mole_sim" state="0"><bounds x="280.0" y="305" width="25" height="25"/></backdrop>   
     
+      
 		<screen index="0">
 			<bounds x="0" y="0" width="320" height="240" />
 		</screen>
