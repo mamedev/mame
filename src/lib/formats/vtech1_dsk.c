@@ -28,6 +28,10 @@ LEGACY_FLOPPY_OPTIONS_START( vtech1_only )
 		vtech1_dsk_identify,
 		vtech1_dsk_construct,
 		NULL,
-		NULL
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([154])
+		FIRST_SECTOR_ID([0])
 	)
 LEGACY_FLOPPY_OPTIONS_END0

@@ -1211,24 +1211,27 @@ rameses
 vz2000
 crvisio2
 manager
+
+// Video Technology Laser Generation 1 machines
 laser110  // 1983 Laser 110
-las110de  // 1983 Sanyo Laser 110 (Germany)
-laser200  // 1983 Laser 200 (color version of 110)
-//  vz200de   // 1983 VZ-200 (Germany)
-fellow  // 1983 Salora Fellow (Finland)
-tx8000  // 1983 Texet TX-8000 (U.K.)
-laser210  // 1984 Laser 210 (200 with more memory)
-las210de  // 1984 Sanyo Laser 210 (Germany)
-vz200    // 1984 Dick Smith Electronics VZ-200
-laser310  // 1984 Laser 310 (210 with diff. keyboard and RAM)
+laser200  // 1983 Laser 200
+vz200de   // 1983 VZ-200 (Germany)
+fellow    // 1983 Salora Fellow
+tx8000    // 1983 Texet TX-8000
+laser210  // 1984 Laser 210
+vz200     // 1984 Dick Smith Electronics VZ-200
+laser310  // 1984 Laser 310
 laser310h // 1984 Laser 310 with SHRG mod
-vz300    // 1984 Dick Smith Electronics VZ-300
+vz300     // 1984 Dick Smith Electronics VZ-300
+
+// Video Technology Laser Generation 2 machines
 laser350  // 1984? Laser 350
 laser500  // 1984? Laser 500
 laser700  // 1984? Laser 700
+
 socrates  // 1988 Socrates Educational Video System (USA)
 socratfc  // 1988 Socrates SAITOUT (French Canada)
-profweis  // 1988 (Yeno) Proffesor Weiss-Alles (Germany)
+profweis  // 1988 (Yeno) Professor Weiss-Alles (Germany)
 gl8008cx  // 1999 Genius Leader 8008 CX (Germany)
 bs9009cx  // 1999 BrainStation 9009 CXL (Germany)
 iq128_fr // 1997 Genius PC (France)
