@@ -8486,7 +8486,7 @@
 		</part>
 	</software>
 
-	<software name="kog" cloneof="kof97">
+	<software name="kog" cloneof="kof97" supported="no">
 		<description>King of Gladiator (The King of Fighters '97 bootleg)</description>
 		<year>1997</year>
 		<publisher>bootleg</publisher>
