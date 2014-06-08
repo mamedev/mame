@@ -114,7 +114,8 @@ machine_manager::machine_manager(emu_options &options,osd_interface &osd)
        : m_osd(osd),
 	   m_options(options),
 	   m_web(options),
-	   m_new_driver_pending(NULL)
+	   m_new_driver_pending(NULL),
+	   m_machine(NULL)
 {
 }
 
