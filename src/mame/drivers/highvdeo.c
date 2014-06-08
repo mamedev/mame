@@ -102,6 +102,7 @@ Game is V30 based, with rom banking (2Mb)
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
 #include "fashion.lh"
+#include "video/ramdac.h"
 
 
 class highvdeo_state : public driver_device
@@ -122,7 +123,6 @@ public:
 	DECLARE_READ16_MEMBER(read0_r);
 	DECLARE_READ16_MEMBER(read1_r);
 	DECLARE_READ16_MEMBER(read2_r);
-	DECLARE_WRITE16_MEMBER(tv_vcf_paletteram_w);
 	DECLARE_WRITE16_MEMBER(tv_vcf_bankselect_w);
 	DECLARE_WRITE16_MEMBER(write1_w);
 	DECLARE_READ16_MEMBER(tv_ncf_read1_r);
@@ -241,38 +241,6 @@ READ16_MEMBER(highvdeo_state::read2_r)
 	return ioport("IN2")->read();
 }
 
-WRITE16_MEMBER(highvdeo_state::tv_vcf_paletteram_w)
-{
-	switch(offset*2)
-	{
-		case 0:
-			m_pal.offs = data;
-			break;
-		case 2:
-			m_pal.offs_internal = 0;
-			break;
-		case 4:
-			switch(m_pal.offs_internal)
-			{
-				case 0:
-					m_pal.r = pal6bit(data);
-					m_pal.offs_internal++;
-					break;
-				case 1:
-					m_pal.g = pal6bit(data);
-					m_pal.offs_internal++;
-					break;
-				case 2:
-					m_pal.b = pal6bit(data);
-					m_palette->set_pen_color(m_pal.offs, m_pal.r, m_pal.g, m_pal.b);
-					m_pal.offs_internal = 0;
-					m_pal.offs++;
-					break;
-			}
-
-			break;
-	}
-}
 
 WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 {
@@ -343,7 +311,9 @@ static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ(read2_r )
-	AM_RANGE(0x0010, 0x0015) AM_WRITE(tv_vcf_paletteram_w )
+	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_vcf_bankselect_w ) AM_READ(tv_oki6376_r )
 ADDRESS_MAP_END
 
@@ -391,7 +361,9 @@ static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x000c, 0x000d) AM_READ(read0_r )
 	AM_RANGE(0x0010, 0x0011) AM_READ(tv_ncf_read1_r )
 	AM_RANGE(0x0012, 0x0013) AM_READ(read2_r )
-	AM_RANGE(0x0030, 0x0035) AM_WRITE(tv_vcf_paletteram_w )
+	AM_RANGE(0x0030, 0x0031) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x0032, 0x0033) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x0034, 0x0035) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -416,7 +388,9 @@ static ADDRESS_MAP_START( nyjoker_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
 	AM_RANGE(0x0014, 0x0015) AM_READ(tv_ncf_read1_r )
 	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
-	AM_RANGE(0x0030, 0x0035) AM_WRITE(tv_vcf_paletteram_w )
+	AM_RANGE(0x0030, 0x0031) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x0032, 0x0033) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x0034, 0x0035) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -521,7 +495,9 @@ static ADDRESS_MAP_START( newmcard_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ(newmcard_vblank_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
-	AM_RANGE(0x0010, 0x0015) AM_WRITE(tv_vcf_paletteram_w )
+	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 ADDRESS_MAP_END
 
 /****************************
@@ -1139,6 +1115,11 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, highvdeo_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+
 static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
@@ -1155,6 +1136,7 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_tourvisn)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 

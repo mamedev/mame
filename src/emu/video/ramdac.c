@@ -7,7 +7,8 @@
     Written by Angelo Salese
 
     TODO:
-    - masking register
+    - masking register, almost likely it controls rollback on incrementing
+      r/w palette access;
     - needs information about different models and what exactly they does
 
 ***************************************************************************/

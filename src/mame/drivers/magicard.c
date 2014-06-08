@@ -168,6 +168,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2413intf.h"
+#include "video/ramdac.h"
 
 
 class magicard_state : public driver_device
@@ -198,9 +199,7 @@ public:
 	required_shared_ptr<UINT16> m_scc68070_dma_ch1_regs;
 	required_shared_ptr<UINT16> m_scc68070_dma_ch2_regs;
 	required_shared_ptr<UINT16> m_scc68070_mmu_regs;
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_WRITE16_MEMBER(paletteram_io_w);
 	DECLARE_READ16_MEMBER(philips_66470_r);
 	DECLARE_WRITE16_MEMBER(philips_66470_w);
 	DECLARE_READ16_MEMBER(scc68070_ext_irqc_r);
@@ -500,42 +499,6 @@ READ16_MEMBER(magicard_state::test_r)
 	return machine().rand();
 }
 
-// should use ramdac device
-WRITE16_MEMBER(magicard_state::paletteram_io_w)
-{
-	data &= mem_mask;
-
-	switch(offset*2)
-	{
-		case 0:
-			m_pal.offs = data;
-			m_pal.offs_internal = 0;
-			break;
-		case 4:
-			break;
-		case 2:
-			switch(m_pal.offs_internal)
-			{
-				case 0:
-					m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_pal.offs_internal++;
-					break;
-				case 1:
-					m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_pal.offs_internal++;
-					break;
-				case 2:
-					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
-					m_pal.offs_internal = 0;
-					m_pal.offs++;
-					break;
-			}
-
-			break;
-	}
-}
-
 READ16_MEMBER(magicard_state::philips_66470_r)
 {
 	switch(offset)
@@ -693,7 +656,9 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	/* 001ffc00-001ffdff System I/O */
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffc40, 0x001ffc41) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffd00, 0x001ffd05) AM_MIRROR(0x7fe00000) AM_WRITE(paletteram_io_w) //RAMDAC
+	AM_RANGE(0x001ffd00, 0x001ffd01) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x001ffd02, 0x001ffd03) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x001ffd04, 0x001ffd05) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
 	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
@@ -741,6 +706,11 @@ INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 		device.execute().set_input_line_and_vector(1, HOLD_LINE,0xf0/4);
 }
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, magicard_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+
 static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
@@ -754,8 +724,7 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_SCREEN_UPDATE_DRIVER(magicard_state, screen_update_magicard)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-
-
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, CLOCK_A/12)

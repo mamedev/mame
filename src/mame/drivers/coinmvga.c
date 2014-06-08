@@ -203,6 +203,7 @@
     - Interrupts generation is unknown.
     - Touch screen hook-up.
     - Fully understand why it trigger some RTEs that should be RTS at POST.
+    - Rewrite palette system, use two RAMDAC devices
 
 
 *******************************************************************************/
@@ -217,6 +218,7 @@
 #include "cpu/h8/h83006.h"
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 
 
 class coinmvga_state : public driver_device
@@ -227,13 +229,11 @@ public:
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<UINT16> m_vram;
-	struct { int r,g,b,offs,offs_internal; } m_bgpal, m_fgpal;
 	DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_WRITE16_MEMBER(ramdac_bg_w);
-	DECLARE_WRITE16_MEMBER(ramdac_fg_w);
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_DRIVER_INIT(colorama);
 	DECLARE_DRIVER_INIT(cmrltv75);
@@ -244,6 +244,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette2;
+
 };
 
 
@@ -296,65 +298,6 @@ PALETTE_INIT_MEMBER(coinmvga_state, coinmvga)
 //  popmessage("written : %02X", data);
 //}
 
-WRITE16_MEMBER(coinmvga_state::ramdac_bg_w)
-{
-	if(ACCESSING_BITS_8_15)
-	{
-		m_bgpal.offs = data >> 8;
-		m_bgpal.offs_internal = 0;
-	}
-	else //if(mem_mask == 0x00ff)
-	{
-		switch(m_bgpal.offs_internal)
-		{
-			case 0:
-				m_bgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				m_bgpal.offs_internal++;
-				break;
-			case 1:
-				m_bgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				m_bgpal.offs_internal++;
-				break;
-			case 2:
-				m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				m_palette->set_pen_color(m_bgpal.offs, rgb_t(m_bgpal.r, m_bgpal.g, m_bgpal.b));
-				m_bgpal.offs_internal = 0;
-				m_bgpal.offs++;
-				break;
-		}
-	}
-}
-
-
-WRITE16_MEMBER(coinmvga_state::ramdac_fg_w)
-{
-	if(ACCESSING_BITS_8_15)
-	{
-		m_fgpal.offs = data >> 8;
-		m_fgpal.offs_internal = 0;
-	}
-	else
-	{
-		switch(m_fgpal.offs_internal)
-		{
-			case 0:
-				m_fgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				m_fgpal.offs_internal++;
-				break;
-			case 1:
-				m_fgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				m_fgpal.offs_internal++;
-				break;
-			case 2:
-				m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				m_palette->set_pen_color(0x100+m_fgpal.offs, rgb_t(m_fgpal.r, m_fgpal.g, m_fgpal.b));
-				m_fgpal.offs_internal = 0;
-				m_fgpal.offs++;
-				break;
-		}
-	}
-}
-
 /*
 READ16_MEMBER(coinmvga_state::test_r)
 {
@@ -376,8 +319,12 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 //  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(ramdac_bg_w)
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(ramdac_fg_w)
+	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x600002, 0x600003) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
+	AM_RANGE(0x600004, 0x600005) AM_DEVWRITE8("ramdac2", ramdac_device, index_w, 0xff00)
+	AM_RANGE(0x600004, 0x600005) AM_DEVWRITE8("ramdac2", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x600006, 0x600007) AM_DEVWRITE8("ramdac2", ramdac_device, mask_w, 0xff00)
 	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
 	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
 
@@ -645,8 +592,11 @@ static const gfx_layout tiles16x16_layout =
 ******************************/
 
 static GFXDECODE_START( coinmvga )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x100, 16 )  /* Foreground GFX */
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x000, 16 )  /* Background GFX */
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 16 )  /* Foreground GFX */
+GFXDECODE_END
+
+static GFXDECODE_START( coinmvga2 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x000, 1 )  /* Background GFX */
 GFXDECODE_END
 
 
@@ -664,6 +614,15 @@ INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 /*************************
 *    Machine Drivers     *
 *************************/
+
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, coinmvga_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ramdac2_map, AS_0, 8, coinmvga_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
 
 static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 
@@ -685,8 +644,14 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmvga)
+	MCFG_GFXDECODE_ADD("gfxdecode2", "palette2", coinmvga2)
 
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+
+	MCFG_PALETTE_ADD("palette2", 16)
+	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
+
 	MCFG_PALETTE_INIT_OWNER(coinmvga_state, coinmvga)
 
 	/* sound hardware */

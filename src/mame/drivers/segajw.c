@@ -24,6 +24,7 @@ SOUND     : YM3438
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "video/h63484.h"
+#include "video/ramdac.h"
 
 class segajw_state : public driver_device
 {
@@ -41,7 +42,6 @@ public:
 	DECLARE_READ16_MEMBER(coinlockout_r);
 	DECLARE_WRITE16_MEMBER(coinlockout_w);
 	DECLARE_READ16_MEMBER(soundboard_r);
-	DECLARE_WRITE8_MEMBER(ramdac_io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
@@ -55,7 +55,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 	UINT64      m_coin_start_cycles;
 	UINT64      m_hopper_start_cycles;
 	UINT8       m_coin_counter;
@@ -105,42 +104,6 @@ READ16_MEMBER(segajw_state::soundboard_r)
 {
 	// TODO: to replace with proper sound emulation
 	return 0xfff0;  // value expected for pass the sound board test
-}
-
-WRITE8_MEMBER(segajw_state::ramdac_io_w)
-{
-	// copied from adp.c
-	switch(offset)
-	{
-		case 0:
-			m_pal.offs = data;
-			m_pal.offs_internal = 0;
-			break;
-		case 2:
-			//mask pen reg
-			break;
-		case 1:
-			switch(m_pal.offs_internal)
-			{
-				case 0:
-					m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_pal.offs_internal++;
-					break;
-				case 1:
-					m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_pal.offs_internal++;
-					break;
-				case 2:
-					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
-					m_pal.offs_internal = 0;
-					m_pal.offs++;
-					m_pal.offs&=0xff;
-					break;
-			}
-
-			break;
-	}
 }
 
 INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
@@ -215,7 +178,9 @@ static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("IN3")
 	AM_RANGE(0x1c000c, 0x1c000d) AM_READWRITE(coinlockout_r, coinlockout_w)
 
-	AM_RANGE(0x280000, 0x280007) AM_WRITE8(ramdac_io_w, 0x00ff)
+	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x280002, 0x280003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x280004, 0x280005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -391,6 +356,10 @@ void segajw_state::machine_reset()
 	m_hopper_ctrl = 0;
 }
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, segajw_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START( segajw, segajw_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
@@ -415,6 +384,7 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_H63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
 

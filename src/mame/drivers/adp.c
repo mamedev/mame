@@ -160,6 +160,8 @@ Quick Jack administration/service mode:
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
+
 
 class adp_state : public driver_device
 {
@@ -181,12 +183,10 @@ public:
 
 	/* misc */
 	UINT8 m_mux_data;
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 
 	/* devices */
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(input_w);
-	DECLARE_WRITE8_MEMBER(ramdac_io_w);
 	DECLARE_MACHINE_START(skattv);
 	DECLARE_MACHINE_RESET(skattv);
 	DECLARE_PALETTE_INIT(adp);
@@ -297,47 +297,14 @@ static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(adp_state::ramdac_io_w)
-{
-	switch(offset)
-	{
-		case 0:
-			m_pal.offs = data;
-			m_pal.offs_internal = 0;
-			break;
-		case 2:
-			//mask pen reg
-			break;
-		case 1:
-			switch(m_pal.offs_internal)
-			{
-				case 0:
-					m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_pal.offs_internal++;
-					break;
-				case 1:
-					m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_pal.offs_internal++;
-					break;
-				case 2:
-					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
-					m_pal.offs_internal = 0;
-					m_pal.offs++;
-					m_pal.offs&=0xff;
-					break;
-			}
-
-			break;
-	}
-}
-
 static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
-	AM_RANGE(0x800088, 0x80008d) AM_WRITE8(ramdac_io_w, 0x00ff)
+	AM_RANGE(0x800088, 0x800089) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x80008a, 0x80008b) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x80008c, 0x80008d) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
@@ -574,12 +541,17 @@ static MACHINE_CONFIG_DERIVED( fashiong, skattv )
 	MCFG_H63484_ADDRESS_MAP(fashiong_h63484_map)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, adp_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_DERIVED( funland, quickjac )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_DEVICE_MODIFY("h63484")
 	MCFG_H63484_ADDRESS_MAP(fstation_h63484_map)

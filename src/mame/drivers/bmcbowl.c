@@ -106,6 +106,7 @@ Main board:
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
+#include "video/ramdac.h"
 
 #define NVRAM_HACK
 
@@ -119,21 +120,17 @@ public:
 		m_stats_ram(*this, "nvram", 16),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"),
-		m_colorram(*this, "colorram", 16),
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_stats_ram;
 	required_shared_ptr<UINT16> m_vid1;
 	required_shared_ptr<UINT16> m_vid2;
-	required_shared_ptr<UINT8> m_colorram;
 	required_device<palette_device> m_palette;
 	int m_clr_offset;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);
 	DECLARE_READ16_MEMBER(bmc_protection_r);
-	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_offset_w);
-	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_color_w);
 	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(via_b_in);
 	DECLARE_WRITE8_MEMBER(via_a_out);
@@ -225,18 +222,6 @@ READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bmcbowl_state::bmc_RAMDAC_offset_w)
-{
-	m_clr_offset=data*3;
-}
-
-WRITE16_MEMBER(bmcbowl_state::bmc_RAMDAC_color_w)
-{
-	m_colorram[m_clr_offset]=data;
-	m_palette->set_pen_color(m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
-	m_clr_offset=(m_clr_offset+1)%768;
-}
-
 WRITE16_MEMBER(bmcbowl_state::scroll_w)
 {
 	//TODO - scroll
@@ -325,9 +310,9 @@ void bmcbowl_state::machine_reset()
 static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
-	AM_RANGE(0x090000, 0x090001) AM_WRITE(bmc_RAMDAC_offset_w) AM_SHARE("colorram")
-	AM_RANGE(0x090002, 0x090003) AM_WRITE(bmc_RAMDAC_color_w)
-	AM_RANGE(0x090004, 0x090005) AM_WRITENOP//RAMDAC
+	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x090002, 0x090003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x090004, 0x090005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 
 	AM_RANGE(0x090800, 0x090803) AM_WRITENOP
 	AM_RANGE(0x091000, 0x091001) AM_WRITENOP
@@ -459,6 +444,10 @@ WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 	m_bmc_input=data;
 }
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcbowl_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
@@ -473,6 +462,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
