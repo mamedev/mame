@@ -874,7 +874,7 @@ m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 WRITE16_MEMBER(gstriker_state::twrldc94_mcu_w)
 {
-	m_mcu_data = data;
+	m_mcu_data = data & 0xff;
 }
 
 READ16_MEMBER(gstriker_state::twrldc94_mcu_r)
@@ -885,7 +885,7 @@ READ16_MEMBER(gstriker_state::twrldc94_mcu_r)
 WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 {
 	m_prot_reg[1] = m_prot_reg[0];
-	m_prot_reg[0] = data;
+	m_prot_reg[0] = data & 0xff;
 
 	if( ((m_prot_reg[1] & 2) == 2) && ((m_prot_reg[0] & 2) == 0) )
 	{
