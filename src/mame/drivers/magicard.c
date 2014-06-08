@@ -500,8 +500,11 @@ READ16_MEMBER(magicard_state::test_r)
 	return machine().rand();
 }
 
+// should use ramdac device
 WRITE16_MEMBER(magicard_state::paletteram_io_w)
 {
+	data &= mem_mask;
+
 	switch(offset*2)
 	{
 		case 0:
@@ -567,6 +570,8 @@ READ16_MEMBER(magicard_state::scc68070_ext_irqc_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_ext_irqc_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_ext_irqc_regs[offset] = data;
 }
 
@@ -584,6 +589,8 @@ READ16_MEMBER(magicard_state::scc68070_iic_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_iic_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_iic_regs[offset] = data;
 }
 
@@ -601,6 +608,8 @@ READ16_MEMBER(magicard_state::scc68070_uart_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_uart_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_uart_regs[offset] = data;
 }
 
@@ -611,6 +620,8 @@ READ16_MEMBER(magicard_state::scc68070_timer_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_timer_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_timer_regs[offset] = data;
 }
 
@@ -621,6 +632,8 @@ READ16_MEMBER(magicard_state::scc68070_int_irqc_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_int_irqc_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_int_irqc_regs[offset] = data;
 }
 
@@ -631,6 +644,8 @@ READ16_MEMBER(magicard_state::scc68070_dma_ch1_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_dma_ch1_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_dma_ch1_regs[offset] = data;
 }
 
@@ -641,6 +656,8 @@ READ16_MEMBER(magicard_state::scc68070_dma_ch2_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_dma_ch2_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_dma_ch2_regs[offset] = data;
 }
 
@@ -651,6 +668,8 @@ READ16_MEMBER(magicard_state::scc68070_mmu_r)
 
 WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 {
+	data &= mem_mask;
+
 	m_scc68070_mmu_regs[offset] = data;
 
 	switch(offset)
