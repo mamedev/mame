@@ -1,5 +1,5 @@
 /* Kensei Mogura
-  aka Street Fighter II Whac-a-mole game */
+  aka Street Fighter II Whack-a-mole game */
 
 /*
   this game uses a CPS1 board as the 'Video board'
@@ -38,7 +38,7 @@
   |                                                           MB89363B                                     pin) |
   |                    TMPZ84C011-8                                                    TLP521-4                 |
   |         16.00Mhz    (rotated 180                                                                        C   |
-  |                       degress)                                                                          N   |
+  |                       degrees)                                                                          N   |
   |                                                                                                         4   |
   |                                                                                                       (4    |
   |                                                                                                        pin) |
@@ -333,7 +333,7 @@ READ8_MEMBER(kenseim_state::i8255_porte_r)
 
 WRITE8_MEMBER(kenseim_state::i8255_porta_w) // maybe molesa output? (6-bits?)
 {
-	if (data&0xc0) printf("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s i8255 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
 
 
 	for (int i = 0; i < 6; i++)
@@ -352,7 +352,7 @@ WRITE8_MEMBER(kenseim_state::i8255_porta_w) // maybe molesa output? (6-bits?)
 
 WRITE8_MEMBER(kenseim_state::i8255_portb_w) // maybe molesb output? (6-bits?)
 {
-	if (data&0xc0) printf("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s i8255 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -371,7 +371,7 @@ WRITE8_MEMBER(kenseim_state::i8255_portb_w) // maybe molesb output? (6-bits?)
 WRITE8_MEMBER(kenseim_state::i8255_portf_w)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
-	printf("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+	//printf("%s i8255 write %02x to port F (strobe?)\n", machine().describe_context(), data);
 }
 
 
