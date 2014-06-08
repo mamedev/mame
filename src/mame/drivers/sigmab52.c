@@ -155,6 +155,7 @@ public:
 	DECLARE_WRITE8_MEMBER(audiocpu_cmd_irq_w);
 	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
+	DECLARE_WRITE8_MEMBER(coin_enable_w);
 	DECLARE_DRIVER_INIT(jwildb52);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
@@ -251,6 +252,11 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 	m_hopper_start_cycles = data & 0x01 ? m_maincpu->total_cycles() : 0;
 }
 
+WRITE8_MEMBER(sigmab52_state::coin_enable_w)
+{
+	coin_lockout_w(machine(), 0, data & 0x01 ? 0 : 1);
+}
+
 WRITE8_MEMBER(sigmab52_state::audiocpu_cmd_irq_w)
 {
 	m_audiocpu_cmd_irq = ASSERT_LINE;
@@ -311,6 +317,7 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0xf780, 0xf780) AM_WRITE(audiocpu_cmd_irq_w)
 	AM_RANGE(0xf790, 0xf790) AM_WRITE(soundlatch_byte_w)
 
+	AM_RANGE(0xf7b0, 0xf7b0) AM_WRITE(coin_enable_w)
 	AM_RANGE(0xf7d5, 0xf7d5) AM_WRITE(hopper_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
