@@ -103,10 +103,6 @@ machine_manager* machine_manager::instance(emu_options &options,osd_interface &o
 
 machine_manager* machine_manager::instance()
 {
-    if(!m_manager)
-	{
-        return NULL;
-    }
     return m_manager;
 }
 
