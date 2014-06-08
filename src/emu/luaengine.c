@@ -268,7 +268,6 @@ void lua_engine::initialize()
 void lua_engine::close()
 {
 	lua_settop(m_lua_state, 0);  /* clear stack */
-	luai_writeline();
 	lua_close(m_lua_state);	
 }
 
