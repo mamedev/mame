@@ -844,5 +844,5 @@ DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
 // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
-GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Ken Sei Mogura (1994.04.18, Ver 1.00)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_kenseim )
+GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Sigma / Togo / Capcom", "Ken Sei Mogura (1994.04.18, Ver 1.00)", GAME_CLICKABLE_ARTWORK, layout_kenseim )
 
