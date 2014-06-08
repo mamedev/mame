@@ -780,6 +780,8 @@ WRITE16_MEMBER(rbisland_state::rbisland_cchip_bank_w)
 
 WRITE16_MEMBER(rbisland_state::rbisland_cchip_ram_w)
 {
+	data &= mem_mask;
+
 	m_CRAM[m_current_bank][offset] = data;
 }
 

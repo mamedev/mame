@@ -380,6 +380,7 @@ WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ram_w)
 {
 //  if (space.device().safe_pc()!=0xa028)
 //  logerror("%08x:  write %04x %04x cchip\n", space.device().safe_pc(), offset, data);
+	data &= mem_mask;
 
 	if (m_current_bank == 0)
 	{

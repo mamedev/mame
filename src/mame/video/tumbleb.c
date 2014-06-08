@@ -24,6 +24,8 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 {
+	data &= mem_mask;
+
 	m_tilebank = data;
 	m_pf1_tilemap->mark_all_dirty();
 	m_pf1_alt_tilemap->mark_all_dirty();
@@ -32,6 +34,8 @@ WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 
 WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
 {
+	data &= mem_mask;
+
 	m_tilebank = data << 1;
 	m_pf1_tilemap->mark_all_dirty();
 	m_pf1_alt_tilemap->mark_all_dirty();
@@ -50,6 +54,8 @@ WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
 
 WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
 {
+	data &= mem_mask;
+
 	m_tilebank = data << 14; // shift it here, makes using bcstory_tilebank easier
 	m_pf1_tilemap->mark_all_dirty();
 	m_pf1_alt_tilemap->mark_all_dirty();
