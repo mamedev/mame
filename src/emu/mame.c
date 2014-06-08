@@ -129,6 +129,7 @@ machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 
 machine_manager::~machine_manager()
 {
+	m_manager = NULL;
 }
 
 
