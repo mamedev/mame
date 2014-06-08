@@ -469,6 +469,7 @@ enum rpk_open_error
 	RPK_XML_ERROR,
 	RPK_INVALID_FILE_REF,
 	RPK_ZIP_ERROR,
+	RPK_ZIP_UNSUPPORTED,
 	RPK_MISSING_RAM_LENGTH,
 	RPK_INVALID_RAM_SPEC,
 	RPK_UNKNOWN_RESOURCE_TYPE,
@@ -479,7 +480,7 @@ enum rpk_open_error
 	RPK_UNKNOWN_PCB_TYPE
 };
 
-static const char error_text[15][30] =
+static const char error_text[16][30] =
 {
 	"No error",
 	"Not a RPK (zip) file",
@@ -488,6 +489,7 @@ static const char error_text[15][30] =
 	"XML format error",
 	"Invalid file reference",
 	"Zip file error",
+	"Unsupported zip version",
 	"Missing RAM length",
 	"Invalid RAM specification",
 	"Unknown resource type",

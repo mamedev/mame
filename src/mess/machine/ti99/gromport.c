@@ -2202,7 +2202,11 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 
 	// and unzip file from the zip file
 	ziperr = zip_file_decompress(zip, contents, length);
-	if (ziperr != ZIPERR_NONE) throw rpk_exception(RPK_ZIP_ERROR);
+	if (ziperr != ZIPERR_NONE)
+	{
+		if (ziperr == ZIPERR_UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
+		else throw rpk_exception(RPK_ZIP_ERROR);
+	}
 
 	// check for sha1
 	sha1 = xml_get_attribute_string(rom_resource_node, "sha1", NULL);
@@ -2341,7 +2345,11 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 
 		/* uncompress the layout text */
 		ziperr = zip_file_decompress(zipfile, layout_text, header->uncompressed_length);
-		if (ziperr != ZIPERR_NONE) throw rpk_exception(RPK_ZIP_ERROR);
+		if (ziperr != ZIPERR_NONE)
+		{
+			if (ziperr == ZIPERR_UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
+			else throw rpk_exception(RPK_ZIP_ERROR);
+		}
 
 		layout_text[header->uncompressed_length] = '\0';  // Null-terminate
 
