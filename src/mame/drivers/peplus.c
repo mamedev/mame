@@ -4498,16 +4498,37 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap656.u50", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
-/* Known to exist:
-BE0013 508-544 (Non Double-up)
-BE0013 528-A22 (Non Double-up)
-BE0014 526-906
-BE0014 527-936
-BE0017 532-A22
+ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) - Non-Progressive Jackpot - Payout 98.30% */
+/*
+Blackjack BE0014 game features / rules:
+
+Game Options:
+  Auto Bet
+  Double Up
+
+Deal: 1 Deck (52 cards) - Shuffled before each hand
+
+Game Rules:
+  1. Dealer hits on soft 17, Stands on hard 17 or better or six (6) cards totaling 21 or less
+  2. Player wins on six (6) cards totaling 21 or less
+  3. All wins pay 2 for 1, including Blackjack
+  4. Bet returned on pushes
+
+In game features/Options:
+  Insurance offered
+  Surrender
+  Splits
+  Double Down
+
+Known to exist:
+ BE0013 508-544 (Non Double-up)
+ BE0013 528-A22 (Non Double-up)
+ BE0014 526-906
+ BE0014 527-936
+ BE0017 532-A22
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "be0014_522-a22.u68",   0x00000, 0x10000, CRC(232b32b7) SHA1(a3af9414577642fedc23b4c1911901cd31e9d6e0) ) /* Game Version: 528, Library Version: A22 */
+	ROM_LOAD( "be0014_528-a22.u68",   0x00000, 0x10000, CRC(232b32b7) SHA1(a3af9414577642fedc23b4c1911901cd31e9d6e0) ) /* Game Version: 528, Library Version: A22 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2036.u72",  0x00000, 0x8000, CRC(0a168d06) SHA1(7ed4fb5c7bcacab077bcec030f0465c6eaf3ce1c) )
@@ -4519,9 +4540,9 @@ BE0017 532-A22
 	ROM_LOAD( "cap707.u50", 0x0000, 0x0100, CRC(9851ba36) SHA1(5a0a43c1e212ae8c173102ede9c57a3d95752f99) )
 ROM_END
 
-ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) */
+ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ke1012_576-a3u.u68",   0x00000, 0x10000, CRC(470e8c10) SHA1(f8a65a3a73477e9e9d2f582eeefa93b470497dfa) )
+	ROM_LOAD( "ke1012_576-a3u.u68",   0x00000, 0x10000, CRC(470e8c10) SHA1(f8a65a3a73477e9e9d2f582eeefa93b470497dfa) ) /* Game Version: 576, Library Version: A3U */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg1267.u72",  0x00000, 0x8000, CRC(16498b57) SHA1(9c22726299af7204c4be1c6d8afc4c1b512ad918) )
@@ -4533,9 +4554,9 @@ ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) */
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peke1013 ) /* Normal board : Keno 2-10 Spot (KE1013) */
+ROM_START( peke1013 ) /* Normal board : Keno 2-10 Spot (KE1013) - Payout 91.97% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ke1013_590-a77.u68",   0x00000, 0x10000, CRC(3b178f94) SHA1(c601150a728d750b73f949ba6e2d2979c4c4be2e) )
+	ROM_LOAD( "ke1013_590-a77.u68",   0x00000, 0x10000, CRC(3b178f94) SHA1(c601150a728d750b73f949ba6e2d2979c4c4be2e) ) /* Game Version: 590, Library Version: A77 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg1267.u72",  0x00000, 0x8000, CRC(16498b57) SHA1(9c22726299af7204c4be1c6d8afc4c1b512ad918) )
