@@ -8,27 +8,107 @@
     Michael Zapf, September 2010
 
     January 2012: rewritten as class
+    June 2014: rewritten for modern floppy implementation
+
+    WORK IN PROGRESS
 
 ****************************************************************************/
 
 #ifndef __HFDC__
 #define __HFDC__
 
-#include "emu.h"
-#include "peribox.h"
-#include "machine/ti99_hd.h"
-#include "machine/smc92x4.h"
-#include "machine/mm58274c.h"
-
 #define HFDC_MAX_FLOPPY 4
 #define HFDC_MAX_HARD 4
 
+#include "machine/mm58274c.h"
+#include "machine/hdc9234.h"
+
 extern const device_type TI99_HFDC;
 
+/*
+    Implementation for modern floppy system.
+*/
 class myarc_hfdc_device : public ti_expansion_card_device
 {
 public:
 	myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
+
+	DECLARE_WRITE_LINE_MEMBER( intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( dip_w );
+	DECLARE_WRITE8_MEMBER( auxbus_out );
+	DECLARE_READ8_MEMBER( auxbus_in );
+	DECLARE_READ8_MEMBER( read_buffer );
+	DECLARE_WRITE8_MEMBER( write_buffer );
+
+private:
+	void device_start();
+	void device_reset();
+
+	const rom_entry *device_rom_region() const;
+	machine_config_constructor device_mconfig_additions() const;
+	ioport_constructor device_input_ports() const;
+
+	// Motor monoflop (4.23 sec)
+	emu_timer*      m_motor_on_timer;
+
+	// HDC9234 controller on the board
+	required_device<hdc9234_device> m_hdc9234;
+
+	// Clock chip on the board
+	required_device<mm58274c_device> m_clock;
+
+	// True: Access to DIP switch settings, false: access to line states
+	bool    m_see_switches;
+
+	// IRQ state
+	bool    m_irq;
+
+	// DMA in Progress state
+	bool    m_dip;
+
+	// When true, motor monoflop is high
+	bool    m_motor_running;
+
+	// Device Service Routine ROM (firmware)
+	UINT8*  m_dsrrom;
+
+	// ROM banks.
+	int     m_rom_page;
+
+	// HFDC on-board SRAM (32K)
+	UINT8*  m_buffer_ram;
+
+	// RAM page registers
+	int     m_ram_page[4];
+
+	// Output 1 latch
+	UINT8   m_output1_latch;
+
+	// Output 2 latch
+	UINT8   m_output2_latch;
+
+	// Clock divider bits 0 and 1. Unused in this emulation. */
+	int     m_CD;
+};
+
+// =========================================================================
+
+/*
+    Legacy implementation.
+*/
+extern const device_type TI99_HFDC_LEG;
+
+#include "machine/smc92x4.h"
+
+class myarc_hfdc_legacy_device : public ti_expansion_card_device
+{
+public:
+	myarc_hfdc_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8Z_MEMBER(crureadz);

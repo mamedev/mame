@@ -339,7 +339,7 @@ void peribox_device::set_genmod(bool set)
 */
 void peribox_device::inta_join(int slot, int state)
 {
-	if (TRACE_INT) logerror("Peribox propagating INTA from slot %d to console: %d\n", slot, state);
+	if (TRACE_INT) logerror("%s: propagating INTA from slot %d to console: %d\n", tag(), slot, state);
 	if (state==ASSERT_LINE)
 		m_inta_flag |= (1 << slot);
 	else
@@ -350,7 +350,7 @@ void peribox_device::inta_join(int slot, int state)
 
 void peribox_device::intb_join(int slot, int state)
 {
-	if (TRACE_INT) logerror("Peribox propagating INTB from slot %d to console: %d\n", slot, state);
+	if (TRACE_INT) logerror("%s: propagating INTB from slot %d to console: %d\n", tag(), slot, state);
 	if (state==ASSERT_LINE)
 		m_intb_flag |= (1 << slot);
 	else
@@ -364,7 +364,7 @@ void peribox_device::intb_join(int slot, int state)
 */
 void peribox_device::ready_join(int slot, int state)
 {
-	if (TRACE_READY) logerror("peribox: Incoming READY=%d from slot %d\n", state, slot);
+	if (TRACE_READY) logerror("%s: Incoming READY=%d from slot %d\n", tag(), state, slot);
 	// We store the inverse state
 	if (state==CLEAR_LINE)
 		m_ready_flag |= (1 << slot);
@@ -376,17 +376,12 @@ void peribox_device::ready_join(int slot, int state)
 
 void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
 {
-	if (TRACE_EMU)
-	{
-		if (slotdev!=NULL) logerror("Setting slot %d to device %s\n", slot, slotdev->tag());
-		else logerror("Setting slot %d to EMPTY\n", slot);
-	}
 	m_slot[slot] = slotdev;
 }
 
 void peribox_device::device_start(void)
 {
-	if (TRACE_EMU) logerror("Peribox started\n");
+	if (TRACE_EMU) logerror("%s: started\n", tag());
 
 	subdevice<legacy_floppy_image_device>(FLOPPY_0)->floppy_drive_set_rpm(300.);
 	subdevice<legacy_floppy_image_device>(FLOPPY_1)->floppy_drive_set_rpm(300.);
@@ -398,7 +393,14 @@ void peribox_device::device_start(void)
 	m_console_intb.resolve();
 	m_datamux_ready.resolve();
 
-	if (TRACE_EMU) logerror("AMA/B/C address prefix set to %05x\n", m_address_prefix);
+	if (TRACE_EMU)
+	{
+		logerror("%s: AMA/B/C address prefix set to %05x\n", tag(), m_address_prefix);
+		for (int i=2; i < 9; i++)
+		{
+			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != NULL)? m_slot[i]->m_card->tag() : "EMPTY");
+		}
+	}
 }
 
 void peribox_device::device_config_complete()
@@ -431,7 +433,8 @@ SLOT_INTERFACE_START( peribox_slot7 )
 	SLOT_INTERFACE("usbsm", TI99_USBSM)
 	SLOT_INTERFACE("bwgleg", TI99_BWG_LEG)
 	SLOT_INTERFACE("bwg", TI99_BWG)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
+	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slot8 )
@@ -439,7 +442,8 @@ SLOT_INTERFACE_START( peribox_slot8 )
 	SLOT_INTERFACE("tifdc", TI99_FDC)
 	SLOT_INTERFACE("bwgleg", TI99_BWG_LEG)
 	SLOT_INTERFACE("bwg", TI99_BWG)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
+	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( peribox_device )
@@ -463,7 +467,7 @@ MACHINE_CONFIG_FRAGMENT( peribox_device )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	
+
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -490,13 +494,15 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char
 SLOT_INTERFACE_START( peribox_slot7nobwg )
 	SLOT_INTERFACE("ide", TI99_IDE)
 	SLOT_INTERFACE("usbsm", TI99_USBSM)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
+	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slot8nobwg )
 	SLOT_INTERFACE("tifdcleg", TI99_FDC_LEG)
 	SLOT_INTERFACE("tifdc", TI99_FDC)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
+	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slotg )
@@ -527,7 +533,7 @@ MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
 	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)	
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 	MCFG_MFMHD_3_DRIVES_ADD()

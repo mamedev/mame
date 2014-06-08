@@ -15,9 +15,16 @@
 
     February 2012: Rewritten as class
 
+    June 2014: Rewritten for modern floppy implementation
+
+    WORK IN PROGRESS
+
 *****************************************************************************/
 
+#include "emu.h"
+#include "peribox.h"
 #include "hfdc.h"
+#include "machine/ti99_hd.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ti99_dsk.h"       // Format
 
@@ -27,20 +34,328 @@
 
 #define MOTOR_TIMER 1
 
-#define HFDC_MAX_FLOPPY 4
-#define HFDC_MAX_HARD 4
-
 #define TAPE_ADDR   0x0fc0
 #define HDC_R_ADDR  0x0fd0
 #define HDC_W_ADDR  0x0fd2
 #define CLK_ADDR    0x0fe0
 #define RAM_ADDR    0x1000
 
+#define TRACE_EMU 1
+#define TRACE_CRU 1
+
+// =========================================================================
+
+/*
+    Modern implementation.
+*/
+myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__),
+		m_hdc9234(*this, FDC_TAG),
+		m_clock(*this, CLOCK_TAG)
+{
+}
+
+/*
+    Read a byte from the memory address space of the HFDC
+
+    0x4000 - 0x4fbf one of four possible ROM pages
+    0x4fc0 - 0x4fcf Tape control (only available in prototype HFDC models)
+    0x4fd0 - 0x4fdf HDC 9234 ports
+    0x4fe0 - 0x4fff RTC chip ports
+
+    0x5000 - 0x53ff static RAM page 0x10
+    0x5400 - 0x57ff static RAM page any of 32 pages
+    0x5800 - 0x5bff static RAM page any of 32 pages
+    0x5c00 - 0x5fff static RAM page any of 32 pages
+
+    HFDC manual, p. 44
+*/
+READ8Z_MEMBER(myarc_hfdc_device::readz)
+{
+	if (m_selected && ((offset & m_select_mask)==m_select_value))
+	{
+		logerror("%s: Read access to %04x\n", tag(), offset & 0xffff);
+	}
+}
+
+/*
+    Write a byte to the memory address space of the HFDC
+
+    0x4fc0 - 0x4fcf Tape control (only available in prototype HFDC models)
+    0x4fd0 - 0x4fdf HDC 9234 ports
+    0x4fe0 - 0x4fff RTC chip ports
+
+    0x5000 - 0x53ff static RAM page 0x08
+    0x5400 - 0x57ff static RAM page any of 32 pages
+    0x5800 - 0x5bff static RAM page any of 32 pages
+    0x5c00 - 0x5fff static RAM page any of 32 pages
+*/
+WRITE8_MEMBER( myarc_hfdc_device::write )
+{
+	if (m_selected && ((offset & m_select_mask)==m_select_value))
+	{
+		logerror("%s: Write access to %04x: %02x\n", tag(), offset & 0xffff, data);
+	}
+}
+
+/*
+    Read a set of 8 bits in the CRU space of the HFDC
+    There are two banks, according to the state of m_see_switches
+
+    m_see_switches == true:
+
+       7     6     5     4     3     2     1     0
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |DIP1*|DIP2*|DIP3*|DIP4*|DIP5*|DIP6*|DIP7*|DIP8*|
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+
+    MZ: The setting 00 (all switches on) is a valid setting according to the
+        HFDC manual and indicates 36 sectors/track, 80 tracks; however, this
+        setting is intended "for possible future expansion" and cannot fall
+        back to lower formats, hence, single density disks cannot be read.
+    ---
+
+    m_see_switches == false:
+
+       7     6     5     4     3     2     1     0
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |  0  |  0  |  0  |  0  |  0  | MON | DIP | IRQ |
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+
+    MON = Motor on
+    DIP = DMA in progress
+    IRQ = Interrupt request
+    ---
+    0 on all other locations
+*/
+READ8Z_MEMBER(myarc_hfdc_device::crureadz)
+{
+	if ((offset & 0xff00)==m_cru_base)
+	{
+		if (TRACE_CRU) logerror("%s: CRU read access to %04x\n", tag(), offset & 0xffff);
+	}
+}
+
+/*
+    Set a bit in the CRU space of the HFDC
+
+       7     6     5     4     3     2     1     0
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+    |  0  | MON | DIP | ROM1| ROM0| MON | RES | SEL |
+    |     |     |     | CSEL| CD1 | CD0 |     |     |
+    +-----+-----+-----+-----+-----+-----+-----+-----+
+
+       17    16    15    14    13    12    11    10    F     E     D     C     B     A     9     8
+    +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    |    RAM page select @5C00    |    RAM page select @5800    |     RAM page select @5400   |  -  |
+    +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+
+    SEL = Select card (and map ROM into address space)
+    RES = Reset controller
+    MON = Motor on
+    ROM bank select: bank 0..3; bit 3 = MSB, 4 = LSB
+    RAM bank select: bank 0..31; bit 9 = LSB (accordingly for other two areas)
+    CD0 and CD1 are Clock Divider selections for the Floppy Data Separator (FDC9216)
+    CSEL = cru_select
+
+    HFDC manual p. 43
+*/
+WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
+{
+	if ((offset & 0xff00)==m_cru_base)
+	{
+		if (TRACE_CRU) logerror("%s: CRU write access to %04x: %d\n", tag(), offset & 0xffff, data);
+
+		int bit = (offset >> 1) & 0x1f;
+
+		// Handle the page selects right here
+		if (bit >= 0x09 && bit < 0x18)
+		{
+			if (data)
+				// we leave index 0 unchanged; modify indices 1-3
+				m_ram_page[(bit-4)/5] |= 1 << ((bit-9)%5);
+			else
+				m_ram_page[(bit-4)/5] &= ~(1 << ((bit-9)%5));
+			return;
+		}
+
+		switch (bit)
+		{
+		case 0:
+			m_selected = (data!=0);
+			if (TRACE_CRU) logerror("%s: selected = %d\n", tag(), m_selected);
+			break;
+		}
+	}
+}
+
+/*
+    Called whenever the state of the HDC9234 interrupt pin changes.
+*/
+WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
+{
+	m_irq = state;
+
+	// Set INTA*
+	// Signal from SMC is active high, INTA* is active low; board inverts signal
+	// Anyway, we keep with ASSERT_LINE and CLEAR_LINE
+	m_slot->set_inta(state);
+}
+
+/*
+    Called whenever the state of the HDC9234 DMA in progress changes.
+*/
+WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
+{
+	m_dip = state;
+}
+
+WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
+{
+	logerror("%s: Write access to auxbus at %04x: %02x\n", tag(), offset & 0xffff, data);
+}
+
+READ8_MEMBER( myarc_hfdc_device::auxbus_in )
+{
+	logerror("%s: Read access to auxbus at %04x\n", tag(), offset & 0xffff);
+	return 0;
+}
+
+/*
+    Read a byte from the onboard SRAM
+*/
+READ8_MEMBER( myarc_hfdc_device::read_buffer )
+{
+	logerror("%s: Read access to onboard SRAM at %04x\n", tag(), offset & 0xffff);
+	return 0;
+}
+
+/*
+    Write a byte to the onboard SRAM
+*/
+WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
+{
+	logerror("%s: Write access to onboard SRAM at %04x: %02x\n", tag(), offset & 0xffff, data);
+}
+
+void myarc_hfdc_device::device_start()
+{
+	if (TRACE_EMU) logerror("%s: start\n", tag());
+	m_dsrrom = memregion(DSRROM)->base();
+	m_buffer_ram = memregion(BUFFER)->base();
+	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
+	// The HFDC does not use READY; it has on-board RAM for DMA
+}
+
+void myarc_hfdc_device::device_reset()
+{
+	if (TRACE_EMU) logerror("%s: reset\n", tag());
+
+	// The GenMOD mod; our implementation automagically adapts all cards
+	if (m_genmod)
+	{
+		m_select_mask = 0x1fe000;
+		m_select_value = 0x174000;
+	}
+	else
+	{
+		m_select_mask = 0x7e000;
+		m_select_value = 0x74000;
+	}
+
+	m_cru_base = ioport("CRUHFDC")->read();
+
+	// Resetting values
+	m_rom_page = 0;
+
+	m_ram_page[0] = 0x08;   // static page 0x08
+	for (int i=1; i < 4; i++) m_ram_page[i] = 0;
+
+	m_output1_latch = m_output2_latch = 0;
+	m_dip = m_irq = false;
+	m_see_switches = false;
+	m_CD = 0;
+	m_motor_running = false;
+	m_selected = false;
+}
+
+INPUT_PORTS_START( ti99_hfdc )
+	PORT_START( "CRUHFDC" )
+	PORT_DIPNAME( 0x1f00, 0x1100, "HFDC CRU base" )
+		PORT_DIPSETTING( 0x1000, "1000" )
+		PORT_DIPSETTING( 0x1100, "1100" )
+		PORT_DIPSETTING( 0x1200, "1200" )
+		PORT_DIPSETTING( 0x1300, "1300" )
+		PORT_DIPSETTING( 0x1400, "1400" )
+		PORT_DIPSETTING( 0x1500, "1500" )
+		PORT_DIPSETTING( 0x1600, "1600" )
+		PORT_DIPSETTING( 0x1700, "1700" )
+		PORT_DIPSETTING( 0x1800, "1800" )
+		PORT_DIPSETTING( 0x1900, "1900" )
+		PORT_DIPSETTING( 0x1a00, "1A00" )
+		PORT_DIPSETTING( 0x1b00, "1B00" )
+		PORT_DIPSETTING( 0x1c00, "1C00" )
+		PORT_DIPSETTING( 0x1d00, "1D00" )
+		PORT_DIPSETTING( 0x1e00, "1E00" )
+		PORT_DIPSETTING( 0x1f00, "1F00" )
+
+	PORT_START( "HFDCDIP" )
+	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" )
+		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
+		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
+		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
+INPUT_PORTS_END
+
+MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
+	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
+	MCFG_HDC9234_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
+	MCFG_HDC9234_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
+	MCFG_HDC9234_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
+	MCFG_HDC9234_AUXBUS_IN_CALLBACK(READ8(myarc_hfdc_device, auxbus_in))
+	MCFG_HDC9234_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
+	MCFG_HDC9234_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
+
+	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
+	MCFG_MM58274C_MODE24(1) // 24 hour
+	MCFG_MM58274C_DAY1(0)   // sunday
+MACHINE_CONFIG_END
+
+ROM_START( ti99_hfdc )
+	ROM_REGION(0x4000, DSRROM, 0)
+	ROM_LOAD("hfdc.bin", 0x0000, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
+	ROM_REGION(0x8000, BUFFER, 0)  /* HFDC RAM buffer 32 KiB */
+	ROM_FILL(0x0000, 0x8000, 0x00)
+ROM_END
+
+
+machine_config_constructor myarc_hfdc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti99_hfdc );
+}
+
+const rom_entry *myarc_hfdc_device::device_rom_region() const
+{
+	return ROM_NAME( ti99_hfdc );
+}
+
+ioport_constructor myarc_hfdc_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ti99_hfdc );
+}
+
+const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
+
+// =========================================================================
+
+/*
+    Legacy implementation.
+*/
 #define VERBOSE 1
 #define LOG logerror
 
-myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__),
+myarc_hfdc_legacy_device::myarc_hfdc_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_expansion_card_device(mconfig, TI99_HFDC_LEG, "Myarc Hard and Floppy Disk Controller LEGACY", tag, owner, clock, "ti99_hfdc", __FILE__),
 		m_hdc9234(*this, FDC_TAG),
 		m_clock(*this, CLOCK_TAG)
 {
@@ -61,7 +376,7 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
     0x5800 - 0x5bff static RAM page any of 32 pages
     0x5c00 - 0x5fff static RAM page any of 32 pages
 */
-READ8Z_MEMBER(myarc_hfdc_device::readz)
+READ8Z_MEMBER(myarc_hfdc_legacy_device::readz)
 {
 	if (m_selected && ((offset & m_select_mask)==m_select_value))
 	{
@@ -119,7 +434,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 /*
     Write a byte to the controller.
 */
-WRITE8_MEMBER( myarc_hfdc_device::write )
+WRITE8_MEMBER( myarc_hfdc_legacy_device::write )
 {
 	if (m_selected && ((offset & m_select_mask)==m_select_value))
 	{
@@ -160,7 +475,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 	}
 }
 
-READ8Z_MEMBER(myarc_hfdc_device::crureadz)
+READ8Z_MEMBER(myarc_hfdc_legacy_device::crureadz)
 {
 	UINT8 reply;
 	if ((offset & 0xff00)==m_cru_base)
@@ -213,7 +528,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
     Bit number = (CRU_rel_address - base_address)/2
     CD0 and CD1 are Clock Divider selections for the Floppy Data Separator (FDC9216)
 */
-WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
+WRITE8_MEMBER(myarc_hfdc_legacy_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -273,7 +588,7 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 }
 
 
-int myarc_hfdc_device::slog2(int value)
+int myarc_hfdc_legacy_device::slog2(int value)
 {
 	int i=-1;
 	while (value!=0)
@@ -284,7 +599,7 @@ int myarc_hfdc_device::slog2(int value)
 	return i;
 }
 
-READ8_MEMBER( myarc_hfdc_device::auxbus_in )
+READ8_MEMBER( myarc_hfdc_legacy_device::auxbus_in )
 {
 	UINT8 reply = 0;
 	int index = 0;
@@ -335,7 +650,7 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 	return reply;
 }
 
-WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
+WRITE8_MEMBER( myarc_hfdc_legacy_device::auxbus_out )
 {
 	int index;
 	switch (offset)
@@ -383,7 +698,7 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 /*
     Read a byte from buffer in DMA mode
 */
-READ8_MEMBER( myarc_hfdc_device::read_buffer )
+READ8_MEMBER( myarc_hfdc_legacy_device::read_buffer )
 {
 	UINT8 value = m_buffer_ram[m_dma_address & 0x7fff];
 	m_dma_address++;
@@ -393,7 +708,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 /*
     Write a byte to buffer in DMA mode
 */
-WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
+WRITE8_MEMBER( myarc_hfdc_legacy_device::write_buffer )
 {
 	m_buffer_ram[m_dma_address & 0x7fff] = data;
 	m_dma_address++;
@@ -402,7 +717,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
 /*
     Called whenever the state of the sms9234 interrupt pin changes.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
+WRITE_LINE_MEMBER( myarc_hfdc_legacy_device::intrq_w )
 {
 	m_irq = state;
 
@@ -412,11 +727,10 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 	m_slot->set_inta(state);
 }
 
-
 /*
     Called whenever the state of the sms9234 DMA in progress changes.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
+WRITE_LINE_MEMBER( myarc_hfdc_legacy_device::dip_w )
 {
 	m_dip = state;
 }
@@ -424,20 +738,20 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 /*
     Callback called at the end of DVENA pulse
 */
-void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void myarc_hfdc_legacy_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_motor_running = false;
 	if (VERBOSE>6) LOG("hfdc: motor off\n");
 }
 
-MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
+MACHINE_CONFIG_FRAGMENT( ti99_hfdc_legacy )
 	MCFG_DEVICE_ADD(FDC_TAG, SMC92X4, 0)
-	MCFG_SMC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
-	MCFG_SMC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
-	MCFG_SMC92X4_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
-	MCFG_SMC92X4_AUXBUS_IN_CALLBACK(READ8(myarc_hfdc_device, auxbus_in))
-	MCFG_SMC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
-	MCFG_SMC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
+	MCFG_SMC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_legacy_device, intrq_w))
+	MCFG_SMC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_legacy_device, dip_w))
+	MCFG_SMC92X4_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_legacy_device, auxbus_out))
+	MCFG_SMC92X4_AUXBUS_IN_CALLBACK(READ8(myarc_hfdc_legacy_device, auxbus_in))
+	MCFG_SMC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_legacy_device, read_buffer))
+	MCFG_SMC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_legacy_device, write_buffer))
 	MCFG_SMC92X4_FULL_TRACK_LAYOUT(FALSE)    /* do not use the full track layout */
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
@@ -445,14 +759,14 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_MM58274C_DAY1(0)   // sunday
 MACHINE_CONFIG_END
 
-ROM_START( ti99_hfdc )
+ROM_START( ti99_hfdc_legacy )
 	ROM_REGION(0x4000, DSRROM, 0)
 	ROM_LOAD("hfdc.bin", 0x0000, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
 	ROM_REGION(0x8000, BUFFER, 0)  /* HFDC RAM buffer 32 KiB */
 	ROM_FILL(0x0000, 0x8000, 0x00)
 ROM_END
 
-INPUT_PORTS_START( ti99_hfdc )
+INPUT_PORTS_START( ti99_hfdc_legacy )
 	PORT_START( "CRUHFDC" )
 	PORT_DIPNAME( 0x1f00, 0x1100, "HFDC CRU base" )
 		PORT_DIPSETTING( 0x1000, "1000" )
@@ -485,7 +799,7 @@ INPUT_PORTS_START( ti99_hfdc )
 		PORT_CONFSETTING( 0x01, "Realistic")
 INPUT_PORTS_END
 
-void myarc_hfdc_device::device_start()
+void myarc_hfdc_legacy_device::device_start()
 {
 	if (VERBOSE>5) LOG("hfdc: start\n");
 	m_dsrrom = memregion(DSRROM)->base();
@@ -496,7 +810,7 @@ void myarc_hfdc_device::device_start()
 	// The HFDC does not use READY; it has on-board RAM for DMA
 }
 
-void myarc_hfdc_device::device_reset()
+void myarc_hfdc_legacy_device::device_reset()
 {
 	if (VERBOSE>5) LOG("hfdc: reset\n");
 	if (m_genmod)
@@ -558,19 +872,19 @@ void myarc_hfdc_device::device_reset()
 	// TODO: Check how to make use of   floppy_mon_w(w->drive, CLEAR_LINE);
 }
 
-machine_config_constructor myarc_hfdc_device::device_mconfig_additions() const
+machine_config_constructor myarc_hfdc_legacy_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( ti99_hfdc );
+	return MACHINE_CONFIG_NAME( ti99_hfdc_legacy );
 }
 
-const rom_entry *myarc_hfdc_device::device_rom_region() const
+const rom_entry *myarc_hfdc_legacy_device::device_rom_region() const
 {
-	return ROM_NAME( ti99_hfdc );
+	return ROM_NAME( ti99_hfdc_legacy );
 }
 
-ioport_constructor myarc_hfdc_device::device_input_ports() const
+ioport_constructor myarc_hfdc_legacy_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(ti99_hfdc);
+	return INPUT_PORTS_NAME(ti99_hfdc_legacy);
 }
 
-const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
+const device_type TI99_HFDC_LEG = &device_creator<myarc_hfdc_legacy_device>;
