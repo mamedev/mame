@@ -32,6 +32,7 @@ ft5_v6_c4.u58 /
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
+#include "video/ramdac.h"
 
 
 class koftball_state : public driver_device
@@ -43,7 +44,6 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_bmc_1_videoram(*this, "bmc_1_videoram"),
 		m_bmc_2_videoram(*this, "bmc_2_videoram"),
-		m_colorram(*this, "colorram", 16),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -51,7 +51,6 @@ public:
 	required_shared_ptr<UINT16> m_main_ram;
 	required_shared_ptr<UINT16> m_bmc_1_videoram;
 	required_shared_ptr<UINT16> m_bmc_2_videoram;
-	required_shared_ptr<UINT8> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	tilemap_t *m_tilemap_1;
@@ -59,9 +58,6 @@ public:
 	int m_clr_offset;
 	UINT16 m_prot_data;
 
-	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_offset_w);
-	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_color_w);
-	DECLARE_READ16_MEMBER(bmc_RAMDAC_color_r);
 	DECLARE_READ16_MEMBER(random_number_r);
 	DECLARE_READ16_MEMBER(prot_r);
 	DECLARE_WRITE16_MEMBER(prot_w);
@@ -107,23 +103,6 @@ UINT32 koftball_state::screen_update_koftball(screen_device &screen, bitmap_ind1
 	m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-WRITE16_MEMBER(koftball_state::bmc_RAMDAC_offset_w)
-{
-	m_clr_offset=data*3;
-}
-
-WRITE16_MEMBER(koftball_state::bmc_RAMDAC_color_w)
-{
-	m_colorram[m_clr_offset]=data;
-	m_palette->set_pen_color(m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
-	m_clr_offset=(m_clr_offset+1)%768;
-}
-
-READ16_MEMBER(koftball_state::bmc_RAMDAC_color_r)
-{
-	return m_colorram[m_clr_offset];
 }
 
 READ16_MEMBER(koftball_state::random_number_r)
@@ -178,9 +157,10 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
 	AM_RANGE(0x2da000, 0x2da003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
-	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w) AM_SHARE("colorram")
-	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
-	AM_RANGE(0x2db004, 0x2db005) AM_WRITENOP
+	AM_RANGE(0x2db000, 0x2db001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x2db002, 0x2db003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x2db004, 0x2db005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+
 	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP
@@ -189,6 +169,9 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, koftball_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( koftball )
 	PORT_START("INPUTS")
@@ -256,6 +239,7 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
 
