@@ -782,15 +782,15 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
 
-	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)                  /* TMPZ84C011, 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(niyanpai_sound_map)
 	MCFG_CPU_IO_MAP(niyanpai_sound_io_map)
-	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(niyanpai_state, cpu_portd_r))
-	MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(niyanpai_state, cpu_porta_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(niyanpai_state,cpu_portb_w))
-	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(niyanpai_state,cpu_portc_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(niyanpai_state,cpu_porte_w))
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(niyanpai_state, cpu_portd_r))
+	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(niyanpai_state, cpu_porta_w))
+	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(niyanpai_state, cpu_portb_w))
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(niyanpai_state, cpu_portc_w))
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(niyanpai_state, cpu_porte_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 8000000 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -808,7 +808,6 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256*3)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

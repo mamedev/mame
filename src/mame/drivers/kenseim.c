@@ -544,16 +544,16 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
-	//MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(WRITE8(kenseim_state, porta_default_w)) // unused?
-	//MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(WRITE8(kenseim_state, portb_default_w)) // unused?
-	MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(WRITE8(kenseim_state, portc_w))
-	MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(WRITE8(kenseim_state, portd_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(WRITE8(kenseim_state, porte_w))	
-	MCFG_TMPZ84C011_PORTA_READ_CALLBACK(READ8(kenseim_state, porta_r))
-	MCFG_TMPZ84C011_PORTB_READ_CALLBACK(READ8(kenseim_state, portb_r))
-	MCFG_TMPZ84C011_PORTC_READ_CALLBACK(READ8(kenseim_state, portc_r))
-	MCFG_TMPZ84C011_PORTD_READ_CALLBACK(READ8(kenseim_state, portd_r))
-	//MCFG_TMPZ84C011_PORTE_READ_CALLBACK(READ8(kenseim_state, porte_default_r)) // unused?
+	//MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(kenseim_state, porta_default_w)) // unused?
+	//MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(kenseim_state, portb_default_w)) // unused?
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(kenseim_state, portc_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(kenseim_state, portd_w))
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(kenseim_state, porte_w))	
+	MCFG_TMPZ84C011_PORTA_READ_CB(READ8(kenseim_state, porta_r))
+	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(kenseim_state, portb_r))
+	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(kenseim_state, portc_r))
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(kenseim_state, portd_r))
+	//MCFG_TMPZ84C011_PORTE_READ_CB(READ8(kenseim_state, porte_default_r)) // unused?
 	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
 
 	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84

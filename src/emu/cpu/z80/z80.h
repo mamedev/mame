@@ -301,7 +301,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	void take_interrupt_nsc800();
-	UINT8 m_nsc800_irq_state[4];/* state of NSC800 restart interrupts A, B, C */
+	UINT8 m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
 };
 
 extern const device_type NSC800;
@@ -340,35 +340,35 @@ extern const device_type TLCS_Z80;
 
 
 
-#define MCFG_TMPZ84C011_PORTA_READ_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTA_READ_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_inports0_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTB_READ_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTB_READ_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_inports1_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTC_READ_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTC_READ_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_inports2_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTD_READ_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTD_READ_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_inports3_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTE_READ_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTE_READ_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_inports4_cb(*device, DEVCB_##_devcb);
 
 
-#define MCFG_TMPZ84C011_PORTA_WRITE_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTA_WRITE_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_outports0_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTB_WRITE_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTB_WRITE_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_outports1_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTC_WRITE_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTC_WRITE_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_outports2_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTD_WRITE_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTD_WRITE_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_outports3_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_TMPZ84C011_PORTE_WRITE_CALLBACK(_devcb) \
+#define MCFG_TMPZ84C011_PORTE_WRITE_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_outports4_cb(*device, DEVCB_##_devcb);
 
 
