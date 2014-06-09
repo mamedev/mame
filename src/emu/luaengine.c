@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
+#include "drivenum.h"
 #include "lua/lua.hpp"
 #include "lua/lib/lualibs.h"
 #include "web/mongoose.h"
@@ -131,10 +132,30 @@ int emu_keypost(lua_State *L)
 	return 1;
 }
 
+int emu_exit(lua_State *L)
+{
+	machine_manager::instance()->machine()->schedule_exit();
+	return 1;
+}
+
+int emu_start(lua_State *L)
+{
+	const char *system_name = luaL_checkstring(L,1);
+	
+	int index = driver_list::find(system_name);
+	if (index != -1) {
+		machine_manager::instance()->schedule_new_driver(driver_list::driver(index));	
+		machine_manager::instance()->machine()->schedule_hard_reset();
+	}
+	return 1;
+}
+
 static const struct luaL_Reg emu_funcs [] =
 {
 	{ "gamename", emu_gamename },
 	{ "keypost", emu_keypost },
+	{ "exit", emu_exit },
+	{ "start", emu_start },
 	{ NULL, NULL }  /* sentinel */
 };
 
