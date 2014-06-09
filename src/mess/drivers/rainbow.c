@@ -649,7 +649,7 @@ void rainbow_state::machine_reset()
 		device().machine().schedule_hard_reset();
 	}
 
-	if ( (COLD_BOOT == 1) )
+	if ( COLD_BOOT == 1 )
 	{
 		COLD_BOOT = 2;
 		m_crtc->MHFU(-100); // reset MHFU counter
