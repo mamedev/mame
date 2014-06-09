@@ -256,6 +256,8 @@ const rom_entry *lk201_device::device_rom_region() const
 */
 
 INPUT_PORTS_START( lk201 )
+
+#ifndef KEYBOARD_WORKAROUND
 	PORT_START("KBD0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -435,6 +437,8 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F19")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+#endif
 INPUT_PORTS_END
 
 
@@ -600,6 +604,7 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			// Check for keyboard read strobe
 			if (((data & 0x40) == 0) && (ports[offset] & 0x40))
 			{
+#ifndef KEYBOARD_WORKAROUND
 				if (ports[0] & 0x1) kbd_data = m_kbd0->read();
 				if (ports[0] & 0x2) kbd_data = m_kbd1->read();
 				if (ports[0] & 0x4) kbd_data = m_kbd2->read();
@@ -618,6 +623,7 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				if (ports[1] & 0x80) kbd_data = m_kbd15->read();
 				if (ports[2] & 0x1) kbd_data = m_kbd16->read();
 				if (ports[2] & 0x2) kbd_data = m_kbd17->read();
+#endif
 			}
 			// Check for LED update strobe
 			if (((data & 0x80) == 0) && (ports[offset] & 0x80))

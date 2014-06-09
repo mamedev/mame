@@ -185,6 +185,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/pyldin_dsk.o  \
 	$(LIBOBJ)/formats/ql_dsk.o      \
 	$(LIBOBJ)/formats/rk_cas.o      \
+	$(LIBOBJ)/formats/rx50_dsk.o    \
 	$(LIBOBJ)/formats/sc3000_bit.o  \
 	$(LIBOBJ)/formats/sf7000_dsk.o  \
 	$(LIBOBJ)/formats/smx_dsk.o     \
