@@ -238,7 +238,6 @@ public:
 	DECLARE_DRIVER_INIT(colorama);
 	DECLARE_DRIVER_INIT(cmrltv75);
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(coinmvga);
 	UINT32 screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
@@ -281,11 +280,6 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 
 
 	return 0;
-}
-
-
-PALETTE_INIT_MEMBER(coinmvga_state, coinmvga)
-{
 }
 
 
@@ -651,8 +645,6 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 
 	MCFG_PALETTE_ADD("palette2", 16)
 	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
-
-	MCFG_PALETTE_INIT_OWNER(coinmvga_state, coinmvga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
