@@ -112,17 +112,6 @@ static ADDRESS_MAP_START( czz50_map, AS_PROGRAM, 8, coleco_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( czz50_io_map, AS_IO, 8, coleco_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE("sn76489a", sn76489a_device, write)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
-ADDRESS_MAP_END
-
 
 /* Input Ports */
 
@@ -298,21 +287,22 @@ DEVICE_IMAGE_LOAD_MEMBER( coleco_state,czz50_cart )
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( coleco, coleco_state )
-	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)   // 3.579545 MHz
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(coleco_map)
 	MCFG_CPU_IO_MAP(coleco_io_map)
 
-	// video hardware
+	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
-	// sound hardware
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) /* 3.579545 MHz */
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) // 3.579545 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
@@ -327,38 +317,33 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( czz50, coleco_state )
-	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)   // ???
-	MCFG_CPU_PROGRAM_MAP(czz50_map)
-	MCFG_CPU_IO_MAP(czz50_io_map)
+static MACHINE_CONFIG_DERIVED( colecop, coleco )
 
-	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	/* video hardware */
+	MCFG_DEVICE_REMOVE("tms9928a")
+	MCFG_DEVICE_REMOVE("screen")
+
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+MACHINE_CONFIG_END
 
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) // ???
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+static MACHINE_CONFIG_DERIVED( czz50, coleco )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
+	MCFG_CPU_PROGRAM_MAP(czz50_map)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(coleco_state,czz50_cart)
-	MCFG_CARTSLOT_INTERFACE("coleco_cart")
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
+	MCFG_CARTSLOT_MODIFY("cart")
+	MCFG_CARTSLOT_LOAD(coleco_state, czz50_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )
+
+	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
 	MCFG_DEVICE_REMOVE("screen")
 
@@ -398,7 +383,6 @@ R72114A
 
 ROM_START (colecop)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-        /* Has shorter delay than NTSC - about 3 seconds ($190a) + additional code right at beginning (replacing NTSC FF's) */
 	ROM_LOAD( "r72114a_8317.u2", 0x0000, 0x2000, CRC(d393c0cc) SHA1(160077afb139943725c634d6539898db59f33657) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
@@ -423,7 +407,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT              COMPANY             FULLNAME                            FLAGS
 CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1983, colecop,  coleco,   0,      dina,     coleco, driver_device, 0, "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, driver_device, 0, "Coleco",           "ColecoVision (PAL)",               0 )
 CONS( 1983, svi603,   coleco,   0,      coleco,   coleco, driver_device, 0, "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
 CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device, 0, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
 CONS( 1988, dina,     czz50,    0,      dina,     czz50,  driver_device, 0, "Telegames",        "Dina",                             0 )
