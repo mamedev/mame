@@ -250,6 +250,8 @@ int machine_manager::execute()
 
 void CLIB_DECL popmessage(const char *format, ...)
 {
+	if (machine_manager::instance()==NULL || machine_manager::instance()->machine() == NULL) return;
+
 	// if the format is NULL, it is a signal to clear the popmessage
 	if (format == NULL)
 		machine_manager::instance()->machine()->ui().popup_time(0, " ");

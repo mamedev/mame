@@ -223,6 +223,8 @@ void video_manager::frame_update(bool debug)
 	machine().osd().update(!debug && skipped_it);
 	g_profiler.stop();
 
+	machine().manager().lua()->periodic_check();
+
 	// perform tasks for this frame
 	if (!debug)
 		machine().call_notifiers(MACHINE_NOTIFY_FRAME);

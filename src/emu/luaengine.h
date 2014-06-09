@@ -32,13 +32,11 @@ public:
 	void close();
 
 	void serve_lua();
+	void periodic_check();
 private:	
 	int report(int status);
 	int docall(int narg, int nres);
-	const char *get_prompt(int firstline);
 	int incomplete(int status) ;
-	int pushline(int firstline);
-	int loadline();
 private:
 	// internal state
 	lua_State*          m_lua_state;

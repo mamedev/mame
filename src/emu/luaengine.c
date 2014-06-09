@@ -95,14 +95,6 @@ int lua_engine::docall(int narg, int nres)
 	return status;
 }
 
-const char *lua_engine::get_prompt(int firstline) {
-	const char *p;
-	lua_getglobal(m_lua_state, firstline ? "_PROMPT" : "_PROMPT2");
-	p = lua_tostring(m_lua_state, -1);
-	if (p == NULL) p = (firstline ? LUA_PROMPT : LUA_PROMPT2);
-	return p;
-}
-
 /* mark in error messages for incomplete statements */
 #define EOFMARK     "<eof>"
 #define marklen     (sizeof(EOFMARK)/sizeof(char) - 1)
@@ -121,49 +113,6 @@ int lua_engine::incomplete(int status)
 	}
 	return 0;  /* else... */
 }
-
-int lua_engine::pushline(int firstline) 
-{
-	char buffer[LUA_MAXINPUT];
-	char *b = buffer;
-	size_t l;
-	const char *prmt = get_prompt(firstline);
-	int readstatus = lua_readline(b, prmt);
-	lua_pop(m_lua_state, 1);  /* remove result from 'get_prompt' */
-	if (readstatus == 0)
-		return 0;  /* no input */
-	l = strlen(b);
-	if (l > 0 && b[l - 1] == '\n')  /* line ends with newline? */
-		b[l - 1] = '\0';  /* remove it */
-	if (firstline && b[0] == '=')  /* first line starts with `=' ? */
-		lua_pushfstring(m_lua_state, "return %s", b + 1);  /* change it to `return' */
-	else
-		lua_pushstring(m_lua_state, b);
-	return 1;
-}
-
-
-int lua_engine::loadline() 
-{
-	int status;
-	lua_settop(m_lua_state, 0);
-	if (!pushline(1))
-		return -1;  /* no input */
-	for (;;) {  /* repeat until gets a complete line */
-		size_t l;
-		const char *line = lua_tolstring(m_lua_state, 1, &l);
-		status = luaL_loadbuffer(m_lua_state, line, l, "=stdin");
-		if (!incomplete(status)) break;  /* cannot try to add lines? */
-		if (!pushline(0))  /* no more input? */
-			return -1;
-		lua_pushliteral(m_lua_state, "\n");  /* add a new line... */
-		lua_insert(m_lua_state, -2);  /* ...between the two lines */
-		lua_concat(m_lua_state, 3);  /* join them */
-	}
-	lua_remove(m_lua_state, 1);  /* remove line */
-	return status;
-}
-
 
 int emu_gamename(lua_State *L)
 {
@@ -199,23 +148,66 @@ static int luaopen_emu ( lua_State * L )
 	return 1;
 }
 
+
+struct msg {
+	astring text;
+	int ready;
+	astring response;
+	int status;
+	int done;
+} msg;
+
+osd_lock *lock;
+
 void lua_engine::serve_lua()
 {
+	osd_sleep(osd_ticks_per_second() / 1000 * 50);
 	printf("%s v%s - %s\n%s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info(),LUA_COPYRIGHT);
-	int status;
-	while ((status = loadline()) != -1) {
-		if (status == LUA_OK) status = docall(0, LUA_MULTRET);
-		report(status);
-		if (status == LUA_OK && lua_gettop(m_lua_state) > 0) {  /* any result to print? */
-			luaL_checkstack(m_lua_state, LUA_MINSTACK, "too many results to print");
-			lua_getglobal(m_lua_state, "print");
-			lua_insert(m_lua_state, 1);
-			if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
-				luai_writestringerror("%s\n", lua_pushfstring(m_lua_state,
-				"error calling " LUA_QL("print") " (%s)",
-				lua_tostring(m_lua_state, -1)));
+	fflush(stdout);
+	char buff[LUA_MAXINPUT];
+	astring oldbuff;
+	
+	const char *b = LUA_PROMPT;
+	
+	do {
+		// Wait for input
+		fputs(b, stdout); fflush(stdout);  /* show prompt */ 		
+		fgets(buff, LUA_MAXINPUT, stdin);
+		
+		// Create message
+		osd_lock_acquire(lock);
+		if (msg.ready == 0) {
+			msg.text = oldbuff;
+			if (oldbuff.len()!=0) msg.text.cat("\n");
+			msg.text.cat(buff);
+			msg.ready = 1;
+			msg.done = 0;
 		}
-	}
+		osd_lock_release(lock);
+		
+		// Wait for response
+		int done = 0;
+		do {
+			osd_sleep(osd_ticks_per_second() / 1000);
+			osd_lock_acquire(lock);
+			done = msg.done;
+			osd_lock_release(lock);
+		} while (done==0);
+
+		// Do action on client side
+		osd_lock_acquire(lock);
+		if (msg.status == -1){
+			b = LUA_PROMPT2;
+			oldbuff = msg.response;
+		}
+		else {
+			b = LUA_PROMPT;
+			oldbuff = "";
+		}
+		msg.done = 0;
+		osd_lock_release(lock);
+		
+	} while (1);
 }
 
 static void *serve_lua(void *param)
@@ -241,6 +233,10 @@ lua_engine::lua_engine()
 	luaL_requiref(m_lua_state, "emu", luaopen_emu, 1);
 		
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);		
+	msg.ready = 0;
+	msg.status = 0;
+	msg.done = 0;
+	lock = osd_lock_alloc();
 }
 
 //-------------------------------------------------
@@ -259,6 +255,40 @@ lua_engine::~lua_engine()
 void lua_engine::initialize()
 {
 	mg_start_thread(::serve_lua, this);
+}
+
+void lua_engine::periodic_check()
+{
+  osd_lock_acquire(lock);
+  if (msg.ready == 1) {
+	lua_settop(m_lua_state, 0);
+	int status = luaL_loadbuffer(m_lua_state, msg.text.cstr(), strlen(msg.text.cstr()), "=stdin");
+	if (incomplete(status)==0)  /* cannot try to add lines? */
+	{
+		if (status == LUA_OK) status = docall(0, LUA_MULTRET);
+		report(status);
+		if (status == LUA_OK && lua_gettop(m_lua_state) > 0)   /* any result to print? */
+		{
+			luaL_checkstack(m_lua_state, LUA_MINSTACK, "too many results to print");
+			lua_getglobal(m_lua_state, "print");
+			lua_insert(m_lua_state, 1);
+			if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
+				luai_writestringerror("%s\n", lua_pushfstring(m_lua_state,
+				"error calling " LUA_QL("print") " (%s)",
+				lua_tostring(m_lua_state, -1)));
+	  }	
+	}
+	else 
+	{
+	  status = -1;
+	}
+	msg.status = status;
+	msg.response = msg.text;
+	msg.text = "";
+	msg.ready = 0;
+	msg.done = 1;
+  }
+  osd_lock_release(lock);
 }
 
 //-------------------------------------------------
