@@ -187,6 +187,7 @@ public:
 		m_scc68070_dma_ch2_regs(*this, "scc_dma2_regs"),
 		m_scc68070_mmu_regs(*this, "scc_mmu_regs"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_magicram;
@@ -224,6 +225,7 @@ public:
 	UINT32 screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(magicard_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
 
@@ -503,8 +505,13 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 {
 	switch(offset)
 	{
-//      case 0/2:
-//          return machine().rand(); //TODO
+		case 0/2:
+		{
+			UINT8 vdisp;
+			vdisp = m_screen->vpos() < 256;
+
+          	return (m_pcab_vregs[offset] & 0xff7f) | vdisp<<7; //TODO
+		}
 	}
 
 	//printf("[%04x]\n",offset*2);
@@ -651,7 +658,7 @@ WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 
 static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_SHARE("magicram") /*only 0-7ffff accessed in Magic Card*/
+	AM_RANGE(0x00000000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_SHARE("magicram") /*only 0-7ffff accessed in Magic Card*/
 	AM_RANGE(0x00180000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_REGION("maincpu", 0)
 	/* 001ffc00-001ffdff System I/O */
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
@@ -717,7 +724,7 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state,  magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
