@@ -195,7 +195,7 @@ TODO:
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
 #include "includes/mpu4.h"
-	#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68000.h"
 
 
 struct ef9369_t
@@ -289,14 +289,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
 	DECLARE_READ16_MEMBER( mpu4_vid_vidram_r );
 	DECLARE_WRITE16_MEMBER( mpu4_vid_vidram_w );
-	DECLARE_WRITE16_MEMBER( ef9369_w );
-	DECLARE_READ16_MEMBER( ef9369_r );
-	DECLARE_WRITE16_MEMBER( bt471_w );
-	DECLARE_READ16_MEMBER( bt471_r );
-	DECLARE_WRITE16_MEMBER( characteriser16_w );
-	DECLARE_READ16_MEMBER( characteriser16_r );
-	DECLARE_WRITE16_MEMBER( bwb_characteriser16_w );
-	DECLARE_READ16_MEMBER( bwb_characteriser16_r );
+	DECLARE_WRITE8_MEMBER( ef9369_w );
+	DECLARE_READ8_MEMBER( ef9369_r );
+	DECLARE_WRITE8_MEMBER( bt471_w );
+	DECLARE_READ8_MEMBER( bt471_r );
+	DECLARE_WRITE8_MEMBER( vidcharacteriser_w );
+	DECLARE_READ8_MEMBER( vidcharacteriser_r );
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 };
 
@@ -491,10 +489,9 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 
 /* Non-multiplexed mode */
 
-WRITE16_MEMBER(mpu4vid_state::ef9369_w )
+WRITE8_MEMBER(mpu4vid_state::ef9369_w )
 {
 	struct ef9369_t &pal = m_pal;
-	data &= 0x00ff;
 
 	/* Address register */
 	if (offset & 1)
@@ -532,22 +529,25 @@ WRITE16_MEMBER(mpu4vid_state::ef9369_w )
 }
 
 
-READ16_MEMBER(mpu4vid_state::ef9369_r )
+READ8_MEMBER(mpu4vid_state::ef9369_r )
 {
 	struct ef9369_t &pal = m_pal;
 	if ((offset & 1) == 0)
 	{
 		UINT16 col = pal.clut[pal.addr >> 1];
 
-		if ((pal.addr & 1) == 0)
+/*		if ((pal.addr & 1) == 0)
 			return col & 0xff;
 		else
 			return col >> 8;
+			*/
+			
+	return col;
 	}
 	else
 	{
 		/* Address register is write only */
-		return 0xffff;
+		return 0xff;
 	}
 }
 
@@ -568,19 +568,15 @@ READ16_MEMBER(mpu4vid_state::ef9369_r )
  *  1 0 1    Overlay register
  */
 
-WRITE16_MEMBER(mpu4vid_state::bt471_w )
+WRITE8_MEMBER(mpu4vid_state::bt471_w )
 {
 	struct bt471_t &bt471 = m_bt471;
-	UINT8 val = data & 0xff;
-		{
-			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, val);
-		}
 
 	switch (offset)
 	{
 		case 0x0:
 		{
-			bt471.address = val;
+			bt471.address = data;
 			bt471.addr_cnt = 0;
 			break;
 		}
@@ -589,7 +585,7 @@ WRITE16_MEMBER(mpu4vid_state::bt471_w )
 			UINT8 *addr_cnt = &bt471.addr_cnt;
 			rgb_t *color = &bt471.color;
 
-			color[*addr_cnt] = val;
+			color[*addr_cnt] = data;
 
 			if (++*addr_cnt == 3)
 			{
@@ -603,18 +599,18 @@ WRITE16_MEMBER(mpu4vid_state::bt471_w )
 		}
 		case 0x2:
 		{
-			bt471.pixmask = val;
+			bt471.pixmask = data;
 			break;
 		}
 
-//      default:
+      default:
 		{
-			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, val);
+			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, data);
 		}
 	}
 }
 
-READ16_MEMBER(mpu4vid_state::bt471_r )
+READ8_MEMBER(mpu4vid_state::bt471_r )
 {
 	popmessage("Bt471: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -1290,17 +1286,17 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
+	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w,0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
@@ -1310,18 +1306,18 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff)  // 6840PTM on sampled sound board
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
+	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0x00ff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
+	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w, 0x00ff)
 //  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
 ADDRESS_MAP_END
 
@@ -1332,15 +1328,15 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 //  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
@@ -1350,19 +1346,19 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
-	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(bt471_r,bt471_w) Some games use this
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
+	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00)
+	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00) //Seems odd...
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
 	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE8(bwb_characteriser_r, bwb_characteriser_w, 0x00ff)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
 
@@ -1504,7 +1500,7 @@ Characteriser (CHR)
  the 'challenge' part of the startup check is always the same
 */
 
-WRITE16_MEMBER(mpu4vid_state::characteriser16_w )
+WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 {
 	int x;
 	int call=(data&0xff);
@@ -1535,7 +1531,7 @@ WRITE16_MEMBER(mpu4vid_state::characteriser16_w )
 }
 
 
-READ16_MEMBER(mpu4vid_state::characteriser16_r )
+READ8_MEMBER(mpu4vid_state::vidcharacteriser_r )
 {
 	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space.device().safe_pcbase(),offset,m_current_chr_table[m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
@@ -1558,99 +1554,6 @@ READ16_MEMBER(mpu4vid_state::characteriser16_r )
 }
 
 
-/*
-BwB Characteriser (CHR)
-
-The BwB method of protection is considerably different to the Barcrest one, with any
-incorrect behaviour manifesting in ridiculously large payouts.
-
-In fact, the software seems deliberately designed to mislead, but is (fortunately for
-us) prone to similar weaknesses that allow a per game solution.
-
-See mpu4hw.c for more info
-
-As BwB games aren't yet booting on the 16-bit board, we're duplicating the 8-bit program
-Precedent suggests this is not that dangerous an assumption to make.
-*/
-
-
-WRITE16_MEMBER(mpu4vid_state::bwb_characteriser16_w )
-{
-	int x;
-	int call=(data &0xff);
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space.device().safe_pcbase(),offset,data));
-	if (!m_current_chr_table)
-	{
-		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
-		return;
-	}
-
-	if (offset == 0)
-	{
-		if (!m_chr_state)
-		{
-			m_chr_state=1;
-			m_chr_counter=0;
-		}
-		if (call == 0)
-		{
-			m_init_col ++;
-		}
-		else
-		{
-			m_init_col =0;
-		}
-	}
-	m_chr_value = space.machine().rand();
-	for (x = 0; x < 4; x++)
-	{
-		if  (m_current_chr_table[(x)].call == call)
-		{
-			if (x == 0) // reinit
-			{
-				m_bwb_return = 0;
-			}
-			m_chr_value = bwb_chr_table_common[(m_bwb_return)];
-			m_bwb_return++;
-			break;
-		}
-	}
-}
-
-READ16_MEMBER(mpu4vid_state::bwb_characteriser16_r )
-{
-	LOG_CHR(("Characteriser read offset %02X \n",offset));
-
-
-	if (offset ==0)
-	{
-		switch (m_chr_counter)
-		{
-			case 6:
-			case 13:
-			case 20:
-			case 27:
-			case 34:
-			{
-				return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)].response;
-			}
-			default:
-			{
-				if (m_chr_counter > 34)
-				{
-					m_chr_counter = 35;
-					m_chr_state = 2;
-				}
-				m_chr_counter ++;
-				return m_chr_value;
-			}
-		}
-	}
-	else
-	{
-		return m_chr_value;
-	}
-}
 
 static mpu4_chr_table adders_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x84}, {0x18, 0x84}, {0x0F, 0xC4}, {0x13, 0x84}, {0x1B, 0x84},

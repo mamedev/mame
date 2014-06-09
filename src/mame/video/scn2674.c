@@ -496,7 +496,7 @@ void scn2674_device::scn2674_write_command(running_machine &machine, UINT8 data)
 }
 
 
-READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
+READ8_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
 {
 	/*
 	Offset:  Purpose
@@ -541,11 +541,11 @@ READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
 		case 7: LOG2674(("Read Screen2_h Register %06x\n",space.device().safe_pc()));return m_scn2674_screen2_h;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 
-WRITE16_MEMBER( scn2674_device::mpu4_vid_scn2674_w )
+WRITE8_MEMBER( scn2674_device::mpu4_vid_scn2674_w )
 {
 	/*
 	Offset:  Purpose
@@ -558,8 +558,6 @@ WRITE16_MEMBER( scn2674_device::mpu4_vid_scn2674_w )
 	 6       Screen Start 2 Lower Register
 	 7       Screen Start 2 Upper Register
 	*/
-
-	data &=0x00ff; /* it's an 8-bit chip on a 16-bit board, feel the cheapness. */
 
 	switch (offset)
 	{

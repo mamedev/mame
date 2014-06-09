@@ -31,8 +31,8 @@ public:
 	}
 //  int m_gfx_index;
 
-	DECLARE_READ16_MEMBER( mpu4_vid_scn2674_r );
-	DECLARE_WRITE16_MEMBER( mpu4_vid_scn2674_w );
+	DECLARE_READ8_MEMBER( mpu4_vid_scn2674_r );
+	DECLARE_WRITE8_MEMBER( mpu4_vid_scn2674_w );
 
 	UINT8 get_irq_state( void )
 	{
