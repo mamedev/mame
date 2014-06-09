@@ -142,8 +142,8 @@ GND | 20
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "includes/cps1.h"
-#include "machine/i8255.h"
 #include "kenseim.lh"
+#include "machine/mb89363b.h"
 
 class kenseim_state : public cps_state
 {
@@ -515,76 +515,7 @@ READ8_MEMBER(kenseim_state::portd_r)
 
 
 /*
-    Manufacturer: Fujitsu
-    Part Number: MB89363 / MB89363B / MB89363R
-    Package: Surface Mount QFP80 / QFP64P (MB89363R)
-    Description: 8-bit x 3 x 2 (6 x 8-bit) parallel data I/O port VLSI chip
-                 Parallel Communication Interface
-                 Extended I/O
-
-    Note: MB89363B is compatible with 8255
-
-    Pin Assignment:
-                                          +5v                                          
-                         P P P P P P P P P V   P P P P P P P P P                       
-                     N N 5 4 4 4 4 4 4 4 4 C N 1 1 1 1 1 1 1 1 2 N N                   
-                     C C 3 0 1 2 3 4 5 6 7 C C 7 6 5 4 3 2 1 0 3 C C                   
-                                                                                       
-                     | | ^ ^ ^ ^ ^ ^ ^ ^ ^ | | ^ ^ ^ ^ ^ ^ ^ ^ ^ | |                   
-                     | | | | | | | | | | | | | | | | | | | | | | | |                   
-                     | | v v v v v v v v v | | v v v v v v v v v | |                   
-                .-------------------------------------------------------.              
-                |    6 6 6 6 6 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4    |              
-                |    4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1    |              
-      P52   <-> | 65                                                 40 | <->    P22   
-      P51   <-> | 66                                                 39 | <->    P21   
-      P50   <-> | 67                                                 38 | <->    P20   
-      P54   <-> | 68                                                 37 | <->    P24   
-      P55   <-> | 69                                                 36 | <->    P25   
-      P56   <-> | 70                                                 35 | <->    P26   
-      P57   <-> | 71                                                 34 | <->    P27   
-       NC   --- | 72                   MB89363B                      33 | ---    NC    
-       NC   --- | 73                                                 32 | <--    RSLCT1
-      GND   --> | 74                                                 31 | <--    RSLCT0
-      CS2   --> | 75                                                 30 | <--    GND   
-        R   --> | 76                                                 29 | <--    CS1   
-      P30   <-> | 77                                                 28 | <->    P00   
-      P31   <-> | 78                                                 27 | <->    P01   
-      P32   <-> | 79                                                 26 | <->    P02   
-      P33   <-> | 80                                                 25 | <->    P03   
-                 \                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2    |              
-                  \  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4    |              
-                   -----------------------------------------------------'              
-                     ^ ^ ^ ^ ^ ^ | | ^ | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |                   
-                     | | | | | | | | | | | | | | | | | | | | | | | |                   
-                     v v v v | | | | | | | v v v v v v v v v v v v |                   
-                                                                                       
-                     P P P P W R N N R N O D D D D D D D D P P P P N                   
-                     3 3 3 3   S C C H C U B B B B B B B B 0 0 0 0 C                   
-                     4 5 6 7   T     /   S 0 1 2 3 4 5 6 7 7 6 5 4                     
-                                     R   /                                             
-                                     L   I                                             
-                                         N                                             
-                                         S                                             
-
-    Block Diagram / Pin Descriptions:
-    http://www.mess.org/_media/datasheets/fujitsu/mb89363b_partial.pdf
-
-    D.C. Characteristics:
-    (Recommended operating conditions unless otherwise noted)
-    (VCC = +5V +- 10%, GND = 0V, TA = -40o C to 85o C)
-                                         Value
-    Parameter            Symbol      Min       Max            Unit      Test Condition
-    ----------------------------------------------------------------------------------
-    Input Low Voltage    ViL         -0.3      0.8            V
-    Input High Voltage   ViH         2.2       VCC +0.3       V
-    Output Low Voltage   VoL         -         0.4            V         IoL = 2.5mA
-    Output High Voltage  VoH         3.0       -              V         IoH =-2.5mA
-
-    Sources:
-    http://www.emb-tech.co.jp/pc104/96dio.pdf
-    http://www.pb5800.com/resources/2350ser01.pdf
-    http://www.diagramasde.com/diagramas/otros2/TS-850S%20Service%20Manual%20.pdf
+ 
 */
 
 static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
@@ -596,8 +527,7 @@ static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("gamecpu_ctc", z80ctc_device, read, write)
 
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("i8255",   i8255_device, read, write)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("i8255_2", i8255_device, read, write)
+	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("mb89363b",   mb89363b_device, read, write)
 
 ADDRESS_MAP_END
 
@@ -628,19 +558,17 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
 	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2 ) // part of the tmpz84
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
-	
-	// the MB89363B seems to be 2 * i8255?
-	MCFG_DEVICE_ADD("i8255", I8255, 0) // MB89363B!
-	// always $80: all ports set as output
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_w))
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0) // MB89363B!
-	// always $92: port A and B as input, port C as output
-	MCFG_I8255_IN_PORTA_CB(READ8(kenseim_state, i8255_portd_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(kenseim_state, i8255_porte_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portf_w))
+	// a,b,c always $80: all ports set as output
+	// d,e,f always $92: port D and E as input, port F as output
+	
+	MCFG_MB89363B_ADD("mb89363b")
+	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(kenseim_state, i8255_porta_w))
+	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(kenseim_state, i8255_portb_w))
+	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(kenseim_state, i8255_portc_w))
+	MCFG_MB89363B_IN_PORTD_CB(READ8(kenseim_state, i8255_portd_r))
+	MCFG_MB89363B_IN_PORTE_CB(READ8(kenseim_state, i8255_porte_r))
+	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(kenseim_state, i8255_portf_w))
 
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

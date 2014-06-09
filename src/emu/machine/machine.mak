@@ -1749,6 +1749,7 @@ endif
 
 ifneq ($(filter I8255,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/i8255.o
+MACHINEOBJS += $(MACHINEOBJ)/mb89363b.o
 endif
 
 $(MACHINEOBJ)/s3c2400.o:    $(MACHINESRC)/s3c24xx.inc
