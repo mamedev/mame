@@ -44,8 +44,8 @@
 
 static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8, nitedrvr_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
-	AM_RANGE(0x0200, 0x027f) AM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_SHARE("videoram") // PFW
-	AM_RANGE(0x0400, 0x042f) AM_WRITEONLY AM_MIRROR(0x1c0) AM_SHARE("hvc") // POSH, POSV, CHAR
+	AM_RANGE(0x0200, 0x027f) AM_READNOP AM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_SHARE("videoram") // PFW
+	AM_RANGE(0x0400, 0x042f) AM_READNOP AM_WRITEONLY AM_MIRROR(0x1c0) AM_SHARE("hvc") // POSH, POSV, CHAR
 	AM_RANGE(0x0430, 0x043f) AM_WRITE(watchdog_reset_w) AM_MIRROR(0x1c0)
 	AM_RANGE(0x0600, 0x07ff) AM_READ(nitedrvr_in0_r)
 	AM_RANGE(0x0800, 0x09ff) AM_READ(nitedrvr_in1_r)

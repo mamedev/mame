@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
 
 void nitedrvr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 8);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 4);
 }
 
 void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey)
@@ -55,7 +55,7 @@ UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind1
 	
 	// don't wrap playfield
 	rectangle clip = cliprect;
-	if (clip.max_y > 63) clip.max_y = 63;
+	if (clip.max_y > 31) clip.max_y = 31;
 
 	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
 	draw_roadway(bitmap, cliprect);
