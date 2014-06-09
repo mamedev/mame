@@ -2153,6 +2153,7 @@ ROM_START( sgmast )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
 	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
+	// reconstructed key; some of the RNG-independent bits could be incorrect
 	ROM_LOAD( "317-0058-05d.key", 0x0000, 0x2000, BAD_DUMP  CRC(c779738d) SHA1(f65355c20fbcb22781816d24633a509f13bec170) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
