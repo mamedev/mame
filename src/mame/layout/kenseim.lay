@@ -29,7 +29,8 @@
 		</disk>
 	</element> 
 
-	<element name="text_level"><text string="LEVEL GAUGE"><color red="1" green="0.86666" blue="0" /></text></element>
+	<element name="text_level_l"><text string="LEVEL GAUGE" align="2"><color red="1" green="0.86666" blue="0" /></text></element>
+	<element name="text_level_r"><text string="LEVEL GAUGE" align="1"><color red="1" green="0.86666" blue="0" /></text></element>
 	<element name="text_ryu"><text string="Ryu"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_chunli"><text string="Chun-Li"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_start"><text string="Start"><color red="0.3" green="0.3" blue="0.3" /></text></element>
@@ -259,8 +260,8 @@
 		<bezel element="static_black">
 			<bounds x="6" y="254" width="105" height="8" />
 		</bezel>
-		<bezel element="text_level">
-			<bounds x="6" y="263" width="105" height="8" />
+		<bezel element="text_level_l">
+			<bounds x="0" y="263" width="107" height="8" />
 		</bezel>
 
 		<bezel name="lamp1" element="powerled">
@@ -299,8 +300,8 @@
 		<bezel element="static_black">
 			<bounds x="209" y="254" width="105" height="8" />
 		</bezel>
-		<bezel element="text_level">
-			<bounds x="209" y="263" width="105" height="8" />
+		<bezel element="text_level_r">
+			<bounds x="213" y="263" width="100" height="8" />
 		</bezel>
 
 		<bezel name="lamp11" element="powerled">
@@ -339,10 +340,10 @@
 	<!-- start buttons -->
 
 		<bezel element="text_ryu">
-			<bounds x="116" y="255" width="30" height="5"/>
+			<bounds x="115" y="254" width="30" height="6"/>
 		</bezel>
  		<bezel element="text_start">
-			<bounds x="116" y="261" width="30" height="5"/>
+			<bounds x="115" y="261" width="30" height="6"/>
 		</bezel>
 
 		<bezel element="disk_black">
@@ -353,10 +354,10 @@
 		</bezel>
 
 		<bezel element="text_chunli">
-			<bounds x="177" y="255" width="30" height="5"/>
+			<bounds x="177" y="254" width="30" height="6"/>
 		</bezel>
  		<bezel element="text_start">
-			<bounds x="177" y="261" width="30" height="5"/>
+			<bounds x="177" y="261" width="30" height="6"/>
 		</bezel> 
 
 		<bezel element="disk_black">
