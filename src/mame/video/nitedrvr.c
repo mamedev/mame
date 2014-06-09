@@ -13,13 +13,6 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_hvc_w)
-{
-	m_hvc[offset & 0x3f] = data;
-
-	if ((offset & 0x30) == 0x30)
-		watchdog_reset_w(space, 0, 0);
-}
 
 TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
 {
@@ -28,47 +21,44 @@ TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-
-
 void nitedrvr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 8);
 }
 
-void nitedrvr_state::draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey )
+void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey)
 {
-	int x, y;
-
-	for (y = by; y < ey; y++)
+	for (int y = by; y < ey; y++)
 	{
-		for (x = bx; x < ex; x++)
-			if ((y < 256) && (x < 256))
+		for (int x = bx; x < ex; x++)
+			if (cliprect.contains(x, y))
 				bitmap.pix16(y, x) = 1;
 	}
-
-	return;
 }
 
-void nitedrvr_state::draw_roadway( bitmap_ind16 &bitmap )
+void nitedrvr_state::draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int roadway;
-
-	for (roadway = 0; roadway < 16; roadway++)
+	for (int roadway = 0; roadway < 16; roadway++)
 	{
-		int bx, by, ex, ey;
+		int bx = m_hvc[roadway];
+		int by = m_hvc[roadway + 16];
+		int ex = bx + ((m_hvc[roadway + 32] & 0xf0) >> 4);
+		int ey = by + (16 - (m_hvc[roadway + 32] & 0x0f));
 
-		bx = m_hvc[roadway];
-		by = m_hvc[roadway + 16];
-		ex = bx + ((m_hvc[roadway + 32] & 0xf0) >> 4);
-		ey = by + (16 - (m_hvc[roadway + 32] & 0x0f));
-
-		draw_box(bitmap, bx, by, ex, ey);
+		draw_box(bitmap, cliprect, bx, by, ex, ey);
 	}
 }
 
 UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_roadway(bitmap);
+	bitmap.fill(0, cliprect);
+	
+	// don't wrap playfield
+	rectangle clip = cliprect;
+	if (clip.max_y > 63) clip.max_y = 63;
+
+	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
+	draw_roadway(bitmap, cliprect);
+
 	return 0;
 }

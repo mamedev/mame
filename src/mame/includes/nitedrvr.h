@@ -58,16 +58,15 @@ public:
 	DECLARE_WRITE8_MEMBER(nitedrvr_out0_w);
 	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
 	DECLARE_WRITE8_MEMBER(nitedrvr_videoram_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_hvc_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_crash_toggle_callback);
-	void draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey );
-	void draw_roadway( bitmap_ind16 &bitmap );
-	int nitedrvr_steering(  );
+	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey);
+	void draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int nitedrvr_steering();
 };
 
 /*----------- defined in audio/nitedrvr.c -----------*/
