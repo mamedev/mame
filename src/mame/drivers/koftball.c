@@ -55,7 +55,6 @@ public:
 	required_device<palette_device> m_palette;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	int m_clr_offset;
 	UINT16 m_prot_data;
 
 	DECLARE_READ16_MEMBER(random_number_r);
@@ -297,7 +296,6 @@ static const UINT16 nvram[]=
 #endif
 DRIVER_INIT_MEMBER(koftball_state,koftball)
 {
-	save_item(NAME(m_clr_offset));
 	save_item(NAME(m_prot_data));
 
 #if NVRAM_HACK

@@ -127,7 +127,6 @@ public:
 	required_shared_ptr<UINT16> m_vid1;
 	required_shared_ptr<UINT16> m_vid2;
 	required_device<palette_device> m_palette;
-	int m_clr_offset;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);
 	DECLARE_READ16_MEMBER(bmc_protection_r);
@@ -511,7 +510,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(bmcbowl_state,bmcbowl)
 {
-	save_item(NAME(m_clr_offset));
 	save_item(NAME(m_bmc_input));
 }
 

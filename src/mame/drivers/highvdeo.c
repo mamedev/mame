@@ -119,7 +119,6 @@ public:
 	UINT16 m_vblank_bit;
 	UINT16 m_brasil_prot_latch;
 	UINT16 m_grancapi_prot_latch;
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 	DECLARE_READ16_MEMBER(read0_r);
 	DECLARE_READ16_MEMBER(read1_r);
 	DECLARE_READ16_MEMBER(read2_r);
