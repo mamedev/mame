@@ -806,14 +806,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
-	MCFG_LR35902_HALT_BUG
-
-	MCFG_MACHINE_START_OVERRIDE(gb_state, gbpocket)
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
-
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)

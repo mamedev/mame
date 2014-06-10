@@ -146,7 +146,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 };
 
 
@@ -211,4 +210,4 @@ extern const device_type GB_LCD_CGB;
 		MCFG_DEVICE_ADD( _tag, GB_LCD_CGB, 0 )
 
 
-#endif /* GB_H_ */
+#endif /* GB_LCD_H_ */

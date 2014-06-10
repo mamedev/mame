@@ -173,15 +173,6 @@ void gb_state::machine_start()
 	save_gb_base();
 }
 
-MACHINE_START_MEMBER(gb_state,gbpocket)
-{
-	/* Allocate the serial timer, and disable it */
-	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
-	m_gb_serial_timer->enable( 0 );
-
-	save_gb_base();
-}
-
 MACHINE_START_MEMBER(gb_state,gbc)
 {
 	/* Allocate the serial timer, and disable it */
@@ -220,22 +211,6 @@ void gb_state::machine_reset()
 	m_bios_disable = 0;
 
 	m_divcount = 0x0004;
-}
-
-MACHINE_RESET_MEMBER(gb_state,gbpocket)
-{
-	gb_init();
-
-	gb_init_regs();
-
-	m_bios_disable = 1;
-
-	/* Initialize the Sound registers */
-	m_custom->sound_w(generic_space(), 0x16, 0x80);
-	m_custom->sound_w(generic_space(), 0x15, 0xF3);
-	m_custom->sound_w(generic_space(), 0x14, 0x77);
-
-	m_divcount = 0xABC8;
 }
 
 MACHINE_RESET_MEMBER(gb_state,gbc)

@@ -318,14 +318,6 @@ void mgb_lcd_device::device_start()
 	save_pointer(NAME(m_vram), 0x2000);
 
 	memcpy(m_oam, mgb_oam_fingerprint, 0x100);
-
-	/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
-	for (int i = 1; i < 0x0d; i++)
-	{
-		m_vram[0x1903 + i] = i;
-		m_vram[0x1923 + i] = i + 0x0C;
-	}
-	m_vram[0x1910] = 0x19;
 }
 
 void sgb_lcd_device::device_start()
@@ -368,7 +360,6 @@ void cgb_lcd_device::device_start()
 	save_pointer(NAME(m_vram), 0x4000);
 
 	memcpy(m_oam, cgb_oam_fingerprint, 0x100);
-
 
 	/* Background is initialised as white */
 	for (int i = 0; i < 32; i++)
@@ -449,27 +440,6 @@ void gb_lcd_device::device_reset()
 	m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(456));
 }
 
-void mgb_lcd_device::device_reset()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	common_reset();
-
-	/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(1), timer_expired_delegate(FUNC(mgb_lcd_device::video_init_vbl),this));
-
-	/* Initialize some video registers */
-	video_w(space, 0x0, 0x91);    /* LCDCONT */
-	video_w(space, 0x7, 0xFC);    /* BGRDPAL */
-	video_w(space, 0x8, 0xFC);    /* SPR0PAL */
-	video_w(space, 0x9, 0xFC);    /* SPR1PAL */
-
-	CURLINE = m_current_line = 0;
-	LCDSTAT = (LCDSTAT & 0xF8) | 0x05;
-	m_mode = 1;
-
-	m_lcd_timer->adjust(m_maincpu->cycles_to_attotime(60), GB_LCD_STATE_LY00_M0);
-}
-
 void sgb_lcd_device::device_reset()
 {
 	common_reset();
@@ -495,7 +465,6 @@ void cgb_lcd_device::device_reset()
 	m_hdma_possible = 0;
 
 	m_gbc_mode = 1;
-
 }
 
 
