@@ -39,6 +39,10 @@ static lua_State *globalL = NULL;
 #define luai_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
 #define luai_writeline()    (luai_writestring("\n", 1), fflush(stdout))
 
+const char *const lua_engine::tname_ioport = "lua.ioport";
+lua_engine* lua_engine::luaThis = NULL;
+
+
 static void lstop(lua_State *L, lua_Debug *ar) 
 {
 	(void)ar;  /* unused arg. */
@@ -115,9 +119,89 @@ int lua_engine::incomplete(int status)
 	return 0;  /* else... */
 }
 
-int emu_gamename(lua_State *L)
+lua_engine::hook::hook()
 {
-	lua_pushstring(L, machine_manager::instance()->machine()->system().description);
+	L = NULL;
+	cb = -1;
+}
+
+void lua_engine::hook::set(lua_State *_L, int idx)
+{
+	if (L)
+		luaL_unref(L, LUA_REGISTRYINDEX, cb);
+
+	if (lua_isnil(_L, idx)) {
+		L = NULL;
+		cb = -1;
+
+	} else {
+		L = _L;
+		lua_pushvalue(_L, idx);
+		cb = luaL_ref(_L, LUA_REGISTRYINDEX);
+	}
+}
+
+lua_State *lua_engine::hook::precall()
+{
+	lua_State *T = lua_newthread(L);
+	lua_rawgeti(T, LUA_REGISTRYINDEX, cb);
+	return T;
+}
+
+void lua_engine::hook::call(lua_engine *engine, lua_State *T, int nparam)
+{
+	engine->resume(T, nparam, L);
+}
+
+void lua_engine::resume(lua_State *L, int nparam, lua_State *root)
+{
+	int s = lua_resume(L, NULL, nparam);
+	switch(s) {
+	case LUA_OK:
+		if(!root) {
+			std::map<lua_State *, std::pair<lua_State *, int> >::iterator i = thread_registry.find(L);
+			if(i != thread_registry.end()) {
+				luaL_unref(i->second.first, LUA_REGISTRYINDEX, i->second.second);
+				thread_registry.erase(i);
+			}
+		} else
+			lua_pop(root, 1);
+		break;
+
+	case LUA_YIELD:
+		if(root) {
+			int id = luaL_ref(root, LUA_REGISTRYINDEX);
+			thread_registry[L] = std::pair<lua_State *, int>(root, id);
+		}
+		break;
+
+	default:
+		osd_printf_error("[LUA ERROR] %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+		break;
+	}
+}
+
+void lua_engine::resume(void *_L, INT32 param)
+{
+	resume(static_cast<lua_State *>(_L));
+}
+
+int lua_engine::l_ioport_write(lua_State *L)
+{
+	ioport_field *field = static_cast<ioport_field *>(getparam(L, 1, tname_ioport));
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "value expected");
+    field->set_value(lua_tointeger(L, 2));
+	return 0;
+}
+
+//-------------------------------------------------
+//  emu_gamename - returns game full name
+//-------------------------------------------------
+
+int lua_engine::l_emu_gamename(lua_State *L)
+{
+	lua_pushstring(L, luaThis->machine().system().description);
 	return 1;
 }
 
@@ -125,50 +209,177 @@ int emu_gamename(lua_State *L)
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
-int emu_keypost(lua_State *L)
+int lua_engine::l_emu_keypost(lua_State *L)
 {
 	const char *keys = luaL_checkstring(L,1);
-	machine_manager::instance()->machine()->ioport().natkeyboard().post_utf8(keys);
+	luaThis->machine().ioport().natkeyboard().post_utf8(keys);
 	return 1;
 }
 
-int emu_exit(lua_State *L)
+int lua_engine::l_emu_time(lua_State *L)
 {
-	machine_manager::instance()->machine()->schedule_exit();
+	lua_pushnumber(L, luaThis->machine().time().as_double());
 	return 1;
 }
 
-int emu_start(lua_State *L)
+void lua_engine::emu_after_done(void *_h, INT32 param)
+{
+    hook *h = static_cast<hook *>(_h);
+    h->call(this, h->precall(), 0);
+    delete h;
+}
+
+int lua_engine::emu_after(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
+    struct hook *h = new hook;
+    h->set(L, 2);
+	machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::emu_after_done), this), 0, h);
+	return 0;
+}
+
+int lua_engine::l_emu_after(lua_State *L)
+{
+	return luaThis->emu_after(L);
+}
+
+int lua_engine::emu_wait(lua_State *L)
+{
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
+	machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), this), 0, L);
+	return lua_yieldk(L, 0, 0, 0);
+}
+
+int lua_engine::l_emu_wait(lua_State *L)
+{
+	return luaThis->emu_wait(L);
+}
+
+void lua_engine::output_notifier(const char *outname, INT32 value)
+{
+	if (hook_output_cb.active()) {
+		lua_State *L = hook_output_cb.precall();
+		lua_pushstring(L, outname);
+		lua_pushnumber(L, value);
+		hook_output_cb.call(this, L, 2);
+	}
+}
+
+void lua_engine::s_output_notifier(const char *outname, INT32 value, void *param)
+{
+	static_cast<lua_engine *>(param)->output_notifier(outname, value);
+}
+
+void lua_engine::emu_hook_output(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
+	hook_output_cb.set(L, 1);
+
+	if (!output_notifier_set) {
+		output_set_notifier(NULL, s_output_notifier, this);
+		output_notifier_set = true;
+	}
+}
+
+int lua_engine::l_emu_hook_output(lua_State *L)
+{
+	luaThis->emu_hook_output(L);
+	return 0;
+}
+
+
+void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
+{
+  const char *name;
+
+  if(!lua_getmetatable(L, idx))
+    return 0;
+
+  lua_rawget(L, LUA_REGISTRYINDEX);
+  name = lua_tostring(L, -1);
+  if(!name || strcmp(name, tname)) {
+    lua_pop(L, 1);
+    return 0;
+  }
+  lua_pop(L, 1);
+
+  return *static_cast<void **>(lua_touserdata(L, idx));
+}
+
+void *lua_engine::getparam(lua_State *L, int idx, const char *tname)
+{
+	void *p = checkparam(L, idx, tname);
+  char msg[256];
+  sprintf(msg, "%s expected", tname);
+  luaL_argcheck(L, p, idx, msg);
+  return p;
+}
+
+void lua_engine::push(lua_State *L, void *p, const char *tname)
+{
+  void **pp = static_cast<void **>(lua_newuserdata(L, sizeof(void *)));
+  *pp = p;
+  luaL_getmetatable(L, tname);
+  lua_setmetatable(L, -2);
+}
+
+int lua_engine::l_emu_exit(lua_State *L)
+{
+	luaThis->machine().schedule_exit();
+	return 1;
+}
+
+int lua_engine::l_emu_start(lua_State *L)
 {
 	const char *system_name = luaL_checkstring(L,1);
 	
 	int index = driver_list::find(system_name);
 	if (index != -1) {
 		machine_manager::instance()->schedule_new_driver(driver_list::driver(index));	
-		machine_manager::instance()->machine()->schedule_hard_reset();
+		luaThis->machine().schedule_hard_reset();
 	}
 	return 1;
 }
-
-static const struct luaL_Reg emu_funcs [] =
-{
-	{ "gamename", emu_gamename },
-	{ "keypost", emu_keypost },
-	{ "exit", emu_exit },
-	{ "start", emu_start },
-	{ NULL, NULL }  /* sentinel */
-};
 
 //-------------------------------------------------
 //  luaopen_emu - connect emu section lib
 //-------------------------------------------------
 
-static int luaopen_emu ( lua_State * L )
+int lua_engine::luaopen_emu(lua_State *L)
 {
+	static const struct luaL_Reg emu_funcs [] = {
+		{ "gamename",    l_emu_gamename },
+		{ "keypost",     l_emu_keypost },
+		{ "hook_output", l_emu_hook_output },
+		{ "time",        l_emu_time },
+		{ "wait",        l_emu_wait },
+		{ "after",       l_emu_after },
+		{ "exit",		 l_emu_exit },
+		{ "start", 		 l_emu_start },
+		{ NULL, NULL }  /* sentinel */
+	};
+
 	luaL_newlib(L, emu_funcs);
 	return 1;
 }
 
+int lua_engine::luaopen_ioport(lua_State *L)
+{
+	static const struct luaL_Reg ioport_funcs [] = {
+		{ "write",       l_ioport_write },
+		{ NULL, NULL }  /* sentinel */
+	};
+
+	luaL_newmetatable(L, tname_ioport);
+	lua_pushvalue(L, -1);
+	lua_pushstring(L, tname_ioport);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+	lua_pushstring(L, "__index");
+	lua_pushvalue(L, -2);
+	lua_settable(L, -3);
+	luaL_setfuncs(L, ioport_funcs, 0);
+	return 1;
+}
 
 struct msg {
 	astring text;
@@ -245,14 +456,20 @@ static void *serve_lua(void *param)
 
 lua_engine::lua_engine()
 {
+	m_machine = NULL;
+	luaThis = this;
 	m_lua_state = luaL_newstate();  /* create state */
+	output_notifier_set = false;
+	
 	luaL_checkversion(m_lua_state);
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
 	luaL_openlibs(m_lua_state);  /* open libraries */
 	
 	luaopen_lsqlite3(m_lua_state);
 	luaL_requiref(m_lua_state, "emu", luaopen_emu, 1);
-		
+	
+	luaopen_ioport(m_lua_state);
+
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);		
 	msg.ready = 0;
 	msg.status = 0;
@@ -267,6 +484,29 @@ lua_engine::lua_engine()
 lua_engine::~lua_engine()
 {
 	close();
+}
+
+
+void lua_engine::update_machine()
+{	
+	lua_newtable(m_lua_state);
+	if (m_machine!=NULL) 
+	{
+		// Create the ioport array
+		ioport_port *port = machine().ioport().first_port();
+		while(port) {
+			ioport_field *field = port->first_field();
+			while(field) {
+				if(field->name()) {
+					push(m_lua_state, field, tname_ioport);
+					lua_setfield(m_lua_state, -2, field->name());
+				}
+				field = field->next();
+			}
+			port = port->next();
+		}
+	}
+	lua_setglobal(m_lua_state, "ioport");
 }
 
 //-------------------------------------------------
@@ -326,22 +566,30 @@ void lua_engine::close()
 //  execute - load and execute script
 //-------------------------------------------------
 
-void lua_engine::execute(const char *filename)
+void lua_engine::load_script(const char *filename)
 {
 	int s = luaL_loadfile(m_lua_state, filename);
-	s = docall(0, 0);	
 	report(s);	
-	lua_settop(m_lua_state, 0);
+	start();
 }
 
 //-------------------------------------------------
 //  execute_string - execute script from string
 //-------------------------------------------------
 
-void lua_engine::execute_string(const char *value)
+void lua_engine::load_string(const char *value)
 {
 	int s = luaL_loadstring(m_lua_state, value);
-	s = docall(0, 0);
 	report(s);	
-	lua_settop(m_lua_state, 0);
+	start();
 }
+
+//-------------------------------------------------
+//  start - execute the loaded script
+//-------------------------------------------------
+
+void lua_engine::start()
+{
+	resume(m_lua_state);
+}
+

@@ -97,6 +97,8 @@ public:
 
 	void set_machine(running_machine *machine) { m_machine = machine; }
 	
+	void update_machine();
+	
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
 	void schedule_new_driver(const game_driver &driver);

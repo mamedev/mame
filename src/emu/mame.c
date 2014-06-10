@@ -148,6 +148,12 @@ void machine_manager::schedule_new_driver(const game_driver &driver)
 /***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
+void machine_manager::update_machine() 
+{ 	
+	m_lua.set_machine(m_machine);
+	m_web.set_machine(m_machine);
+	if (m_machine!=NULL) m_web.push_message("update_machine");
+}
 
 /*-------------------------------------------------
     execute - run the core emulation
@@ -204,9 +210,6 @@ int machine_manager::execute()
 		running_machine machine(config, *this);
 
 		set_machine(&machine);
-
-		m_web.set_machine(machine);
-		m_web.push_message("update_machine");
 
 		// run the machine
 		error = machine.run(firstrun);

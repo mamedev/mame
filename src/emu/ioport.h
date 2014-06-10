@@ -1014,6 +1014,7 @@ public:
 	ioport_condition &condition() { return m_condition; }
 	ioport_type type() const { return m_type; }
 	UINT8 player() const { return m_player; }
+	void set_value(ioport_value value);
 
 	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); }
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
@@ -1109,6 +1110,9 @@ private:
 	void *                      m_read_param;       // parameter for read callback routine
 	ioport_field_write_delegate m_write;            // write callback routine
 	void *                      m_write_param;      // parameter for write callback routine
+
+	// data relevant to digital control types
+	bool                        m_digital_value;    // externally set value
 
 	// data relevant to analog control types
 	ioport_value                m_min;              // minimum value for absolute axes

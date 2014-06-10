@@ -26,7 +26,7 @@ public:
 	void push_message(const char *message);
 	void close();
 
-	void set_machine(running_machine &machine) { m_machine = &machine; }
+	void set_machine(running_machine *machine) { m_machine = machine; }
 	int begin_request_handler(struct mg_connection *conn);
 protected:
 	// getters

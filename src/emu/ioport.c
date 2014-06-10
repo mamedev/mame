@@ -1460,6 +1460,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_name(name),
 		m_read_param(NULL),
 		m_write_param(NULL),
+		m_digital_value(false),
 		m_min(0),
 		m_max(maskbits),
 		m_sensitivity(0),
@@ -1491,6 +1492,11 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 					m_defvalue = def->defvalue & m_mask;
 		}
 	}
+}
+
+void ioport_field::set_value(ioport_value value)
+{
+	m_digital_value = value != 0;
 }
 
 
@@ -1896,7 +1902,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		return;
 
 	// if the state changed, look for switch down/switch up
-	bool curstate = mouse_down || machine().input().seq_pressed(seq());
+	bool curstate = mouse_down || machine().input().seq_pressed(seq()) || m_digital_value;
 	bool changed = false;
 	if (curstate != m_live->last)
 	{

@@ -195,13 +195,13 @@ const char *running_machine::describe_context()
 TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 {
 	if (strlen(options().autoboot_script())!=0) {
-		manager().lua()->execute(options().autoboot_script());
+		manager().lua()->load_script(options().autoboot_script());
 	}
-	if (strlen(options().autoboot_command())!=0) {
+	else if (strlen(options().autoboot_command())!=0) {
 		astring cmd = astring(options().autoboot_command());
 		cmd.replace("'","\\'");
 		astring val = astring("emu.keypost('",cmd,"')");
-		manager().lua()->execute_string(val);
+		manager().lua()->load_string(val);
 	}
 }
 
@@ -292,6 +292,8 @@ void running_machine::start()
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
+	
+	manager().update_machine();
 }
 
 
