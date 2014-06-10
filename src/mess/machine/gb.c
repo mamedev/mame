@@ -540,10 +540,6 @@ READ8_MEMBER(gb_state::gb_io_r)
 }
 
 
-INTERRUPT_GEN_MEMBER(gb_state::gb_scanline_interrupt)
-{
-}
-
 TIMER_CALLBACK_MEMBER(gb_state::gb_serial_timer_proc)
 {
 	/* Shift in a received bit */

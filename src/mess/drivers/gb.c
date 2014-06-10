@@ -448,7 +448,6 @@ space. This mapper uses 32KB sized banks.
 
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
-static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };   /* Game Boy Pocket / Super Game Boy 2 */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };  /* Megaduck */
 
 
@@ -744,9 +743,6 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_CPU_PROGRAM_MAP(gameboy_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)  /* 1 dummy int each frame */
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, gb )
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gb )
@@ -810,7 +806,6 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
-	MCFG_LR35902_RESET_VALUES(mgb_cpu_regs)
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, gbpocket)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
@@ -854,14 +849,11 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 	MCFG_LR35902_RESET_VALUES(megaduck_cpu_regs)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)  /* 1 int each scanline ! */
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck )
 	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck )
@@ -904,8 +896,8 @@ ROM_START( supergb )
 ROM_END
 
 ROM_START( gbpocket )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-/*  ROM_LOAD( "gbp_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
+	ROM_REGION( 0x0100, "maincpu", 0 )
+	ROM_LOAD( "mgb_boot.bin", 0x0000, 0x0100, CRC(e6920754) SHA1(4e68f9da03c310e84c523654b9026e51f26ce7f0) )
 ROM_END
 
 ROM_START( gblight )

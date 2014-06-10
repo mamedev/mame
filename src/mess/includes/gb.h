@@ -105,7 +105,6 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	DECLARE_PALETTE_INIT(gbc);
-	INTERRUPT_GEN_MEMBER(gb_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(gb_serial_timer_proc);
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
