@@ -10,30 +10,7 @@
   Wilbert Pol                 2004 (Megaduck/Cougar Boy)
 
   TODO list:
-  Done entries kept for historical reasons, besides that it's nice to see
-  what is already done instead of what has to be done.
-
-Priority:  Todo:                                                  Done:
-  2        Replace Marat's  video/gb.c  by Playboy code           *
-  2        Clean & speed up video/gb.c                            *
-  2        Replace Marat's  Z80gb/Z80gb.c by Playboy code           *
-  2        Transform Playboys Z80gb.c to big case method            *
-  2        Clean up Z80gb.c                                         *
-  2        Fix / optimise halt instruction                          *
-  2        Do correct lcd stat timing                               In Progress
-  2        Generate lcd stat interrupts                             *
-  2        Replace Marat's code in machine/gb.c by Playboy code     ?
-  1        Check, and fix if needed flags bug which troubles ffa    ?
-  1        Save/restore battery backed ram                          *
-  1        Add sound                                                *
-  0        Add supergb support                                      *
-  0        Add palette editting, save & restore
-  0        Add somekind of backdrop support
-  0        Speedups if remotly possible
-
-  2 = has to be done before first public release
-  1 = should be added later on
-  0 = bells and whistles
+  - Do correct lcd stat timing
 
 
 Timers
