@@ -24,6 +24,9 @@
                * uPC494C (pulse width modulation control)
                May need to be split off to another driver.
 
+    2014-06-10 Added AP2000, gets caught in the same place as LX810L.
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -332,6 +335,11 @@ ROM_START( lx810l )
 	ROM_LOAD("lx810l.ic3c", 0x0000, 0x8000, CRC(a66454e1) SHA1(8e6f2f98abcbd8af6e34b9ba746edf0d18aef843) )
 ROM_END
 
+ROM_START( ap2000 )
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("ap2k.ic3c", 0x0000, 0x8000, CRC(ee7294b7) SHA1(219ffa6ff661ce95d5772c9fc1967093718f04e9) )
+ROM_END
+
 
 /***************************************************************************
     GAME DRIVERS
@@ -339,4 +347,5 @@ ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
 COMP( 1987, lx800, 0,      0,      lx800,   lx800, driver_device, 0,    "Epson", "LX-800 Printer", GAME_NOT_WORKING )
-COMP( 1987, lx810l,lx800,  0,      lx800,   lx800, driver_device, 0,    "Epson", "LX-810L Printer", GAME_NOT_WORKING )
+COMP( 19??, lx810l,lx800,  0,      lx800,   lx800, driver_device, 0,    "Epson", "LX-810L Printer", GAME_NOT_WORKING )
+COMP( 19??, ap2000,lx800,  0,      lx800,   lx800, driver_device, 0,    "Epson", "Advanced Printer 2000", GAME_NOT_WORKING )
