@@ -11,6 +11,7 @@
 
   TODO list:
   - Do correct lcd stat timing
+  - Add Game Boy Light (Japan, 1997) - does it differ from gbpocket?
 
 
 Timers
@@ -881,11 +882,6 @@ ROM_START( gbpocket )
 	ROM_LOAD( "mgb_boot.bin", 0x0000, 0x0100, CRC(e6920754) SHA1(4e68f9da03c310e84c523654b9026e51f26ce7f0) )
 ROM_END
 
-ROM_START( gblight )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-/*  ROM_LOAD( "gbl_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
-ROM_END
-
 ROM_START( gbcolor )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62) ) /* Bootstrap code part 1 */
@@ -901,7 +897,6 @@ ROM_END
 CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", GAME_SUPPORTS_SAVE )
 CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", GAME_SUPPORTS_SAVE )
 CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", GAME_SUPPORTS_SAVE )
-CONS( 1997, gblight,  gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Light", GAME_SUPPORTS_SAVE )
 CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
