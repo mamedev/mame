@@ -348,4 +348,4 @@ ROM_END
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
 COMP( 1987, lx800, 0,      0,      lx800,   lx800, driver_device, 0,    "Epson", "LX-800 Printer", GAME_NOT_WORKING )
 COMP( 19??, lx810l,lx800,  0,      lx800,   lx800, driver_device, 0,    "Epson", "LX-810L Printer", GAME_NOT_WORKING )
-COMP( 19??, ap2000,lx800,  0,      lx800,   lx800, driver_device, 0,    "Epson", "Advanced Printer 2000", GAME_NOT_WORKING )
+COMP( 19??, ap2000,lx800,  0,      lx800,   lx800, driver_device, 0,    "Epson", "Action Printer 2000", GAME_NOT_WORKING )
