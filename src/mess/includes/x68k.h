@@ -61,6 +61,7 @@ public:
 			m_ym2151(*this, "ym2151"),
 			m_ppi(*this, "ppi8255"),
 			m_screen(*this, "screen"),
+			m_upd72065(*this, "upd72065"),
 			m_options(*this, "options"),
 			m_mouse1(*this, "mouse1"), 
 			m_mouse2(*this, "mouse2"), 
@@ -91,6 +92,7 @@ public:
 	required_device<ym2151_device> m_ym2151;
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
+	required_device<upd72065_device> m_upd72065;
 
 	required_ioport m_options;
 	required_ioport m_mouse1;
@@ -112,7 +114,7 @@ public:
 	bitmap_ind16 *m_pcgbitmap;
 	bitmap_ind16 *m_gfxbitmap;
 
-	void floppy_load_unload();
+	void floppy_load_unload(bool load, floppy_image_device *dev);
 	int floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -127,13 +129,13 @@ public:
 	} m_sysport;
 	struct
 	{
-		upd72065_device *fdc;
 		floppy_image_device *floppy[4];
 		int led_ctrl[4];
 		int led_eject[4];
 		int eject[4];
-		int motor[4];
-		int selected_drive;
+		int motor;
+		int control_drives;
+		int select_drive;
 	} m_fdc;
 	struct
 	{
@@ -283,8 +285,6 @@ public:
 	void dma_irq(int channel);
 	DECLARE_WRITE8_MEMBER(dma_end);
 	DECLARE_WRITE8_MEMBER(dma_error);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 
 	int x68k_read_mouse();
 	void x68k_set_adpcm();

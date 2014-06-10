@@ -207,6 +207,7 @@ protected:
 		READ_TRACK,
 		FORMAT_TRACK,
 		READ_ID,
+		SCAN_DATA,
 
 		// Sub-states
 		COMMAND_DONE,
@@ -241,6 +242,7 @@ protected:
 		SEARCH_ADDRESS_MARK_DATA_FAILED,
 		READ_SECTOR_DATA,
 		READ_SECTOR_DATA_BYTE,
+		SCAN_SECTOR_DATA_BYTE,
 
 		WRITE_SECTOR_SKIP_GAP2,
 		WRITE_SECTOR_SKIP_GAP2_BYTE,
@@ -305,17 +307,17 @@ protected:
 
 	bool ready_connected, ready_polled, select_connected;
 
-	bool external_ready, no_poll_irq;
+	bool external_ready;
 
 	int mode;
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
 	devcb_write_line intrq_cb, drq_cb, hdl_cb;
-	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
+	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 
-	int fifo_pos, fifo_expected, command_pos, result_pos;
+	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
 	bool fifo_write;
 	UINT8 dor, dsr, msr, fifo[16], command[16], result[16];
 	UINT8 st1, st2, st3;
@@ -345,6 +347,9 @@ protected:
 		C_SENSE_INTERRUPT_STATUS,
 		C_SPECIFY,
 		C_WRITE_DATA,
+		C_SCAN_EQUAL,
+		C_SCAN_LOW,
+		C_SCAN_HIGH,
 
 		C_INVALID,
 		C_INCOMPLETE,
@@ -386,6 +391,8 @@ protected:
 
 	void read_id_start(floppy_info &fi);
 	void read_id_continue(floppy_info &fi);
+
+	void scan_start(floppy_info &fi);
 
 	void general_continue(floppy_info &fi);
 	void index_callback(floppy_image_device *floppy, int state);

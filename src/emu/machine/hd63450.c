@@ -274,7 +274,7 @@ void hd63450_device::set_timer(int channel, attotime tm)
 
 TIMER_CALLBACK_MEMBER(hd63450_device::dma_transfer_timer)
 {
-	if((m_reg[param].ocr & 3) == 2)
+	if(((m_reg[param].ocr & 3) == 2) && !m_drq_state[param])
 		return;
 	single_transfer(param);
 }
@@ -467,7 +467,7 @@ void hd63450_device::single_transfer(int x)
 					m_reg[x].mtc = space.read_word(m_reg[x].bar+4);
 					return;
 				}
-				m_timer[x]->adjust(attotime::zero);
+				m_timer[x]->adjust(attotime::never);
 				m_in_progress[x] = 0;
 				m_reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 				m_reg[x].csr &= ~0x08;  // channel no longer active
@@ -491,7 +491,13 @@ WRITE_LINE_MEMBER(hd63450_device::drq0_w)
 	m_drq_state[0] = state;
 	
 	if((m_reg[0].ocr & 2) && (state && !ostate))
+	{
+		// in cycle steal mode drq is supposed to be edge triggered
 		single_transfer(0);
+		m_timer[0]->adjust(m_our_clock[0], 0, m_our_clock[0]);
+	}
+	else if(!state)
+		m_timer[0]->adjust(attotime::never);
 }
 
 WRITE_LINE_MEMBER(hd63450_device::drq1_w)
@@ -500,7 +506,12 @@ WRITE_LINE_MEMBER(hd63450_device::drq1_w)
 	m_drq_state[1] = state;
 
 	if((m_reg[1].ocr & 2) && (state && !ostate))
+	{
 		single_transfer(1);
+		m_timer[1]->adjust(m_our_clock[1], 1, m_our_clock[1]);
+	}
+	else if(!state)
+		m_timer[1]->adjust(attotime::never);
 }
 
 WRITE_LINE_MEMBER(hd63450_device::drq2_w)
@@ -509,7 +520,12 @@ WRITE_LINE_MEMBER(hd63450_device::drq2_w)
 	m_drq_state[2] = state;
 	
 	if((m_reg[2].ocr & 2) && (state && !ostate))
+	{
 		single_transfer(2);
+		m_timer[0]->adjust(m_our_clock[2], 2, m_our_clock[2]);
+	}
+	else if(!state)
+		m_timer[2]->adjust(attotime::never);
 }
 
 WRITE_LINE_MEMBER(hd63450_device::drq3_w)
@@ -518,7 +534,12 @@ WRITE_LINE_MEMBER(hd63450_device::drq3_w)
 	m_drq_state[3] = state;
 	
 	if((m_reg[3].ocr & 2) && (state && !ostate))
+	{
 		single_transfer(3);
+		m_timer[0]->adjust(m_our_clock[3], 3, m_our_clock[3]);
+	}
+	else if(!state)
+		m_timer[3]->adjust(attotime::never);
 }
 
 int hd63450_device::get_vector(int channel)

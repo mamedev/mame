@@ -116,7 +116,6 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	ready_connected = true;
 	select_connected = true;
 	external_ready = false;
-	no_poll_irq = false;
 	dor_reset = 0x00;
 	mode = MODE_AT;
 }
@@ -845,7 +844,10 @@ void upd765_family_device::live_run(attotime limit)
 			int slot = (cur_live.bit_counter >> 4)-1;
 			if(slot < sector_size) {
 				// Sector data
-				live_delay(READ_SECTOR_DATA_BYTE);
+				if(cur_live.fi->main_state == SCAN_DATA)
+					live_delay(SCAN_SECTOR_DATA_BYTE);
+				else
+					live_delay(READ_SECTOR_DATA_BYTE);
 				return;
 
 			} else if(slot < sector_size+2) {
@@ -861,6 +863,38 @@ void upd765_family_device::live_run(attotime limit)
 		case READ_SECTOR_DATA_BYTE:
 			if(!tc_done)
 				fifo_push(cur_live.data_reg, true);
+			cur_live.state = READ_SECTOR_DATA;
+			checkpoint();
+			break;
+
+		case SCAN_SECTOR_DATA_BYTE:
+			if(!scan_done) // TODO: handle stp, x68000 sets it to 0xff (as it would dtl)?
+			{
+				int slot = (cur_live.bit_counter >> 4)-1;
+				UINT8 data = fifo_pop(true);
+				if(!slot)
+					st2 = (st2 & ~(ST2_SN)) | ST2_SH;
+
+				if(data != cur_live.data_reg)
+				{
+					st2 = (st2 & ~(ST2_SH)) | ST2_SN;
+					if((data < cur_live.data_reg) && ((command[0] & 0x1f) == 0x19)) // low
+						st2 &= ~ST2_SN;
+
+					if((data > cur_live.data_reg) && ((command[0] & 0x1f) == 0x1d)) // high
+						st2 &= ~ST2_SN;
+				}
+				if((slot == sector_size) && !(st2 & ST2_SN))
+				{
+					scan_done = true;
+					tc_done = true;
+				}
+			}
+			else
+			{
+				if(fifo_pos)
+					fifo_pop(true);
+			}
 			cur_live.state = READ_SECTOR_DATA;
 			checkpoint();
 			break;
@@ -1150,6 +1184,9 @@ int upd765_family_device::check_command()
 	case 0x0f:
 		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
 
+	case 0x11:
+		return command_pos == 9 ? C_SCAN_EQUAL         : C_INCOMPLETE;
+
 	case 0x12:
 		return command_pos == 2 ? C_PERPENDICULAR      : C_INCOMPLETE;
 
@@ -1158,6 +1195,12 @@ int upd765_family_device::check_command()
 
 	case 0x14:
 		return C_LOCK;
+
+	case 0x19:
+		return command_pos == 9 ? C_SCAN_LOW           : C_INCOMPLETE;
+
+	case 0x1d:
+		return command_pos == 9 ? C_SCAN_HIGH          : C_INCOMPLETE;
 
 	default:
 		return C_INVALID;
@@ -1226,6 +1269,12 @@ void upd765_family_device::start_command(int cmd)
 
 	case C_READ_TRACK:
 		read_track_start(flopi[command[1] & 3]);
+		break;
+
+	case C_SCAN_EQUAL:
+	case C_SCAN_LOW:
+	case C_SCAN_HIGH:
+		scan_start(flopi[command[1] & 3]);
 		break;
 
 	case C_RECALIBRATE:
@@ -1448,10 +1497,67 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 	fi.st0 = command[1] & 7;
 	st1 = ST1_MA;
 	st2 = 0x00;
+	hdl_cb(1);
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		st1 = 0;
+		st2 = 0;
+		read_data_continue(fi);
+		return;
+	}
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	read_data_continue(fi);
+}
+
+void upd765_family_device::scan_start(floppy_info &fi)
+{
+	fi.main_state = SCAN_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+	mfm = command[0] & 0x40;
+
+	logerror("%s: command scan%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x stp=%02x rate=%d\n",
+				tag(),
+				command[0] & 0x08 ? " deleted" : "",
+				command[0] & 0x80 ? " mt" : "",
+				command[0] & 0x40 ? " mfm" : "",
+				command[0] & 0x20 ? " sk" : "",
+				fifocfg & 0x40 ? " seek" : "",
+				command[0],
+				command[1],
+				command[2],
+				command[3],
+				command[4],
+				128 << (command[5] & 7),
+				command[6],
+				command[7],
+				command[8],
+				cur_rate);
+
+	fi.st0 = command[1] & 7;
+	st1 = ST1_MA;
+	st2 = 0x00;
+	scan_done = false;
 	hdl_cb(1);
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		st1 = 0;
+		st2 = 0;
+		read_data_continue(fi);
+		return;
+	}
+
+	if(fi.dev)
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 	read_data_continue(fi);
 }
 
@@ -1529,7 +1635,10 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 						cur_live.idbuf[2],
 						cur_live.idbuf[3]);
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
-			fifo_expect(sector_size, false);
+			if(fi.main_state == SCAN_DATA)
+				fifo_expect(sector_size, true);
+			else
+				fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
 			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
 			return;
@@ -1628,8 +1737,19 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	fi.st0 = command[1] & 7;
 	st1 = ST1_MA;
 	st2 = 0x00;
-
 	hdl_cb(1);
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		st1 = 0;
+		st2 = 0;
+		write_data_continue(fi);
+		return;
+	}
+
 	write_data_continue(fi);
 }
 
@@ -1721,6 +1841,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 	fi.main_state = READ_TRACK;
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
+	sectors_read = 0;
 
 	logerror("%s: command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				tag(),
@@ -1735,10 +1856,24 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 				command[7],
 				command[8],
 				cur_rate);
+	fi.st0 = command[1] & 7;
+	st1 = ST1_MA;
+	st2 = 0x00;
+	hdl_cb(1);
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		st1 = 0;
+		st2 = 0;
+		read_track_continue(fi);
+		return;
+	}
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
-	hdl_cb(1);
 	read_track_continue(fi);
 }
 
@@ -1751,6 +1886,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
+			fi.st0 |= ST0_SE;
 			if(fi.dev) {
 				fi.dev->dir_w(fi.pcn > command[2] ? 1 : 0);
 				fi.dev->stp_w(0);
@@ -1783,16 +1919,34 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 
 		case SEEK_DONE:
 			fi.counter = 0;
+			fi.sub_state = WAIT_INDEX;
+			return;
+
+		case WAIT_INDEX:
+			return;
+
+		case WAIT_INDEX_DONE:
+			logerror("%s: index found, reading track\n", tag());
 			fi.sub_state = SCAN_ID;
 			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
 			if(cur_live.crc) {
-				fprintf(stderr, "Header CRC error\n");
-				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
-				return;
+				st1 |= ST1_DE;
 			}
+			st1 &= ~ST1_MA;
+			logerror("%s: reading sector %02x %02x %02x %02x\n",
+						tag(),
+						cur_live.idbuf[0],
+						cur_live.idbuf[1],
+						cur_live.idbuf[2],
+						cur_live.idbuf[3]);
+			if(!sector_matches())
+				st1 |= ST1_ND;
+			else
+				st1 &= ~ST1_ND;
+
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
@@ -1800,30 +1954,49 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			return;
 
 		case SCAN_ID_FAILED:
-			fprintf(stderr, "RNF\n");
-			//          command_end(fi, true, 1);
-			return;
+			fi.st0 |= ST0_FAIL;
+			st1 |= ST1_ND;
+			fi.sub_state = COMMAND_DONE;
+			break;
 
-		case SECTOR_READ:
-			if(cur_live.crc) {
-				fprintf(stderr, "CRC error\n");
-			}
-			if(command[4] < command[6]) {
-				command[4]++;
-				fi.sub_state = HEAD_LOAD_DONE;
+		case SECTOR_READ: {
+			if(st2 & ST2_MD) {
+				fi.st0 |= ST0_FAIL;
+				fi.sub_state = COMMAND_DONE;
 				break;
 			}
+			if(cur_live.crc) {
+				st1 |= ST1_DE;
+				st2 |= ST2_CM;
+			}
+			bool done = tc_done;
+			sectors_read++;
+			if(sectors_read == command[6]) {
+				if(!tc_done) {
+					fi.st0 |= ST0_FAIL;
+					st1 |= ST1_EN;
+				}
+				done = true;
+			}
+			if(!done) {
+				fi.sub_state = WAIT_INDEX_DONE;
+				break;
+			}
+			fi.sub_state = COMMAND_DONE;
+			break;
+		}
 
+		case COMMAND_DONE:
 			main_phase = PHASE_RESULT;
-			result[0] = 0x40 | (fi.dev->ss_r() << 2) | fi.id;
-			result[1] = 0;
-			result[2] = 0;
+			result[0] = fi.st0;
+			result[1] = st1;
+			result[2] = st2;
 			result[3] = command[2];
 			result[4] = command[3];
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			//          command_end(fi, true, 0);
+			command_end(fi, true);
 			return;
 
 		default:
@@ -1849,11 +2022,22 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 				command[0] & 0x40 ? "mfm" : "fm",
 				command[1], command[2], command[3], command[4], command[5]);
 
+	hdl_cb(1);
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready)
+	{
+		fi.st0 = (command[1] & 7) | ST0_NR | ST0_FAIL;
+		fi.sub_state = TRACK_DONE;
+		format_track_continue(fi);
+		return;
+	}
+	fi.st0 = command[1] & 7;
+
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 	sector_size = calc_sector_size(command[2]);
 
-	hdl_cb(1);
 	format_track_continue(fi);
 }
 
@@ -1877,7 +2061,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 
 		case TRACK_DONE:
 			main_phase = PHASE_RESULT;
-			result[0] = (fi.dev->ss_r() << 2) | fi.id;
+			result[0] = fi.st0;
 			result[1] = 0;
 			result[2] = 0;
 			result[3] = 0;
@@ -1917,6 +2101,16 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 		cur_live.idbuf[i] = 0x00;
 
 	hdl_cb(1);
+	fi.ready = get_ready(command[1] & 3);
+
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.sub_state = COMMAND_DONE;
+		read_id_continue(fi);
+		return;
+	}
+
 	read_id_continue(fi);
 }
 
@@ -2022,7 +2216,7 @@ void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 void upd765_family_device::run_drive_ready_polling()
 {
-	if(main_phase != PHASE_CMD || (fifocfg & FIF_POLL))
+	if(main_phase != PHASE_CMD || (fifocfg & FIF_POLL) || command_pos)
 		return;
 
 	for(int fid=0; fid<4; fid++) {
@@ -2033,8 +2227,7 @@ void upd765_family_device::run_drive_ready_polling()
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid;
 				flopi[fid].st0_filled = true;
-				if(!no_poll_irq)
-					other_irq = true;
+				other_irq = true;
 			}
 		}
 	}
@@ -2114,6 +2307,7 @@ void upd765_family_device::general_continue(floppy_info &fi)
 		break;
 
 	case READ_DATA:
+	case SCAN_DATA:
 		read_data_continue(fi);
 		break;
 
@@ -2241,7 +2435,6 @@ i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, dev
 upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD72065, "UPD72065", tag, owner, clock, "upd72065", __FILE__)
 {
 	dor_reset = 0x0c;
-	no_poll_irq = true;
 }
 
 smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock, "smc37c78", __FILE__)
