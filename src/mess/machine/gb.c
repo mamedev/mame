@@ -164,7 +164,7 @@ void gb_state::gb_init()
 }
 
 
-MACHINE_START_MEMBER(gb_state,gb)
+void gb_state::machine_start()
 {
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -212,7 +212,7 @@ MACHINE_START_MEMBER(gb_state,sgb)
 	}
 }
 
-MACHINE_RESET_MEMBER(gb_state,gb)
+void gb_state::machine_reset()
 {
 	gb_init();
 

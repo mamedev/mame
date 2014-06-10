@@ -738,15 +738,14 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 
 
 static MACHINE_CONFIG_START( gameboy, gb_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
+	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz)
 	MCFG_CPU_PROGRAM_MAP(gameboy_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_MACHINE_START_OVERRIDE(gb_state, gb )
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gb )
-
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(0)
@@ -762,7 +761,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
-	MCFG_GB_LCD_DMG_ADD( "lcd" )
+	MCFG_GB_LCD_DMG_ADD("lcd")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -778,17 +777,20 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( supergb, gameboy )
-	MCFG_CPU_REPLACE("maincpu", LR35902, 4295454)   /* 4.295454 MHz */
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", LR35902, 4295454) /* 4.295454 MHz */
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb )
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb )
+	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
-	MCFG_DEFAULT_LAYOUT(layout_horizont)    /* runs on a TV, not an LCD */
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 28*8)
@@ -799,10 +801,12 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
 	MCFG_DEVICE_REMOVE("lcd")
-	MCFG_GB_LCD_SGB_ADD( "lcd" )
+	MCFG_GB_LCD_SGB_ADD("lcd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
@@ -810,14 +814,17 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_MACHINE_START_OVERRIDE(gb_state, gbpocket)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
 
+	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("lcd")
-	MCFG_GB_LCD_MGB_ADD( "lcd" )
+	MCFG_GB_LCD_MGB_ADD("lcd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
@@ -825,12 +832,13 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
+	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
 	MCFG_DEVICE_REMOVE("lcd")
-	MCFG_GB_LCD_CGB_ADD( "lcd" )
+	MCFG_GB_LCD_CGB_ADD("lcd")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -843,20 +851,22 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( megaduck, megaduck_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
+	MCFG_CPU_ADD("maincpu", LR35902, 4194304) /* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP( megaduck_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 	MCFG_LR35902_RESET_VALUES(megaduck_cpu_regs)
 
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck )
-	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck )
+	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
+	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
 
 	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
@@ -868,13 +878,15 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
-	MCFG_GB_LCD_DMG_ADD( "lcd" )
+	MCFG_GB_LCD_DMG_ADD("lcd")
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
+	/* cartslot */
 	MCFG_MEGADUCK_CARTRIDGE_ADD("duckslot", megaduck_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "megaduck")
 MACHINE_CONFIG_END
@@ -907,7 +919,7 @@ ROM_END
 
 ROM_START( gbcolor )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62) )  /* Bootstrap code part 1 */
+	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62) ) /* Bootstrap code part 1 */
 	ROM_LOAD( "gbc_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396) ) /* Bootstrap code part 2 */
 ROM_END
 

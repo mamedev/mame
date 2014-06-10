@@ -93,8 +93,6 @@ public:
 	DECLARE_READ8_MEMBER(gb_io_r);
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
-	DECLARE_MACHINE_START(gb);
-	DECLARE_MACHINE_RESET(gb);
 	DECLARE_PALETTE_INIT(gb);
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
@@ -136,6 +134,9 @@ protected:
 	void save_gb_base();
 	void save_gbc_only();
 	void save_sgb_only();
+
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
