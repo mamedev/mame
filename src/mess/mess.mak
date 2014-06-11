@@ -384,6 +384,7 @@ MACHINES += DS2404
 MACHINES += DS75160A
 MACHINES += DS75161A
 MACHINES += E0516
+MACHINES += E05A03
 MACHINES += EEPROMDEV
 MACHINES += ER2055
 MACHINES += ER59256
@@ -1267,7 +1268,6 @@ $(MESSOBJ)/epoch.a:             \
 
 $(MESSOBJ)/epson.a:             \
 	$(MESS_DRIVERS)/hx20.o      \
-	$(MESS_MACHINE)/e05a03.o    \
 	$(MESS_DRIVERS)/px4.o       \
 	$(MESS_DRIVERS)/px8.o       \
 	$(MESS_DRIVERS)/qx10.o      \
