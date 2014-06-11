@@ -1619,6 +1619,16 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 				texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
 	}
 
+	if ( texture->type == TEXTURE_TYPE_NONE && sdl->useglsl &&
+		 texture->xprescale == 1 && texture->yprescale == 1 &&
+		 texsource->rowpixels <= sdl->texture_max_width )
+	 {
+		 texture->type      = TEXTURE_TYPE_SHADER;
+		 texture->nocopy    = TRUE;
+		 texture->texTarget = GL_TEXTURE_2D;
+		 texture->texpow2   = sdl->texpoweroftwo;
+	 }
+
 	// determine if we can skip the copy step
 	// if this was not already decided by the shader condition above
 	if    ( texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
@@ -2972,7 +2982,7 @@ static void texture_disable(sdl_info *sdl, texture_info * texture)
 static void texture_all_disable(sdl_info *sdl)
 {
 	if ( sdl->useglsl )
-		{
+	{
 		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
 
 		pfn_glActiveTexture(GL_TEXTURE3);
@@ -2987,24 +2997,24 @@ static void texture_all_disable(sdl_info *sdl)
 		pfn_glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		if ( sdl->usefbo ) pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-		}
+	}
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-		if(sdl->usetexturerect)
-		{
-				glDisable(GL_TEXTURE_RECTANGLE_ARB);
-		}
-		glDisable(GL_TEXTURE_2D);
+	if(sdl->usetexturerect)
+	{
+		glDisable(GL_TEXTURE_RECTANGLE_ARB);
+	}
+	glDisable(GL_TEXTURE_2D);
 
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		if(sdl->usevbo)
-		{
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	if(sdl->usevbo)
+	{
 		pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, 0); // unbind ..
-		}
+	}
 	if ( sdl->usepbo )
 	{
 		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
-		}
+	}
 }
 
 static void drawogl_destroy_all_textures(sdl_window_info *window)
