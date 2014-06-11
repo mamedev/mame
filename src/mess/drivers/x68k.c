@@ -705,6 +705,8 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 		logerror("FDC: IRQ triggered\n");
 		m_maincpu->set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
 	}
+	else
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(x68k_state::x68k_fm_w)

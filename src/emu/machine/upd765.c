@@ -400,6 +400,8 @@ WRITE8_MEMBER(upd765_family_device::fifo_w)
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;
+		other_irq = false;
+		check_irq();
 		int cmd = check_command();
 		if(cmd == C_INCOMPLETE)
 			break;
@@ -1283,8 +1285,6 @@ void upd765_family_device::start_command(int cmd)
 		break;
 
 	case C_SEEK:
-		other_irq = false;
-		check_irq();
 		seek_start(flopi[command[1] & 3]);
 		main_phase = PHASE_CMD;
 		break;
