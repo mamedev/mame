@@ -187,7 +187,6 @@ struct texture_info
 	UINT32              mpass_texture_scrn[2];  // Multipass OpenGL texture "name"/ID for the shader
 	UINT32              mpass_fbo_scrn[2];      // framebuffer object for this texture, multipass
 
-	UINT32              lut_texture;            // LUT OpenGL texture "name"/ID for the shader
 	int                 lut_table_width;        // LUT table width
 	int                 lut_table_height;       // LUT table height
 
@@ -1624,7 +1623,6 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 		 texsource->rowpixels <= sdl->texture_max_width )
 	 {
 		 texture->type      = TEXTURE_TYPE_SHADER;
-		 texture->nocopy    = TRUE;
 		 texture->texTarget = GL_TEXTURE_2D;
 		 texture->texpow2   = sdl->texpoweroftwo;
 	 }
@@ -2600,21 +2598,13 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 
 	if ( texture->type == TEXTURE_TYPE_SHADER )
 	{
-		if ( texture->lut_texture )
-		{
-			pfn_glActiveTexture(GL_TEXTURE1);
-			glBindTexture(texture->texTarget, texture->lut_texture);
-
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->lut_table_width);
-
-			// give the card a hint
-			glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->lut_table_width, texture->lut_table_height,
-						GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, texsource->palette );
-		}
 		pfn_glActiveTexture(GL_TEXTURE0);
 		glBindTexture(texture->texTarget, texture->texture);
 
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->texinfo.rowpixels);
+		if (texture->nocopy)
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->texinfo.rowpixels);
+		else
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth);
 
 		// and upload the image
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
@@ -2843,50 +2833,47 @@ static void texture_mpass_flip(sdl_info *sdl, texture_info *texture, int shaderI
 static void texture_shader_update(sdl_window_info *window, texture_info *texture, int shaderIdx)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
-	if ( !texture->lut_texture )
+	int uniform_location, scrnum;
+	render_container *container;
+	GLfloat vid_attributes[4];
+
+	scrnum = 0;
+	container = (render_container *)NULL;
+	screen_device_iterator iter(window->machine().root_device());
+	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
 	{
-		int uniform_location, scrnum;
-		render_container *container;
-		GLfloat vid_attributes[4]; // gamma, contrast, brightness, effect
-
-		scrnum = 0;
-		container = (render_container *)NULL;
-		screen_device_iterator iter(window->machine().root_device());
-		for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+		if (scrnum == window->start_viewscreen)
 		{
-			if (scrnum == window->start_viewscreen)
-			{
-				container = &screen->container();
-			}
-
-			scrnum++;
+			container = &screen->container();
 		}
 
-		if (container!=NULL)
-		{
-			render_container::user_settings settings;
-			container->get_user_settings(settings);
-			//FIXME: Intended behaviour
+		scrnum++;
+	}
+
+	if (container!=NULL)
+	{
+		render_container::user_settings settings;
+		container->get_user_settings(settings);
+		//FIXME: Intended behaviour
 #if 1
-			vid_attributes[0] = window->machine().options().gamma();
-			vid_attributes[1] = window->machine().options().contrast();
-			vid_attributes[2] = window->machine().options().brightness();
+		vid_attributes[0] = window->machine().options().gamma();
+		vid_attributes[1] = window->machine().options().contrast();
+		vid_attributes[2] = window->machine().options().brightness();
 #else
-			vid_attributes[0] = settings.gamma;
-			vid_attributes[1] = settings.contrast;
-			vid_attributes[2] = settings.brightness;
+		vid_attributes[0] = settings.gamma;
+		vid_attributes[1] = settings.contrast;
+		vid_attributes[2] = settings.brightness;
 #endif
-			vid_attributes[3] = 0.0f;
-			uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[shaderIdx], "vid_attributes");
-			pfn_glUniform4fvARB(uniform_location, 1, &(vid_attributes[shaderIdx]));
-			if ( GL_CHECK_ERROR_QUIET() ) {
-				osd_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
-			}
+		vid_attributes[3] = 0.0f;
+		uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[shaderIdx], "vid_attributes");
+		pfn_glUniform4fvARB(uniform_location, 1, &(vid_attributes[shaderIdx]));
+		if ( GL_CHECK_ERROR_QUIET() ) {
+			osd_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
 		}
-		else
-		{
-			osd_printf_verbose("GLSL: could not get render container for screen %d\n", window->start_viewscreen);
-		}
+	}
+	else
+	{
+		osd_printf_verbose("GLSL: could not get render container for screen %d\n", window->start_viewscreen);
 	}
 }
 
@@ -3078,9 +3065,6 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 			pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
 			glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
 		}
-
-		if(texture->lut_texture)
-			glDeleteTextures(1, (GLuint *)&texture->lut_texture);
 
 		glDeleteTextures(1, (GLuint *)&texture->texture);
 		if ( texture->data_own )
