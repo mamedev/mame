@@ -350,6 +350,7 @@ cdimono1  // Philips CD-i (Mono-I board)
 // Yamaha
 mu100   // 1997 MU-100
 mu100r  // 1997 MU-100 Rackable version
+fb01    // 1986 FB-01
 
 // Roland
 mt32

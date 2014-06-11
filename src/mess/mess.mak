@@ -2042,6 +2042,7 @@ $(MESSOBJ)/xussrpc.a:            \
 
 $(MESSOBJ)/yamaha.a:            \
 	$(MESS_DRIVERS)/ymmu100.o   \
+	$(MESS_DRIVERS)/fb01.o      \
 
 $(MESS_DRIVERS)/ymmu100.o: $(MESS_DRIVERS)/ymmu100.inc
 $(MESS_DRIVERS)/ymmu100.inc: $(MESSSRC)/drivers/ymmu100.ppm $(FILE2STR_TARGET)
@@ -2270,6 +2271,7 @@ $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
 $(MESS_MACHINE)/esqvfd.o:   $(MESS_LAYOUT)/esq2by40.lh \
 							$(MESS_LAYOUT)/esq1by22.lh
 $(MESS_DRIVERS)/et3400.o:   $(MESS_LAYOUT)/et3400.lh
+$(MESS_DRIVERS)/fb01.o:     $(MESS_LAYOUT)/fb01.lh
 $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 							$(MESS_LAYOUT)/bridgec3.lh \
 							$(MESS_LAYOUT)/vsc.lh
