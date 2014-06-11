@@ -139,8 +139,7 @@ GND | 20
 // note: I've kept this code out of cps1.c as there is likely to be a substantial amount of game specific code here ones all the extra hardware is emulated
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
+#include "cpu/z80/tmpz84c011.h"
 #include "includes/cps1.h"
 #include "kenseim.lh"
 #include "machine/mb89363b.h"
@@ -460,14 +459,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("gamecpu_ctc", z80ctc_device, read, write)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
+	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("mb89363b",   mb89363b_device, read, write)
 ADDRESS_MAP_END
 
 
 static const z80_daisy_config daisy_chain_gamecpu[] =
 {
-	{ "gamecpu_ctc" },
+	{ "gamecpu:ctc" },
 	{ NULL }
 };
 
@@ -486,9 +484,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 	MCFG_TMPZ84C011_PORTC_READ_CB(IOPORT("CAB-IN"))
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(kenseim_state, cpu_portd_r))
 	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
+	MCFG_TMPZ84C011_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("gamecpu_ctc", Z80CTC, XTAL_16MHz/2) // part of the tmpz84
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("gamecpu", INPUT_LINE_IRQ0))
 
 	MCFG_MB89363B_ADD("mb89363b")
 	// a,b,c always $80: all ports set as output

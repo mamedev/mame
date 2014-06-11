@@ -27,8 +27,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
 #include "video/v9938.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
+#include "cpu/z80/tmpz84c011.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "cpu/z80/z80daisy.h"
@@ -235,7 +234,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
@@ -453,7 +451,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 
 static const z80_daisy_config daisy_chain_sound[] =
 {
-	{ "ctc" },
+	{ "audiocpu:ctc" },
 	{ NULL }
 };
 
@@ -483,10 +481,8 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(csplayh5_state, soundcpu_dac1_w))
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(csplayh5_state, soundcpu_portd_r))
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porte_w))
-
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 8000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_TMPZ84C011_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	MCFG_TMPZ84C011_Z80CTC_ZC0_CB(DEVWRITELINE("audiocpu:ctc", z80ctc_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
