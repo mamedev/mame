@@ -511,7 +511,6 @@ ROM_START( vz200de )
 	ROM_LOAD("vtechv11.u10", 0x2000, 0x2000, NO_DUMP)
 ROM_END
 
-#define rom_las110de    rom_laser110
 #define rom_laser200    rom_laser110
 #define rom_fellow  	rom_laser110
 
@@ -524,8 +523,15 @@ ROM_START( laser210 )
 	ROM_LOAD("vtechv20.u10", 0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440))
 ROM_END
 
-#define rom_las210de    rom_laser210
-#define rom_vz200   	rom_laser210
+ROM_START( vz200 )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "basic20", "BASIC V2.0")
+	ROMX_LOAD("vtechv20.u09",  0x0000, 0x2000, CRC(cc854fe9) SHA1(6e66a309b8e6dc4f5b0b44e1ba5f680467353d66), ROM_BIOS(1))
+	ROMX_LOAD("vtechv20.u10",  0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "enhanced", "VZ-200 Enhanced BASIC V1.01")
+	ROMX_LOAD("vz200_v101.u9", 0x0000, 0x2000, CRC(70340b97) SHA1(eb3f3c8cf0cfa7acd646e89a90a3edf9e556cab6), ROM_BIOS(2))
+	ROMX_LOAD("vtechv20.u10",  0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440), ROM_BIOS(2))
+ROM_END
 
 ROM_START( laser310 )
 	ROM_REGION(0x4000, "maincpu", 0)
