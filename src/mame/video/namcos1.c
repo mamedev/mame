@@ -50,17 +50,7 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-inline void namcos1_state::bg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram)
-{
-	int code;
-
-	tile_index <<= 1;
-	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO_MEMBER(0,code,0,0);
-	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
-}
-
-inline void namcos1_state::fg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram)
+inline void namcos1_state::get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram)
 {
 	int code;
 
@@ -72,32 +62,32 @@ inline void namcos1_state::fg_get_info(tile_data &tileinfo,int tile_index,UINT8 
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info0)
 {
-	bg_get_info(tileinfo,tile_index,&m_videoram[0x0000]);
+	get_tile_info(tileinfo,tile_index,&m_videoram[0x0000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info1)
 {
-	bg_get_info(tileinfo,tile_index,&m_videoram[0x2000]);
+	get_tile_info(tileinfo,tile_index,&m_videoram[0x2000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info2)
 {
-	bg_get_info(tileinfo,tile_index,&m_videoram[0x4000]);
+	get_tile_info(tileinfo,tile_index,&m_videoram[0x4000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info3)
 {
-	bg_get_info(tileinfo,tile_index,&m_videoram[0x6000]);
+	get_tile_info(tileinfo,tile_index,&m_videoram[0x6000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info4)
 {
-	fg_get_info(tileinfo,tile_index,&m_videoram[0x7010]);
+	get_tile_info(tileinfo,tile_index,&m_videoram[0x7010]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info5)
 {
-	fg_get_info(tileinfo,tile_index,&m_videoram[0x7810]);
+	get_tile_info(tileinfo,tile_index,&m_videoram[0x7810]);
 }
 
 
@@ -113,10 +103,6 @@ void namcos1_state::video_start()
 	int i;
 
 	m_tilemap_maskdata = (UINT8 *)memregion("gfx1")->base();
-
-	/* allocate videoram */
-	m_videoram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
-	m_spriteram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
 
 	/* initialize playfields */
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -140,10 +126,7 @@ void namcos1_state::video_start()
 	m_bg_tilemap[5]->set_scrolldy(16, 16);
 
 	/* register videoram to the save state system (post-allocation) */
-	save_pointer(NAME(m_videoram), 0x8000);
 	save_item(NAME(m_cus116));
-	save_pointer(NAME(m_spriteram), 0x1000);
-	save_item(NAME(m_playfield_control));
 
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i < 15;i++)
@@ -174,11 +157,6 @@ void namcos1_state::video_start()
   Memory handlers
 
 ***************************************************************************/
-
-READ8_MEMBER( namcos1_state::namcos1_videoram_r )
-{
-	return m_videoram[offset];
-}
 
 WRITE8_MEMBER( namcos1_state::namcos1_videoram_w )
 {
@@ -235,33 +213,15 @@ WRITE8_MEMBER( namcos1_state::namcos1_paletteram_w )
 
 
 
-
-READ8_MEMBER( namcos1_state::namcos1_spriteram_r )
-{
-	/* 0000-07ff work ram */
-	/* 0800-0fff sprite ram */
-	if (offset < 0x1000)
-		return m_spriteram[offset];
-	/* 1xxx playfield control ram */
-	else
-		return m_playfield_control[offset & 0x1f];
-}
-
 WRITE8_MEMBER( namcos1_state::namcos1_spriteram_w )
 {
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
-	if (offset < 0x1000)
-	{
-		m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 
-		/* a write to this offset tells the sprite chip to buffer the sprite list */
-		if (offset == 0x0ff2)
-			m_copy_sprites = 1;
-	}
-	/* 1xxx playfield control ram */
-	else
-		m_playfield_control[offset & 0x1f] = data;
+	/* a write to this offset tells the sprite chip to buffer the sprite list */
+	if (offset == 0x0ff2)
+		m_copy_sprites = 1;
 }
 
 

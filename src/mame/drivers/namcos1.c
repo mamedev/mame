@@ -60,12 +60,7 @@ CUS151      protection [1]
 Memory map
 ----------
 Main, Sub CPU:
-Address decoding is entirely handled by CUS117, which is a simple MMU providing a
-virtual address space 23 bits wide. The chip outputs the various enable lines for
-RAM, ROM, etc., and bits 12-21 of the virtual address (therefore bit 22 is handled
-only internally). There are 8 banks in the 6809 address space, each one redirectable
-to a portion of the virtual address space. The main and sub CPUs are independent,
-each one can set up its own banks.
+Address decoding is entirely handled by CUS117; see machine/c117.c.
 
 Main & sub CPU memory map:
 
@@ -179,7 +174,7 @@ Ernesto Corvi
 ernesto@imagina.com
 
 Updates by:
-Vernon C. Brooks, Acho A. Tang, Nicola Salmoria
+Vernon C. Brooks, Acho A. Tang, Nicola Salmoria, Alex W. Jackson
 
 
 Notes:
@@ -220,7 +215,7 @@ Notes:
 
 
 TODO:
-- There is still a big mistery about the first location of tri port ram, which is
+- There is still a big mystery about the first location of tri port ram, which is
   shared among all four CPUs. See namcos1_mcu_patch_w() for the kludge: essentially,
   this location has to be 0xA6 for the games to work. However, the MCU first sets it
   to 0xA6, then zeroes it - and there doesn't seem to be any code anywhere for any CPU
@@ -290,7 +285,7 @@ are programmed separately and may be 4,8,16,or 32 pixels.
 Sound:
 
 Namco custom 8 channel 16-bit stereo PSG for sound effects
-registor array based 2 channel 8-bit DAC for voice
+resistor array based 2 channel 8-bit DAC for voice
 Yamaha YM2151+YM3012 FM chip for background music
 
 Controls:
@@ -342,28 +337,16 @@ C - uses sub board with support for player 3 and 4 controls
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/2151intf.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
 #include "includes/namcos1.h"
 
 
 /**********************************************************************/
 
-WRITE8_MEMBER(namcos1_state::namcos1_sub_firq_w)
-{
-	m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-}
-
 WRITE8_MEMBER(namcos1_state::irq_ack_w)
 {
 	space.device().execute().set_input_line(0, CLEAR_LINE);
 }
-
-WRITE8_MEMBER(namcos1_state::firq_ack_w)
-{
-	space.device().execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-}
-
 
 
 READ8_MEMBER(namcos1_state::dsw_r)
@@ -423,52 +406,36 @@ WRITE8_MEMBER(namcos1_state::namcos1_dac1_w)
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, namcos1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("bank5")
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank6")
-	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank7")
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(namcos1_bankswitch_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(namcos1_cpu_control_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(namcos1_watchdog_w)
-//  AM_RANGE(0xf400, 0xf400) AM_WRITENOP // unknown
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(namcos1_sub_firq_w) // asserts FIRQ on CPU1
-	AM_RANGE(0xfc00, 0xfc01) AM_WRITE(namcos1_subcpu_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8")
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("c117", namco_c117_device, main_r, main_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank9")
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank10")
-	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank11")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank12")
-	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("bank13")
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank14")
-	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank15")
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(namcos1_bankswitch_w)
-//  AM_RANGE(0xf000, 0xf000) AM_WRITENOP // IO Chip
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(namcos1_watchdog_w)
-//  AM_RANGE(0xf400, 0xf400) AM_WRITENOP // ?
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank16")
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("c117", namco_c117_device, sub_r, sub_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( virtual_map, AS_PROGRAM, 8, namcos1_state )
+	AM_RANGE(0x2c0000, 0x2c1fff) AM_WRITE(namcos1_3dcs_w)
+	AM_RANGE(0x2e0000, 0x2e7fff) AM_RAM_WRITE(namcos1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2f0000, 0x2f7fff) AM_RAM_WRITE(namcos1_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2f8000, 0x2f9fff) AM_READWRITE(no_key_r, no_key_w)
+	AM_RANGE(0x2fc000, 0x2fcfff) AM_RAM_WRITE(namcos1_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x2fd000, 0x2fd01f) AM_RAM AM_SHARE("pfcontrol") AM_MIRROR(0xfe0)
+	AM_RANGE(0x2fe000, 0x2fe3ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0xc00) /* PSG ( Shared ) */
+	AM_RANGE(0x2ff000, 0x2ff7ff) AM_RAM AM_SHARE("triram") AM_MIRROR(0x800)
+	AM_RANGE(0x300000, 0x307fff) AM_RAM
+	AM_RANGE(0x400000, 0x7fffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank17")   /* Banked ROMs */
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("soundbank")   /* Banked ROMs */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ymsnd", ym2151_device, status_r)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
-	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK("bank18")   /* TRIRAM (shared) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("triram")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(namcos1_watchdog_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVWRITE("c117", namco_c117_device, sound_watchdog_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -480,9 +447,8 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("CONTROL0")
 	AM_RANGE(0x1401, 0x1401) AM_READ_PORT("CONTROL1")
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank20") /* banked ROM */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(namcos1_mcu_patch_w)  /* kludge! see notes */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAMBANK("bank19")   /* TRIRAM (shared) */
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("mcubank") /* banked ROM */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("triram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(namcos1_dac0_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(namcos1_dac1_w)
@@ -1081,6 +1047,11 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+
+	MCFG_DEVICE_ADD("c117", NAMCO_C117, 0)
+	MCFG_DEVICE_PROGRAM_MAP(virtual_map)
+	MCFG_CUS117_CPUS("maincpu", "subcpu")
+	MCFG_CUS117_SUBRES_CB(WRITELINE(namcos1_state, subres_w))
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))

@@ -1507,6 +1507,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/toypop.o $(VIDEO)/toypop.o \
 	$(DRIVERS)/turrett.o $(AUDIO)/turrett.o $(VIDEO)/turrett.o \
 	$(DRIVERS)/warpwarp.o $(AUDIO)/geebee.o $(AUDIO)/warpwarp.o $(VIDEO)/warpwarp.o \
+	$(MACHINE)/c117.o \
 	$(MACHINE)/namcoio.o \
 	$(MACHINE)/namco06.o \
 	$(MACHINE)/namco50.o \
