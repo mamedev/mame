@@ -407,6 +407,7 @@ STOP            01001000  10111011          12  stop
 #include "emu.h"
 #include "debugger.h"
 #include "upd7810.h"
+#include "upd7810_macros.h"
 
 
 const device_type UPD7810 = &device_creator<upd7810_device>;
@@ -540,162 +541,6 @@ offs_t upd78c05_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 	extern CPU_DISASSEMBLE( upd78c05 );
 	return CPU_DISASSEMBLE_NAME(upd78c05)(this, buffer, pc, oprom, opram, options);
 }
-
-
-#define CY  0x01
-#define F1  0x02
-#define L0  0x04
-#define L1  0x08
-#define HC  0x10
-#define SK  0x20
-#define Z   0x40
-#define F7  0x80
-
-/* IRR flags */
-#define INTNMI  0x0001
-#define INTFT0  0x0002
-#define INTFT1  0x0004
-#define INTF1   0x0008
-#define INTF2   0x0010
-#define INTFE0  0x0020
-#define INTFE1  0x0040
-#define INTFEIN 0x0080
-#define INTFAD  0x0100
-#define INTFSR  0x0200
-#define INTFST  0x0400
-#define INTER   0x0800
-#define INTOV   0x1000
-#define INTF0   0x2000
-
-/* ITF flags */
-#define INTAN4  0x0001
-#define INTAN5  0x0002
-#define INTAN6  0x0004
-#define INTAN7  0x0008
-#define INTSB   0x0010
-
-#define PPC     m_ppc.w.l
-#define PC      m_pc.w.l
-#define PCL     m_pc.b.l
-#define PCH     m_pc.b.h
-#define PCD     m_pc.d
-#define SP      m_sp.w.l
-#define SPL     m_sp.b.l
-#define SPH     m_sp.b.h
-#define SPD     m_sp.d
-#define PSW     m_psw
-#define OP      m_op
-#define OP2     m_op2
-#define IFF     m_iff
-#define EA      m_ea.w.l
-#define EAL     m_ea.b.l
-#define EAH     m_ea.b.h
-#define VA      m_va.w.l
-#define V       m_va.b.h
-#define A       m_va.b.l
-#define VAD     m_va.d
-#define BC      m_bc.w.l
-#define B       m_bc.b.h
-#define C       m_bc.b.l
-#define DE      m_de.w.l
-#define D       m_de.b.h
-#define E       m_de.b.l
-#define HL      m_hl.w.l
-#define H       m_hl.b.h
-#define L       m_hl.b.l
-#define EA2     m_ea2.w.l
-#define VA2     m_va2.w.l
-#define BC2     m_bc2.w.l
-#define DE2     m_de2.w.l
-#define HL2     m_hl2.w.l
-
-#define OVC0    m_ovc0
-#define OVC1    m_ovc1
-#define OVCE    m_ovce
-#define OVCF    m_ovcf
-#define OVCS    m_ovcs
-#define EDGES   m_edges
-
-#define CNT0    m_cnt.b.l
-#define CNT1    m_cnt.b.h
-#define TM0     m_tm.b.l
-#define TM1     m_tm.b.h
-#define ECNT    m_ecnt.w.l
-#define ECPT    m_ecnt.w.h
-#define ETM0    m_etm.w.l
-#define ETM1    m_etm.w.h
-
-#define MA      m_ma
-#define MB      m_mb
-#define MCC     m_mcc
-#define MC      m_mc
-#define MM      m_mm
-#define MF      m_mf
-#define TMM     m_tmm
-#define ETMM    m_etmm
-#define EOM     m_eom
-#define SML     m_sml
-#define SMH     m_smh
-#define PANM    m_panm
-#define ANM     m_anm
-#define MKL     m_mkl
-#define MKH     m_mkh
-#define ZCM     m_zcm
-
-#define CR0     m_cr0
-#define CR1     m_cr1
-#define CR2     m_cr2
-#define CR3     m_cr3
-#define RXB     m_rxb
-#define TXB     m_txb
-
-#define RXD     m_rxd
-#define TXD     m_txd
-#define SCK     m_sck
-#define TI      m_ti
-#define TO      m_to
-#define CI      m_ci
-#define CO0     m_co0
-#define CO1     m_co1
-
-#define IRR     m_irr
-#define ITF     m_itf
-
-
-#define RDOP(O)     O = m_direct->read_decrypted_byte(PCD); PC++
-#define RDOPARG(A)  A = m_direct->read_raw_byte(PCD); PC++
-#define RM(A)       m_program->read_byte(A)
-#define WM(A,V)     m_program->write_byte(A,V)
-
-#define ZHC_ADD(after,before,carry)     \
-	if (after == 0) PSW |= Z; else PSW &= ~Z; \
-	if (after == before) \
-		PSW = (PSW&~CY) | (carry); \
-	else if (after < before)            \
-		PSW |= CY;          \
-	else                                \
-		PSW &= ~CY;             \
-	if ((after & 15) < (before & 15))   \
-		PSW |= HC;                      \
-	else                                \
-		PSW &= ~HC;
-#define ZHC_SUB(after,before,carry)     \
-	if (after == 0) PSW |= Z; else PSW &= ~Z; \
-	if (before == after)                    \
-		PSW = (PSW & ~CY) | (carry);    \
-	else if (after > before)            \
-		PSW |= CY;          \
-	else                                \
-		PSW &= ~CY;             \
-	if ((after & 15) > (before & 15))   \
-		PSW |= HC;                      \
-	else                                \
-		PSW &= ~HC;
-#define SKIP_CY     if (CY == (PSW & CY)) PSW |= SK
-#define SKIP_NC     if (0 == (PSW & CY)) PSW |= SK
-#define SKIP_Z      if (Z == (PSW & Z)) PSW |= SK
-#define SKIP_NZ     if (0 == (PSW & Z)) PSW |= SK
-#define SET_Z(n)    if (n) PSW &= ~Z; else PSW |= Z
 
 UINT8 upd7810_device::RP(offs_t port)
 {
@@ -1977,9 +1822,6 @@ void upd7810_device::state_string_export(const device_state_entry &entry, astrin
 	}
 }
 
-#include "7810tbl.inc"
-#include "7810ops.inc"
-
 void upd7810_device::device_reset()
 {
 	m_ppc.d = 0;
@@ -2091,7 +1933,6 @@ void upd78c05_device::device_reset()
 	TM0 = 0xFF; /* Timer seems to be running from boot */
 	m_ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
 }
-
 
 void upd7810_device::execute_run()
 {

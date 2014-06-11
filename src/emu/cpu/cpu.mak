@@ -1774,14 +1774,17 @@ $(CPUOBJ)/upd7725/upd7725.o:    $(CPUSRC)/upd7725/upd7725.c \
 ifneq ($(filter UPD7810,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/upd7810
 CPUOBJS += $(CPUOBJ)/upd7810/upd7810.o
-DASMOBJS += $(CPUOBJ)/upd7810/7810dasm.o
+CPUOBJS += $(CPUOBJ)/upd7810/upd7810_opcodes.o
+CPUOBJS += $(CPUOBJ)/upd7810/upd7810_table.o
+DASMOBJS += $(CPUOBJ)/upd7810/upd7810_dasm.o
 endif
 
-$(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
-								$(CPUSRC)/upd7810/7810tbl.inc \
-								$(CPUSRC)/upd7810/7810ops.inc \
-								$(CPUSRC)/upd7810/upd7810.h
+$(CPUOBJ)/upd7810/upd7810_opcodes.o: $(CPUSRC)/upd7810/upd7810_opcodes.c \
+                                     $(CPUSRC)/upd7810/upd7810_macros.h
 
+$(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
+								$(CPUSRC)/upd7810/upd7810.h \
+								$(CPUSRC)/upd7810/upd7810_macros.h
 
 
 #-------------------------------------------------

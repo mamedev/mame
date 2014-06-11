@@ -7,6 +7,8 @@
  *
  *****************************************************************************/
 
+#include "emu.h"
+#include "upd7810.h"
 
 const struct upd7810_device::opcode_s upd7810_device::s_op48[256] =
 {

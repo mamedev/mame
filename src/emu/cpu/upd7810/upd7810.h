@@ -102,6 +102,48 @@ public:
 	template<class _Object> static devcb_base &set_an7_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(object); }
 
 protected:
+	// flags
+	enum
+	{
+		CY = 0x01,
+		F1 = 0x02,
+		L0 = 0x04,
+		L1 = 0x08,
+		HC = 0x10,
+		SK = 0x20,
+		Z  = 0x40,
+		F7 = 0x80
+	};
+
+	// IRR flags
+	enum
+	{
+		INTNMI  = 0x0001,
+		INTFT0  = 0x0002,
+		INTFT1  = 0x0004,
+		INTF1   = 0x0008,
+		INTF2   = 0x0010,
+		INTFE0  = 0x0020,
+		INTFE1  = 0x0040,
+		INTFEIN = 0x0080,
+		INTFAD  = 0x0100,
+		INTFSR  = 0x0200,
+		INTFST  = 0x0400,
+		INTER   = 0x0800,
+		INTOV   = 0x1000,
+		INTF0   = 0x2000
+	};
+
+	// ITF flags
+	enum
+	{
+		INTAN4 = 0x0001,
+		INTAN5 = 0x0002,
+		INTAN6 = 0x0004,
+		INTAN7 = 0x0008,
+		INTSB  = 0x0010
+	};
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();

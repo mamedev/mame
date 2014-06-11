@@ -7,6 +7,10 @@
  *
  *****************************************************************************/
 
+#include "emu.h"
+#include "upd7810.h"
+#include "upd7810_macros.h"
+
 void upd7810_device::illegal()
 {
 	logerror("uPD7810 '%s': illegal opcode %02x at PC:%04x\n", tag(), OP, PC);
