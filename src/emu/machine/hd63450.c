@@ -522,7 +522,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq2_w)
 	if((m_reg[2].ocr & 2) && (state && !ostate))
 	{
 		single_transfer(2);
-		m_timer[3]->adjust(m_our_clock[2], 2, m_our_clock[2]);
+		m_timer[2]->adjust(m_our_clock[2], 2, m_our_clock[2]);
 	}
 	else if(!state)
 		m_timer[2]->adjust(attotime::never);
