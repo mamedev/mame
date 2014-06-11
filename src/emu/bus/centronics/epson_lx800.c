@@ -286,6 +286,15 @@ epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, d
 
 void epson_lx800_t::device_start()
 {
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void epson_lx800_t::device_reset()
+{
 	m_beep->set_state(0);
 	m_beep->set_frequency(4000); /* ? */
 }

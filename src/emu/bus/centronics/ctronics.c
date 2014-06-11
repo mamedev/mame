@@ -117,11 +117,13 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 
 
 #include "comxpl80.h"
+#include "epson_ex800.h"
 #include "epson_lx800.h"
 #include "printer.h"
 
 SLOT_INTERFACE_START(centronics_printers)
 	SLOT_INTERFACE("pl80", COMX_PL80)
+	SLOT_INTERFACE("ex800", EPSON_EX800)
 	SLOT_INTERFACE("lx800", EPSON_LX800)
 	SLOT_INTERFACE("lx810l", EPSON_LX810L)
 	SLOT_INTERFACE("ap2000", EPSON_AP2000)

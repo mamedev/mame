@@ -1266,7 +1266,6 @@ $(MESSOBJ)/epoch.a:             \
 	$(MESS_AUDIO)/upd1771.o     \
 
 $(MESSOBJ)/epson.a:             \
-	$(MESS_DRIVERS)/ex800.o     \
 	$(MESS_DRIVERS)/hx20.o      \
 	$(MESS_MACHINE)/e05a03.o    \
 	$(MESS_DRIVERS)/px4.o       \
@@ -2271,7 +2270,6 @@ $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
 $(MESS_MACHINE)/esqvfd.o:   $(MESS_LAYOUT)/esq2by40.lh \
 							$(MESS_LAYOUT)/esq1by22.lh
 $(MESS_DRIVERS)/et3400.o:   $(MESS_LAYOUT)/et3400.lh
-$(MESS_DRIVERS)/ex800.o:    $(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 							$(MESS_LAYOUT)/bridgec3.lh \
 							$(MESS_LAYOUT)/vsc.lh
