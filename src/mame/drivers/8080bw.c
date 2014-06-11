@@ -3340,7 +3340,7 @@ ROM_START( sinvemag )
 	ROM_LOAD( "emag_si.e",    0x1800, 0x0400, CRC(c4e80586) SHA1(3d427d5a2eea3c911ec7bd055e06e6747ce5e84d) )
 	ROM_LOAD( "emag_si.f",    0x1c00, 0x0400, CRC(077f5ef2) SHA1(625de6839073ac4c904f949efc1b2e0afea5d676) )
 ROM_END
-
+   
 ROM_START( tst_invd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "test.h",       0x0000, 0x0800, CRC(f86a2eea) SHA1(4a72ff01f3e6d16bbe9bf7f123cd98895bfbed9a) )   /*  The Test ROM */
@@ -4084,6 +4084,33 @@ ROM_START( invasionrza )
 	ROM_LOAD( "rz7-7.2k",   0x1c00, 0x0400, CRC(27dbea48) SHA1(f0bf5d31424dc72ac2e6fa01c528365efff838d2) )
 ROM_END
 
+/*
+
+Space Invaders (Electromar, Madrid) 1980
+
+Board by Roselson
+Dumped by Ricky2001 from Aumap
+
+This game runs in a clone of a Midway L-Shape Space Invaders pcb with different connectors, but identical.
+The board is updated with a litthe daughter board for the reset, instead of being generated in the Power supply.
+Most of the Texts are in Spanish but keeps the original name "Space Invaders", also in the psb is writen a Patent number, I think this means it was a licensed version.
+
+Boards Electromar 1007-A / 1007B
+Patente N MU221718
+
+
+*/
+
+ROM_START( invadersem )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h.bin",    0x0000, 0x0400, CRC(7fc672a5) SHA1(93c8dd27769e9c1ab812fd68031c67a5dc79d0da) )
+	ROM_LOAD( "g.bin",    0x0400, 0x0400, CRC(ad518883) SHA1(8f7f1f520287b738ebb6f2c70b7da2cae5db2be8) )
+	ROM_LOAD( "f.bin",    0x0800, 0x0400, CRC(f4a6c480) SHA1(eb179a46345d652ffd74f77956d361cebfbb1112))
+	ROM_LOAD( "c.bin",    0x1400, 0x0400, CRC(8f62c513) SHA1(87570241d4ab7df3ef380d57d27055af3cca7845) )
+	ROM_LOAD( "b.bin",    0x1800, 0x0400, CRC(2808e5c0) SHA1(aef4821d6d6e7f062e3ebecb878e6370b604224e) )
+	ROM_LOAD( "a.bin",    0x1c00, 0x0400, CRC(04c9b084) SHA1(d267438589de2d8332410e9641164fe68f337f73) )
+ROM_END
+
 ROM_START( ultrainv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "in-01.bin",   0x0000, 0x0400, CRC(db9de599) SHA1(ccee1116ca924b520a126b63088a76d2ce8c396f) )
@@ -4607,6 +4634,7 @@ GAMEL(19??, invasiona,  invaders, invaders,  invasion,  driver_device, 0, ROT270
 GAMEL(19??, invasionb,  invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg", "Invasion (bootleg set 2, no copyright)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invasionrz, invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg set 3, R Z SRL Bologna)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
 GAMEL(19??, invasionrza,invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg set 4, R Z SRL Bologna)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
+GAMEL(19??, invadersem, invaders, invaders,  sitv,      driver_device, 0, ROT270, "Electromar", "Space Invaders (Electromar, Spanish)", GAME_SUPPORTS_SAVE, layout_invaders ) // possibly licensed
 GAMEL(1978, superinv,   invaders, invaders,  superinv,  driver_device, 0, ROT270, "bootleg", "Super Invaders (bootleg set 1)", GAME_SUPPORTS_SAVE, layout_invaders ) // not related to Zenitone-Microsec version
 GAMEL(1978, sinvemag,   invaders, invaders,  sinvemag,  driver_device, 0, ROT270, "bootleg (Emag)", "Super Invaders (bootleg set 2)", GAME_SUPPORTS_SAVE, layout_invaders ) // not related to Zenitone-Microsec version
 GAMEL(1980, searthin,   invaders, invaders,  searthin,  driver_device, 0, ROT270, "bootleg (Competitive Video)", "Super Earth Invasion (set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
