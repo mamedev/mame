@@ -522,7 +522,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq2_w)
 	if((m_reg[2].ocr & 2) && (state && !ostate))
 	{
 		single_transfer(2);
-		m_timer[0]->adjust(m_our_clock[2], 2, m_our_clock[2]);
+		m_timer[3]->adjust(m_our_clock[2], 2, m_our_clock[2]);
 	}
 	else if(!state)
 		m_timer[2]->adjust(attotime::never);
@@ -536,7 +536,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq3_w)
 	if((m_reg[3].ocr & 2) && (state && !ostate))
 	{
 		single_transfer(3);
-		m_timer[0]->adjust(m_our_clock[3], 3, m_our_clock[3]);
+		m_timer[3]->adjust(m_our_clock[3], 3, m_our_clock[3]);
 	}
 	else if(!state)
 		m_timer[3]->adjust(attotime::never);
