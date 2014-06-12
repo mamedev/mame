@@ -20,19 +20,33 @@ class fb01_state : public driver_device
 public:
 	fb01_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_upd71051(*this, "upd71051")
 		, m_midi_thru(*this, "mdthru")
+		, m_ym2164_irq(CLEAR_LINE)
+		, m_upd71051_txrdy(CLEAR_LINE)
+		, m_upd71051_rxrdy(CLEAR_LINE)
 	{
 	}
 
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
+	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
 
+	virtual void machine_start();
 	virtual void machine_reset();
 
 private:
+	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
 	required_device<midi_port_device> m_midi_thru;
+	int m_ym2164_irq;
+	int m_upd71051_txrdy;
+	int m_upd71051_rxrdy;
+
+	void update_int();
 };
 
 
@@ -75,6 +89,14 @@ static INPUT_PORTS_START( fb01 )
 INPUT_PORTS_END
 
 
+void fb01_state::machine_start()
+{
+	save_item(NAME(m_ym2164_irq));
+	save_item(NAME(m_upd71051_txrdy));
+	save_item(NAME(m_upd71051_rxrdy));
+}
+
+
 void fb01_state::machine_reset()
 {
 	m_upd71051->write_cts(0);
@@ -93,6 +115,33 @@ WRITE_LINE_MEMBER(fb01_state::midi_in)
 {
 	m_midi_thru->write_txd(state);
 	m_upd71051->write_rxd(state);
+}
+
+
+WRITE_LINE_MEMBER(fb01_state::ym2164_irq_w)
+{
+	m_ym2164_irq = state;
+	update_int();
+}
+
+
+WRITE_LINE_MEMBER(fb01_state::upd71051_txrdy_w)
+{
+	m_upd71051_txrdy = state;
+	update_int();
+}
+
+
+WRITE_LINE_MEMBER(fb01_state::upd71051_rxrdy_w)
+{
+	m_upd71051_rxrdy = state;
+	update_int();
+}
+
+
+void fb01_state::update_int()
+{
+	m_maincpu->set_input_line(0, (m_ym2164_irq || m_upd71051_txrdy || m_upd71051_rxrdy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -130,8 +179,8 @@ static MACHINE_CONFIG_START( fb01, fb01_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_pixel_update)
 
 	MCFG_DEVICE_ADD("upd71051", I8251, XTAL_4MHz)
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) MCFG_DEVCB_XOR(1)  // inverted -> Z80 INT
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) MCFG_DEVCB_XOR(1)  // inverted -> Z80 INT
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(fb01_state, upd71051_rxrdy_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(fb01_state, upd71051_txrdy_w))
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_4MHz / 8) // 500KHz
@@ -146,7 +195,7 @@ static MACHINE_CONFIG_START( fb01, fb01_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YM2151_ADD("ym2164", XTAL_4MHz)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fb01_state, ym2164_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
