@@ -348,12 +348,19 @@ static void build_command_line(int argc, char *argv[])
 	}
 
 	// identify the version number of the EXE
-	if (!icl_compile) exe_version = get_exe_version(executable);
-	else exe_version = 0x00110000; // assume this for ICL
+	if (!icl_compile)
+		exe_version = get_exe_version(executable);
+	else 
+		exe_version = 0x00110000; // assume this for ICL
 
-	// special case
-	if (!strcmp(executable, "cl.exe") && (exe_version >= 0x00070000))
-		dst += sprintf(dst, "/wd4025 ");
+	// special cases
+	if (!icl_compile && !strcmp(executable, "cl.exe")) {
+		if (exe_version >= 0x00070000)
+			dst += sprintf(dst, "/wd4025 ");
+		// fixes -j compiles with VS2013
+		if (exe_version >= 0x000C0000)
+			dst += sprintf(dst, "/FS ");
+	}
 
 	// iterate over parameters
 	for (param = parampos; param < argc; param++)
