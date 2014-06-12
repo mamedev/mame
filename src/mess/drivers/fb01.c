@@ -28,6 +28,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 
+	virtual void machine_reset();
+
 private:
 	required_device<i8251_device> m_upd71051;
 	required_device<midi_port_device> m_midi_thru;
@@ -71,6 +73,13 @@ static INPUT_PORTS_START( fb01 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("-1/No")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("+1/Yes")
 INPUT_PORTS_END
+
+
+void fb01_state::machine_reset()
+{
+	m_upd71051->write_cts(0);
+	m_upd71051->write_rxd(ASSERT_LINE);
+}
 
 
 WRITE_LINE_MEMBER(fb01_state::write_usart_clock)

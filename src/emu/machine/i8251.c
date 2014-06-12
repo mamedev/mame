@@ -417,6 +417,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 				int data_bits_count = ((data>>2) & 0x03)+5;
 
 				set_data_frame(1, data_bits_count, parity, stop_bits);
+				receive_register_reset();
 
 				switch (data & 0x03)
 				{
