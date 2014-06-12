@@ -5268,16 +5268,16 @@ crackndj        // 2000.10 Crackin' DJ
 deathcox        // 2000.10 Death Crimson OX
 cspike          // 2000.10 Gun Spike / Cannon Spike
 sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A)
-confmiss        // 2000.11 Confidential Mission         // First GD-ROM game?
+confmiss        // 2000.10.11 Confidential Mission         // First GD-ROM game?
 ninjaslt1       // 2000.11 Ninja Assault (NJA1 Ver. A)
 ninjaslt2       // 2000.11 Ninja Assault (NJA2 Ver. A)
 ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
 ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
 				// 2000.11 Shakatto Tambourine (Rev B)
 wwfroyal        // 2000.11 WWF Royal Rumble
+sprtjam         // 2000.11.13 Sports Jam
 pjustic         // 2000.12 Moero Justice Gakuen / Project Justice
 samba2k         // 2000.12 Samba de Amigo Ver.2000
-sprtjam         // 2000.12 Sports Jam
 				// 2000.?? Boat Race Ocean Heats
 csmash          // 2000.?? Cosmic Smash
 csmasho         // 2000.?? Cosmic Smash (original)
@@ -5288,9 +5288,9 @@ sfz3ugd         // 2001.02 Street Fighter ZERO3 Upper
 gundmgd         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
 starhrsp        // 2001.03 Star Horse Progress (Rev A)
-dygolf          // 2001.04 Dynamic Golf / Virtua Golf (Rev A)
+dygolf          // 2001.04.27 Dynamic Golf / Virtua Golf (Rev A)
 				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
-shaktmsp        // 2001.04 Shakatto Tambourine 2K1 SPR
+shaktmsp        // 2001.04.04 Shakatto Tambourine 2K1 SPR
 monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
 cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
@@ -5301,17 +5301,17 @@ starseek        // 2001.07 Dokidoki Idol Star Seeker
 gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF1)
 gunsur2e        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF2 Ver. E)
 spkrbtl         // 2001.07 Spikers Battle
-cvs2gd          // 2001.08 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
+cvs2gd          // 2001.07.05 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
 wrungp          // 2001.08 Wave Runner GP
+vtennis2        // 2001.08.27 Virtua Tennis 2 / Power Smash 2 (GD-ROM)
 alienfnt        // 2001.09 Alien Front (Rev T)
 alienfnta       // 2001.09 Alien Front (Rev A)
 gundmxgd        // 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
 derbyoc2        // 2001.10 Derby Owners Club II (Rev B)
 inunoos         // 2001.10 Inu No Osanpo / Dog Walking (Rev A)
-vtennis2        // 2001.10 Virtua Tennis 2 / Power Smash 2 (GD-ROM)
 vtenis2c        // 2001.10 Virtua Tennis 2 / Power Smash 2 (cartridge)
+shaktamb        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu 2K1 AUT
 keyboard        // 2001.11 La Keyboard
-shaktamb        // 2001.11 Shakatto Tambourine Cho Powerup Chu 2K1 AUT
 ikaruga         // 2001.12 Ikaruga
 lupinsho        // 2001.12 Lupin the Third: the Shooting
 drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
@@ -5320,10 +5320,10 @@ shootplm        // 2001.?? Shootout Pool Medal
 				// 2001.?? Star Horse 2001
 hopper          // 2002.?? SWP Hopper Board
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
+mok             // 2002.03.06 The Maze of the Kings
 luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
 ggxx            // 2002.05 Guilty Gear XX
-mok             // 2002.05 The Maze of the Kings
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
 mazan           // 2002.07 Mazan : Flash of the Blade (MAZ2 Ver. A)
 mazana          // 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
@@ -5362,7 +5362,7 @@ meltybld        // 2005.08 Melty Blood Act Cadenza (Rev C)
 ggxxsla         // 2005.09 Guilty Gear XX Slash (Rev A)
 radirgy         // 2005.10 Radirgy
 undefeat        // 2005.10 Under Defeat
-radirgya        // 2005.12 Radirgy (Rev A)
+radirgya        // 2005.12.04 Radirgy (Rev A)
 				// 2005.?? Dragon Treasure 3 (Rev A)
 				// 2005.?? ExZeus
 mushik2e        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 1.001)
@@ -5380,10 +5380,10 @@ meltyba         // 2006.12 Melty Blood Act Cadenza Ver.B (Rev A)
 takoron         // 2006.12.16 Noukone Puzzle Takoron                        // Last GD-ROM game?
 				// 2007.03 Melty Blood Act Cadenza Ver.B Syuuseiban(Ver.B2)
 				// 2007.09 Rythm Tengoku (Japan)
+ndcfboxa        // 2009.04.01 DIMM Firmware Updater for CF-BOX (Rev A)
 ngdup23a        // DIMM Firmware Updater (Rev A)
 ngdup23c        // DIMM Firmware Updater (Rev C)
 ngdup23e        // DIMM Firmware Updater (Rev E)
-ndcfboxa        // DIMM Firmware Updater for CF-BOX (Rev A)
 
 // Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced.
 manicpnc        // 2007.07 Manic Panic Ghosts!
@@ -5412,7 +5412,7 @@ radirgyn        // 2009.06 Radirgy Noa
 
 // NAOMI 2
 naomi2          // 2001.?? Naomi 2 BIOS
-vstrik3         // 2001.04 Virtua Striker 3 Ver. 2002 (GD-ROM)
+vstrik3         // 2001.04.06 Virtua Striker 3 Ver. 2002
 vstrik3cb       // 2001.04 Virtua Striker 3 (Rev B) (cartridge)
 vstrik3c        // 2001.04 Virtua Striker 3 (Rev C) (cartridge)
 wldrider        // 2001.05 Wild Riders
@@ -5424,29 +5424,31 @@ vf4             // 2001.08.02 Virtua Fighter 4 (GD-ROM)
 vf4b            // 2001.08.20 Virtua Fighter 4 (Rev B) (cartridge)
 vf4c            // 2002.01.31 Virtua Fighter 4 (Rev C) (cartridge)
 kingrt66        // 2002.02 The King of Route 66 (Rev A)
+     			// 2002.02.14 Initial D Arcade Stage (Japan)
 initd           // 2002.03 Initial D Arcade Stage (Japan) (Rev B)
 				// 2002.06 World Club Champion Football Serie A 2001-2002
 soulsurf        // 2002.07 Soul Surfer
+initdexp        // 2002.07.18 Initial D Arcade Stage (Export) (Rev A)
 vf4evoct        // 2002.08 Virtua Fighter 4 Evolution (cartridge)
 vf4evoa         // 2002.08 Virtua Fighter 4 Evolution
 				// 2002.11 World Club Champion Football Serie A 2001-2002 Ver.1.2
-initdv2j        // 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
 clubk2k3        // 2003.?? Club Kart: European Session (2003)
 clubk2kf        // 2003.?? Club Kart: European Session (2003, not protected)
-initdexp        // 2002.?? Initial D Arcade Stage (Export) (Rev A)
 initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
 				// 2003.03 World Club Champion Football Serie A 2001-2002 Ver.2
+                // 2003.05 Initial D Arcade Stage Ver. 2 (Japan) (Rev A)
+initdv2j        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 				// 2003.09 World Club Champion Football Serie A 2002-2003
 				// 2003.?? Club Kart Cycraft Edition
 clubkprz        // 2003.?? Club Kart Prize
-initdv3j        // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
+initdv3j        // 2004.01.30 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb       // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
 clubkpzb        // 2004.01 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
-initdv3e        // 2004.05 Initial D Arcade Stage Ver. 3 (Export)
+initdv3e        // 2004.05.18 Initial D Arcade Stage Ver. 3 (Export)
 				// 2004.06 World Club Champion Football Serie A 2002-2003 Ver.2
 				// 2004.07 Virtua Fighter 4 Final Tuned
 vf4tuneda       // 2004.09 Virtua Fighter 4 Final Tuned (Rev A)
@@ -5513,25 +5515,25 @@ airtrix         // 2001.02 Air Trix
 
 // Triforce (GameCube based)
 triforce        // 2002.?? Triforce BIOS
+vs2002ex        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j         // 2002.10 Virtua Striker 2002 (Japan)
-vs2002ex        // 2002.10 Virtua Striker 2002 (Export)
-fzeroaxc		// 2003.06 F-Zero AX (Rev. C)
+fzeroaxc		// 2003.06.11 F-Zero AX (Rev. C)
 avalons         // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 				// 2003.10 The Key Of Avalon 1.01
 gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)
 fzeroax			// 2003.12 F-Zero AX (Rev. E)
 				// 2003.12 The Key Of Avalon 1.10
 				// 2004.04 The Key Of Avalon 1.20 - Summon The New Monsters
-avalon13        // 2004.07 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)
-vs4             // 2004.10 Virtua Striker 4 (export)
+avalon13        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)
 vs4j            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
-avalon20        // 2004.11 The Key Of Avalon 2 - Eutaxy Commandment (client) (Rev B)
+avalon20        // 2004.11.02 The Key Of Avalon 2 - Eutaxy Commandment (client) (Rev B)
+vs4             // 2004.12.02 Virtua Striker 4 (export)
 				// 2004.?? F-Zero AX - Monster Ride Cycraft Edition
 tfupdate        // 2004.?? Triforce GDROM Boot Update
 				// 2005.08 Avalon no Kagi Ver.2.5 Kagi Seisen
 mkartagp        // 2005.12 Mario Kart Arcade Grand Prix
 				// 2005.?? Donkey Kong Jungle Fever
-				// 2006.01 Virtua Striker 4 Ver.2006 (Export)
+                // 2006.01.31 Virtua Striker 4 Ver.2006 (export)
 vs42006         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 				// 2006.?? Firmware Update For Compact Flash Box (Rev A)
 				// 2007.03 Mario Kart Arcade Grand Prix 2
@@ -5539,29 +5541,29 @@ vs42006         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 // Chihiro (X-Box based)
 chihiro         // 2002.?? Chihiro BIOS
 				// 200?.?? Firmware Update For Compact Flash Box (Rev A)
-hotd3           // 2002.12 The House of the Dead III
-				// 2003.03 Crazy Taxi High Roller
-				// 2003.03 Crazy Taxi High Roller (Rev A)
-crtaxihr        // 2003.03 Crazy Taxi High Roller (Rev B)
-				// 2003.04 Virtua Cop 3
-vcop3           // 2003.04 Virtua Cop 3 (Rev A)
+hotd3           // 2002.10.29 The House of the Dead III
+				// 2003.02 Crazy Taxi High Roller
+				// 2003.02 Crazy Taxi High Roller (Rev A)
+crtaxihr        // 2003.02.24 Crazy Taxi High Roller (Rev B)
+				// 2003.02 Virtua Cop 3
+vcop3           // 2003.02.26 Virtua Cop 3 (Rev A)
 				// 2003.12 Outrun 2 Prototype (Rev P)
 				// 2003.12 Outrun 2
 outr2           // 2003.12 Outrun 2 (Rev A)
-				// 2004.03 Sega Network Taisen Mahjong MJ 2
 ollie           // 2004.03 Ollie King
+				// 2004.03 Sega Network Taisen Mahjong MJ 2
 				// 2004.04 Sega Network Taisen Mahjong MJ 2 (Rev A)
+				// 2004.04 Sega Network Taisen Mahjong MJ 2 (Rev B)
 				// 2004.07 Wangan Midnight Maximum Tune (Japan)
 				// 2004.07 Wangan Midnight Maximum Tune (Japan) (Rev A)
 				// 2004.07 Wangan Midnight Maximum Tune (Japan) (Rev B)
 				// 2004.07 Wangan Midnight Maximum Tune (export)
 				// 2004.07 Wangan Midnight Maximum Tune (export) (Rev A)
 wangmid         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
-				// 2004.04 Sega Network Taisen Mahjong MJ 2 (Rev B)
 				// 2004.09 Quest of D
 				// 2004.11 Sega Golf Club Network Pro Tour
 				// 2004.12 Ghost Squad
-ghostsqu        // 2004.12 Ghost Squad (Rev A)
+ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2004.12 Quest of D Ver.1.01C
 				// 2004.12 Quest of D Ver.1.02
 				// 2004.12 Quest of D Ver.1.10
@@ -5569,14 +5571,14 @@ ghostsqu        // 2004.12 Ghost Squad (Rev A)
 				// 2004.12 Outrun 2 SP (Japan)
 				// 2004.12 Outrun 2 Special Tours
 outr2st         // 2004.12 Outrun 2 Special Tours (Rev A)
-mj2             // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
+mj2c            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 				// 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev D)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev E)
+				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
+mj2				// 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
 				// 2005.03 Sangokushi Taisen
 gundamos        // 2005.03 Gundam Battle Operating Simulator
 				// 2005.04 Quest of D Ver.1.20
-				// 2005.04 Sega Network Taisen Mahjong MJ 2 (Rev F)
-				// 2005.04 Sega Network Taisen Mahjong MJ 2 (Rev G)
 				// 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 wangmid2        // 2005.04 Wangan Midnight Maximum Tune 2 (export)
 				// 2005.06 Sangokushi Taisen Ver.1.002
@@ -5593,9 +5595,9 @@ wangmd2b        // 2005.10 Wangan Midnight Maximum Tune 2 (Japan) (Rev A)
 				// 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev A)
 				// 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev B)
 				// 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev C)
-mj3             // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev D)
+mj3d            // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev D)
 				// 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev E)
-mj3f            // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev F)
+mj3             // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev F)
 				// 2005.12 Sega Golf Club 2006: Next Tours
 scg06nt         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2006.02 Sangokushi Taisen Ver.1.12
