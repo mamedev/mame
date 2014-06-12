@@ -276,8 +276,12 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
 		return conn->content_len == 4 && !memcmp(conn->content, "exit", 4) ? MG_FALSE : MG_TRUE;
     } else {
 		web_engine *engine = static_cast<web_engine *>(conn->server_param);	
-		return engine->begin_request_handler(conn);    
+		return engine->begin_request_handler(conn);
 	}
+  } else if (ev== MG_WS_CONNECT) {
+	// New websocket connection. Send connection ID back to the client.
+	mg_websocket_printf(conn, WEBSOCKET_OPCODE_TEXT, "update_machine");
+	return MG_FALSE;
   } else if (ev == MG_AUTH) {
     return MG_TRUE;
   } else {
