@@ -2284,7 +2284,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 //  copyline_palette16
 //============================================================
 
-INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2292,7 +2292,11 @@ INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const 
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*src];
 	for (x = 0; x < width; x++)
-		*dst++ = 0xff000000 | palette[*src++];
+	{
+		int srcpix = *src++;
+		for (int x2 = 0; x2 < xprescale; x2++)
+			*dst++ = 0xff000000 | palette[srcpix]; 
+	}
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*--src];
 }
@@ -2303,7 +2307,7 @@ INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const 
 //  copyline_palettea16
 //============================================================
 
-INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2311,7 +2315,11 @@ INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const
 	if (xborderpix)
 		*dst++ = palette[*src];
 	for (x = 0; x < width; x++)
-		*dst++ = palette[*src++];
+	{
+		int srcpix = *src++;
+		for (int x2 = 0; x2 < xprescale; x2++)
+			*dst++ = palette[srcpix];
+	}
 	if (xborderpix)
 		*dst++ = palette[*--src];
 }
@@ -2322,7 +2330,7 @@ INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const
 //  copyline_rgb32
 //============================================================
 
-INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
+INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2339,7 +2347,10 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+			for (int x2 = 0; x2 < xprescale; x2++)
+			{
+				*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+			}
 		}
 		if (xborderpix)
 		{
@@ -2354,7 +2365,14 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 		if (xborderpix)
 			*dst++ = 0xff000000 | *src;
 		for (x = 0; x < width; x++)
-			*dst++ = 0xff000000 | *src++;
+		{
+			rgb_t srcpix = *src++;
+
+			for (int x2 = 0; x2 < xprescale; x2++)
+			{
+				*dst++ = 0xff000000 | srcpix;
+			}
+		}
 		if (xborderpix)
 			*dst++ = 0xff000000 | *--src;
 	}
@@ -2364,7 +2382,7 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 //  copyline_argb32
 //============================================================
 
-INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
+INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2381,7 +2399,8 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+			for (int x2 = 0; x2 < xprescale; x2++)
+				*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 		if (xborderpix)
 		{
@@ -2396,7 +2415,11 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 		if (xborderpix)
 			*dst++ = *src;
 		for (x = 0; x < width; x++)
-			*dst++ = *src++;
+		{
+			rgb_t srcpix = *src++;
+			for (int x2 = 0; x2 < xprescale; x2++)
+				*dst++ = srcpix;
+		}
 		if (xborderpix)
 			*dst++ = *--src;
 	}
@@ -2447,7 +2470,7 @@ INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 //  copyline_yuy16_to_argb
 //============================================================
 
-INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
 {
 	int x;
 
@@ -2472,8 +2495,11 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
-			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+			for (int x2 = 0; x2 < xprescale/2; x2++)
+			{
+				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+			}
 		}
 		if (xborderpix)
 		{
@@ -2504,8 +2530,11 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
-			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+			for (int x2 = 0; x2 < xprescale/2; x2++)
+			{
+				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+				*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+			}
 		}
 		if (xborderpix)
 		{
@@ -2551,38 +2580,41 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 	// when nescesarry copy (and convert) the data
 	if (!texture->nocopy)
 	{
-		int y;
+		int y, y2;
 		UINT8 *dst;
 
 		for (y = 0; y < texsource->height; y++)
 		{
-			dst = (UINT8 *)(texture->data + (y * texture->yprescale + texture->borderpix) * texture->rawwidth);
-
-			switch (PRIMFLAG_GET_TEXFORMAT(flags))
+			for (y2 = 0; y2 < texture->yprescale; y2++)
 			{
-				case TEXFORMAT_PALETTE16:
-					copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
-					break;
+				dst = (UINT8 *)(texture->data + (y * texture->yprescale + texture->borderpix + y2) * texture->rawwidth); 
 
-				case TEXFORMAT_PALETTEA16:
-					copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
-					break;
+				switch (PRIMFLAG_GET_TEXFORMAT(flags))
+				{
+					case TEXFORMAT_PALETTE16:
+						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						break;
 
-				case TEXFORMAT_RGB32:
-					copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
-					break;
+					case TEXFORMAT_PALETTEA16:
+						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						break;
 
-				case TEXFORMAT_ARGB32:
-					copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
-					break;
+					case TEXFORMAT_RGB32:
+						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						break;
 
-				case TEXFORMAT_YUY16:
-					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
-					break;
+					case TEXFORMAT_ARGB32:
+						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						break;
 
-				default:
-					osd_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
-					break;
+					case TEXFORMAT_YUY16:
+						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						break;
+
+					default:
+						osd_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
+						break;
+				}
 			}
 		}
 	}
