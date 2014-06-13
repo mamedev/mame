@@ -41,6 +41,14 @@
 #include "debugger.h"
 #include "lr35902.h"
 
+/* Flag bit definitions */
+enum lr35902_flag
+{
+	FLAG_C = 0x10,
+	FLAG_H = 0x20,
+	FLAG_N = 0x40,
+	FLAG_Z = 0x80
+};
 
 #define IME     0x01
 #define HALTED  0x02
@@ -54,7 +62,7 @@ const device_type LR35902 = &device_creator<lr35902_cpu_device>;
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, LR35902, "LR35902 CPU", tag, owner, clock, "lr35902", __FILE__)
+	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock, "lr35902", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_A(0)
 	, m_F(0)
@@ -177,10 +185,10 @@ void lr35902_cpu_device::state_string_export(const device_state_entry &entry, as
 
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c",
-				m_F & LR35902_FLAG_Z   ? 'Z' : '.',
-				m_F & LR35902_FLAG_N   ? 'N' : '.',
-				m_F & LR35902_FLAG_H   ? 'H' : '.',
-				m_F & LR35902_FLAG_C   ? 'C' : '.'
+				m_F & FLAG_Z   ? 'Z' : '.',
+				m_F & FLAG_N   ? 'N' : '.',
+				m_F & FLAG_H   ? 'H' : '.',
+				m_F & FLAG_C   ? 'C' : '.'
 			);
 			break;
 	}
@@ -307,7 +315,7 @@ void lr35902_cpu_device::execute_run()
 			UINT8   x;
 			/* Execute instruction */
 			switch( m_op ) {
-#include "opc_main.h"
+#include "opc_main.inc"
 			}
 		} else {
 			/* Fetch and count cycles */

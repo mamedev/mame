@@ -110,12 +110,6 @@ protected:
 	UINT8   m_features;
 	const UINT16 *c_regs;
 	const struct lr35902_config *m_config;
-
-	/* Flag bit definitions */
-	static const UINT8 LR35902_FLAG_Z = 0x80;
-	static const UINT8 LR35902_FLAG_N = 0x40;
-	static const UINT8 LR35902_FLAG_H = 0x20;
-	static const UINT8 LR35902_FLAG_C = 0x10;
 };
 
 extern const device_type LR35902;

@@ -2252,8 +2252,8 @@ endif
 
 $(CPUOBJ)/lr35902/lr35902.o:    $(CPUSRC)/lr35902/lr35902.c \
 								$(CPUSRC)/lr35902/lr35902.h \
-								$(CPUSRC)/lr35902/opc_cb.h \
-								$(CPUSRC)/lr35902/opc_main.h
+								$(CPUSRC)/lr35902/opc_cb.inc \
+								$(CPUSRC)/lr35902/opc_main.inc
 
 
 
