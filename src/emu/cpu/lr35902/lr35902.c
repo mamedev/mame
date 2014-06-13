@@ -304,8 +304,7 @@ void lr35902_cpu_device::check_interrupts()
 
 
 /************************************************************/
-/*** Execute lr35902 code for cycles cycles, return nr of ***/
-/*** cycles actually executed.                            ***/
+/*** Execute lr35902 code for m_icount cycles.            ***/
 /************************************************************/
 void lr35902_cpu_device::execute_run()
 {
@@ -316,6 +315,10 @@ void lr35902_cpu_device::execute_run()
 			/* Execute instruction */
 			switch( m_op ) {
 #include "opc_main.inc"
+				default:
+					// actually this should lock up the cpu!
+					logerror("LR35902: Illegal opcode $%02X @ %04X\n", m_op, m_PC);
+					break;
 			}
 		} else {
 			/* Fetch and count cycles */

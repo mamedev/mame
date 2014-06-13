@@ -62,23 +62,6 @@
 	m_F=f; \
 }
 
-/*
-   #define      CP_A_X(x) \
-   { \
-   register UINT16 r; \
-   register UINT8 f; \
-   r=(UINT16)(m_A-(x)); \
-   if( ((UINT8)r)==0 ) \
-   f=FLAG_N|FLAG_Z; \
-   else \
-   f=FLAG_N; \
-   f|=(UINT8)((r>>8)&FLAG_C); \
-   if( (r^m_A^(x))&0x10 ) \
-   f|=FLAG_H; \
-   m_F=f; \
-   }
- */
-
 #define CP_A_X(x) \
 { \
 	register UINT16 r1,r2; \
@@ -146,6 +129,8 @@
 	mem_write_byte( m_SP, x ); \
 	m_SP--; \
 	mem_write_byte( m_SP, y );
+
+/**********************************************************/
 
 case 0x00: /*      NOP */
 	break;
@@ -1280,8 +1265,6 @@ case 0xD2: /*      JP NC,n16 */
 		}
 	}
 	break;
-case 0xD3: /*      EH? */
-	break;
 case 0xD4: /*      CALL NC,n16 */
 	{
 		UINT16 addr = mem_read_word( m_PC );
@@ -1338,8 +1321,6 @@ case 0xDA: /*      JP C,n16 */
 		}
 	}
 	break;
-case 0xDB: /*      EH? */
-	break;
 case 0xDC: /*      CALL C,n16 */
 	{
 		UINT16 addr = mem_read_word( m_PC );
@@ -1353,8 +1334,6 @@ case 0xDC: /*      CALL C,n16 */
 			cycles_passed( 4 );
 		}
 	}
-	break;
-case 0xDD: /*      EH? */
 	break;
 case 0xDE: /*      SBC A,n8 */
 
@@ -1379,10 +1358,6 @@ case 0xE1: /*      POP HL */
 case 0xE2: /*      LD ($FF00+C),A */
 
 	mem_write_byte( 0xFF00 + m_C, m_A );
-	break;
-case 0xE3: /*      EH? */
-	break;
-case 0xE4: /*      EH? */
 	break;
 case 0xE5: /*      PUSH HL */
 	PUSH( m_H, m_L );
@@ -1438,12 +1413,6 @@ case 0xEA: /*      LD (n16),A */
 	mem_write_byte( mem_read_word( m_PC ), m_A );
 	m_PC += 2;
 	break;
-case 0xEB: /*      EH? */
-	break;
-case 0xEC: /*      EH? */
-	break;
-case 0xED: /*      EH? */
-	break;
 case 0xEE: /*      XOR A,n8 */
 
 	x = mem_read_byte( m_PC++ );
@@ -1472,8 +1441,6 @@ case 0xF2: /*      LD A,($FF00+C) */
 case 0xF3: /*      DI */
 	m_ei_delay = 0;
 	m_enable &= ~IME;
-	break;
-case 0xF4: /*      EH? */
 	break;
 case 0xF5: /*      PUSH AF */
 	m_F &= 0xF0;
@@ -1539,10 +1506,6 @@ case 0xFA: /*      LD A,(n16) */
 case 0xFB: /*      EI */
 	m_enable |= IME;
 	m_ei_delay = 1;
-	break;
-case 0xFC: /*      EH? */
-	break;
-case 0xFD: /*      EH? */
 	break;
 case 0xFE: /*      CP A,n8 */
 	x = mem_read_byte( m_PC++ );
