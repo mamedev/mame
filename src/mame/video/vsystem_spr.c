@@ -148,6 +148,12 @@ void vsystem_spr_device::CG10103_set_pal_base(device_t &device, int pal_base)
 	dev.m_pal_base = pal_base;
 }
 
+
+void vsystem_spr_device::set_pal_base(int pal_base)
+{
+	m_pal_base = pal_base;
+}
+
 // static
 void vsystem_spr_device::set_pal_mask(device_t &device, int pal_mask)
 {

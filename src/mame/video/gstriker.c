@@ -11,6 +11,13 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	
+	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x", m_mixerregs1[0],m_mixerregs1[1],m_mixerregs1[2],m_mixerregs1[3],m_mixerregs1[4],m_mixerregs1[5],m_mixerregs1[6],m_mixerregs1[7],  m_mixerregs1[8],m_mixerregs1[9],m_mixerregs1[10],m_mixerregs1[11],m_mixerregs1[12],m_mixerregs1[13],m_mixerregs1[14],m_mixerregs1[15] );
+
+	m_spr->set_pal_base( (m_mixerregs1[0]&0xf000)>>8 );
+	m_bg->set_pal_base( (m_mixerregs1[1]&0xf000)>>8 );
+	m_tx->set_pal_base( (m_mixerregs1[2]&0xf000)>>8 );
+
+
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
 	m_bg->draw( screen, bitmap,cliprect, 0);
@@ -24,47 +31,13 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-VIDEO_START_MEMBER(gstriker_state,gstriker)
+VIDEO_START_MEMBER(gstriker_state, gstriker)
 {
-	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
-
 	// Initalize the chip for the score plane
 	m_tx->set_gfx_region(0);
-	m_tx->set_pal_base(0x30);
 	m_tx->get_tilemap()->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	m_bg->set_gfx_region( 1);
-	m_bg->set_pal_base( 0);
-	m_bg->get_tilemap()->set_transparent_pen(0xf);
-}
-
-VIDEO_START_MEMBER(gstriker_state,twrldc94)
-{
-	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
-
-	// Initalize the chip for the score plane
-	m_tx->set_gfx_region(0);
-	m_tx->set_pal_base(0x40);
-	m_tx->get_tilemap()->set_transparent_pen(0xf);
-
-	// Initalize the chip for the screen plane
-	m_bg->set_gfx_region( 1);
-	m_bg->set_pal_base( 0x50);
-	m_bg->get_tilemap()->set_transparent_pen(0xf);
-}
-
-VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
-{
-	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
-
-	// Initalize the chip for the score plane
-	m_tx->set_gfx_region(0);
-	m_tx->set_pal_base(0x30);
-	m_tx->get_tilemap()->set_transparent_pen(0xf);
-
-	// Initalize the chip for the screen plane
-	m_bg->set_gfx_region( 1);
-	m_bg->set_pal_base( 0x20);
+	m_bg->set_gfx_region(1);
 	m_bg->get_tilemap()->set_transparent_pen(0xf);
 }

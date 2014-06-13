@@ -279,8 +279,8 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w ) 
-	AM_RANGE(0x200040, 0x20005f) AM_RAM
-	AM_RANGE(0x200060, 0x20007f) AM_RAM
+	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
+	AM_RANGE(0x200060, 0x20007f) AM_RAM AM_SHARE("mixerregs2")
 	AM_RANGE(0x200080, 0x200081) AM_READ_PORT("P1")
 	AM_RANGE(0x200082, 0x200083) AM_READ_PORT("P2")
 	AM_RANGE(0x200084, 0x200085) AM_READ_PORT("SYSTEM")
@@ -315,7 +315,8 @@ static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x181000, 0x181fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  line_r, line_w ) 
 	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w ) 
-	AM_RANGE(0x200040, 0x20005f) AM_RAM
+	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
+	AM_RANGE(0x200060, 0x20007f) AM_RAM AM_SHARE("mixerregs2")
 
 	AM_RANGE(0x200080, 0x200081) AM_READ_PORT("P1")
 	AM_RANGE(0x200082, 0x200083) AM_READ_PORT("P2")
@@ -565,7 +566,6 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_SET_PALBASE(0x10)
 	MCFG_VSYSTEM_SPR_SET_PALMASK(0x1f)
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
@@ -581,14 +581,6 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( twrldc94, gstriker )
-	MCFG_VIDEO_START_OVERRIDE(gstriker_state, twrldc94 )
-
-	MCFG_DEVICE_MODIFY("vsystem_spr")
-	MCFG_VSYSTEM_SPR_SET_PALBASE(0x60)
-
 MACHINE_CONFIG_END
 
 
@@ -622,11 +614,10 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_SET_PALBASE(0x00)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(gstriker_state,vgoalsoc)
+	MCFG_VIDEO_START_OVERRIDE(gstriker_state,gstriker)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1109,5 +1100,5 @@ GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, driver_device, 0,        RO
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
 GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 1)", GAME_NOT_WORKING )
 GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 2)", GAME_NOT_WORKING )
-GAME( 1994, twrldc94, 0,        twrldc94, twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, twrldc94a,twrldc94, twrldc94, twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, twrldc94, 0,        gstriker, twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, twrldc94a,twrldc94, gstriker, twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
