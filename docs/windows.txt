@@ -70,7 +70,7 @@ Windows performance options
 -bench [n]
 
         Benchmark for [n] number of emulated seconds; implies the command string:
-        -str [n] -video none -nosound -nothrottle
+        -str [n] -video none -sound none -nothrottle
 
 
 
@@ -338,6 +338,12 @@ Full screen options
 
 Windows sound options
 ---------------------
+
+-sound <dsound|sdl|none>
+
+	Specifies which sound subsystem to use. 'none' disables sound altogether.
+	The default is dsound.
+
 
 -audio_latency <value>
 

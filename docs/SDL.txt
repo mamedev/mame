@@ -59,7 +59,7 @@ Performance options
 -bench [n]
 
         Benchmark for [n] number of emulated seconds; implies the command string:
-        -str [n] -video none -nosound -nothrottle. Default is OFF (-nobench)
+        -str [n] -video none -sound none -nothrottle. Default is OFF (-nobench)
 
 
 
@@ -325,6 +325,11 @@ Full screen options
 
 Sound options
 -------------
+
+-sound <sdl|none>
+
+	Specifies which sound subsystem to use. 'none' disables sound altogether.
+	The default is sdl.
 
 -audio_latency <value>
 

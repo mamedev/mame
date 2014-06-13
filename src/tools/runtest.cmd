@@ -166,7 +166,7 @@ goto :eof
 :runone
 @echo Testing %1 (%2)...
 echo.>>%SUMMARY%
-mame %1 -str 30 -watchdog 300 -nodebug -nothrottle -inipath .. -video none -nosound 1>log\%1.txt 2>log\%1.err
+mame %1 -str 30 -watchdog 300 -nodebug -nothrottle -inipath .. -video none -sound none 1>log\%1.txt 2>log\%1.err
 if %errorlevel% equ 100 (
 echo @@@@@driver=%1: Exception>>%SUMMARY%
 type log\%1.err >>%SUMMARY%

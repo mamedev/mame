@@ -864,11 +864,6 @@ Core vector options
 Core sound options
 ------------------
 
--sound [value]
-
-	Enable (auto), disable (none), or SDL (sdl) if using SDL. The default
-        is enable (auto).
-
 -samplerate <value> / -sr <value>
 
 	Sets the audio sample rate. Smaller values (e.g. 11025) cause lower
