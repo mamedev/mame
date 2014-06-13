@@ -29,6 +29,7 @@ excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const 
 void excellent_spr_device::device_start()
 {
 	m_ram = auto_alloc_array_clear(this->machine(), UINT8, 0x1000);
+	save_pointer(NAME(m_ram), 0x1000);
 }
 
 

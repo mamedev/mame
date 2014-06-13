@@ -2059,6 +2059,7 @@ $(MAMEOBJ)/vsystem.a: \
 	$(DRIVERS)/fromance.o $(VIDEO)/fromance.o \
 	$(DRIVERS)/fromanc2.o $(VIDEO)/fromanc2.o \
 	$(DRIVERS)/gstriker.o $(VIDEO)/gstriker.o \
+	$(VIDEO)/mb60553.o $(VIDEO)/vs920a.o \
 	$(DRIVERS)/inufuku.o $(VIDEO)/inufuku.o \
 	$(DRIVERS)/ojankohs.o $(VIDEO)/ojankohs.o \
 	$(DRIVERS)/pipedrm.o \
