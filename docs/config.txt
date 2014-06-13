@@ -14,7 +14,7 @@ The usual way to run MAME is by telling it to run a particular game:
 
 For example:
 
-	mame robby -nosound
+	mame robby -sound none
 
 ...will run Robby Roto without sound. There are many, many options
 available. All commonly supported options are listed below. Options that
@@ -864,9 +864,10 @@ Core vector options
 Core sound options
 ------------------
 
--[no]sound
+-sound [value]
 
-	Enable or disable sound altogether. The default is ON (-sound).
+	Enable (auto), disable (none), or SDL (sdl) if using SDL. The default
+        is enable (auto).
 
 -samplerate <value> / -sr <value>
 
