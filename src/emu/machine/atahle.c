@@ -25,7 +25,8 @@ enum
 enum
 {
 	IDE_CS1_ALTERNATE_STATUS_R = 6,
-	IDE_CS1_DEVICE_CONTROL_W = 6
+	IDE_CS1_DEVICE_CONTROL_W = 6,
+	IDE_CS1_ACTIVE_STATUS = 7
 };
 
 enum
@@ -697,6 +698,31 @@ READ16_MEMBER( ata_hle_device::read_cs1 )
 					if (device_selected())
 					{
 						result = calculate_status();
+					}
+					else
+					{
+						result = 0;
+					}
+					break;
+
+				case IDE_CS1_ACTIVE_STATUS:
+					/*
+
+						bit 	description
+
+						0 		master active
+						1 		slave active
+						2 		complement of active disk head bit 0
+						3 		complement of active disk head bit 1
+						4 		complement of active disk head bit 2
+						5 		complement of active disk head bit 3
+						6 		write in progress
+						7 		floppy present (unused)
+
+					*/
+					if (device_selected())
+					{
+						result = 0x01;
 					}
 					else
 					{
