@@ -90,5 +90,6 @@ void msx_cart_interface::sram_alloc(UINT32 size)
 // not connected.
 SLOT_INTERFACE_START(msx_yamaha_60pin)
 	SLOT_INTERFACE("sfg01", MSX_CART_SFG01)
+	SLOT_INTERFACE("sfg05", MSX_CART_SFG05)
 SLOT_INTERFACE_END
 

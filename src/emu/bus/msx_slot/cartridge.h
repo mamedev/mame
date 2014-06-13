@@ -15,9 +15,9 @@ extern const device_type MSX_SLOT_YAMAHA_EXPANSION;
 	devcb = &msx_slot_cartridge_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 
-#define MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, _devcb) \
+#define MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, _devcb, _default) \
 	MCFG_DEVICE_ADD(_tag, MSX_SLOT_YAMAHA_EXPANSION, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(msx_yamaha_60pin, NULL, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(msx_yamaha_60pin, _default, false) \
 	devcb = &msx_slot_cartridge_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 

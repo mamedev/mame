@@ -56,8 +56,8 @@
 	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, WRITELINE(msx_state, msx_irq_source1)) \
 	msx_state::install_slot_pages(*owner, _prim, _sec, 0, 4, device);
 
-#define MCFG_MSX_LAYOUT_YAMAHA_EXPANSION(_tag, _prim, _sec) \
-	MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, WRITELINE(msx_state, msx_irq_source2)) \
+#define MCFG_MSX_LAYOUT_YAMAHA_EXPANSION(_tag, _prim, _sec, _default) \
+	MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, WRITELINE(msx_state, msx_irq_source2), _default) \
 	msx_state::install_slot_pages(*owner, _prim, _sec, 0, 4, device);
 
 #define MCFG_MSX_LAYOUT_RAM_MM(_tag, _prim, _sec, _total_size) \

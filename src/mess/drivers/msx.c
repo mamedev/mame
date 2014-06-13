@@ -20,13 +20,11 @@
 ** - svi738: v9938 not emulated
 ** - svi738: rs232c not emulated
 ** - hx10: Expansion slot not emulated (hx10s also??)
-** - cx5m, cx5m128, cx5m2: sfg not emulated
 ** - cx5m128: Firmware not emulated?
 ** - y503iir: Keyboard not responding correctly
 ** - y503iir, y503iir2: RTC not emulated
 ** - y503iir, y503iir2: Net not emulated
 ** - y503iir, y503iir2: Floppy support broken
-** - yis503m: sfg not emulated
 ** - cpc300: Config for MSX Tutor ON/OFF is not saved
 ** - expert20: Does not boot
 ** - fs4600: Kanji12 not emulated; how to trigger usage of kanji12??
@@ -43,7 +41,6 @@
 ** - tpc310: Floppy support broken
 **           7fbb <- c7  => seek 199???
 ** - hx23f: The builtin word processor displays white squares instead of text
-** - cx7m: sfg not emulated
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
 ** - expertac: Does not boot
@@ -2767,7 +2764,6 @@ MACHINE_CONFIG_END
 ROM_START (cx5m)
 	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
-	ROM_LOAD ("sfg05m.rom",         0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( cx5m, msx_pal )
@@ -2780,8 +2776,7 @@ static MACHINE_CONFIG_DERIVED( cx5m, msx_pal )
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 2, 2)   /* 32KB RAM */
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
-	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 0)
-//	MCFG_MSX_LAYOUT_ROM("sfg", 3, 0, 0, 2, "maincpu", 0x8000)  /* SFG */
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 0, "sfg01")
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
 MACHINE_CONFIG_END
@@ -2792,7 +2787,6 @@ ROM_START (cx5m128)
 	ROM_REGION (0x18000, "maincpu",0)
 	ROM_LOAD ("cx5m128bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
 	ROM_LOAD ("cx5m128ext.rom",  0x8000, 0x4000, CRC(feada82e) SHA1(48b0c2ff1f1e407cc44394219f7b3878efaa919f))
-	ROM_LOAD ("sfg05.rom",      0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
 	ROM_LOAD ("yrm502.rom",     0x14000,0x4000, CRC(5330fe21) SHA1(7b1798561ee1844a7d6432924fbee9b4fc591c19))
 ROM_END
 
@@ -2807,7 +2801,7 @@ static MACHINE_CONFIG_DERIVED( cx5m128, msx_pal )
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 1, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("yrm", 3, 1, 1, 1, "maincpu", 0x14000) /* YRM-502 */
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
-	MCFG_MSX_LAYOUT_ROM("sfg", 3, 3, 0, 2, "maincpu", 0xc000) /* SFG-05 */
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 3, "sfg05")
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
 MACHINE_CONFIG_END
@@ -2818,7 +2812,6 @@ ROM_START (cx5m2)
 	ROM_REGION (0x14000, "maincpu",0)
 	ROM_LOAD ("cx5m2bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
 	ROM_LOAD ("cx5m2ext.rom",  0x8000, 0x4000, CRC(feada82e) SHA1(48b0c2ff1f1e407cc44394219f7b3878efaa919f))
-	ROM_LOAD ("sfg05.rom",       0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( cx5m2, msx_pal )
@@ -2831,7 +2824,7 @@ static MACHINE_CONFIG_DERIVED( cx5m2, msx_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 1, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB Mapper RAM */
-	MCFG_MSX_LAYOUT_ROM("sfg", 3, 3, 0, 2, "maincpu", 0xc000)
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 3, "sfg05")
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
 MACHINE_CONFIG_END
@@ -2984,7 +2977,6 @@ MACHINE_CONFIG_END
 ROM_START (yis503m)
 	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("yis503mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
-	ROM_LOAD ("sfg05m.rom",        0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( yis503m, msx_pal )
@@ -2995,7 +2987,7 @@ static MACHINE_CONFIG_DERIVED( yis503m, msx_pal )
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
-	MCFG_MSX_LAYOUT_ROM("sfg", 3, 0, 0, 2, "maincpu", 0x8000)
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 0, "sfg05")
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 0, 2, 2)   /* 32KB RAM */
 
 	MCFG_FRAGMENT_ADD( msx1_cartlist )
@@ -5094,7 +5086,6 @@ ROM_START (cx7m)
 	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
-	ROM_LOAD ("sfg05m.rom", 0x20000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( cx7m, msx2_pal )
@@ -5108,7 +5099,7 @@ static MACHINE_CONFIG_DERIVED( cx7m, msx2_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
-	MCFG_MSX_LAYOUT_ROM("sfg", 3, 3, 0, 2, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 3, "sfg05")
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -5121,7 +5112,6 @@ ROM_START (cx7m128)
 	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
-	ROM_LOAD ("sfg05m.rom", 0x20000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 	ROM_LOAD ("yrm502.rom", 0x28000, 0x4000, CRC(51f7ddd1) SHA1(2a4b4a4657e3077df8a88f98210b76883d3702b1))
 ROM_END
 
@@ -5137,7 +5127,7 @@ static MACHINE_CONFIG_DERIVED( cx7m128, msx2_pal )
 	MCFG_MSX_LAYOUT_ROM("yrm502", 3, 1, 1, 1, "maincpu", 0x28000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
-	MCFG_MSX_LAYOUT_ROM("sfg", 3, 3, 0, 2, "maincpu", 0x20000)
+	MCFG_MSX_LAYOUT_YAMAHA_EXPANSION("expansion", 3, 3, "sfg05")
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
