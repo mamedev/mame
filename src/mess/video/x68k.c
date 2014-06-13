@@ -24,9 +24,9 @@
          1 sprite layer - up to 128 16x16 sprites, 16 colours per sprite, maximum 16 sprites per scanline (not yet implemented).
 
          Questions: What do the other bits in m_video.reg[2] do?
+                    What is "special priority mode"?
                     How is the intensity applied during blending if at all?
                     Black appears to be opaque only at priority 2 but not 3, is that right?
-                    How is the gfx layer cleared in pacland and text layer in akumajo?
                     Are the gfx layers blended from the bottom up or all at once?
 
 */
@@ -90,28 +90,21 @@ bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
     return NULL;  // should never reach here either.
 }
 */
-void x68k_state::x68k_crtc_text_copy(int src, int dest)
+void x68k_state::x68k_crtc_text_copy(int src, int dest, UINT8 planes)
 {
 	// copys one raster in T-VRAM to another raster
 	int src_ram = src * 256;  // 128 bytes per scanline
 	int dest_ram = dest * 256;
-	int line;
 
-	if(dest > 250)
-		return;  // for some reason, Salamander causes a SIGSEGV in a debug build in this function.
-
-	for(line=0;line<8;line++)
-	{
-		// update RAM in each plane
-		memcpy(m_tvram+dest_ram,m_tvram+src_ram,128);
-		memcpy(m_tvram+dest_ram+0x10000,m_tvram+src_ram+0x10000,128);
-		memcpy(m_tvram+dest_ram+0x20000,m_tvram+src_ram+0x20000,128);
-		memcpy(m_tvram+dest_ram+0x30000,m_tvram+src_ram+0x30000,128);
-
-		src_ram+=64;
-		dest_ram+=64;
-	}
-
+	// update RAM in each plane
+	if(planes & 1)
+		memcpy(m_tvram+dest_ram,m_tvram+src_ram,512);
+	if(planes & 2)
+		memcpy(m_tvram+dest_ram+0x10000,m_tvram+src_ram+0x10000,512);
+	if(planes & 4)
+		memcpy(m_tvram+dest_ram+0x20000,m_tvram+src_ram+0x20000,512);
+	if(planes & 8)
+		memcpy(m_tvram+dest_ram+0x30000,m_tvram+src_ram+0x30000,512);
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_operation_end)
@@ -188,8 +181,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 	m_crtc.hblank = hstate;
 	m_mfpdev->i7_w(!m_crtc.hblank);
 
-	if(m_crtc.operation & 8) // is this supposed to happen when the src or dest line is scanned?
-		x68k_crtc_text_copy((m_crtc.reg[22] & 0xff00) >> 8,(m_crtc.reg[22] & 0x00ff));
+	if(m_crtc.operation & 8)
+		x68k_crtc_text_copy((m_crtc.reg[22] & 0xff00) >> 8,(m_crtc.reg[22] & 0x00ff),(m_crtc.reg[21] & 0xf));
 
 	if(m_crtc.vmultiple == 2) // 256-line (doublescan)
 	{

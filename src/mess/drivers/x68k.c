@@ -107,8 +107,6 @@
       Dragon Buster: Text is black and unreadable. (Text layer actually covers it)
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
-      Akumajo Drac:  no sfx starting on second stage (m68000 only, 030 is fine), simon sprite flickers
-
 
     More detailed documentation at http://x68kdev.emuvibes.com/iomap.html - if you can stand broken english :)
 
@@ -709,25 +707,6 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(x68k_state::x68k_fm_w)
-{
-	switch(offset)
-	{
-	case 0x00:
-	case 0x01:
-		m_ym2151->write(space, offset, data);
-		break;
-	}
-}
-
-READ16_MEMBER(x68k_state::x68k_fm_r)
-{
-	if(offset == 0x01)
-		return m_ym2151->read(space, 1);
-
-	return 0xffff;
-}
-
 WRITE8_MEMBER(x68k_state::x68k_ct_w)
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
@@ -1165,7 +1144,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
-	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
+	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_ctrl_w, 0x00ff)
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
@@ -1202,7 +1181,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
-	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
+	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_ctrl_w, 0x00ff)
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
@@ -1241,7 +1220,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
-	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
+	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff00ff)
 	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8("okim6258", okim6258_device, okim6258_status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)

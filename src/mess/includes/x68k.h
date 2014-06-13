@@ -299,8 +299,6 @@ public:
 	DECLARE_WRITE16_MEMBER(x68k_scc_w);
 	DECLARE_WRITE16_MEMBER(x68k_fdc_w);
 	DECLARE_READ16_MEMBER(x68k_fdc_r);
-	DECLARE_WRITE16_MEMBER(x68k_fm_w);
-	DECLARE_READ16_MEMBER(x68k_fm_r);
 	DECLARE_WRITE16_MEMBER(x68k_ioc_w);
 	DECLARE_READ16_MEMBER(x68k_ioc_r);
 	DECLARE_WRITE16_MEMBER(x68k_sysport_w);
@@ -336,7 +334,7 @@ public:
 
 private:
 	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, UINT32 color);
-	void x68k_crtc_text_copy(int src, int dest);
+	void x68k_crtc_text_copy(int src, int dest, UINT8 planes);
 	void x68k_crtc_refresh_mode();
 	void x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
 	bool x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
