@@ -23,15 +23,12 @@ class vegaeo_state : public eolith_state
 {
 public:
 	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state(mconfig, type, tag),
-		  m_generic_paletteram_32(*this, "paletteram") { }
+		: eolith_state(mconfig, type, tag) { }
 
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
-    UINT32 *m_vega_vram;
+	UINT32 *m_vega_vram;
 	UINT8 m_vega_vbuffer;
 	DECLARE_WRITE32_MEMBER(vega_vram_w);
 	DECLARE_READ32_MEMBER(vega_vram_r);
-	DECLARE_WRITE32_MEMBER(vega_palette_w);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);
 	DECLARE_READ32_MEMBER(vegaeo_custom_read);
 	DECLARE_WRITE32_MEMBER(soundlatch_w);
@@ -108,16 +105,6 @@ READ32_MEMBER(vegaeo_state::vega_vram_r)
 	return m_vega_vram[offset + (0x14000/4) * m_vega_vbuffer];
 }
 
-WRITE32_MEMBER(vegaeo_state::vega_palette_w)
-{
-	UINT16 paldata;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	paldata = m_generic_paletteram_32[offset] & 0x7fff;
-	m_palette->set_pen_color(offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
-}
-
 WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 {
 	// other bits ???
@@ -147,7 +134,7 @@ static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
@@ -241,10 +228,11 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_MEMBITS(16)
 
 	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)
 
-	/* sound hardware */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

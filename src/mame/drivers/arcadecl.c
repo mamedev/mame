@@ -146,7 +146,7 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_RAM_WRITE(expanded_paletteram_666_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
 	AM_RANGE(0x3effc0, 0x3effff) AM_RAM AM_SHARE("mob:slip")
@@ -328,6 +328,8 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_MEMBITS(8)
 
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")

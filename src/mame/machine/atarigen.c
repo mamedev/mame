@@ -1400,31 +1400,6 @@ void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen
 }
 
 
-//-------------------------------------------------
-//  expanded_paletteram_666_w: 6-6-6 RGB expanded
-//  palette RAM handler.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::expanded_paletteram_666_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	if (ACCESSING_BITS_8_15)
-	{
-		int palentry = offset / 2;
-		int newword = (m_generic_paletteram_16[palentry * 2] & 0xff00) | (m_generic_paletteram_16[palentry * 2 + 1] >> 8);
-
-		int r, g, b;
-
-		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
-		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
-		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
-
-		m_palette->set_pen_color(palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
-	}
-}
-
-
 /***************************************************************************
     MISC HELPERS
 ***************************************************************************/
