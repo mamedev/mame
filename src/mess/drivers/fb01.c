@@ -38,6 +38,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	DECLARE_PALETTE_INIT(fb01);
+
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
@@ -154,6 +156,13 @@ static HD44780_PIXEL_UPDATE(fb01_pixel_update)
 }
 
 
+PALETTE_INIT_MEMBER(fb01_state, fb01)
+{
+	palette.set_pen_color(0, rgb_t(30, 0, 0));
+	palette.set_pen_color(1, rgb_t(150, 0, 0));
+}
+
+
 static MACHINE_CONFIG_START( fb01, fb01_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -172,7 +181,8 @@ static MACHINE_CONFIG_START( fb01, fb01_state )
 
 	MCFG_DEFAULT_LAYOUT( layout_fb01 )
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(fb01_state, fb01)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
@@ -213,5 +223,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  INIT                  COMPANY   FULLNAME  FLAGS */
-CONS( 1986, fb01, 0,      0,       fb01,    fb01,  driver_device,   0,   "Yamaha", "FB-01",  GAME_NOT_WORKING )
+CONS( 1986, fb01, 0,      0,       fb01,    fb01,  driver_device,   0,   "Yamaha", "FB-01",  GAME_SUPPORTS_SAVE )
 
