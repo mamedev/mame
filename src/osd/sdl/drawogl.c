@@ -1873,8 +1873,8 @@ static int texture_shader_create(sdl_window_info *window,
 	int lut_table_width_pow2=0;
 	int lut_table_height_pow2=0;
 	int i;
-	int surf_w_pow2  = get_valid_pow2_value (window->width, texture->texpow2);
-	int surf_h_pow2  = get_valid_pow2_value (window->height, texture->texpow2);
+	int surf_w_pow2  = get_valid_pow2_value (window->blitwidth, texture->texpow2);
+	int surf_h_pow2  = get_valid_pow2_value (window->blitheight, texture->texpow2);
 
 	assert ( texture->type==TEXTURE_TYPE_SHADER );
 
@@ -1959,28 +1959,20 @@ static int texture_shader_create(sdl_window_info *window,
 			GL_CHECK_ERROR_NORMAL();
 		}
 
-		{
-			GLfloat color_texture_pow2_sz[2] = { (GLfloat)texture->rawwidth_create, (GLfloat)texture->rawheight_create };
-			uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "color_texture_pow2_sz");
-			pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
-			GL_CHECK_ERROR_NORMAL();
-		}
-		if ( i>sdl->glsl_program_mb2sc )
-		{
-			{
-				GLfloat screen_texture_sz[2] = { (GLfloat)window->width, (GLfloat)window->height };
-				uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "screen_texture_sz");
-				pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_sz[0]));
-				GL_CHECK_ERROR_NORMAL();
-			}
+		GLfloat color_texture_pow2_sz[2] = { (GLfloat)texture->rawwidth_create, (GLfloat)texture->rawheight_create };
+		uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "color_texture_pow2_sz");
+		pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
+		GL_CHECK_ERROR_NORMAL();
 
-			{
-				GLfloat screen_texture_pow2_sz[2] = { (GLfloat)surf_w_pow2, (GLfloat)surf_h_pow2 };
-				uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "screen_texture_pow2_sz");
-				pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_pow2_sz[0]));
-				GL_CHECK_ERROR_NORMAL();
-			}
-		}
+		GLfloat screen_texture_sz[2] = { (GLfloat)window->blitwidth, (GLfloat)window->blitheight };
+		uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "screen_texture_sz");
+		pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_sz[0]));
+		GL_CHECK_ERROR_NORMAL();
+
+		GLfloat screen_texture_pow2_sz[2] = { (GLfloat)surf_w_pow2, (GLfloat)surf_h_pow2 };
+		uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "screen_texture_pow2_sz");
+		pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_pow2_sz[0]));
+		GL_CHECK_ERROR_NORMAL();
 	}
 
 	pfn_glUseProgramObjectARB(sdl->glsl_program[0]); // start with 1st shader
