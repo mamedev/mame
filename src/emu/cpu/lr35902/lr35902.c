@@ -79,7 +79,6 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 	, m_timer_func(*this)
 	, m_enable(0)
 	, m_features(0)
-	, c_regs(NULL)
 {
 }
 
@@ -194,11 +193,6 @@ void lr35902_cpu_device::state_string_export(const device_state_entry &entry, as
 	}
 }
 
-/*** Reset lr353902 registers: ******************************/
-/*** This function can be used to reset the register      ***/
-/*** file before starting execution with lr35902_execute(cpustate)***/
-/*** It sets the registers to their initial values.       ***/
-/************************************************************/
 void lr35902_cpu_device::device_reset()
 {
 	m_A = 0x00;
@@ -211,18 +205,6 @@ void lr35902_cpu_device::device_reset()
 	m_L = 0x00;
 	m_SP = 0x0000;
 	m_PC = 0x0000;
-	if ( c_regs ) {
-		m_A = c_regs[0] >> 8;
-		m_F = c_regs[0] & 0xFF;
-		m_B = c_regs[1] >> 8;
-		m_C = c_regs[1] & 0xFF;
-		m_D = c_regs[2] >> 8;
-		m_E = c_regs[2] & 0xFF;
-		m_H = c_regs[3] >> 8;
-		m_L = c_regs[3] & 0xFF;
-		m_SP = c_regs[4];
-		m_PC = c_regs[5];
-	}
 
 	m_enable = 0;
 	m_IE = 0;

@@ -8,9 +8,6 @@
 	lr35902_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
 #define MCFG_LR35902_HALT_BUG \
 	lr35902_cpu_device::set_halt_bug(*device);
-// This should be removed/improved once all gameboy boot roms have been dumped
-#define MCFG_LR35902_RESET_VALUES(_regs) \
-	lr35902_cpu_device::set_reset_values(*device, _regs);
 
 enum
 {
@@ -32,7 +29,6 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
 	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_features |= LR35902_FEATURE_HALT_BUG; }
-	static void set_reset_values(device_t &device, const UINT16 *regs) { downcast<lr35902_cpu_device &>(device).c_regs = regs; }
 
 	UINT8 get_speed();
 	void set_speed( UINT8 speed_request );
@@ -108,8 +104,6 @@ protected:
 	int m_enable;
 	int m_doHALTbug;
 	UINT8   m_features;
-	const UINT16 *c_regs;
-	const struct lr35902_config *m_config;
 };
 
 extern const device_type LR35902;

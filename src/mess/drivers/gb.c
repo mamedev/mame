@@ -425,10 +425,6 @@ space. This mapper uses 32KB sized banks.
 #include "bus/gameboy/mbc.h"
 
 
-/* Initial value of the cpu registers (hacks until we get bios dumps) */
-static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };  /* Megaduck */
-
-
 READ8_MEMBER(gb_state::gb_cart_r)
 {
 	if (m_bios_disable && m_cartslot)
@@ -827,7 +823,6 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_CPU_PROGRAM_MAP( megaduck_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
-	MCFG_LR35902_RESET_VALUES(megaduck_cpu_regs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -899,7 +894,5 @@ CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    
 CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", GAME_SUPPORTS_SAVE )
 CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-/* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
-   system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
-   Game Boy green colors */
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , GAME_SUPPORTS_SAVE )
+// Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
