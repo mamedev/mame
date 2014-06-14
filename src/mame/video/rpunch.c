@@ -66,8 +66,10 @@ TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 }
 
 
-void rpunch_state::video_start()
+VIDEO_START_MEMBER(rpunch_state,rpunch)
 {
+	m_sprite_xoffs = 0;
+
 	/* allocate tilemaps for the backgrounds */
 	m_background[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rpunch_state::get_bg0_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,64);
 	m_background[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rpunch_state::get_bg1_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,64);
@@ -81,6 +83,16 @@ void rpunch_state::video_start()
 	/* reset the timer */
 	m_crtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rpunch_state::crtc_interrupt_gen),this));
 }
+
+
+VIDEO_START_MEMBER(rpunch_state,svolley)
+{
+	VIDEO_START_CALL_MEMBER(rpunch);
+	m_background[0]->set_scrolldx(8, 0); // aligns middle net sprite with bg as shown in reference
+	m_sprite_xoffs = -4;
+}
+
+
 
 
 
@@ -217,7 +229,7 @@ void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
 		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-				code, color + (m_sprite_palette / 16), xflip, yflip, x, y, 15);
+				code, color + (m_sprite_palette / 16), xflip, yflip, x+m_sprite_xoffs, y, 15);
 	}
 }
 
