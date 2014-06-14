@@ -1641,6 +1641,51 @@ ROM_START( galaga88j )
 	ROM_LOAD( "g8_obj-5.bin",       0xa0000, 0x20000, CRC(b0645169) SHA1(e55dc9bd532b6bd821b7bf6994c35175600c317c) )
 ROM_END
 
+// roms all have handwritten labels with checksums and dates
+ROM_START( galaga88a )
+	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
+	ROM_LOAD( "g81_s0.bin",         0x0c000, 0x10000, CRC(164a3fdc) SHA1(d7b026f6a617bb444e3bce80cec2cbb4772cb533) )  // 12-11-87
+	ROM_LOAD( "g81_s1.bin",         0x1c000, 0x10000, CRC(16a4b784) SHA1(a0d6f6ad4a68c9e10f2662e940ffaee691cafcac) )  // 11-12-87 - mistake?
+
+	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_LOAD_512( "g81_p0.bin",      0x000000, CRC(0f0778ca) SHA1(17cc03c6ff138cf947dafe05dc0759ff968a399e) )  // 12-11-87
+	ROM_LOAD_512( "g81_p1.bin",      0x080000, CRC(e68cb351) SHA1(1087c0d9a53f3a4d238f19d479856b502bde7b77) )  // 12-11-87
+	/* 100000-17ffff empty */
+	/* 180000-1fffff empty */
+	/* 200000-27ffff empty */
+	ROM_LOAD_512( "g81_p5.bin",      0x280000, CRC(4fbd3f6c) SHA1(40d8dadc0a36b4c1886778cfc8d380a34aea2505) ) // 12-11-87
+	ROM_LOAD_512( "prg-6c.s10",      0x300000, CRC(c781b8b5) SHA1(93b75e7512aa48d55a4230a02e1012210a79d372) ) // 02-03-88    (romcmp g8x_p6.bin - 99.981689%)
+	ROM_LOAD_512( "prg-7c.t10",      0x380000, CRC(d2d7e4fa) SHA1(5de44d1ea4c3135f16dc5a4f8a2147d991bbe681) ) // 02-03-88    (romcmp g8x_p7.bin - 99.908447%)
+
+	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_LOAD_HS( "g81_v0.bin",      0x10000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v1.bin",      0x30000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v2.bin",      0x50000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v3.bin",      0x70000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v4.bin",      0x90000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v5.bin",      0xb0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) ) // 12-11-87
+
+	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) ) // 12-11-87
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
+	ROM_LOAD( "g8_chr-0.bin",       0x00000, 0x20000, CRC(68559c78) SHA1(28f6284acbf1fc263c2d38ae464ee77f367b0af5) ) // 12-11-87
+	ROM_LOAD( "g8_chr-1.bin",       0x20000, 0x20000, CRC(3dc0f93f) SHA1(0db9f37cf6e06013b402df23e615b0ab0d32b9ee) ) // 12-11-87
+	ROM_LOAD( "g8_chr-2.bin",       0x40000, 0x20000, CRC(dbf26f1f) SHA1(e52723647a8fe6db0b9c5e11c02486b20a549506) ) // 12-11-87
+	ROM_LOAD( "g8_chr-3.bin",       0x60000, 0x20000, CRC(f5d6cac5) SHA1(3d098b8219de4a7729ec95547eebff17c9b505b9) ) // 12-11-87
+	ROM_LOAD( "g8chr-7.m8",       0xe0000, 0x20000, CRC(5f655016) SHA1(f6f1fa26dad363f1b50995fd1c52db0671365d83) ) // 10-27-87 (present, but not used by this version? possibly leftover from earlier development)
+
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD( "g8_obj-0.bin",       0x00000, 0x20000, CRC(d7112e3f) SHA1(476f9e1b636b257e517fc789508dac923d05ef67) ) // 12-11-87
+	ROM_LOAD( "g8_obj-1.bin",       0x20000, 0x20000, CRC(680db8e7) SHA1(84a68c27aaae27c0540f68f9c7d490a416c8f027) ) // 12-11-87
+	ROM_LOAD( "g8_obj-2.bin",       0x40000, 0x20000, CRC(13c97512) SHA1(9c5f39bcfe28abe1faa67bbe829a61fbcec98ec8) ) // 12-11-87
+	ROM_LOAD( "g8_obj-3.bin",       0x60000, 0x20000, CRC(3ed3941b) SHA1(5404aed795536ce6b37b8292d6a4446222bb50bf) ) // 12-11-87
+	ROM_LOAD( "g8_obj-4.bin",       0x80000, 0x20000, CRC(370ff4ad) SHA1(61d7306325103c6a03def619c21877faadf12699) ) // 12-11-87
+	ROM_LOAD( "g8_obj-5.bin",       0xa0000, 0x20000, CRC(b0645169) SHA1(e55dc9bd532b6bd821b7bf6994c35175600c317c) ) // 12-11-87
+ROM_END
+
+
 /* World Stadium */
 ROM_START( ws )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
@@ -2667,6 +2712,7 @@ GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, quester,  ROT
 GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania", 0 )
 GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
 GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, galaga88, ROT270, "Namco", "Galaga '88", 0 )
+GAME( 1987, galaga88a, galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (02-03-88)", 0 )
 GAME( 1987, galaga88j, galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", 0 )
 GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, ws,       ROT180, "Namco", "World Stadium (Japan)", 0 )
 GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", 0 )
