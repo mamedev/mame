@@ -422,7 +422,7 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nsmpoker)
 
-	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)
 
 MACHINE_CONFIG_END
