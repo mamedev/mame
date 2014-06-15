@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_m_vram")
 	AM_RANGE(0x180000, 0x180fff) AM_DEVREADWRITE("texttilemap", vs920a_text_tilemap_device,  vram_r, vram_w ) 
 	AM_RANGE(0x181000, 0x181fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  line_r, line_w ) 
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x00f000)
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w ) 
 	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
@@ -307,27 +307,6 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, gstriker_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16, gstriker_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  vram_r, vram_w ) 
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_m_vram")
-	AM_RANGE(0x180000, 0x180fff) AM_DEVREADWRITE("texttilemap", vs920a_text_tilemap_device,  vram_r, vram_w ) 
-	AM_RANGE(0x181000, 0x181fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  line_r, line_w ) 
-	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w ) 
-	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
-	AM_RANGE(0x200060, 0x20007f) AM_RAM AM_SHARE("mixerregs2")
-
-	AM_RANGE(0x200080, 0x200081) AM_READ_PORT("P1")
-	AM_RANGE(0x200082, 0x200083) AM_READ_PORT("P2")
-	AM_RANGE(0x200084, 0x200085) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x200086, 0x200087) AM_READ_PORT("DSW1")
-	AM_RANGE(0x200088, 0x200089) AM_READ_PORT("DSW2")
-	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
-
-	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
-ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
 
@@ -583,50 +562,23 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( twc94, gstriker )
+	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(gstriker_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vgoal, gstriker_state )
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(vgoal_map)
+
+static MACHINE_CONFIG_DERIVED( vgoal, gstriker )
+	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(gstriker_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000) /* hand-tuned, it needs a bit */)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update_gstriker)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstriker)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("zoomtilemap", MB60553, 0)
-	MCFG_MB60553_GFXDECODE("gfxdecode")
-
-	MCFG_DEVICE_ADD("texttilemap", VS920A, 0)
-	MCFG_VS920A_GFXDECODE("gfxdecode")
-
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	MCFG_DEVICE_REPLACE("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
+	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0xf) // different vs. the other games, find register
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(gstriker_state,gstriker)
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(gstriker_state, gs_ym2610_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1100,5 +1052,5 @@ GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, driver_device, 0,        RO
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
 GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 1)", GAME_NOT_WORKING )
 GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 2)", GAME_NOT_WORKING )
-GAME( 1994, twrldc94, 0,        gstriker, twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, twrldc94a,twrldc94, gstriker, twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, twrldc94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, twrldc94a,twrldc94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
