@@ -116,11 +116,11 @@ NETLIB_START(QBJT_switch)
 NETLIB_UPDATE(QBJT_switch)
 {
     if (!m_RB.m_P.net().isRailNet())
-        m_RB.m_P.net().as_analog().schedule_solve();   // Basis
+        m_RB.m_P.schedule_solve();   // Basis
     else if (!m_RB.m_N.net().isRailNet())
-        m_RB.m_N.net().as_analog().schedule_solve();   // Emitter
+        m_RB.m_N.schedule_solve();   // Emitter
     else if (!m_RC.m_P.net().isRailNet())
-        m_RC.m_P.net().as_analog().schedule_solve();   // Collector
+        m_RC.m_P.schedule_solve();   // Collector
 }
 
 
@@ -176,11 +176,11 @@ NETLIB_START(QBJT_EB)
 NETLIB_UPDATE(QBJT_EB)
 {
 	if (!m_D_EB.m_P.net().isRailNet())
-		m_D_EB.m_P.net().as_analog().schedule_solve();   // Basis
+		m_D_EB.m_P.schedule_solve();   // Basis
 	else if (!m_D_EB.m_N.net().isRailNet())
-		m_D_EB.m_N.net().as_analog().schedule_solve();   // Emitter
+		m_D_EB.m_N.schedule_solve();   // Emitter
 	else
-		m_D_CB.m_N.net().as_analog().schedule_solve();   // Collector
+		m_D_CB.m_N.schedule_solve();   // Collector
 }
 
 NETLIB_RESET(QBJT_EB)

@@ -225,39 +225,27 @@ class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
 	ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
-			: nld_base_d_to_a_proxy(out_proxied)
+    : nld_base_d_to_a_proxy(out_proxied)
+    , m_RV(TWOTERM)
+	, m_last_state(-1)
 	{
 	}
 
 	ATTR_COLD virtual ~nld_d_to_a_proxy() {}
 
 protected:
-	ATTR_COLD void start()
-	{
-		nld_base_d_to_a_proxy::start();
+	ATTR_COLD virtual void start();
 
-		register_sub(m_R, "R");
-		register_output("_Q", m_Q);
-		register_subalias("Q", m_R.m_P);
+	ATTR_COLD virtual void reset();
 
-		connect(m_R.m_N, m_Q);
-	}
-
-	ATTR_COLD void reset()
-	{
-		m_R.do_reset();
-	}
-
-	ATTR_COLD virtual netlist_core_terminal_t &out()
-	{
-		return m_R.m_P;
-	}
+	ATTR_COLD virtual netlist_core_terminal_t &out();
 
 	ATTR_HOT ATTR_ALIGN void update();
 
 private:
 	netlist_analog_output_t m_Q;
-	nld_R_base m_R;
+	nld_twoterm m_RV;
+	int m_last_state;
 };
 #endif
 

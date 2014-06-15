@@ -296,18 +296,19 @@ public:
 	};
 	enum family_t {
 		// Terminal families
-		LOGIC     = 1,
-		ANALOG    = 2,
+		LOGIC,
+		ANALOG,
 		// Device families
-		GENERIC   = 3,   // <== devices usually fall into this category
-		RESISTOR  = 4,   // Resistor
-		CAPACITOR = 5,   // Capacitor
-		DIODE     = 6,   // Diode
-		BJT_SWITCH = 7,  // BJT(Switch)
-		VCVS       = 8,  // Voltage controlled voltage source
-		VCCS       = 9,  // Voltage controlled current source
-		BJT_EB     = 10, // BJT(Ebers-Moll)
-		GND        = 11, // GND device
+		GENERIC,    // <== devices usually fall into this category
+		TWOTERM,    // Generic twoterm ...
+		RESISTOR,   // Resistor
+		CAPACITOR,  // Capacitor
+		DIODE,      // Diode
+        BJT_EB,     // BJT(Ebers-Moll)
+		BJT_SWITCH, // BJT(Switch)
+		VCVS,       // Voltage controlled voltage source
+		VCCS,       // Voltage controlled current source
+		GND,        // GND device
 	};
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -458,6 +459,8 @@ public:
 		set_ptr(m_gt1, GT);
 	}
 
+    ATTR_HOT void schedule_solve();
+    ATTR_HOT void schedule_after(const netlist_time &after);
 
 	netlist_terminal_t *m_otherterm;
 
@@ -715,7 +718,7 @@ public:
         return m_cur_Analog;
     }
 
-    ATTR_HOT void schedule_solve();
+    ATTR_HOT inline netlist_matrix_solver_t *solver() { return m_solver; }
 
     ATTR_COLD bool already_processed(list_t *groups, int cur_group);
     ATTR_COLD void process_net(list_t *groups, int &cur_group);
@@ -734,8 +737,6 @@ public:
 
     //FIXME: needed by current solver code
     netlist_matrix_solver_t *m_solver;
-//    netlist_terminal_t::list_t m_terms;
-//    netlist_terminal_t::list_t m_rails;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -964,7 +965,12 @@ public:
 		out.set_Q(val, delay);
 	}
 
-	ATTR_HOT inline bool INP_HL(const netlist_logic_input_t &inp) const
+    ATTR_HOT inline bool INP_CHANGED(const netlist_logic_input_t &inp) const
+    {
+        return (inp.last_Q() != inp.Q());
+    }
+
+    ATTR_HOT inline bool INP_HL(const netlist_logic_input_t &inp) const
 	{
 		return ((inp.last_Q() & !inp.Q()) == 1);
 	}

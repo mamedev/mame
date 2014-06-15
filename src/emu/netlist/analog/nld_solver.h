@@ -205,6 +205,10 @@ public:
 	ATTR_HOT inline bool is_timestep() { return m_step_devices.count() > 0; }
 
     ATTR_HOT void update_forced();
+    ATTR_HOT inline void update_after(const netlist_time after)
+    {
+        m_Q_sync.net().reschedule_in_queue(after);
+    }
 
 	/* netdevice functions */
 	ATTR_HOT  virtual void update();
