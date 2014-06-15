@@ -196,6 +196,9 @@ public:
 
     ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
 
+    template<class C>
+    void solve_base(C *p);
+
 	ATTR_HOT double solve();
 
 	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.count() > 0; }
@@ -216,9 +219,10 @@ public:
 protected:
 
     ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
+    ATTR_HOT void update_dynamic();
 
-    // return true if a reschedule is needed ...
-    ATTR_HOT virtual int vsolve_non_dynamic() = 0;
+    // should return next time step
+    ATTR_HOT virtual double vsolve() = 0;
 
     ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
 
@@ -227,9 +231,11 @@ protected:
 
     int m_calculations;
 
+    ATTR_HOT inline const double current_timestep() { return m_cur_ts; }
 private:
 
     netlist_time m_last_step;
+    double m_cur_ts;
     dev_list_t m_step_devices;
     dev_list_t m_dynamic_devices;
 
@@ -238,14 +244,7 @@ private:
 
     ATTR_HOT void step(const netlist_time delta);
 
-    /* bring the whole system to the current time
-     * Don't schedule a new calculation time. The recalculation has to be
-     * triggered by the caller after the netlist element was changed.
-     */
-    ATTR_HOT virtual double compute_next_timestep(const double) = 0;
-
     ATTR_HOT void update_inputs();
-    ATTR_HOT void update_dynamic();
 
 };
 
@@ -263,21 +262,30 @@ public:
 
 	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
 
+    ATTR_HOT inline int vsolve_non_dynamic();
+
 protected:
     ATTR_COLD virtual void add_term(int net_idx, netlist_terminal_t *term);
 
-    ATTR_HOT virtual int vsolve_non_dynamic();
+    ATTR_HOT virtual double vsolve();
+
     ATTR_HOT int solve_non_dynamic();
 	ATTR_HOT void build_LE();
 	ATTR_HOT void gauss_LE(double (* RESTRICT x));
 	ATTR_HOT double delta(const double (* RESTRICT V));
 	ATTR_HOT void store(const double (* RESTRICT V), const bool store_RHS);
 
-    ATTR_HOT virtual double compute_next_timestep(const double);
+    /* bring the whole system to the current time
+     * Don't schedule a new calculation time. The recalculation has to be
+     * triggered by the caller after the netlist element was changed.
+     */
+    ATTR_HOT double compute_next_timestep();
 
     double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
     double m_RHS[_storage_N];
     double m_last_RHS[_storage_N]; // right hand side - contains currents
+    double m_Vdelta[_storage_N];
+    double m_last_V[_storage_N];
 
     terms_t **m_terms;
 
@@ -287,6 +295,7 @@ private:
     vector_ops_t *m_row_ops[_storage_N + 1];
 
 	int m_dim;
+	double m_lp_fact;
 };
 
 template <int m_N, int _storage_N>
@@ -296,6 +305,7 @@ public:
 
 	netlist_matrix_solver_gauss_seidel_t(int size)
       : netlist_matrix_solver_direct_t<m_N, _storage_N>(size)
+      , m_lp_fact(0)
       , m_gs_fail(0)
       , m_gs_total(0)
       {}
@@ -304,10 +314,12 @@ public:
 
     ATTR_COLD virtual void log_stats();
 
+    ATTR_HOT inline int vsolve_non_dynamic();
 protected:
-	ATTR_HOT int vsolve_non_dynamic();
+    ATTR_HOT virtual double vsolve();
 
 private:
+    double m_lp_fact;
     int m_gs_fail;
     int m_gs_total;
 
@@ -320,8 +332,9 @@ public:
     netlist_matrix_solver_direct1_t()
       : netlist_matrix_solver_direct_t<1, 1>(1)
       {}
+    ATTR_HOT inline int vsolve_non_dynamic();
 protected:
-    ATTR_HOT int vsolve_non_dynamic();
+    ATTR_HOT virtual double vsolve();
 private:
 };
 
@@ -332,8 +345,9 @@ public:
     netlist_matrix_solver_direct2_t()
       : netlist_matrix_solver_direct_t<2, 2>(2)
       {}
+    ATTR_HOT inline int vsolve_non_dynamic();
 protected:
-    ATTR_HOT int vsolve_non_dynamic();
+    ATTR_HOT virtual double vsolve();
 private:
 };
 

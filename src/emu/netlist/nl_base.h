@@ -619,7 +619,6 @@ public:
     // We have to have those on one object. Dividing those does lead
     // to a significant performance hit
     // FIXME: Have to fix the public at some time
-    double m_new_Analog;
     double m_last_Analog;
     double m_cur_Analog;
 
@@ -1344,9 +1343,9 @@ ATTR_HOT inline const double netlist_analog_input_t::Q_Analog() const
 
 ATTR_HOT inline void netlist_analog_output_t::set_Q(const double newQ)
 {
-    if (newQ != net().as_analog().m_new_Analog)
+    if (newQ != net().as_analog().m_cur_Analog)
     {
-        net().as_analog().m_new_Analog = newQ;
+        net().as_analog().m_cur_Analog = newQ;
         net().push_to_queue(NLTIME_FROM_NS(1));
     }
 }

@@ -460,7 +460,6 @@ ATTR_COLD netlist_net_t::netlist_net_t(const family_t afamily)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
-    , m_new_Analog(0.0)
     , m_last_Analog(0.0)
     , m_cur_Analog(0.0)
 {
@@ -500,7 +499,6 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 			m_last_Analog = m_cur_Analog; // FIXME: Needed here ?
 			railterminal().netdev().inc_active();
 			m_cur_Q = m_new_Q;
-			m_cur_Analog = m_new_Analog;
 		}
 	}
 
@@ -514,7 +512,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 		else
 		{
 			m_cur_Q = m_last_Q = m_new_Q;
-			m_cur_Analog = m_last_Analog = m_new_Analog;  // FIXME: Needed here?
+			m_last_Analog = m_cur_Analog;
 			m_in_queue = 2;
 		}
 	}
@@ -553,7 +551,6 @@ ATTR_COLD void netlist_net_t::reset()
     m_cur_Q = 0;
     m_last_Analog = 0.0;
     m_cur_Analog = 0.0;
-    m_new_Analog = 0.0;
 
 	/* rebuild m_list */
 
@@ -592,7 +589,6 @@ ATTR_COLD void netlist_net_t::save_register()
 	save(NAME(m_in_queue));
     save(NAME(m_last_Analog));
     save(NAME(m_cur_Analog));
-    save(NAME(m_new_Analog));
     save(NAME(m_last_Q));
     save(NAME(m_cur_Q));
     save(NAME(m_new_Q));
@@ -722,8 +718,6 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
-
-	m_cur_Analog = m_new_Analog;
 
     switch (m_active)
     {
@@ -859,14 +853,12 @@ ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 
 	net().as_analog().m_last_Analog = 0.97;
 	net().as_analog().m_cur_Analog = 0.98;
-	net().as_analog().m_new_Analog = 0.99;
 }
 
 ATTR_COLD void netlist_analog_output_t::initial(const double val)
 {
 	net().as_analog().m_cur_Analog = val * 0.98;
 	net().as_analog().m_cur_Analog = val * 0.99;
-	net().as_analog().m_new_Analog = val * 1.0;
 }
 
 // ----------------------------------------------------------------------------------------
