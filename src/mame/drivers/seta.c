@@ -8042,7 +8042,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( daioh, seta_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)   /* 16 MHz, MC68000-16, Verified from PCB */
 	MCFG_CPU_PROGRAM_MAP(daioh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
@@ -8052,7 +8052,7 @@ static MACHINE_CONFIG_START( daioh, seta_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.42)   /* verified on PCB */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
@@ -8067,7 +8067,7 @@ static MACHINE_CONFIG_START( daioh, seta_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_16MHz)   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
