@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+//	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000) /* hand-tuned, it needs a bit */)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
@@ -1050,7 +1050,7 @@ GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, driver_device, 0,        RO
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 1)", GAME_NOT_WORKING )
-GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 2)", GAME_NOT_WORKING )
-GAME( 1994, twrldc94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, twrldc94a,twrldc94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (Europe)",         GAME_NOT_WORKING ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", GAME_NOT_WORKING ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twrldc94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, twrldc94a,twrldc94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
