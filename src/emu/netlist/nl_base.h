@@ -622,7 +622,6 @@ public:
     // We have to have those on one object. Dividing those does lead
     // to a significant performance hit
     // FIXME: Have to fix the public at some time
-    double m_last_Analog;
     double m_cur_Analog;
 
 };

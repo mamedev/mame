@@ -283,11 +283,6 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
     for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
         (*p)->set_Q((*p)->m_proxied_net->m_cur_Analog);
 
-    for (int k = 0; k < m_nets.count(); k++)
-    {
-        netlist_analog_net_t *p= m_nets[k];
-        p->m_last_Analog = p->m_cur_Analog;
-    }
 }
 
 
