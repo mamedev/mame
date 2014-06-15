@@ -834,7 +834,7 @@ ATTR_HOT double netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolve()
             this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
         }
 
-    solve_base(this);
+    this->solve_base(this);
 
     if (USE_LINEAR_PREDICTION)
     {
