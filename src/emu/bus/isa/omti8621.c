@@ -974,8 +974,8 @@ UINT16 omti8621_device::get_data()
 {
 	UINT16 data = 0xff;
 	if (data_index < data_length) {
-		data = data_buffer[data_index++] << 8;
-		data |= data_buffer[data_index++];
+		data = data_buffer[data_index++];
+		data |= data_buffer[data_index++] << 8;
 		if (data_index >= data_length) {
 			omti_state = OMTI_STATE_STATUS;
 			status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
@@ -994,8 +994,8 @@ UINT16 omti8621_device::get_data()
 void omti8621_device::set_data(UINT16 data)
 {
 	if (data_index < data_length) {
-		data_buffer[data_index++] = data >> 8;
 		data_buffer[data_index++] = data & 0xff;
+		data_buffer[data_index++] = data >> 8;
 		if (data_index >= data_length) {
 			do_command(command_buffer, command_index);
 		}
@@ -1013,11 +1013,11 @@ WRITE16_MEMBER(omti8621_device::write)
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			write8(space, offset*2+1, data, mem_mask);
+			write8(space, offset*2, data, mem_mask);
 			break;
 
 		case 0xff00:
-			write8(space, offset*2, data>>8, mem_mask>>8);
+			write8(space, offset*2+1, data>>8, mem_mask>>8);
 			break;
 
 		default:
@@ -1125,9 +1125,9 @@ READ16_MEMBER(omti8621_device::read)
 	switch (mem_mask)
 	{
 		case 0x00ff:
-			return read8(space, offset*2+1, mem_mask);
+			return read8(space, offset*2, mem_mask);
 		case 0xff00:
-			return read8(space, offset*2, mem_mask >> 8) << 8;
+			return read8(space, offset*2+1, mem_mask >> 8) << 8;
 		default:
 			return get_data();
 	}
@@ -1212,7 +1212,7 @@ UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 le
 	}
 	else
 	{
-		LOG1(("omti8621_get_sector %x on lun %d", diskaddr, lun));
+//		LOG1(("omti8621_get_sector %x on lun %d", diskaddr, lun));
 
 		// restrict length to size of 1 sector (i.e. 1024 Byte)
 		length = length < OMTI_DISK_SECTOR_SIZE ? length  : OMTI_DISK_SECTOR_SIZE;

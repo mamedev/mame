@@ -125,22 +125,33 @@ class threecom3c505_device:  public device_t,
 public:
 	// construction/destruction
 	threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 
 	// device register I/O
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ16_MEMBER(read);
+	virtual DECLARE_WRITE16_MEMBER(write);
+
+	static void set_verbose(int on_off);
 
 	required_ioport m_iobase;
 	required_ioport m_irqdrq;
 
-private:
+	virtual void recv_cb(UINT8 *data, int length);
+
+protected:
+	virtual int tx_data(device_t *, const UINT8 *, int);
+	virtual int setfilter(device_t *, int);
+
+	const char *cpu_context();
+
 	// device-level overrides
 	virtual void device_start();
+
+private:
+	// device-level overrides
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual ioport_constructor device_input_ports() const;
-
-	const char *cpu_context();
 
 	class data_buffer_fifo;
 
@@ -165,6 +176,8 @@ private:
 		void log(const char *title) const;
 
 	private:
+		const char *cpu_context() { return m_device->cpu_context(); }
+
 		threecom3c505_device *m_device; // pointer back to our device
 		UINT16 m_length;
 		dynamic_buffer m_data;
@@ -183,6 +196,8 @@ private:
 		int is_empty () { return m_get_index == m_put_index; }
 		int is_full () { return ((m_put_index + 1) % m_size) == m_get_index; }
 	private:
+		const char *cpu_context() { return m_device->cpu_context(); }
+
 		threecom3c505_device *m_device; // pointer back to our device
 		UINT16 m_size;
 		UINT16 m_count;
@@ -212,7 +227,6 @@ private:
 	UINT8 read_status_port();
 
 	void do_command();
-	virtual void recv_cb(UINT8 *data, int length);
 
 	UINT8 m_reg[16];
 

@@ -12,8 +12,9 @@
  *  - http://lxr.free-electrons.com/source/drivers/net/3c505.h
  *  - http://lxr.free-electrons.com/source/drivers/net/3c505.c
  *  - http://stason.org/TULARC/pc/network-cards/O/OLIVETTI-Ethernet-NPU-9144-3C505.html
- *  - http://www.bitsavers.org/pdf/3Com/3C500_Mar83.pdf
+ *  - http://www.bitsavers.org/pdf/3Com/3c505_Etherlink_Plus_Developers_Guide_May86.pdf'
  *  - http://www.bitsavers.org/pdf/3Com/1569-03_EtherLink_Plus_Technical_Reference_Jan89.pdf
+ *
  */
 
 #include "3c505.h"
@@ -22,7 +23,7 @@
 
 static int verbose = VERBOSE;
 
-#define LOG(x)  { logerror x; logerror ("\n"); }
+#define LOG(x)  { logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
 #define LOG1(x) { if (verbose > 0) LOG(x)}
 #define LOG2(x) { if (verbose > 1) LOG(x)}
 
@@ -295,6 +296,15 @@ threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const 
 {
 }
 
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
+	device_network_interface(mconfig, *this, 10.0f),
+	device_isa16_card_interface(mconfig, *this),
+	m_iobase(*this, "IO_BASE"),
+	m_irqdrq(*this, "IRQ_DRQ")
+{
+}
+
 ioport_constructor threecom3c505_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( tc3c505_port );
@@ -369,7 +379,7 @@ void threecom3c505_device::device_reset()
 		m_irq = m_irqdrq->read() & 0xf;
 		m_drq = (m_irqdrq->read() >> 4) & 0x7;
 
-		m_isa->install_device(base, base + ELP_IO_EXTENT - 1, 0, 0, read8_delegate(FUNC(threecom3c505_device::read), this), write8_delegate(FUNC(threecom3c505_device::write), this));
+		m_isa->install16_device(base, base + ELP_IO_EXTENT - 1, 0, 0, read16_delegate(FUNC(threecom3c505_device::read), this), write16_delegate(FUNC(threecom3c505_device::write), this));
 
 		m_installed = true;
 	}
@@ -383,11 +393,21 @@ const char *threecom3c505_device::cpu_context()
 {
 	static char statebuf[64]; /* string buffer containing state description */
 
+	device_t *cpu = machine().device(MAINCPU);
 	osd_ticks_t t = osd_ticks();
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
-	sprintf(statebuf, "%d.%03d:%s:", s, ms, tag());
+	/* if we have an executing CPU, output data */
+	if (cpu != NULL)
+	{
+		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
+				cpu->safe_pcbase(), tag());
+	}
+	else
+	{
+		sprintf(statebuf, "%d.%03d", s, ms);
+	}
 	return statebuf;
 }
 
@@ -548,6 +568,11 @@ void threecom3c505_device::set_filter_list()
 	memcpy(m_filter_list, m_station_address, ETHERNET_ADDR_SIZE);
 	memset(m_filter_list + ETHERNET_ADDR_SIZE, 0xff, ETHERNET_ADDR_SIZE);
 	memcpy(m_filter_list + ETHERNET_ADDR_SIZE * 2, m_multicast_list, sizeof(m_multicast_list));
+
+	int node_id = (((m_station_address[3] << 8) + m_station_address[4]) << 8) + m_station_address[5];
+	LOG2(("set_filter_list node_id=%x",node_id));
+
+	setfilter(this, node_id);
 }
 
 /*-------------------------------------------------
@@ -1230,6 +1255,12 @@ UINT8 threecom3c505_device::read_command_port()
 					LOG(("read_command_port(): !!! failed to send Ethernet packet"));
 				}
 
+				if (!tx_data(this, m_tx_data_buffer.get_data(), m_tx_data_buffer.get_length()))
+				{
+					// FIXME: failed to transmit the Ethernet packet
+					LOG(("read_command_port(): !!! failed to transmit Ethernet packet"));
+				}
+
 				m_tx_data_buffer.reset();
 				if (m_command_buffer[0] != CMD_TRANSMIT_PACKET_F9)
 				{
@@ -1347,7 +1378,8 @@ void threecom3c505_device::write_data_port(UINT8 data)
 		LOG(("write_data_port: unexpected command %02x data=%02x", m_command_buffer[0], data));
 	}
 
-	if (m_tx_data_buffer.get_length() >= PORT_DATA_FIFO_SIZE
+	if (m_command_buffer[0] != CMD_DOWNLOAD_PROGRAM &&
+			m_tx_data_buffer.get_length() >= PORT_DATA_FIFO_SIZE
 			&& m_tx_data_buffer.get_length() >= m_tx_data_length)
 	{
 		m_status &= ~HRDY; /* data register not ready */
@@ -1505,14 +1537,18 @@ UINT8 threecom3c505_device::read_status_port()
 	return data;
 }
 
+
 /***************************************************************************
  write_port
  ***************************************************************************/
 
-WRITE8_MEMBER(threecom3c505_device::write)
+WRITE16_MEMBER(threecom3c505_device::write)
 {
+	// make byte offset
+	offset *= 2;
+
 	m_reg[offset & 0x0f] = data;
-	LOG2(("writing 3C505 Register at offset %02x = %02x", offset, data));
+	LOG2(("writing 3C505 Register at offset=%02x with mem_mask=%04x = %04x", offset, mem_mask, data));
 
 	switch (offset)
 	{
@@ -1522,8 +1558,8 @@ WRITE8_MEMBER(threecom3c505_device::write)
 	case PORT_AUXDMA: /* 0x02 write only, 8-bit */
 		break;
 	case PORT_DATA: /* 0x04 read/write, 16-bit */
-	case PORT_DATA + 1: /* 0x04 read/write, 16-bit */
-		write_data_port(data);
+		write_data_port(data & 0xff);
+		write_data_port(data >> 8);
 		break;
 	case PORT_CONTROL: /* 0x06 read/write, 8-bit */
 		write_control_port(data);
@@ -1537,13 +1573,16 @@ WRITE8_MEMBER(threecom3c505_device::write)
  read_port
  ***************************************************************************/
 
-READ8_MEMBER(threecom3c505_device::read)
+READ16_MEMBER(threecom3c505_device::read)
 {
 	// data to omit excessive logging
-	static UINT8 last_data = 0xff;
+	static UINT16 last_data = 0xff;
 	static UINT32 last_pc = 0;
 
-	UINT8 data = m_reg[offset & 0x0f];
+	// make byte offset
+	offset *= 2;
+
+	UINT16 data = m_reg[offset & 0x0f];
 	switch (offset)
 	{
 	case PORT_COMMAND: /* 0x00 read/write, 8-bit */
@@ -1555,7 +1594,7 @@ READ8_MEMBER(threecom3c505_device::read)
 		// omit excessive logging
 		if (data == last_data)
 		{
-			UINT32 pc = machine().device(MAINCPU)->safe_pcbase();
+			UINT32 pc = space.device().safe_pcbase();
 			if (pc == last_pc)
 			{
 				return data;
@@ -1563,11 +1602,10 @@ READ8_MEMBER(threecom3c505_device::read)
 			last_pc = pc;
 		}
 		last_data = data;
-
 		break;
 	case PORT_DATA: /* 0x04 read/write, 16-bit */
-	case PORT_DATA + 1: /* 0x04 read/write, 16-bit */
 		data = read_data_port();
+		data |= (read_data_port() << 8);
 		break;
 	case PORT_CONTROL: /* 0x06 read/write, 8-bit */
 		data = m_control;
@@ -1576,6 +1614,23 @@ READ8_MEMBER(threecom3c505_device::read)
 		break;
 	}
 
-	LOG2(("reading 3C505 Register at offset %02x = %02x", offset, data));
+	LOG2(("reading 3C505 Register at offset=%02x with mem_mask=%04x = %04x", offset, mem_mask, data));
+
 	return data;
+}
+
+void threecom3c505_device::set_verbose(int on_off)
+{
+	verbose = on_off == 0 ? 0 : VERBOSE > 1 ? VERBOSE : 1;
+}
+
+int threecom3c505_device::tx_data(device_t *device, const UINT8 data[], int length)
+{
+	LOG1(("threecom3c505_device::tx_data length=%d", length));
+	return 1;
+}
+
+int threecom3c505_device::setfilter(device_t *device, int node_id)
+{
+	return 0;
 }

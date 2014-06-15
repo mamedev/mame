@@ -16,7 +16,8 @@
  * - apollo_rtc.c - APOLLO DS3500 RTC MC146818
  * - apollo_sio.c - APOLLO DS3500 SIO
  * - apollo_sio2.c - APOLLO DS3500 SIO2
- * - apollo_fdc.c - APOLLO DS3500 Floppy disk controller
+ * - apollo_stdio.c - stdio terminal for mess
+ * - apollo_3c505.h - Apollo 3C505 Ethernet controller
  *
  * see also:
  * - http://www.bitsavers.org/pdf/apollo/008778-03_DOMAIN_Series_3000_4000_Technical_Reference_Aug87.pdf
@@ -88,17 +89,21 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_GERMAN_KBD, DEF_STR ( On ) )
 
-		PORT_CONFNAME(APOLLO_CONF_DATE_1990, APOLLO_CONF_DATE_1990, "20 Years Ago ...")
+		PORT_CONFNAME(APOLLO_CONF_20_YEARS_AGO, APOLLO_CONF_20_YEARS_AGO, "20 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-		PORT_CONFSETTING(APOLLO_CONF_DATE_1990, DEF_STR ( On ) )
+		PORT_CONFSETTING(APOLLO_CONF_20_YEARS_AGO, DEF_STR ( On ) )
+
+		PORT_CONFNAME(APOLLO_CONF_25_YEARS_AGO, APOLLO_CONF_25_YEARS_AGO, "25 Years Ago ...")
+		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+		PORT_CONFSETTING(APOLLO_CONF_25_YEARS_AGO, DEF_STR ( On ) )
 
 		PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
 
-		PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
-		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-		PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
+//		PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
+//		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
+//		PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
 
 		PORT_CONFNAME(APOLLO_CONF_TRAP_TRACE, 0x00, "Trap Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
@@ -631,7 +636,6 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {
 	}
 }
 
-
 //##########################################################################
 // machine/apollo_ptm.c - APOLLO DS3500 Programmable Timer 6840
 //##########################################################################
@@ -713,8 +717,110 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 }
 
 //##########################################################################
-// machine/apollo_sio.c - APOLLO DS3500 SIO
+// machine/apollo_sio.c - DN3000/DS3500 SIO at 0x8400/0x10400
 //##########################################################################
+
+#undef VERBOSE
+#define VERBOSE 0
+
+apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
+		device_t *owner, UINT32 clock) :
+	mc68681_device(mconfig, tag, owner, clock),
+	m_csrb(0),
+	m_ip6(0)
+{
+}
+
+void apollo_sio::device_reset()
+{
+	UINT8 input_data = apollo_get_ram_config_byte();
+	ip0_w((input_data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	ip1_w((input_data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	ip2_w((input_data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	ip3_w((input_data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	ip4_w((input_data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	ip5_w((input_data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+//	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+
+	// MC2681 has IP[6] (instead of /IACK on MC68681)
+	m_ip6 = (input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE;
+}
+
+READ8_MEMBER( apollo_sio::read )
+{
+	static int last_read8_offset[2] = { -1, -1 };
+	static int last_read8_value[2] = { -1, -1 };
+
+	static const char * const duart68681_reg_read_names[0x10] = { "MRA", "SRA",
+			"BRG Test", "RHRA", "IPCR", "ISR", "CTU", "CTL", "MRB", "SRB",
+			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
+			"Stop Counter" };
+
+	int data = mc68681_device::read(space, offset/2, mem_mask);
+
+	switch (offset / 2)
+	{
+	case 0x0b: /* RHRB */
+		if (m_csrb == 0x77 && data == 0xfe)
+		{
+			// special fix for the MD ROM baudrate recognition
+			// fix data only if CR is entered while baudrate is set to 2000 Baud
+
+			// Receive and transmit clock in diserial.c are not precise enough
+			// to support the baudrate recognition done in the Apollo MD ROM
+			// use 0xff instead of 0xfe to set the baudrate recognition for 9600 Bd
+			// (to prevent that the MD selftest or SK command will hang in Service mode)
+			data = 0xff;
+		}
+		break;
+	case 0x0d: /* IP */
+		// MC2681 has IP[6] (instead of /IACK on MC68681)
+		data = (data & ~0x40) | (m_ip6 ? 0x40 : 0);
+		break;
+	}
+
+	// omit logging if sio is being polled from the boot rom
+	if ((offset != last_read8_offset[1] || data != last_read8_value[1]) && \
+		(offset != last_read8_offset[0] || data != last_read8_value[0]))
+	{
+		last_read8_offset[0] = last_read8_offset[1];
+		last_read8_value[0] = last_read8_value[1];
+		last_read8_offset[1] = offset;
+		last_read8_value[1] = data;
+		CLOG2(("reading MC2681 reg %02x (%s) returned %02x",
+				offset, duart68681_reg_read_names[(offset/2) & 15], data));
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( apollo_sio::write )
+{
+	static const char * const duart68681_reg_write_names[0x10] = { "MRA",
+			"CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB",
+			"CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits" };
+
+	CLOG2(("writing MC2681 reg %02x (%s) with %02x",
+			offset, duart68681_reg_write_names[(offset/2) & 15], data));
+
+	switch (offset / 2) {
+	case 0x09: /* CSRB */
+		// remember CSRB to handle MD selftest or SK command
+		m_csrb = data;
+		break;
+#if 0
+	case 0x0b: /* THRB */
+		// tee output of SIO1 to stdout
+		// sad: ceterm will get confused from '\r'
+		if (apollo_is_dsp3x00() && data != '\r') ::putchar(data);
+		break;
+#endif
+	}
+	mc68681_device::write(space, offset/2, data, mem_mask);
+}
+
+// device type definition
+const device_type APOLLO_SIO = &device_creator<apollo_sio>;
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -723,18 +829,24 @@ WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 
 WRITE8_MEMBER(apollo_state::sio_output)
 {
+//	CLOG2(("apollo_sio - sio_output %02x", data));
+
 	if ((data & 0x80) != (sio_output_data & 0x80))
 	{
 		apollo_pic_set_irq_line(APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
-		sio_output_data = data;
 	}
-}
-	// The counter/timer on the SIO chip is used for the refresh count.
-	// This is set up in the timer mode to  produce a square wave output on output OP3.
+
+	// The counter/timer on the SIO chip is used for the RAM refresh count.
+	// This is set up in the timer mode to produce a square wave output on output OP3.
 	// The period of the output is 15 microseconds.
 
-	// toggle memory refresh counter
-//  sio_input_data ^= 0x01;
+	if ((data & 0x08) != (sio_output_data & 0x08))
+	{
+		m_sio->ip0_w((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	sio_output_data = data;
+}
 
 //##########################################################################
 // machine/apollo_sio2.c - APOLLO DS3500 SIO2
@@ -755,7 +867,7 @@ WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 static SLOT_INTERFACE_START(apollo_isa_cards)
 	SLOT_INTERFACE("wdc", ISA16_OMTI8621)   // Combo ESDI/AT floppy controller
 	SLOT_INTERFACE("ctape", ISA8_SC499)     // Archive SC499 cartridge tape
-	SLOT_INTERFACE("3c505", ISA16_3C505)    // 3Com 3C505 Ethernet card
+	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( common )
@@ -806,8 +918,8 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL_32_768kHz )
 	MCFG_MC146818_UTC( true )
 
-	MCFG_MC68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
+	MCFG_APOLLO_SIO_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
+	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
 
 	MCFG_DEVICE_ADD(APOLLO_ISA_TAG, ISA16, 0)
 	MCFG_ISA16_CPU(":"MAINCPU)
@@ -818,9 +930,9 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir5_w))
 	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir4_w))
 	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir7_w))
 	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq0_w))
@@ -842,11 +954,10 @@ MACHINE_CONFIG_END
 // for machines with the keyboard and a graphics head
 MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_FRAGMENT_ADD(common)
-
-	MCFG_MC68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
+	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
+	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
+	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
+	MCFG_APOLLO_SIO_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
 MACHINE_CONFIG_END
 
 static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
@@ -861,25 +972,25 @@ DEVICE_INPUT_DEFAULTS_END
 // for headless machines using a serial console
 MACHINE_CONFIG_FRAGMENT( apollo_terminal )
 	MCFG_FRAGMENT_ADD(common)
-
-	MCFG_MC68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
+	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
+	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
+	MCFG_APOLLO_SIO_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(APOLLO_SIO_TAG, mc68681_device, rx_b_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
+
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(apollo_state,apollo)
 {
-	//MLOG1(("driver_init_apollo"));
+	MLOG1(("driver_init_apollo"));
 }
 
 MACHINE_START_MEMBER(apollo_state,apollo)
 {
-	//MLOG1(("machine_start_apollo"));
+	MLOG1(("machine_start_apollo"));
 
 	if (apollo_is_dn3000())
 	{
@@ -897,18 +1008,24 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 	m_dma_channel = -1;
 	m_cur_eop = false;
 
-	//MLOG1(("machine_reset_apollo"));
+	MLOG1(("machine_reset_apollo"));
 
 	// set configuration
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));
 
 	// change year according to configuration settings
-	if (year < 20 && apollo_config(APOLLO_CONF_DATE_1990))
+	if (year < 20 && apollo_config(APOLLO_CONF_20_YEARS_AGO))
 	{
 		year+=80;
 		apollo_rtc_w(space, 9, year);
 	}
-	else if (year >= 80 && !apollo_config(APOLLO_CONF_DATE_1990))
+	else if (year < 25 && apollo_config(APOLLO_CONF_25_YEARS_AGO))
+	{
+		year += 75;
+		apollo_rtc_w(space, 9, year);
+	}
+	else if (year >= 80 && !apollo_config(APOLLO_CONF_20_YEARS_AGO)
+			&& !apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
 		year -=80;
 		apollo_rtc_w(space, 9, year);

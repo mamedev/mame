@@ -29,6 +29,7 @@
 #include "machine/clock.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/isa/3c505.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -53,6 +54,7 @@
 #define  MAINCPU "maincpu"
 
 /*----------- machine/apollo_dbg.c -----------*/
+
 int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 /*----------- drivers/apollo.c -----------*/
@@ -89,6 +91,7 @@ void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
 #define APOLLO_DMA1_TAG "dma8237_1"
 #define APOLLO_DMA2_TAG "dma8237_2"
 #define APOLLO_KBD_TAG  "kbd"
+#define APOLLO_STDIO_TAG "stdio"
 #define APOLLO_PIC1_TAG "pic8259_master"
 #define APOLLO_PIC2_TAG "pic8259_slave"
 #define APOLLO_PTM_TAG  "ptm"
@@ -97,6 +100,9 @@ void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
 #define APOLLO_SIO2_TAG "sio2"
 #define APOLLO_ETH_TAG  "3c505"
 #define APOLLO_ISA_TAG "isabus"
+
+// forward declaration
+class apollo_sio;
 
 class apollo_state : public driver_device
 {
@@ -124,8 +130,8 @@ public:
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
 	required_device<ptm6840_device> m_ptm;
-	required_device<mc68681_device> m_sio;
-	optional_device<mc68681_device> m_sio2;
+	required_device<apollo_sio> m_sio;
+	optional_device<apollo_sio> m_sio2;
 	required_device<mc146818_device> m_rtc;
 	required_device<isa16_device> m_isa;
 
@@ -232,7 +238,7 @@ public:
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
 	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
@@ -258,13 +264,14 @@ MACHINE_CONFIG_EXTERN( apollo_terminal );
 #define APOLLO_CONF_MONO_15I     0x0008
 #define APOLLO_CONF_MONO_19I     0x0010
 #define APOLLO_CONF_GERMAN_KBD   0x0020
-#define APOLLO_CONF_DATE_1990    0x0040
-#define APOLLO_CONF_NODE_ID      0x0080
-#define APOLLO_CONF_IDLE_SLEEP   0x0100
-#define APOLLO_CONF_TRAP_TRACE   0x0200
-#define APOLLO_CONF_FPU_TRACE    0x0400
-#define APOLLO_CONF_DISK_TRACE   0x0800
-#define APOLLO_CONF_NET_TRACE    0x1000
+#define APOLLO_CONF_20_YEARS_AGO 0x0040
+#define APOLLO_CONF_25_YEARS_AGO 0x0080
+#define APOLLO_CONF_NODE_ID      0x0100
+#define APOLLO_CONF_IDLE_SLEEP   0x0200
+#define APOLLO_CONF_TRAP_TRACE   0x0400
+#define APOLLO_CONF_FPU_TRACE    0x0800
+#define APOLLO_CONF_DISK_TRACE   0x1000
+#define APOLLO_CONF_NET_TRACE    0x2000
 
 // check configuration setting
 int apollo_config(int mask);
@@ -292,6 +299,42 @@ INPUT_PORTS_EXTERN(apollo_config);
 UINT16 apollo_csr_get_control_register(void);
 UINT16 apollo_csr_get_status_register(void);
 void apollo_csr_set_status_register(UINT16 mask, UINT16 data);
+
+/*----------- machine/apollo_sio.c -----------*/
+
+#define MCFG_APOLLO_SIO_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, APOLLO_SIO, _clock)
+
+#define MCFG_APOLLO_SIO_IRQ_CALLBACK(_cb) \
+	devcb = &apollo_sio::set_irq_cb(*device, DEVCB_##_cb);
+
+#define MCFG_APOLLO_SIO_A_TX_CALLBACK(_cb) \
+	devcb = &apollo_sio::set_a_tx_cb(*device, DEVCB_##_cb);
+
+#define MCFG_APOLLO_SIO_B_TX_CALLBACK(_cb) \
+	devcb = &apollo_sio::set_b_tx_cb(*device, DEVCB_##_cb);
+
+#define MCFG_APOLLO_SIO_OUTPORT_CALLBACK(_cb) \
+	devcb = &apollo_sio::set_outport_cb(*device, DEVCB_##_cb);
+
+class apollo_sio: public mc68681_device
+{
+public:
+	apollo_sio(const machine_config &mconfig, const char *tag,
+			device_t *owner, UINT32 clock);
+
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+
+protected:
+	virtual void device_reset();
+
+private:
+	 UINT8 m_csrb;
+	 UINT8 m_ip6;
+};
+
+extern const device_type APOLLO_SIO;
 
 /*----------- video/apollo.c -----------*/
 
@@ -528,8 +571,6 @@ private:
 	running_machine *m_machine;
 };
 
-
-
 extern const device_type APOLLO_GRAPHICS;
 
 #define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
@@ -558,6 +599,5 @@ extern const device_type APOLLO_MONO19I;
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
 
 MACHINE_CONFIG_EXTERN( apollo_mono19i );
-
 
 #endif /* APOLLO_H_ */

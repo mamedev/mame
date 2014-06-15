@@ -1007,7 +1007,9 @@ void mc68681_channel::recalc_framing()
 			break;
 
 		case 3: // multidrop mode
-			fatalerror("68681: multidrop parity not supported\n");
+			// fatalerror("68681: multidrop parity not supported\n");
+			// Apollo DEX CPU will test this; omit to abort the emulation
+			logerror("68681: multidrop parity not supported\n");
 			break;
 	}
 

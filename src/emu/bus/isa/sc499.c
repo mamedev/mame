@@ -397,6 +397,8 @@ void sc499_device::device_reset()
 
 		m_isa->install_device(base, base+7, 0, 0, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
 		m_isa->set_dma_channel(m_drq, this, true);
+
+		m_installed = true;
 	}
 }
 
@@ -1014,7 +1016,7 @@ void sc499_device::write_dma_reset( UINT8 data)
 
 WRITE8_MEMBER(sc499_device::write)
 {
-	switch (offset^1)
+	switch (offset)
 	{
 	case SC499_PORT_COMMAND: // write command
 		write_command_port(data);
@@ -1038,7 +1040,7 @@ READ8_MEMBER(sc499_device::read)
 {
 	UINT8 data = 0xff;
 
-	switch (offset^1)
+	switch (offset)
 	{
 	case SC499_PORT_DATA: // read data (status data)
 		data = read_data_port();
