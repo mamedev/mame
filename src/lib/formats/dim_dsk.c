@@ -148,6 +148,8 @@ bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	int offset = 0x100;
 	UINT8 h;
+	UINT8 track_total = 77;
+	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 
 	io_generic_read(io, &h, 0, 1);
 
@@ -160,6 +162,10 @@ bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		size = 3;
 		break;
 	case 1:
+		spt = 9;
+		gap3 = 0x39;
+		size = 3;
+		break;
 	case 3:
 		spt = 9;
 		gap3 = 0x39;
@@ -183,7 +189,7 @@ bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 	bps = 128 << size;
 
-	for(int track=0; track < 77; track++)
+	for(int track=0; track < track_total; track++)
 		for(int head=0; head < 2; head++) {
 			desc_pc_sector sects[30];
 			UINT8 sect_data[10000];
@@ -191,7 +197,15 @@ bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			for(int i=0; i<spt; i++) {
 				sects[i].track       = track;
 				sects[i].head        = head;
-				sects[i].sector      = i+1;
+				if(h == 1)  // handle 2HS sector layout
+				{
+					if(i == 0 && track == 0)
+						sects[i].sector      = i+1;
+					else
+						sects[i].sector      = i+10;
+				}
+				else
+					sects[i].sector      = i+1;
 				sects[i].size        = size;
 				sects[i].actual_size = bps;
 				sects[i].deleted     = false;
@@ -202,7 +216,7 @@ bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				sdatapos += bps;
 			}
 
-			build_pc_track_mfm(track, head, image, (500000*60/360)*2, spt, sects, gap3);
+			build_pc_track_mfm(track, head, image, cell_count, spt, sects, gap3);
 		}
 
 	return true;
