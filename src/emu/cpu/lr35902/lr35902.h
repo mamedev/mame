@@ -6,6 +6,10 @@
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
 	lr35902_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
+
+// The first release of this CPU has a bug where the programcounter
+// is not incremented properly after an interrupt after the halt opcode.
+// This was fixed in a newer revision.
 #define MCFG_LR35902_HALT_BUG \
 	lr35902_cpu_device::set_halt_bug(*device);
 
@@ -28,7 +32,7 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
-	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_features |= LR35902_FEATURE_HALT_BUG; }
+	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_has_halt_bug = true; }
 
 	UINT8 get_speed();
 	void set_speed( UINT8 speed_request );
@@ -40,7 +44,6 @@ public:
 	void set_if( UINT8 data ) { m_IF = data; }
 
 protected:
-	static const UINT8 LR35902_FEATURE_HALT_BUG = 0x01;
 
 	// device-level overrides
 	virtual void device_start();
@@ -71,7 +74,6 @@ protected:
 	inline void mem_write_word(UINT16 addr, UINT16 data);
 	inline void check_interrupts();
 
-protected:
 	address_space_config m_program_config;
 
 	UINT8 m_A;
@@ -86,24 +88,24 @@ protected:
 	UINT16 m_SP;
 	UINT16 m_PC;
 	/* Interrupt related */
-	UINT8   m_IE;
-	UINT8   m_IF;
+	UINT8 m_IE;
+	UINT8 m_IF;
 	int m_irq_state;
-	int m_ei_delay;
+	bool m_handle_ei_delay;
 	lr35902_cpu_device *m_device;
 	address_space *m_program;
 	int m_icount;
 	/* Timer callback */
 	devcb_write8 m_timer_func;
 	/* Fetch & execute related */
-	int     m_execution_state;
+	int m_execution_state;
 	UINT8   m_op;
 	/* Others */
 	int m_gb_speed;
 	int m_gb_speed_change_pending;
 	int m_enable;
-	int m_doHALTbug;
-	UINT8   m_features;
+	bool m_handle_halt_bug;
+	bool m_has_halt_bug;
 };
 
 extern const device_type LR35902;

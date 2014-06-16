@@ -78,7 +78,7 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 	, m_IF(0)
 	, m_timer_func(*this)
 	, m_enable(0)
-	, m_features(0)
+	, m_has_halt_bug(false)
 {
 }
 
@@ -144,13 +144,13 @@ void lr35902_cpu_device::device_start()
 	save_item(NAME(m_IE));
 	save_item(NAME(m_IF));
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_ei_delay));
+	save_item(NAME(m_handle_ei_delay));
 	save_item(NAME(m_execution_state));
 	save_item(NAME(m_op));
 	save_item(NAME(m_gb_speed));
 	save_item(NAME(m_gb_speed_change_pending));
 	save_item(NAME(m_enable));
-	save_item(NAME(m_doHALTbug));
+	save_item(NAME(m_handle_halt_bug));
 
 	// Register state for debugger
 	state_add( LR35902_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");
@@ -211,8 +211,8 @@ void lr35902_cpu_device::device_reset()
 	m_IF = 0;
 
 	m_execution_state = 0;
-	m_doHALTbug = 0;
-	m_ei_delay = 0;
+	m_handle_halt_bug = false;
+	m_handle_ei_delay = false;
 	m_gb_speed_change_pending = 0;
 	m_gb_speed = 1;
 }
@@ -230,8 +230,8 @@ void lr35902_cpu_device::check_interrupts()
 	UINT8 irq = m_IE & m_IF;
 
 	/* Interrupts should be taken after the first instruction after an EI instruction */
-	if (m_ei_delay) {
-		m_ei_delay = 0;
+	if (m_handle_ei_delay) {
+		m_handle_ei_delay = false;
 		return;
 	}
 
@@ -255,10 +255,10 @@ void lr35902_cpu_device::check_interrupts()
 				{
 					m_enable &= ~HALTED;
 					m_PC++;
-					if ( m_features & LR35902_FEATURE_HALT_BUG ) {
+					if ( m_has_halt_bug ) {
 						if ( ! ( m_enable & IME ) ) {
 							/* Old cpu core (dmg/mgb/sgb) */
-							m_doHALTbug = 1;
+							m_handle_halt_bug = true;
 						}
 					} else {
 						/* New cpu core (cgb/agb/ags) */
@@ -311,9 +311,9 @@ void lr35902_cpu_device::execute_run()
 				m_execution_state = 1;
 			} else {
 				m_op = mem_read_byte( m_PC++ );
-				if ( m_doHALTbug ) {
+				if ( m_handle_halt_bug ) {
 					m_PC--;
-					m_doHALTbug = 0;
+					m_handle_halt_bug = false;
 				}
 			}
 		}

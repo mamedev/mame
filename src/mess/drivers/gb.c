@@ -12,6 +12,7 @@
   TODO list:
   - Do correct lcd stat timing
   - Add Game Boy Light (Japan, 1997) - does it differ from gbpocket?
+  - SGB should be moved to SNES driver
 
 
 Timers
@@ -753,11 +754,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", LR35902, 4295454) /* 4.295454 MHz */
+	MCFG_CPU_REPLACE("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
@@ -792,8 +793,8 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // todo XTAL_8_388MHz
-	MCFG_CPU_PROGRAM_MAP( gbc_map)
-	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_CPU_PROGRAM_MAP(gbc_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
@@ -820,8 +821,8 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304) /* 4.194304 MHz */
-	MCFG_CPU_PROGRAM_MAP( megaduck_map)
-	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_CPU_PROGRAM_MAP(megaduck_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */

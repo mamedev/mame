@@ -1439,7 +1439,7 @@ case 0xF2: /*      LD A,($FF00+C) */
 	m_A = mem_read_byte( 0xFF00 + m_C );
 	break;
 case 0xF3: /*      DI */
-	m_ei_delay = 0;
+	m_handle_ei_delay = false;
 	m_enable &= ~IME;
 	break;
 case 0xF5: /*      PUSH AF */
@@ -1505,7 +1505,7 @@ case 0xFA: /*      LD A,(n16) */
 	break;
 case 0xFB: /*      EI */
 	m_enable |= IME;
-	m_ei_delay = 1;
+	m_handle_ei_delay = true;
 	break;
 case 0xFE: /*      CP A,n8 */
 	x = mem_read_byte( m_PC++ );
