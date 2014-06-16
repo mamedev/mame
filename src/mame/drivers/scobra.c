@@ -2,6 +2,7 @@
 
  Super Cobra hardware
 
+NOTE:  Eventually to be merged into GALAXIAN.C
 
 TODO:
 ----

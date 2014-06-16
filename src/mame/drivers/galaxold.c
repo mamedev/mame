@@ -2,6 +2,7 @@
 
  Galaxian/Moon Cresta hardware
 
+NOTE:  Eventually to be merged into GALAXIAN.C
 
 Main clock: XTAL = 18.432 MHz
 Z80 Clock: XTAL/6 = 3.072 MHz

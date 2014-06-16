@@ -432,13 +432,13 @@ GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 //GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "LeMans [TTL]",           GAME_IS_SKELETON)
 //GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K/Race Circuit [TTL]",GAME_IS_SKELETON) //?
 //GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 20/Trak 20/Twin Racer [TTL]",GAME_IS_SKELETON) //?
-//GAME(1974,  qwak,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      GAME_IS_SKELETON)
+//GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      GAME_IS_SKELETON)
 
 // 100% TLL
 //GAME(1976,  breakout,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Breakout [TTL]",GAME_IS_SKELETON)
 //GAME(1975,  goal4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal 4/World Cup/Coupe De Monde [TTL]",GAME_IS_SKELETON)
-//GAME(1973,  gotcha,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",GAME_IS_SKELETON) //?
-//GAME(1973,  gotchac,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha Color [TTL]",GAME_IS_SKELETON) //?
+//GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",GAME_IS_SKELETON) //?
+//GAME(1973,  gotchaatc, 0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha Color [TTL]",GAME_IS_SKELETON) //?
 //GAME(1975,  highway,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Highway/Hiway [TTL]",GAME_IS_SKELETON)
 //GAME(1974,  pinpong,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pin Pong [TTL]",GAME_IS_SKELETON)
 //GAME(1974,  pongdbl,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pong Doubles/Coupe De Monde [TTL]",GAME_IS_SKELETON)

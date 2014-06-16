@@ -5,6 +5,8 @@ Dambusters
 
 Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 
+NOTE:  Eventually to be merged into GALAXIAN.C
+
 2008-08
 Dip locations verified with manual
 

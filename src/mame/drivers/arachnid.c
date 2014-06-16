@@ -466,4 +466,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-CONS( 1990, arac6000,   0,          0,      arachnid,        arachnid, driver_device,    0,      "Arachnid",         "Super Six Plus II English Mark Darts", GAME_MECHANICAL | GAME_NOT_WORKING )
+GAME( 1990, arac6000,   0,         arachnid,        arachnid, driver_device,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", GAME_MECHANICAL | GAME_NOT_WORKING )

@@ -2,6 +2,7 @@
 
  Scramble hardware
 
+NOTE:  Eventually to be merged into GALAXIAN.C
 
 Interesting tidbit:
 
