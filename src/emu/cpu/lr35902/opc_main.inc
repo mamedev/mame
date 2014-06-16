@@ -20,6 +20,22 @@
 	m_F=f; \
 }
 
+#define INC_16BIT(x,y) \
+{ \
+	register UINT16 r = x << 8 | y; \
+	if (++y == 0) x++; \
+	if (!m_incdec16_func.isnull()) \
+		m_incdec16_func(r << 16 | x << 8 | y); \
+}
+
+#define DEC_16BIT(x,y) \
+{ \
+	register UINT16 r = x << 8 | y; \
+	if (--y == 0xff) x--; \
+	if (!m_incdec16_func.isnull()) \
+		m_incdec16_func(r << 16 | x << 8 | y); \
+}
+
 #define ADD_HL_RR(x) \
 { \
 	register UINT32 r1,r2; \
@@ -145,24 +161,15 @@ case 0x02: /*      LD (BC),A */
 	break;
 
 case 0x03: /*      INC BC */
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_B == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
-	m_C++;
-	if ( m_C == 0 )
-	{
-		m_B++;
-	}
+	INC_16BIT(m_B, m_C);
 	cycles_passed( 4 );
 	break;
+
 case 0x04: /*      INC B */
 	INC_8BIT (m_B)
 	break;
-case 0x05: /*      DEC B */
 
+case 0x05: /*      DEC B */
 	DEC_8BIT (m_B)
 	break;
 
@@ -197,18 +204,7 @@ case 0x0A: /*      LD A,(BC) */
 	m_A = mem_read_byte ( (m_B<<8)|m_C );
 	break;
 case 0x0B: /*      DEC BC */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_B == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
-	m_C--;
-	if ( m_C == 0xFF )
-	{
-		m_B--;
-	}
+	DEC_16BIT(m_B, m_C);
 	cycles_passed( 4 );
 	break;
 case 0x0C: /*      INC C */
@@ -246,18 +242,7 @@ case 0x12: /*      LD (DE),A */
 	mem_write_byte( ( m_D << 8 ) | m_E, m_A );
 	break;
 case 0x13: /*      INC DE */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_D == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
-	m_E++;
-	if ( m_E == 0 )
-	{
-		m_D++;
-	}
+	INC_16BIT(m_D, m_E);
 	cycles_passed( 4 );
 	break;
 case 0x14: /*      INC D */
@@ -297,18 +282,7 @@ case 0x1A: /*      LD A,(DE) */
 	m_A = mem_read_byte( ( m_D << 8 ) | m_E );
 	break;
 case 0x1B: /*      DEC DE */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_D == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
-	m_E--;
-	if ( m_E == 0xFF )
-	{
-		m_D--;
-	}
+	DEC_16BIT(m_D, m_E);
 	cycles_passed( 4 );
 	break;
 case 0x1C: /*      INC E */
@@ -345,33 +319,11 @@ case 0x21: /*      LD HL,n16 */
 	m_H = mem_read_byte( m_PC++ );
 	break;
 case 0x22: /*      LD (HL+),A */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_H == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
 	mem_write_byte( (m_H << 8 ) | m_L, m_A );
-	m_L++;
-	if ( m_L == 0 )
-	{
-		m_H++;
-	}
+	INC_16BIT(m_H, m_L);
 	break;
 case 0x23: /*      INC HL */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_H == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
-	m_L++;
-	if ( m_L == 0 )
-	{
-		m_H++;
-	}
+	INC_16BIT(m_H, m_L);
 	cycles_passed( 4 );
 	break;
 case 0x24: /*      INC H */
@@ -428,32 +380,11 @@ case 0x29: /*      ADD HL,HL */
 	cycles_passed( 4 );
 	break;
 case 0x2A: /*      LD A,(HL+) */
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_H == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
 	m_A = mem_read_byte( ( m_H << 8 ) | m_L );
-	m_L++;
-	if ( m_L == 0 )
-	{
-		m_H++;
-	}
+	INC_16BIT(m_H, m_L);
 	break;
 case 0x2B: /*      DEC HL */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_H == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
-	m_L--;
-	if ( m_L == 0xFF )
-	{
-		m_H--;
-	}
+	DEC_16BIT(m_H, m_L);
 	cycles_passed( 4 );
 	break;
 case 0x2C: /*      INC L */
@@ -490,19 +421,8 @@ case 0x31: /*      LD SP,n16 */
 	m_PC += 2;
 	break;
 case 0x32: /*      LD (HL-),A */
-
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_H == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
 	mem_write_byte( ( m_H << 8 ) | m_L, m_A );
-	m_L--;
-	if ( m_L == 0xFF )
-	{
-		m_H--;
-	}
+	DEC_16BIT(m_H, m_L);
 	break;
 case 0x33: /*      INC SP */
 	m_SP += 1;
@@ -572,18 +492,8 @@ case 0x39: /*      ADD HL,SP */
 	cycles_passed( 4 );
 	break;
 case 0x3A: /*      LD A,(HL-) */
-#if 0               /* FIXME ?? do we want to support this? (bug emulation) */
-	if (m_H == 0xFE)
-	{
-	trash_sprites (state);
-	}
-#endif
 	m_A = mem_read_byte( ( m_H << 8 ) | m_L );
-	m_L--;
-	if ( m_L == 0xFF )
-	{
-		m_H--;
-	}
+	DEC_16BIT(m_H, m_L);
 	break;
 case 0x3B: /*      DEC SP */
 	m_SP -= 1;

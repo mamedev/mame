@@ -76,9 +76,10 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 	, m_PC(0)
 	, m_IE(0)
 	, m_IF(0)
-	, m_timer_func(*this)
 	, m_enable(0)
 	, m_has_halt_bug(false)
+	, m_timer_func(*this)
+	, m_incdec16_func(*this)
 {
 }
 

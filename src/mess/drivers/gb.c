@@ -13,6 +13,7 @@
   - Do correct lcd stat timing
   - Add Game Boy Light (Japan, 1997) - does it differ from gbpocket?
   - SGB should be moved to SNES driver
+  - Emulate OAM corruption bug on 16bit inc/dec in $fe** region
 
 
 Timers

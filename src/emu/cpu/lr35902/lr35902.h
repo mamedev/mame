@@ -13,6 +13,13 @@
 #define MCFG_LR35902_HALT_BUG \
 	lr35902_cpu_device::set_halt_bug(*device);
 
+// The GameBoy has a bug where OAM data gets corrupted if you inc/dec
+// a 16-bit register in the $fe** region.
+// note: oldval is in hiword, newval is in loword
+#define MCFG_LR35902_INCDEC16_CB(_devcb) \
+	lr35902_cpu_device::set_incdec16_cb(*device, DEVCB_##_devcb);
+
+
 enum
 {
 	LR35902_PC=1, LR35902_SP, LR35902_A, LR35902_F, LR35902_B, LR35902_C, LR35902_D, LR35902_E, LR35902_H, LR35902_L,
@@ -32,6 +39,7 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_incdec16_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_incdec16_func.set_callback(object); }
 	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_has_halt_bug = true; }
 
 	UINT8 get_speed();
@@ -87,6 +95,7 @@ protected:
 
 	UINT16 m_SP;
 	UINT16 m_PC;
+
 	/* Interrupt related */
 	UINT8 m_IE;
 	UINT8 m_IF;
@@ -95,17 +104,21 @@ protected:
 	lr35902_cpu_device *m_device;
 	address_space *m_program;
 	int m_icount;
-	/* Timer callback */
-	devcb_write8 m_timer_func;
+
 	/* Fetch & execute related */
 	int m_execution_state;
-	UINT8   m_op;
+	UINT8 m_op;
+
 	/* Others */
 	int m_gb_speed;
 	int m_gb_speed_change_pending;
 	int m_enable;
 	bool m_handle_halt_bug;
 	bool m_has_halt_bug;
+
+	/* Callbacks */
+	devcb_write8 m_timer_func;
+	devcb_write32 m_incdec16_func;
 };
 
 extern const device_type LR35902;
