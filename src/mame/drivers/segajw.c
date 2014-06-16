@@ -23,6 +23,7 @@ SOUND     : YM3438
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "sound/2612intf.h"
 #include "video/h63484.h"
 #include "video/ramdac.h"
 
@@ -32,7 +33,7 @@ public:
 	segajw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_palette(*this, "palette")
+			m_audiocpu(*this, "audiocpu")
 	{ }
 
 	DECLARE_READ16_MEMBER(coin_counter_r);
@@ -41,7 +42,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hopper_w);
 	DECLARE_READ16_MEMBER(coinlockout_r);
 	DECLARE_WRITE16_MEMBER(coinlockout_w);
-	DECLARE_READ16_MEMBER(soundboard_r);
+	DECLARE_WRITE8_MEMBER(audiocpu_cmd_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
@@ -50,7 +51,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
+	required_device<cpu_device> m_audiocpu;
 
 	// driver_device overrides
 	virtual void machine_start();
@@ -99,11 +100,10 @@ WRITE16_MEMBER(segajw_state::coinlockout_w)
 	m_coin_lockout = data;
 }
 
-
-READ16_MEMBER(segajw_state::soundboard_r)
+WRITE8_MEMBER(segajw_state::audiocpu_cmd_w)
 {
-	// TODO: to replace with proper sound emulation
-	return 0xfff0;  // value expected for pass the sound board test
+	soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
@@ -161,12 +161,13 @@ static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x180004, 0x180005) AM_READ(soundboard_r)
+	AM_RANGE(0x180004, 0x180005) AM_READWRITE8(soundlatch2_byte_r, audiocpu_cmd_w, 0x00ff)
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("DSW3")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(coin_counter_w)
+	AM_RANGE(0x1a0002, 0x1a0005) AM_NOP // TODO: lamps
 	AM_RANGE(0x1a0006, 0x1a0007) AM_READWRITE(hopper_r, hopper_w)
 	AM_RANGE(0x1a000a, 0x1a000b) AM_READ(coin_counter_r)
 
@@ -192,6 +193,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segajw_audiocpu_io_map, AS_IO, 8, segajw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segajw_hd63484_map, AS_0, 16, segajw_state )
@@ -365,12 +368,12 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(segajw_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segajw_state, irq4_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(segajw_state, irq5_line_hold, 300)    // FIXME: unknown source, but vblank is too slow
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(segajw_audiocpu_map)
 	MCFG_CPU_IO_MAP(segajw_audiocpu_io_map)
-	MCFG_DEVICE_DISABLE()
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(2000))
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
@@ -390,8 +393,9 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)   // unknown clock
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 5))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************
