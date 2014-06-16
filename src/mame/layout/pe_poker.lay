@@ -134,35 +134,35 @@
 			<bounds left="0" top="0" right="340" bottom="310" />
 		</bezel>
 		<!-- specific bezels to a kind of machine -->
-		<bezel name="pe_bnkb3" element="hold">
+		<bezel name="pe_bnkb3" element="hold" inputtag="IN_BANK1" inputmask="0x04">
 			<bounds x="12" y="250" width="60" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb0" element="hold">
+		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x08">
 			<bounds x="76" y="250" width="60" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb0" element="hold">
+		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x10">
 			<bounds x="140" y="250" width="60" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb0" element="hold">
+		<bezel name="pe_bnkb0" element="hold" inputtag="IN_BANK1" inputmask="0x20">
 			<bounds x="204" y="250" width="60" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb7" element="hold">
+		<bezel name="pe_bnkb7" element="hold" inputtag="IN_BANK1" inputmask="0x40">
 			<bounds x="268" y="250" width="60" height="20" />
 		</bezel>
 		<!-- shared bezels by all kinds of machine -->
 		<bezel name="pe_bnkb5" element="changetext">
 			<bounds x="20" y="10" width="300" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb1" element="dealspinstart">
+		<bezel name="pe_bnkb1" element="dealspinstart" inputtag="IN_BANK2" inputmask="0x01">
 			<bounds x="10" y="280" width="74" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb4" element="bet1">
+		<bezel name="pe_bnkb4" element="bet1" inputtag="IN_BANK2" inputmask="0x08">
 			<bounds x="92" y="280" width="74" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb4" element="betmax">
+		<bezel name="pe_bnkb4" element="betmax" inputtag="IN_BANK2" inputmask="0x02">
 			<bounds x="174" y="280" width="74" height="20" />
 		</bezel>
-		<bezel name="pe_bnkb2" element="cashout">
+		<bezel name="pe_bnkb2" element="cashout" inputtag="IN_BANK2" inputmask="0x10">
 			<bounds x="256" y="280" width="74" height="20" />
 		</bezel>
 	</view>
