@@ -271,8 +271,6 @@ static int ev_handler(struct mg_connection *conn, enum mg_event ev) {
 		// This handler is called for each incoming websocket frame, one or more
 		// times for connection lifetime.
 		// Echo websocket data back to the client.
-		//const char *msg = "update_machine";
-		//mg_websocket_write(conn, 1, msg, strlen(msg));
 		return conn->content_len == 4 && !memcmp(conn->content, "exit", 4) ? MG_FALSE : MG_TRUE;
     } else {
 		web_engine *engine = static_cast<web_engine *>(conn->server_param);	
