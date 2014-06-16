@@ -62,7 +62,7 @@ enum
 	XTAL_4MHz           = 4000000,
 	XTAL_4_028MHz       = 4028000,      /* Sony SMC-777 */
 	XTAL_4_096MHz       = 4096000,      /* Used to drive OKI M9810 chips */
-	XTAL_4_194304Mhz    = 4194304,      /* Used to drive MC146818 */
+	XTAL_4_194304Mhz    = 4194304,      /* Used to drive MC146818 / Nintendo Game Boy */
 	XTAL_4_224MHz       = 4224000,      /* Used to drive OKI M6295 chips, usually with /4 divider */
 	XTAL_4_41MHz        = 4410000,      /* Pioneer PR-8210 ldplayer */
 	XTAL_4_43361MHz     = 4433610,      /* Cidelsa Draco */
@@ -85,6 +85,7 @@ enum
 	XTAL_7_8643MHz      = 7864300,      /* Used on InterFlip games as video clock */
 	XTAL_8MHz           = 8000000,      /* Extremely common, used on 100's of PCBs */
 	XTAL_8_2MHz         = 8200000,      /* Universal Mr. Do - Model 8021 PCB */
+	XTAL_8_388MHz       = 8388000,      /* Nintendo Game Boy Color */
 	XTAL_8_4672MHz      = 8467200,      /* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz       = 8664000,      /* Touchmaster */
 	XTAL_8_7MHz         = 8700000,      /* Tandberg TDV 2324 */
