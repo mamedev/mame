@@ -791,7 +791,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu") // todo XTAL_8_388MHz
 	MCFG_CPU_PROGRAM_MAP( gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 
@@ -892,7 +892,7 @@ ROM_END
 CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", GAME_SUPPORTS_SAVE )
 CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", GAME_SUPPORTS_SAVE )
 CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", GAME_SUPPORTS_SAVE )
-CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1998, gbcolor,  0,       0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
 CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
