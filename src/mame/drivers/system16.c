@@ -96,7 +96,7 @@
 #include "sound/rf5c68.h"
 #include "video/segaic16.h"
 
-#define SHADOW_COLORS_MULTIPLIER 2
+#define SHADOW_COLORS_MULTIPLIER 3
 
 
 INTERRUPT_GEN_MEMBER(segas1x_bootleg_state::sys16_interrupt)
