@@ -205,6 +205,7 @@ static int cleanupvm(lua_State *L, sdb_vm *svm) {
 }
 
 static int stepvm(lua_State *L, sdb_vm *svm) {
+	// MAME: fixed Visual Studio compiler warning lsqlite3.c(235) : warning C4701: potentially uninitialized local variable 'result' used
     int result = 0;
     int loop_limit = 3;
     while ( loop_limit-- ) {
