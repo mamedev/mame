@@ -205,7 +205,7 @@ static int cleanupvm(lua_State *L, sdb_vm *svm) {
 }
 
 static int stepvm(lua_State *L, sdb_vm *svm) {
-    int result;
+    int result = 0;
     int loop_limit = 3;
     while ( loop_limit-- ) {
         result = sqlite3_step(svm->vm);
