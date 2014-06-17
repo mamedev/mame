@@ -32351,8 +32351,8 @@ INPUT_PORTS_START( sc4tridn ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2103 THE TRIDENT         TRID SOUNDS         THE TRIDENT
-GAMEL( 200?, sc4tridn    ,0,         sc4, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","Trident, The (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4tridna   ,sc4tridn,  sc4, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","Trident, The (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4tridn    ,0,         sc4, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","The Trident (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4tridna   ,sc4tridn,  sc4, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","The Trident (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 
@@ -53462,14 +53462,14 @@ GAMEL( 200?, sc4ibizai   ,sc4ibiza,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Red 
 
 // half size sound roms
 // PR6905 SKY'S THE LIMIT         PR6905 SKY'S THE LIMIT SOUNDS11
-GAMEL( 200?, sc4stl      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stla     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stlb     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stlc     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stld     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stle     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stlf     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
-GAMEL( 200?, sc4stlg     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stl      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stla     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stlb     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stlc     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stld     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stle     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stlf     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+GAMEL( 200?, sc4stlg     ,sc4stl,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Sky's The Limit (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
 
 //  PR7055 SPLASH N GRAB         GRAB SOUNDS

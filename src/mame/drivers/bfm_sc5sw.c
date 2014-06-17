@@ -12777,12 +12777,12 @@ GAME( 200?, sc5colmob   ,sc5colmo,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, 
 GAME( 200?, sc5colmoc   ,sc5colmo,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 //  PR3502 AWP THE COLOUR OF MONEY NEW S5         PR3502 C OF M TEN SOUNDS11        COLOUR OF MONEY2  S.SITE
-GAME( 200?, sc5newcm    ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money New, The (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5newcma   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money New, The (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5newcmb   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money New, The (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5newcmc   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money New, The (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5newcmd   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money New, The (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5newcme   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Colour Of Money New, The (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5newcm    ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Colour Of Money New (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5newcma   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Colour Of Money New (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5newcmb   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Colour Of Money New (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5newcmc   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Colour Of Money New (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5newcmd   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Colour Of Money New (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5newcme   ,sc5newcm,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Colour Of Money New (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR3506 AWP COPS AND ROBBERS ON THE RUN S5         PR3506 C & R ON T RUN SOUNDS11    ON THE RUN  S.SITE
@@ -13199,16 +13199,16 @@ GAME( 200?, sc5hirole   ,sc5hirol,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, 
 
 
 // PR1405 THE HULK         PR1405 THE HULK SOUNDS11
-GAME( 200?, sc5hulk     ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulka    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulkb    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulkc    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulkd    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulke    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulkf    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulkg    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulkh    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5hulki    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Hulk, The (Bellfruit) (Scorpion 5) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulk     ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulka    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulkb    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulkc    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulkd    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulke    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulkf    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulkg    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulkh    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5hulki    ,sc5hulk,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","The Hulk (Bellfruit) (Scorpion 5) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2316 IT'S A BULLSEYE         ITSBULLSEYE SOUNDS         IT'S A BULLSEYE
 GAME( 200?, sc5iab      ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "Mazooma","It's A Bullseye (Mazooma) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )

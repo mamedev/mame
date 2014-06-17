@@ -4384,8 +4384,8 @@ GAME( 199?, sp_poundbwbg    ,sp_pound   ,ace_sp ,ace_sp , ace_sp_state,ace_sp   
 
 GAME( 199?, sp_road         ,0          ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "Road To Hell (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL ) // incomplete program
 
-GAME( 199?, sp_skylm        ,0          ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "Sky's The Limit Club, The (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, sp_skylma       ,sp_skylm   ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "Sky's The Limit Club, The (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_skylm        ,0          ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "The Sky's The Limit Club (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_skylma       ,sp_skylm   ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "The Sky's The Limit Club (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, sp_tkpik        ,0          ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "Take Your Pick (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_tkpika       ,sp_tkpik   ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "Take Your Pick (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )

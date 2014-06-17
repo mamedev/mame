@@ -2125,41 +2125,41 @@ GAME( 199?, m1hotpot0 ,m1hotpot ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "
 	ROM_LOAD( "greatescape.p1", 0x000000, 0x080000, CRC(a7e0a7a8) SHA1(f65171d72a6add5ebc903aac18b426d91134a492) ) \
 	ROM_LOAD( "greatescape.p2", 0x080000, 0x080000, CRC(61de5e0f) SHA1(26ca6786de4da1e9c48de47887ed6e3e7e3a108b) )
 ROM_START( m1gresc )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("ge5p810.bin",   0x0000, 0x020000, CRC(67cb37b9) SHA1(48ef081a52400afd533909eacf8872f094b98049) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresc   ,0       ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
+GAME( 199?, m1gresc   ,0       ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
 ROM_START( m1gresca ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("geprog",        0x0000, 0x020000, CRC(f3c2bdd4) SHA1(9c71b6ef179f7c059715d9a7005cc36e07d8854b) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresca  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 2)",GAME_FLAGS )
+GAME( 199?, m1gresca  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 2)",GAME_FLAGS )
 ROM_START( m1grescb ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("gtesc55",       0x0000, 0x020000, CRC(96042c55) SHA1(e54c8d323d3bc845ed270f4325741fb7bf31f55e) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescb  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 3)",GAME_FLAGS )
+GAME( 199?, m1grescb  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 3)",GAME_FLAGS )
 ROM_START( m1grescc ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-157",       0x0000, 0x020000, CRC(6753dc1a) SHA1(34f7dc84482a020fb028b036ca941422454afcf6) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescc  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 4)",GAME_FLAGS )
+GAME( 199?, m1grescc  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 4)",GAME_FLAGS )
 ROM_START( m1grescd ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-158",       0x0000, 0x020000, CRC(26f37d71) SHA1(9ae6e4f816feb71c8938f435ff2085e41ae7a44e) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescd  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 5)",GAME_FLAGS )
+GAME( 199?, m1grescd  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 5)",GAME_FLAGS )
 ROM_START( m1gresce ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-244",       0x0000, 0x020000, CRC(b6828a2d) SHA1(36335507acbed03275b02762f0dce0fdedd96374) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresce  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 6)",GAME_FLAGS )
+GAME( 199?, m1gresce  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 6)",GAME_FLAGS )
 ROM_START( m1grescf ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-245",       0x0000, 0x020000, CRC(e6c37491) SHA1(2915815c5885974010bb337f9b4adf3dfecaf1ce) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescf  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 7)",GAME_FLAGS )
+GAME( 199?, m1grescf  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 7)",GAME_FLAGS )
 ROM_START( m1grescg ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-249",       0x0000, 0x020000, CRC(c7b7e6be) SHA1(ba523bc79f3bc1def9974b821b010df835832cb0) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescg  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 8)",GAME_FLAGS )
+GAME( 199?, m1grescg  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 8)",GAME_FLAGS )
 ROM_START( m1gresch ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-250",       0x0000, 0x020000, CRC(be32ff45) SHA1(14f7ebe10482a192de6527afacfe7fa6ad18822c) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresch  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 9)",GAME_FLAGS )
+GAME( 199?, m1gresch  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 9)",GAME_FLAGS )
 ROM_START( m1gresci ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-740",       0x0000, 0x020000, CRC(53e170b7) SHA1(964bc3a5598ee9303cad7fd90a65322a2a1d20dd) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresci  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 10)",GAME_FLAGS )
+GAME( 199?, m1gresci  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 10)",GAME_FLAGS )
 ROM_START( m1grescj ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-102",       0x0000, 0x020000, CRC(1fd002c2) SHA1(cca5bcbc845d5aaf8b7416670a35b0557d5d7dd6) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescj  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 11)",GAME_FLAGS )
+GAME( 199?, m1grescj  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 11)",GAME_FLAGS )
 ROM_START( m1gresck ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-176",       0x0000, 0x020000, CRC(f21f7497) SHA1(aaaa049b3006297d830441a6ecb2db700dab15ae) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresck  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 12)",GAME_FLAGS )
+GAME( 199?, m1gresck  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 12)",GAME_FLAGS )
 ROM_START( m1grescl ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-177",       0x0000, 0x020000, CRC(a25e8a2b) SHA1(ba8e0b2ea13c5ab3f7f6f83ef1b19c2041a5de88) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescl  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 13)",GAME_FLAGS )
+GAME( 199?, m1grescl  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 13)",GAME_FLAGS )
 ROM_START( m1grescm ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-178",       0x0000, 0x020000, CRC(494b19ec) SHA1(1a7414a7c0c5c50155c07e6e409f119e4fc93add) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescm  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 14)",GAME_FLAGS )
+GAME( 199?, m1grescm  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 14)",GAME_FLAGS )
 ROM_START( m1grescn ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-179",       0x0000, 0x020000, CRC(190ae750) SHA1(d9138ed325b8450c431c7685a3395e43b31c73c2) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescn  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 15)",GAME_FLAGS )
+GAME( 199?, m1grescn  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 15)",GAME_FLAGS )
 ROM_START( m1gresco ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-274",       0x0000, 0x020000, CRC(cb6da2c4) SHA1(fb7eff962d3c0508a893d56851d1d46598a082c5) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1gresco  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 16)",GAME_FLAGS )
+GAME( 199?, m1gresco  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 16)",GAME_FLAGS )
 ROM_START( m1grescp ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-275",       0x0000, 0x020000, CRC(9b2c5c78) SHA1(ab16de1da60eb0fd95e18ab0849bcc7ab2413804) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescp  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 17)",GAME_FLAGS )
+GAME( 199?, m1grescp  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 17)",GAME_FLAGS )
 ROM_START( m1grescq ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("tge.bin",       0x0000, 0x020000, CRC(4c11546b) SHA1(453f9980f5aa02b44a1341ac37f4f101feab05bd) ) m1_gresc_sound ROM_END_M1A_MCU
-GAME( 199?, m1grescq  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Great Escape, The (Maygay) (M1A/B) (set 18)",GAME_FLAGS )
+GAME( 199?, m1grescq  ,m1gresc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 18)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Inferno
