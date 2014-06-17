@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_bg_tile_info)
 
 	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
+			(attr&0x70)>>4,
 			0);
 }
 
@@ -271,7 +271,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_reel1_tile_info)
 
 	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
+			(attr&0x70)>>4,
 			0);
 }
 
@@ -282,7 +282,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_reel2_tile_info)
 
 	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
+			(attr&0x70)>>4,
 			0);
 }
 
@@ -293,7 +293,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_reel3_tile_info)
 
 	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
+			(attr&0x70)>>4,
 			0);
 }
 

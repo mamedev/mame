@@ -7285,7 +7285,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( sangho )
 	GFXDECODE_ENTRY( "gfx1", 0, sangho_charlayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 128, 8 )
 /* 7*16,16 title girl in 1st color
    6*16,16 watermelon in game
    4*16,16 blueberry in game
