@@ -59,7 +59,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 	required_device<sed1330_device> m_lcdc;
-	required_device<mc6845_device> m_crtc;
+	optional_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen_lcd;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
