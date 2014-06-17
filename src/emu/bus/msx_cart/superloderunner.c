@@ -35,7 +35,7 @@ void msx_cart_superloderunner::initialize_cartridge()
 {
 	if (get_rom_size() != 0x20000)
 	{
-		fatalerror("crossblaim: Invalid ROM size\n");
+		fatalerror("superloderunner: Invalid ROM size\n");
 	}
 
 	restore_banks();
