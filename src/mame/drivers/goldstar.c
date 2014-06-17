@@ -585,6 +585,7 @@ static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
@@ -6360,7 +6361,6 @@ static INPUT_PORTS_START( star100 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -6596,7 +6596,330 @@ static INPUT_PORTS_START( crazybon )	// to analyze...
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW6:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( cmpacman )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_UP)    PORT_NAME("Stop 2 / Big / Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("Stop 1 / D-UP / Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_DOWN)  PORT_NAME("Stop All / Take / Down")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CODE(KEYCODE_C)                          PORT_NAME("Stop 3 / Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )        PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Start / Right")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )         PORT_CODE(KEYCODE_K) PORT_NAME("Hidden switch for change games")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B / Coin Service */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)  /* Coin D */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  /* Coin C */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> PB0 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:!1")  /* OK */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:!2")  /* OK */
+	PORT_DIPSETTING(    0x02, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
+	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:!3")  /* OK */
+	PORT_DIPSETTING(    0x04, "Payout Switch" )
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:!4")  /* not checked */
+	PORT_DIPSETTING(    0x08, "Loss" )
+	PORT_DIPSETTING(    0x00, "Even" )
+	PORT_DIPNAME( 0x10, 0x00, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:!5")  /* OK */
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x10, "90%" )
+	PORT_DIPNAME( 0x20, 0x00, "W-UP Game" )         PORT_DIPLOCATION("DSW1:!6")  /* OK */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )           PORT_DIPLOCATION("DSW1:!7,!8")    /* OK */
+	PORT_DIPSETTING(    0x00, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x80, "64" )
+	PORT_DIPSETTING(    0xc0, "96" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:!1,!2,!3")  /* OK */
+	PORT_DIPSETTING(    0x07, "55%" )
+	PORT_DIPSETTING(    0x06, "60%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "70%" )
+	PORT_DIPSETTING(    0x03, "75%" )
+	PORT_DIPSETTING(    0x02, "80%" )
+	PORT_DIPSETTING(    0x01, "85%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:!4,!5")    /* OK */
+	PORT_DIPSETTING(    0x18, "300" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:!6")  /* not checked */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key-In Type" )           PORT_DIPLOCATION("DSW2:!7")  /* OK */
+	PORT_DIPSETTING(    0x40, "A-Type" )
+	PORT_DIPSETTING(    0x00, "B-Type" )
+	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:!8")  /* related with DSW 4-6 */
+	PORT_DIPSETTING(    0x80, "Unlimited" )
+	PORT_DIPSETTING(    0x00, "Limited" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:!1,!2")  /* OK */
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:!3,!4")  /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:!5,!6")  /* OK */
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:!7,!8")  /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* not checked */
+	PORT_DIPSETTING(    0x07, "5,000" )
+	PORT_DIPSETTING(    0x06, "10,000" )
+	PORT_DIPSETTING(    0x05, "20,000" )
+	PORT_DIPSETTING(    0x04, "30,000" )
+	PORT_DIPSETTING(    0x03, "40,000" )
+	PORT_DIPSETTING(    0x02, "50,000" )
+	PORT_DIPSETTING(    0x01, "100,000" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* not working */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
+	PORT_DIPSETTING(    0x10, "C-Type" )
+	PORT_DIPSETTING(    0x00, "D-Type" )
+	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
+	PORT_DIPSETTING(    0x20, "16 Bet" )
+	PORT_DIPSETTING(    0x00, "8 Bet" )
+	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
+	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* not working */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* not checked */
+	PORT_DIPSETTING(    0x06, "1,000" )
+	PORT_DIPSETTING(    0x04, "5,000" )
+	PORT_DIPSETTING(    0x02, "10,000" )
+	PORT_DIPSETTING(    0x00, "20,000" )
+	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
+	PORT_DIPSETTING(    0x18, "12-7-1" )
+	PORT_DIPSETTING(    0x10, "9-5-1" )
+	PORT_DIPSETTING(    0x08, "6-3-1" )
+	PORT_DIPSETTING(    0x00, "3-2-1" )
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
+	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cmtetris )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Stop 2 / Big / Right")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_CODE(KEYCODE_Z)                         PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_UP)   PORT_NAME("Stop All / Take / Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Stop 3 / Small / Info / Left")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )        PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Start / Down")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )         PORT_CODE(KEYCODE_K) PORT_NAME("Hidden switch for Cherry Master")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )         PORT_CODE(KEYCODE_L) PORT_NAME("Hidden switch for Tetris")
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin Service (tied to PPI u34 PB3 to also coin Tetris game) */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)  /* Coin D */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  /* Coin C */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> (PB0|PB1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:!1")  /* OK */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:!2")  /* OK */
+	PORT_DIPSETTING(    0x02, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
+	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:!3")  /* OK */
+	PORT_DIPSETTING(    0x04, "Payout Switch" )
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:!4")  /* not checked */
+	PORT_DIPSETTING(    0x08, "Loss" )
+	PORT_DIPSETTING(    0x00, "Even" )
+	PORT_DIPNAME( 0x10, 0x00, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:!5")  /* OK */
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x10, "90%" )
+	PORT_DIPNAME( 0x20, 0x00, "W-UP Game" )         PORT_DIPLOCATION("DSW1:!6")  /* OK */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )           PORT_DIPLOCATION("DSW1:!7,!8")    /* OK */
+	PORT_DIPSETTING(    0x00, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x80, "64" )
+	PORT_DIPSETTING(    0xc0, "96" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:!1,!2,!3")  /* OK */
+	PORT_DIPSETTING(    0x07, "35%" )
+	PORT_DIPSETTING(    0x06, "40%" )
+	PORT_DIPSETTING(    0x05, "45%" )
+	PORT_DIPSETTING(    0x04, "50%" )
+	PORT_DIPSETTING(    0x03, "55%" )
+	PORT_DIPSETTING(    0x02, "60%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x00, "70%" )
+	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:!4,!5")    /* OK */
+	PORT_DIPSETTING(    0x18, "300" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:!6")  /* not checked */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key-In Type" )           PORT_DIPLOCATION("DSW2:!7")  /* OK */
+	PORT_DIPSETTING(    0x40, "A-Type" )
+	PORT_DIPSETTING(    0x00, "B-Type" )
+	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:!8")  /* related with DSW 4-6 */
+	PORT_DIPSETTING(    0x80, "Unlimited" )
+	PORT_DIPSETTING(    0x00, "Limited" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* not checked */
+	PORT_DIPSETTING(    0x07, "5,000" )
+	PORT_DIPSETTING(    0x06, "10,000" )
+	PORT_DIPSETTING(    0x05, "20,000" )
+	PORT_DIPSETTING(    0x04, "30,000" )
+	PORT_DIPSETTING(    0x03, "40,000" )
+	PORT_DIPSETTING(    0x02, "50,000" )
+	PORT_DIPSETTING(    0x01, "100,000" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* not working */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
+	PORT_DIPSETTING(    0x10, "C-Type" )
+	PORT_DIPSETTING(    0x00, "D-Type" )
+	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
+	PORT_DIPSETTING(    0x20, "16 Bet" )
+	PORT_DIPSETTING(    0x00, "8 Bet" )
+	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
+	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* not working */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* not checked */
+	PORT_DIPSETTING(    0x06, "1,000" )
+	PORT_DIPSETTING(    0x04, "5,000" )
+	PORT_DIPSETTING(    0x02, "10,000" )
+	PORT_DIPSETTING(    0x00, "20,000" )
+	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
+	PORT_DIPSETTING(    0x18, "12-7-1" )
+	PORT_DIPSETTING(    0x10, "9-5-1" )
+	PORT_DIPSETTING(    0x08, "6-3-1" )
+	PORT_DIPSETTING(    0x00, "3-2-1" )
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
+	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -12779,6 +13102,268 @@ ROM_START( wcherry )
 ROM_END
 
 
+/****************************** Stealth Sets ******************************/
+
+/*
+  Super PacMan 2.1 + Cherry Master (Corsica, ver 8.31)
+  stealth game...
+
+  The game runs in the blue old cherry master hardware,
+  with a daughterboard placed in the Z80 socket.
+
+  You can switch the games pulsing a hidden input.
+
+  Hidden Switch:
+
+  One wire goes to edge connector 35+36 (solder side),
+  carrying GND, and putting PPI (u34) pin 14 (PC0) to GND.
+
+  The other goes to edge connector 8 (solder side): PPI pin 18 (PB0)
+
+*/
+ROM_START( cmpacman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "corsica_v8.31_pacman_old_board.bin",  0x0000,  0x10000, CRC(f69cbe75) SHA1(08446eb005b6c7ed24489fd664df14b20a41e3eb) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "c_m_pacman_rom7.u16", 0x00000,  0x8000, CRC(c53273a4) SHA1(d359e65c31ef5253f1e9a3b67db8851a8d1262d1) )
+	ROM_LOAD( "c_m_pacman_rom6.u11", 0x08000,  0x8000, CRC(013bff64) SHA1(65f2808480970a756b642ddd1a64c10b89ea3b3e) )
+	ROM_LOAD( "c_m_pacman_rom5.u4",  0x10000,  0x8000, CRC(03298f22) SHA1(32c99da82afff6d38333a9998802c497d6f49fab) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/*
+  Tetris + Cherry Master (Corsica, ver 8.01)
+  stealth game...
+
+  The game runs in the blue old cherry master hardware,
+  with some mods...
+
+  You can switch the games pulsing their respective hidden buttons.
+
+  Hidden Switch:
+
+  One wire goes to edge connector 35+36 (solder side), putting PPI (u34)
+  pin 14 (PC0) to GND (needed to get the switch working).
+
+  One button adds GND to the edge connector 8 (solder side):
+  PPI pin 18 (PB0), to switch to Tetris game.
+
+  The other button, adds GND to the edge connector 7 (solder side):
+  PPI pin 19 (PB1), to switch to Cherry Master game.
+
+*/
+ROM_START( cmtetris )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris_cm_v8.01.u81",  0x0000,  0x10000, CRC(3f67dcb2) SHA1(00aa1dcfd14f9b3e130ad31462cd7c9873e9a990) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7__cmtetris.u16", 0x00000,  0x8000, CRC(2f5c94bd) SHA1(d99bcaa788f8abf5c75b29572d53be109b20c4bb) )
+	ROM_LOAD( "6__cmtetris.u11", 0x08000,  0x8000, CRC(dac50071) SHA1(7d1c8ec0d81897fe2155578d8c7455dc07104899) )
+	ROM_LOAD( "5__cmtetris.u4",  0x10000,  0x8000, CRC(9d67e265) SHA1(62eba137d881789c70121d5c07b5247684b917dd) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/*
+  Tetris + Cherry Master (Corsica, ver 8.01)
+  stealth game...
+
+  The game runs in the blue old cherry master hardware,
+  with some mods... The program is shuffled in banks of 0x1000.
+
+  You can switch the games pulsing their respective hidden buttons.
+
+  The Tetris game is different to the one in cmtetris set.
+
+  Hidden Switch:
+
+  One wire goes to edge connector 35+36 (solder side), putting PPI (u34)
+  pin 14 (PC0) to GND (needed to get the switch working).
+
+  One button adds GND to the edge connector 8 (solder side):
+  PPI pin 18 (PB0), to switch to Tetris game.
+
+  The other button, adds GND to the edge connector 7 (solder side):
+  PPI pin 19 (PB1), to switch to Cherry Master game.
+
+*/
+ROM_START( cmtetrsa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cm89-tetri-9.u81",  0x10000,  0x10000, CRC(75e0c101) SHA1(6dc4f7c43f0f4e21d621f3c42cb1709d6b730c53) )
+/*
+  Need checks and fixes
+
+  3800+ --> 5800+
+  9800+ --> 3800+
+
+*/
+//	ROM_COPY( "maincpu", 0x1c000, 0x0000, 0x1000 )      /* src-dest-size ok */
+//	ROM_COPY( "maincpu", 0x16000, 0x1000, 0x1000 )      /* src-dest-size ok */
+//	ROM_COPY( "maincpu", 0x14000, 0x2000, 0x1000 )      /* src-dest-size ok */
+//	ROM_COPY( "maincpu", 0x1a000, 0x3000, 0x1000 )      /* src-dest-size ok (some calls to high 5xxx appear here, maybe split in 0x800?) */
+//	ROM_COPY( "maincpu", 0x15000, 0x4000, 0x1000 )      /* src-dest-size ok */
+//	ROM_COPY( "maincpu", 0x11000, 0x6000, 0x1000 )      /* src-dest-size ok */
+//	ROM_COPY( "maincpu", 0x13000, 0x8000, 0x1000 )      /* src-dest-size ok */
+
+//	ROM_COPY( "maincpu", 0x17000, 0x5000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x10000, 0x7000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x18000, 0x9000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x19000, 0xa000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x12000, 0xb000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x1b000, 0xc000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x1d000, 0xd000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x1e000, 0xe000, 0x1000 )      /* src-dest-size */
+//	ROM_COPY( "maincpu", 0x1f000, 0xf000, 0x1000 )      /* src-dest-size */
+
+	ROM_COPY( "maincpu", 0x1c000, 0x0000, 0x0800 )      /* src-dest-size */	// #01
+	ROM_COPY( "maincpu", 0x19800, 0x0800, 0x0800 )      /* src-dest-size */	// #02
+	ROM_COPY( "maincpu", 0x16000, 0x1000, 0x0800 )      /* src-dest-size */	// #03
+	ROM_COPY( "maincpu", 0x17800, 0x1800, 0x0800 )      /* src-dest-size */	// #04
+	ROM_COPY( "maincpu", 0x14000, 0x2000, 0x0800 )      /* src-dest-size */	// #05
+	ROM_COPY( "maincpu", 0x1c800, 0x2800, 0x0800 )      /* src-dest-size */	// #06
+	ROM_COPY( "maincpu", 0x1a000, 0x3000, 0x0800 )      /* src-dest-size */	// #07
+	ROM_COPY( "maincpu", 0x18800, 0x3800, 0x0800 )      /* src-dest-size */	// #08
+	ROM_COPY( "maincpu", 0x10000, 0x4000, 0x0800 )      /* src-dest-size */	// #09
+	ROM_COPY( "maincpu", 0x15000, 0x4800, 0x0800 )      /* src-dest-size */	// #10
+	ROM_COPY( "maincpu", 0x14800, 0x5000, 0x0800 )      /* src-dest-size */	// #11
+	ROM_COPY( "maincpu", 0x1a800, 0x5800, 0x0800 )      /* src-dest-size */	// #12
+	ROM_COPY( "maincpu", 0x11000, 0x6000, 0x0800 )      /* src-dest-size */	// #13
+	ROM_COPY( "maincpu", 0x11800, 0x6800, 0x0800 )      /* src-dest-size */	// #14
+	ROM_COPY( "maincpu", 0x1b000, 0x7000, 0x0800 )      /* src-dest-size */	// #15
+	ROM_COPY( "maincpu", 0x1f000, 0x7800, 0x0800 )      /* src-dest-size */	// #16
+	ROM_COPY( "maincpu", 0x1f800, 0x8000, 0x0800 )      /* src-dest-size */	// #17
+	ROM_COPY( "maincpu", 0x13800, 0x8800, 0x0800 )      /* src-dest-size */	// #18
+	ROM_COPY( "maincpu", 0x19000, 0x9000, 0x0800 )      /* src-dest-size */	// #19
+	ROM_COPY( "maincpu", 0x1b800, 0x9800, 0x0800 )      /* src-dest-size */	// #20
+	ROM_COPY( "maincpu", 0x12000, 0xa000, 0x0800 )      /* src-dest-size */	// #21
+	ROM_COPY( "maincpu", 0x10800, 0xa800, 0x0800 )      /* src-dest-size */	// #22
+	ROM_COPY( "maincpu", 0x18000, 0xb000, 0x0800 )      /* src-dest-size */	// #23
+	ROM_COPY( "maincpu", 0x12800, 0xb800, 0x0800 )      /* src-dest-size */	// #24
+	ROM_COPY( "maincpu", 0x13000, 0xc000, 0x0800 )      /* src-dest-size */	// #25
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cm89-tetri-7.u16", 0x00000,  0x8000, CRC(2f5c94bd) SHA1(d99bcaa788f8abf5c75b29572d53be109b20c4bb) )
+	ROM_LOAD( "cm89-tetri-6.u11", 0x08000,  0x8000, CRC(dac50071) SHA1(7d1c8ec0d81897fe2155578d8c7455dc07104899) )
+	ROM_LOAD( "cm89-tetri-5.u4",  0x10000,  0x8000, CRC(9d67e265) SHA1(62eba137d881789c70121d5c07b5247684b917dd) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "cm89-tetri-4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "cm89-tetri-3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "cm89-tetri-2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "cm89-tetri-1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "cm89-tetri-8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/*
+  Tetris + Cherry Master (+K, Canada Version, encrypted)
+  stealth game...
+
+  The game runs in the blue old cherry master hardware,
+  with a daughterboard placed in the Z80 socket.
+
+  Daughterboard specs:
+
+  Silkscreened: AMUS89 REV.0
+
+  1x Zilog Z0840006PSC (Z80 CPU)
+  1x Lattice A444A12 (PLCC68)
+  1x Unknown DIL-24 IC marked 3567 HX881(1) 9620.
+  1x AM27C512 for program, labeled '9'.
+  1x HM6116LP-3
+  1x C358C (dual oper amplifier)
+
+  1x 12.000 MHz. crystal.
+  1x 3.579545 MHz. crystal.
+
+
+  About the unknown IC....
+
+  HX881 is known as U3567, U3567 is a YM2413 clone.
+  YM2413 is 18 pins, but the SOP package is 24 pins.
+  Because of the dual amp, this might support it being a sound chip.
+  Probably tracing pin connections to the HX881 will confirm it.
+
+  
+  You can switch the games pulsing their respective hidden buttons.
+
+  Hidden Switch:
+
+  Unknown, yet...
+
+*/
+ROM_START( cmtetrsb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9__canada_daughterboard.bin",  0x0000,  0x10000, CRC(9810b853) SHA1(cf1216414f93cc78c7c9e5a3998e8b162692e05e) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "rom7.u16", 0x00000,  0x10000, CRC(51498501) SHA1(7ac92129b449f7d4407f847c6200bf278c196c02) )
+	ROM_LOAD( "rom6.u11", 0x10000,  0x10000, CRC(8b113a3c) SHA1(aa24edd672c05a06f476286b343f8b1a40d5f0c9) )
+	ROM_LOAD( "rom5.u4",  0x20000,  0x10000, CRC(c3de5ce1) SHA1(2945c8e336c6d8638899b798fbe79c5757941fd8) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "rom3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "rom2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "rom1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "rom8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u43", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
 /*********************************************************************************************************************/
 
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
@@ -13521,6 +14106,7 @@ GAME(  198?, cmv801,    0,        cm,       cmv801,   goldstar_state, cm,       
 
 
 
+
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
 // the original, unmodified dyna versions is almost impossible due to lack of documentation from back in the day,
 // even original boards almost always run modified sets
@@ -13626,8 +14212,15 @@ GAME( 1999, unkch3,   unkch1,    unkch,    unkch,     goldstar_state, unkch3,   
 GAME( 1999, unkch4,   unkch1,    unkch,    unkch,     goldstar_state, unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         GAME_NOT_WORKING|GAME_NO_SOUND ) // by 'toy system' hungary
 
 
-/* possible stealth sets:
+/* Stealth sets.
+   These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */
 
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY      FULLNAME                                                 FLAGS  */
+GAME( 198?, cmpacman,  0,        cm,       cmpacman,  goldstar_state, cm,        ROT0, "<unknown>", "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31)",   0 ) /* need to press K to switch between games... */
+GAME( 198?, cmtetris,  0,        cm,       cmtetris,  goldstar_state, cm,        ROT0, "<unknown>", "Tetris + Cherry Master (Corsica, v8.01, set 1)",         0 ) /* need to press K/L to switch between games... */
+GAME( 198?, cmtetrsa,  0,        cm,       cmtetris,  goldstar_state, cm,        ROT0, "<unknown>", "Tetris + Cherry Master (Corsica, v8.01, set 2)",         GAME_NOT_WORKING)		// seems banked...
+GAME( 198?, cmtetrsb,  0,        cm,       cmtetris,  goldstar_state, cm,        ROT0, "<unknown>", "Tetris + Cherry Master (+K, Canada Version, encrypted)", GAME_NOT_WORKING)		// different Tetris game
+
+/* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
-
 */
