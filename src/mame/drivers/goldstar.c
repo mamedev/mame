@@ -6847,11 +6847,22 @@ static const gfx_layout tiles8x8x4_layout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
+static const gfx_layout sangho_charlayout =
+{
+	8,8,            /* 8*8 characters */
+	RGN_FRAC(1,1),  /* 4096 characters */
+	4,              /* 4 bits per pixel */
+	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 0*8+0, 0*8+1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
 static const gfx_layout sangho_tilelayout =
 {
-	8,32,    /* 8*32 characters */
-	1024,    /* 256 tiles */
-	4,      /* 4 bits per pixel */
+	8,32,           /* 8*32 characters */
+	RGN_FRAC(1,1),  /* 256 tiles */
+	4,              /* 4 bits per pixel */
 	{ 0, 2, 4, 6 },
 	{ 0, 1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
@@ -6950,8 +6961,8 @@ static GFXDECODE_START( megaline )
 GFXDECODE_END
 
 static GFXDECODE_START( sangho )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   24, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 128 + (2 * 16),  16 )
+	GFXDECODE_ENTRY( "gfx1", 0, sangho_charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 0, 16 )
 /* 7*16,16 title girl in 1st color
    6*16,16 watermelon in game
    4*16,16 blueberry in game
@@ -8593,10 +8604,10 @@ ROM_START( star100 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "str-100_051212__27c512.1e",  0x00000, 0x10000, CRC(6c73ae4e) SHA1(8476b77a190a653b2a47682072bc9b4db594c02e) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "str_l3__flash29c011a-15.3l", 0x00000, 0x20000, CRC(89bf5935) SHA1(f8af107e21a9157ea5056eedbda36a1b99c5df5b) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "str_m3__flash29c011a-15.3m", 0x00000, 0x20000, CRC(fff9ea0e) SHA1(6125c99e684ac639a0f85cbb00c26131a23324aa) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
@@ -8617,10 +8628,10 @@ ROM_START( crazybon )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazy_14_030418.bin",  0x00000, 0x10000, CRC(0071fb2a) SHA1(771b9b2b9fdf11dafc5ec0dbababc181d2ce4c75) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "crazy_h3.bin", 0x00000, 0x20000, CRC(6b3692b5) SHA1(ffdcd4e59d7c009fd76a65e8f87642da35f996f4) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "crazy_j3.bin", 0x00000, 0x20000, CRC(e375cd4b) SHA1(68888126ff9743cd589f3426205231bc3a896588) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
