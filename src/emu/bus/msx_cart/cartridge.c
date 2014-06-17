@@ -66,22 +66,22 @@ msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &
 
 void msx_cart_interface::rom_alloc(UINT32 size)
 {
-	m_rom.resize(size);
+	m_rom.resize_and_clear(size, 0xff);
 }
 
 void msx_cart_interface::rom_vlm5030_alloc(UINT32 size)
 {
-	m_rom_vlm5030.resize(size);
+	m_rom_vlm5030.resize_and_clear(size, 0xff);
 }
 
 void msx_cart_interface::ram_alloc(UINT32 size)
 {
-	m_ram.resize(size);
+	m_ram.resize_and_clear(size);
 }
 
 void msx_cart_interface::sram_alloc(UINT32 size)
 {
-	m_sram.resize(size);
+	m_sram.resize_and_clear(size);
 }
 
 

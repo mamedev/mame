@@ -137,11 +137,22 @@ bool msx_slot_cartridge_device::call_load()
 		else
 		{
 			UINT32 length = this->length();
-
-			UINT32 length_aligned = 0x4000;
-			while (length_aligned < length )
+			
+			// determine how much space to allocate
+			UINT32 length_aligned = 0x10000;
+			
+			if (length <= 0x2000)
+				length_aligned = 0x2000;
+			else if (length <= 0x4000)
+				length_aligned = 0x4000;
+			else if (length <= 0x8000)
+				length_aligned = 0x8000;
+			else if (length <= 0xc000)
+				length_aligned = 0xc000;
+			else
 			{
-				length_aligned *= 2;
+				while (length_aligned < length )
+					length_aligned *= 2;
 			}
 
 			m_cartridge->rom_alloc(length_aligned);
