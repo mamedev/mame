@@ -6861,7 +6861,7 @@ static const gfx_layout sangho_charlayout =
 static const gfx_layout sangho_tilelayout =
 {
 	8,32,           /* 8*32 characters */
-	RGN_FRAC(1,1),  /* 256 tiles */
+	RGN_FRAC(1,1),  /* 1024 tiles */
 	4,              /* 4 bits per pixel */
 	{ 0, 2, 4, 6 },
 	{ 0, 1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
