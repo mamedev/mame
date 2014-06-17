@@ -759,9 +759,9 @@ UINT32 goldstar_state::screen_update_sangho(screen_device &screen, bitmap_ind16 
 		}
 
 		// are these hardcoded, or registers?
-		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
-		const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
-		const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
+		const rectangle visible1(0*8, (15+48)*8-1,  4*8,  (4+7)*8-1);
+		const rectangle visible2(0*8, (15+48)*8-1, 12*8, (12+7)*8-1);
+		const rectangle visible3(0*8, (15+48)*8-1, 20*8, (20+7)*8-1);
 
 		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
 		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
