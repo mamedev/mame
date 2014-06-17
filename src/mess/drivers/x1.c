@@ -2647,4 +2647,4 @@ COMP( 1982, x1,        0,      0,       x1,      x1, driver_device,         0,  
 // x1twin in x1twin.c
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", GAME_NOT_WORKING ) //model 10
 COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
-// x1turboz  /* 1986 Sharp X1 TurboZ  */
+//COMP( 1986, x1turboz, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", GAME_NOT_WORKING )

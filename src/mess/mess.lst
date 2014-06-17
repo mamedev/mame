@@ -50,7 +50,7 @@ a5200    // Atari 5200
 a7800    // Atari 7800 NTSC
 a7800p  // Atari 7800 PAL
 lynx      // Atari Lynx Handheld
-//  lynx2  // Atari Lynx II Handheld redesigned, no additions
+//lynx2  // Atari Lynx II Handheld redesigned, no additions
 jaguar  // Atari Jaguar
 jaguarcd  // Atari Jaguar CD
 
@@ -217,9 +217,6 @@ adam      // Coleco Adam
 pce    // PC/Engine NEC 1987-1993
 tg16      // Turbo Grafix-16  NEC 1989-1993
 sgx    // SuperGrafX NEC 1989
-//pce_new
-//tg16_new
-//sgx_new
 pcfx      // PC-FX NEC 1994
 pcfxga  // PC-FX NEC 199? (PC-FX on a PC ISA Card)
 
@@ -365,6 +362,7 @@ acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
 atom      // 1979 Acorn Atom
 atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
+//prophet2
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B
 bbcb_de   // 1981 BBC Micro Model B (German)
@@ -480,10 +478,11 @@ agat7    // Agat-7
 agat9    // Agat-9
 space84 // 1985 IBS/ComputerTechnik Space 84
 am64    // 1985 ASEM AM 64 (motherboard is marked AM-100 but it boots as "AM 64")
+//laba2p  // Lab equipment Apple II Plus Clone
 
-//  Lisa   January    1983
-//  Lisa 2   January  1984
-//Macintosh XL   January    1985
+// Lisa   January    1983
+// Lisa 2   January  1984
+// Macintosh XL   January    1985
 
 lisa      // 1983 Apple Lisa
 lisa2    // 1984 Apple Lisa 2
@@ -497,6 +496,7 @@ macxl    // 1985 Apple Macintosh XL
 // Macintosh SE  March     1987
 // Macintosh II  March     1987
 
+//mactw   // Macintosh (4.3T Prototype) - missing roms?
 mac128k   // 1984 Apple Macintosh
 mac512k   // 1985 Apple Macintosh 512k
 mac512ke  // 1986 Apple Macintosh 512ke
@@ -526,6 +526,7 @@ macpb145  // 1992 Apple Macintosh PowerBook 145
 macpb160    // 1992 Apple Macintosh PowerBook 160
 macpb180    // 1992 Apple Macintosh PowerBook 180
 macpb180c // 1992 Apple Macintosh PowerBook 180c
+//macpd210  // 1992 Apple Macintosh PowerBook Duo 210
 maccclas // 1993 Apple Macintosh Color Classic
 macpb145b  // 1993 Apple Macintosh PowerBook 145B
 maclc3  // 1993 Apple Macintosh LC III
@@ -562,7 +563,7 @@ megast_de
 megast_fr
 megast_se
 megast_sg
-//  stacy  // Atari STacy
+//stacy  // Atari STacy
 ste  // Atari STe
 ste_uk
 ste_de
@@ -579,13 +580,13 @@ megaste_es
 megaste_fr
 megaste_it
 megaste_se
-//  stpad  // Atari STPad (prototype)
+//stpad  // Atari STPad (prototype)
 tt030  // Atari TT030
 tt030_uk
 tt030_de
 tt030_fr
 tt030_pl
-//  fx1      // Atari FX-1 (prototype)
+//fx1      // Atari FX-1 (prototype)
 falcon30    // Atari Falcon030
 falcon40  // Atari Falcon040 (prototype)
 
@@ -644,8 +645,8 @@ c64_jp  // Commodore 64 (Japan)
 c64_se  // Commodore 64 (Sweden)
 pet64    // Commodore PET 64
 edu64    // Commodore Educator 64
-//  clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
-//  tesa6240  //  modified SX64 with label printer
+//clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer - roms needed - not in driver
+//tesa6240  //  modified SX64 with label printer - roms needed - not in driver
 sx64
 sx64p
 
@@ -690,6 +691,8 @@ v364
 c128
 c128p
 c128_de
+//c128_fr
+//c128_no
 c128_se
 c128d
 c128dp
@@ -697,6 +700,7 @@ c128cr
 c128dcr
 c128dcrp
 c128dcr_de
+//c128dcr_it
 c128dcr_se
 c128d81
 
@@ -930,7 +934,9 @@ quorum
 pentagon
 pent1024
 atm
+//atmtb1
 atmtb2
+//turbo2
 bestzx
 
 ql  // 1984 Sinclair QL (UK)
@@ -943,7 +949,7 @@ ql_se    // 1984 Sinclair QL (Sweden)
 ql_dk    // 1984 Sinclair QL (Denmark)
 ql_gr    // 1984 Sinclair QL (Greece)
 tonto
-//  megaopd
+//megaopd
 
 // Sharp
 pc1245  // Pocket Computer 1245
@@ -986,7 +992,7 @@ x1      // 1982 Sharp X1
 x1twin  // 1986 Sharp X1 Twin
 x1turbo   // 1984 Sharp X1 Turbo (Model 10)
 x1turbo40 // 1985 Sharp X1 Turbo (Model 40)
-//  x1turboz  // 1986 Sharp X1 TurboZ
+//x1turboz  // 1986 Sharp X1 TurboZ
 
 x68000  // Sharp X68000 (1987)
 x68ksupr // Sharp X68000 Super (1990)
@@ -1050,7 +1056,7 @@ ti83      // 1996 TI-83 (Z80 6 MHz)
 ti86      // 1997 TI-86 (Z80 6 MHz)
 ti83p    // 1999 TI-83 Plus (Z80 6 MHz)
 ti83pse   // 2001 TI-83 Plus Silver Edition
-//  ti84p  // 2004 TI-84 Plus
+//ti84p  // 2004 TI-84 Plus
 ti84pse   // 2004 TI-84 Plus Silver Edition
 ti89      // 1998 TI-89
 ti92      // 1995 TI-92
@@ -1074,16 +1080,22 @@ pc8001mk2
 pc8801
 pc8801mk2
 pc8801mk2sr
+//pc8801mk2tr
 pc8801mk2fr
 pc8801mk2mr
+//pc8801fh
 pc8801mh
 pc8801fa
 pc8801ma
+//pc8801fe
 pc8801ma2
+//pc8801fe2
 pc8801mc
+//pc98do
+//pc98dop
 pc88va
 pc88va2
-
+//pc88va3
 pc100
 
 pc9801f // 1983
@@ -1165,6 +1177,9 @@ sys80    // EACA System 80
 lnw80    // LNW Research LNW-80
 trs80m2
 trs80m16
+//trs80m12
+//trs80m16b
+//tandy6k
 trs80m3   // TRS-80 Model III - Radio Shack/Tandy
 trs80m4
 trs80m4p
@@ -1201,7 +1216,7 @@ alice90 // Matra & Hachette Alice 90
 // EACA
 cgenie  // Colour Genie EG2000
 cgenienz  // Colour Genie EG2000 (New Zealand)
-// system 80 trs80 compatible
+// System 80 trs80 compatible
 
 // Video Technology
 crvision  // 1981 creatiVision
@@ -1211,6 +1226,8 @@ wizzard
 rameses
 vz2000
 crvisio2
+//lasr2001
+//vz2001
 manager
 
 // Video Technology Laser Generation 1 machines
@@ -1286,6 +1303,7 @@ uk101
 
 // Ohio Scientific
 sb2m600b
+//sb2m600c
 c1p
 c1pmf
 
@@ -1477,9 +1495,16 @@ vt131 // 1981 Digital Equipment Corporation
 vt180 // 1981 Digital Equipment Corporation
 vt220 // 1983 Digital Equipment Corporation
 vt320 // 1987 Digital Equipment Corporation
+//vt330
+//vt340
+//vt340p
+//vt510
 vt520 // 1994 Digital Equipment Corporation
+//vt525
 vk100 // 1980 Digital Equipment Corporation
 dectalk // 1982 Digital Equipment Corporation
+//vt240
+//vt241
 mc7105 // Elektronika MC7105
 rainbow100a  // 1982 DEC Rainbow 100-A
 rainbow     // 1983 DEC Rainbow 100-B
@@ -1495,7 +1520,7 @@ intvkbd   // 1981 - Mattel Intellivision Keyboard Component
 // (Test marketed, later recalled)
 intvecs   // 1983 - Mattel Intellivision ECS
 aquarius  // 1983 Aquarius
-//  aquariu2  // 1984 Aquarius II
+//aquariu2  // 1984 Aquarius II
 juicebox
 hs
 
@@ -1569,7 +1594,7 @@ sv328p80  // SVI-328 (PAL) + SVI-806 80 column card
 sv328n80  // SVI-328 (NTSC) + SVI-806 80 column card
 
 // Andrew Donald Booth (this is the name of the designer, not a company)
-//  apexc53   // 1951(?) APEXC: All-Purpose Electronic X-ray Computer
+//apexc53   // 1951(?) APEXC: All-Purpose Electronic X-ray Computer
 apexc    // 1955(?) APEXC: All-Purpose Electronic X-ray Computer
 
 // Corvus
@@ -1590,7 +1615,7 @@ mpf1b      // 1979 Multitech Micro Professor 1B
 //tmc1800
 tmc2000
 tmc2000e
-//  tmc600s1
+//tmc600s1
 tmc600s2
 
 // OSCOM Oy
@@ -1830,7 +1855,6 @@ exeltel
 // Comx World Operations Ltd
 comx35p
 comx35n
-//  comxpl80
 
 // Grundy Business Systems Ltd
 newbrain
@@ -1855,14 +1879,15 @@ tecjmon   // Talking Electronics Computer
 // Kyocera (and clones)
 kc85
 m10
-//  m10m
+//m10m
 trsm100
 tandy102
 tandy200
 pc8201
 pc8201a
 npc8300
-//  pc8401bd
+pc8401a  // roms needed
+//pc8401bd
 pc8500
 
 // Nakajima manufactured eletronic typewriters
@@ -1933,7 +1958,7 @@ diablo68 // 1991 Novag Diablo 68000 Chess Computer
 
 
 // Hegener & Glaser Munich
-//  mephisto  // Mephisto
+//mephisto  // Mephisto 1 - roms needed - not in driver
 mm2       // Mephisto 2
 mm4       // Mephisto 4
 mm4tk     // Mephisto 4 Turbo Kit
@@ -1975,8 +2000,8 @@ stratos // Kasparov Stratos Chess Computer
 // JAKKS Pacific, Inc. / HotGen, Ltd.
 batmantv    // The Batman, 2004
 
-// Quadtel
-//paintbox // 1981
+// Quantel
+//paintbox // 1981  // No driver or roms as of yet, but a driver is being worked on:  https://www.youtube.com/watch?v=-s5yN0_7Dok
 harriet // 1990
 
 // Fanuc
@@ -2248,6 +2273,7 @@ pofo
 homez80
 tek4051
 tek4052a
+//tek4054
 tek4107a
 tek4109a
 phunsy

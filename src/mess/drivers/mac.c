@@ -2190,10 +2190,12 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+/*
 ROM_START( mactw )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
 	ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
 ROM_END
+*/
 
 ROM_START( mac128k )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
@@ -2389,11 +2391,12 @@ ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
 ROM_END
-
-/*ROM_START( macpd210 )
+/*
+ROM_START( macpd210 )
     ROM_REGION32_BE(0x100000, "bootrom", 0)
     ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) )
-ROM_END*/
+ROM_END
+*/
 
 ROM_START( maclc520 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
@@ -2401,7 +2404,7 @@ ROM_START( maclc520 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  GAME_NOT_WORKING )
+//COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  GAME_NOT_WORKING )
 COMP( 1984, mac128k,  0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,  mac512ke, macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986, mac512ke, macplus,  0,  mac512ke, macplus, mac_state,  mac512ke,      "Apple Computer", "Macintosh 512ke", 0 )
