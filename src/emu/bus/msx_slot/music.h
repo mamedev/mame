@@ -24,18 +24,14 @@ public:
 	static void set_ym2413_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_music_device &>(device).m_ym2413_tag = tag; }
 
 	virtual void device_start();
-	virtual void device_reset();
 
 	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE8_MEMBER(write_ym2413);
 
 private:
 	ym2413_device *m_ym2413;
 	const char *m_ym2413_tag;
-	bool m_opll_active;
-	UINT8 m_unlock;
 };
 
 

@@ -9,8 +9,6 @@ msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, cons
 	: msx_slot_rom_device(mconfig, MSX_SLOT_MUSIC, "MSX Internal MSX-MUSIC", tag, owner, clock, "msx_slot_music", __FILE__)
 	, m_ym2413(NULL)
 	, m_ym2413_tag(NULL)
-	, m_opll_active(false)
-	, m_unlock(0)
 {
 }
 
@@ -37,33 +35,14 @@ void msx_slot_music_device::device_start()
 }
 
 
-void msx_slot_music_device::device_reset()
-{
-	m_opll_active = false;
-}
-
-
 READ8_MEMBER(msx_slot_music_device::read)
 {
 	return msx_slot_rom_device::read(space, offset);
 }
 
 
-WRITE8_MEMBER(msx_slot_music_device::write)
-{
-	if (m_unlock == 0xbe && data == 0x41)
-	{
-		m_opll_active = true;
-	}
-	m_unlock = data;
-}
-
-
 WRITE8_MEMBER(msx_slot_music_device::write_ym2413)
 {
-	if (m_opll_active)
-	{
-		m_ym2413->write(space, offset & 1, data);
-	}
+	m_ym2413->write(space, offset & 1, data);
 }
 
