@@ -3353,6 +3353,20 @@ static void d68851_p001(void)
 	sprintf(g_dasm_str, "MMU 001 group");
 }
 
+static void d68040_fbcc_16()
+{
+	UINT32 temp_pc = g_cpu_pc;
+	INT16 disp = make_int_16(read_imm_16());
+	sprintf(g_dasm_str, "fb%-s   $%x", g_cpcc[g_cpu_ir & 0x3f], temp_pc + disp);
+}
+
+static void d68040_fbcc_32()
+{
+	UINT32 temp_pc = g_cpu_pc;
+	UINT32 disp = read_imm_32();
+	sprintf(g_dasm_str, "fb%-s   $%x", g_cpcc[g_cpu_ir & 0x3f], temp_pc + disp);
+}
+
 /* ======================================================================== */
 /* ======================= INSTRUCTION TABLE BUILDER ====================== */
 /* ======================================================================== */
@@ -3680,6 +3694,8 @@ static const opcode_struct g_opcode_info[] =
 	{d68851_pbcc32       , 0xffc0, 0xf0c0, 0x000},
 	{d68851_pdbcc        , 0xfff8, 0xf048, 0x000},
 	{d68851_p001         , 0xffc0, 0xf040, 0x000},
+	{d68040_fbcc_16      , 0xffc0, 0xf280, 0x000},
+	{d68040_fbcc_32      , 0xffc0, 0xf2c0, 0x000},
 	{0, 0, 0, 0}
 };
 
