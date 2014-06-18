@@ -105,10 +105,8 @@ static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")              // Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")              // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)                           // Palette
-	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x204600, 0x207fff) AM_RAM
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
+	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
 	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
@@ -138,10 +136,8 @@ static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")                  // Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")                  // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)                           // Palette
-	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x204600, 0x207fff) AM_RAM
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
+	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
 	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
@@ -365,8 +361,9 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
-	MCFG_PALETTE_ADD("palette", 0x300)
 
+	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -408,7 +405,7 @@ static MACHINE_CONFIG_START( watrball, blmbycar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
 	MCFG_PALETTE_ADD("palette", 0x300)
-
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
