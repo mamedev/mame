@@ -3353,8 +3353,10 @@ static void d68851_p001(void)
 	sprintf(g_dasm_str, "MMU 001 group");
 }
 
+// fbcc is 68040 and 68881
 static void d68040_fbcc_16()
 {
+	LIMIT_CPU_TYPES(M68030_PLUS);
 	UINT32 temp_pc = g_cpu_pc;
 	INT16 disp = make_int_16(read_imm_16());
 	sprintf(g_dasm_str, "fb%-s   $%x", g_cpcc[g_cpu_ir & 0x3f], temp_pc + disp);
@@ -3362,6 +3364,7 @@ static void d68040_fbcc_16()
 
 static void d68040_fbcc_32()
 {
+	LIMIT_CPU_TYPES(M68030_PLUS);
 	UINT32 temp_pc = g_cpu_pc;
 	UINT32 disp = read_imm_32();
 	sprintf(g_dasm_str, "fb%-s   $%x", g_cpcc[g_cpu_ir & 0x3f], temp_pc + disp);
@@ -4029,6 +4032,10 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 			if(g_instruction_table[instruction] == d68020_unpk_rr)
 				return 0;
 			if(g_instruction_table[instruction] == d68020_unpk_mm)
+				return 0;
+			if(g_instruction_table[instruction] == d68040_fbcc_16)
+				return 0;
+			if(g_instruction_table[instruction] == d68040_fbcc_32)
 				return 0;
 		case M68K_CPU_TYPE_68EC020:
 		case M68K_CPU_TYPE_68020:
