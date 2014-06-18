@@ -4509,7 +4509,7 @@ Game Options:
 Deal: 1 Deck (52 cards) - Shuffled before each hand
 
 Game Rules:
-  1. Dealer hits on soft 17, Stands on hard 17 or better or six (6) cards totaling 21 or less
+  1. Dealer stands on 17 or better or six (6) cards totaling 21 or less
   2. Player wins on six (6) cards totaling 21 or less
   3. All wins pay 2 for 1, including Blackjack
   4. Bet returned on pushes
