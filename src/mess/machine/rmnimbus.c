@@ -64,7 +64,6 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 /* Defines, constants, and global variables                                */
 /*-------------------------------------------------------------------------*/
 
-/* CPU 80186 */
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
 #define LOG_DISK_FDD        0
@@ -87,19 +86,39 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #define DECODE_BIOS_RAW     0x0000004
 #define DECODE_DOS21        0x0000008
 
-static const UINT16 def_config[16] =
+/* Nimbus sub-bios structures for debugging */
+
+struct t_area_params
 {
-	0x0280, 0x017F, 0xE822, 0x8129,
-	0x0329, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x8796, 0x2025, 0xB9E6
+	UINT16  ofs_brush;
+	UINT16  seg_brush;
+	UINT16  ofs_data;
+	UINT16  seg_data;
+	UINT16  count;
 };
 
-/* Memory controler */
+struct t_plot_string_params
+{
+	UINT16  ofs_font;
+	UINT16  seg_font;
+	UINT16  ofs_data;
+	UINT16  seg_data;
+	UINT16  x;
+	UINT16  y;
+	UINT16  length;
+};
 
-/* IO Unit */
-
-/* Sound */
+struct t_nimbus_brush
+{
+	UINT16  style;
+	UINT16  style_index;
+	UINT16  colour1;
+	UINT16  colour2;
+	UINT16  transparency;
+	UINT16  boundary_spec;
+	UINT16  boundary_colour;
+	UINT16  save_colour;
+};
 
 
 static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[]);
@@ -152,11 +171,8 @@ void rmnimbus_state::machine_reset()
 	rmni_sound_reset();
 	memory_reset();
 	mouse_js_reset();
-}
 
-DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
-{
-/* USER VIA 6522 port B is connected to the BBC user port */
+	/* USER VIA 6522 port B is connected to the BBC user port */
 	m_via->write_pb0(1);
 	m_via->write_pb1(1);
 	m_via->write_pb2(1);
@@ -169,7 +185,7 @@ DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 
 void rmnimbus_state::machine_start()
 {
-	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::mouse_callback),this));
+	m_nimbus_mouse.m_mouse_timer=timer_alloc(TIMER_MOUSE);
 
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
@@ -779,9 +795,6 @@ static void decode_dos21(device_t *device,offs_t pc)
 	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
 	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
 	logerror("=======================================================================\n");
-
-	if((ax & 0xff00)==0x0900)
-		debugger_break(device->machine());
 }
 
 
@@ -960,31 +973,6 @@ void rmnimbus_state::memory_reset()
 {
 	m_mcu_reg080=0x07;
 	nimbus_bank_memory();
-}
-
-READ16_MEMBER(rmnimbus_state::nimbus_io_r)
-{
-	int pc=space.device().safe_pc();
-
-	logerror("Nimbus IOR at pc=%08X from %04X mask=%04X, data=%04X\n",pc,(offset*2)+0x30,mem_mask,m_IOPorts[offset]);
-
-	switch (offset*2)
-	{
-		default         : return m_IOPorts[offset];
-	}
-	return 0;
-}
-
-WRITE16_MEMBER(rmnimbus_state::nimbus_io_w)
-{
-	int pc=space.device().safe_pc();
-
-	logerror("Nimbus IOW at %08X write of %04X to %04X mask=%04X\n",pc,data,(offset*2)+0x30,mem_mask);
-
-	switch (offset*2)
-	{
-		default         : COMBINE_DATA(&m_IOPorts[offset]); break;
-	}
 }
 
 /*
@@ -1255,9 +1243,6 @@ void rmnimbus_state::pc8031_reset()
 	logerror("peripheral controler reset\n");
 
 	memset(&m_ipc_interface,0,sizeof(m_ipc_interface));
-
-	if(!m_eeprom->data_loaded())
-		m_eeprom->preload_rom(def_config,ARRAY_LENGTH(def_config));
 }
 
 
@@ -1395,7 +1380,9 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 
 	switch(offset)
 	{
-		case 0x01   : result=m_eeprom->get_iobits();
+		case 0x01:
+			result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
+			break;
 	}
 
 	return result;
@@ -1407,7 +1394,22 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 
 	switch (offset)
 	{
-		case 0x01   : m_eeprom->set_iobits((data&0x0F));
+		case 0x01:
+			m_eeprom->cs_write((data & 8) ? 1 : 0);
+
+			if(!(data & 8))
+				m_eeprom_state = 0;
+			else if(!(data & 2) || (m_eeprom_state == 2))
+				m_eeprom_state = 2;
+			else if((data & 8) && (!(m_eeprom_bits & 8)))
+				m_eeprom_state = 1;
+			else if((!(data & 1)) && (m_eeprom_bits & 1) && (m_eeprom_state == 1))
+				m_eeprom_state = 2; //wait until 1 clk after cs rises to set di else it's seen as a start bit
+
+			m_eeprom->di_write(((data & 2) && (m_eeprom_state == 2)) ? 1 : 0);
+			m_eeprom->clk_write((data & 1) ? 1 : 0);
+			m_eeprom_bits = data;
+			break;
 	}
 
 	if(LOG_PC8031_PORT)
@@ -1450,6 +1452,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 void rmnimbus_state::iou_reset()
 {
 	m_iou_reg092=0x00;
+	m_eeprom_state = 0;
 }
 
 /*
@@ -1506,24 +1509,22 @@ static const int MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 
 
 void rmnimbus_state::mouse_js_reset()
 {
-	mouse_joy_state *state = &m_nimbus_mouse;
-
-	state->m_mouse_px=0;
-	state->m_mouse_py=0;
-	state->m_mouse_x=128;
-	state->m_mouse_y=128;
-	state->m_mouse_pc=0;
-	state->m_mouse_pcx=0;
-	state->m_mouse_pcy=0;
-	state->m_intstate_x=0;
-	state->m_intstate_y=0;
-	state->m_reg0a4=0xC0;
+	m_nimbus_mouse.m_mouse_px=0;
+	m_nimbus_mouse.m_mouse_py=0;
+	m_nimbus_mouse.m_mouse_x=128;
+	m_nimbus_mouse.m_mouse_y=128;
+	m_nimbus_mouse.m_mouse_pc=0;
+	m_nimbus_mouse.m_mouse_pcx=0;
+	m_nimbus_mouse.m_mouse_pcy=0;
+	m_nimbus_mouse.m_intstate_x=0;
+	m_nimbus_mouse.m_intstate_y=0;
+	m_nimbus_mouse.m_reg0a4=0xC0;
 
 	// Setup timer to poll the mouse
-	state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1000));
+	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1000));
 }
 
-TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
+void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	UINT8   x = 0;
 	UINT8   y = 0;
@@ -1534,10 +1535,7 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 	int     xint;
 	int     yint;
 
-	mouse_joy_state *state = &m_nimbus_mouse;
-
-
-	state->m_reg0a4 = ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
+	m_nimbus_mouse.m_reg0a4 = ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
 	x = ioport(MOUSEX_TAG)->read();
 	y = ioport(MOUSEY_TAG)->read();
 
@@ -1548,65 +1546,65 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 
 	//logerror("poll_mouse()\n");
 
-	if (x == state->m_mouse_x)
+	if (x == m_nimbus_mouse.m_mouse_x)
 	{
-		state->m_mouse_px = MOUSE_PHASE_STATIC;
+		m_nimbus_mouse.m_mouse_px = MOUSE_PHASE_STATIC;
 	}
-	else if (x > state->m_mouse_x)
+	else if (x > m_nimbus_mouse.m_mouse_x)
 	{
-		state->m_mouse_px = MOUSE_PHASE_POSITIVE;
+		m_nimbus_mouse.m_mouse_px = MOUSE_PHASE_POSITIVE;
 	}
-	else if (x < state->m_mouse_x)
+	else if (x < m_nimbus_mouse.m_mouse_x)
 	{
-		state->m_mouse_px = MOUSE_PHASE_NEGATIVE;
-	}
-
-	if (y == state->m_mouse_y)
-	{
-		state->m_mouse_py = MOUSE_PHASE_STATIC;
-	}
-	else if (y > state->m_mouse_y)
-	{
-		state->m_mouse_py = MOUSE_PHASE_POSITIVE;
-	}
-	else if (y < state->m_mouse_y)
-	{
-		state->m_mouse_py = MOUSE_PHASE_NEGATIVE;
+		m_nimbus_mouse.m_mouse_px = MOUSE_PHASE_NEGATIVE;
 	}
 
-	switch (state->m_mouse_px)
+	if (y == m_nimbus_mouse.m_mouse_y)
+	{
+		m_nimbus_mouse.m_mouse_py = MOUSE_PHASE_STATIC;
+	}
+	else if (y > m_nimbus_mouse.m_mouse_y)
+	{
+		m_nimbus_mouse.m_mouse_py = MOUSE_PHASE_POSITIVE;
+	}
+	else if (y < m_nimbus_mouse.m_mouse_y)
+	{
+		m_nimbus_mouse.m_mouse_py = MOUSE_PHASE_NEGATIVE;
+	}
+
+	switch (m_nimbus_mouse.m_mouse_px)
 	{
 		case MOUSE_PHASE_STATIC     : break;
-		case MOUSE_PHASE_POSITIVE   : state->m_mouse_pcx++; break;
-		case MOUSE_PHASE_NEGATIVE   : state->m_mouse_pcx--; break;
+		case MOUSE_PHASE_POSITIVE   : m_nimbus_mouse.m_mouse_pcx++; break;
+		case MOUSE_PHASE_NEGATIVE   : m_nimbus_mouse.m_mouse_pcx--; break;
 	}
-	state->m_mouse_pcx &= 0x03;
+	m_nimbus_mouse.m_mouse_pcx &= 0x03;
 
-	switch (state->m_mouse_py)
+	switch (m_nimbus_mouse.m_mouse_py)
 	{
 		case MOUSE_PHASE_STATIC     : break;
-		case MOUSE_PHASE_POSITIVE   : state->m_mouse_pcy++; break;
-		case MOUSE_PHASE_NEGATIVE   : state->m_mouse_pcy--; break;
+		case MOUSE_PHASE_POSITIVE   : m_nimbus_mouse.m_mouse_pcy++; break;
+		case MOUSE_PHASE_NEGATIVE   : m_nimbus_mouse.m_mouse_pcy--; break;
 	}
-	state->m_mouse_pcy &= 0x03;
+	m_nimbus_mouse.m_mouse_pcy &= 0x03;
 
-//  mxb = MOUSE_XYB[state->m_mouse_px][state->m_mouse_pcx]; // XB
-//  mxa = MOUSE_XYA[state->m_mouse_px][state->m_mouse_pcx]; // XA
-//  mya = MOUSE_XYA[state->m_mouse_py][state->m_mouse_pcy]; // YA
-//  myb = MOUSE_XYB[state->m_mouse_py][state->m_mouse_pcy]; // YB
+//  mxb = MOUSE_XYB[state.m_mouse_px][state->m_mouse_pcx]; // XB
+//  mxa = MOUSE_XYA[state.m_mouse_px][state->m_mouse_pcx]; // XA
+//  mya = MOUSE_XYA[state.m_mouse_py][state->m_mouse_pcy]; // YA
+//  myb = MOUSE_XYB[state.m_mouse_py][state->m_mouse_pcy]; // YB
 
-	mxb = MOUSE_XYB[1][state->m_mouse_pcx]; // XB
-	mxa = MOUSE_XYA[1][state->m_mouse_pcx]; // XA
-	mya = MOUSE_XYA[1][state->m_mouse_pcy]; // YA
-	myb = MOUSE_XYB[1][state->m_mouse_pcy]; // YB
+	mxb = MOUSE_XYB[1][m_nimbus_mouse.m_mouse_pcx]; // XB
+	mxa = MOUSE_XYA[1][m_nimbus_mouse.m_mouse_pcx]; // XA
+	mya = MOUSE_XYA[1][m_nimbus_mouse.m_mouse_pcy]; // YA
+	myb = MOUSE_XYB[1][m_nimbus_mouse.m_mouse_pcy]; // YB
 
-	if ((state->m_mouse_py!=MOUSE_PHASE_STATIC) || (state->m_mouse_px!=MOUSE_PHASE_STATIC))
+	if ((m_nimbus_mouse.m_mouse_py!=MOUSE_PHASE_STATIC) || (m_nimbus_mouse.m_mouse_px!=MOUSE_PHASE_STATIC))
 	{
 //        logerror("mouse_px=%02X, mouse_py=%02X, mouse_pcx=%02X, mouse_pcy=%02X\n",
-//              state->m_mouse_px,state->m_mouse_py,state->m_mouse_pcx,state->m_mouse_pcy);
+//              state.m_mouse_px,state->m_mouse_py,state->m_mouse_pcx,state->m_mouse_pcy);
 
 //        logerror("mxb=%02x, mxa=%02X (mxb ^ mxa)=%02X, (ay8910_a & 0xC0)=%02X, (mxb ^ mxa) ^ ((ay8910_a & 0x80) >> 7)=%02X\n",
-//              mxb,mxa, (mxb ^ mxa) , (state->m_ay8910_a & 0xC0), (mxb ^ mxa) ^ ((state->m_ay8910_a & 0x40) >> 6));
+//              mxb,mxa, (mxb ^ mxa) , (state.m_ay8910_a & 0xC0), (mxb ^ mxa) ^ ((state->m_ay8910_a & 0x40) >> 6));
 	}
 
 	intstate_x = (mxb ^ mxa) ^ ((m_ay8910_a & 0x40) >> 6);
@@ -1614,8 +1612,8 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 
 	if (MOUSE_INT_ENABLED(this))
 	{
-		if ((intstate_x==1) && (state->m_intstate_x==0))
-//        if (intstate_x!=state->m_intstate_x)
+		if ((intstate_x==1) && (m_nimbus_mouse.m_intstate_x==0))
+//        if (intstate_x!=state.m_intstate_x)
 		{
 			xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
 
@@ -1624,8 +1622,8 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 //            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
 		}
 
-		if ((intstate_y==1) && (state->m_intstate_y==0))
-//        if (intstate_y!=state->m_intstate_y)
+		if ((intstate_y==1) && (m_nimbus_mouse.m_intstate_y==0))
+//        if (intstate_y!=state.m_intstate_y)
 		{
 			yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
 
@@ -1635,24 +1633,24 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 	}
 	else
 	{
-		state->m_reg0a4 &= 0xF0;
-		state->m_reg0a4 |= ( mxb & 0x01) << 3; // XB
-		state->m_reg0a4 |= (~mxb & 0x01) << 2; // XA
-		state->m_reg0a4 |= (~myb & 0x01) << 1; // YA
-		state->m_reg0a4 |= ( myb & 0x01) << 0; // YB
+		m_nimbus_mouse.m_reg0a4 &= 0xF0;
+		m_nimbus_mouse.m_reg0a4 |= ( mxb & 0x01) << 3; // XB
+		m_nimbus_mouse.m_reg0a4 |= (~mxb & 0x01) << 2; // XA
+		m_nimbus_mouse.m_reg0a4 |= (~myb & 0x01) << 1; // YA
+		m_nimbus_mouse.m_reg0a4 |= ( myb & 0x01) << 0; // YB
 	}
 
-	state->m_mouse_x = x;
-	state->m_mouse_y = y;
+	m_nimbus_mouse.m_mouse_x = x;
+	m_nimbus_mouse.m_mouse_y = y;
 
-	if ((state->m_mouse_py!=MOUSE_PHASE_STATIC) || (state->m_mouse_px!=MOUSE_PHASE_STATIC))
+	if ((m_nimbus_mouse.m_mouse_py!=MOUSE_PHASE_STATIC) || (m_nimbus_mouse.m_mouse_px!=MOUSE_PHASE_STATIC))
 	{
 //        logerror("pc=%05X, reg0a4=%02X, reg092=%02X, ay_a=%02X, x=%02X, y=%02X, px=%02X, py=%02X, intstate_x=%02X, intstate_y=%02X\n",
-//                 pc,state->m_reg0a4,state->m_iou_reg092,state->m_ay8910_a,state->m_mouse_x,state->m_mouse_y,state->m_mouse_px,state->m_mouse_py,intstate_x,intstate_y);
+//                 pc,state.m_reg0a4,state->m_iou_reg092,state->m_ay8910_a,state->m_mouse_x,state->m_mouse_y,state->m_mouse_px,state->m_mouse_py,intstate_x,intstate_y);
 	}
 
-	state->m_intstate_x=intstate_x;
-	state->m_intstate_y=intstate_y;
+	m_nimbus_mouse.m_intstate_x=intstate_x;
+	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
 
 READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
@@ -1673,11 +1671,10 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 	*/
 	UINT8 result;
 	//int pc=m_maincpu->_pc();
-	mouse_joy_state *state = &m_nimbus_mouse;
 
 	if (ioport("config")->read() & 0x01)
 	{
-		result=state->m_reg0a4;
+		result=m_nimbus_mouse.m_reg0a4;
 		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
 	}
 	else

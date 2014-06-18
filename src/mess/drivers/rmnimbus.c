@@ -18,29 +18,6 @@
 #include "bus/rs232/rs232.h"
 #include "machine/rmnkbd.h"
 
-const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3] =
-{
-	/*normal brightness */
-	{ 0x00,0x00,0x00 },      /* black */
-	{ 0x00,0x00,0x80 },      /* blue */
-	{ 0x80,0x00,0x00 },      /* red */
-	{ 0x80,0x00,0x80 },      /* magenta */
-	{ 0x00,0x80,0x00 },      /* green */
-	{ 0x00,0x80,0x80 },      /* cyan */
-	{ 0x80,0x80,0x00 },      /* yellow */
-	{ 0x80,0x80,0x80 },      /* light grey */
-
-	/*enhanced brightness*/
-	{ 0x40,0x40,0x40 },      /* dark grey */
-	{ 0x00,0x00,0xFF },      /* light blue */
-	{ 0xFF,0x00,0x00 },      /* light red */
-	{ 0xFF,0x00,0xFF },      /* light magenta */
-	{ 0x00,0xFF,0x00 },      /* light green */
-	{ 0x00,0xFF,0xFF },      /* light cyan */
-	{ 0xFF,0xFF,0x00 },      /* yellow */
-	{ 0xFF,0xFF,0xFF }       /* white */
-};
-
 static SLOT_INTERFACE_START(rmnimbus_floppies)
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
@@ -63,7 +40,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
 	AM_RANGE( 0x0000, 0x0031) AM_READWRITE(nimbus_video_io_r, nimbus_video_io_w)
-	AM_RANGE( 0x0032, 0x007f) AM_READWRITE(nimbus_io_r, nimbus_io_w)
 	AM_RANGE( 0x0080, 0x0081) AM_READWRITE8(nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
 	AM_RANGE( 0x0092, 0x0093) AM_READWRITE8(nimbus_iou_r, nimbus_iou_w, 0x00FF)
 	AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8(nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
@@ -106,27 +82,23 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_RAM
+	//AM_RANGE(0x2000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
-	AM_RANGE(0x00010, 0x07fff) AM_RAM
+	//AM_RANGE(0x00010, 0x07fff) AM_RAM
 	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
-
-PALETTE_INIT_MEMBER(rmnimbus_state, rmnimbus)
+static const UINT16 def_config[16] =
 {
-	int colourno;
-
-	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
-	{
-		palette.set_pen_color(colourno, nimbus_palette[colourno][RED], nimbus_palette[colourno][GREEN], nimbus_palette[colourno][BLUE]);
-	}
-}
-
+	0x0280, 0x017F, 0xE824, 0x8129,
+	0x0329, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x8893, 0x2025, 0xB9E6
+};
 
 static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	/* basic machine hardware */
@@ -144,21 +116,16 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_4_433619MHz*2,650,0,640,260,0,250)
-//  MCFG_SCREEN_REFRESH_RATE(50)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
-	MCFG_SCREEN_VBLANK_DRIVER(rmnimbus_state, screen_eof_nimbus)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(rmnimbus_state, rmnimbus)
 
-//  MCFG_SCREEN_SIZE(650, 260)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-
 	/* Backing storage */
 	MCFG_WD2793x_ADD(FDC_TAG, 1000000)
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(rmnimbus_state,nimbus_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(rmnimbus_state,nimbus_fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats)
@@ -205,7 +172,8 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rib_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
-	MCFG_ER59256_ADD(ER59256_TAG)
+	MCFG_EEPROM_SERIAL_93C06_ADD(ER59256_TAG)
+	MCFG_EEPROM_DATA(def_config,sizeof(def_config))
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))

@@ -64,9 +64,6 @@
 #define IS_80COL        (m_vidregs[reg026]&MASK_4080)
 #define IS_XOR          (m_vidregs[reg022]&XOR_MASK)
 
-
-
-
 #define DEBUG_TEXT  0x01
 #define DEBUG_DB    0x02
 #define DEBUG_PIXEL 0x04
@@ -90,10 +87,10 @@ READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 	{
 		case    reg000  : result=m_vidregs[reg000]; break;
 		case    reg002  : result=m_vidregs[reg002]; break;
-		case    reg004  : result=m_vidregs[reg004]; break;
+		case    reg004  : result=read_pixel_data(m_vidregs[reg002],++m_vidregs[reg00C]); break;
 		case    reg006  : result=m_vidregs[reg006]; break;
 		case    reg008  : result=m_vidregs[reg008]; break;
-		case    reg00A  : result=read_reg_00A(); break;
+		case    reg00A  : result=read_pixel_data(++m_vidregs[reg002],m_vidregs[reg00C]); break;
 		case    reg00C  : result=m_vidregs[reg00C]; break;
 		case    reg00E  : result=m_vidregs[reg00E]; break;
 
@@ -110,7 +107,7 @@ READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 		case    reg022  : result=m_vidregs[reg022]; break;
 		case    reg024  : result=m_vidregs[reg024]; break;
 		case    reg026  : result=m_vidregs[reg026]; break;
-		case    reg028  : result=m_hs_count; break; //result=m_vidregs[reg028]; break;
+		case    reg028  : result=m_screen->vpos() % 0xb; break; //result=m_vidregs[reg028]; break;
 		case    reg02A  : result=m_vidregs[reg02A]; break;
 		case    reg02C  : result=m_vidregs[reg02C]; break;
 		case    reg02E  : result=m_vidregs[reg02E]; break;
@@ -130,9 +127,9 @@ UINT8 rmnimbus_state::get_pixel(UINT16 x, UINT16 y)
 	if((x<SCREEN_WIDTH_PIXELS) && (y<SCREEN_HEIGHT_LINES))
 	{
 		if(IS_80COL)
-			result=m_video_mem[x][y];
+			result=m_video_mem.pix16(y, x);
 		else
-			result=m_video_mem[x*2][y];
+			result=m_video_mem.pix16(y, x*2);
 	}
 
 	return result;
@@ -187,7 +184,9 @@ UINT16 rmnimbus_state::read_pixel_data(UINT16 x, UINT16 y)
 
 			case 0x03   : break;
 
-			case 0x04   : break;
+			case 0x04   : m_bpp=2; m_pixel_mask=0xC0;
+							result=read_pixel_line(x,y,8);
+							break;
 
 			case 0x05   : break;
 
@@ -224,12 +223,6 @@ UINT16 rmnimbus_state::read_pixel_data(UINT16 x, UINT16 y)
 
 	return result;
 }
-
-UINT16 rmnimbus_state::read_reg_00A()
-{
-	return read_pixel_data(++m_vidregs[reg002],m_vidregs[reg00C]);
-}
-
 
 /*
     Write to the video registers, the default action is to write to the array of registers.
@@ -298,9 +291,9 @@ void rmnimbus_state::set_pixel(UINT16 x, UINT16 y, UINT8 colour)
 	if((x<SCREEN_WIDTH_PIXELS) && (y<SCREEN_HEIGHT_LINES))
 	{
 		if(IS_XOR)
-			m_video_mem[x][y]^=colour;
+			m_video_mem.pix16(y, x)^=colour;
 		else
-			m_video_mem[x][y]=colour;
+			m_video_mem.pix16(y, x)=colour;
 	}
 }
 
@@ -353,7 +346,7 @@ void rmnimbus_state::move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 w
 		pixelx=(x*width)+pixelno;
 		if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
 			logerror("pixelx=%04X\n",pixelx);
-		m_video_mem[pixelx][m_vidregs[reg020]]=m_video_mem[pixelx][y];
+		m_video_mem.pix16(m_vidregs[reg020], pixelx)=m_video_mem.pix16(y, pixelx);
 	}
 }
 
@@ -369,8 +362,8 @@ void rmnimbus_state::move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 w
     001 2bpp, using the first 4 colours of the pallette
     010
     011
-    100 4bpp, must be a 16 bit word, of which the upper byte is a mask anded with the lower byte
-              containing the pixel data for two pixels.
+    100 4bpp, must be a 16 bit word, of which the upper byte is a mask anded with existing pixels then ored
+              with the lower byte containing the pixel data for two pixels.
     101 Move pixel data at x,reg020 to x,y, used for scrolling.
     110 if 40 col
             4bpp, 16 bit word containing the pixel data for 4 pixels.
@@ -410,7 +403,7 @@ void rmnimbus_state::write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
 							break;
 
 			case 0x04   : m_bpp=2; m_pixel_mask=0xC0;
-							write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
+							write_pixel_line(x,y,(((data & 0xFF00)>>8) & (data & 0xFF)) | (~((data & 0xFF00)>>8) & read_pixel_line(x,y,8)),8);
 							break;
 
 			case 0x05   : move_pixel_line(x,y,data,16);
@@ -446,7 +439,7 @@ void rmnimbus_state::write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
 							break;
 
 			case 0x04   : m_bpp=4; m_pixel_mask=0xF0;
-							write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
+							write_pixel_line(x,y,(((data & 0xFF00)>>8) & (data & 0xFF)) | (~((data & 0xFF00)>>8) & read_pixel_line(x,y,8)),8);
 							break;
 
 			case 0x05   : move_pixel_line(x,y,data,16);
@@ -492,14 +485,14 @@ void rmnimbus_state::write_reg_012()
 
 void rmnimbus_state::write_reg_014()
 {
-	write_pixel_data(m_vidregs[reg002],m_vidregs[reg00C]++,m_vidregs[reg014]);
+	write_pixel_data(m_vidregs[reg002],++m_vidregs[reg00C],m_vidregs[reg014]);
 }
 
 void rmnimbus_state::write_reg_016()
 {
 	m_vidregs[reg002]=m_vidregs[reg016];
 
-	write_pixel_data(m_vidregs[reg002],m_vidregs[reg00C]++,FG_COLOUR);
+	write_pixel_data(m_vidregs[reg002],++m_vidregs[reg00C],FG_COLOUR);
 }
 
 
@@ -541,7 +534,6 @@ void rmnimbus_state::change_palette(UINT8 bank, UINT16 colours, UINT8 regno)
 	UINT8   colourno;
 	UINT16  mask;
 	UINT8   shifts;
-	UINT8   paletteidx;
 	UINT8   colourmax;
 	UINT8   first;
 
@@ -561,11 +553,12 @@ void rmnimbus_state::change_palette(UINT8 bank, UINT16 colours, UINT8 regno)
 	// loop over changing colours
 	for(colourno=first; colourno<(first+colourmax); colourno++)
 	{
-		paletteidx=(colours & mask) >> shifts;
-		m_palette->set_pen_color(colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
+		int paletteidx=(colours & mask) >> shifts;
+		int i = (paletteidx & 8) >> 3;
+		m_palette->set_pen_color(colourno, pal2bit((paletteidx & 2) | i), pal2bit(((paletteidx & 4) >> 1) | i), pal2bit(((paletteidx & 1) << 1) | i));
 
 		if(DEBUG_SET(DEBUG_TEXT))
-			logerror("set colourno[%02X](r,g,b)=(%02X,%02X,%02X), paletteidx=%02X\n",colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE],paletteidx);
+			logerror("set colourno[%02X], paletteidx=%02X\n",colourno, paletteidx);
 		mask=mask<<4;
 		shifts+=4;
 	}
@@ -610,6 +603,10 @@ void rmnimbus_state::video_start()
 
 	logerror("video_start\n");
 
+	m_screen->register_screen_bitmap(m_video_mem);
+
+	save_item(NAME(m_vidregs));
+
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine(), "nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
@@ -617,34 +614,29 @@ void rmnimbus_state::video_start()
 	}
 }
 
+PALETTE_INIT_MEMBER(rmnimbus_state, rmnimbus)
+{
+	int colourno;
+
+	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
+	{
+		int i = (colourno & 8) >> 3;
+		palette.set_pen_color(colourno, pal2bit((colourno & 2) | i), pal2bit(((colourno & 4) >> 1) | i), pal2bit(((colourno & 1) << 1) | i));
+	}
+}
+
 void rmnimbus_state::video_reset()
 {
 	// When we reset clear the video registers and video memory.
 	memset(&m_vidregs,0x00,sizeof(m_vidregs));
-	memset(&m_video_mem,0,sizeof(m_video_mem));
 
 	m_bpp=4;          // bits per pixel
 	logerror("Video reset\n");
 }
 
-void rmnimbus_state::screen_eof_nimbus(screen_device &screen, bool state)
-{
-//    logerror("screen_eof_nimbus\n");
-}
-
 UINT32 rmnimbus_state::screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int     XCoord;
-	int     YCoord = screen.vpos();
-
-	for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
-	{
-		bitmap.pix16(YCoord, XCoord)=m_video_mem[XCoord][YCoord];
-	}
-
-	m_hs_count++;
-	if((m_hs_count & 0x000F)>0x0A)
-		m_hs_count&=0xFFF0;
+	copybitmap(bitmap, m_video_mem, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

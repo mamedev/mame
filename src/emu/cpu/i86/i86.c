@@ -2077,7 +2077,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			break;
 
 		case 0xf4: // i_hlt
-			logerror("%s: %06x: HALT\n", tag(), pc());
+			//logerror("%s: %06x: HALT\n", tag(), pc());
 			m_icount = 0;
 			m_halt = true;
 			break;

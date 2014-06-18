@@ -1008,6 +1008,7 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 				count = count ? count : 0x10000;
 				t->int_timer->adjust((attotime::from_hz(clock()/8) * count), which);
+				t->count = 0;
 				if (LOG_TIMER) logerror("  Repriming interrupt\n");
 			}
 			else
@@ -1041,7 +1042,11 @@ void i80186_cpu_device::internal_timer_sync(int which)
 	/* if we have a timing timer running, adjust the count */
 	if (t->time_timer_active && !(t->control & 0x0c))
 	{
-		t->last_time = t->time_timer->elapsed();
+		attotime current_time = t->time_timer->elapsed();
+		int net_clocks = ((current_time - t->last_time) * (clock()/8)).seconds;
+		t->last_time = current_time;
+
+		t->count = t->count + net_clocks;
 	}
 }
 
