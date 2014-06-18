@@ -50,8 +50,8 @@ Games on this system include....
 |*| 2005 | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  |              |
 | | 2006 | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   |              |
 | | 2006 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
-| | 200x | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
-|*| 200x | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
+| | 2009 | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
+|*| 2009 | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
 |*| 2004 | Quest Of D (Ver.1.01C)                             | Sega                     | CDROM  | CDV-10005C |              |
 |*| 2005 | Sangokushi Taisen (Ver.1.002)                      | Sega                     | DVDROM | CDV-10009D |              |
 |*| 2006 | Sangokushi Taisen 2 (Ver.2.007)                    | Sega                     | DVDROM | CDV-10019A |              |
@@ -4629,7 +4629,7 @@ ROM_START( crtaxihr )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0002b", 0, SHA1(0bd6f656ba8174b2309efa6be7e688f0f1db8301) )
+	DISK_IMAGE_READONLY( "gdx-0002b", 0, SHA1(e77d31aea9d4bf150e427aecf29b97855c2096f6) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0353-com.pic", 0x000000, 0x004000, CRC(1c6830b1) SHA1(75be47441783c18ee296209a34c432864deed70d) )
@@ -4659,7 +4659,7 @@ ROM_START( vcop3 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0003a", 0, SHA1(55154273dde5652193e33cfd7d07b07909f3f5db) )
+	DISK_IMAGE_READONLY( "gdx-0003a", 0, SHA1(04cd12bec50a9e9f1f05e7b7c2ef396800a385dd) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
@@ -4705,7 +4705,7 @@ ROM_START( mj2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0006g", 0, SHA1(c936543a1cd0aa5237a8578ad15b100f0b023ee1) )
+	DISK_IMAGE_READONLY( "gdx-0006g", 0, SHA1(e306837d5c093fdf1e9ff02239a8563535b1c181) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
 	ROM_LOAD("317-0374-jpn.data", 0x00, 0x50, NO_DUMP )
@@ -4851,7 +4851,7 @@ ROM_START( ccfboxa )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0024a", 0, SHA1(8bbbf42dc4e2eb41a66d2409d9e4985e88e642c4) )
+	DISK_IMAGE_READONLY( "gdx-0024a", 0, SHA1(79d8c0faeec7cf6882f014760b8af938800b7e52) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0567-exp.data", 0x00, 0x50, NO_DUMP )

@@ -5544,7 +5544,6 @@ vs42006         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 
 // Chihiro (X-Box based)
 chihiro         // 2002.?? Chihiro BIOS
-ccfboxa         // 200?.?? Firmware Update For Compact Flash Box (Rev A)
 hotd3           // 2002.10.29 The House of the Dead III
 				// 2003.02 Crazy Taxi High Roller
 				// 2003.02 Crazy Taxi High Roller (Rev A)
@@ -5622,6 +5621,8 @@ scg06nt         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2008.?? Sangokushi Taisen 3 Ver.J
 				// 2008.?? Sangokushi Taisen 3 War Begins
 				// 2008.?? Sangokushi Taisen 3 War Begins Ver.3.59
+                // 2009.03 Firmware Update For Compact Flash Box
+ccfboxa         // 2009.03.31 Firmware Update For Compact Flash Box (Rev A)
 
 hshavoc         // (c) 1993 Data East
 
