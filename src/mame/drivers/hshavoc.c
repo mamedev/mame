@@ -107,14 +107,6 @@ ROM_START( hshavoc )
 	ROM_LOAD( "pic16c57",  0x00, 0x01, NO_DUMP ) // protected
 ROM_END
 
-#ifdef UNUSED_DEFINITION
-ROM_START( hshavoc2 ) /* Genesis Version, for reference */
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "hsh.rom", 0x000000, 0x100000, CRC(17be551c) SHA1(0dc1969098716ba332978b89356f62961417682b) )
-ROM_END
-
-//GAME( 1993, hshavoc2,  hshavoc,  md_bootleg, hshavoc, md_havoc_state, genesis, ROT0, "Data East",                  "High Seas Havoc (Genesis ROM)",GAME_NOT_WORKING )
-#endif
 
 DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 {
@@ -226,7 +218,6 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 
 	m_vdp->stop_timers();
 }
-
 
 
 GAME( 1993, hshavoc,   0,        md_bootleg, hshavoc, md_boot_state, hshavoc, ROT0, "Data East",                  "High Seas Havoc",GAME_NOT_WORKING )

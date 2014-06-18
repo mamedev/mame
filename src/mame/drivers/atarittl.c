@@ -436,12 +436,12 @@ GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 
 // 100% TLL
 //GAME(1976,  breakout,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Breakout [TTL]",GAME_IS_SKELETON)
+//GAME(1974,  coupedem,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Coupe De Monde [TTL]",GAME_IS_SKELETON)
 //GAME(1975,  goal4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal 4/World Cup/Coupe De Monde [TTL]",GAME_IS_SKELETON)
 //GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",GAME_IS_SKELETON) //?
 //GAME(1973,  gotchaatc, 0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha Color [TTL]",GAME_IS_SKELETON) //?
 //GAME(1975,  highway,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Highway/Hiway [TTL]",GAME_IS_SKELETON)
 //GAME(1974,  pinpong,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pin Pong [TTL]",GAME_IS_SKELETON)
-//GAME(1974,  pongdbl,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pong Doubles/Coupe De Monde [TTL]",GAME_IS_SKELETON)
 //GAME(1975,  pursuit,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Pursuit [TTL]",GAME_IS_SKELETON)
 //GAME(1973,  quadpong,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Quadrapong/Elimination [TTL]",GAME_IS_SKELETON)
 //GAME(1974,  rebound,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Rebound/Spike/Volleyball [TTL]",GAME_IS_SKELETON)

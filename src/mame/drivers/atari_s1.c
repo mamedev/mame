@@ -333,8 +333,6 @@ ROM_START(atarianb)
 	ROM_REGION(0x1000, "sound1", 0)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
-
-//GAME( 2002, atarianb, atarians,   atari_s1, atari_s1, driver_device, 0, ROT0, "Atari / Gaston", "The Atarians (working bootleg)", GAME_IS_SKELETON_MECHANICAL)
 #endif
 
 
@@ -388,6 +386,7 @@ ROM_END
 
 
 GAME( 1976, atarians, 0,         atarians, atari_s1, driver_device, 0, ROT0, "Atari", "The Atarians", GAME_MECHANICAL | GAME_NO_SOUND)
+//GAME( 2002, atarianb, atarians,   atari_s1, atari_s1, driver_device, 0, ROT0, "Atari / Gaston", "The Atarians (working bootleg)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1977, time2000, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Time 2000", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1977, aavenger, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Airborne Avenger", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1978, midearth, 0,         midearth, atari_s1, driver_device, 0, ROT0, "Atari", "Middle Earth", GAME_IS_SKELETON_MECHANICAL)

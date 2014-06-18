@@ -2180,12 +2180,10 @@ GAME( 2002, bmfinal,  0,        djmain,   bm6thmix, djmain_state, bmfinal,   ROT
 
 GAME( 1998, popn2,    0,        djmain,   popnmusic, djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
 
-#if 0
 // for reference, these sets have not been verified
-GAME( 1998, bm3rdmxb, bm3rdmix, djmain,   bm3rdmix, djmain_state,  beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
+//GAME( 1998, bm3rdmxb, bm3rdmix, djmain,   bm3rdmix, djmain_state,  beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
 
-GAME( 1998, popn1,    0,        djmain,   popn1, djmain_state,     beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
-GAME( 1999, popn3,    0,        djmain,   popnmusic, djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
+//GAME( 1998, popn1,    0,        djmain,   popn1, djmain_state,     beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
+//GAME( 1999, popn3,    0,        djmain,   popnmusic, djmain_state, beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
 
-GAME( 1999, popnstex, 0,        djmain,   popnstex, djmain_state,  beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )
-#endif
+//GAME( 1999, popnstex, 0,        djmain,   popnstex, djmain_state,  beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )

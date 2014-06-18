@@ -474,9 +474,9 @@ ROM_START( wc90b2 )
 	ROM_LOAD( "el_ic143_gal16v8_4.bin", 0x0800, 0x0117, NO_DUMP SHA1(fbe632437eac2418da7a3c3e947cfd36f6211407) )
 ROM_END
 
-#if 0
-/* Different bootleg set with only one new ROM, a05 (added as "el_ic98_27c512_05.bin"), not included because it's
-probably just a minor text mod from the supported set (only two bytes differs), although I cannot find the difference:
+
+/* Different bootleg set with only one new ROM, a05 (added as "el_ic98_27c512_05.bin"), probably just a minor text mod from the supported set
+(only two bytes differs), although I cannot find the difference:
    Comparing files a05.bin and el_ic98_27c512_05.bin
     00000590: 0F 0B
     00000591: FF FA
@@ -524,8 +524,7 @@ ROM_START( wc90ba )
 	ROM_LOAD( "el_ic143_gal16v8_4.bin", 0x0800, 0x0117, NO_DUMP SHA1(fbe632437eac2418da7a3c3e947cfd36f6211407) )
 ROM_END
 
-//GAME( 1989, wc90ba,  wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-#endif
 
 GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
