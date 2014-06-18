@@ -4,6 +4,7 @@
 #include "bus/msx_cart/cartridge.h"
 #include "sound/2151intf.h"
 #include "bus/msx_cart/msx_audio_kb.h"
+#include "machine/ym2148.h"
 
 
 extern const device_type MSX_CART_SFG01;
@@ -32,11 +33,10 @@ private:
 	required_memory_region m_region_sfg;
 	required_device<ym2151_device> m_ym2151;
 	required_device<msx_audio_kbdc_port_device> m_kbdc;
+	required_device<ym2148_device> m_ym2148;
 	int m_ym2151_irq_state;
 	int m_ym2148_irq_state;
 	UINT32 m_rom_mask;
-	UINT8 m_ym2148_irq_vector;
-	UINT8 m_ym2148_external_irq_vector;
 
 	void check_irq();
 };
