@@ -227,10 +227,10 @@ FLOPPY_FORMATS_END
 
 // this card has two EPROMs: a program for the on-board Z8 CPU,
 // and a PC BIOS to make the card bootable on a PC.
-// we need both!
+// we have the Z8 program, we still need the PC BIOS.
 ROM_START( omti8621 )
-	ROM_REGION(0x1000, OMTI_CPU_REGION, 0)
-	ROM_LOAD("omti_z8.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)	// disassembles fine as Z8 code
+	ROM_LOAD( "omti_8621_102640-b.bin", 0x000000, 0x004000, CRC(e6f20dbb) SHA1(cf1990ad72eac6b296485410f5fa3309a0d6d078) )
 
 	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
 	ROM_LOAD("omti_bios", 0x0000, 0x1000, NO_DUMP)
