@@ -7957,6 +7957,7 @@ src/mess/drivers/gba.c svneol=native#text/plain
 src/mess/drivers/geneve.c svneol=native#text/plain
 src/mess/drivers/geniusiq.c svneol=native#text/plain
 src/mess/drivers/genpc.c svneol=native#text/plain
+src/mess/drivers/gimix.c svneol=native#text/plain
 src/mess/drivers/gizmondo.c svneol=native#text/plain
 src/mess/drivers/glasgow.c svneol=native#text/plain
 src/mess/drivers/gmaster.c svneol=native#text/plain
