@@ -14263,7 +14263,7 @@ kept for now until finding out what those bytes affect...
 
 <!-- The following all need FM Sound Synthesizer Unit -->
 
-	<software name="dx7vp" supported="no">
+	<software name="yrm103" supported="no">
 		<description>Yamaha DX7 Voicing Program YRM-103 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14275,7 +14275,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dx7vpa" cloneof="dx7vp" supported="no">
+	<software name="yrm103a" cloneof="yrm103" supported="no">
 		<description>Yamaha DX7 Voicing Program YRM-103 (Jpn, Alt)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14287,7 +14287,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dx7vp2" supported="no">
+	<software name="yrm304" supported="no">
 		<description>Yamaha DX7 Voicing Program II YRM-304 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14299,7 +14299,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dx9vp" supported="no">
+	<software name="yrm105" supported="no">
 		<description>Yamaha DX9 Voicing Program YRM-105 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14311,7 +14311,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dx21vp" supported="no">
+	<software name="yrm305" supported="no">
 		<description>Yamaha DX21 Voicing Program YRM-305 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14323,7 +14323,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fb01vp" supported="no">
+	<software name="yrm506" supported="no">
 		<description>Yamaha FB-01 Voicing Program YRM-506 (Jpn)</description>
 		<year>1985</year>
 		<publisher>Yamaha</publisher>
@@ -14335,7 +14335,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmarrang" supported="no">
+	<software name="cmp01" supported="no">
 		<description>Yamaha FM Auto Arranger CMP-01 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14347,7 +14347,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmmuscom" supported="no">
+	<software name="yrm101" supported="no">
 		<description>Yamaha FM Music Composer YRM-101 (Jpn)</description>
 		<year>1984</year>
 		<publisher>Yamaha</publisher>
@@ -14360,7 +14360,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmmuscoma" cloneof="fmmuscom" supported="no">
+	<software name="yrm101a" cloneof="yrm101" supported="no">
 		<description>Yamaha FM Music Composer YRM-101 (Jpn, Alt)</description>
 		<year>1984</year>
 		<publisher>Yamaha</publisher>
@@ -14373,7 +14373,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmmusco2" supported="no">
+	<software name="yrm501" supported="no">
 		<description>Yamaha FM Music Composer II YRM-501 (Jpn)</description>
 		<year>1984</year>
 		<publisher>Yamaha</publisher>
@@ -14386,7 +14386,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmmusmac" supported="no">
+	<software name="yrm104" supported="no">
 		<description>Yamaha FM Music Macro YRM-104 (Jpn)</description>
 		<year>1984</year>
 		<publisher>Yamaha</publisher>
@@ -14399,7 +14399,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmmusma2" supported="no">
+	<software name="yrm504" supported="no">
 		<description>Yamaha FM Music Macro II YRM-504 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14411,7 +14411,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmvp" supported="no">
+	<software name="yrm102" supported="no">
 		<description>Yamaha FM Voicing Program (Jpn)</description>
 		<year>1985</year>
 		<publisher>Yamaha</publisher>
@@ -14424,7 +14424,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmvpa" cloneof="fmvp" supported="no">
+	<software name="yrm102a" cloneof="yrm102" supported="no">
 		<description>Yamaha FM Voicing Program YRM-102 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14437,7 +14437,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="fmvp2" supported="no">
+	<software name="yrm502" supported="no">
 		<description>Yamaha FM Voicing Program II YRM-502 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14462,7 +14462,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="midimacm" supported="no">
+	<software name="yrm303" supported="no">
 		<description>Yamaha MIDI Macro &amp; Monitor YRM-303 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14474,7 +14474,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="midirec" supported="no">
+	<software name="yrm301" supported="no">
 		<description>Yamaha MIDI Recorder YRM-301 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
@@ -14499,7 +14499,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="yamahare" supported="no">
+	<software name="yrm302" supported="no">
 		<description>Yamaha Rhythm Editor YRM-302 (Jpn)</description>
 		<year>198?</year>
 		<publisher>Yamaha</publisher>
