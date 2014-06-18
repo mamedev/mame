@@ -6,7 +6,7 @@ TODO:
 - hook up all the other signals for the CTC, SIO
 - which type of SIO hookup is used? tmpz84c015af supports SIO/0, SIO/1, and SIO/2
 - since the SIO signals are not hooked up, the midi in/thru/out ports are also not
-  implemented yet
+  implemented yet. Channel A seems to be used for sending midi data.
 - proper irq handling taking the irq priority into account is not implemented
 - the hookup between 2 PIOs is educated guess work; it could be incorrect
 
@@ -28,6 +28,7 @@ msx_cart_bm_012::msx_cart_bm_012(const machine_config &mconfig, const char *tag,
 	, m_tmpz84c015af_sio(*this, "tmpz84_sio")
 	, m_irq_priority(0)
 	, m_bm012_pio(*this, "bm012_pio")
+	, m_mdthru(*this, "mdthru")
 {
 }
 
@@ -93,6 +94,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_cart_bm_012 )
 
 	MCFG_Z80SIO0_ADD("tmpz84_sio", XTAL_12MHz/2, 0, 0, 0, 0)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("tmpz84_cpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("mdout", midi_port_device, write_txd))
 
 	// Sony CXK5864BSP-10L  (8KB ram)
 	// Sharp LH0081A Z80A-PIO-0 - For communicating between the MSX and the TMP
@@ -103,6 +105,13 @@ static MACHINE_CONFIG_FRAGMENT( msx_cart_bm_012 )
 	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("tmpz84_pio", z80pio_device, pb_r))
 	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE("tmpz84_pio", z80pio_device, strobe_b))
 
+	// MIDI ports
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(WRITELINE(msx_cart_bm_012, midi_in))
+
+	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
+
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 
@@ -142,6 +151,13 @@ void msx_cart_bm_012::device_reset()
 WRITE8_MEMBER(msx_cart_bm_012::tmpz84c015af_f4_w)
 {
 	m_irq_priority = data;
+}
+
+
+WRITE_LINE_MEMBER(msx_cart_bm_012::midi_in)
+{
+	m_mdthru->write_txd(state);
+	m_tmpz84c015af_sio->rxb_w(state);
 }
 
 

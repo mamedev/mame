@@ -5,6 +5,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "bus/midi/midi.h"
 
 
 extern const device_type MSX_CART_BM_012;
@@ -23,6 +24,7 @@ public:
 	virtual void device_reset();
 
 	DECLARE_WRITE8_MEMBER(tmpz84c015af_f4_w);
+	DECLARE_WRITE_LINE_MEMBER(midi_in);
 
 private:
 	// TMPZ84C015AF related
@@ -32,6 +34,7 @@ private:
 	UINT8 m_irq_priority;
 
 	required_device<z80pio_device> m_bm012_pio;
+	required_device<midi_port_device> m_mdthru;
 };
 
 
