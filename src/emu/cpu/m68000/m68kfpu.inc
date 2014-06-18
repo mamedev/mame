@@ -1662,7 +1662,6 @@ static void fmove_fpcr(m68000_base_device *m68k, UINT16 w2)
 		}
 	}
 
-#if 0
 	// FIXME: (2011-12-18 ost)
 	// rounding_mode and rounding_precision of softfloat.c should be set according to current fpcr
 	// but:  with this code on Apollo the following programs in /systest/fptest will fail:
@@ -1710,7 +1709,6 @@ static void fmove_fpcr(m68000_base_device *m68k, UINT16 w2)
 			break;
 		}
 	}
-#endif
 
 	m68k->remaining_cycles -= 10;
 }
