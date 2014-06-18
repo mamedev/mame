@@ -6959,11 +6959,14 @@ ROM_END
 ROM_START( pex2172p ) /* Superboard : Ace$ Bonus Poker (X002172P+XP000112) */
 /*
                                       5-K 2-4
-PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------------
-  P903A     1    2    3   4    5   7  25  40  80  50 250    800
+PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SA$  SF  RF  (Bonus)
+----------------------------------------------------------------------
+  P903A     1    2    3   4    5   7  25  40  80  250  50 250    800
   % Range: 94.3-96.3%  Optimum: 98.3%  Hit Frequency: 45.7%
      Programs Available: X002172P
+
+SA$ - Sequential ACE$ pays the same as RF
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000112.u67",   0x00000, 0x10000, CRC(c1ae96ad) SHA1(da109602f0fbe9b225cdcd60be0613fd41014864) )
@@ -7111,8 +7114,8 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K* SF  RF  (Bonus)
   % Range: 94.5-96.5%  Optimum: 98.5%  Hit Frequency: 42.6%
      Programs Available: X002250P
 
-* Getting a 4K hand sets the game in "Shockwave" mode for the next 10 dealt hands.
-  While in shockwave mode, 4K pays 250 per coin / credit.
+4K* - Getting a 4K hand sets the game in "Shockwave" mode for the next 10 dealt hands.
+      While in shockwave mode, 4K pays 250 per coin / credit.
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7139,8 +7142,8 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K* SF  RF  (Bonus)
   % Range: 95.6-97.6%  Optimum: 99.6%  Hit Frequency: 42.6%
      Programs Available: X002251P
 
-* Getting a 4K hand sets the game in "Shockwave" mode for the next 10 dealt hands.
-  While in shockwave mode, 4K pays 250 per coin / credit.
+4K* - Getting a 4K hand sets the game in "Shockwave" mode for the next 10 dealt hands.
+      While in shockwave mode, 4K pays 250 per coin / credit.
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7245,7 +7248,7 @@ ROM_START( pex2283p ) /* Superboard : Dealt Deuces Wild Bonus (X002283P+XP000057
                                    w/D 6-K 3-5         w/A w/oD
 PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 -----------------------------------------------------------------------
-   ???      1   1    3   3   4  10  25  20  40  80 200 400 250    800
+  ????      1   1    3   3   4  10  25  20  40  80 200 400 250    800
   % Range: 94.6-96.6%  Optimum: 98.6%  Hit Frequency: ??.?%
      Programs Available: X002283P
 
@@ -7279,7 +7282,7 @@ ROM_START( pex2284p ) /* Superboard : Barbaric Decues Wild Bonus (X002284P+XP000
                                    w/D 6-K 3-5         w/A w/oD
 PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 -----------------------------------------------------------------------
-   ???      1   1    2   3   4  12  25  20  40  80 200 400 250    800
+  ????      1   1    2   3   4  12  25  20  40  80 200 400 250    800
   % Range: 93.5-95.5%  Optimum: 97.5%  Hit Frequency: ??.?%
      Programs Available: X002284P
 
