@@ -7105,11 +7105,15 @@ ROM_END
 
 ROM_START( pex2250p ) /* Superboard : Shockwave Poker (X002250P+XP000050) */
 /*
-PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
+PayTable   Js+  2PR  3K  STR  FL  FH  4K* SF  RF  (Bonus)
 ---------------------------------------------------------
  P598BA     1    1    3   5    8  11  25 100 250    800
   % Range: 94.5-96.5%  Optimum: 98.5%  Hit Frequency: 42.6%
      Programs Available: X002250P
+
+* Getting a 4K hand sets the game in "Shockwave" mode for the next 10 dealt hands.
+  While in shockwave mode, 4K pays 250 per coin / credit.
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000050.u67",   0x00000, 0x10000, CRC(cf9e72d6) SHA1(fc5c679aae43df0bd563fbcc3e00a3274af1ed11) )
@@ -7129,11 +7133,15 @@ ROM_END
 
 ROM_START( pex2251p ) /* Superboard : Shockwave Poker (X002251P+XP000050) */
 /*
-PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
+PayTable   Js+  2PR  3K  STR  FL  FH  4K* SF  RF  (Bonus)
 ---------------------------------------------------------
   P719A     1    1    3   5    8  12  25 100 250    800
   % Range: 95.6-97.6%  Optimum: 99.6%  Hit Frequency: 42.6%
      Programs Available: X002251P
+
+* Getting a 4K hand sets the game in "Shockwave" mode for the next 10 dealt hands.
+  While in shockwave mode, 4K pays 250 per coin / credit.
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000050.u67",   0x00000, 0x10000, CRC(cf9e72d6) SHA1(fc5c679aae43df0bd563fbcc3e00a3274af1ed11) )
