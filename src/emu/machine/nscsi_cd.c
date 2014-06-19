@@ -53,15 +53,29 @@ UINT8 nscsi_cdrom_device::scsi_get_data(int id, int pos)
 	return block[pos & (bytes_per_sector - 1)];
 }
 
+void nscsi_cdrom_device::return_no_cd()
+{
+	sense(false, 3);
+	scsi_status_complete(SS_CHECK_CONDITION);
+}
+
 void nscsi_cdrom_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 		logerror("%s: command TEST UNIT READY\n", tag());
-		scsi_status_complete(SS_GOOD);
+		if(cdrom)
+			scsi_status_complete(SS_GOOD);
+		else
+			return_no_cd();
 		break;
 
-	case SC_READ:
+	case SC_READ_6:
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
 		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
 		blocks = scsi_cmdbuf[4];
 		if(!blocks)
@@ -113,6 +127,11 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 
 	case SC_READ_CAPACITY: {
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
 		logerror("%s: command READ CAPACITY\n", tag());
 
 		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
@@ -132,7 +151,12 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 	}
 
-	case SC_READ_EXTENDED:
+	case SC_READ_10:
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
 		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
@@ -143,7 +167,82 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
+	case SC_MODE_SENSE_6: {
+		int lun = get_lun(scsi_cmdbuf[1] >> 5);
+		logerror("%s: command MODE SENSE 6 lun=%d page=%02x alloc=%02x link=%02x\n",
+					tag(),
+					lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
+		if(lun) {
+			bad_lun();
+			return;
+		}
+
+		int page = scsi_cmdbuf[2] & 0x3f;
+		int size = scsi_cmdbuf[4];
+		int pos = 1;
+		scsi_cmdbuf[pos++] = 0x00; // medium type
+		scsi_cmdbuf[pos++] = 0x80; // WP, cache
+
+		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
+		temp--; // return the last used block on the disc
+		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
+
+		scsi_cmdbuf[pos++] = (temp>>24) & 0xff;
+		scsi_cmdbuf[pos++] = (temp>>16) & 0xff;
+		scsi_cmdbuf[pos++] = (temp>>8) & 0xff;
+		scsi_cmdbuf[pos++] = (temp & 0xff);
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = 0;
+		scsi_cmdbuf[pos++] = (bytes_per_sector>>8)&0xff;
+		scsi_cmdbuf[pos++] = (bytes_per_sector & 0xff);
+
+		int pmax = page == 0x3f ? 0x3e : page;
+		int pmin = page == 0x3f ? 0x00 : page;
+		for(int page=pmax; page >= pmin; page--) {
+			switch(page) {
+			case 0x00: // Unit attention parameters page (weird)
+				scsi_cmdbuf[pos++] = 0x80; // PS, page id
+				scsi_cmdbuf[pos++] = 0x02; // Page length
+				scsi_cmdbuf[pos++] = 0x00; // Meh
+				scsi_cmdbuf[pos++] = 0x00; // Double meh
+				break;
+
+			case 0x02: // Disconnect/reconnect control parameters (guessed)
+				scsi_cmdbuf[pos++] = 0x82; // PS, page id
+				scsi_cmdbuf[pos++] = 0x0e; // Page length
+				scsi_cmdbuf[pos++] = 0xe6; // Buffer full ratio, 90%
+				scsi_cmdbuf[pos++] = 0x1a; // Buffer empty ratio, 10%
+				scsi_cmdbuf[pos++] = 0x00; // Bus inactivity limit, 0
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00; // Disconnect time limit, 0
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00; // Connect time limit, 0
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00; // Maximum burst size, 0
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00; // EMDP, Dimm, DTDC
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				break;
+
+			default:
+				logerror("%s: mode sense page %02x unhandled\n", tag(), page);
+				break;
+			}
+		}
+		scsi_cmdbuf[0] = pos;
+		if(pos > size)
+			pos = size;
+
+		scsi_data_in(0, pos);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
 	default:
+		fprintf(stderr, "scsi %02x\n", scsi_cmdbuf[0]);
+
 		nscsi_full_device::scsi_command();
 		break;
 	}

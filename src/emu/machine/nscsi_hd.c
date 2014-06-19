@@ -99,7 +99,7 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_READ:
+	case SC_READ_6:
 		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
 		blocks = scsi_cmdbuf[4];
 		if(!blocks)
@@ -112,7 +112,7 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_WRITE:
+	case SC_WRITE_6:
 		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
 		blocks = scsi_cmdbuf[4];
 		if(!blocks)
@@ -337,7 +337,7 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 	}
 
-	case SC_READ_EXTENDED:
+	case SC_READ_10:
 		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
@@ -348,7 +348,7 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_WRITE_EXTENDED:
+	case SC_WRITE_10:
 		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 

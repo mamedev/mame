@@ -22,6 +22,8 @@ private:
 	cdrom_file *cdrom;
 	int bytes_per_sector;
 	int lba, cur_lba, blocks;
+
+	void return_no_cd();
 };
 
 extern const device_type NSCSI_CDROM;
