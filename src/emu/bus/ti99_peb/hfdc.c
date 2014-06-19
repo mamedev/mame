@@ -355,7 +355,7 @@ const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
 #define LOG logerror
 
 myarc_hfdc_legacy_device::myarc_hfdc_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_expansion_card_device(mconfig, TI99_HFDC_LEG, "Myarc Hard and Floppy Disk Controller LEGACY", tag, owner, clock, "ti99_hfdc", __FILE__),
+	: ti_expansion_card_device(mconfig, TI99_HFDC_LEG, "Myarc Hard and Floppy Disk Controller LEGACY", tag, owner, clock, "ti99_hfdc_leg", __FILE__),
 		m_hdc9234(*this, FDC_TAG),
 		m_clock(*this, CLOCK_TAG)
 {
