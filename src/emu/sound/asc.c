@@ -587,7 +587,7 @@ WRITE8_MEMBER( asc_device::write )
 				break;
 		}
 
-		if (offset < 0x800)
+		if (offset >= 0x800 && offset < 0x1000)
 		{
 			m_regs[offset-0x800] = data;
 		}
