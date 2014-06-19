@@ -158,7 +158,7 @@ int v99x8_device::interrupt ()
 	}
 
 	max = (m_cont_reg[9] & 2) ? 313 : 262;
-	if (++m_scanline == max)
+	if (++m_scanline >= max)
 		m_scanline = 0;
 
 	return m_int_state;
