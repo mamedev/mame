@@ -20,7 +20,6 @@
 ** - svi738: v9938 not emulated
 ** - svi738: rs232c not emulated
 ** - hx10: Expansion slot not emulated (hx10s also??)
-** - cx5m128: Firmware not emulated?
 ** - y503iir: Keyboard not responding correctly
 ** - y503iir, y503iir2: RTC not emulated
 ** - y503iir, y503iir2: Net not emulated
