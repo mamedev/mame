@@ -16,7 +16,7 @@
 */
 
 #include "emu.h"
-#include "cpu\m6809\m6809.h"
+#include "cpu/m6809/m6809.h"
 
 class gimix_state : public driver_device
 {
