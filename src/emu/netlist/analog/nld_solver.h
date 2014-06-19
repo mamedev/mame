@@ -11,9 +11,13 @@
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
-//#undef RESTRICT
-//#define RESTRICT
 
+#define USE_PIVOT_SEARCH (0)
+#define VECTALT 1
+#define USE_GABS 0
+#define USE_MATRIX_GS 0
+// savings are eaten up by effort
+#define USE_LINEAR_PREDICTION (0)
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -37,6 +41,7 @@ struct netlist_solver_parameters_t
 	double m_lte;
 	double m_min_timestep;
 	double m_max_timestep;
+	double m_sor;
 	bool m_dynamic;
 	int m_gs_loops;
 	int m_nr_loops;
@@ -54,14 +59,14 @@ public:
 
     virtual ~vector_ops_t() {}
 
-    ATTR_ALIGNED(64) double * RESTRICT  m_V;
-
     virtual const double sum(const double * v) = 0;
     virtual void sum2(const double * RESTRICT v1, const double * RESTRICT v2, double & RESTRICT  s1, double & RESTRICT s2) = 0;
     virtual void addmult(double * RESTRICT v1, const double * RESTRICT v2, const double &mult) = 0;
     virtual void sum2a(const double * RESTRICT v1, const double * RESTRICT v2, const double * RESTRICT v3abs, double & RESTRICT s1, double & RESTRICT s2, double & RESTRICT s3abs) = 0;
 
     virtual const double sumabs(const double * v) = 0;
+
+    static vector_ops_t *create_ops(const int size);
 
 protected:
     int m_dim;
@@ -150,7 +155,8 @@ class ATTR_ALIGNED(64) terms_t
     NETLIST_PREVENT_COPYING(terms_t)
 
     public:
-    ATTR_COLD terms_t() {}
+    ATTR_COLD terms_t() : m_railstart(0), m_ops(NULL)
+    {}
 
     ATTR_COLD void clear()
     {
@@ -178,8 +184,8 @@ class ATTR_ALIGNED(64) terms_t
 private:
     plinearlist_t<netlist_terminal_t *> m_term;
     plinearlist_t<int> m_net_other;
-    plinearlist_t<double> m_gt;
     plinearlist_t<double> m_go;
+    plinearlist_t<double> m_gt;
     plinearlist_t<double> m_Idr;
     plinearlist_t<double *> m_other_curanalog;
     vector_ops_t * m_ops;
@@ -191,7 +197,7 @@ public:
 	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
-	ATTR_COLD netlist_matrix_solver_t();
+	ATTR_COLD netlist_matrix_solver_t(const netlist_solver_parameters_t &params);
 	ATTR_COLD virtual ~netlist_matrix_solver_t();
 
     ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
@@ -215,8 +221,6 @@ public:
     ATTR_COLD virtual void start();
     ATTR_COLD virtual void reset();
 
-	netlist_solver_parameters_t m_params;
-
     ATTR_COLD int get_net_idx(netlist_net_t *net);
 	ATTR_COLD virtual void log_stats() {};
 
@@ -234,6 +238,7 @@ protected:
     plinearlist_t<netlist_analog_output_t *> m_inps;
 
     int m_calculations;
+    const netlist_solver_parameters_t &m_params;
 
     ATTR_HOT inline const double current_timestep() { return m_cur_ts; }
 private:
@@ -252,108 +257,7 @@ private:
 
 };
 
-template <int m_N, int _storage_N>
-class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
-{
-public:
 
-	netlist_matrix_solver_direct_t(int size);
-
-	virtual ~netlist_matrix_solver_direct_t();
-
-	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets);
-	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
-
-	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
-
-    ATTR_HOT inline int vsolve_non_dynamic();
-
-protected:
-    ATTR_COLD virtual void add_term(int net_idx, netlist_terminal_t *term);
-
-    ATTR_HOT virtual double vsolve();
-
-    ATTR_HOT int solve_non_dynamic();
-	ATTR_HOT void build_LE();
-	ATTR_HOT void gauss_LE(double (* RESTRICT x));
-	ATTR_HOT double delta(const double (* RESTRICT V));
-	ATTR_HOT void store(const double (* RESTRICT V), const bool store_RHS);
-
-    /* bring the whole system to the current time
-     * Don't schedule a new calculation time. The recalculation has to be
-     * triggered by the caller after the netlist element was changed.
-     */
-    ATTR_HOT double compute_next_timestep();
-
-    double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
-    double m_RHS[_storage_N];
-    double m_last_RHS[_storage_N]; // right hand side - contains currents
-    double m_Vdelta[_storage_N];
-    double m_last_V[_storage_N];
-
-    terms_t **m_terms;
-
-    terms_t *m_rails_temp;
-
-private:
-    vector_ops_t *m_row_ops[_storage_N + 1];
-
-	int m_dim;
-	double m_lp_fact;
-};
-
-template <int m_N, int _storage_N>
-class ATTR_ALIGNED(64) netlist_matrix_solver_gauss_seidel_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
-{
-public:
-
-	netlist_matrix_solver_gauss_seidel_t(int size)
-      : netlist_matrix_solver_direct_t<m_N, _storage_N>(size)
-      , m_lp_fact(0)
-      , m_gs_fail(0)
-      , m_gs_total(0)
-      {}
-
-	virtual ~netlist_matrix_solver_gauss_seidel_t() {}
-
-    ATTR_COLD virtual void log_stats();
-
-    ATTR_HOT inline int vsolve_non_dynamic();
-protected:
-    ATTR_HOT virtual double vsolve();
-
-private:
-    double m_lp_fact;
-    int m_gs_fail;
-    int m_gs_total;
-
-};
-
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
-{
-public:
-
-    netlist_matrix_solver_direct1_t()
-      : netlist_matrix_solver_direct_t<1, 1>(1)
-      {}
-    ATTR_HOT inline int vsolve_non_dynamic();
-protected:
-    ATTR_HOT virtual double vsolve();
-private:
-};
-
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
-{
-public:
-
-    netlist_matrix_solver_direct2_t()
-      : netlist_matrix_solver_direct_t<2, 2>(2)
-      {}
-    ATTR_HOT inline int vsolve_non_dynamic();
-protected:
-    ATTR_HOT virtual double vsolve();
-private:
-};
 
 class ATTR_ALIGNED(64) NETLIB_NAME(solver) : public netlist_device_t
 {
@@ -381,6 +285,7 @@ protected:
     netlist_param_double_t m_accuracy;
     netlist_param_double_t m_gmin;
     netlist_param_double_t m_lte;
+    netlist_param_double_t m_sor;
     netlist_param_logic_t  m_dynamic;
     netlist_param_double_t m_min_timestep;
 

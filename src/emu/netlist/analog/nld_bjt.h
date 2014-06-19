@@ -98,11 +98,12 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-		double m = (is_qtype( BJT_NPN) ? 1 : -1);
+	    const double m = (is_qtype( BJT_NPN) ? 1 : -1);
 
-		int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
+		const int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
 		{
+#if 0
 			double gb = m_gB;
 			double gc = m_gC;
 			double v  = m_V * m;
@@ -113,6 +114,11 @@ public:
 				v = 0;
 				gc = netlist().gmin();
 			}
+#else
+			const double gb = new_state ? m_gB : netlist().gmin();
+			const double gc = new_state ? m_gC : netlist().gmin();
+			const double v  = new_state ? m_V * m : 0;
+#endif
 			m_RB.set(gb, v,   0.0);
 			m_RC.set(gc, 0.0, 0.0);
 			//m_RB.update_dev();
@@ -163,22 +169,19 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-		double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+		const double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
 
-		double gee = m_gD_BE.G();
-		double gcc = m_gD_BC.G();
-		double gec =  m_alpha_r * gcc;
-		double gce =  m_alpha_f * gee;
-		double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
-		double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
-		double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
-		double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
-		//double Ie = sIe + gee * -m_D_EB.deltaV() - gec * -m_D_CB.deltaV();
-		//double Ic = sIc - gce * -m_D_EB.deltaV() + gcc * -m_D_CB.deltaV();
-		//printf("EB %f sIe %f sIc %f\n", m_D_BE.deltaV(), sIe, sIc);
+		const double gee = m_gD_BE.G();
+		const double gcc = m_gD_BC.G();
+		const double gec =  m_alpha_r * gcc;
+		const double gce =  m_alpha_f * gee;
+		const double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
+		const double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
+		const double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
+		const double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
 		m_D_EB.set_mat(gee, gec - gee, gce - gee, gee - gec, Ie, -Ie);
 		m_D_CB.set_mat(gcc, gce - gcc, gec - gcc, gcc - gce, Ic, -Ic);
