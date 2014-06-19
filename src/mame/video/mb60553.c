@@ -181,6 +181,85 @@ void mb60553_zooming_tilemap_device::set_gfx_region( int gfx_region)
 	m_m_gfx_region = gfx_region;
 }
 
+
+
+
+
+void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
+{
+	// pre-cache all the inner loop values
+	//const rgb_t *clut = m_palette->palette()->entry_list_adjusted();
+	const int xmask = m_tmap->pixmap().width() - 1;
+	const int ymask = m_tmap->pixmap().height() - 1;
+	const int widthshifted = m_tmap->pixmap().width() << 16;
+	const int heightshifted = m_tmap->pixmap().height() << 16;
+	UINT8 mask = 0x1f;// blit.mask;
+	UINT8 value = 0x10;// blit.value;
+	bitmap_ind16 &srcbitmap = m_tmap->pixmap();
+	bitmap_ind8 &flagsbitmap = m_tmap->flagsmap();
+
+	// pre-advance based on the cliprect
+	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;
+	starty += cliprect.min_x * incxy + cliprect.min_y * incyy;
+
+	// extract start/end points
+	int sx = cliprect.min_x;
+	int sy = cliprect.min_y;
+	int ex = cliprect.max_x;
+	int ey = cliprect.max_y;
+
+	// loop over rows
+	while (sy <= ey)
+	{
+		// initialize X counters
+		int x = sx;
+		UINT32 cx = startx;
+		UINT32 cy = starty;
+
+		// get dest and priority pointers
+		UINT16 *dest = &destbitmap.pix(sy, sx);
+
+		// loop over columns
+		while (x <= ex)
+		{
+			if (wraparound)
+			{
+				if ((flagsbitmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				{
+					*dest = (srcbitmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask));
+				}
+			}
+			else
+			{
+				if (cx < widthshifted && cy < heightshifted)
+				{
+					if ((flagsbitmap.pix(cy >> 16, cx >> 16) & mask) == value)
+					{
+						*dest = (srcbitmap.pix(cy >> 16, cx >> 16));
+					}
+				}
+			}
+
+			// advance in X
+			cx += incxx;
+			cy += incxy;
+			x++;
+			dest++;
+			//pri++;
+		}
+
+		// advance in Y
+		startx += incyx;
+		starty += incyy;
+		sy++;
+	}
+}
+
+
+
+
+
 /* THIS IS STILL WRONG! */
 void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority)
 {
@@ -211,15 +290,12 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 
 		clip.min_y = clip.max_y = line;
 
-		m_tmap->draw_roz(screen, bitmap, clip, startx<<12,starty<<12,
+		draw_roz_core(screen, bitmap, clip, startx<<12,starty<<12,
 				incxx,0,0,incyy,
-				1,
-				0,priority);
+				1
+				);
 
 	}
-
-
-
 }
 
 tilemap_t* mb60553_zooming_tilemap_device::get_tilemap()

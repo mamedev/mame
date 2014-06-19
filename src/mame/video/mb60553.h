@@ -33,6 +33,9 @@ public:
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_READ16_MEMBER(line_r);
 
+	void draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
