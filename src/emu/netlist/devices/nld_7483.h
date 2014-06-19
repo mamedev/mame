@@ -55,7 +55,7 @@ NETLIB_DEVICE(7483,
 	netlist_ttl_input_t m_B3;
 	netlist_ttl_input_t m_B4;
 
-	UINT8 m_lastr;
+	netlist_state_t<UINT8> m_lastr;
 
 	netlist_ttl_output_t m_S1;
 	netlist_ttl_output_t m_S2;

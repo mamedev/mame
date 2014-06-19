@@ -73,7 +73,7 @@ NETLIB_SUBDEVICE(7493ff,
 	netlist_ttl_input_t m_I;
 	netlist_ttl_output_t m_Q;
 
-	UINT8 m_reset;
+	netlist_state_t<UINT8> m_reset;
 );
 
 NETLIB_DEVICE(7493,

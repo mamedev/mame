@@ -66,7 +66,7 @@ NETLIB_SUBDEVICE(74153sub,
 
 	netlist_ttl_output_t m_Y;
 
-	int m_chan;
+	netlist_state_t<int> m_chan;
 );
 
 NETLIB_DEVICE(74153,

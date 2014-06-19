@@ -28,7 +28,7 @@ NETLIB_DEVICE(log,
 	~NETLIB_NAME(log)();
 	netlist_analog_input_t m_I;
 protected:
-	FILE *m_file;
+    netlist_state_t<FILE *> m_file;
 );
 
 #define LOGD(_name, _I, _I2)                                                 \

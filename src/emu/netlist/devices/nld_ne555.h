@@ -37,7 +37,7 @@ NETLIB_DEVICE(NE555,
 	netlist_analog_input_t m_TRIG;
 	netlist_analog_output_t m_OUT;
 
-	bool m_last_out;
+	netlist_state_t<bool> m_last_out;
 
 	inline double clamp(const double v, const double a, const double b);
 

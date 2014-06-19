@@ -73,9 +73,9 @@ NETLIB_START(9316_sub)
 	register_output("QD", m_QD);
 	register_output("RC", m_RC);
 
-	save(NAME(m_cnt));
-	save(NAME(m_loadq));
-	save(NAME(m_ent));
+	save(NAME(m_cnt.ref()));
+	save(NAME(m_loadq.ref()));
+	save(NAME(m_ent.ref()));
 }
 
 NETLIB_RESET(9316_sub)
@@ -103,7 +103,7 @@ NETLIB_UPDATE(9316_sub)
 	}
 	else
 	{
-		cnt = m_ABCD->read_ABCD();
+		cnt = m_ABCD.get()->read_ABCD();
 		update_outputs_all(cnt);
 		OUTLOGIC(m_RC, m_ent & (cnt == 0x0f), NLTIME_FROM_NS(20));
 	}

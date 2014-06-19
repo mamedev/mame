@@ -81,10 +81,10 @@ NETLIB_SUBDEVICE(9316_sub,
 
 	netlist_ttl_input_t m_CLK;
 
-	UINT8 m_cnt;
-	NETLIB_NAME(9316_subABCD) *m_ABCD;
-	netlist_sig_t m_loadq;
-	netlist_sig_t m_ent;
+	netlist_state_t<UINT8> m_cnt;
+	netlist_state_t<NETLIB_NAME(9316_subABCD) *> m_ABCD;
+	netlist_state_t<netlist_sig_t> m_loadq;
+	netlist_state_t<netlist_sig_t> m_ent;
 
 	netlist_ttl_output_t m_QA;
 	netlist_ttl_output_t m_QB;

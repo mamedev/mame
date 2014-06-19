@@ -30,10 +30,10 @@ NETLIB_RESET(4066)
 
 NETLIB_UPDATE(4066)
 {
-	double sup = (m_supply->vdd() - m_supply->vss());
+	double sup = (m_supply.get()->vdd() - m_supply.get()->vss());
 	double low = 0.45 * sup;
 	double high = 0.55 * sup;
-	double in = INPANALOG(m_control) - m_supply->vss();
+	double in = INPANALOG(m_control) - m_supply.get()->vss();
 	double rON = 270.0 * 5.0 / sup;
 
 	if (in < low)

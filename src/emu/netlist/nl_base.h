@@ -276,6 +276,24 @@ struct netlist_logic_family_desc_t
 
 extern netlist_logic_family_desc_t netlist_family_ttl;
 
+
+// ----------------------------------------------------------------------------------------
+// netlist_state_t
+// ----------------------------------------------------------------------------------------
+
+template< typename X>
+class netlist_state_t {
+public:
+  inline netlist_state_t() : m_x(static_cast<X>(0)) {}
+  inline netlist_state_t(const X& x_) : m_x(x_) {}
+  inline const X& get() const { return m_x; }
+  inline X& ref() { return m_x; }
+  inline operator const X&() const { return m_x; }
+  inline operator X&() { return m_x; }
+private:
+  X m_x;
+};
+
 // ----------------------------------------------------------------------------------------
 // netlist_object_t
 // ----------------------------------------------------------------------------------------
@@ -321,6 +339,10 @@ public:
 	ATTR_COLD const pstring &name() const;
 
 	PSTATE_INTERFACE_DECL()
+	template<typename C> ATTR_COLD void save(netlist_state_t<C> &state, const pstring &stname)
+	{
+	    save(state.ref(), stname);
+	}
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
 	ATTR_HOT inline const family_t family() const { return m_family; }

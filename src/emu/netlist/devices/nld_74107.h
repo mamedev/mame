@@ -80,9 +80,9 @@ NETLIB_SUBDEVICE(74107Asub,
 	netlist_ttl_output_t m_Q;
 	netlist_ttl_output_t m_QQ;
 
-	netlist_sig_t m_Q1;
-	netlist_sig_t m_Q2;
-	netlist_sig_t m_F;
+	netlist_state_t<netlist_sig_t> m_Q1;
+	netlist_state_t<netlist_sig_t> m_Q2;
+	netlist_state_t<netlist_sig_t> m_F;
 
 	ATTR_HOT void newstate(const netlist_sig_t state);
 
