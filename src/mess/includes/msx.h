@@ -83,6 +83,10 @@
 	MCFG_MSX_SLOT_DISK4_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1") \
 	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
 
+#define MCFG_MSX_LAYOUT_DISK5(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
+	MCFG_MSX_SLOT_DISK5_ADD(_tag, _page, _numpages, _region, _offset, "fdc", "fdc:0", "fdc:1", "fdc:2", "fdc:3") \
+	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);
+
 #define MCFG_MSX_LAYOUT_MUSIC(_tag, _prim, _sec, _page, _numpages, _region, _offset) \
 	MCFG_MSX_SLOT_MUSIC_ADD(_tag, _page, _numpages, _region, _offset, "ym2413" ) \
 	msx_state::install_slot_pages(*owner, _prim, _sec, _page, _numpages, device);

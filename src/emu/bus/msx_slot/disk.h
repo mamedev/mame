@@ -17,6 +17,9 @@ extern const device_type MSX_SLOT_DISK2;
 extern const device_type MSX_SLOT_DISK3;
 /* TC8566 accessed through 7ff0-7ff7 (used in Turob-R, untested) */
 extern const device_type MSX_SLOT_DISK4;
+/* WD FDC accessed through i/o ports 0xd0-0xd4 */
+extern const device_type MSX_SLOT_DISK5;
+
 
 #define MCFG_MSX_SLOT_DISK1_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK1, _startpage, _numpages) \
@@ -46,6 +49,15 @@ extern const device_type MSX_SLOT_DISK4;
 	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
 	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag);
 
+#define MCFG_MSX_SLOT_DISK5_ADD(_tag, _startpage, _numpages, _region, _offset, _fdc_tag, _floppy0_tag, _floppy1_tag, _floppy2_tag, _floppy3_tag) \
+	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_DISK5, _startpage, _numpages) \
+	msx_slot_rom_device::set_rom_start(*device, _region, _offset); \
+	msx_slot_disk_device::set_fdc_tag(*device, _fdc_tag); \
+	msx_slot_disk_device::set_floppy0_tag(*device, _floppy0_tag); \
+	msx_slot_disk_device::set_floppy1_tag(*device, _floppy1_tag); \
+	msx_slot_disk_device::set_floppy2_tag(*device, _floppy2_tag); \
+	msx_slot_disk_device::set_floppy3_tag(*device, _floppy3_tag);
+
 
 class msx_slot_disk_device : public msx_slot_rom_device
 {
@@ -58,15 +70,21 @@ public:
 	static void set_fdc_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_disk_device &>(device).m_fdc_tag = tag; }
 	static void set_floppy0_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_disk_device &>(device).m_floppy0_tag = tag; }
 	static void set_floppy1_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_disk_device &>(device).m_floppy1_tag = tag; }
+	static void set_floppy2_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_disk_device &>(device).m_floppy2_tag = tag; }
+	static void set_floppy3_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_disk_device &>(device).m_floppy3_tag = tag; }
 
 protected:
 	floppy_connector *m_floppy0;
 	floppy_connector *m_floppy1;
+	floppy_connector *m_floppy2;
+	floppy_connector *m_floppy3;
 	floppy_image_device *m_floppy;
 
 	const char *m_fdc_tag;
 	const char *m_floppy0_tag;
 	const char *m_floppy1_tag;
+	const char *m_floppy2_tag;
+	const char *m_floppy3_tag;
 };
 
 
@@ -153,6 +171,26 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
+};
+
+
+class msx_slot_disk5_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void device_start();
+	virtual void device_reset();
+
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+
+    void post_load();
+
+private:
+	UINT8 m_control;
+
+	void set_control(UINT8 control);
 };
 
 

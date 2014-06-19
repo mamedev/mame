@@ -37,16 +37,21 @@ const device_type MSX_SLOT_DISK1 = &device_creator<msx_slot_disk1_device>;
 const device_type MSX_SLOT_DISK2 = &device_creator<msx_slot_disk2_device>;
 const device_type MSX_SLOT_DISK3 = &device_creator<msx_slot_disk3_device>;
 const device_type MSX_SLOT_DISK4 = &device_creator<msx_slot_disk4_device>;
+const device_type MSX_SLOT_DISK5 = &device_creator<msx_slot_disk5_device>;
 
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: msx_slot_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_floppy0(NULL)
 	, m_floppy1(NULL)
+	, m_floppy2(NULL)
+	, m_floppy3(NULL)
 	, m_floppy(NULL)
 	, m_fdc_tag(NULL)
 	, m_floppy0_tag(NULL)
 	, m_floppy1_tag(NULL)
+	, m_floppy2_tag(NULL)
+	, m_floppy3_tag(NULL)
 {
 }
 
@@ -60,8 +65,10 @@ void msx_slot_disk_device::device_start()
 		fatalerror("msx_slot_disk_device: no FDC tag specified\n");
 	}
 
-	m_floppy0 = owner()->subdevice<floppy_connector>(m_floppy0_tag);
-	m_floppy1 = owner()->subdevice<floppy_connector>(m_floppy1_tag);
+	m_floppy0 = m_floppy0_tag ? owner()->subdevice<floppy_connector>(m_floppy0_tag) : NULL;
+	m_floppy1 = m_floppy1_tag ? owner()->subdevice<floppy_connector>(m_floppy1_tag) : NULL;
+	m_floppy2 = m_floppy2_tag ? owner()->subdevice<floppy_connector>(m_floppy2_tag) : NULL;
+	m_floppy3 = m_floppy3_tag ? owner()->subdevice<floppy_connector>(m_floppy3_tag) : NULL;
 
 	if (m_floppy0 == NULL && m_floppy1 == NULL)
 	{
@@ -507,4 +514,129 @@ READ8_MEMBER(msx_slot_disk4_device::read)
 
 	return msx_slot_rom_device::read(space, offset);
 }
+
+
+
+
+msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5, "MSX Internal floppy type 5", tag, owner, clock, "msx_slot_disk5", __FILE__)
+	, m_control(0)
+{
+}
+
+
+void msx_slot_disk5_device::device_start()
+{
+	msx_slot_wd_disk_device::device_start();
+
+	save_item(NAME(m_control));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_slot_disk5_device::post_load), this));
+
+	// Install IO read/write handlers
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	space.install_write_handler(0xd0, 0xd4, write8_delegate(FUNC(msx_slot_disk5_device::io_write), this));
+	space.install_read_handler(0xd0, 0xd4, read8_delegate(FUNC(msx_slot_disk5_device::io_read), this));
+}
+
+
+void msx_slot_disk5_device::device_reset()
+{
+	m_fdc->dden_w(false);
+}
+
+
+void msx_slot_disk5_device::post_load()
+{
+	set_control(m_control);
+}
+
+
+void msx_slot_disk5_device::set_control(UINT8 control)
+{
+	m_control = control;
+
+	switch (m_control & 0x0f)
+	{
+		case 0x01:
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			break;
+
+		case 0x02:
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			break;
+
+		case 0x04:
+			m_floppy = m_floppy2 ? m_floppy2->get_device() : NULL;
+			break;
+
+		case 0x08:
+			m_floppy = m_floppy3 ? m_floppy3->get_device() : NULL;
+			break;
+
+		default:
+			m_floppy = NULL;
+			break;
+	}
+
+	if (m_floppy)
+	{
+		m_floppy->mon_w((m_control & 0x20) ? 0 : 1);
+		m_floppy->ss_w((m_control & 0x10) ? 1 : 0);
+	}
+
+	m_fdc->set_floppy(m_floppy);
+}
+
+
+READ8_MEMBER(msx_slot_disk5_device::io_read)
+{
+	switch (offset)
+	{
+		case 0x00:
+			return m_fdc->status_r();
+
+		case 0x01:
+			return m_fdc->track_r();
+
+		case 0x02:
+			return m_fdc->sector_r();
+
+		case 0x03:
+			return m_fdc->data_r();
+
+		case 0x04:
+			return 0x3f | (m_fdc->drq_r() ? 0 : 0x40) | (m_fdc->intrq_r() ? 0x80 : 0);
+	}
+
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(msx_slot_disk5_device::io_write)
+{
+	switch (offset)
+	{
+		case 0x00:
+			m_fdc->cmd_w(data);
+			break;
+
+		case 0x01:
+			m_fdc->track_w(data);
+			break;
+
+		case 0x02:
+			m_fdc->sector_w(data);
+			break;
+
+		case 0x03:
+			m_fdc->data_w(data);
+			break;
+
+		case 0x04:
+			set_control(data);
+			break;
+	}
+}
+
 

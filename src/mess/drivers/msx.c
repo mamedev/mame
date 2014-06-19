@@ -26,14 +26,12 @@
 ** - y503iir, y503iir2: Net not emulated
 ** - y503iir, y503iir2: Floppy support broken
 ** - cpc300: Config for MSX Tutor ON/OFF is not saved
-** - expert20: Does not boot
 ** - fs4600: Kanji12 not emulated; how to trigger usage of kanji12??
 ** - fsa1fm: Firmware not emulated
 ** - fsa1fm: kanji12 not emulated
 ** - fsa1fm: Modem not emulated
 ** - nms8280, nms8280g: Digitizer functionality not emulated
 ** - vg8230j: Floppy support broken?
-** - hotbit20: Does not boot
 ** - hbf1: Does not boot. This seems to be caused by a raise condition between setting the VBlank bit in the
 **         VDP status register and the z80 taking the interrupt. Currently the interrupt gets taken before the
 **         bit can be read, so the code goes into an infinite loop.
@@ -1162,7 +1160,6 @@ static MACHINE_CONFIG_FRAGMENT( msx_tc8566af )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx_microsol )
-	// TODO: Implement MICROSOL, the fragment below is to keep the core happy
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
@@ -3308,7 +3305,7 @@ static MACHINE_CONFIG_DERIVED( expert20, msx2_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 1, 1, 0, 1, "maincpu", 0x8000) /* EXT */
 	MCFG_MSX_LAYOUT_ROM("xbasic", 1, 1, 1, 1, "maincpu", 0x20000) /* BASIC */
-	MCFG_MSX_LAYOUT_DISK1("disk", 1, 3, 1, 1, "maincpu", 0x24000) /* Microsol controller */
+	MCFG_MSX_LAYOUT_DISK5("disk", 1, 3, 1, 1, "maincpu", 0x24000) /* Microsol controller */
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 2, 0, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
@@ -4355,7 +4352,7 @@ static MACHINE_CONFIG_DERIVED( hotbit20, msx2_pal )
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 1, 1, 0, 1, "maincpu", 0x8000) /* EXT */
 	MCFG_MSX_LAYOUT_ROM("xbasic", 1, 1, 1, 1, "maincpu", 0x20000) /* BASIC */
-	MCFG_MSX_LAYOUT_DISK1("disk", 1, 3, 1, 1, "maincpu", 0x24000) /* Microsol controller */
+	MCFG_MSX_LAYOUT_DISK5("disk", 1, 3, 1, 1, "maincpu", 0x24000) /* Microsol controller */
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 2, 0, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
@@ -5905,7 +5902,7 @@ COMP(1984, bruc100,   msx,      0,      bruc100,  msx, msx_state,      msx,     
 COMP(1985, msx2,      0,        msx,    msx2_gen, msx2, msx_state,     msx,     "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, ax350,     msx2,     0,      ax350,    msx2, msx_state,     msx,     "Al Alamiah", "AX-350", 0)
 COMP(1986, ax370,     msx2,     0,      ax370,    msx2, msx_state,     msx,     "Al Alamiah", "AX-370", 0)
-COMP(1986, expert20,  msx2,     0,      expert20, msx2, msx_state,     msx,     "Gradiente", "Expert 2.0 (Brazil)" , GAME_NOT_WORKING) // Black screen
+COMP(1986, expert20,  msx2,     0,      expert20, msx2, msx_state,     msx,     "Gradiente", "Expert 2.0 (Brazil)" , 0)
 COMP(1986, nms8220,   msx2,     0,      nms8220,  msx2, msx_state,     msx,     "Philips", "NMS-8220 (12-jun-1986)", 0)
 COMP(1986, nms8220a,  msx2,     0,      nms8220a, msx2, msx_state,     msx,     "Philips", "NMS-8220 (13-aug-1986)", 0)
 COMP(1986, vg8230,    msx2,     0,      vg8230,   msx2, msx_state,     msx,     "Philips", "VG-8230", 0)
@@ -5929,7 +5926,7 @@ COMP(1985, hbf700p,   msx2,     0,      hbf700p,  msx2, msx_state,     msx,     
 COMP(1985, hbf700s,   msx2,     0,      hbf700s,  msx2, msx_state,     msx,     "Sony", "HB-F700S (Spain)", 0)
 COMP(1986, hbg900ap,  msx2,     0,      hbg900ap, msx2, msx_state,     msx,     "Sony", "HB-G900AP", 0 )
 COMP(1986, hbg900p,   msx2,     0,      hbg900p,  msx2, msx_state,     msx,     "Sony", "HB-G900P", 0 )
-COMP(1986, hotbit20,  msx2,     0,      hotbit20, msx2, msx_state,     msx,     "Sharp / Epcom", "HB-8000 Hotbit 2.0" , GAME_NOT_WORKING) // Black screen
+COMP(1986, hotbit20,  msx2,     0,      hotbit20, msx2, msx_state,     msx,     "Sharp / Epcom", "HB-8000 Hotbit 2.0" , 0) // Black screen
 COMP(1986, tpc310,    msx2,     0,      tpc310,   msx2, msx_state,     msx,     "Talent", "TPC-310", 0)
 COMP(19??, tpp311,    msx2,     0,      tpp311,   msx2, msx_state,     msx,     "Talent", "TPP-311", 0)
 COMP(19??, tps312,    msx2,     0,      tps312,   msx2, msx_state,     msx,     "Talent", "TPS-312", 0)
@@ -5937,7 +5934,7 @@ COMP(1986, hx23,      msx2,     0,      hx23,     msx2, msx_state,     msx,     
 COMP(1986, hx23f,     msx2,     0,      hx23f,    msx2, msx_state,     msx,     "Toshiba", "HX-23F", 0)
 COMP(1986, cx7m,      msx2,     0,      cx7m,     msx2, msx_state,     msx,     "Yamaha", "CX7M" , 0)
 COMP(1986, cx7m128,   msx2,     0,      cx7m128,  msx2, msx_state,     msx,     "Yamaha", "CX7M-128", 0)
-COMP(1983, mlg30,     msx2,     0,      mlg30,    msx2, msx_state,     msx,     "Mistubishi", "ML-G30", GAME_NOT_WORKING) // Screen flashes a few times before going into basic
+COMP(1983, mlg30,     msx2,     0,      mlg30,    msx2, msx_state,     msx,     "Mistubishi", "ML-G30", 0)
 COMP(1985, fs5500f1,  msx2,     0,      fs5500f1, msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5500F1 (Japan)", 0 )
 COMP(1985, fs5500f2,  msx2,     0,      fs5500f2, msx2jp, msx_state,   msx,     "National / Matsushita", "FS-5500F2 (Japan)", 0 )
 COMP(1986, fs4500,    msx2,     0,      fs4500,   msx2jp, msx_state,   msx,     "National / Matsushita", "FS-4500 (Japan)", 0 )
@@ -5949,7 +5946,7 @@ COMP(1986, fsa1a,     msx2,     0,      fsa1a,    msx2jp, msx_state,   msx,     
 COMP(1987, fsa1mk2,   msx2,     0,      fsa1mk2,  msx2jp, msx_state,   msx,     "Panasonic / Matsushita", "FS-A1MK2 (Japan)", 0)
 COMP(1987, fsa1f,     msx2,     0,      fsa1f,    msx2jp, msx_state,   msx,     "Panasonic / Matsushita", "FS-A1F (Japan)", 0 )
 COMP(1987, fsa1fm,    msx2,     0,      fsa1fm,   msx2jp, msx_state,   msx,     "Panasonic / Matsushita", "FS-A1FM (Japan)", 0 )
-COMP(19??, nms8250j,  msx2,     0,      nms8250j, msx2jp, msx_state,   msx,     "Philips", "NMS-8250J", GAME_NOT_WORKING) // Screen flashes a few times before going into basic
+COMP(19??, nms8250j,  msx2,     0,      nms8250j, msx2jp, msx_state,   msx,     "Philips", "NMS-8250J", 0)
 COMP(19??, vg8230j,   msx2,     0,      vg8230j,  msx2jp, msx_state,   msx,     "Philips", "VG-8230J", GAME_NOT_WORKING) // Screen flashes a few times before going into basic
 COMP(1986, hbf500,    msx2,     0,      hbf500,   msx2jp, msx_state,   msx,     "Sony", "HB-F500 (Japan)", 0)
 COMP(1986, hbf900,    msx2,     0,      hbf900,   msx2jp, msx_state,   msx,     "Sony", "HB-F900 / 1st released version (Japan)", 0)
@@ -5959,7 +5956,7 @@ COMP(1987, hbf12,     msx2,     0,      hbf12,    msx2jp, msx_state,   msx,     
 COMP(1987, hbf1xd,    msx2,     0,      hbf1xd,   msx2jp, msx_state,   msx,     "Sony", "HB-F1XD (Japan)", 0)
 COMP(1988, hbf1xdm2,  msx2,     0,      hbf1xdm2, msx2jp, msx_state,   msx,     "Sony", "HB-F1XDMK2 (Japan)", 0)
 COMP(19??, mpc2300,   msx2,     0,      mpc2300,  msx2, msx_state,     msx,     "Sanyo", "MPC-2300", GAME_NOT_WORKING) // Keyboard responds differently
-COMP(19??, mpc25fd,   msx2,     0,      mpc25fd,  msx2, msx_state,     msx,     "Sanyo", "Wavy MPC-25FD", GAME_NOT_WORKING) // Screen stays black
+COMP(19??, mpc25fd,   msx2,     0,      mpc25fd,  msx2, msx_state,     msx,     "Sanyo", "Wavy MPC-25FD", 0)
 COMP(1988, phc23,     msx2,     0,      phc23,    msx2jp, msx_state,   msx,     "Sanyo", "Wavy PHC-23 (Japan)", 0)
 COMP(1986, cpc300,    msx2,     0,      cpc300,   msx2kr, msx_state,   msx,     "Daewoo", "IQ-2000 CPC-300 (Korea)", 0)
 COMP(1986, cpc300e,   msx2,     0,      cpc300e,  msx2kr, msx_state,   msx,     "Daewoo", "IQ-2000 CPC-300E (Korea)", 0)
