@@ -372,7 +372,7 @@ READ8_MEMBER( asc_device::read )
 		m_regs[0x2f] = m_incr[3];
 	}
 
-	if (offset > 0x800)
+	if (offset >= 0x1000)
 	{
 		return 0xff;
 	}
