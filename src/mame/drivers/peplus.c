@@ -126,7 +126,7 @@ Board type with program type
 
 Standard PE+
  Program Types:
-  BEnnnn Black Jack / 21 games
+  BEnnnn Blackjack / 21 games
   KEnnnn Keno
   PPnnnn Poker games. Several different types of poker require specific CG graphics + CAP color prom
   IPnnnn International Poker games. Several different types of poker require specific CG graphics + CAP color prom
@@ -153,7 +153,7 @@ The CG graphics + CAP color proms along with which program sets they belong to i
 
 NOTE:  Do NOT use the CG+CAP combos listed below as THE definitive absolute reference. There are other combos that
        worked to produce correct card graphics plus paytable information for many sets. So the combos listed below
-       are not the "official" combo and a better or more correct combo may exist.
+       may not always be the "official" combo and a better or more correct combo may exist.
 
 NOTE:  International PP0xxx sets support a Tournament mode.  You can toggle back and forth between standard and
        Tournament mode by pressing and holding Jackpot Reset (L key) and pressing Change Request (Y key)
