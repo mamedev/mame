@@ -2024,6 +2024,10 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
+	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
+	MCFG_DECO_ZOOMSPR_PALETTE("palette")
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
@@ -2138,6 +2142,10 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
+	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
+	MCFG_DECO_ZOOMSPR_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)

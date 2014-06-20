@@ -1027,6 +1027,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/deco_mlc.o $(VIDEO)/deco_mlc.o \
 	$(DRIVERS)/deco156.o $(MACHINE)/deco156.o \
 	$(DRIVERS)/deco32.o $(VIDEO)/deco32.o $(VIDEO)/dvi.o \
+	$(VIDEO)/deco_zoomspr.o \
 	$(DRIVERS)/decocass.o $(MACHINE)/decocass.o $(MACHINE)/decocass_tape.o $(VIDEO)/decocass.o \
 	$(DRIVERS)/deshoros.o \
 	$(DRIVERS)/dietgo.o $(VIDEO)/dietgo.o \

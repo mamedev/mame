@@ -6,6 +6,7 @@
 #include "sound/okim6295.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
+#include "video/deco_zoomspr.h"
 
 class deco32_state : public driver_device
 {
@@ -27,6 +28,7 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
+		m_sprgenzoom(*this, "spritegen_zoom"),
 		m_eeprom(*this, "eeprom"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
@@ -55,6 +57,7 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
+	optional_device<deco_zoomspr_device> m_sprgenzoom;
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<okim6295_device> m_oki1;
