@@ -1,13 +1,9 @@
 // license:MAME|GPL-2.0+
-// copyright-holders:Felipe Correa
+// copyright-holders:Felipe Sanches
 /*
   Replicator 1 desktop 3d printer
 
   driver by Felipe Correa da Silva Sanches <fsanches@metamaquina.com.br>
-
-  Licensed under GPLv2 or later.
-
-  NOTE: Even though the MAME/MESS project has been adopting a non-commercial additional licensing clause, I do allow commercial usage of my portion of the code according to the plain terms of the GPL license (version 2 or later). This is useful if you happen to use my code in another project or in case the other MAME/MESS developers happen to drop the non-comercial clause completely. I suggest that other developers consider doing the same. --Felipe Sanches
 
 Changelog:
 

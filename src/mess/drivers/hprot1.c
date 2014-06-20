@@ -1,3 +1,5 @@
+// license:MAME|GPL-2.0+
+// copyright-holders: Felipe Sanches
 /***************************************************************************
 
   HENRY Prot I/II - brazilian document timestamp printers
@@ -6,13 +8,9 @@
   Driver by Felipe Sanches
   Technical info at https://www.garoa.net.br/wiki/HENRY
 
-  Licensed under GPLv2 or later.
-
-  NOTE: Even though the MAME/MESS project has been adopting a non-commercial additional licensing clause, I do allow commercial usage of my portion of the code according to the plain terms of the GPL license (version 2 or later). This is useful if you happen to use my code in another project or in case the other MAME/MESS developers happen to drop the non-comercial clause completely. I suggest that other developers consider doing the same. --Felipe Sanches
-
   Changelog:
 
-	 2014 JUN 13 [Felipe Sanches]:
+   2014 JUN 13 [Felipe Sanches]:
    * new derivative "CARD I PCB rev.08A"
    * new derivative "CARD II PCB rev.6"
    * fixed LCD rendering (now both lines are displayed properly)

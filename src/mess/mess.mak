@@ -2162,6 +2162,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/systec.o    \
 	$(MESS_DRIVERS)/tavernie.o  \
 	$(MESS_DRIVERS)/terak.o     \
+	$(MESS_DRIVERS)/ti630.o     \
 	$(MESS_DRIVERS)/tsispch.o   \
 	$(MESS_DRIVERS)/unistar.o   \
 	$(MESS_DRIVERS)/v6809.o     \

@@ -1,4 +1,7 @@
-/*
+// license:MAME
+// copyright-holders: Ryan Holtz (Mooglyguy), Sandro Ronco, Felipe Sanches
+/***************************************************************************
+
     Atmel 8-bit AVR simulator
 
     - Notes -
