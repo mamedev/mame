@@ -8,15 +8,15 @@
 
 ***************************************************************************/
 
+#include "lua/lua.hpp"
+#include "lua/lib/lualibs.h"
+#include "lua/bridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
 #include "drivenum.h"
-#include "lua/lua.hpp"
-#include "lua/lib/lualibs.h"
 #include "web/mongoose.h"
-#include "lua/bridge/LuaBridge.h"
 
 //**************************************************************************
 //  LUA ENGINE
