@@ -51,6 +51,7 @@ NETLIB_START(SN74LS629clk)
 
 	save(NAME(m_enableq));
 	save(NAME(m_inc));
+    save(NAME(m_out));
 }
 
 NETLIB_RESET(SN74LS629clk)
@@ -63,7 +64,8 @@ NETLIB_UPDATE(SN74LS629clk)
 {
 	if (!m_enableq)
 	{
-		OUTLOGIC(m_Y, !m_Y.net().as_logic().new_Q(), m_inc);
+	    m_out = m_out ^ 1;
+		OUTLOGIC(m_Y, m_out, m_inc);
 	}
 	else
 	{
@@ -146,12 +148,14 @@ NETLIB_UPDATE(SN74LS629)
 	if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
 	{
 		m_clock.m_enableq = 1;
-		OUTLOGIC(m_clock.m_Y, !m_clock.m_Y.net().as_logic().last_Q(), netlist_time::from_nsec(1));
+		m_clock.m_out = m_clock.m_out ^ 1;
+		OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
 	}
 	else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
 	{
 		m_clock.m_enableq = 0;
-		OUTLOGIC(m_clock.m_Y, !m_clock.m_Y.net().as_logic().last_Q(), netlist_time::from_nsec(1));
+		m_clock.m_out = m_clock.m_out ^ 1;
+		OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
 	}
 }
 

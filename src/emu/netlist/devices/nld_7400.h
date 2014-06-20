@@ -39,7 +39,33 @@
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)
 
+#if 1
 NETLIB_SIGNAL(7400, 2, 0, 0);
+#else
+#include "nld_truthtable.h"
+class nld_7400 : public nld_truthtable_t<2,1>
+    {
+    public:
+        nld_7400 ()
+        : nld_truthtable_t<2,1>()
+    {
+    }
+        void start()
+        {
+            static const char *tt[] = {
+                    "A,B,PQ,PA,PB|Q",
+                    "0,X,X,X,X|1",
+                    "X,0,X,X,X|1",
+                    "1,1,X,X,X|0",
+                    ""
+            };
+            setup_tt(tt, m_outs);
+        }
+    private:
+        static UINT32 m_outs[m_size];
+};
+#endif
+
 
 #define TTL_7400_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7400_dip, _name)

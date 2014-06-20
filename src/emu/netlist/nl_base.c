@@ -455,7 +455,6 @@ ATTR_COLD netlist_net_t::netlist_net_t(const family_t afamily)
 	: netlist_object_t(NET, afamily)
     , m_new_Q(0)
     , m_cur_Q (0)
-    , m_last_Q(0)
     , m_railterminal(NULL)
 	, m_time(netlist_time::zero)
 	, m_active(0)
@@ -486,7 +485,6 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 	{
 		if (m_active == 1 && m_in_queue > 0)
 		{
-			m_last_Q = m_cur_Q;
 			railterminal().netdev().inc_active();
 			m_cur_Q = m_new_Q;
 		}
@@ -501,7 +499,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 		}
 		else
 		{
-			m_cur_Q = m_last_Q = m_new_Q;
+			m_cur_Q = m_new_Q;
 			m_in_queue = 2;
 		}
 	}
@@ -541,7 +539,6 @@ ATTR_COLD void netlist_net_t::save_register()
 	save(NAME(m_active));
 	save(NAME(m_in_queue));
     save(NAME(m_cur_Analog));
-    save(NAME(m_last_Q));
     save(NAME(m_cur_Q));
     save(NAME(m_new_Q));
 	netlist_object_t::save_register();
@@ -565,13 +562,13 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 	assert(this->isRailNet());
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
-	const UINT32 mask = masks[ (m_last_Q  << 1) | m_new_Q ];
+    const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 	netlist_core_terminal_t *p = m_list_active.first();
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
 
-    switch (m_active)
+	switch (m_active)
     {
     case 2:
         update_dev(p, mask);
@@ -588,7 +585,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
         }
         break;
     }
-	m_last_Q = m_cur_Q;
+
 }
 
 ATTR_COLD void netlist_net_t::reset()
@@ -597,7 +594,6 @@ ATTR_COLD void netlist_net_t::reset()
 	m_active = 0;
 	m_in_queue = 2;
 
-    m_last_Q = 0;
     m_new_Q = 0;
     m_cur_Q = 0;
     m_cur_Analog = 0.0;

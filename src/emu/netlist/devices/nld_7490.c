@@ -20,6 +20,8 @@ NETLIB_START(7490)
 	register_output("QD", m_Q[3]);
 
 	save(NAME(m_cnt));
+    save(NAME(m_last_A));
+    save(NAME(m_last_B));
 
 }
 
@@ -47,18 +49,20 @@ NETLIB_UPDATE(7490)
 		m_cnt = 0;
 		update_outputs();
 	}
-	else if (INP_HL(m_A))
+	else if (m_last_A && !INPLOGIC(m_A))  // High - Low
 	{
 		m_cnt ^= 1;
 		OUTLOGIC(m_Q[0], m_cnt & 1, delay[0]);
 	}
-	else if (INP_HL(m_B))
+	else if (m_last_B && !INPLOGIC(m_B))  // High - Low
 	{
 		m_cnt += 2;
 		if (m_cnt >= 10)
 			m_cnt = 0;
 		update_outputs();
 	}
+    m_last_A = INPLOGIC(m_A);
+    m_last_B = INPLOGIC(m_B);
 }
 
 NETLIB_FUNC_VOID(7490, update_outputs, (void))

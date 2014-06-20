@@ -2996,6 +2996,7 @@ src/emu/netlist/devices/nld_ne555.h svneol=native#text/plain
 src/emu/netlist/devices/nld_signal.h svneol=native#text/plain
 src/emu/netlist/devices/nld_system.c svneol=native#text/plain
 src/emu/netlist/devices/nld_system.h svneol=native#text/plain
+src/emu/netlist/devices/nld_truthtable.h svneol=native#text/plain
 src/emu/netlist/netlist.mak svneol=native#text/plain
 src/emu/netlist/nl_base.c svneol=native#text/plain
 src/emu/netlist/nl_base.h svneol=native#text/plain

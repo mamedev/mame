@@ -23,8 +23,13 @@
  */
 #define USE_PMFDELEGATES        (0)
 
-// This increases performance in circuits with a lot of gates
-// but is not guaranteed to be absolutely timing correct.
+/*
+ *  This increases performance in circuits with a lot of gates
+ *  but is not guaranteed to be absolutely timing correct.
+ *
+ *  Performance increase about 10%
+ *
+ */
 
 #define USE_DEACTIVE_DEVICE     (0)
 

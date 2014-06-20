@@ -5,6 +5,10 @@
 
 #include "nld_7400.h"
 
+#if 0
+UINT32 nld_7400::m_outs[m_size];
+#endif
+
 NETLIB_START(7400_dip)
 {
 	register_sub(m_1, "1");

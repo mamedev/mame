@@ -629,7 +629,6 @@ protected:  //FIXME: needed by current solver code
 
     netlist_sig_t m_new_Q;
     netlist_sig_t m_cur_Q;
-    netlist_sig_t m_last_Q;
 
 private:
 
@@ -663,11 +662,6 @@ public:
         return m_cur_Q;
     }
 
-    ATTR_HOT inline const netlist_sig_t last_Q() const
-    {
-        return m_last_Q;
-    }
-
     ATTR_HOT inline const netlist_sig_t new_Q() const
     {
         return m_new_Q;
@@ -691,7 +685,6 @@ public:
     {
         m_cur_Q = val;
         m_new_Q = val;
-        m_last_Q = val;
     }
 
     /* internal state support
@@ -984,21 +977,6 @@ public:
 	ATTR_HOT inline void OUTLOGIC(netlist_logic_output_t &out, const netlist_sig_t val, const netlist_time delay)
 	{
 		out.set_Q(val, delay);
-	}
-
-    ATTR_HOT inline bool INP_CHANGED(const netlist_logic_input_t &inp) const
-    {
-        return (inp.last_Q() != inp.Q());
-    }
-
-    ATTR_HOT inline bool INP_HL(const netlist_logic_input_t &inp) const
-	{
-		return ((inp.last_Q() & !inp.Q()) == 1);
-	}
-
-	ATTR_HOT inline bool INP_LH(const netlist_logic_input_t &inp) const
-	{
-		return ((!inp.last_Q() & inp.Q()) == 1);
 	}
 
 	ATTR_HOT inline const double INPANALOG(const netlist_analog_input_t &inp) const { return inp.Q_Analog(); }
@@ -1356,11 +1334,6 @@ ATTR_HOT inline void netlist_net_t::reschedule_in_queue(const netlist_time delay
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const
 {
 	return net().as_logic().Q();
-}
-
-ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::last_Q() const
-{
-	return net().as_logic().last_Q();
 }
 
 ATTR_HOT inline const double netlist_analog_input_t::Q_Analog() const
