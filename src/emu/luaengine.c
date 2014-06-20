@@ -16,6 +16,7 @@
 #include "lua/lua.hpp"
 #include "lua/lib/lualibs.h"
 #include "web/mongoose.h"
+#include "lua/bridge/LuaBridge.h"
 
 //**************************************************************************
 //  LUA ENGINE
@@ -341,28 +342,6 @@ int lua_engine::l_emu_start(lua_State *L)
 	return 1;
 }
 
-//-------------------------------------------------
-//  luaopen_emu - connect emu section lib
-//-------------------------------------------------
-
-int lua_engine::luaopen_emu(lua_State *L)
-{
-	static const struct luaL_Reg emu_funcs [] = {
-		{ "gamename",    l_emu_gamename },
-		{ "keypost",     l_emu_keypost },
-		{ "hook_output", l_emu_hook_output },
-		{ "time",        l_emu_time },
-		{ "wait",        l_emu_wait },
-		{ "after",       l_emu_after },
-		{ "exit",		 l_emu_exit },
-		{ "start", 		 l_emu_start },
-		{ NULL, NULL }  /* sentinel */
-	};
-
-	luaL_newlib(L, emu_funcs);
-	return 1;
-}
-
 int lua_engine::luaopen_ioport(lua_State *L)
 {
 	static const struct luaL_Reg ioport_funcs [] = {
@@ -466,7 +445,6 @@ lua_engine::lua_engine()
 	luaL_openlibs(m_lua_state);  /* open libraries */
 	
 	luaopen_lsqlite3(m_lua_state);
-	luaL_requiref(m_lua_state, "emu", luaopen_emu, 1);
 	
 	luaopen_ioport(m_lua_state);
 
@@ -515,6 +493,36 @@ void lua_engine::update_machine()
 
 void lua_engine::initialize()
 {
+	luabridge::getGlobalNamespace (m_lua_state)
+		.beginNamespace ("emu")
+			.addCFunction ("gamename",    l_emu_gamename )
+			.addCFunction ("keypost",     l_emu_keypost )
+			.addCFunction ("hook_output", l_emu_hook_output )
+			.addCFunction ("time",        l_emu_time )
+			.addCFunction ("wait",        l_emu_wait )
+			.addCFunction ("after",       l_emu_after )
+			.addCFunction ("exit",		  l_emu_exit )
+			.addCFunction ("start", 	  l_emu_start )
+			.beginClass <machine_manager> ("manager")
+				.addFunction ("machine", &machine_manager::machine)
+				.addFunction ("options", &machine_manager::options)
+			.endClass ()
+			.beginClass <running_machine> ("machine")
+				.addFunction ("exit", &running_machine::schedule_exit)
+				.addFunction ("hard_reset", &running_machine::schedule_hard_reset)
+				.addFunction ("soft_reset", &running_machine::schedule_soft_reset)
+				.addFunction ("system", &running_machine::system)
+			.endClass ()
+			.beginClass <game_driver> ("game_driver")
+				.addData ("name", &game_driver::name)
+				.addData ("description", &game_driver::description)
+				.addData ("year", &game_driver::year)
+				.addData ("manufacturer", &game_driver::manufacturer)
+			.endClass ()
+		.endNamespace ();
+	luabridge::push (m_lua_state, machine_manager::instance());
+	lua_setglobal(m_lua_state, "manager");
+
 	mg_start_thread(::serve_lua, this);
 }
 

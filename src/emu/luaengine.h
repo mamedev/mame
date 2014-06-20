@@ -86,7 +86,6 @@ private:
 	void resume(void *L, INT32 param);
 	void report_errors(int status);
 	void start();
-	static int luaopen_emu(lua_State *L);
 	static int luaopen_ioport(lua_State *L);
 	void close();
 
