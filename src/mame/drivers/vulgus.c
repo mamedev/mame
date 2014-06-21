@@ -32,10 +32,10 @@ SOUND CPU
 4000-47ff RAM
 
 write:
-8000      YM2203 #1 control
-8001      YM2203 #1 write
-c000      YM2203 #2 control
-c001      YM2203 #2 write
+8000      AY-3-8910 #1 control
+8001      AY-3-8910 #1 write
+c000      AY-3-8910 #2 control
+c001      AY-3-8910 #2 write
 
 All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
@@ -60,6 +60,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITENOP // ?
 	AM_RANGE(0xc802, 0xc803) AM_RAM AM_SHARE("scroll_low")
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(vulgus_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(vulgus_palette_bank_w)
