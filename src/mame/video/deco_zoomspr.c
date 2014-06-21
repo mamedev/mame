@@ -278,9 +278,9 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	        0x01ff - Y block offset
 	*/
 
-	/* Sprite global disable bit */
-	if (dragngun_sprite_ctrl&0x40000000)
-		return;
+	/* Sprite global disable bit - can't be, it's set in lockload calibration menu where the targets are sprites */
+//	if (dragngun_sprite_ctrl&0x40000000)
+//		return;
 
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
@@ -293,19 +293,21 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		if (!scalex || !scaley) /* Zero pixel size in X or Y - skip block */
 			continue;
 
-		if (spritedata[offs+0]&0x400)
-			layout_ram = dragngun_sprite_layout_1_ram + ((spritedata[offs+0]&0x1ff)*4); //CHECK!
+		int layoutram_offset = (spritedata[offs + 0] & 0x1ff) * 4;
+
+		if (spritedata[offs + 0] & 0x400)
+			layout_ram = dragngun_sprite_layout_1_ram;
 		else
-			layout_ram = dragngun_sprite_layout_0_ram + ((spritedata[offs+0]&0x1ff)*4); //1ff in drag gun code??
-		h = (layout_ram[1]>>0)&0xf;
-		w = (layout_ram[1]>>4)&0xf;
+			layout_ram = dragngun_sprite_layout_0_ram;
+		h = (layout_ram[layoutram_offset + 1]>>0)&0xf;
+		w = (layout_ram[layoutram_offset + 1]>>4)&0xf;
 		if (!h || !w)
 			continue;
 
 		sx = spritedata[offs+2] & 0x3ff;
 		sy = spritedata[offs+3] & 0x3ff;
-		bx = layout_ram[2] & 0x1ff;
-		by = layout_ram[3] & 0x1ff;
+		bx = layout_ram[layoutram_offset + 2] & 0x1ff;
+		by = layout_ram[layoutram_offset + 3] & 0x1ff;
 		if (bx&0x100) bx=1-(bx&0xff);
 		if (by&0x100) by=1-(by&0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
 		if (sx >= 512) sx -= 1024;
@@ -333,11 +335,13 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		fx = spritedata[offs+4]&0x8000;
 		fy = spritedata[offs+5]&0x8000;
 
+		int lookupram_offset = layout_ram[layoutram_offset + 0] & 0x1fff;
+
 //      if (spritedata[offs+0]&0x400)
-		if (layout_ram[0]&0x2000)
-			lookup_ram = dragngun_sprite_lookup_1_ram + (layout_ram[0]&0x1fff);
+		if (layout_ram[layoutram_offset + 0] & 0x2000)
+			lookup_ram = dragngun_sprite_lookup_1_ram;
 		else
-			lookup_ram = dragngun_sprite_lookup_0_ram + (layout_ram[0]&0x1fff);
+			lookup_ram = dragngun_sprite_lookup_0_ram;
 
 		zoomx=scalex * 0x10000 / (w*16);
 		zoomy=scaley * 0x10000 / (h*16);
@@ -356,7 +360,10 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 			for (x=0; x<w; x++) {
 				int bank,sprite;
 
-				sprite = ((*(lookup_ram++))&0x3fff);
+				sprite = lookup_ram[lookupram_offset];
+				sprite &= 0x3fff;
+
+				lookupram_offset++;
 
 				/* High bits of the sprite reference into the sprite control bits for banking */
 				switch (sprite&0x3000) {
