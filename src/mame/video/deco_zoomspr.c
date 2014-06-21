@@ -51,7 +51,9 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,
-		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height, UINT8 alpha )
+		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height, UINT8 alpha,
+		bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
+		int priority)
 {
 	rectangle myclip;
 
@@ -66,7 +68,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
-	myclip &= dest_bmp.cliprect();
+	myclip &= temp_bitmap.cliprect();
 
 	{
 		if( gfx )
@@ -137,42 +139,31 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					/* case 1: no alpha */
 					if (alpha == 0xff)
 					{
-						if (pri_buffer)
 						{
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
-								UINT32 *dest = &dest_bmp.pix32(y);
-								UINT8 *pri = &pri_buffer->pix8(y);
+								UINT32 *dest = &temp_bitmap.pix32(y);
+								UINT8 *pri = &pri_bitmap.pix8(y);
+
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>16];
-									if( c != transparent_color )
+									if (c != transparent_color)
 									{
-										if (((1 << pri[x]) & pri_mask) == 0)
+										if (priority >= pri[x])
+										{
 											dest[x] = pal[c];
-										pri[x] = 31;
+											dest[x] |= 0xff000000;
+										}
+										else // sprites can have a 'masking' effect on other sprites
+										{
+											dest[x] = 0x00000000;
+										}
 									}
-									x_index += dx;
-								}
 
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
-								UINT32 *dest = &dest_bmp.pix32(y);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = pal[c];
 									x_index += dx;
 								}
 
@@ -184,42 +175,36 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					/* alpha-blended */
 					else
 					{
-						if (pri_buffer)
 						{
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
-								UINT32 *dest = &dest_bmp.pix32(y);
-								UINT8 *pri = &pri_buffer->pix8(y);
+								UINT32 *dest = &temp_bitmap.pix32(y);
+								UINT8 *pri = &pri_bitmap.pix8(y);
+								UINT32 *tmapcolor = &dest_bmp.pix32(y);
 
+								
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>16];
-									if( c != transparent_color )
+									if (c != transparent_color)
 									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
-										pri[x] = 31;
+										if (priority >= pri[x])
+										{
+											if ((dest[x] & 0xff000000) == 0x00000000)
+												dest[x] = alpha_blend_r32(tmapcolor[x] & 0x00ffffff, pal[c] & 0x00ffffff, alpha); // if nothing has been drawn pull the pixel from the tilemap to blend with
+											else
+												dest[x] = alpha_blend_r32(dest[x] & 0x00ffffff, pal[c] & 0x00ffffff, alpha); // otherwise blend with what was previously drawn
+
+											dest[x] |= 0xff000000;
+										}
+										else // sprites can have a 'masking' effect on other sprites
+										{
+											dest[x] = 0x00000000;
+										}
 									}
-									x_index += dx;
-								}
 
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
-								UINT32 *dest = &dest_bmp.pix32(y);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
 									x_index += dx;
 								}
 
@@ -233,11 +218,12 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 	}
 }
 
-void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *spritedata, UINT32* dragngun_sprite_layout_0_ram, UINT32* dragngun_sprite_layout_1_ram, UINT32* dragngun_sprite_lookup_0_ram, UINT32* dragngun_sprite_lookup_1_ram, UINT32 dragngun_sprite_ctrl )
+void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *spritedata, UINT32* dragngun_sprite_layout_0_ram, UINT32* dragngun_sprite_layout_1_ram, UINT32* dragngun_sprite_lookup_0_ram, UINT32* dragngun_sprite_lookup_1_ram, UINT32 dragngun_sprite_ctrl,  bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
 {
 	const UINT32 *layout_ram;
 	const UINT32 *lookup_ram;
 	int offs;
+	temp_bitmap.fill(0x00000000, cliprect);
 
 	/*
 	    Sprites are built from main control ram, which references tile
@@ -319,6 +305,15 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 
 		colour = spritedata[offs+6]&0x1f;
 
+		int priority = (spritedata[offs + 6] & 0x60) >> 5;
+		/*
+		if (priority == 0) priority = 1;
+		else if (priority == 1) priority = 1;
+		else if (priority == 2) priority = 1;
+		else if (priority == 3) priority = 1;
+		*/
+		priority = 7;
+
 		if (spritedata[offs+6]&0x80)
 			alpha=0x80;
 		else
@@ -378,7 +373,6 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 				if (sprite&0x8000) bank=4; else bank=3;
 				sprite&=0x7fff;
 
-				if (zoomx!=0x10000 || zoomy!=0x10000)
 					dragngun_drawgfxzoom(
 						bitmap,cliprect,m_gfxdecode->gfx(bank),
 						sprite,
@@ -386,14 +380,11 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 						fx,fy,
 						xpos>>16,ypos>>16,
 						15,zoomx,zoomy,NULL,0,
-						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha );
-				else
-					m_gfxdecode->gfx(bank)->alpha(bitmap,cliprect,
-						sprite,
-						colour,
-						fx,fy,
-						xpos>>16,ypos>>16,
-						15,alpha);
+						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha,
+						pri_bitmap, temp_bitmap,
+						priority
+						);
+
 
 				if (fx)
 					xpos-=zoomx<<4;
@@ -406,5 +397,23 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 				ypos+=zoomy<<4;
 		}
 	}
+		
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		UINT32 *src = &temp_bitmap.pix32(y);
+		UINT32 *dst = &bitmap.pix32(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			UINT32 srcpix = src[x];
+
+			if ((srcpix & 0xff000000) == 0xff000000)
+			{
+				dst[x] = srcpix & 0x00ffffff;
+			}
+		}
+
+	}
+
 }
 

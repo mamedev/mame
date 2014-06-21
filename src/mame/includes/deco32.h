@@ -214,4 +214,7 @@ public:
 	
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
+
+	bitmap_rgb32 m_temp_render_bitmap;
+
 };

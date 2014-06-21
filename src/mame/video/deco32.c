@@ -159,10 +159,15 @@ VIDEO_START_MEMBER(dragngun_state,dragngun)
 {
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
 
+
+	m_screen->register_screen_bitmap(m_temp_render_bitmap);
+
 	memset(m_dirty_palette,0,4096);
 
 	save_item(NAME(m_dragngun_sprite_ctrl));
 	m_has_ace_ram=0;
+
+
 }
 
 VIDEO_START_MEMBER(dragngun_state,lockload)
@@ -237,6 +242,7 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 
 UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
@@ -244,9 +250,10 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 
 	//m_deco_tilegen1->set_pf3_8bpp_mode(1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
 
-	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 0); // it uses pf3 in 8bpp mode instead, like captaven
-	m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 1); // it uses pf3 in 8bpp mode instead, like captaven
+	m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
 
 	// zooming sprite draw is very slow, and sprites are buffered.. however, one of the levels attempts to use
 	// partial updates for every line, which causes things to be very slow... the sprites appear to support
@@ -259,8 +266,7 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 	{
 		rectangle clip(cliprect.min_x, cliprect.max_x, 8, 247);
 
-		m_sprgenzoom->dragngun_draw_sprites(bitmap,clip,m_spriteram->buffer(), m_dragngun_sprite_layout_0_ram, m_dragngun_sprite_layout_1_ram, m_dragngun_sprite_lookup_0_ram, m_dragngun_sprite_lookup_1_ram, m_dragngun_sprite_ctrl );
-		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, clip, 0, 0);
+		m_sprgenzoom->dragngun_draw_sprites(bitmap,clip,m_spriteram->buffer(), m_dragngun_sprite_layout_0_ram, m_dragngun_sprite_layout_1_ram, m_dragngun_sprite_lookup_0_ram, m_dragngun_sprite_lookup_1_ram, m_dragngun_sprite_ctrl, screen.priority(), m_temp_render_bitmap );
 
 	}
 
