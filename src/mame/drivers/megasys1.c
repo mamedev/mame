@@ -3153,6 +3153,33 @@ ROM_START( peekaboo )
 	ROM_LOAD( "priority.69",    0x000000, 0x200, CRC(b40bff56) SHA1(39c95eed79328ef2df754988db83e07909e848f8) )
 ROM_END
 
+ROM_START( peekaboo1 )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 CPU Code */
+	ROM_LOAD16_BYTE( "pb92127a_3_ver1.0.ic29", 0x000000, 0x020000, CRC(4603176a) SHA1(bbdc3fa439b32bdaaef5ca374af89e25fc4d9c1a) )
+	ROM_LOAD16_BYTE( "pb92127a_2_ver1.0.ic28", 0x000001, 0x020000, CRC(7bf4716b) SHA1(f2c0bfa32426c9816d9d3fbd73560566a497912d) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747 */
+	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+	ROM_LOAD( "4",       0x000000, 0x020000, CRC(f037794b) SHA1(235c278121921b234a27835284be80c136e6409b) )
+
+	ROM_REGION( 0x020000, "gfx3", ROMREGION_ERASEFF ) /* Scroll 2 */
+	// Unused
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "1",       0x000000, 0x080000, CRC(5a444ecf) SHA1(38a7a6e91d0635a7f82a1c9a04efe1586ed3d856) )
+
+	ROM_REGION( 0x120000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "peeksamp.124", 0x000000, 0x020000, CRC(e1206fa8) SHA1(339d5a4fa2af7fb4ab2e9c6c66f4848fa8774832) )
+	ROM_CONTINUE(             0x040000, 0x0e0000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "priority.69",    0x000000, 0x200, CRC(b40bff56) SHA1(39c95eed79328ef2df754988db83e07909e848f8) )
+ROM_END
 
 /***************************************************************************
 
@@ -4134,3 +4161,4 @@ GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chi
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
 GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 )
+GAME( 1993, peekaboo1,peekaboo, system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (US, ver 1.0)", 0 )
