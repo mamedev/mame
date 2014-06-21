@@ -5,17 +5,6 @@
 
 #include "nld_4066.h"
 
-NETLIB_START(vdd_vss)
-{
-}
-
-NETLIB_RESET(vdd_vss)
-{
-}
-
-NETLIB_UPDATE(vdd_vss)
-{
-}
 
 NETLIB_START(4066)
 {
