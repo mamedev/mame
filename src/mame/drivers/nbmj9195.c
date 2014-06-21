@@ -25,7 +25,6 @@ Notes:
 #include "includes/nb1413m3.h"      // needed for mahjong input controller
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "cpu/z80/z80daisy.h"
 #include "includes/nbmj9195.h"
 
 
@@ -2779,19 +2778,6 @@ static INPUT_PORTS_START( mjegolf )
 INPUT_PORTS_END
 
 
-static const z80_daisy_config daisy_chain_main[] =
-{
-	{ "maincpu:ctc" },
-	{ NULL }
-};
-
-static const z80_daisy_config daisy_chain_sound[] =
-{
-	{ "audiocpu:ctc" },
-	{ NULL }
-};
-
-
 // the only difference between these 2 setups is the DAC is swapped, is that intentional?
 #define OTHERS_TMZ84C011_SOUND_PORTS \
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porta_w)) \
@@ -2829,20 +2815,16 @@ static const z80_daisy_config daisy_chain_sound[] =
 static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMPZ84C011, 12000000/2)        /* TMPZ84C011, 6.00 MHz */
-	MCFG_CPU_CONFIG(daisy_chain_main)
+	MCFG_CPU_ADD("maincpu", TMPZ84C011, 12000000/2) /* TMPZ84C011, 6.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(sailorws_map)
 	MCFG_CPU_IO_MAP(sailorws_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state,  ctc0_trg1)                /* vblank is connect to ctc triggfer */
-	MCFG_TMPZ84C011_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state, ctc0_trg1) /* vblank is connect to ctc trigger */
 
-	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)                  /* TMPZ84C011, 8.00 MHz */
-	MCFG_CPU_CONFIG(daisy_chain_sound)
+	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(sailorws_sound_map)
 	MCFG_CPU_IO_MAP(sailorws_sound_io_map)
-	MCFG_TMPZ84C011_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_TMPZ84C011_Z80CTC_ZC0_CB(DEVWRITELINE("audiocpu:ctc", z80ctc_device, trg3))
-
+	MCFG_DEVICE_MODIFY("audiocpu:ctc")
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3167,7 +3149,6 @@ static MACHINE_CONFIG_DERIVED( shabdama, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shabdama_map)
 	MCFG_CPU_IO_MAP(shabdama_io_map)
-
 MACHINE_CONFIG_END
 
 

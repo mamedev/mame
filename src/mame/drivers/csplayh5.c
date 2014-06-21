@@ -30,7 +30,6 @@
 #include "cpu/z80/tmpz84c011.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
-#include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
 #include "cpu/h8/h83002.h"
 
@@ -449,12 +448,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 	}
 }
 
-static const z80_daisy_config daisy_chain_sound[] =
-{
-	{ "audiocpu:ctc" },
-	{ NULL }
-};
-
 static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 	/* basic machine hardware */
@@ -473,7 +466,6 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 #endif
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
-	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
 	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porta_w))
@@ -481,8 +473,8 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(csplayh5_state, soundcpu_dac1_w))
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(csplayh5_state, soundcpu_portd_r))
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porte_w))
-	MCFG_TMPZ84C011_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_TMPZ84C011_Z80CTC_ZC0_CB(DEVWRITELINE("audiocpu:ctc", z80ctc_device, trg3))
+	MCFG_DEVICE_MODIFY("audiocpu:ctc")
+	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

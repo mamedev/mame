@@ -40,11 +40,7 @@ tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *
 	m_inportsb(*this),
 	m_inportsc(*this),
 	m_inportsd(*this),
-	m_inportse(*this),
-	m_intr_cb(*this),
-	m_zc0_cb(*this),
-	m_zc1_cb(*this),
-	m_zc2_cb(*this)
+	m_inportse(*this)
 {
 	memset(m_pio_dir, 0, 5);
 	memset(m_pio_latch, 0, 5);
@@ -71,11 +67,6 @@ void tmpz84c011_device::device_start()
 	m_inportsc.resolve_safe(0);
 	m_inportsd.resolve_safe(0);
 	m_inportse.resolve_safe(0);
-
-	m_intr_cb.resolve_safe();
-	m_zc0_cb.resolve_safe();
-	m_zc1_cb.resolve_safe();
-	m_zc2_cb.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_pio_dir[0]));
@@ -214,18 +205,17 @@ WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_dir_pe_w)
 }
 
 
-WRITE_LINE_MEMBER( tmpz84c011_device::intr_cb_trampoline_w ) { m_intr_cb(state); }
-WRITE_LINE_MEMBER( tmpz84c011_device::zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-WRITE_LINE_MEMBER( tmpz84c011_device::zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-WRITE_LINE_MEMBER( tmpz84c011_device::zc2_cb_trampoline_w ) { m_zc2_cb(state); }
-
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "ctc" },
+	{ NULL }
+};
 
 static MACHINE_CONFIG_FRAGMENT( tmpz84c011 )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, DERIVED_CLOCK(1,1) )
-	MCFG_Z80CTC_INTR_CB(WRITELINE(tmpz84c011_device, intr_cb_trampoline_w))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(tmpz84c011_device, zc0_cb_trampoline_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(tmpz84c011_device, zc1_cb_trampoline_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(tmpz84c011_device, zc2_cb_trampoline_w))
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
+	MCFG_CPU_MODIFY(DEVICE_SELF)
+	MCFG_CPU_CONFIG(daisy_chain)
 MACHINE_CONFIG_END
 
 machine_config_constructor tmpz84c011_device::device_mconfig_additions() const
