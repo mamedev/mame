@@ -306,13 +306,16 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		colour = spritedata[offs+6]&0x1f;
 
 		int priority = (spritedata[offs + 6] & 0x60) >> 5;
-		/*
-		if (priority == 0) priority = 1;
-		else if (priority == 1) priority = 1;
-		else if (priority == 2) priority = 1;
-		else if (priority == 3) priority = 1;
-		*/
-		priority = 7;
+		
+
+		
+
+//		printf("%02x\n", priority);
+		
+		if (priority == 0) priority = 7;
+		else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
+		else if (priority == 2) priority = 7;
+		else if (priority == 3) priority = 7;
 
 		if (spritedata[offs+6]&0x80)
 			alpha=0x80;

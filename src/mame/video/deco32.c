@@ -158,8 +158,6 @@ VIDEO_START_MEMBER(deco32_state,fghthist)
 VIDEO_START_MEMBER(dragngun_state,dragngun)
 {
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
-
-
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
 	memset(m_dirty_palette,0,4096);
@@ -173,6 +171,7 @@ VIDEO_START_MEMBER(dragngun_state,dragngun)
 VIDEO_START_MEMBER(dragngun_state,lockload)
 {
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 
 	memset(m_dirty_palette,0,4096);
 
