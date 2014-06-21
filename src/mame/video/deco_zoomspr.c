@@ -47,7 +47,7 @@ void deco_zoomspr_device::device_reset()
 /******************************************************************************/
 
 
-inline void deco_zoomspr_device::deco_zoomspr_device::dragngun_drawgfxzoom(
+inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,
