@@ -4,7 +4,7 @@
 /* probably 186 + 187 custom chips, although there is a 145 too? */
 
 // helicopter in lockload is only half drawn? (3rd attract demo)
-// how are we meant to mix these with the tilemaps, parts must go above / behind parts of a single 8bpp tilemap in lockload, could be more priority masking sprites we're missing / not drawing tho?
+// how are we meant to mix these with the tilemaps, parts must go above / behind parts of tilemap '4/7' in lockload, could be more priority masking sprites we're missing / not drawing tho?
 // dragongun also does a masking trick on the dragon during the attract intro, it should not be visible but rather cause the fire to be invisible in the shape of the dragon (see note / hack in code to enable this effect)
 // dragongun 'waterfall' prior to one of the bosses also needs correct priority
 
