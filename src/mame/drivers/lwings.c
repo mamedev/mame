@@ -12,6 +12,8 @@ To Do:
     increment twice per coin.
 -   clean up Avengers protection; it currently checks against hard-coded program
     counter rather than behaving as a memory-mapped black box.
+-   accurate music tempo (audiocpu irq freq)
+-   accurate video timing, raw params
 
 
 Change Log:
@@ -765,8 +767,7 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 4*60)    /* ??? */
-
+	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -803,9 +804,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trojan, lwings )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_12MHz/4)            /* verified on PCB */
-
 	MCFG_CPU_PROGRAM_MAP(trojan_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
@@ -831,7 +832,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( avengers, trojan )
 
-	MCFG_CPU_MODIFY("maincpu") //AT: (avengers37b16gre)
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(avengers_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt) // RST 38h triggered by software
 
