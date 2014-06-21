@@ -11,7 +11,7 @@
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
-netlist_logic_family_desc_t netlist_family_ttl =
+netlist_logic_family_desc_t netlist_family_TTL =
 {
 		0.8, // m_low_thresh_V
 		2.0, // m_high_thresh_V
@@ -19,6 +19,17 @@ netlist_logic_family_desc_t netlist_family_ttl =
 		3.7, // m_high_V
 		1.0, // m_R_low;
 		130.0, //  m_R_high;
+};
+
+//FIXME: set to proper values
+netlist_logic_family_desc_t netlist_family_CD4000 =
+{
+        0.8, // m_low_thresh_V
+        2.0, // m_high_thresh_V
+        0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
+        3.7, // m_high_V
+        1.0, // m_R_low;
+        130.0, //  m_R_high;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -320,8 +331,8 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily, const netlist_logic_family_desc_t *family_desc)
-: netlist_object_t(DEVICE, afamily), m_family_desc(family_desc)
+ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
+: netlist_object_t(DEVICE, afamily)
 {
     assert((afamily == GENERIC && family_desc != NULL) || (afamily != GENERIC && family_desc == NULL));
 }
@@ -360,13 +371,13 @@ ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(
 // ----------------------------------------------------------------------------------------
 
 netlist_device_t::netlist_device_t()
-	: netlist_core_device_t(GENERIC, &netlist_family_ttl),
+	: netlist_core_device_t(GENERIC),
 		m_terminals(20)
 {
 }
 
 netlist_device_t::netlist_device_t(const family_t afamily)
-	: netlist_core_device_t(afamily, NULL),
+	: netlist_core_device_t(afamily),
 		m_terminals(20)
 {
 }
@@ -413,13 +424,13 @@ ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_
 
 ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
-	port.m_family_desc = this->m_family_desc;
+	port.m_logic_family = this->logic_family();
 	setup().register_object(*this, name, port);
 }
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
 {
-	inp.m_family_desc = this->m_family_desc;
+	inp.m_logic_family = this->logic_family();
 	setup().register_object(*this, name, inp);
 	m_terminals.add(inp.name());
 }
@@ -744,7 +755,7 @@ ATTR_COLD void netlist_analog_net_t::process_net(list_t *groups, int &cur_group)
 ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
 , plinkedlist_element_t<netlist_core_terminal_t>()
-, m_family_desc(NULL)
+, m_logic_family(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
 {

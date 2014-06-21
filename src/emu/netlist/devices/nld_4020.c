@@ -73,22 +73,31 @@ NETLIB_UPDATE(4020)
     if (INPLOGIC(m_RESET))
     {
         sub.m_cnt = 0;
+        sub.m_IP.inactivate();
         static const netlist_time reset_time = netlist_time::from_nsec(140);
         OUTLOGIC(sub.m_Q[0], 0, reset_time);
         for (int i=3; i<14; i++)
             OUTLOGIC(sub.m_Q[i], 0, reset_time);
     }
-
+    else
+        sub.m_IP.activate_hl();
 }
 
 inline NETLIB_FUNC_VOID(4020_sub, update_outputs, (const UINT16 cnt))
 {
-	const netlist_time out_delayQ1 = netlist_time::from_nsec(180);
-    const netlist_time out_delayQn = netlist_time::from_nsec(100);
+    static const netlist_time out_delayQn[14] = {
+            NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
+            NLTIME_FROM_NS(380), NLTIME_FROM_NS(480),
+            NLTIME_FROM_NS(580), NLTIME_FROM_NS(680),
+            NLTIME_FROM_NS(780), NLTIME_FROM_NS(880),
+            NLTIME_FROM_NS(980), NLTIME_FROM_NS(1080),
+            NLTIME_FROM_NS(1180), NLTIME_FROM_NS(1280),
+            NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
+    };
 
-    OUTLOGIC(m_Q[0], 0, out_delayQ1);
+    OUTLOGIC(m_Q[0], 0, out_delayQn[0]);
     for (int i=3; i<14; i++)
-        OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn);
+        OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
 }
 
 NETLIB_START(4020_dip)
