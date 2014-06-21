@@ -4,11 +4,6 @@
 #define __Z80_H__
 
 #include "z80daisy.h"
-#include "machine/z80ctc.h"
-
-#define TLCSZ80_INTERNAL_CTC_TAG      "tlcsz80_int_ctc"
-#define TLCSZ80_INTERNAL_PIO_TAG      "tlcsz80_int_pio"
-#define TLCSZ80_INTERNAL_SIO_TAG      "tlcsz80_int_sio"
 
 enum
 {
@@ -305,39 +300,6 @@ protected:
 };
 
 extern const device_type NSC800;
-
-class tlcs_z80_device : public z80_device
-{
-public:
-	tlcs_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
-
-	required_device<z80ctc_device> m_z80ctc;
-
-	DECLARE_WRITE8_MEMBER( ctc_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_trg0 );
-	DECLARE_WRITE_LINE_MEMBER( ctc_trg1 );
-	DECLARE_WRITE_LINE_MEMBER( ctc_trg2 );
-	DECLARE_WRITE_LINE_MEMBER( ctc_trg3 );
-
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-	const address_space_config m_io_space_config;
-
-	const address_space_config *memory_space_config(address_spacenum spacenum) const
-	{
-		switch (spacenum)
-		{
-			case AS_IO: return &m_io_space_config;
-			default: return z80_device::memory_space_config(spacenum);
-		}
-	}
-};
-
-
-
-extern const device_type TLCS_Z80;
-
 
 
 #endif /* __Z80_H__ */

@@ -15,9 +15,7 @@
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "pve500.lh"
 
 #define IO_EXPANDER_PORTA 0
@@ -49,14 +47,15 @@ private:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	required_device<tlcs_z80_device> m_maincpu;
-	required_device<tlcs_z80_device> m_subcpu;
+	required_device<tmpz84c015_device> m_maincpu;
+	required_device<tmpz84c015_device> m_subcpu;
 	UINT8 io_SEL, io_LD, io_LE, io_SC, io_KY;
 };
 
 
 static const z80_daisy_config maincpu_daisy_chain[] =
 {
+	TMPZ84C015_DAISY_INTERNAL,
 	{ "external_ctc" },
 	{ "external_sio" },
 	{ NULL }
@@ -64,6 +63,7 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 
 
 static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0B) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -196,7 +196,7 @@ void pve500_state::machine_reset()
 READ8_MEMBER(pve500_state::dualport_ram_left_r)
 {
 	//printf("dualport_ram: Left READ\n");
-	m_subcpu->ctc_trg1(1); //(INT_Right)
+	m_subcpu->m_ctc->trg1(1); //(INT_Right)
 	return dualport_7FE_data;
 }
 
@@ -204,13 +204,13 @@ WRITE8_MEMBER(pve500_state::dualport_ram_left_w)
 {
 	//printf("dualport_ram: Left WRITE\n");
 	dualport_7FF_data = data;
-	m_subcpu->ctc_trg1(0); //(INT_Right)
+	m_subcpu->m_ctc->trg1(0); //(INT_Right)
 }
 
 READ8_MEMBER(pve500_state::dualport_ram_right_r)
 {
 	//printf("dualport_ram: Right READ\n");
-	m_maincpu->ctc_trg1(1); //(INT_Left)
+	m_maincpu->m_ctc->trg1(1); //(INT_Left)
 	return dualport_7FF_data;
 }
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER(pve500_state::dualport_ram_right_w)
 {
 	//printf("dualport_ram: Right WRITE\n");
 	dualport_7FE_data = data;
-	m_maincpu->ctc_trg1(0); //(INT_Left)
+	m_maincpu->m_ctc->trg1(0); //(INT_Left)
 }
 
 READ8_MEMBER(pve500_state::io_expander_r)
@@ -283,7 +283,7 @@ WRITE8_MEMBER(pve500_state::io_expander_w)
 }
 
 static MACHINE_CONFIG_START( pve500, pve500_state )
-	MCFG_CPU_ADD("maincpu", TLCS_Z80, XTAL_12MHz / 2) /* TMPZ84C015BF-6 (TOSHIBA TLCS-Z80) */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_CONFIG(maincpu_daisy_chain)
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_Z80SIO0_ADD("external_sio", XTAL_12MHz / 2, 0, 0, 0, 0)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_CPU_ADD("subcpu", TLCS_Z80, XTAL_12MHz / 2) /* TMPZ84C015BF-6 (TOSHIBA TLCS-Z80) */
+	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
 
 /* TODO:

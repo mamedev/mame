@@ -2228,16 +2228,17 @@ $(CPUOBJ)/tlcs900/dasm900.o:    $(CPUSRC)/tlcs900/dasm900.c
 
 ifneq ($(filter Z80,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/z80
-CPUOBJS += $(CPUOBJ)/z80/z80.o $(CPUOBJ)/z80/tlcs_z80.o $(CPUOBJ)/z80/z80daisy.o
-CPUOBJS += $(CPUOBJ)/z80/tmpz84c011.o
+CPUOBJS += $(CPUOBJ)/z80/z80.o \
+	$(CPUOBJ)/z80/z80daisy.o \
+	$(CPUOBJ)/z80/tmpz84c011.o \
+	$(CPUOBJ)/z80/tmpz84c015.o
+
 DASMOBJS += $(CPUOBJ)/z80/z80dasm.o
 endif
 
 $(CPUOBJ)/z80/z80.o:    $(CPUSRC)/z80/z80.c \
 						$(CPUSRC)/z80/z80.h
 
-$(CPUOBJ)/z80/tlcs_z80.o:    $(CPUSRC)/z80/tlcs_z80.c \
-						$(CPUSRC)/z80/z80.h
 
 #-------------------------------------------------
 # Sharp LR35902 (Game Boy CPU)

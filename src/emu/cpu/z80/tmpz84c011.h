@@ -48,6 +48,7 @@ class tmpz84c011_device : public z80_device
 public:
 	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
 
+	// static configuration helpers
 	template<class _Object> static devcb_base & set_outportsa_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsa.set_callback(object); }
 	template<class _Object> static devcb_base & set_outportsb_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsb.set_callback(object); }
 	template<class _Object> static devcb_base & set_outportsc_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsc.set_callback(object); }
@@ -59,6 +60,9 @@ public:
 	template<class _Object> static devcb_base & set_inportsc_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsc.set_callback(object); }
 	template<class _Object> static devcb_base & set_inportsd_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsd.set_callback(object); }
 	template<class _Object> static devcb_base & set_inportse_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportse.set_callback(object); }
+
+	// devices/pointers
+	required_device<z80ctc_device> m_ctc;
 
 	DECLARE_READ8_MEMBER(tmpz84c011_pa_r);
 	DECLARE_READ8_MEMBER(tmpz84c011_pb_r);
@@ -99,20 +103,22 @@ protected:
 	}
 
 private:
+	// internal state
 	UINT8 m_pio_dir[5];
 	UINT8 m_pio_latch[5];
 
-	devcb_write8      m_outportsa;
-	devcb_write8      m_outportsb;
-	devcb_write8      m_outportsc;
-	devcb_write8      m_outportsd;
-	devcb_write8      m_outportse;
+	// callbacks
+	devcb_write8 m_outportsa;
+	devcb_write8 m_outportsb;
+	devcb_write8 m_outportsc;
+	devcb_write8 m_outportsd;
+	devcb_write8 m_outportse;
 
-	devcb_read8       m_inportsa;
-	devcb_read8       m_inportsb;
-	devcb_read8       m_inportsc;
-	devcb_read8       m_inportsd;
-	devcb_read8       m_inportse;
+	devcb_read8 m_inportsa;
+	devcb_read8 m_inportsb;
+	devcb_read8 m_inportsc;
+	devcb_read8 m_inportsd;
+	devcb_read8 m_inportse;
 };
 
 extern const device_type TMPZ84C011;
