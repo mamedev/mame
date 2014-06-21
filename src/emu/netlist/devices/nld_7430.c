@@ -16,7 +16,7 @@ NETLIB_START(7430_dip)
 	register_subalias("5", m_1.m_i[4]);
 	register_subalias("6", m_1.m_i[5]);
 
-	register_subalias("8", m_1.m_Q);
+	register_subalias("8", m_1.m_Q[0]);
 
 	register_subalias("11", m_1.m_i[6]);
 	register_subalias("12", m_1.m_i[7]);

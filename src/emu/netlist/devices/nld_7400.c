@@ -6,7 +6,16 @@
 #include "nld_7400.h"
 
 #if 0
-UINT32 nld_7400::m_outs[m_size];
+nld_7400::truthtable_t nld_7400::m_ttbl;
+
+const char *nld_7400::m_desc[] = {
+        "A,B,PQ,PA,PB|Q",
+        "0,X,X,X,X|1|22",
+        "X,0,X,X,X|1|22",
+        "1,1,X,X,X|0|15",
+        ""
+};
+
 #endif
 
 NETLIB_START(7400_dip)
@@ -18,19 +27,19 @@ NETLIB_START(7400_dip)
 
 	register_subalias("1", m_1.m_i[0]);
 	register_subalias("2", m_1.m_i[1]);
-	register_subalias("3", m_1.m_Q);
+	register_subalias("3", m_1.m_Q[0]);
 
 	register_subalias("4", m_2.m_i[0]);
 	register_subalias("5", m_2.m_i[1]);
-	register_subalias("6", m_2.m_Q);
+	register_subalias("6", m_2.m_Q[0]);
 
 	register_subalias("9", m_3.m_i[0]);
 	register_subalias("10", m_3.m_i[1]);
-	register_subalias("8", m_3.m_Q);
+	register_subalias("8", m_3.m_Q[0]);
 
 	register_subalias("12", m_4.m_i[0]);
 	register_subalias("13", m_4.m_i[1]);
-	register_subalias("11", m_4.m_Q);
+	register_subalias("11", m_4.m_Q[0]);
 }
 
 NETLIB_UPDATE(7400_dip)

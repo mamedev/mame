@@ -39,7 +39,7 @@ public:
 	{
 		const char *sIN[8] = { "A", "B", "C", "D", "E", "F", "G", "H" };
 
-		register_output("Q", m_Q);
+		register_output("Q", m_Q[0]);
 		for (int i=0; i < _numdev; i++)
 		{
 			register_input(sIN[i], m_i[i]);
@@ -49,7 +49,7 @@ public:
 
 	ATTR_COLD void reset()
 	{
-		m_Q.initial(1);
+		m_Q[0].initial(1);
 		m_active = 1;
 	}
 
@@ -90,16 +90,16 @@ public:
 				for (int j = i + 1; j < _numdev; j++)
 					this->m_i[j].inactivate();
 
-				OUTLOGIC(this->m_Q, _check ^ (1 ^ _invert), times[_check ^ (1 ^ _invert)]);// ? 15000 : 22000);
+				OUTLOGIC(this->m_Q[0], _check ^ (1 ^ _invert), times[_check ^ (1 ^ _invert)]);// ? 15000 : 22000);
 				return;
 			}
 		}
-		OUTLOGIC(this->m_Q,_check ^ (_invert), times[_check ^ (_invert)]);// ? 22000 : 15000);
+		OUTLOGIC(this->m_Q[0],_check ^ (_invert), times[_check ^ (_invert)]);// ? 22000 : 15000);
 	}
 
 public:
 	netlist_ttl_input_t m_i[_numdev];
-	netlist_ttl_output_t m_Q;
+	netlist_ttl_output_t m_Q[1];
 	INT32 m_active;
 };
 
@@ -114,7 +114,7 @@ public:
 
 	ATTR_COLD void start()
 	{
-		register_output("Q", m_Q);
+		register_output("Q", m_Q[0]);
 		register_input("A", m_i[0]);
 		register_input("B", m_i[1]);
 
@@ -123,7 +123,7 @@ public:
 
 	ATTR_COLD void reset()
 	{
-		m_Q.initial(1);
+		m_Q[0].initial(1);
 		m_active = 1;
 	}
 
@@ -171,12 +171,12 @@ public:
 				res = _invert ^ _check;
 				break;
 		}
-		OUTLOGIC(m_Q, res, times[res]);// ? 22000 : 15000);
+		OUTLOGIC(m_Q[0], res, times[res]);// ? 22000 : 15000);
 	}
 
 public:
 	netlist_ttl_input_t m_i[2];
-	netlist_ttl_output_t m_Q;
+	netlist_ttl_output_t m_Q[1];
 	INT32 m_active;
 
 };
