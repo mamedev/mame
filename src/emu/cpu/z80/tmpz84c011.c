@@ -205,17 +205,9 @@ WRITE8_MEMBER(tmpz84c011_device::tmpz84c011_dir_pe_w)
 }
 
 
-static const z80_daisy_config daisy_chain[] =
-{
-	{ "ctc" },
-	{ NULL }
-};
-
 static MACHINE_CONFIG_FRAGMENT( tmpz84c011 )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
-	MCFG_CPU_MODIFY(DEVICE_SELF)
-	MCFG_CPU_CONFIG(daisy_chain)
 MACHINE_CONFIG_END
 
 machine_config_constructor tmpz84c011_device::device_mconfig_additions() const

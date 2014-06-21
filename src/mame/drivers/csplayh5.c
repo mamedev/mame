@@ -44,14 +44,16 @@ public:
 		m_v9958(*this, "v9958"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2")
-		{ }
-
-	UINT16 m_mux_data;
-
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<v9958_device> m_v9958;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+
+	UINT16 m_mux_data;
+
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
 	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
 	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
@@ -78,8 +80,6 @@ public:
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
 };
 
 
@@ -448,6 +448,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 	}
 }
 
+static const z80_daisy_config daisy_chain_sound[] =
+{
+	{ "audiocpu:ctc" },
+	{ NULL }
+};
+
 static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 	/* basic machine hardware */
@@ -466,6 +472,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 #endif
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
+	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sound_map)
 	MCFG_CPU_IO_MAP(csplayh5_sound_io_map)
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porta_w))

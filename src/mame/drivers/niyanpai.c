@@ -760,6 +760,11 @@ INTERRUPT_GEN_MEMBER(niyanpai_state::niyanpai_interrupt)
 	m_tmp68301->external_interrupt_0();
 }
 
+static const z80_daisy_config daisy_chain_sound[] =
+{
+	{ "audiocpu:ctc" },
+	{ NULL }
+};
 
 static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 
@@ -773,6 +778,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
+	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(niyanpai_sound_map)
 	MCFG_CPU_IO_MAP(niyanpai_sound_io_map)
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(niyanpai_state, cpu_portd_r))
