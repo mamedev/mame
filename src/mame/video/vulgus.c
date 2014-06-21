@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  Capcom Vulgus hardware
 
   Functions to emulate the video hardware of the machine.
 
@@ -162,48 +162,35 @@ WRITE8_MEMBER(vulgus_state::vulgus_palette_bank_w)
 
 ***************************************************************************/
 
-void vulgus_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-
-	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	gfx_element *gfx = m_gfxdecode->gfx(2);
+	
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int code,i,col,sx,sy,dir;
-
-
-		code = spriteram[offs];
-		col = spriteram[offs + 1] & 0x0f;
-		sx = spriteram[offs + 3];
-		sy = spriteram[offs + 2];
-		dir = 1;
-		if (flip_screen())
+		int code = m_spriteram[offs];
+		int color = m_spriteram[offs + 1] & 0x0f;
+		int sy = m_spriteram[offs + 2];
+		int sx = m_spriteram[offs + 3];
+		bool flip = flip_screen() ? true : false;
+		int dir = 1;
+		
+		if (sy == 0)
+			continue;
+		
+		if (flip)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
 			dir = -1;
 		}
 
-		i = (spriteram[offs + 1] & 0xc0) >> 6;
-		if (i == 2) i = 3;
+		// draw sprite rows (16*16, 16*32, or 16*64)
+		int row = (m_spriteram[offs + 1] & 0xc0) >> 6;
+		if (row == 2) row = 3;
 
-		do
-		{
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code + i,
-					col,
-					flip_screen(),flip_screen(),
-					sx, sy + 16 * i * dir,15);
-
-			/* draw again with wraparound */
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code + i,
-					col,
-					flip_screen(),flip_screen(),
-					sx, sy + 16 * i * dir -  dir * 256,15);
-			i--;
-		} while (i >= 0);
+		for (; row >= 0; row--)
+			gfx->transpen(bitmap, cliprect, code + row, color, flip, flip, sx, sy + 16 * row * dir, 15);
 	}
 }
 
@@ -212,8 +199,9 @@ UINT32 vulgus_state::screen_update_vulgus(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->set_scrollx(0, m_scroll_low[1] + 256 * m_scroll_high[1]);
 	m_bg_tilemap->set_scrolly(0, m_scroll_low[0] + 256 * m_scroll_high[0]);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	draw_sprites(bitmap,cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
