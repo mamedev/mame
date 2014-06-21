@@ -3,6 +3,11 @@
 
 /* probably 186 + 187 custom chips, although there is a 145 too? */
 
+// helicopter in lockload is only half drawn? (3rd attract demo)
+// how are we meant to mix these with the tilemaps, parts must go above / behind parts of a single 8bpp tilemap in lockload, could be more priority masking sprites we're missing / not drawing tho?
+// dragongun also does a masking trick on the dragon during the attract intro, it should not be visible but rather cause the fire to be invisible in the shape of the dragon (see note / hack in code to enable this effect)
+// dragongun 'waterfall' prior to one of the bosses also needs correct priority
+
 #include "emu.h"
 #include "deco_zoomspr.h"
 
@@ -192,6 +197,9 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 									{
 										if (priority >= pri[x])
 										{
+											// this logic doesn't seem correct.  Sprites CAN blend other sprites (needed in many places) but based on videos of the character select screen it appears that sprites can't blend already blended sprites
+											// I'm not sure which colour gets used but the video shows a single shade of yellow rather than the yellow blending the yellow)
+
 											if ((dest[x] & 0xff000000) == 0x00000000)
 												dest[x] = alpha_blend_r32(tmapcolor[x] & 0x00ffffff, pal[c] & 0x00ffffff, alpha); // if nothing has been drawn pull the pixel from the tilemap to blend with
 											else
