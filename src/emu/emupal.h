@@ -367,7 +367,6 @@ public:
 	void set_indirect_color(int index, rgb_t rgb);
 	void set_pen_indirect(pen_t pen, UINT16 index);
 	UINT32 transpen_mask(gfx_element &gfx, int color, int transcolor);
-	void configure_tilemap_groups(tilemap_t &tmap, gfx_element &gfx, int transcolor);
 
 	// shadow config
 	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_palette->group_set_contrast(m_shadow_group, factor); }

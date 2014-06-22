@@ -386,7 +386,7 @@ void tceptor_state::video_start()
 
 	m_tx_tilemap->set_scrollx(0, -2*8);
 	m_tx_tilemap->set_scrolly(0, 0);
-	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 7);
+	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 7);
 
 	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);

@@ -127,7 +127,7 @@ void gunsmoke_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gunsmoke_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,  32, 32, 2048, 8);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gunsmoke_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
-	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0x4f);
+	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x4f);
 }
 
 void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )

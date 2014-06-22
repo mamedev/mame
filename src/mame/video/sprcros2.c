@@ -127,7 +127,7 @@ void sprcros2_state::video_start()
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_bgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_fgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_palette->configure_tilemap_groups(*m_fgtilemap, *m_gfxdecode->gfx(2), 0);
+	m_fgtilemap->configure_groups(*m_gfxdecode->gfx(2), 0);
 }
 
 void sprcros2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)

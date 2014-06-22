@@ -311,14 +311,14 @@ VIDEO_START_MEMBER(mappy_state,superpac)
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 31);
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
 }
 
 VIDEO_START_MEMBER(mappy_state,phozon)
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 
-	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 15);
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 15);
 
 	save_item(NAME(m_scroll));
 }
@@ -327,7 +327,7 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::mappy_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::mappy_tilemap_scan),this),8,8,36,60);
 
-	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 31);
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
 	m_bg_tilemap->set_scroll_cols(36);
 }
 

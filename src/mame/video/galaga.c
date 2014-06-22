@@ -429,7 +429,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 VIDEO_START_MEMBER(galaga_state,galaga)
 {
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
-	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0x1f);
+	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 
 	m_galaga_gfxbank = 0;
 

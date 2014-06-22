@@ -525,6 +525,24 @@ void tilemap_t::set_transmask(int group, UINT32 fgmask, UINT32 bgmask)
 }
 
 
+//-------------------------------------------------
+//  configure_groups - configure groups so that
+//  when group == color, pens whose indirect value
+//  matches the given transcolor are transparent
+//-------------------------------------------------
+
+void tilemap_t::configure_groups(gfx_element &gfx, int transcolor)
+{
+	int color;
+
+	assert(gfx.colors() <= TILEMAP_NUM_GROUPS);
+
+	// iterate over all colors in the tilemap
+	for (color = 0; color < gfx.colors(); color++)
+		set_transmask(color, m_palette->transpen_mask(gfx, color, transcolor), 0);
+}
+
+
 
 //**************************************************************************
 //  COMMON LOGICAL-TO-MEMORY MAPPERS

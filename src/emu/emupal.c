@@ -167,23 +167,6 @@ UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor
 }
 
 
-//-------------------------------------------------
-//  configure_tilemap_groups - configure groups
-//  within a tilemap to match the indirect masks
-//-------------------------------------------------
-
-void palette_device::configure_tilemap_groups(tilemap_t &tmap, gfx_element &gfx, int transcolor)
-{
-	int color;
-
-	assert(gfx.colors() <= TILEMAP_NUM_GROUPS);
-
-	// iterate over all colors in the tilemap
-	for (color = 0; color < gfx.colors(); color++)
-		tmap.set_transmask(color, transpen_mask(gfx, color, transcolor), 0);
-}
-
-
 
 //**************************************************************************
 //  SHADOW TABLE CONFIGURATION

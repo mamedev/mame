@@ -178,7 +178,7 @@ void gaplus_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gaplus_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(gaplus_state::tilemap_scan),this),8,8,36,28);
 
-	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 0xff);
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0xff);
 
 	starfield_init();
 }

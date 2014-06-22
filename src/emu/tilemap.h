@@ -533,6 +533,7 @@ public:
 	void map_pen_to_layer(int group, pen_t pen, UINT8 layermask) { map_pens_to_layer(group, pen, ~0, layermask); }
 	void set_transparent_pen(pen_t pen);
 	void set_transmask(int group, UINT32 fgmask, UINT32 bgmask);
+	void configure_groups(gfx_element &gfx, int transcolor);
 
 	// drawing
 	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);

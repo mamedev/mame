@@ -124,8 +124,8 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),this),  8,8, 8,32);
 
-	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 0x1f);
-	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0x1f);
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
+	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 
 	m_bg_tilemap->set_scrolldx(3,3);
 

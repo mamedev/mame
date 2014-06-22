@@ -132,7 +132,7 @@ VIDEO_START_MEMBER(equites_state,splndrbt)
 	m_fg_tilemap->set_scrolldx(8, -8);
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(1), 0x10);
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0x10);
 }
 
 
