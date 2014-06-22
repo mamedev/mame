@@ -17,7 +17,7 @@
 #define SEGA315_5124_WIDTH                      342     /* 342 pixels */
 #define SEGA315_5124_HEIGHT_NTSC                262     /* 262 lines */
 #define SEGA315_5124_HEIGHT_PAL                 313     /* 313 lines */
-#define SEGA315_5124_LBORDER_START              (1 + 2 + 14 + 8)
+#define SEGA315_5124_LBORDER_START              (9 + 2 + 14 + 8)
 #define SEGA315_5124_LBORDER_WIDTH              13      /* 13 pixels */
 #define SEGA315_5124_RBORDER_WIDTH              15      /* 15 pixels */
 #define SEGA315_5124_TBORDER_START              (3 + 13)
@@ -129,7 +129,6 @@ protected:
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
-	attotime         m_line_end_time;
 	UINT8            m_line_counter;
 	UINT8            m_hcounter;
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */
@@ -155,17 +154,23 @@ protected:
 	devcb_write_line  m_int_cb;       /* Interrupt callback function */
 	devcb_write_line  m_pause_cb;     /* Pause callback function */
 	emu_timer        *m_display_timer;
-	emu_timer        *m_check_hint_timer;
-	emu_timer        *m_check_vint_timer;
+	emu_timer        *m_hint_timer;
+	emu_timer        *m_vint_timer;
+	emu_timer        *m_nmi_timer;
 	emu_timer        *m_draw_timer;
+	emu_timer        *m_lborder_timer;
+	emu_timer        *m_rborder_timer;
 
 	const address_space_config  m_space_config;
 
 	/* Timers */
 	static const device_timer_id TIMER_LINE = 0;
 	static const device_timer_id TIMER_DRAW = 1;
-	static const device_timer_id TIMER_CHECK_HINT = 2;
-	static const device_timer_id TIMER_CHECK_VINT = 3;
+	static const device_timer_id TIMER_LBORDER = 2;
+	static const device_timer_id TIMER_RBORDER = 3;
+	static const device_timer_id TIMER_HINT = 4;
+	static const device_timer_id TIMER_VINT = 5;
+	static const device_timer_id TIMER_NMI = 6;
 
 	required_device<palette_device> m_palette;
 };
