@@ -334,7 +334,7 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily)
 {
-    assert((afamily == GENERIC && family_desc != NULL) || (afamily != GENERIC && family_desc == NULL));
+    assert((afamily == GENERIC && logic_family() != NULL) || (afamily != GENERIC && logic_family() == NULL));
 }
 
 ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstring &name)
