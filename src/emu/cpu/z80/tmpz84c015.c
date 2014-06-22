@@ -1,7 +1,7 @@
 /***************************************************************************
 
-    Toshiba TMPZ84C015, TLCS-Z80 ASSP Family
-    Z80 CPU, SIO, CTC, CGC(6/8MHz), PIO, WDT
+    Toshiba TMPZ84C015, MPUZ80/TLCS-Z80 ASSP Family
+    Z80 CPU, SIO, CTC, CGC, PIO, WDT
     
     TODO:
     - SIO configuration, or should that be up to the driver?
@@ -40,6 +40,9 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 void tmpz84c015_device::device_start()
 {
 	z80_device::device_start();
+
+	// register for save states
+	save_item(NAME(m_irq_priority));
 }
 
 
@@ -92,8 +95,14 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 		};
 		
 		// reconfigure first 3 entries in daisy chain
-		const char *daisy[4] = { dev[prio[data][0]], dev[prio[data][1]], dev[prio[data][2]], NULL };
-		m_daisy.init(this, (const z80_daisy_config *)daisy);
+		const z80_daisy_config daisy_chain[] =
+		{
+			{ dev[prio[data][0]] },
+			{ dev[prio[data][1]] },
+			{ dev[prio[data][2]] },
+			{ NULL }
+		};
+		m_daisy.init(this, daisy_chain);
 		
 		m_irq_priority = data;
 	}

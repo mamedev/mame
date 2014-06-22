@@ -1,7 +1,7 @@
 /***************************************************************************
 
-    Toshiba TMPZ84C011, TLCS-Z80 ASSP Family
-    Z80 CPU, CTC, CGC(6/8MHz), I/O8x5
+    Toshiba TMPZ84C011, MPUZ80/TLCS-Z80 ASSP Family
+    Z80 CPU, CTC, CGC, I/O8x5
     
     TODO:
     - CGC (clock generator/controller)
@@ -13,18 +13,18 @@
 const device_type TMPZ84C011 = &device_creator<tmpz84c011_device>;
 
 static ADDRESS_MAP_START( tmpz84c011_internal_io_map, AS_IO, 8, tmpz84c011_device )
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_device, read, write) AM_MIRROR(0xff00)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 
-	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_pa_r, tmpz84c011_pa_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_pb_r, tmpz84c011_pb_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_pc_r, tmpz84c011_pc_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_pd_r, tmpz84c011_pd_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_pe_r, tmpz84c011_pe_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_dir_pa_r, tmpz84c011_dir_pa_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_dir_pb_r, tmpz84c011_dir_pb_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_dir_pc_r, tmpz84c011_dir_pc_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_dir_pd_r, tmpz84c011_dir_pd_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_dir_pe_r, tmpz84c011_dir_pe_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_pa_r, tmpz84c011_pa_w)
+	AM_RANGE(0x51, 0x51) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_pb_r, tmpz84c011_pb_w)
+	AM_RANGE(0x52, 0x52) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_pc_r, tmpz84c011_pc_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_pd_r, tmpz84c011_pd_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_pe_r, tmpz84c011_pe_w)
+	AM_RANGE(0x54, 0x54) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_dir_pa_r, tmpz84c011_dir_pa_w)
+	AM_RANGE(0x55, 0x55) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_dir_pb_r, tmpz84c011_dir_pb_w)
+	AM_RANGE(0x56, 0x56) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_dir_pc_r, tmpz84c011_dir_pc_w)
+	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_dir_pd_r, tmpz84c011_dir_pd_w)
+	AM_RANGE(0x44, 0x44) AM_MIRROR(0xff00) AM_READWRITE(tmpz84c011_dir_pe_r, tmpz84c011_dir_pe_w)
 ADDRESS_MAP_END
 
 

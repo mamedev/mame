@@ -1,7 +1,7 @@
 /***************************************************************************
 
-    Toshiba TMPZ84C015, TLCS-Z80 ASSP Family
-    Z80 CPU, SIO, CTC, CGC(6/8MHz), PIO, WDT
+    Toshiba TMPZ84C015, MPUZ80/TLCS-Z80 ASSP Family
+    Z80 CPU, SIO, CTC, CGC, PIO, WDT
 
 ***************************************************************************/
 
