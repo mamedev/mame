@@ -561,7 +561,14 @@ int a2_16sect_format::identify(io_generic *io, UINT32 form_factor)
 {
 		UINT64 size = io_generic_size(io);
 		UINT32 expected_size = 35 * 16 * 256;
-		return size == expected_size;
+
+		// check standard size plus some oddball sizes in our softlist
+		if ((size = (35*16*256)) || (size == 143403) || (size == 143363) || (size == 143358))
+		{
+			return 1;
+		}
+
+		return 0;
 }
 
 // following is placeholder, is completely wrong.
@@ -603,6 +610,8 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 		UINT32 track_data[51090*2];
 		UINT8 sector_data[256*16];
 		int offset = 0;
+		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
+		static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
 
 		io_generic_read(io, sector_data, fpos, 256*16);
 
@@ -619,8 +628,6 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			}	// check Apple II Pascal
 			else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12))
 			{
-				unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
-
 				// Pascal discs can still be DOS order.
 				// Check for the second half of the boot code at 0x100
 				// (which means ProDOS order)
@@ -628,6 +635,10 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 				{
 					m_prodos_order = true;
 				}
+			}	// check for DOS 3.3 disks in ProDOS order
+			else if (!memcmp(dos33_block1, &sector_data[0x100], 4))
+			{
+				m_prodos_order = true;
 			}
 		}
 
