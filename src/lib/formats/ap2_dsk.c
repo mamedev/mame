@@ -563,7 +563,7 @@ int a2_16sect_format::identify(io_generic *io, UINT32 form_factor)
 		UINT32 expected_size = 35 * 16 * 256;
 
 		// check standard size plus some oddball sizes in our softlist
-		if ((size = (35*16*256)) || (size == 143403) || (size == 143363) || (size == 143358))
+		if ((size = expected_size) || (size == 143403) || (size == 143363) || (size == 143358))
 		{
 			return 1;
 		}
