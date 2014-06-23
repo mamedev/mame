@@ -321,9 +321,8 @@ WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
 /* CTC of main cpu, ch0 trigger is vblank */
 INTERRUPT_GEN_MEMBER(nbmj9195_state::ctc0_trg1)
 {
-	z80ctc_device *ctc = machine().device<z80ctc_device>("maincpu:ctc");
-	ctc->trg1(1);
-	ctc->trg1(0);
+	m_maincpu->trg1(1);
+	m_maincpu->trg1(0);
 }
 
 void nbmj9195_state::machine_reset()
@@ -2780,13 +2779,13 @@ INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain_main[] =
 {
-	{ "maincpu:ctc" },
+	TMPZ84C011_DAISY_INTERNAL,
 	{ NULL }
 };
 
 static const z80_daisy_config daisy_chain_sound[] =
 {
-	{ "audiocpu:ctc" },
+	TMPZ84C011_DAISY_INTERNAL,
 	{ NULL }
 };
 
@@ -2838,8 +2837,7 @@ static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(sailorws_sound_map)
 	MCFG_CPU_IO_MAP(sailorws_sound_io_map)
-	MCFG_DEVICE_MODIFY("audiocpu:ctc")
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

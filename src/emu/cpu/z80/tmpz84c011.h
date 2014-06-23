@@ -5,12 +5,35 @@
 
 ***************************************************************************/
 
+#pragma once
+
+#ifndef __TMPZ84C011__
+#define __TMPZ84C011__
+
 #include "emu.h"
 #include "z80.h"
 #include "machine/z80ctc.h"
 
-// NOTE: for CTC callbacks, see machine/z80ctc.h
-// TMPZ84C011 PIO callbacks
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+// For daisy chain configuration, insert this:
+#define TMPZ84C011_DAISY_INTERNAL { "tmpz84c011_ctc" }
+
+// CTC callbacks
+#define MCFG_TMPZ84C011_ZC0_CB(_devcb) \
+	devcb = &tmpz84c011_device::set_zc0_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMPZ84C011_ZC1_CB(_devcb) \
+	devcb = &tmpz84c011_device::set_zc1_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMPZ84C011_ZC2_CB(_devcb) \
+	devcb = &tmpz84c011_device::set_zc2_callback(*device, DEVCB_##_devcb);
+
+
+// I/O callbacks
 #define MCFG_TMPZ84C011_PORTA_READ_CB(_devcb) \
 	devcb = &tmpz84c011_device::set_inportsa_cb(*device, DEVCB_##_devcb);
 
@@ -43,12 +66,20 @@
 	devcb = &tmpz84c011_device::set_outportse_cb(*device, DEVCB_##_devcb);
 
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 class tmpz84c011_device : public z80_device
 {
 public:
 	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
 
 	// static configuration helpers
+	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc2_cb.set_callback(object); }
+
 	template<class _Object> static devcb_base & set_outportsa_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsa.set_callback(object); }
 	template<class _Object> static devcb_base & set_outportsb_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsb.set_callback(object); }
 	template<class _Object> static devcb_base & set_outportsc_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsc.set_callback(object); }
@@ -61,29 +92,39 @@ public:
 	template<class _Object> static devcb_base & set_inportsd_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsd.set_callback(object); }
 	template<class _Object> static devcb_base & set_inportse_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportse.set_callback(object); }
 
-	// devices/pointers
-	required_device<z80ctc_device> m_ctc;
+	// CTC public interface
+	DECLARE_WRITE_LINE_MEMBER( trg0 ) { m_ctc->trg0(state); }
+	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
+	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
+	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
+	
+	/////////////////////////////////////////////////////////
 
-	DECLARE_READ8_MEMBER(tmpz84c011_pa_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_pb_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_pc_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_pd_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_pe_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pa_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pb_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pc_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pd_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_pe_w);
-	DECLARE_READ8_MEMBER(tmpz84c011_dir_pa_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_dir_pb_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_dir_pc_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_dir_pd_r);
-	DECLARE_READ8_MEMBER(tmpz84c011_dir_pe_r);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_dir_pa_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_dir_pb_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_dir_pc_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_dir_pd_w);
-	DECLARE_WRITE8_MEMBER(tmpz84c011_dir_pe_w);
+	DECLARE_READ8_MEMBER( tmpz84c011_pa_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_pb_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_pc_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_pd_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_pe_r );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_pa_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_pb_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_pc_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_pd_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_pe_w );
+
+	DECLARE_READ8_MEMBER( tmpz84c011_dir_pa_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_dir_pb_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_dir_pc_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_dir_pd_r );
+	DECLARE_READ8_MEMBER( tmpz84c011_dir_pe_r );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pa_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pb_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pc_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pd_w );
+	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pe_w );
+
+	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
 
 protected:
 	// device-level overrides
@@ -103,6 +144,9 @@ protected:
 	}
 
 private:
+	// devices/pointers
+	required_device<z80ctc_device> m_ctc;
+
 	// internal state
 	UINT8 m_pio_dir[5];
 	UINT8 m_pio_latch[5];
@@ -119,6 +163,15 @@ private:
 	devcb_read8 m_inportsc;
 	devcb_read8 m_inportsd;
 	devcb_read8 m_inportse;
+
+	devcb_write_line m_zc0_cb;
+	devcb_write_line m_zc1_cb;
+	devcb_write_line m_zc2_cb;
 };
 
+
+// device type definition
 extern const device_type TMPZ84C011;
+
+
+#endif /// __TMPZ84C011__

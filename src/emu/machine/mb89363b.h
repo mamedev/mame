@@ -1,3 +1,9 @@
+/***************************************************************************
+
+    Fujitsu MB89363 Parallel Communication Interface
+    (this acts as a trampoline to 2x i8255 chips)
+
+***************************************************************************/
 
 #pragma once
 

@@ -5,17 +5,31 @@
 
 ***************************************************************************/
 
+#pragma once
+
+#ifndef __TMPZ84C015__
+#define __TMPZ84C015__
+
 #include "emu.h"
 #include "z80.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
 // If an external daisy chain is used, insert this before your own device tags:
 #define TMPZ84C015_DAISY_INTERNAL { "ctc" }, { "sio" }, { "pio" }
 
 // NOTE: for callbacks, see machine/z80dart.h, machine/z80ctc.h, machine/z80pio.h
 
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 class tmpz84c015_device : public z80_device
 {
@@ -51,4 +65,9 @@ private:
 	UINT8 m_irq_priority;
 };
 
+
+// device type definition
 extern const device_type TMPZ84C015;
+
+
+#endif // __TMPZ84C015__

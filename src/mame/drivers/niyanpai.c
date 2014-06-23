@@ -762,7 +762,7 @@ INTERRUPT_GEN_MEMBER(niyanpai_state::niyanpai_interrupt)
 
 static const z80_daisy_config daisy_chain_sound[] =
 {
-	{ "audiocpu:ctc" },
+	TMPZ84C011_DAISY_INTERNAL,
 	{ NULL }
 };
 
@@ -786,8 +786,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(niyanpai_state, cpu_portb_w))
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(niyanpai_state, cpu_portc_w))
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(niyanpai_state, cpu_porte_w))
-	MCFG_DEVICE_MODIFY("audiocpu:ctc")
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	

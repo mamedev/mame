@@ -1,3 +1,10 @@
+/******************************************************************************
+
+    nbmj9195 - Nichibutsu Mahjong games for years 1991-1995
+
+******************************************************************************/
+
+#include "cpu/z80/tmpz84c011.h"
 #include "sound/dac.h"
 
 #define VRAM_MAX    2
@@ -20,7 +27,14 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
+
+	required_device<tmpz84c011_device> m_maincpu;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	int m_inputport;
 	int m_dipswbitsel;
@@ -114,11 +128,6 @@ public:
 	int nbmj9195_dipsw_r();
 	void nbmj9195_dipswbitsel_w(int data);
 	void mscoutm_inputportsel_w(int data);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

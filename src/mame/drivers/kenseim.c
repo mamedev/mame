@@ -11,13 +11,13 @@
   https://www.youtube.com/watch?v=yQpMvRL0FfM
 
   todo:
-   we have no way of telling the physical order of the moles on the control panel vs. the reads / writes
-   so our moles could be in the wrong positions - maybe there are fixed patterns in the video we can use
-   to figure it out? * the big mole appears to be worth 2 points so that one we can identify
+  - we have no way of telling the physical order of the moles on the control panel vs. the reads / writes
+    so our moles could be in the wrong positions - maybe there are fixed patterns in the video we can use
+    to figure it out? * the big mole appears to be worth 2 points so that one we can identify
 
 
 
-  Additional 'DRIVE BOARD' PCB  (todo, improve ascii layout)
+  Additional 'DRIVE BOARD' PCB
 
   --------------------------------------------------------------------------------------------------------------|
   |                                                                                                             |
@@ -466,7 +466,7 @@ ADDRESS_MAP_END
 
 static const z80_daisy_config daisy_chain_gamecpu[] =
 {
-	{ "gamecpu:ctc" },
+	TMPZ84C011_DAISY_INTERNAL,
 	{ NULL }
 };
 

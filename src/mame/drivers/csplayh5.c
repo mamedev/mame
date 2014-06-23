@@ -450,7 +450,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 
 static const z80_daisy_config daisy_chain_sound[] =
 {
-	{ "audiocpu:ctc" },
+	TMPZ84C011_DAISY_INTERNAL,
 	{ NULL }
 };
 
@@ -480,8 +480,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(csplayh5_state, soundcpu_dac1_w))
 	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(csplayh5_state, soundcpu_portd_r))
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(csplayh5_state, soundcpu_porte_w))
-	MCFG_DEVICE_MODIFY("audiocpu:ctc")
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
