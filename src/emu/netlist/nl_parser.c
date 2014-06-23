@@ -385,6 +385,7 @@ void netlist_parser::net_c()
 	{
 		pstring t1 = get_identifier();
 		m_setup.register_link(last , t1);
+	    NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", last.cstr(), t1.cstr()));
 		token_t n = get_token();
 		if (n.is(m_tok_param_right))
 			break;
@@ -393,7 +394,6 @@ void netlist_parser::net_c()
 		last = t1;
 	}
 
-	NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", t1.cstr(), t2.cstr()));
 }
 
 void netlist_parser::netdev_param()

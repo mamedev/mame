@@ -57,7 +57,7 @@ void netlist_queue_t::on_pre_save()
 {
 	NL_VERBOSE_OUT(("on_pre_save\n"));
 	m_qsize = this->count();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist.time().as_double(), m_qsize));
+	NL_VERBOSE_OUT(("current time %f qsize %d\n", netlist().time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].exec_time().as_raw();
@@ -72,7 +72,7 @@ void netlist_queue_t::on_pre_save()
 void netlist_queue_t::on_post_load()
 {
 	this->clear();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist.time().as_double(), m_qsize));
+	NL_VERBOSE_OUT(("current time %f qsize %d\n", netlist().time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		netlist_net_t *n = netlist().find_net(&(m_name[i][0]));
@@ -334,7 +334,6 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily)
 {
-    assert((afamily == GENERIC && logic_family() != NULL) || (afamily != GENERIC && logic_family() == NULL));
 }
 
 ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstring &name)
@@ -781,12 +780,16 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 
 ATTR_HOT void netlist_terminal_t::schedule_solve()
 {
-    net().as_analog().solver()->update_forced();
+    // FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
+    if (net().as_analog().solver() != NULL)
+        net().as_analog().solver()->update_forced();
 }
 
 ATTR_HOT void netlist_terminal_t::schedule_after(const netlist_time &after)
 {
-    net().as_analog().solver()->update_after(after);
+    // FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
+    if (net().as_analog().solver() != NULL)
+        net().as_analog().solver()->update_after(after);
 }
 
 ATTR_COLD void netlist_terminal_t::reset()

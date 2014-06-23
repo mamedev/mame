@@ -444,7 +444,10 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 	}
 	else
 	{
-		out.net().register_con(in);
+	    if (in.has_net())
+	        out.net().merge_net(&in.net());
+	    else
+	        out.net().register_con(in);
 	}
 }
 
@@ -482,6 +485,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
 {
 	if (out.isFamily(netlist_terminal_t::ANALOG))
 	{
+	    NL_VERBOSE_OUT(("connect_terminal_output: %s %s\n", in.name().cstr(), out.name().cstr()));
 		/* no proxy needed, just merge existing terminal net */
 		if (in.has_net())
 			out.net().merge_net(&in.net());
@@ -660,6 +664,7 @@ void netlist_setup_t::resolve_inputs()
 
 
 	netlist().log("looking for two terms connected to rail nets ...\n");
+	// FIXME: doesn't find internal devices. This needs to be more clever
 	for (int i=0; i < netlist().m_devices.count(); i++)
 	{
 		NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
@@ -693,7 +698,7 @@ void netlist_setup_t::start_devices()
 		for (int i=0; i < ll.count(); i++)
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
-			printf("%d: <%s>\n",i, ll[i].cstr());
+			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			netlist_device_t *nc = factory().new_device_by_classname("nld_log", *this);
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);

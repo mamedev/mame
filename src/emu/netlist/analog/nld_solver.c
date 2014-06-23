@@ -187,7 +187,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 					break;
 			}
 		}
-		NL_VERBOSE_OUT(("added net with %d populated connections (%d railnets)\n", net->m_terms.count(), (*pn)->m_rails.count()));
+		NL_VERBOSE_OUT(("added net with %d populated connections\n", net->m_core_terms.count()));
 	}
 }
 
