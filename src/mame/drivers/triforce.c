@@ -902,6 +902,21 @@ ROM_START( mkartag2 )
 	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) ) 
 ROM_END
 
+ROM_START( mkartag2a )
+	TRIFORCE_BIOS
+
+	ROM_REGION(0x21200000, "rom_board", 0)
+	ROM_LOAD( "ic9_mx29lv400cttc.bin", 0x00000000, 0x0080000, CRC(ff854fd0) SHA1(0e42aff9a60aacd200b7a29d4d180abdab6a732e) ) 
+	ROM_LOAD( "ic1_k9f1208u0b.bin",    0x01000000, 0x4200000, CRC(c5624816) SHA1(d6f2a2ff9e9e14d857a0ec810521c378ba1fabd5) ) 
+	ROM_LOAD( "ic2_k9f1208u0b.bin",    0x04200000, 0x4200000, CRC(44e59a1f) SHA1(68a8c1178a33e23446980ec84486bc614f830dad) ) 
+	ROM_LOAD( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, CRC(6688e7f9) SHA1(7d1e60806c02fd765dd0981e790a698a29050aae) ) 
+	ROM_LOAD( "ic4_k9f1208u0b.bin",    0x0c600000, 0x4200000, CRC(e043eac2) SHA1(0108d940a852ff03e919170957f2bca2c1a88a03) ) 
+	ROM_LOAD( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, CRC(20882926) SHA1(c802de32ca24bf4e9fbabf47fed23a91b3d614ac) ) 
+	ROM_LOAD( "ic6_k9f1208u0b.bin",    0x14c00000, 0x4200000, CRC(14171ba4) SHA1(3ddace539cd8a4b53a1ef03238e8404db7dcd85e) ) 
+	ROM_LOAD( "ic7_k9f1208u0b.bin",    0x18e00000, 0x4200000, CRC(bd0199df) SHA1(aafb171e9f5a4c8dc2ef55ba344a0eb310c63467) ) 
+	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(8ad6c7ae) SHA1(749b99a944f62aefb895a622c029656c69b3c736) ) 
+ROM_END
+
 /* Main board */
 /*Triforce*/GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
 
@@ -952,3 +967,4 @@ ROM_END
 // ROM games
 /* 14343 */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
 /* 14343 */ GAME( 2007, mkartag2, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP 2 (MK21 Ver.A)", GAME_IS_SKELETON )
+/* 14343 */ GAME( 2007, mkartag2a,mkartag2, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP 2 (MK21 Ver.A, alt dump)", GAME_IS_SKELETON )
