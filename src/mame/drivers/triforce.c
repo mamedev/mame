@@ -878,6 +878,29 @@ ROM_START( mkartagp )
 	ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) )
 ROM_END
 
+/*
+ 
+MK21 Ver.A
+Number on ROM PCB  837-14343R4S0
+Number on Actel ProAsic  315-6419B
+Number on Key Chip (PIC)  235-5509-5128 
+ 
+*/ 
+
+ROM_START( mkartag2 )
+	TRIFORCE_BIOS
+
+	ROM_REGION(0x21200000, "rom_board", 0)
+	ROM_LOAD( "ic9_mx29lv400cttc.bin", 0x00000000, 0x0080000, CRC(2bb9f1fe) SHA1(935511d93a0ab06436b0674bef90c790c100e0b1) ) 
+	ROM_LOAD( "ic1_k9f1208u0b.bin",    0x01000000, 0x4200000, CRC(e52f17ef) SHA1(1e007d3136cacb89c396b8261e3978956cc21bdd) ) 
+	ROM_LOAD( "ic2_k9f1208u0b.bin",    0x04200000, 0x4200000, CRC(8a6a2649) SHA1(fd4318e7fb5020c499e06fdb1996b8d40161b674) ) 
+	ROM_LOAD( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, CRC(8fd44a29) SHA1(9392bc4da6541960a83e9c7b3ab4f36bc5564fb7) ) 
+	ROM_LOAD( "ic4_k9f1208u0b.bin",    0x0c600000, 0x4200000, CRC(ae3fb198) SHA1(c9c0beb9f6875dbf7ce015454a59481524ef3ef6) ) 
+	ROM_LOAD( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, CRC(e9208514) SHA1(ad0ed3e681cd78a61d7ad3af83db20e364bb47fd) ) 
+	ROM_LOAD( "ic6_k9f1208u0b.bin",    0x14c00000, 0x4200000, CRC(7363697c) SHA1(997c96d0b41774a24a2e0427a703bc295e784187) ) 
+	ROM_LOAD( "ic7_k9f1208u0b.bin",    0x18e00000, 0x4200000, CRC(407da1d2) SHA1(c185ebd2f3d8654d8fd394c56ac9bfff7e49f125) ) 
+	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) ) 
+ROM_END
 
 /* Main board */
 /*Triforce*/GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
@@ -928,3 +951,4 @@ ROM_END
 
 // ROM games
 /* 14343 */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
+/* 14343 */ GAME( 2007, mkartag2, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP 2 (MK21 Ver.A)", GAME_IS_SKELETON )
