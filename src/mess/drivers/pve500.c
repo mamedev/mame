@@ -196,7 +196,7 @@ void pve500_state::machine_reset()
 READ8_MEMBER(pve500_state::dualport_ram_left_r)
 {
 	//printf("dualport_ram: Left READ\n");
-	m_subcpu->m_ctc->trg1(1); //(INT_Right)
+	m_subcpu->trg1(1); //(INT_Right)
 	return dualport_7FE_data;
 }
 
@@ -204,13 +204,13 @@ WRITE8_MEMBER(pve500_state::dualport_ram_left_w)
 {
 	//printf("dualport_ram: Left WRITE\n");
 	dualport_7FF_data = data;
-	m_subcpu->m_ctc->trg1(0); //(INT_Right)
+	m_subcpu->trg1(0); //(INT_Right)
 }
 
 READ8_MEMBER(pve500_state::dualport_ram_right_r)
 {
 	//printf("dualport_ram: Right READ\n");
-	m_maincpu->m_ctc->trg1(1); //(INT_Left)
+	m_maincpu->trg1(1); //(INT_Left)
 	return dualport_7FF_data;
 }
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER(pve500_state::dualport_ram_right_w)
 {
 	//printf("dualport_ram: Right WRITE\n");
 	dualport_7FE_data = data;
-	m_maincpu->m_ctc->trg1(0); //(INT_Left)
+	m_maincpu->trg1(0); //(INT_Left)
 }
 
 READ8_MEMBER(pve500_state::io_expander_r)
