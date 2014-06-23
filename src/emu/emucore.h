@@ -290,33 +290,45 @@ public:
 	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
 		: code(0)
 	{
-		va_list ap;
-		va_start(ap, format);
-		vsprintf(text, format, ap);
-		va_end(ap);
+		if (format != NULL)
+		{
+			va_list ap;
+			va_start(ap, format);
+			vsprintf(text, format, ap);
+			va_end(ap);
+		}
 		osd_break_into_debugger(text);
 	}
 
 	emu_fatalerror(const char *format, va_list ap)
 		: code(0)
 	{
-		vsprintf(text, format, ap);
+		if (format != NULL)
+		{
+			vsprintf(text, format, ap);
+		}
 		osd_break_into_debugger(text);
 	}
 
 	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4)
 		: code(_exitcode)
 	{
-		va_list ap;
-		va_start(ap, format);
-		vsprintf(text, format, ap);
-		va_end(ap);
+		if (format != NULL)
+		{
+			va_list ap;
+			va_start(ap, format);
+			vsprintf(text, format, ap);
+			va_end(ap);
+		}
 	}
 
 	emu_fatalerror(int _exitcode, const char *format, va_list ap)
 		: code(_exitcode)
 	{
-		vsprintf(text, format, ap);
+		if (format != NULL)
+		{
+			vsprintf(text, format, ap);
+		}
 	}
 
 	const char *string() const { return text; }

@@ -194,7 +194,7 @@ int cli_frontend::execute(int argc, char **argv)
 			if (!found)
 			{
 				software_list_device::display_matches(config, NULL, m_options.software_name());
-				throw emu_fatalerror(MAMERR_FATALERROR, "");
+				throw emu_fatalerror(MAMERR_FATALERROR, NULL);
 			}
 		}
 		
