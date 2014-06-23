@@ -744,6 +744,48 @@ ROM_START( 1942abl )
 	ROM_LOAD( "sb-9.m11", 0x0900, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
+/* set contained only three program ROMs, other ROMs should be checked against a real PCB */
+ROM_START( 1942h )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "42-3.bin",  0x00000, 0x4000, CRC(ec70785f) SHA1(2010a945e1d5c984a14cf7f47a883d04bd71567d) )
+	ROM_LOAD( "42-4.bin",  0x04000, 0x4000, CRC(cc11355f) SHA1(44fceb449f406f657494eeee4e6b43bf063f2013) )
+	ROM_LOAD( "42-5.bin",  0x10000, 0x4000, CRC(42746d75) SHA1(ede6919b84653b94fddeb40b3004e44336880ba2) )
+	ROM_LOAD( "srb-06.m6", 0x14000, 0x2000, CRC(466f8248) SHA1(2ccc8fc59962d3001fbc10e8d2f20a254a74f251) )
+	ROM_LOAD( "srb-07.m7", 0x18000, 0x4000, CRC(0d31038c) SHA1(b588eaf6fddd66ecb2d9832dc197f286f1ccd846) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sr-02.f2", 0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) )    /* characters */
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "sr-08.a1", 0x0000, 0x2000, CRC(3884d9eb) SHA1(5cbd9215fa5ba5a61208b383700adc4428521aed) )    /* tiles */
+	ROM_LOAD( "sr-09.a2", 0x2000, 0x2000, CRC(999cf6e0) SHA1(5b8b685038ec98b781908b92eb7fb9506db68544) )
+	ROM_LOAD( "sr-10.a3", 0x4000, 0x2000, CRC(8edb273a) SHA1(85fdd4c690ed31e6396e3c16aa02140ee7ea2d61) )
+	ROM_LOAD( "sr-11.a4", 0x6000, 0x2000, CRC(3a2726c3) SHA1(187c92ef591febdcbd1d42ab850e0cbb62c00873) )
+	ROM_LOAD( "sr-12.a5", 0x8000, 0x2000, CRC(1bd3d8bb) SHA1(ef4dce605eb4dc8035985a415315ec61c21419c6) )
+	ROM_LOAD( "sr-13.a6", 0xa000, 0x2000, CRC(658f02c4) SHA1(f087d69e49e38cf3107350cde18fcf85a8fa04f0) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "sr-14.l1", 0x00000, 0x4000, CRC(2528bec6) SHA1(29f7719f18faad6bd1ec6735cc24e69168361470) )   /* sprites */
+	ROM_LOAD( "sr-15.l2", 0x04000, 0x4000, CRC(f89287aa) SHA1(136fff6d2a4f48a488fc7c620213761459c3ada0) )
+	ROM_LOAD( "sr-16.n1", 0x08000, 0x4000, CRC(024418f8) SHA1(145b8d5d6c8654cd090955a98f6dd8c8dbafe7c1) )
+	ROM_LOAD( "sr-17.n2", 0x0c000, 0x4000, CRC(e2c7e489) SHA1(d4b5d575c021f58f6966df189df94e08c5b3621c) )
+
+	ROM_REGION( 0x0a00, "proms", 0 )
+	ROM_LOAD( "sb-5.e8",  0x0000, 0x0100, CRC(93ab8153) SHA1(a792f24e5c0c3c4a6b436102e7a98199f878ece1) )    /* red component */
+	ROM_LOAD( "sb-6.e9",  0x0100, 0x0100, CRC(8ab44f7d) SHA1(f74680a6a987d74b3acb32e6396f20e127874149) )    /* green component */
+	ROM_LOAD( "sb-7.e10", 0x0200, 0x0100, CRC(f4ade9a4) SHA1(62ad31d31d183cce213b03168daa035083b2f28e) )    /* blue component */
+	ROM_LOAD( "sb-0.f1",  0x0300, 0x0100, CRC(6047d91b) SHA1(1ce025f9524c1033e48c5294ee7d360f8bfebe8d) )    /* char lookup table */
+	ROM_LOAD( "sb-4.d6",  0x0400, 0x0100, CRC(4858968d) SHA1(20b5dbcaa1a4081b3139e7e2332d8fe3c9e55ed6) )    /* tile lookup table */
+	ROM_LOAD( "sb-8.k3",  0x0500, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
+	ROM_LOAD( "sb-2.d1",  0x0600, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
+	ROM_LOAD( "sb-3.d2",  0x0700, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
+	ROM_LOAD( "sb-1.k6",  0x0800, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0900, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+ROM_END
+
 ROM_START( 1942b )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sr-03.m3", 0x00000, 0x4000, CRC(612975f2) SHA1(f3744335862dd4c53925cc32792badd4a378c837) )
@@ -868,6 +910,7 @@ DRIVER_INIT_MEMBER(_1942_state,1942)
 GAME( 1984, 1942,     0,    1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision B)", GAME_SUPPORTS_SAVE )
 GAME( 1984, 1942a,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision A)", GAME_SUPPORTS_SAVE )
 GAME( 1984, 1942abl,  1942, 1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", GAME_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
+GAME( 198?, 1942h,    1942, 1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score?)", "42", GAME_SUPPORTS_SAVE ) 
 GAME( 1984, 1942b,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 1942w,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", GAME_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
 GAME( 1984, 1942p,    1942, 1942p,1942p,_1942_state, 1942, ROT270, "Capcom", "1942 (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
