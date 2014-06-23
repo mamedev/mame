@@ -200,18 +200,40 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 
 		if ( m_audio4.on )
 		{
-			if ( m_audio4_noise )
+			sample = m_audio4.signal;
+			m_audio4.pos++;
+			if ( m_audio4.pos >= m_audio4.period / 2 )
 			{
-				sample = 0;
-			}
-			else
-			{
-				sample = m_audio4.signal;
-				m_audio4.pos++;
-				if ( m_audio4.pos >= m_audio4.period / 2 )
+				m_audio4.signal = -m_audio4.signal;
+				m_audio4.pos = 0;
+
+				if (m_noise_enable)
 				{
-					m_audio4.pos = 0;
-					m_audio4.signal = -m_audio4.signal;
+					UINT16 new_bit = 0;
+
+					if (m_noise_type == 0)
+					{
+						new_bit = (m_noise_shift ^ (m_noise_shift >> 5) ^ (m_noise_shift >> 8)) & 1;
+					}
+					else
+					{
+						static int shift_bit[] = { 0, 10, 13, 4, 8, 6, 9, 11 };
+
+						new_bit = (1 ^ (m_noise_shift >> 7) ^ (m_noise_shift >> shift_bit[m_noise_type])) & 1;
+					}
+					m_noise_shift = (m_noise_shift << 1) | new_bit;
+
+					if (m_audio4_noise)
+					{
+						m_audio4.signal = (m_noise_shift & 0x8000) ? 16 : -16;
+					}
+
+					m_noise_shift &= 0x7fff;
+
+					if (m_noise_shift == 0x7fff)
+					{
+						m_noise_shift = (m_noise_type == 0) ? 0x80 : 0;
+					}
 				}
 			}
 			left += m_audio4.vol_left * sample;
@@ -305,6 +327,10 @@ WRITE8_MEMBER( wswan_sound_device::port_w )
 			m_noise_type = data & 0x07;
 			m_noise_reset = ( data & 0x08 ) >> 3;
 			m_noise_enable = ( data & 0x10 ) >> 4;
+			if (m_noise_reset)
+			{
+				m_noise_shift = (m_noise_type == 0) ? 0x80 : 0;
+			}
 			break;
 
 		case 0x8F:              /* Sample location */
@@ -333,7 +359,7 @@ WRITE8_MEMBER( wswan_sound_device::port_w )
 			break;
 
 		case 0x93:              /* Noise counter shift register (hi) */
-			m_noise_shift = ( data << 8 ) | ( m_noise_shift & 0x00FF );
+			m_noise_shift = ( ( data & 0x7f ) << 8 ) | ( m_noise_shift & 0x00FF );
 			break;
 
 		case 0x94:              /* Master volume */
