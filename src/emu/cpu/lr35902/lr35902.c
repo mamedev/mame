@@ -130,8 +130,11 @@ void lr35902_cpu_device::device_start()
 	m_device = this;
 	m_program = &space(AS_PROGRAM);
 
+	// resolve callbacks
 	m_timer_func.resolve_safe();
+	m_incdec16_func.resolve_safe();
 
+	// register for save states
 	save_item(NAME(m_A));
 	save_item(NAME(m_F));
 	save_item(NAME(m_B));

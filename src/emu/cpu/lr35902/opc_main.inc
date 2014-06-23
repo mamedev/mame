@@ -24,16 +24,14 @@
 { \
 	register UINT16 r = x << 8 | y; \
 	if (++y == 0) x++; \
-	if (!m_incdec16_func.isnull()) \
-		m_incdec16_func(r << 16 | x << 8 | y); \
+	m_incdec16_func(r << 16 | x << 8 | y); \
 }
 
 #define DEC_16BIT(x,y) \
 { \
 	register UINT16 r = x << 8 | y; \
 	if (--y == 0xff) x--; \
-	if (!m_incdec16_func.isnull()) \
-		m_incdec16_func(r << 16 | x << 8 | y); \
+	m_incdec16_func(r << 16 | x << 8 | y); \
 }
 
 #define ADD_HL_RR(x) \
