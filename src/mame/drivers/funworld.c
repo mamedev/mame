@@ -66,6 +66,7 @@
   * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
+  * Royal Card (Italian, Dino 4 hardware, encrypted)  unknown,            1998.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
   * Magic Card II (Bulgarian),                        Impera,             1996.
@@ -438,15 +439,6 @@
   C134: 8D 02 00   STA $0002   ;/
   C137: 4C DC 48   JMP $48DC   ; jump to $48DC...
 
-  48DC: 93         NOP         ;\
-  48DD: 00         BRK         ; \
-  48DE: B7 4B      SMB3 $4B    ;  \
-  48E0: 05 93      ORA $93     ;   > nothing has sense here...
-  48E2: 00         BRK         ;  /
-  48E3: B7 4D      SMB3 $4B    ; /
-  48E5: 05 B7      ORA $B7     ;/
-  48E7: 4C 05 76   JMP $7605   ; jump to $7605 (no code there)
-
   And the IRQ vector pointed code... does nothing!
 
   C20F: 40         RTI         ; return from interrupt
@@ -467,15 +459,6 @@
   match 100% the ones I decrypted here. Even with the game working properly in the real hardware.
   The only visible changes are in the NVRAM, where the $0000 offset hasn't the JMP $C210 instruction
   injected at the start...
-
-  Maybe some scrambled instructions on the fatidic 'mexican' Rockwell R65C02 (like Magic Card II)??...
-  Maybe mnemonic 93 is AXA (ab),Y (93 ab) instead of NOP (as seen in some sources)??...
-
-  Tooo much obscure/darkness here
-
-  So... No idea what's wrong here.
-  If someone could figure a possible transform, please let me know.
-
 
 ***********************************************************************************
 
@@ -542,7 +525,7 @@
 ***********************************************************************************
 
 
-  *** Driver Updates by Roberto Fresca ***
+  *** Driver Updates by Roberto Fresca and Peter Ferrie ***
 
 
   [2005/09/08]
@@ -974,6 +957,10 @@
     This set is original, but running in a bootleg board.
   - Added a default NVRAM to get the game working.
   - Added technical notes.
+
+  [2014/05/08]
+  - Rcdino4: Fully decrypted the code set.
+  - Corrected technical notes...
 
 
   *** TO DO ***
@@ -6267,8 +6254,12 @@ static UINT8 rcdino4_keys80[] =
 	0x00, 0x00, 0x00, 0x00, 0x00,
 /*	d0*/
 	0x84,
-/*	d1    d2    d3    d4    d5*/
-	0x00, 0x00, 0x00, 0x00, 0x00,
+/*	d1*/
+	0x00,
+/*	d2*/
+	0xaa,
+/*	d3    d4    d5*/
+	0x00, 0x00, 0x00,
 /*	d6*/
 	0xea,
 /*	d7    d8    d9    da    db    dc    dd    de    df*/
@@ -6361,19 +6352,32 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 			  && (j >= 0x7e) && (j <= 0x8d) /* '0'-'9', 'A'-'F' */
 			    )
 			 || ((i == 0x94)
-		 	  && (j == 0xbf) /* set of masks */
+			  && (((j >= 0x4a) && (j <= 0x86)) /* zeroes */
+		 	   || ((j >= 0xbf) && (j <= 0xc1)) /* set of masks */
+			     )
 			    )
 			 || ((i == 0x96)
-			  && ((j == 0x39) || (j == 0x3c)) /* set of masks */
+			  && (j >= 0x39) && (j <= 0x3e) /* set of masks */
+			    )
+			 || ((i == 0xa6)
+			  && (j >= 0x30) && (j <= 0x32) /* set of masks */
 			    )
 			 || ((i == 0xaa)
 			  && (j >= 0xf2) /* table of addresses */
+			    )
+			 || ((i == 0xc3)
+			  && (j >= 0x70) && (j <= 0xaf) /* set of masks */
 			    )
 			 || ((i == 0xc4)
 			  && (j >= 0xdc) /* zeroes and things */
 			    )
 			 || ((i == 0xd0)
 			  && (j >= 0xd2) /* text and zeroes */
+			    )
+			 || ((i == 0xd2)
+			  && ((j <= 0x2f) /* text and zeroes */
+			   || ((j >= 0x84) && (j <= 0xaf)) /* text and zeroes */
+			     )
 			    )
 			 || (add == 9)
 			   )
@@ -6509,7 +6513,7 @@ GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, tabblue, 
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
-GAME(  1998, rcdino4,   0,        rcdino4,  rcdino4,   funworld_state, rcdino4,  ROT0, "<unknown>",       "unknown encrypted Royal Card (Dino4 HW)",         GAME_NOT_WORKING )
+GAME ( 1998, rcdino4,   0,        rcdino4,  rcdino4,   funworld_state, rcdino4,  ROT0, "<unknown>",       "Royal Card (Italian, Dino 4 hardware, encrypted)",0 )
 GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdinch,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
 
 // MCU based games...
