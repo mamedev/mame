@@ -290,7 +290,11 @@ public:
 	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
 		: code(0)
 	{
-		if (format != NULL)
+		if (format == NULL)
+		{
+			text[0] = '\0';
+		}
+		else
 		{
 			va_list ap;
 			va_start(ap, format);
@@ -303,7 +307,11 @@ public:
 	emu_fatalerror(const char *format, va_list ap)
 		: code(0)
 	{
-		if (format != NULL)
+		if (format == NULL)
+		{
+			text[0] = '\0';
+		}
+		else
 		{
 			vsprintf(text, format, ap);
 		}
@@ -313,7 +321,11 @@ public:
 	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4)
 		: code(_exitcode)
 	{
-		if (format != NULL)
+		if (format == NULL)
+		{
+			text[0] = '\0';
+		}
+		else
 		{
 			va_list ap;
 			va_start(ap, format);
@@ -325,7 +337,11 @@ public:
 	emu_fatalerror(int _exitcode, const char *format, va_list ap)
 		: code(_exitcode)
 	{
-		if (format != NULL)
+		if (format == NULL)
+		{
+			text[0] = '\0';
+		}
+		else
 		{
 			vsprintf(text, format, ap);
 		}
