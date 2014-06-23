@@ -41,7 +41,6 @@ public:
 	DECLARE_READ8_MEMBER(dualport_ram_left_r);
 	DECLARE_READ8_MEMBER(dualport_ram_right_r);
 	DECLARE_WRITE_LINE_MEMBER(GPI_w);
-	DECLARE_WRITE_LINE_MEMBER(buzzer_w);
 	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
 	DECLARE_WRITE8_MEMBER(io_expander_w);
@@ -64,11 +63,6 @@ WRITE_LINE_MEMBER( pve500_state::GPI_w )
 	/* TODO: Implement-me */
 }
 
-WRITE_LINE_MEMBER( pve500_state::buzzer_w )
-{
-	 m_buzzer->set_state(state);
-}
-
 WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
 {
 	/* TODO: Implement-me */
@@ -79,12 +73,6 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 	TMPZ84C015_DAISY_INTERNAL,
 	{ "external_ctc" },
 	{ "external_sio" },
-	{ NULL }
-};
-
-static const z80_daisy_config subcpu_daisy_chain[] =
-{
-	TMPZ84C015_DAISY_INTERNAL,
 	{ NULL }
 };
 
@@ -327,7 +315,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_CONFIG(maincpu_daisy_chain)
 	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, GPI_w))
-	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, buzzer_w))
+	MCFG_TMPZ84C015_OUT_DTRB_CB(DEVWRITELINE("buzzer", beep_device, set_state))
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))
 	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("player1", rs232_port_device, write_txd))
 
@@ -343,17 +331,16 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
 	MCFG_CPU_IO_MAP(subcpu_io)
-	MCFG_CPU_CONFIG(subcpu_daisy_chain)
 	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, external_monitor_w))
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("switcher", rs232_port_device, write_txd))
 	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("serial_mixer", rs232_port_device, write_txd))
 
 	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
 	MCFG_RS232_PORT_ADD("recorder", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:tmpz84c015_sio", z80dart_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxa_w))
 
 	MCFG_RS232_PORT_ADD("player1", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:tmpz84c015_sio", z80dart_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxb_w))
 
 	MCFG_RS232_PORT_ADD("player2", default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxa_w))
@@ -362,10 +349,10 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxb_w))
 
 	MCFG_RS232_PORT_ADD("switcher", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu:tmpz84c015_sio", z80dart_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxa_w))
 
 	MCFG_RS232_PORT_ADD("serial_mixer", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu:tmpz84c015_sio", z80dart_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxb_w))
 
 /* TODO:
 -> There are a few LEDs and a sequence of 7-seg displays with atotal of 27 digits
@@ -377,7 +364,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("buzzer", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 MACHINE_CONFIG_END
 
