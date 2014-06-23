@@ -16,6 +16,8 @@
 
 #include "emu.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "sound/beep.h"
+#include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
 #include "pve500.lh"
 
 #define IO_EXPANDER_PORTA 0
@@ -31,12 +33,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
+		, m_buzzer(*this, "buzzer")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(dualport_ram_left_w);
 	DECLARE_WRITE8_MEMBER(dualport_ram_right_w);
 	DECLARE_READ8_MEMBER(dualport_ram_left_r);
 	DECLARE_READ8_MEMBER(dualport_ram_right_r);
+	DECLARE_WRITE_LINE_MEMBER(GPI_w);
+	DECLARE_WRITE_LINE_MEMBER(buzzer_w);
+	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
 	DECLARE_WRITE8_MEMBER(io_expander_w);
 	DECLARE_READ8_MEMBER(io_expander_r);
@@ -49,15 +55,36 @@ private:
 	virtual void machine_reset();
 	required_device<tmpz84c015_device> m_maincpu;
 	required_device<tmpz84c015_device> m_subcpu;
+	required_device<beep_device> m_buzzer;
 	UINT8 io_SEL, io_LD, io_LE, io_SC, io_KY;
 };
 
+WRITE_LINE_MEMBER( pve500_state::GPI_w )
+{
+	/* TODO: Implement-me */
+}
+
+WRITE_LINE_MEMBER( pve500_state::buzzer_w )
+{
+	 m_buzzer->set_state(state);
+}
+
+WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
+{
+	/* TODO: Implement-me */
+}
 
 static const z80_daisy_config maincpu_daisy_chain[] =
 {
 	TMPZ84C015_DAISY_INTERNAL,
 	{ "external_ctc" },
 	{ "external_sio" },
+	{ NULL }
+};
+
+static const z80_daisy_config subcpu_daisy_chain[] =
+{
+	TMPZ84C015_DAISY_INTERNAL,
 	{ NULL }
 };
 
@@ -74,6 +101,10 @@ static ADDRESS_MAP_START(maincpu_prg, AS_PROGRAM, 8, pve500_state)
 	AM_RANGE (0xE7FE, 0xE7FE) AM_MIRROR(0x1800) AM_READ(dualport_ram_left_r)
 	AM_RANGE (0xE7FF, 0xE7FF) AM_MIRROR(0x1800) AM_WRITE(dualport_ram_left_w)
 	AM_RANGE (0xE000, 0xE7FF) AM_MIRROR(0x1800) AM_RAM AM_SHARE("sharedram") //  ICF5: 2kbytes of RAM shared between the two CPUs
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(subcpu_io, AS_IO, 8, pve500_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
@@ -191,38 +222,42 @@ void pve500_state::machine_start()
 
 void pve500_state::machine_reset()
 {
+	/* Setup beep */
+	m_buzzer->set_state(0);
+	m_buzzer->set_frequency(3750); //CLK2 coming out of IC D4 (frequency divider circuitry)
 }
 
 READ8_MEMBER(pve500_state::dualport_ram_left_r)
 {
-	//printf("dualport_ram: Left READ\n");
+	printf("dualport_ram: Left READ\n");
 	m_subcpu->trg1(1); //(INT_Right)
 	return dualport_7FE_data;
 }
 
 WRITE8_MEMBER(pve500_state::dualport_ram_left_w)
 {
-	//printf("dualport_ram: Left WRITE\n");
+	printf("dualport_ram: Left WRITE\n");
 	dualport_7FF_data = data;
 	m_subcpu->trg1(0); //(INT_Right)
 }
 
 READ8_MEMBER(pve500_state::dualport_ram_right_r)
 {
-	//printf("dualport_ram: Right READ\n");
+	printf("dualport_ram: Right READ\n");
 	m_maincpu->trg1(1); //(INT_Left)
 	return dualport_7FF_data;
 }
 
 WRITE8_MEMBER(pve500_state::dualport_ram_right_w)
 {
-	//printf("dualport_ram: Right WRITE\n");
+	printf("dualport_ram: Right WRITE\n");
 	dualport_7FE_data = data;
 	m_maincpu->trg1(0); //(INT_Left)
 }
 
 READ8_MEMBER(pve500_state::io_expander_r)
 {
+	printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
 	switch (offset){
 		case IO_EXPANDER_PORTA:
 			return io_SC;
@@ -250,28 +285,31 @@ READ8_MEMBER(pve500_state::io_expander_r)
 
 WRITE8_MEMBER(pve500_state::io_expander_w)
 {
-	//printf("io_expander_w: offset=%d data=%02X\n", offset, data);
 	switch (offset){
 		case IO_EXPANDER_PORTA:
+			printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
 			io_SC = data;
 			break;
 		case IO_EXPANDER_PORTB:
+			printf("io_expander_w: PORTB (io_LE=%02X)\n", data);
 			io_LE = data;
 			break;
 		case IO_EXPANDER_PORTC:
+			printf("io_expander_w: PORTC (io_KY=%02X)\n", data);
 			io_KY = data;
 			break;
 		case IO_EXPANDER_PORTD:
+			printf("io_expander_w: PORTD (io_LD=%02X)\n", data);
 			io_LD = data;
 			break;
 		case IO_EXPANDER_PORTE:
 			io_SEL = data;
+			printf("io_expander_w PORTE (io_SEL=%02X)\n", data);
 			for (int i=0; i<4; i++){
 				if (io_SEL & (1 << i)){
 					for (int j=0; j<8; j++){
 						if (io_SC & (1<<j)){
 							output_set_digit_value(8*i + j, BITSWAP8(io_LD & 0x7F, 7, 0, 1, 2, 3, 4, 5, 6));
-							//printf("io_expander_w PORTE data=%02X\n", data);
 						}
 					}
 				}
@@ -283,28 +321,63 @@ WRITE8_MEMBER(pve500_state::io_expander_w)
 }
 
 static MACHINE_CONFIG_START( pve500, pve500_state )
+  /* Main CPU */
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_CONFIG(maincpu_daisy_chain)
+	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, GPI_w))
+	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, buzzer_w))
+	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))
+	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("player1", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL_12MHz / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_Z80SIO0_ADD("external_sio", XTAL_12MHz / 2, 0, 0, 0, 0)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))
 
+  /* Secondary CPU */
 	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
+	MCFG_CPU_IO_MAP(subcpu_io)
+	MCFG_CPU_CONFIG(subcpu_daisy_chain)
+	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, external_monitor_w))
+	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("switcher", rs232_port_device, write_txd))
+	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("serial_mixer", rs232_port_device, write_txd))
+
+	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
+	MCFG_RS232_PORT_ADD("recorder", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:tmpz84c015_sio", z80dart_device, rxa_w))
+
+	MCFG_RS232_PORT_ADD("player1", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:tmpz84c015_sio", z80dart_device, rxb_w))
+
+	MCFG_RS232_PORT_ADD("player2", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxa_w))
+
+	MCFG_RS232_PORT_ADD("edl_inout", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxb_w))
+
+	MCFG_RS232_PORT_ADD("switcher", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu:tmpz84c015_sio", z80dart_device, rxa_w))
+
+	MCFG_RS232_PORT_ADD("serial_mixer", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu:tmpz84c015_sio", z80dart_device, rxb_w))
 
 /* TODO:
 -> There are a few LEDs and a sequence of 7-seg displays with atotal of 27 digits
--> Sound hardware consists of a buzzer connected to a signal of the maincpu SIO and a logic-gate that attaches/detaches it from the
-   system clock Which apparently means you can only beep the buzzer to a certain predefined tone or keep it mute.
 */
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pve500)
+
+	/* audio hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("buzzer", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -317,4 +390,4 @@ ROM_START( pve500 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS           INIT   COMPANY    FULLNAME                    FLAGS */
-COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY", "PVE-500", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY", "PVE-500", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS)
