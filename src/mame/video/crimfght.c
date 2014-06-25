@@ -20,14 +20,12 @@ K052109_CB_MEMBER(crimfght_state::tile_callback)
 
 ***************************************************************************/
 
-void crimfght_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(crimfght_state::sprite_callback)
 {
 	/* Weird priority scheme. Why use three bits when two would suffice? */
 	/* The PROM allows for mixed priorities, where sprites would have */
 	/* priority over text but not on one or both of the other two planes. */
 	/* Luckily, this isn't used by the game. */
-	crimfght_state *state = machine.driver_data<crimfght_state>();
-
 	switch (*color & 0x70)
 	{
 		case 0x10: *priority = 0; break;
@@ -41,7 +39,7 @@ void crimfght_sprite_callback( running_machine &machine, int *code, int *color, 
 	}
 	/* bit 7 is on in the "Game Over" sprites, meaning unknown */
 	/* in Aliens it is the top bit of the code, but that's not needed here */
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 

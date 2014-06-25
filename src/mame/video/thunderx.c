@@ -20,22 +20,20 @@ K052109_CB_MEMBER(thunderx_state::tile_callback)
 
 ***************************************************************************/
 
-void thunderx_sprite_callback( running_machine &machine, int *code,int *color, int *priority_mask, int *shadow )
+K051960_CB_MEMBER(thunderx_state::sprite_callback)
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
-
 	/* Sprite priority 1 means appear behind background, used only to mask sprites */
 	/* in the foreground */
 	/* Sprite priority 3 means don't draw (not used) */
 	switch (*color & 0x30)
 	{
-		case 0x00: *priority_mask = 0xf0; break;
-		case 0x10: *priority_mask = 0xf0 | 0xcc | 0xaa; break;
-		case 0x20: *priority_mask = 0xf0 | 0xcc; break;
-		case 0x30: *priority_mask = 0xffff; break;
+		case 0x00: *priority = 0xf0; break;
+		case 0x10: *priority = 0xf0 | 0xcc | 0xaa; break;
+		case 0x20: *priority = 0xf0 | 0xcc; break;
+		case 0x30: *priority = 0xffff; break;
 	}
 
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 

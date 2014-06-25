@@ -19,8 +19,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_k051960(*this, "k051960") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_gfxram;
@@ -41,7 +40,6 @@ public:
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_READ16_MEMBER(k052109_halfword_r);
 	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
@@ -65,7 +63,5 @@ public:
 	void gradius3_postload();
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/gradius3.c -----------*/
-extern void gradius3_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

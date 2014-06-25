@@ -21,13 +21,12 @@ K052109_CB_MEMBER(bottom9_state::tile_callback)
 
 ***************************************************************************/
 
-void bottom9_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(bottom9_state::sprite_callback)
 {
 	/* bit 4 = priority over zoom (0 = have priority) */
 	/* bit 5 = priority over B (1 = have priority) */
-	bottom9_state *state = machine.driver_data<bottom9_state>();
 	*priority = (*color & 0x30) >> 4;
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 

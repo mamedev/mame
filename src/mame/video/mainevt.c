@@ -39,29 +39,25 @@ K052109_CB_MEMBER(mainevt_state::dv_tile_callback)
 
 ***************************************************************************/
 
-void mainevt_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow)
+K051960_CB_MEMBER(mainevt_state::mainevt_sprite_callback)
 {
-	mainevt_state *state = machine.driver_data<mainevt_state>();
-
 	/* bit 5 = priority over layer B (has precedence) */
 	/* bit 6 = HALF priority over layer B (used for crowd when you get out of the ring) */
 	if (*color & 0x20)
-		*priority_mask = 0xff00;
+		*priority = 0xff00;
 	else if (*color & 0x40)
-		*priority_mask = 0xff00 | 0xf0f0;
+		*priority = 0xff00 | 0xf0f0;
 	else
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
+		*priority = 0xff00 | 0xf0f0 | 0xcccc;
 	/* bit 7 is shadow, not used */
 
-	*color = state->m_sprite_colorbase + (*color & 0x03);
+	*color = m_sprite_colorbase + (*color & 0x03);
 }
 
-void dv_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow)
+K051960_CB_MEMBER(mainevt_state::dv_sprite_callback)
 {
-	mainevt_state *state = machine.driver_data<mainevt_state>();
-
 	/* TODO: the priority/shadow handling (bits 5-7) seems to be quite complex (see PROM) */
-	*color = state->m_sprite_colorbase + (*color & 0x07);
+	*color = m_sprite_colorbase + (*color & 0x07);
 }
 
 

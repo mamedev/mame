@@ -2,27 +2,41 @@
 #ifndef __K051960_H__
 #define __K051960_H__
 
-typedef void (*k051960_callback)(running_machine &machine, int *code, int *color, int *priority, int *shadow);
-
-struct k051960_interface
+enum 
 {
-	const char         *m_gfx_memory_region;
-	int                m_gfx_num;
-	int                m_plane_order;
-	int                m_deinterleave;
-	k051960_callback   m_callback;
+	K051960_PLANEORDER_BASE = 0,
+	K051960_PLANEORDER_MIA,
+	K051960_PLANEORDER_GRADIUS3
 };
 
+
+typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)> k051960_cb_delegate;
+#define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
+
+#define MCFG_K051960_CB(_class, _method) \
+	k051960_device::set_k051960_callback(*device, k051960_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_K051960_PLANEORDER(_order) \
+	k051960_device::set_plane_order(*device, _order);
+
+
 class k051960_device : public device_t,
-										public k051960_interface
+							public device_gfx_interface
 {
+	static const gfx_layout spritelayout;
+	static const gfx_layout spritelayout_reverse;
+	static const gfx_layout spritelayout_gradius3;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_reverse);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
+	
 public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k051960_device() {}
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
+	static void set_plane_order(device_t &device, int order);
 
 	/*
 	The callback is passed:
@@ -54,37 +68,27 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 private:
 	// internal state
 	UINT8    *m_ram;
-
-	gfx_element *m_gfx;
-
+	
+	UINT8 *m_sprite_rom;
+	UINT32 m_sprite_size;
+	
+	k051960_cb_delegate m_k051960_cb;
+	
 	UINT8    m_spriterombank[3];
 	int      m_romoffset;
 	int      m_spriteflip, m_readroms;
 	int      m_irq_enabled, m_nmi_enabled;
 
 	int      m_k051937_counter;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	int k051960_fetchromdata( int byte );
 };
 
 extern const device_type K051960;
-
-#define MCFG_K051960_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K051960, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_K051960_GFXDECODE(_gfxtag) \
-	k051960_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_K051960_PALETTE(_palette_tag) \
-	k051960_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

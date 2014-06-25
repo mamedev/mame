@@ -63,7 +63,5 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/spy.c -----------*/
-extern void spy_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

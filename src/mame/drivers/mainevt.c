@@ -376,14 +376,6 @@ WRITE8_MEMBER(mainevt_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k051960_interface mainevt_k051960_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	mainevt_sprite_callback
-};
-
 void mainevt_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -436,15 +428,13 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(mainevt_state,mainevt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(mainevt_state, mainevt_tile_callback)
 
-	MCFG_K051960_ADD("k051960", mainevt_k051960_intf)
-	MCFG_K051960_GFXDECODE("gfxdecode")
-	MCFG_K051960_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -458,14 +448,6 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-
-static const k051960_interface dv_k051960_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	dv_sprite_callback
-};
 
 static MACHINE_CONFIG_START( devstors, mainevt_state )
 
@@ -493,15 +475,13 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(mainevt_state,dv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(mainevt_state, dv_tile_callback)
 
-	MCFG_K051960_ADD("k051960", dv_k051960_intf)
-	MCFG_K051960_GFXDECODE("gfxdecode")
-	MCFG_K051960_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_CB(mainevt_state, dv_sprite_callback)
 
 	MCFG_K051733_ADD("k051733")
 
@@ -541,9 +521,9 @@ ROM_START( mainevt )    /* 4 players - English title screen - No "Warning" messa
 	ROM_LOAD32_BYTE( "799c08.j22",   0x00002, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD32_BYTE( "799c09.k22",   0x00003, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
-	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
+	ROM_LOAD32_WORD( "799b05.k4",    0x00002, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )    /* priority encoder (not used) */
@@ -569,9 +549,9 @@ ROM_START( mainevto )   /* 4 players - English title screen - No "Warning" messa
 	ROM_LOAD32_BYTE( "799c08.j22",   0x00002, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD32_BYTE( "799c09.k22",   0x00003, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
-	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
+	ROM_LOAD32_WORD( "799b05.k4",    0x00002, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )    /* priority encoder (not used) */
@@ -597,9 +577,9 @@ ROM_START( mainevt2p )  /* 2 players - English title screen - "Warning" message 
 	ROM_LOAD32_BYTE( "799c08.j22",   0x00002, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD32_BYTE( "799c09.k22",   0x00003, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
-	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
+	ROM_LOAD32_WORD( "799b05.k4",    0x00002, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )    /* priority encoder (not used) */
@@ -625,9 +605,9 @@ ROM_START( ringohja )   /* 2 players - Japan title screen - "Warning" message in
 	ROM_LOAD32_BYTE( "799c08.j22",   0x00002, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD32_BYTE( "799c09.k22",   0x00003, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
-	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
+	ROM_LOAD32_WORD( "799b05.k4",    0x00002, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )    /* priority encoder (not used) */
@@ -654,9 +634,9 @@ ROM_START( devstors )
 	ROM_LOAD32_BYTE( "890f08.j22",  0x00002, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD32_BYTE( "890f09.k22",  0x00003, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD32_WORD( "890f05.k4",  0x00002, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) ) /* priority encoder (not used) */
@@ -679,9 +659,9 @@ ROM_START( devstors2 )
 	ROM_LOAD32_BYTE( "890f08.j22",  0x00002, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD32_BYTE( "890f09.k22",  0x00003, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD32_WORD( "890f05.k4",  0x00002, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) ) /* priority encoder (not used) */
@@ -704,9 +684,9 @@ ROM_START( devstors3 )
 	ROM_LOAD32_BYTE( "890f08.j22",  0x00002, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD32_BYTE( "890f09.k22",  0x00003, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD32_WORD( "890f05.k4",  0x00002, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) ) /* priority encoder (not used) */
@@ -729,9 +709,9 @@ ROM_START( garuka )
 	ROM_LOAD32_BYTE( "890f08.j22",  0x00002, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD32_BYTE( "890f09.k22",  0x00003, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD32_WORD( "890f05.k4",  0x00002, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) ) /* priority encoder (not used) */

@@ -45,8 +45,5 @@ public:
 	INTERRUPT_GEN_MEMBER(aliens_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/aliens.c -----------*/
-
-extern void aliens_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

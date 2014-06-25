@@ -21,12 +21,10 @@ K052109_CB_MEMBER(_88games_state::tile_callback)
 
 ***************************************************************************/
 
-void _88games_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(_88games_state::sprite_callback)
 {
-	_88games_state *state = machine.driver_data<_88games_state>();
-
 	*priority = (*color & 0x20) >> 5;   /* ??? */
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 

@@ -96,50 +96,46 @@ K052109_CB_MEMBER(tmnt_state::blswhstl_tile_callback)
 
 ***************************************************************************/
 
-void mia_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(tmnt_state::mia_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
-void tmnt_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(tmnt_state::tmnt_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*code |= (*color & 0x10) << 9;
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
-void punkshot_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
+K051960_CB_MEMBER(tmnt_state::punkshot_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		*priority = 0xf0 | 0xcc | 0xaa;
 
 	*code |= (*color & 0x10) << 9;
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
-void thndrx2_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
+K051960_CB_MEMBER(tmnt_state::thndrx2_sprite_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int pri = 0x20 | ((*color & 0x60) >> 2);
-	if (pri <= state->m_layerpri[2])
-		*priority_mask = 0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
-		*priority_mask = 0xf0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		*priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -376,7 +372,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 {
 	if (m_glfgreat_roz_rom_mode)
-		return memregion("gfx3")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
+		return memregion("zoom")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
 		UINT8 *usr = memregion("user1")->base();
@@ -477,7 +473,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 {
 	if(m_glfgreat_roz_char_bank)
-		return memregion("gfx3")->base()[offset];
+		return memregion("zoom")->base()[offset];
 	else
 	{
 		UINT8 *usr = memregion("user1")->base();

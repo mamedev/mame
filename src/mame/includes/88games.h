@@ -64,7 +64,5 @@ public:
 	INTERRUPT_GEN_MEMBER(k88games_interrupt);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/88games.c -----------*/
-void _88games_sprite_callback(running_machine &machine, int *code, int *color, int *priority, int *shadow);

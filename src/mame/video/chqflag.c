@@ -16,13 +16,11 @@
 
 ***************************************************************************/
 
-void chqflag_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(chqflag_state::sprite_callback)
 {
-	chqflag_state *state = machine.driver_data<chqflag_state>();
 	*priority = (*color & 0x10) >> 4;
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
-
 
 /***************************************************************************
 

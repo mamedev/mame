@@ -22,17 +22,15 @@ K052109_CB_MEMBER(spy_state::tile_callback)
 
 ***************************************************************************/
 
-void spy_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
+K051960_CB_MEMBER(spy_state::sprite_callback)
 {
-	spy_state *state = machine.driver_data<spy_state>();
-
 	/* bit 4 = priority over layer A (0 = have priority) */
 	/* bit 5 = priority over layer B (1 = have priority) */
-	*priority_mask = 0x00;
-	if ( *color & 0x10) *priority_mask |= 0xa;
-	if (~*color & 0x20) *priority_mask |= 0xc;
+	*priority = 0x00;
+	if ( *color & 0x10) *priority |= 0xa;
+	if (~*color & 0x20) *priority |= 0xc;
 
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 

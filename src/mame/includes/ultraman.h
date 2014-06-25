@@ -47,7 +47,5 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051316_CB_MEMBER(zoom_callback_3);
+	K051960_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/ultraman.c -----------*/
-extern void ultraman_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);

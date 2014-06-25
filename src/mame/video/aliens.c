@@ -20,28 +20,25 @@ K052109_CB_MEMBER(aliens_state::tile_callback)
 
 ***************************************************************************/
 
-void aliens_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
+K051960_CB_MEMBER(aliens_state::sprite_callback)
 {
-	aliens_state *state = machine.driver_data<aliens_state>();
-
 	/* The PROM allows for mixed priorities, where sprites would have */
 	/* priority over text but not on one or both of the other two planes. */
 	switch (*color & 0x70)
 	{
-		case 0x10: *priority_mask = 0x00; break;            /* over ABF */
-		case 0x00: *priority_mask = 0xf0          ; break;  /* over AB, not F */
-		case 0x40: *priority_mask = 0xf0|0xcc     ; break;  /* over A, not BF */
+		case 0x10: *priority = 0x00; break;            /* over ABF */
+		case 0x00: *priority = 0xf0          ; break;  /* over AB, not F */
+		case 0x40: *priority = 0xf0|0xcc     ; break;  /* over A, not BF */
 		case 0x20:
-		case 0x60: *priority_mask = 0xf0|0xcc|0xaa; break;  /* over -, not ABF */
-		case 0x50: *priority_mask =      0xcc     ; break;  /* over AF, not B */
+		case 0x60: *priority = 0xf0|0xcc|0xaa; break;  /* over -, not ABF */
+		case 0x50: *priority =      0xcc     ; break;  /* over AF, not B */
 		case 0x30:
-		case 0x70: *priority_mask =      0xcc|0xaa; break;  /* over F, not AB */
+		case 0x70: *priority =      0xcc|0xaa; break;  /* over F, not AB */
 	}
 	*code |= (*color & 0x80) << 6;
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 	*shadow = 0;    /* shadows are not used by this game */
 }
-
 
 
 /***************************************************************************

@@ -169,6 +169,10 @@ public:
 	inline UINT32 tmnt2_get_word( UINT32 addr );
 	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	K051960_CB_MEMBER(mia_sprite_callback);
+	K051960_CB_MEMBER(tmnt_sprite_callback);
+	K051960_CB_MEMBER(punkshot_sprite_callback);
+	K051960_CB_MEMBER(thndrx2_sprite_callback);
 	K05324X_CB_MEMBER(lgtnfght_sprite_callback);
 	K05324X_CB_MEMBER(blswhstl_sprite_callback);
 	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
@@ -181,11 +185,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/tmnt.c -----------*/
-
-extern void mia_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
-extern void tmnt_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
-extern void punkshot_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void thndrx2_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

@@ -21,8 +21,6 @@
 #include "chqflag.lh"
 
 
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(chqflag_state::chqflag_scanline)
 {
 	int scanline = param;
@@ -268,14 +266,6 @@ WRITE8_MEMBER(chqflag_state::volume_callback1)
 	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-static const k051960_interface chqflag_k051960_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	chqflag_sprite_callback
-};
-
 void chqflag_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -314,7 +304,6 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
 	/* video hardware */
 	//TODO: Vsync 59.17hz Hsync 15.13 / 15.19khz
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -329,10 +318,9 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
-	MCFG_K051960_GFXDECODE("gfxdecode")
-	MCFG_K051960_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_CB(chqflag_state, sprite_callback)
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -379,18 +367,18 @@ ROM_START( chqflag )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "717e01",     0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "717e04",     0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )  /* sprites */
-	ROM_LOAD( "717e05",     0x080000, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )  /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )	/* sprites */
+	ROM_LOAD32_WORD( "717e04",     0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )
+	ROM_LOAD32_WORD( "717e05",     0x000002, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )
 
-	ROM_REGION( 0x020000, "k051316_1", 0 )
-	ROM_LOAD( "717e06",     0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )  /* zoom/rotate (N16) */
+	ROM_REGION( 0x020000, "k051316_1", 0 )		/* zoom/rotate */
+	ROM_LOAD( "717e06.n16",     0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )
 
-	ROM_REGION( 0x100000, "k051316_2", 0 )
-	ROM_LOAD( "717e07",     0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )  /* zoom/rotate (L20) */
-	ROM_LOAD( "717e08",     0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )  /* zoom/rotate (L22) */
-	ROM_LOAD( "717e11",     0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )  /* zoom/rotate (N20) */
-	ROM_LOAD( "717e12",     0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )  /* zoom/rotate (N22) */
+	ROM_REGION( 0x100000, "k051316_2", 0 )		/* zoom/rotate */
+	ROM_LOAD( "717e07.l20",     0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )
+	ROM_LOAD( "717e08.l22",     0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )
+	ROM_LOAD( "717e11.n20",     0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )
+	ROM_LOAD( "717e12.n22",     0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )
 
 	ROM_REGION( 0x080000, "k007232_1", 0 )  /* 007232 data (chip 1) */
 	ROM_LOAD( "717e03",     0x000000, 0x080000, CRC(ebe73c22) SHA1(fad3334e5e91bf8d11b74ffdbbfd57567e6f6f8c) )
@@ -409,18 +397,18 @@ ROM_START( chqflagj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "717e01",     0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "717e04",     0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )  /* sprites */
-	ROM_LOAD( "717e05",     0x080000, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )  /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )	/* sprites */
+	ROM_LOAD32_WORD( "717e04",     0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )
+	ROM_LOAD32_WORD( "717e05",     0x000002, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )
 
-	ROM_REGION( 0x020000, "k051316_1", 0 )
-	ROM_LOAD( "717e06",     0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )  /* zoom/rotate (N16) */
+	ROM_REGION( 0x020000, "k051316_1", 0 )		/* zoom/rotate */
+	ROM_LOAD( "717e06.n16",     0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )
 
-	ROM_REGION( 0x100000, "k051316_2", 0 )
-	ROM_LOAD( "717e07",     0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )  /* zoom/rotate (L20) */
-	ROM_LOAD( "717e08",     0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )  /* zoom/rotate (L22) */
-	ROM_LOAD( "717e11",     0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )  /* zoom/rotate (N20) */
-	ROM_LOAD( "717e12",     0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )  /* zoom/rotate (N22) */
+	ROM_REGION( 0x100000, "k051316_2", 0 )		/* zoom/rotate */
+	ROM_LOAD( "717e07.l20",     0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )
+	ROM_LOAD( "717e08.l22",     0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )
+	ROM_LOAD( "717e11.n20",     0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )
+	ROM_LOAD( "717e12.n22",     0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )
 
 	ROM_REGION( 0x080000, "k007232_1", 0 )  /* 007232 data (chip 1) */
 	ROM_LOAD( "717e03",     0x000000, 0x080000, CRC(ebe73c22) SHA1(fad3334e5e91bf8d11b74ffdbbfd57567e6f6f8c) )

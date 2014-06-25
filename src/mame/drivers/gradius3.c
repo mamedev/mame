@@ -246,14 +246,6 @@ WRITE8_MEMBER(gradius3_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k051960_interface gradius3_k051960_intf =
-{
-	"gfx2", 1,
-	GRADIUS3_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
-	gradius3_sprite_callback
-};
-
 void gradius3_state::machine_start()
 {
 	save_item(NAME(m_irqAen));
@@ -302,16 +294,15 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(gradius3_state, tile_callback)
 	MCFG_K052109_CHARRAM(true)
 
-	MCFG_K051960_ADD("k051960", gradius3_k051960_intf)
-	MCFG_K051960_GFXDECODE("gfxdecode")
-	MCFG_K051960_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_CB(gradius3_state, sprite_callback)
+	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -354,7 +345,7 @@ ROM_START( gradius3 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_r05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) ) /* Same as 945 M05, but different label */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
 	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
@@ -393,7 +384,7 @@ ROM_START( gradius3j )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
 	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
@@ -432,7 +423,7 @@ ROM_START( gradius3a )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
 	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )

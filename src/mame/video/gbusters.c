@@ -21,11 +21,10 @@ K052109_CB_MEMBER(gbusters_state::tile_callback)
 
 ***************************************************************************/
 
-void gbusters_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(gbusters_state::sprite_callback)
 {
-	gbusters_state *state = machine.driver_data<gbusters_state>();
 	*priority = (*color & 0x30) >> 4;
-	*color = state->m_sprite_colorbase + (*color & 0x0f);
+	*color = m_sprite_colorbase + (*color & 0x0f);
 }
 
 

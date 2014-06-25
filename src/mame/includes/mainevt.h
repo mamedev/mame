@@ -64,9 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(mainevt_tile_callback);
 	K052109_CB_MEMBER(dv_tile_callback);
+	K051960_CB_MEMBER(mainevt_sprite_callback);
+	K051960_CB_MEMBER(dv_sprite_callback);
 };
-
-/*----------- defined in video/mainevt.c -----------*/
-
-extern void mainevt_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void dv_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);

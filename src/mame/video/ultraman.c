@@ -7,12 +7,10 @@
 
 ***************************************************************************/
 
-void ultraman_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
+K051960_CB_MEMBER(ultraman_state::sprite_callback)
 {
-	ultraman_state *state = machine.driver_data<ultraman_state>();
-
 	*priority = (*color & 0x80) >> 7;
-	*color = state->m_sprite_colorbase + ((*color & 0x7e) >> 1);
+	*color = m_sprite_colorbase + ((*color & 0x7e) >> 1);
 	*shadow = 0;
 }
 

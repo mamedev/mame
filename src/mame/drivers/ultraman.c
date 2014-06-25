@@ -156,14 +156,6 @@ static INPUT_PORTS_START( ultraman )
 INPUT_PORTS_END
 
 
-static const k051960_interface ultraman_k051960_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	ultraman_sprite_callback
-};
-
 void ultraman_state::machine_start()
 {
 	save_item(NAME(m_bank0));
@@ -191,7 +183,6 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -205,11 +196,9 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
-	MCFG_K051960_ADD("k051960", ultraman_k051960_intf)
-	MCFG_K051960_GFXDECODE("gfxdecode")
-	MCFG_K051960_PALETTE("palette")
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_CB(ultraman_state, sprite_callback)
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -248,9 +237,9 @@ ROM_START( ultraman )
 	ROM_REGION( 0x010000, "audiocpu", 0 )   /* Z80 code */
 	ROM_LOAD( "910-a05.d05",    0x00000, 0x08000, CRC(ebaef189) SHA1(73e6163466d55ae782f55839ba9c98f06c30876b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "910-a19.l04",    0x000000, 0x080000, CRC(2dc9ffdc) SHA1(aa34247c82d48c8d13f5209be292127938a4a682) )
-	ROM_LOAD( "910-a20.l01",    0x080000, 0x080000, CRC(a4298dce) SHA1(62faf8f0c0490a9562b75ce27909fbee6e84b22a) )
+	ROM_REGION( 0x100000, "k051960", 0 )   /* Sprites */
+	ROM_LOAD32_WORD( "910-a19.l04",    0x000000, 0x080000, CRC(2dc9ffdc) SHA1(aa34247c82d48c8d13f5209be292127938a4a682) )
+	ROM_LOAD32_WORD( "910-a20.l01",    0x000002, 0x080000, CRC(a4298dce) SHA1(62faf8f0c0490a9562b75ce27909fbee6e84b22a) )
 
 	ROM_REGION( 0x080000, "k051316_1", 0 )
 	ROM_LOAD( "910-a07.j15",    0x000000, 0x020000, CRC(8b43a64e) SHA1(e373d0fd88b59fb01782dfaeccb1e13673a35766) )

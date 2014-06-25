@@ -18,14 +18,13 @@ K052109_CB_MEMBER(gradius3_state::tile_callback)
 	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-
 /***************************************************************************
 
   Callbacks for the K051960
 
 ***************************************************************************/
 
-void gradius3_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask, int *shadow )
+K051960_CB_MEMBER(gradius3_state::sprite_callback)
 {
 	#define L0 0xaa
 	#define L1 0xcc
@@ -35,19 +34,17 @@ void gradius3_sprite_callback( running_machine &machine, int *code, int *color, 
 		{ L0|L2, L0, L0|L2, L0|L1|L2 },
 		{ L1|L2, L2, 0,     L0|L1|L2 }
 	};
-	gradius3_state *state = machine.driver_data<gradius3_state>();
+
 	int pri = ((*color & 0x60) >> 5);
 
-	if (state->m_priority == 0)
-		*priority_mask = primask[0][pri];
+	if (m_priority == 0)
+		*priority = primask[0][pri];
 	else
-		*priority_mask = primask[1][pri];
+		*priority = primask[1][pri];
 
 	*code |= (*color & 0x01) << 13;
-	*color = state->m_sprite_colorbase + ((*color & 0x1e) >> 1);
+	*color = m_sprite_colorbase + ((*color & 0x1e) >> 1);
 }
-
-
 
 /***************************************************************************
 
@@ -70,8 +67,6 @@ void gradius3_state::video_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
 }
 
-
-
 /***************************************************************************
 
   Memory handlers
@@ -80,7 +75,7 @@ void gradius3_state::video_start()
 
 READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
 {
-	UINT8 *gfxdata = memregion("gfx2")->base();
+	UINT8 *gfxdata = memregion("k051960")->base();
 
 	return (gfxdata[2 * offset + 1] << 8) | gfxdata[2 * offset];
 }
