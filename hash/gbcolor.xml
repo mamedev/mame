@@ -23717,7 +23717,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_licheng" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="2097152">
-				<rom name="mingzhu koudai guaishou 2 (unlicensed, chinese) (cba060) [raw dump].bin" size="2097152" crc="a477c7ce" sha1="0e1b3e60d4a982538d4645c36693d5fd548cb641" offset="0" />
+				<rom name="mingzhu koudai guaishou 2 (unlicensed, chinese) (cba060) [raw dump].bin" size="2097152" crc="31f14d99" sha1="0ea3390e4479acf96d65791dd9ab08464753d48a" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
 			</dataarea>
