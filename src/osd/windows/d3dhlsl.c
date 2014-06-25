@@ -3273,7 +3273,7 @@ effect::effect(shaders *shadersys, device *dev, const char *name, const char *pa
 		}
 		else
 		{
-			printf("Unable to compile shader (unspecified reason)\n"); fflush(stdout);
+			printf("Shader %s is missing, corrupt or cannot be compiled.\n", (const char*)name); fflush(stdout);
 		}
 	}
 	else
