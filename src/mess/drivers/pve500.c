@@ -8,11 +8,38 @@
   Driver by Felipe Correa da Silva Sanches <juca@members.fsf.org>
   Technical info at https://www.garoa.net.br/wiki/PVE-500
 
+  Notes:
+  One can induce the self-diagnose by booting the device holding LEARN and P2-RESET buttons togheter
+  With the default keyboard map, this can be done by holding keys L and S while pressing F3.
+	(Don't forget to unlock the keyboard by using the UI TOGGLE key)
+
+	This self-diagnose routine displays the value C817, which is the checksum value of the subcpu ROM
+  and afterwards it displays the following message:
+
+  SELFdIAG Error___ _F3 F3_CtC3c
+
+  which means it detected an error in the CTC circuitry (it means we're emulating it wrong!)
+  F3 is the coordinate of the subcpu EEPROM chip in the PCB.
+
+	According to the service manual, this error code means: "ICF3 CTC CH-3 counter operation failure (No interruption)"
+
+  Known issues:
+  There's still an annoying blinking in the 7-seg display.
+
   Changelog:
+
+	 2014 JUN 24 [Felipe Sanches]:
+   * figured out the multiplexing signals for the 7seg display
+
+	 2014 JUN 23 [Felipe Sanches]:
+   * hooked-up the RS422 ports
 
    2014 JAN 14 [Felipe Sanches]:
    * Initial driver skeleton
 */
+
+#define LOG_7SEG_DISPLAY_SIGNALS 0
+#define DEBUGGING_INDUCE_SELFDIAGNOSE 0
 
 #include "emu.h"
 #include "cpu/z80/tmpz84c015.h"
@@ -203,9 +230,6 @@ void pve500_state::machine_start()
 	io_LE = 0;
 	io_SEL = 0;
 	io_KY = 0;
-
-	for (int i=0; i<27; i++)
-		output_set_digit_value(i, 0x00);
 }
 
 void pve500_state::machine_reset()
@@ -217,35 +241,35 @@ void pve500_state::machine_reset()
 
 READ8_MEMBER(pve500_state::dualport_ram_left_r)
 {
-	printf("dualport_ram: Left READ\n");
+	//printf("dualport_ram: Left READ\n");
 	m_subcpu->trg1(1); //(INT_Right)
 	return dualport_7FE_data;
 }
 
 WRITE8_MEMBER(pve500_state::dualport_ram_left_w)
 {
-	printf("dualport_ram: Left WRITE\n");
+	//printf("dualport_ram: Left WRITE\n");
 	dualport_7FF_data = data;
 	m_subcpu->trg1(0); //(INT_Right)
 }
 
 READ8_MEMBER(pve500_state::dualport_ram_right_r)
 {
-	printf("dualport_ram: Right READ\n");
+	//printf("dualport_ram: Right READ\n");
 	m_maincpu->trg1(1); //(INT_Left)
 	return dualport_7FF_data;
 }
 
 WRITE8_MEMBER(pve500_state::dualport_ram_right_w)
 {
-	printf("dualport_ram: Right WRITE\n");
+	//printf("dualport_ram: Right WRITE\n");
 	dualport_7FE_data = data;
 	m_maincpu->trg1(0); //(INT_Left)
 }
 
 READ8_MEMBER(pve500_state::io_expander_r)
 {
-	printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
+//	printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
 	switch (offset){
 		case IO_EXPANDER_PORTA:
 			return io_SC;
@@ -253,14 +277,17 @@ READ8_MEMBER(pve500_state::io_expander_r)
 			return io_LE;
 		case IO_EXPANDER_PORTC:
 			io_KY = 0x00;
-			if (io_SC & 0x01) io_KY |= ioport("SCAN0")->read();
-			if (io_SC & 0x02) io_KY |= ioport("SCAN1")->read();
-			if (io_SC & 0x04) io_KY |= ioport("SCAN2")->read();
-			if (io_SC & 0x08) io_KY |= ioport("SCAN3")->read();
-			if (io_SC & 0x10) io_KY |= ioport("SCAN4")->read();
-			if (io_SC & 0x20) io_KY |= ioport("SCAN5")->read();
-			if (io_SC & 0x40) io_KY |= ioport("SCAN6")->read();
-			if (io_SC & 0x80) io_KY |= ioport("SCAN7")->read();
+			if (!BIT(io_SC, 0)) io_KY |= ioport("SCAN0")->read();
+			if (!BIT(io_SC, 1)) io_KY |= ioport("SCAN1")->read();
+			if (!BIT(io_SC, 2)) io_KY |= ioport("SCAN2")->read();
+			if (!BIT(io_SC, 3)) io_KY |= ioport("SCAN3")->read();
+			if (!BIT(io_SC, 4)) io_KY |= ioport("SCAN4")->read();
+			if (!BIT(io_SC, 5)) io_KY |= ioport("SCAN5")->read();
+			if (!BIT(io_SC, 6)) io_KY |= ioport("SCAN6")->read();
+			if (!BIT(io_SC, 7)) io_KY |= ioport("SCAN7")->read();
+#if DEBUGGING_INDUCE_SELFDIAGNOSE
+			io_KY = 0x42; //according to procedure described in the service manual
+#endif
 			return io_KY;
 		case IO_EXPANDER_PORTD:
 			return io_LD;
@@ -273,33 +300,48 @@ READ8_MEMBER(pve500_state::io_expander_r)
 
 WRITE8_MEMBER(pve500_state::io_expander_w)
 {
+	static int LD_data[4];
+	int swap[4] = {2,1,0,3};
 	switch (offset){
 		case IO_EXPANDER_PORTA:
-			printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
+#if LOG_7SEG_DISPLAY_SIGNALS
+printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
+#endif
 			io_SC = data;
+
+			for (int j=0; j<8; j++){
+				if (!BIT(io_SC,j)){
+					for (int i=0; i<4; i++)
+						output_set_digit_value(8*swap[i] + j, LD_data[i]);
+				}
+			}
 			break;
 		case IO_EXPANDER_PORTB:
+#if LOG_7SEG_DISPLAY_SIGNALS
 			printf("io_expander_w: PORTB (io_LE=%02X)\n", data);
+#endif
 			io_LE = data;
 			break;
 		case IO_EXPANDER_PORTC:
+#if LOG_7SEG_DISPLAY_SIGNALS
 			printf("io_expander_w: PORTC (io_KY=%02X)\n", data);
+#endif
 			io_KY = data;
 			break;
 		case IO_EXPANDER_PORTD:
+#if LOG_7SEG_DISPLAY_SIGNALS
 			printf("io_expander_w: PORTD (io_LD=%02X)\n", data);
+#endif
 			io_LD = data;
 			break;
 		case IO_EXPANDER_PORTE:
-			io_SEL = data;
+#if LOG_7SEG_DISPLAY_SIGNALS
 			printf("io_expander_w PORTE (io_SEL=%02X)\n", data);
+#endif
+			io_SEL = data;
 			for (int i=0; i<4; i++){
-				if (io_SEL & (1 << i)){
-					for (int j=0; j<8; j++){
-						if (io_SC & (1<<j)){
-							output_set_digit_value(8*i + j, BITSWAP8(io_LD & 0x7F, 7, 0, 1, 2, 3, 4, 5, 6));
-						}
-					}
+				if (BIT(io_SEL, i)){
+					LD_data[i] = 0x7F & BITSWAP8(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
 				}
 			}
 			break;
