@@ -33209,7 +33209,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="simcit2k">
+	<software name="simcit2ka" cloneof="simcit2k">
 		<description>Sim City 2000 (Euro)</description>
 		<year>2003</year>
 		<publisher>Zoo Digital Publishing</publisher>
@@ -33219,6 +33219,20 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sim city 2000 (europe) (en,fr,de,es,it).bin" size="4194304" crc="a74187d3" sha1="ad31cb6237a888b51585ccd58077b5f8317ce192" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2k">
+		<description>Sim City 2000 (Euro, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Zoo Digital Publishing</publisher>
+		<info name="serial" value="AGB-A5CP"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sim city 2000 rev1.bin" size="4194304" crc="95c79648" sha1="c5eba83db30b6b9aa2b770070f729d8d194a55b9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
