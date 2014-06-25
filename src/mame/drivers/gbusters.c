@@ -235,14 +235,6 @@ WRITE8_MEMBER(gbusters_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k052109_interface gbusters_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	gbusters_tile_callback
-};
-
 static const k051960_interface gbusters_k051960_intf =
 {
 	"gfx2", 1,
@@ -289,7 +281,6 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gbusters_sound_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -304,9 +295,11 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", gbusters_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(gbusters_state, tile_callback)
+
 	MCFG_K051960_ADD("k051960", gbusters_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
@@ -340,9 +333,9 @@ ROM_START( gbusters )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) ) /* tiles */
-	ROM_LOAD( "878c08.k27", 0x40000, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) ) /* tiles */
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
+	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) ) /* sprites */
@@ -364,9 +357,9 @@ ROM_START( gbustersa )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) ) /* tiles */
-	ROM_LOAD( "878c08.k27", 0x40000, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) ) /* tiles */
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
+	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) ) /* sprites */
@@ -388,9 +381,9 @@ ROM_START( crazycop )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) ) /* tiles */
-	ROM_LOAD( "878c08.k27", 0x40000, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) ) /* tiles */
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
+	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) ) /* sprites */

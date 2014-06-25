@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/tmnt.h"
 
 TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
@@ -32,48 +31,43 @@ TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
 
 /* Missing in Action */
 
-void mia_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(tmnt_state::mia_tile_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
 	if (layer == 0)
 	{
 		*code |= ((*color & 0x01) << 8);
-		*color = state->m_layer_colorbase[layer] + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
+		*color = m_layer_colorbase[layer] + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
 	}
 	else
 	{
 		*code |= ((*color & 0x01) << 8) | ((*color & 0x18) << 6) | (bank << 11);
-		*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+		*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 	}
 }
 
-void cuebrick_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(tmnt_state::cuebrick_tile_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-
-	if ((state->m_k052109->get_rmrd_line() == CLEAR_LINE) && (layer == 0))
+	if ((m_k052109->get_rmrd_line() == CLEAR_LINE) && (layer == 0))
 	{
 		*code |= ((*color & 0x01) << 8);
-		*color = state->m_layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
+		*color = m_layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
 	}
 	else
 	{
 		*code |= ((*color & 0xf) << 8);
-		*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+		*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 	}
 }
 
-void tmnt_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(tmnt_state::tmnt_tile_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-void ssbl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(tmnt_state::ssbl_tile_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
 	if (layer == 0)
 	{
 		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
@@ -84,16 +78,14 @@ void ssbl_tile_callback( running_machine &machine, int layer, int bank, int *cod
 //      osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
 	}
 
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-void blswhstl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(tmnt_state::blswhstl_tile_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8) | (bank << 12) | state->m_blswhstl_rombank << 14;
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8) | (bank << 12) | m_blswhstl_rombank << 14;
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 

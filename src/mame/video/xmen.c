@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/xmen.h"
 
 
@@ -9,15 +8,13 @@
 
 ***************************************************************************/
 
-void xmen_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(xmen_state::tile_callback)
 {
-	xmen_state *state = machine.driver_data<xmen_state>();
-
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	if (layer == 0)
-		*color = state->m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+		*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 	else
-		*color = state->m_layer_colorbase[layer] + ((*color & 0x7c) >> 2);
+		*color = m_layer_colorbase[layer] + ((*color & 0x7c) >> 2);
 }
 
 /***************************************************************************

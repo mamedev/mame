@@ -7,9 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "includes/mainevt.h"
-
 
 /***************************************************************************
 
@@ -17,25 +15,21 @@
 
 ***************************************************************************/
 
-void mainevt_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(mainevt_state::mainevt_tile_callback)
 {
-	mainevt_state *state = machine.driver_data<mainevt_state>();
-
 	*flags = (*color & 0x02) ? TILE_FLIPX : 0;
 
 	/* priority relative to HALF priority sprites */
 	*priority = (layer == 2) ? (*color & 0x20) >> 5 : 0;
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
-void dv_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(mainevt_state::dv_tile_callback)
 {
-	mainevt_state *state = machine.driver_data<mainevt_state>();
-
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x3c) << 7);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 

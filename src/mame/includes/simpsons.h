@@ -62,9 +62,10 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	DECLARE_READ8_MEMBER(simpsons_sound_r);
-	void simpsons_video_banking( int bank );
-	void sound_nmi_callback( int param );
-	void simpsons_objdma(  );
+	void simpsons_video_banking(int bank);
+	void sound_nmi_callback(int param);
+	void simpsons_objdma();
+	K052109_CB_MEMBER(tile_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -72,5 +73,4 @@ protected:
 
 
 /*----------- defined in video/simpsons.c -----------*/
-extern void simpsons_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void simpsons_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);

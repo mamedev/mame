@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/gradius3.h"
 
 
@@ -12,13 +11,11 @@
 
 ***************************************************************************/
 
-void gradius3_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(gradius3_state::tile_callback)
 {
-	gradius3_state *state = machine.driver_data<gradius3_state>();
-
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 
@@ -60,12 +57,7 @@ void gradius3_sprite_callback( running_machine &machine, int *code, int *color, 
 
 void gradius3_state::gradius3_postload()
 {
-	int i;
-
-	for (i = 0; i < 0x20000; i += 16)
-	{
-		m_gfxdecode->gfx(0)->mark_dirty(i / 16);
-	}
+	m_k052109->gfx(0)->mark_all_dirty();
 }
 
 void gradius3_state::video_start()
@@ -74,8 +66,6 @@ void gradius3_state::video_start()
 	m_layer_colorbase[1] = 32;
 	m_layer_colorbase[2] = 48;
 	m_sprite_colorbase = 16;
-
-	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_gfxram.target());
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
 }
@@ -102,7 +92,7 @@ WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 	COMBINE_DATA(&m_gfxram[offset]);
 
 	if (oldword != m_gfxram[offset])
-		m_gfxdecode->gfx(0)->mark_dirty(offset / 16);
+		m_k052109->gfx(0)->mark_dirty(offset / 16);
 }
 
 /***************************************************************************

@@ -8,12 +8,10 @@
 
 ***************************************************************************/
 
-void _88games_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(_88games_state::tile_callback)
 {
-	_88games_state *state = machine.driver_data<_88games_state>();
-
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 }
 
 

@@ -66,9 +66,9 @@ public:
 	void screen_eof_xmen6p(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(xmen_scanline);
 	void sound_reset_bank();
+	K052109_CB_MEMBER(tile_callback);
 };
 
 /*----------- defined in video/xmen.c -----------*/
 
-void xmen_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 void xmen_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);

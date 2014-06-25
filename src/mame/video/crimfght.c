@@ -1,7 +1,5 @@
 #include "emu.h"
-
 #include "includes/crimfght.h"
-
 
 /***************************************************************************
 
@@ -9,13 +7,11 @@
 
 ***************************************************************************/
 
-void crimfght_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(crimfght_state::tile_callback)
 {
-	crimfght_state *state = machine.driver_data<crimfght_state>();
-
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x1f) << 8) | (bank << 13);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 /***************************************************************************

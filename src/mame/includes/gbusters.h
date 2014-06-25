@@ -56,8 +56,8 @@ public:
 	UINT32 screen_update_gbusters(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gbusters_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	K052109_CB_MEMBER(tile_callback);
 };
 
 /*----------- defined in video/gbusters.c -----------*/
-extern void gbusters_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags, int *priority);
 extern void gbusters_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);

@@ -86,7 +86,7 @@ public:
 	optional_device<k054000_device> m_k054000;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	/* memory buffers */
@@ -172,6 +172,11 @@ public:
 	K05324X_CB_MEMBER(lgtnfght_sprite_callback);
 	K05324X_CB_MEMBER(blswhstl_sprite_callback);
 	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
+	K052109_CB_MEMBER(mia_tile_callback);
+	K052109_CB_MEMBER(cuebrick_tile_callback);
+	K052109_CB_MEMBER(tmnt_tile_callback);
+	K052109_CB_MEMBER(ssbl_tile_callback);
+	K052109_CB_MEMBER(blswhstl_tile_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -180,11 +185,6 @@ protected:
 
 /*----------- defined in video/tmnt.c -----------*/
 
-extern void mia_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void cuebrick_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void tmnt_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void ssbl_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
-extern void blswhstl_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void mia_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 extern void tmnt_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 extern void punkshot_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

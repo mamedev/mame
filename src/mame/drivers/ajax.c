@@ -18,11 +18,6 @@
 #include "includes/ajax.h"
 #include "includes/konamipt.h"
 
-
-
-
-/****************************************************************************/
-
 static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ajax_ls138_f10_r, ajax_ls138_f10_w)   /* bankswitch + sound command + FIRQ command */
 	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* sprite control registers */
@@ -167,14 +162,6 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 }
 
 
-static const k052109_interface ajax_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	ajax_tile_callback
-};
-
 static const k051960_interface ajax_k051960_intf =
 {
 	"gfx2", 1,
@@ -198,7 +185,6 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -214,9 +200,10 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K052109_ADD("k052109", ajax_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(ajax_state, tile_callback)
+
 	MCFG_K051960_ADD("k051960", ajax_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
@@ -272,15 +259,15 @@ ROM_START( ajax )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",    0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "770c13-a.f3",     0x000000, 0x010000, CRC(4ef6fff2) SHA1(0a2953f6907738b795d96184329431539386a463) )
-	ROM_LOAD16_BYTE( "770c13-c.f4",     0x000001, 0x010000, CRC(97ffbab6) SHA1(97d9a39600eed918e12908a9abed0d4161c20ef6) )
-	ROM_LOAD16_BYTE( "770c13-b.e3",     0x020000, 0x010000, CRC(86fdd706) SHA1(334c2720fc35aa556c6c5850d32f9bc9a6800fba) )
-	ROM_LOAD16_BYTE( "770c13-d.e4",     0x020001, 0x010000, CRC(7d7acb2d) SHA1(3797743edf99201de928246e22e65ad17afe62f8) )
-	ROM_LOAD16_BYTE( "770c12-a.f5",     0x040000, 0x010000, CRC(6c0ade68) SHA1(35e4548a37e19210c767ef2ed4c514dbde6806c2) )
-	ROM_LOAD16_BYTE( "770c12-c.f6",     0x040001, 0x010000, CRC(61fc39cc) SHA1(34d0342ec0878590c289a66b39bde121cfadf00f) )
-	ROM_LOAD16_BYTE( "770c12-b.e5",     0x060000, 0x010000, CRC(5f221cc6) SHA1(9a7a9c7853a3b582c4034b773cef08aee5391d6e) )
-	ROM_LOAD16_BYTE( "770c12-d.e6",     0x060001, 0x010000, CRC(f1edb2f4) SHA1(3e66cc711e25cbf6e6a747d43a9efec0710d5b7a) )
+	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_BYTE( "770c13-a.f3",     0x000000, 0x010000, CRC(4ef6fff2) SHA1(0a2953f6907738b795d96184329431539386a463) )
+	ROM_LOAD32_BYTE( "770c13-c.f4",     0x000001, 0x010000, CRC(97ffbab6) SHA1(97d9a39600eed918e12908a9abed0d4161c20ef6) )
+	ROM_LOAD32_BYTE( "770c12-a.f5",     0x000002, 0x010000, CRC(6c0ade68) SHA1(35e4548a37e19210c767ef2ed4c514dbde6806c2) )
+	ROM_LOAD32_BYTE( "770c12-c.f6",     0x000003, 0x010000, CRC(61fc39cc) SHA1(34d0342ec0878590c289a66b39bde121cfadf00f) )
+	ROM_LOAD32_BYTE( "770c13-b.e3",     0x040000, 0x010000, CRC(86fdd706) SHA1(334c2720fc35aa556c6c5850d32f9bc9a6800fba) )
+	ROM_LOAD32_BYTE( "770c13-d.e4",     0x040001, 0x010000, CRC(7d7acb2d) SHA1(3797743edf99201de928246e22e65ad17afe62f8) )
+	ROM_LOAD32_BYTE( "770c12-b.e5",     0x040002, 0x010000, CRC(5f221cc6) SHA1(9a7a9c7853a3b582c4034b773cef08aee5391d6e) )
+	ROM_LOAD32_BYTE( "770c12-d.e6",     0x040003, 0x010000, CRC(f1edb2f4) SHA1(3e66cc711e25cbf6e6a747d43a9efec0710d5b7a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "770c09-a.f8",     0x000000, 0x010000, CRC(76690fb8) SHA1(afe267a37b65d63d3765dc3b88d8a8262446f786) )
@@ -338,9 +325,9 @@ ROM_START( typhoon )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",    0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "770c13",     0x000000, 0x040000, CRC(b859ca4e) SHA1(f58678d503683f78cca0d5ed2d79f6f68ab3495a) )  /* characters (N22) */
-	ROM_LOAD( "770c12",     0x040000, 0x040000, CRC(50d14b72) SHA1(e3ff4a5aeefa6c10b5f7fec18297948b7c5acfdf) )  /* characters (K22) */
+	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "770c13.n22",     0x000000, 0x040000, CRC(b859ca4e) SHA1(f58678d503683f78cca0d5ed2d79f6f68ab3495a) )
+	ROM_LOAD32_WORD( "770c12.k22",     0x000002, 0x040000, CRC(50d14b72) SHA1(e3ff4a5aeefa6c10b5f7fec18297948b7c5acfdf) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "770c09",     0x000000, 0x080000, CRC(1ab4a7ff) SHA1(fa007b41027f95d29d2a9f931a2fe235844db637) )  /* sprites (N4) */
@@ -374,9 +361,9 @@ ROM_START( ajaxj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "770_f03.f16",    0x00000, 0x08000, CRC(3fe914fd) SHA1(c691920402bd859e2bf765084704a8bfad302cfa) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "770c13",     0x000000, 0x040000, CRC(b859ca4e) SHA1(f58678d503683f78cca0d5ed2d79f6f68ab3495a) )  /* characters (N22) */
-	ROM_LOAD( "770c12",     0x040000, 0x040000, CRC(50d14b72) SHA1(e3ff4a5aeefa6c10b5f7fec18297948b7c5acfdf) )  /* characters (K22) */
+	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "770c13.n22",     0x000000, 0x040000, CRC(b859ca4e) SHA1(f58678d503683f78cca0d5ed2d79f6f68ab3495a) )
+	ROM_LOAD32_WORD( "770c12.k22",     0x000002, 0x040000, CRC(50d14b72) SHA1(e3ff4a5aeefa6c10b5f7fec18297948b7c5acfdf) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "770c09",     0x000000, 0x080000, CRC(1ab4a7ff) SHA1(fa007b41027f95d29d2a9f931a2fe235844db637) )  /* sprites (N4) */

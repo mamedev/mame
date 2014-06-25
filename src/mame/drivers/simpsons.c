@@ -313,14 +313,6 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static const k052109_interface simpsons_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
-	simpsons_tile_callback
-};
-
 static const k053247_interface simpsons_k053246_intf =
 {
 	"gfx2", 1,
@@ -373,9 +365,11 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", simpsons_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(simpsons_state, tile_callback)
+
 	MCFG_K053246_ADD("k053246", simpsons_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
@@ -413,8 +407,8 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
@@ -442,8 +436,8 @@ ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
@@ -472,8 +466,8 @@ ROM_START( simpsons2p ) /* World 2 Player */
 	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
+	ROM_REGION( 0x100000, "k052109", 0 )
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
@@ -501,8 +495,8 @@ ROM_START( simpsons2p2 ) /* World 2 Player, alt */
 	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
@@ -530,8 +524,8 @@ ROM_START( simpsons2pa ) /* Asia 2 Player */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
@@ -559,8 +553,8 @@ ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */

@@ -13,7 +13,7 @@ class gradius3_state : public driver_device
 public:
 	gradius3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gfxram(*this, "gfxram"),
+		m_gfxram(*this, "k052109"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -24,7 +24,6 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_gfxram;
-//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int         m_layer_colorbase[3];
@@ -65,8 +64,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
 	void gradius3_postload();
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	K052109_CB_MEMBER(tile_callback);
 };
 
 /*----------- defined in video/gradius3.c -----------*/
 extern void gradius3_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
-extern void gradius3_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);

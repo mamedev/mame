@@ -163,14 +163,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const k052109_interface blockhl_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_2,
-	blockhl_tile_callback
-};
-
 static const k051960_interface blockhl_k051960_intf =
 {
 	"gfx2", 1,
@@ -211,7 +203,6 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -226,9 +217,11 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", blockhl_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(blockhl_state, tile_callback)
+
 	MCFG_K051960_ADD("k051960", blockhl_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
@@ -256,11 +249,11 @@ ROM_START( blockhl )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "973d01.g6",  0x0000, 0x8000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "973f07.k15", 0x00000, 0x08000, CRC(1a8cd9b4) SHA1(7cb7944d24ac51fa6b610542d9dec68697cacf0f) ) /* tiles */
-	ROM_LOAD16_BYTE( "973f08.k18", 0x00001, 0x08000, CRC(952b51a6) SHA1(017575738d444b688b137cad5611638d53be84f2) )
-	ROM_LOAD16_BYTE( "973f09.k20", 0x10000, 0x08000, CRC(77841594) SHA1(e1bfdc5bb598d865868d578ef7faba8078becd7a) )
-	ROM_LOAD16_BYTE( "973f10.k23", 0x10001, 0x08000, CRC(09039fab) SHA1(a9dea17aacf4484d21ef3b16470263447b51b6b5) )
+	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_BYTE( "973f07.k15", 0x00000, 0x08000, CRC(1a8cd9b4) SHA1(7cb7944d24ac51fa6b610542d9dec68697cacf0f) )
+	ROM_LOAD32_BYTE( "973f09.k20", 0x00001, 0x08000, CRC(77841594) SHA1(e1bfdc5bb598d865868d578ef7faba8078becd7a) )
+	ROM_LOAD32_BYTE( "973f08.k18", 0x00002, 0x08000, CRC(952b51a6) SHA1(017575738d444b688b137cad5611638d53be84f2) )
+	ROM_LOAD32_BYTE( "973f10.k23", 0x00003, 0x08000, CRC(09039fab) SHA1(a9dea17aacf4484d21ef3b16470263447b51b6b5) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 ) /* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "973f06.k12", 0x00000, 0x08000, CRC(51acfdb6) SHA1(94d243f341b490684f5297d95d4835bd522ece35) ) /* sprites */
@@ -280,11 +273,11 @@ ROM_START( quarth )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "973d01.g6",  0x0000, 0x8000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "973e07.k15", 0x00000, 0x08000, CRC(0bd6b0f8) SHA1(6c59cf637354fe2df424eaa89feb9c1bc1f66a92) ) /* tiles */
-	ROM_LOAD16_BYTE( "973e08.k18", 0x00001, 0x08000, CRC(104d0d5f) SHA1(595698911513113d01e5b565f5b073d1bd033d3f) )
-	ROM_LOAD16_BYTE( "973e09.k20", 0x10000, 0x08000, CRC(bd3a6f24) SHA1(eb45db3a6a52bb2b25df8c2dace877e59b4130a6) )
-	ROM_LOAD16_BYTE( "973e10.k23", 0x10001, 0x08000, CRC(cf5e4b86) SHA1(43348753894c1763b26dbfc70245dac92048db8f) )
+	ROM_REGION( 0x20000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_BYTE( "973e07.k15", 0x00000, 0x08000, CRC(0bd6b0f8) SHA1(6c59cf637354fe2df424eaa89feb9c1bc1f66a92) )
+	ROM_LOAD32_BYTE( "973e09.k20", 0x00001, 0x08000, CRC(bd3a6f24) SHA1(eb45db3a6a52bb2b25df8c2dace877e59b4130a6) )
+	ROM_LOAD32_BYTE( "973e08.k18", 0x00002, 0x08000, CRC(104d0d5f) SHA1(595698911513113d01e5b565f5b073d1bd033d3f) )
+	ROM_LOAD32_BYTE( "973e10.k23", 0x00003, 0x08000, CRC(cf5e4b86) SHA1(43348753894c1763b26dbfc70245dac92048db8f) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 ) /* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "973e06.k12", 0x00000, 0x08000, CRC(0d58af85) SHA1(2efd661d614fb305a14cfe1aa4fb17714f215d4f) ) /* sprites */

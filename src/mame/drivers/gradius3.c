@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
-	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("gfxram")
+	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("k052109")
 ADDRESS_MAP_END
 
 
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( gradius3_map2, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(cpuB_irqenable_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x24c000, 0x253fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
-	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("gfxram")
+	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("k052109")
 	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE(k051937_halfword_r, k051937_halfword_w)
 	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE(k051960_halfword_r, k051960_halfword_w)
 	AM_RANGE(0x400000, 0x5fffff) AM_READ(gradius3_gfxrom_r)     /* gfx ROMs are mapped here, and copied to RAM */
@@ -246,14 +246,6 @@ WRITE8_MEMBER(gradius3_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k052109_interface gradius3_k052109_intf =
-{
-	"gfx1", 0,
-	GRADIUS3_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
-	gradius3_tile_callback
-};
-
 static const k051960_interface gradius3_k051960_intf =
 {
 	"gfx2", 1,
@@ -297,7 +289,6 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -312,9 +303,12 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", gradius3_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(gradius3_state, tile_callback)
+	MCFG_K052109_CHARRAM(true)
+
 	MCFG_K051960_ADD("k051960", gradius3_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
@@ -360,9 +354,6 @@ ROM_START( gradius3 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_r05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) ) /* Same as 945 M05, but different label */
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )    /* fake */
-	/* gfx data is dynamically generated in RAM */
-
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
@@ -402,9 +393,6 @@ ROM_START( gradius3j )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )    /* fake */
-	/* gfx data is dynamically generated in RAM */
-
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
@@ -443,9 +431,6 @@ ROM_START( gradius3a )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
-
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )    /* fake */
-	/* gfx data is dynamically generated in RAM */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )

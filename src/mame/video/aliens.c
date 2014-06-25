@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/aliens.h"
 
 /***************************************************************************
@@ -8,12 +7,10 @@
 
 ***************************************************************************/
 
-void aliens_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(aliens_state::tile_callback)
 {
-	aliens_state *state = machine.driver_data<aliens_state>();
-
 	*code |= ((*color & 0x3f) << 8) | (bank << 14);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 

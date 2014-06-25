@@ -44,9 +44,9 @@ public:
 	UINT32 screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(aliens_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	K052109_CB_MEMBER(tile_callback);
 };
 
 /*----------- defined in video/aliens.c -----------*/
 
-extern void aliens_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color, int *flags, int *priority);
 extern void aliens_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

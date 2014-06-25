@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/gbusters.h"
 
 
@@ -9,12 +8,11 @@
 
 ***************************************************************************/
 
-void gbusters_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(gbusters_state::tile_callback)
 {
-	gbusters_state *state = machine.driver_data<gbusters_state>();
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x0d) << 8) | ((*color & 0x10) << 5) | (bank << 12);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 /***************************************************************************

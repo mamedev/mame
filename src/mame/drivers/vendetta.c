@@ -399,22 +399,6 @@ INTERRUPT_GEN_MEMBER(vendetta_state::vendetta_irq)
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static const k052109_interface vendetta_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
-	vendetta_tile_callback
-};
-
-static const k052109_interface esckids_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
-	esckids_tile_callback
-};
-
 static const k053247_interface vendetta_k053246_intf =
 {
 	"gfx2", 1,
@@ -497,9 +481,11 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", vendetta_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
+
 	MCFG_K053246_ADD("k053246", vendetta_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
@@ -531,9 +517,11 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 
 	MCFG_DEVICE_REMOVE("k054000")
 	MCFG_DEVICE_REMOVE("k052109")
-	MCFG_K052109_ADD("k052109", esckids_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
+
 	MCFG_DEVICE_REMOVE("k053246")
 	MCFG_K053246_ADD("k053246", esckids_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
@@ -558,9 +546,9 @@ ROM_START( vendetta )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
-	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
-	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
@@ -583,9 +571,9 @@ ROM_START( vendettar )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
-	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
-	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
@@ -608,9 +596,9 @@ ROM_START( vendetta2p )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
-	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
-	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
@@ -633,9 +621,9 @@ ROM_START( vendetta2pu )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
-	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
-	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
@@ -658,9 +646,9 @@ ROM_START( vendetta2pd )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
-	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
-	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
@@ -683,9 +671,9 @@ ROM_START( vendettaj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
-	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
-	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
@@ -708,7 +696,7 @@ ROM_START( esckids )
 	ROM_REGION( 0x010000, "audiocpu", 0 )       // Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )       // Tilemap MASK-ROM (4M x 2)
+	ROM_REGION( 0x100000, "k052109", 0 )       // Tilemap MASK-ROM (4M x 2)
 	ROM_LOAD32_WORD( "975c09", 0x000000, 0x080000, CRC(bc52210e) SHA1(301a3892d250495c2e849d67fea5f01fb0196bed) )
 	ROM_LOAD32_WORD( "975c08", 0x000002, 0x080000, CRC(fcff9256) SHA1(b60d29f4d04f074120d4bb7f2a71b9e9bf252d33) )
 
@@ -734,7 +722,7 @@ ROM_START( esckidsj )
 	ROM_REGION( 0x010000, "audiocpu", 0 )       // Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )       // Tilemap MASK-ROM (4M x 2)
+	ROM_REGION( 0x100000, "k052109", 0 )       // Tilemap MASK-ROM (4M x 2)
 	ROM_LOAD32_WORD( "975c09", 0x000000, 0x080000, CRC(bc52210e) SHA1(301a3892d250495c2e849d67fea5f01fb0196bed) )
 	ROM_LOAD32_WORD( "975c08", 0x000002, 0x080000, CRC(fcff9256) SHA1(b60d29f4d04f074120d4bb7f2a71b9e9bf252d33) )
 

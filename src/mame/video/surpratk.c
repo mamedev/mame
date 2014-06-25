@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/surpratk.h"
 
 
@@ -9,12 +8,11 @@
 
 ***************************************************************************/
 
-void surpratk_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(surpratk_state::tile_callback)
 {
-	surpratk_state *state = machine.driver_data<surpratk_state>();
 	*flags = (*color & 0x80) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0x60) >> 5);
+	*color = m_layer_colorbase[layer] + ((*color & 0x60) >> 5);
 }
 
 /***************************************************************************

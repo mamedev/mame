@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/blockhl.h"
 
 
@@ -9,11 +8,10 @@
 
 ***************************************************************************/
 
-void blockhl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(blockhl_state::tile_callback)
 {
-	blockhl_state *state = machine.driver_data<blockhl_state>();
 	*code |= ((*color & 0x0f) << 8);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 /***************************************************************************

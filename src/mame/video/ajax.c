@@ -16,11 +16,10 @@
 
 ***************************************************************************/
 
-void ajax_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(ajax_state::tile_callback)
 {
-	ajax_state *state = machine.driver_data<ajax_state>();
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 }
 
 

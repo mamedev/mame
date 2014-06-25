@@ -62,8 +62,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	K052109_CB_MEMBER(tile_callback);
 };
 
 /*----------- defined in video/spy.c -----------*/
-extern void spy_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void spy_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);

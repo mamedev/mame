@@ -308,14 +308,6 @@ void xmen_state::machine_reset()
 	m_vblank_irq_mask = 0;
 }
 
-static const k052109_interface xmen_k052109_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
-	xmen_tile_callback
-};
-
 static const k053247_interface xmen_k053246_intf =
 {
 	"gfx2", 1,
@@ -365,9 +357,11 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(xmen_state, tile_callback)
+
 	MCFG_K053246_ADD("k053246", xmen_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
@@ -433,9 +427,11 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
-	MCFG_K052109_GFXDECODE("gfxdecode")
-	MCFG_K052109_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(xmen_state, tile_callback)
+
 	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)
 	MCFG_K053246_SET_SCREEN("screen")
 	MCFG_K053246_GFXDECODE("gfxdecode")
@@ -522,8 +518,8 @@ ROM_START( xmen )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -550,8 +546,8 @@ ROM_START( xmenj )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -578,8 +574,8 @@ ROM_START( xmene )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -606,8 +602,8 @@ ROM_START( xmena )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -634,8 +630,8 @@ ROM_START( xmenaa )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -662,8 +658,8 @@ ROM_START( xmen2pe )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -690,8 +686,8 @@ ROM_START( xmen2pa )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -718,8 +714,8 @@ ROM_START( xmen2pj )
 	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )   /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -800,8 +796,8 @@ ROM_START( xmen6p )
 	ROM_LOAD( "065-a01.7b",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.1l",  0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )    /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.1l",  0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.1h",  0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
@@ -829,8 +825,8 @@ ROM_START( xmen6pu )
 	ROM_LOAD( "065-a01.7b",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "065-a08.1l",  0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )    /* tiles */
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.1l",  0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "065-a07.1h",  0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */

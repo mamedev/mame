@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K051316_CB_MEMBER(zoom_callback);
+	K052109_CB_MEMBER(tile_callback);
 };
 
 /*----------- defined in video/ajax.c -----------*/
-extern void ajax_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void ajax_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);

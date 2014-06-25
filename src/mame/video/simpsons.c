@@ -1,5 +1,4 @@
 #include "emu.h"
-
 #include "includes/simpsons.h"
 
 /***************************************************************************
@@ -8,11 +7,10 @@
 
 ***************************************************************************/
 
-void simpsons_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
+K052109_CB_MEMBER(simpsons_state::tile_callback)
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
 	*code |= ((*color & 0x3f) << 8) | (bank << 14);
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
