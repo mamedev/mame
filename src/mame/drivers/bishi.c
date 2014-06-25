@@ -368,7 +368,6 @@ static const k056832_interface bishi_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_8,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	bishi_tile_callback, "none"
 };
 

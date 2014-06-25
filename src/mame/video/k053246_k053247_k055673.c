@@ -68,7 +68,6 @@ void k053247_device::clear_all()
 	m_intf_gfx_num = -1;
 	m_intf_plane_order = 0;
 	m_intf_dx = m_intf_dy = 0;
-	m_intf_deinterleave = 0;
 	m_intf_callback = 0;
 }
 
@@ -1117,9 +1116,6 @@ void k053247_device::device_start()
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
 	}
-
-	/* deinterleave the graphics, if needed */
-	konami_deinterleave_gfx(machine(), m_intf_gfx_memory_region, m_intf_deinterleave);
 
 	m_dx = m_intf_dx;
 	m_dy = m_intf_dy;

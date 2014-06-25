@@ -318,7 +318,6 @@ static const k053247_interface simpsons_k053246_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, 23,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	simpsons_sprite_callback
 };
 

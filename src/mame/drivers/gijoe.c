@@ -300,7 +300,6 @@ static const k056832_interface gijoe_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_4,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	gijoe_tile_callback, "none"
 };
 
@@ -309,7 +308,6 @@ static const k053247_interface gijoe_k053247_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-37, 20,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	gijoe_sprite_callback
 };
 

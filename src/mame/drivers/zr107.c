@@ -742,7 +742,6 @@ static const k056832_interface zr107_k056832_intf =
 	"gfx2", 1,
 	K056832_BPP_8,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	game_tile_callback, "none"
 };
 

@@ -496,7 +496,6 @@ static const k056832_interface lethalen_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_8LE,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	lethalen_tile_callback, "none"
 };
 

@@ -1395,7 +1395,6 @@ static const k056832_interface djmain_k056832_intf =
 	"gfx2", 1,
 	K056832_BPP_4dj,
 	1, 1,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	djmain_tile_callback, "none"
 };
 

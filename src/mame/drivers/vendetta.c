@@ -404,7 +404,6 @@ static const k053247_interface vendetta_k053246_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, 6,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	vendetta_sprite_callback
 };
 
@@ -413,7 +412,6 @@ static const k053247_interface esckids_k053246_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	101, 6,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	vendetta_sprite_callback
 };
 

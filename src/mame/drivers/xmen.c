@@ -313,7 +313,6 @@ static const k053247_interface xmen_k053246_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, -2,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	xmen_sprite_callback
 };
 
@@ -384,7 +383,6 @@ static const k053247_interface xmen6p_k053246_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, -2,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	xmen_sprite_callback
 };
 

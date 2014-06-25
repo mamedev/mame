@@ -552,7 +552,6 @@ static const k056832_interface qdrmfgp_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_4dj,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	qdrmfgp_tile_callback, "none"
 };
 
@@ -561,7 +560,6 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_4dj,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	qdrmfgp2_tile_callback, "none"
 };
 

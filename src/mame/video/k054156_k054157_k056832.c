@@ -261,7 +261,6 @@ void k056832_device::device_config_complete()
 	m_bpp = -1;
 	m_big = 0;
 	m_djmain_hack = 0;
-	m_deinterleave = 0;
 	m_callback = NULL;
 	m_k055555_tag = "";
 	};
@@ -398,9 +397,6 @@ void k056832_device::device_start()
    associations) and which ones can can be init at RESET, if any */
 
 	create_gfx(machine(), m_gfx_memory_region, m_bpp, m_big);
-
-	/* deinterleave the graphics, if needed */
-	konami_deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
 
 	create_tilemaps(machine());
 

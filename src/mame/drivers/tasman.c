@@ -565,7 +565,6 @@ static const k056832_interface k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_8TASMAN,
 	0, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	kongambl_tile_callback, "none"
 };
 
@@ -575,7 +574,6 @@ static const k053247_interface k053247_intf =
 	"gfx2", 1,
 	TASMAN_PLANE_ORDER,
 	-48+1, 23,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	kongambl_sprite_callback
 };
 

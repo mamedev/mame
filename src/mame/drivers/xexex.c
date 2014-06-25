@@ -459,7 +459,6 @@ static const k056832_interface xexex_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_4,
 	1, 0,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	xexex_tile_callback, "none"
 };
 
@@ -468,7 +467,6 @@ static const k053247_interface xexex_k053246_intf =
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-48, 32,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	xexex_sprite_callback
 };
 

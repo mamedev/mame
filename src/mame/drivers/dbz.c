@@ -294,7 +294,6 @@ static const k056832_interface dbz_k056832_intf =
 	"gfx1", 2,
 	K056832_BPP_4,
 	1, 1,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	dbz_tile_callback, "none"
 };
 
@@ -303,7 +302,6 @@ static const k053247_interface dbz_k053246_intf =
 	"gfx2", 3,
 	NORMAL_PLANE_ORDER,
 	-52, 16,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	dbz_sprite_callback
 };
 

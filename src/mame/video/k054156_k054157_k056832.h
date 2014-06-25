@@ -26,7 +26,6 @@ struct k056832_interface
 	int                m_bpp;
 	int                m_big;
 	int                m_djmain_hack;
-	int                m_deinterleave;
 	k056832_callback   m_callback;
 
 	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555

@@ -265,7 +265,6 @@ static const k053247_interface overdriv_k053246_intf =
 	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	77, 22,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	overdriv_sprite_callback
 };
 

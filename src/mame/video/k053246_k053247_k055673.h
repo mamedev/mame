@@ -48,7 +48,6 @@ struct k053247_interface
 	int                m_intf_gfx_num;
 	int                m_intf_plane_order;
 	int                m_intf_dx, m_intf_dy;
-	int                m_intf_deinterleave;
 	k05324x_callback   m_intf_callback;
 };
 

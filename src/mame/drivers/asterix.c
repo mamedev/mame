@@ -220,7 +220,6 @@ static const k056832_interface asterix_k056832_intf =
 	"gfx1", 0,
 	K056832_BPP_4,
 	1, 1,
-	KONAMI_ROM_DEINTERLEAVE_NONE,
 	asterix_tile_callback, "none"
 };
 

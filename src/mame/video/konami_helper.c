@@ -3,40 +3,6 @@
 #include "emu.h"
 #include "konami_helper.h"
 
-/*
-    This recursive function doesn't use additional memory
-    (it could be easily converted into an iterative one).
-    It's called shuffle because it mimics the shuffling of a deck of cards.
-*/
-static void konami_shuffle_16(UINT16 *buf,int len)
-{
-	int i;
-	UINT16 t;
-
-	if (len == 2) return;
-
-	if (len % 4) fatalerror("shuffle() - not modulo 4\n");   /* must not happen */
-
-	len /= 2;
-
-	for (i = 0; i < len / 2; i++)
-	{
-		t = buf[len / 2 + i];
-		buf[len / 2 + i] = buf[len + i];
-		buf[len + i] = t;
-	}
-
-	konami_shuffle_16(buf,len);
-	konami_shuffle_16(buf + len,len);
-}
-
-/* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konamid_rom_deinterleave_2(running_machine &machine, const char *mem_region)
-{
-	konami_shuffle_16((UINT16 *)machine.root_device().memregion(mem_region)->base(),machine.root_device().memregion(mem_region)->bytes()/2);
-}
-
-
 void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, palette_device &palette, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
 {
 	gfx_layout gl;
@@ -46,18 +12,6 @@ void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, p
 	gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(&palette, gl, data, 0, palette.entries() >> bpp, 0)));
 }
 
-
-void konami_deinterleave_gfx(running_machine &machine, const char *gfx_memory_region, int deinterleave)
-{
-	switch (deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, gfx_memory_region);
-		break;
-	}
-}
 
 /* useful function to sort three tile layers by priority order */
 void konami_sortlayers3( int *layer, int *pri )
