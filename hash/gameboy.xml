@@ -16141,6 +16141,19 @@
 		</part>
 	</software>
 
+	<software name="probot2s" cloneof="probot2">
+		<!-- Notes: SGB enhanced -->
+		<description>Probotector 2 (Euro, Sample)</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="probotector 2 (sample).bin" size="131072" crc="7d60c005" sha1="8f060253ea228c43d2992458dbf904a0b0d7b01e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prophecy">
 		<description>Prophecy - The Viking Child (Euro)</description>
 		<year>1992</year>

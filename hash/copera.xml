@@ -5,7 +5,6 @@
 Games for the MIXT BOOK PLAYER COPERA
 
 * おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
-* コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
 * 冒険!メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
 -->
 
@@ -113,6 +112,21 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-17509 J12" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17509 j12.ic1" size="1048576" crc="0cb5727d" sha1="5f271c69f574a761f2c83f8005978dcb0635e81b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copechik">
+		<description>Copera no Chikyuu Daisuki</description>
+		<year>1994?</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-9"/>
+		<info name="alt_title" value="コペラのちきゅうだいすき"/>
+		<part name="cart" interface="copera_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-xxxxx" />    <!-- unreadable marking -->
+			<dataarea name="rom" size="1048576">
+				<rom name="copera no chikyuu daisuki.ic1" size="1048576" crc="9a5dd562" sha1="730195fc41efb923a4f8e8acd5228d1ae8b16c16" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

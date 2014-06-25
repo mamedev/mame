@@ -4983,6 +4983,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="indyinfm">
+		<description>Indiana Jones and the Infernal Machine (Euro, Prototype)</description>
+		<year>2000</year>
+		<publisher>LucasArts</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="indiana jones and the infernal machine (unreleased pal).bin" size="33554432" crc="de726d5a" sha1="be6abe64badfae9dc5f24d564e6c32fdcc442af7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyinfmu" cloneof="indyinfm">
 		<description>Indiana Jones and the Infernal Machine (USA)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>

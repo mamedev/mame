@@ -18,7 +18,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * 魔法騎士 レイアース マジックナイトたんじょう - Magic Knight Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
 * NHKおかあさんといっしょ げんきなこあつまれ! - NHK Okaasan to Issho Genki na Koatsumare! (Sega - 19951125 - HPC-6025)
 * ぺたぺたちょっきん あそべるずかん <どうぶつ> - Petapeta Chokkinna Soberuzukan ~Doubutsu~ (Sega - 199511xx - HPC-6028)
-* 怪盗セイント･テール セイントテールとワン･ツー･スリー! - Kaitou Saint Tail - Saint Tail to One, Two, Three! (Sega - ???? - HPC-6035)
 * バーバパパのうちゅうりょこう - Barbapapa no Uchuu Ryokou (Sega - 1996xxxx - HPC-6036)
 * 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
 * パケット2 ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
@@ -32,8 +31,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * おえかきピコ <タブレットのみ> - Oekaki Pico ~Tablet no Mi~ (Sega - ???? - HPC-????)
 * いっしょにうたおう! ドラえもん わくわくカラオケ - Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega Toys - 1999xxxx - HPC-6073)
 * クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
-* 白雪姫 ～しらゆきひめ～ - Shirayukihime (Sega Toys - 199909xx - HPC-6077)
-* キティとみんなの キーボードピコ サンリオピューロランドにいこう! キティとみんなのはじめてキーボード!<同梱>! - Kitty to Minna no Keyboard Pico Sanrio Puroland ni Ikou! with Kitty to Minna no Hajimete Keyboard (Sega Toys - 2000xxxx - HPC-6084)
 * スージーちゃんとマービー おてつだい だ～いすき! - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
 * それいけ!アンパンマン アンパンマンとすうじあそび - Soreike! Anpanman - Anpanman to Suuji Asobi (Sega Toys - ???? - HPC-6091)
 * コンビニでおかいもの! - Conveni de Okaimono! (Sega Toys - ???? - HPC-6094)
@@ -99,7 +96,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
 * ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
 * 里中満智子のたのしいおりがみ - Satonaka Machiko no Tanoshii Origami (Nayuta - 199511xx - T-227010)
-* くもんの すくすくれっすん 1から30までのすうじ - Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Kumon - 2001xxxx - T-300010)
 * くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
 * 左脳開発シリーズ2 数量・計算 - Sanou Kaihatsu Series 2 Suuryou - Keisan (Imagineer - 19951002 - T-150230)
 * 左脳開発シリーズ5 迷路・記憶 (CD付き) - Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Imagineer - 19951208 - T-150240)
@@ -1618,6 +1614,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="sainttl">
+		<description>Kaitou Saint Tail - Saint Tail to One, Two, Three! (Jpn)</description>
+		<year>1996?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6035"/>
+		<info name="alt_title" value="怪盗セイント･テール セイントテールとワン･ツー･スリー!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18799 J42" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18799 j42.ic1" size="1048576" crc="e1abf964" sha1="174f46776f27d133e947ddd6dc8929f29b76d071" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kamenrid">
 		<description>Kamen Rider Agito &amp; Kuuga - Wild Battle (Jpn)</description>
 		<year>2001</year>
@@ -1741,6 +1752,27 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+<!-- probably requires emulation of the keyboard controller to work -->
+	<software name="kittykbd" supported="no">
+		<description>Kitty to Minna no Keyboard Pico Sanrio Puroland ni Ikou! (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6084"/>
+		<info name="alt_title" value="キティとみんなの キーボードピコ サンリオピューロランドにいこう!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0003A" />
+			<feature name="ic1" value="315-6019" /> <!-- HD404222FP -->
+			<feature name="ic2" value="9K0-0014-MX" />
+			<feature name="u1" value="400SF" /> <!-- ?? -->
+			<feature name="u2" value="HC32" />
+			<feature name="u3" value="HC74" />
+			<feature name="u4" value="HC245" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0014-mx.ic2" size="2097152" crc="3df93ffe" sha1="06df86055b9d4cd06d91406ad6639d9729ccde97" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kosumemk">
 		<description>Kosume Pico Motto Kawaiku Naritai na (Jpn)</description>
 		<year>2002</year>
@@ -1784,6 +1816,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="EPOXY BLOCK IC1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="epoxy block ic1.ic1" size="2097152" crc="eda6b93c" sha1="5dc53a2b40bb3f11181862c819a9fd4d02e77d9c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kumon1k">
+		<description>Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Jpn)</description>
+		<year>2001</year>
+		<publisher>Kumon</publisher>
+		<info name="serial" value="T-300010"/>
+		<info name="alt_title" value="くもんの すくすくれっすん 1から30までのすうじ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0005A" />
+			<feature name="ic1" value="9K0-0040" />
+			<feature name="ic2" value="74HC00A" />
+			<dataarea name="rom" size="4194304">
+				<rom name="9k0-0040.ic1" size="4194304" crc="2019bb5b" sha1="c8828068b6fb15cdcbd116860390241f5743c140" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3037,6 +3085,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shima shima tora no shimajirou - shimajirou to yume no kuni e daibouken (j) [!p].bin" size="4194304" crc="9782b08f" sha1="d95bdc33fa3108e6e60a9b4bccf6d53c7b36329d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shirayuk">
+		<description>Shirayukihime (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6077"/>
+		<info name="release" value="199909xx"/>
+		<info name="alt_title" value="白雪姫 ～しらゆきひめ～"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9K0-0006" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0006.ic1" size="2097152" crc="6b2493a2" sha1="daad822ffbcf1784f5cda10984d4fc62352b7844" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
