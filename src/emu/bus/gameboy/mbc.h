@@ -214,6 +214,17 @@ public:
 	UINT8 m_protection_checked;
 };
 
+// ======================> gb_rom_licheng_device
+
+class gb_rom_licheng_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+};
+
 // ======================> gb_rom_digimon_device
 
 class gb_rom_digimon_device : public gb_rom_mbc5_device
@@ -284,6 +295,7 @@ extern const device_type GB_ROM_MBC7;
 extern const device_type GB_ROM_MMM01;
 extern const device_type GB_ROM_SINTAX;
 extern const device_type GB_ROM_CHONGWU;
+extern const device_type GB_ROM_LICHENG;
 extern const device_type GB_ROM_DIGIMON;
 extern const device_type GB_ROM_ROCKMAN8;
 extern const device_type GB_ROM_SM3SP;

@@ -26,6 +26,7 @@ const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
 const device_type GB_ROM_SINTAX = &device_creator<gb_rom_sintax_device>;
 const device_type GB_ROM_CHONGWU = &device_creator<gb_rom_chongwu_device>;
+const device_type GB_ROM_LICHENG = &device_creator<gb_rom_licheng_device>;
 const device_type GB_ROM_DIGIMON = &device_creator<gb_rom_digimon_device>;
 const device_type GB_ROM_ROCKMAN8 = &device_creator<gb_rom_rockman8_device>;
 const device_type GB_ROM_SM3SP = &device_creator<gb_rom_sm3sp_device>;
@@ -89,6 +90,11 @@ gb_rom_sintax_device::gb_rom_sintax_device(const machine_config &mconfig, const 
 
 gb_rom_chongwu_device::gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gb_rom_mbc5_device(mconfig, GB_ROM_CHONGWU, "GB Chong Wu Xiao Jing Ling", tag, owner, clock, "gb_rom_chongwu", __FILE__)
+{
+}
+
+gb_rom_licheng_device::gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc5_device(mconfig, GB_ROM_LICHENG, "GB MBC5 Li Cheng Carts", tag, owner, clock, "gb_rom_licheng", __FILE__)
 {
 }
 
@@ -681,6 +687,16 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 			default:    m_bank_mask = 0xff; break;
 		}
 	}
+}
+
+// MBC5 variant used by Li Cheng / Niutoude games
+
+WRITE8_MEMBER(gb_rom_licheng_device::write_bank)
+{
+	if (offset > 0x2100 && offset < 0x3000)
+		return;
+
+	gb_rom_mbc5_device::write_bank(space, offset, data);
 }
 
 // MBC5 variant used by Chong Wu Xiao Jing Ling (this appears to be a re-release of a Li Cheng / Niutoude game,

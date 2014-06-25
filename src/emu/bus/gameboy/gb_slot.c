@@ -214,6 +214,7 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_ATVRACIN, "rom_atvrac" },
 	{ GB_MBC_SINTAX, "rom_sintax" },
 	{ GB_MBC_CHONGWU, "rom_chong" },
+	{ GB_MBC_LICHENG, "rom_licheng" },
 	{ GB_MBC_DIGIMON, "rom_digimon" },
 	{ GB_MBC_ROCKMAN8, "rom_rock8" },
 	{ GB_MBC_SM3SP, "rom_sm3sp" },
@@ -532,23 +533,24 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	}
 
 	// Check for some unlicensed games
-	if (type == GB_MBC_MBC5)
+	//if (type == GB_MBC_MBC5)
 	{
 		int count = 0;
 		for (int i = 0x0184; i < 0x0184 + 0x30; i++)
 		{
 			count += ROM[i];
 		}
+
 		if (count == 4876)
 		{
-//          printf("Niutoude!\n");
-//          type = GB_MBC_NIUTOUDE;
+//			printf("Li Cheng %d\n", count);
+			type = GB_MBC_LICHENG;
 		}
 		if (count == 4138 || count == 4125)
 		{
 			// Zhi Huan Wang uses 4138
 			// most sintax use 4125
-			printf("Sintax %d!\n", count);
+//			printf("Sintax %d!\n", count);
 			type = GB_MBC_SINTAX;
 		}
 	}

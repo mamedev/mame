@@ -23636,6 +23636,224 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
+<!-- Li Cheng games -->
+
+<!--
+
+  * CBA010 Shui Hu Shen Shou 水浒神兽
+  * CBA011 Shu Ma Bao Long 3 - Shui Jing Ban 数码暴龙-水晶版
+  * CBA033 Emo Cheng 2 - Fengyun Pian 恶魔城2-风云篇
+  * CBA060 Mingzhu Koudai Guaishou 2 明珠口袋怪兽2
+  * CBA064 Gangdan Wuyu 2 钢弹物语2
+  * CBA065 Mingzhu Koudai Guaishou 3 明珠口袋怪兽3
+  * CBA073 Shuihu Zhuan - Jingdian Ban 水浒传-经典版
+  * CBA075 Yingxiong Jian 2 英雄剑2
+  * CBA076 Xi You Ji 西游记
+  * CBA078 Shuma Baolong - Diannao Pian 数码暴龙-电脑篇
+  * CBA079 Yingxiong Tianxia 英雄天下
+  * CBA080 Sanguozhi Wudai 三国志五代
+
+-->
+
+	<software name="shuihusslc" cloneof="shuihuss">
+		<description>Shui Hu Shen Shou (Chi, Li Cheng)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA010"/>
+		<info name="alt_title" value="水浒神兽"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="shuihu shenshou (unlicensed, chinese) (cba010) [raw dump].bin" size="2097152" crc="618080cd" sha1="93aaddc93941cf53978acd9a88e6525b61c7ea24" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbl3lc" cloneof="smbl3">
+		<description>Shu Ma Bao Long 3 - Shui Jing Ban (Chi, Li Cheng)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA011"/>
+		<info name="alt_title" value="数码暴龙-水晶版 (Box)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="shuma baolong - shuijing ban (unlicensed, chinese) (cba011) [raw dump].bin" size="1048576" crc="ba03bd71" sha1="39d8ebe977cf139be398d87be735ea4f7e6885f7" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emochen2">
+		<description>Emo Cheng 2 - Fengyun Pian (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA033"/>
+		<info name="alt_title" value="恶魔城2-风云篇"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="524288">
+				<rom name="emo cheng 2 - fengyun pian (unlicensed, chinese) (cba033) [raw dump].bin" size="524288" crc="a98eec81" sha1="6da2499578b3cd362a21594034278c3ab2b9b374" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+<!-- AKA Digimon D-4 published by SKOB -->
+	<software name="mingzhu2">
+		<description>Ming Zhu Kou Dai Guai Shou II (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA060"/>
+		<info name="alt_title" value="明珠口袋怪兽2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="mingzhu koudai guaishou 2 (unlicensed, chinese) (cba060) [raw dump].bin" size="2097152" crc="a477c7ce" sha1="0e1b3e60d4a982538d4645c36693d5fd548cb641" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gangdanw">
+		<description>Gang Dan Wu Yu II (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA064"/>
+		<info name="alt_title" value="钢弹物语2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="gangdan wuyu 2 (unlicensed, chinese) (cba064) [raw dump].bin" size="2097152" crc="09dee8cb" sha1="6753a7a34f057f952172dff5ef9e8961d3af6649" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mingzhu3">
+		<description>Ming Zhu Kou Dai Guai Shou III ~ Digimon Fight ~ El Monstruo (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA065"/>
+		<info name="alt_title" value="明珠口袋怪兽3"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="4194304">
+				<rom name="mingzhu koudai guaishou 3 (unlicensed, multi3) (cba065) [raw dump].bin" size="4194304" crc="a477c7ce" sha1="0e1b3e60d4a982538d4645c36693d5fd548cb641" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shuihujd">
+		<description>Shui Hu Zhuan - Jing Dian Ban (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA073"/>
+		<info name="alt_title" value="水浒传-经典版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="shuihu zhuan - jingdian ban (unlicensed, chinese) (cba073) [raw dump].bin" size="1048576" crc="4a083b6e" sha1="c40a80ab26a2a5d884434c215e649dbfebf64fc3" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yingxj2">
+		<description>Ying Xiong Jian 2 (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA075"/>
+		<info name="alt_title" value="英雄剑2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="yingxiong jian 2 (unlicensed, chinese) (cba075) [raw dump].bin" size="2097152" crc="786eb7a4" sha1="3920e7d5a900981d6877ef99b5f3bed8a061c31f" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xiyouji">
+		<description>Xi You Ji (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA076"/>
+		<info name="alt_title" value="西游记"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<dataarea name="rom" size="524288">
+				<rom name="xi you ji (unlicensed, chinese) (cba076) [raw dump].bin" size="524288" crc="f2fc4884" sha1="1f1bb35c47b8bd51edf9511513bb5e5e5e07eec1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbldnp">
+		<description>Shu Ma Bao Long - Dian Nao Pian (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA078"/>
+		<info name="alt_title" value="数码暴龙-电脑篇"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="shuma baolong - diannao pian (unlicensed, chinese) (cba078) [raw dump].bin" size="1048576" crc="363808b4" sha1="bac6e8b313e87c06dd4838ebc5098e0ef6383925" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yxtx">
+		<description>Ying Xiong Tian Xia (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA079"/>
+		<info name="alt_title" value="英雄天下"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<dataarea name="rom" size="2097152">
+				<rom name="yingxiong tianxia (unlicensed, chinese) (cba079) [raw dump].bin" size="2097152" crc="5f2d6317" sha1="41f5f0c11e4e99b7d2d1433b09922a0fd2c48d7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanguowd">
+		<description>San Guo Zhi Wu Dai (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA080"/>
+		<info name="alt_title" value="三国志五代"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="sanguozhi wudai (unlicensed, chinese) (cba080) [raw dump].bin" size="2097152" crc="de136996" sha1="8e476e9db9caceb52d048b28163227d987a09a21" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Sintax games -->
 <!--
   * ST-0206002E Harry Boy Second Edition: The secretx of the chamber of secrets (english)
@@ -24076,7 +24294,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="qtdsheng">
+	<software name="qtdsheng" cloneof="xiyouji">
 		<description>Qi Tian Da Sheng - Sun Wu Kong (Chi, Ripped from 8 in 1 multicart)</description>
 		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
