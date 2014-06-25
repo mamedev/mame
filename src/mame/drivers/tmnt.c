@@ -1961,7 +1961,7 @@ static const samples_interface tmnt_samples_interface =
 /* 051960 interfaces */
 static const k051960_interface cuebrick_k051960_intf =
 {
-	"gfx2", 1,
+	"gfx2", 0,
 	REVERSE_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_NONE,
 	mia_sprite_callback
@@ -1969,7 +1969,7 @@ static const k051960_interface cuebrick_k051960_intf =
 
 static const k051960_interface mia_k051960_intf =
 {
-	"gfx2", 1,
+	"gfx2", 0,
 	REVERSE_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_NONE,
 	mia_sprite_callback
@@ -1977,7 +1977,7 @@ static const k051960_interface mia_k051960_intf =
 
 static const k051960_interface tmnt_k051960_intf =
 {
-	"gfx2", 1,
+	"gfx2", 0,
 	REVERSE_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	tmnt_sprite_callback
@@ -1985,7 +1985,7 @@ static const k051960_interface tmnt_k051960_intf =
 
 static const k051960_interface punkshot_k051960_intf =
 {
-	"gfx2", 1,
+	"gfx2", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	punkshot_sprite_callback
@@ -1993,7 +1993,7 @@ static const k051960_interface punkshot_k051960_intf =
 
 static const k051960_interface thndrx2_k051960_intf =
 {
-	"gfx2", 1,
+	"gfx2", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	thndrx2_sprite_callback
@@ -2909,8 +2909,8 @@ ROM_START( tmht )
 	ROM_LOAD( "963e20.g13",      0x00000, 0x08000, CRC(1692a6d6) SHA1(68c3419012b2863e91a7d7e479fce5ceabb10b88) )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
-	ROM_LOAD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
-	ROM_LOAD( "963a29.k27",      0x080000, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
+	ROM_LOAD32_WORD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
+	ROM_LOAD32_WORD( "963a29.k27",      0x000002, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "963a17.h4",      0x000000, 0x80000, CRC(b5239a44) SHA1(84e94807e7c51aa652b4e4b827b36be59a53d0d6) )        /* sprites */
@@ -2943,8 +2943,8 @@ ROM_START( tmhta )
 	ROM_LOAD( "963e20.g13",      0x00000, 0x08000, CRC(1692a6d6) SHA1(68c3419012b2863e91a7d7e479fce5ceabb10b88) )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
-	ROM_LOAD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
-	ROM_LOAD( "963a29.k27",      0x080000, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
+	ROM_LOAD32_WORD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
+	ROM_LOAD32_WORD( "963a29.k27",      0x000002, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "963a17.h4",      0x000000, 0x80000, CRC(b5239a44) SHA1(84e94807e7c51aa652b4e4b827b36be59a53d0d6) )        /* sprites */
@@ -3011,8 +3011,8 @@ ROM_START( tmht2p )
 	ROM_LOAD( "963e20.g13",      0x00000, 0x08000, CRC(1692a6d6) SHA1(68c3419012b2863e91a7d7e479fce5ceabb10b88) )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
-	ROM_LOAD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
-	ROM_LOAD( "963a29.k27",      0x080000, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
+	ROM_LOAD32_WORD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
+	ROM_LOAD32_WORD( "963a29.k27",      0x000002, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "963a17.h4",      0x000000, 0x80000, CRC(b5239a44) SHA1(84e94807e7c51aa652b4e4b827b36be59a53d0d6) )        /* sprites */
@@ -3045,8 +3045,8 @@ ROM_START( tmht2pa )
 	ROM_LOAD( "963e20.g13",      0x00000, 0x08000, CRC(1692a6d6) SHA1(68c3419012b2863e91a7d7e479fce5ceabb10b88) )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
-	ROM_LOAD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
-	ROM_LOAD( "963a29.k27",      0x080000, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
+	ROM_LOAD32_WORD( "963a28.h27",      0x000000, 0x80000, CRC(db4769a8) SHA1(810811914f9c1fbf2320d5a9030cbf124f6d78cf) )
+	ROM_LOAD32_WORD( "963a29.k27",      0x000002, 0x80000, CRC(8069cd2e) SHA1(54095d3546119ccd1e8814d692aceb1327c9369f) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "963a17.h4",      0x000000, 0x80000, CRC(b5239a44) SHA1(84e94807e7c51aa652b4e4b827b36be59a53d0d6) )        /* sprites */
@@ -3334,6 +3334,8 @@ ROM_START( glfgreat )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "061f01.4e",    0x0000, 0x8000, CRC(ab9a2a57) SHA1(c92738b4d3754c2378cd1e6ae786faa0c5a65808) )
 
+	// the tile and sprite ROMs are actually 16-bit ROMs on a 32-bit bus, but the data lines are
+	// swapped so that D0-D7 and D16-D23 come from one ROM and D8-D15 and D24-D31 from the other
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "061d14.12l", 0x000000, 0x080000, CRC(b9440924) SHA1(d12763f1c999cfa4f2d6f685a73c8c20204f9cbb) )
 	ROM_LOAD16_BYTE( "061d13.12k", 0x000001, 0x080000, CRC(9f999f0b) SHA1(f83e3e9e44d7d5ba4c72f72db1ab9f98a0e80fe2) )
@@ -3364,6 +3366,8 @@ ROM_START( glfgreatj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "061f01.4e",    0x0000, 0x8000, CRC(ab9a2a57) SHA1(c92738b4d3754c2378cd1e6ae786faa0c5a65808) )
 
+	// the tile and sprite ROMs are actually 16-bit ROMs on a 32-bit bus, but the data lines are
+	// swapped so that D0-D7 and D16-D23 come from one ROM and D8-D15 and D24-D31 from the other
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "061d14.12l", 0x000000, 0x080000, CRC(b9440924) SHA1(d12763f1c999cfa4f2d6f685a73c8c20204f9cbb) )
 	ROM_LOAD16_BYTE( "061d13.12k", 0x000001, 0x080000, CRC(9f999f0b) SHA1(f83e3e9e44d7d5ba4c72f72db1ab9f98a0e80fe2) )
@@ -3950,6 +3954,8 @@ ROM_START( prmrsocr )
 	ROM_LOAD( "101c05.5e",   0x00000, 0x20000, CRC(02c3679f) SHA1(e6d878185e73baca24ac98891c647856be9353c4) ) // 1.bin
 	ROM_RELOAD(              0x10000, 0x20000 )
 
+	// the tile and sprite ROMs are actually 16-bit ROMs on a 32-bit bus, but the data lines are
+	// swapped so that D0-D7 and D16-D23 come from one ROM and D8-D15 and D24-D31 from the other
 	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "101a12.12l", 0x000000, 0x040000, CRC(33530d7f) SHA1(87859ad058fb79e357101675706373f83a3f23d4) )
 	ROM_LOAD16_BYTE( "101a11.12k", 0x000001, 0x040000, CRC(7f773271) SHA1(0c6a62c6eb1897e88e893576f751e3d4fc788036) )
@@ -3981,6 +3987,8 @@ ROM_START( prmrsocrj )
 	ROM_LOAD( "101c05.5e",   0x00000, 0x20000, CRC(02c3679f) SHA1(e6d878185e73baca24ac98891c647856be9353c4) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
+	// the tile and sprite ROMs are actually 16-bit ROMs on a 32-bit bus, but the data lines are
+	// swapped so that D0-D7 and D16-D23 come from one ROM and D8-D15 and D24-D31 from the other
 	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "101a12.12l", 0x000000, 0x040000, CRC(33530d7f) SHA1(87859ad058fb79e357101675706373f83a3f23d4) )
 	ROM_LOAD16_BYTE( "101a11.12k", 0x000001, 0x040000, CRC(7f773271) SHA1(0c6a62c6eb1897e88e893576f751e3d4fc788036) )
@@ -4004,146 +4012,63 @@ ROM_START( prmrsocrj )
 ROM_END
 
 
+// MIA and TMNT have their graphics data (both tiles and sprites) stored in the ROMs in
+// the packed pixel format used by older Konami hardware such as Twin16. The data lines
+// from the ROMs to the custom chips are swapped so that the chips receive the data in
+// the planar format they expect.
+
+static void chunky_to_planar(memory_region *rgn)
+{
+	UINT32 *ROM = reinterpret_cast<UINT32 *>(rgn->base());
+	int len = rgn->bytes() / 4;
+
+	for (int i = 0; i < len; i++)
+	{
+		UINT32 data = LITTLE_ENDIANIZE_INT32(ROM[i]);
+		data = BITSWAP32(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
+		ROM[i] = LITTLE_ENDIANIZE_INT32(data);
+	}
+}
+
+
 DRIVER_INIT_MEMBER(tmnt_state, mia)
 {
-	UINT8 *gfxdata;
-	int len;
-	int i, j, k, A, B;
-	int bits[32];
+	chunky_to_planar(memregion("k052109"));
+	chunky_to_planar(memregion("gfx2"));
 
-	/*
-	    MIA needs the bits to be shuffled around because the 
-	    ROMs are connected differently to the 051962 custom IC.
-	*/
-	gfxdata = memregion("k052109")->base();
-	len = memregion("k052109")->bytes();
-	for (i = 0; i < len; i += 4)
+	// unscramble the sprite ROM address lines
+	UINT32 *gfxdata = reinterpret_cast<UINT32 *>(memregion("gfx2")->base());
+	int len = memregion("gfx2")->bytes() / 4;
+	dynamic_array<UINT32> temp(len);
+	memcpy(temp, gfxdata, len * 4);
+	for (int A = 0; A < len; A++)
 	{
-		for (j = 0; j < 4; j++)
-			for (k = 0; k < 8; k++)
-				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
-
-		for (j = 0; j < 4; j++)
-		{
-			gfxdata[i + j] = 0;
-			for (k = 0; k < 8; k++)
-				gfxdata[i + j] |= bits[j + 4 * k] << k;
-		}
-	}
-
-	/*
-        MIA needs the bits to be shuffled around because the 
-        ROMs are connected differently to the 051937 custom IC.
-	*/
-	gfxdata = memregion("gfx2")->base();
-	len = memregion("gfx2")->bytes();
-	for (i = 0; i < len; i += 4)
-	{
-		for (j = 0; j < 4; j++)
-			for (k = 0; k < 8; k++)
-				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
-
-		for (j = 0; j < 4; j++)
-		{
-			gfxdata[i + j] = 0;
-			for (k = 0; k < 8; k++)
-				gfxdata[i + j] |= bits[j + 4 * k] << k;
-		}
-	}
-
-	dynamic_buffer temp(len);
-	memcpy(temp, gfxdata, len);
-	for (A = 0; A < len / 4; A++)
-	{
-		/* the bits to scramble are the low 8 ones */
-		for (i = 0; i < 8; i++)
-			bits[i] = (A >> i) & 0x01;
-
-		B = A & 0x3ff00;
+		// the bits to scramble are the low 8 ones
+		int B = A & 0x3ff00;
 
 		if ((A & 0x3c000) == 0x3c000)
-		{
-			B |= bits[3] << 0;
-			B |= bits[5] << 1;
-			B |= bits[0] << 2;
-			B |= bits[1] << 3;
-			B |= bits[2] << 4;
-			B |= bits[4] << 5;
-			B |= bits[6] << 6;
-			B |= bits[7] << 7;
-		}
+			B |= BITSWAP8(A,7,6,4,2,1,0,5,3);
 		else
-		{
-			B |= bits[3] << 0;
-			B |= bits[5] << 1;
-			B |= bits[7] << 2;
-			B |= bits[0] << 3;
-			B |= bits[1] << 4;
-			B |= bits[2] << 5;
-			B |= bits[4] << 6;
-			B |= bits[6] << 7;
-		}
+			B |= BITSWAP8(A,6,4,2,1,0,7,5,3);
 
-		gfxdata[4 * A + 0] = temp[4 * B + 0];
-		gfxdata[4 * A + 1] = temp[4 * B + 1];
-		gfxdata[4 * A + 2] = temp[4 * B + 2];
-		gfxdata[4 * A + 3] = temp[4 * B + 3];
+		gfxdata[A] = temp[B];
 	}
 }
 
 
 DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 {
-	UINT8 *gfxdata;
-	const UINT8 *code_conv_table;
-	int len;
-	int i, j, k, A, B, entry;
-	int bits[32];
+	chunky_to_planar(memregion("k052109"));
+	chunky_to_planar(memregion("gfx2"));
 
-	/*
-        TMNT needs the bits to be shuffled around because the 
-        ROMs are connected differently to the 051962 custom IC.
-	*/
-	gfxdata = memregion("k052109")->base();
-	len = memregion("k052109")->bytes();
-	for (i = 0; i < len; i += 4)
-	{
-		for (j = 0; j < 4; j++)
-			for (k = 0; k < 8; k++)
-				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
+	// unscramble the sprite ROM address lines
+	const UINT8 *code_conv_table = memregion("proms")->base();
+	UINT32 *gfxdata = reinterpret_cast<UINT32 *>(memregion("gfx2")->base());
+	int len = memregion("gfx2")->bytes() / 4;
+	dynamic_array<UINT32> temp(len);
+	memcpy(temp, gfxdata, len * 4);
 
-		for (j = 0; j < 4; j++)
-		{
-			gfxdata[i + j] = 0;
-			for (k = 0; k < 8; k++)
-				gfxdata[i + j] |= bits[j + 4 * k] << k;
-		}
-	}
-
-	/*
-	    TMNT needs the bits to be shuffled around because the 
-        ROMs are connected differently to the 051937 custom IC.
-	*/
-	gfxdata = memregion("gfx2")->base();
-	len = memregion("gfx2")->bytes();
-	for (i = 0; i < len; i += 4)
-	{
-		for (j = 0; j < 4; j++)
-			for (k = 0; k < 8; k++)
-				bits[8 * j + k] = (gfxdata[i + j] >> k) & 1;
-
-		for (j = 0; j < 4; j++)
-		{
-			gfxdata[i + j] = 0;
-			for (k = 0; k < 8; k++)
-				gfxdata[i + j] |= bits[j + 4 * k] << k;
-		}
-	}
-
-	dynamic_buffer temp(len);
-	memcpy(temp, gfxdata, len);
-	code_conv_table = &memregion("proms")->base()[0x0000];
-	for (A = 0; A < len / 4; A++)
+	for (int A = 0; A < len; A++)
 	{
 #define CA0 0
 #define CA1 1
@@ -4176,21 +4101,20 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 		};
 
 		/* pick the correct entry in the PROM (top 8 bits of the address) */
-		entry = code_conv_table[(A & 0x7f800) >> 11] & 7;
+		int entry = code_conv_table[(A & 0x7f800) >> 11] & 7;
+
+		int bits[32];
 
 		/* the bits to scramble are the low 10 ones */
-		for (i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++)
 			bits[i] = (A >> i) & 0x01;
 
-		B = A & 0x7fc00;
+		int B = A & 0x7fc00;
 
-		for (i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++)
 			B |= bits[bit_pick_table[i][entry]] << i;
 
-		gfxdata[4 * A + 0] = temp[4 * B + 0];
-		gfxdata[4 * A + 1] = temp[4 * B + 1];
-		gfxdata[4 * A + 2] = temp[4 * B + 2];
-		gfxdata[4 * A + 3] = temp[4 * B + 3];
+		gfxdata[A] = temp[B];
 	}
 }
 
