@@ -4,7 +4,10 @@
 
   Wilbert Pol
 
-  Sound emulation is very preliminary and far from complete
+  Sound emulation is preliminary and not complete
+
+
+The noise taps and behavior are the same as the Virtual Boy.
 
 **************************************************************************************/
 
