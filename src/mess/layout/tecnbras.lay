@@ -1,0 +1,313 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="dotmatrix5dot">
+	<dotmatrix5dot>
+		<color red="1.0" green="0" blue="0" />
+	</dotmatrix5dot>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.3" green="0.3" blue="0.5" />
+		</rect>
+	</element>
+	<view name="DMD">
+		<bezel element="background">
+			<bounds left="00" top="00" right="70" bottom="7" />
+		</bezel>
+	<bezel name="dmd_0" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_1" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_2" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_3" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_4" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_5" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_6" element="dotmatrix5dot" state="0">
+		<bounds x="0" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_7" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_8" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_9" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_10" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_11" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_12" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_13" element="dotmatrix5dot" state="0">
+		<bounds x="5" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_14" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_15" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_16" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_17" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_18" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_19" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_20" element="dotmatrix5dot" state="0">
+		<bounds x="10" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_21" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_22" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_23" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_24" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_25" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_26" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_27" element="dotmatrix5dot" state="0">
+		<bounds x="15" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_28" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_29" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_30" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_31" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_32" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_33" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_34" element="dotmatrix5dot" state="0">
+		<bounds x="20" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_35" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_36" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_37" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_38" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_39" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_40" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_41" element="dotmatrix5dot" state="0">
+		<bounds x="25" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_42" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_43" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_44" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_45" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_46" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_47" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_48" element="dotmatrix5dot" state="0">
+		<bounds x="30" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_49" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_50" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_51" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_52" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_53" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_54" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_55" element="dotmatrix5dot" state="0">
+		<bounds x="35" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_56" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_57" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_58" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_59" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_60" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_61" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_62" element="dotmatrix5dot" state="0">
+		<bounds x="40" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_63" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_64" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_65" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_66" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_67" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_68" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_69" element="dotmatrix5dot" state="0">
+		<bounds x="45" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_70" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_71" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_72" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_73" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_74" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_75" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_76" element="dotmatrix5dot" state="0">
+		<bounds x="50" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_77" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_78" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_79" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_80" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_81" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_82" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_83" element="dotmatrix5dot" state="0">
+		<bounds x="55" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_84" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_85" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_86" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_87" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_88" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_89" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_90" element="dotmatrix5dot" state="0">
+		<bounds x="60" y="6" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_91" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="0" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_92" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="1" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_93" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="2" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_94" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="3" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_95" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="4" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_96" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="5" width="5" height="1" />
+	</bezel>
+	<bezel name="dmd_97" element="dotmatrix5dot" state="0">
+		<bounds x="65" y="6" width="5" height="1" />
+	</bezel>
+	</view>
+</mamelayout>

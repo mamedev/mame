@@ -2161,6 +2161,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/sys2900.o   \
 	$(MESS_DRIVERS)/systec.o    \
 	$(MESS_DRIVERS)/tavernie.o  \
+	$(MESS_DRIVERS)/tecnbras.o  \
 	$(MESS_DRIVERS)/terak.o     \
 	$(MESS_DRIVERS)/ti630.o     \
 	$(MESS_DRIVERS)/tsispch.o   \
@@ -2333,6 +2334,7 @@ $(MESS_DRIVERS)/svmu.o:     $(MESS_LAYOUT)/svmu.lh
 $(MESS_DRIVERS)/sym1.o:     $(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tavernie.o: $(MESS_LAYOUT)/tavernie.lh
 $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
+$(MESS_DRIVERS)/tecnbras.o: $(MESS_LAYOUT)/tecnbras.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh
