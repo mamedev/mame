@@ -20,9 +20,6 @@
 #include "includes/konamipt.h"
 #include "includes/thunderx.h"
 
-static KONAMI_SETLINES_CALLBACK( thunderx_banking );
-
-/***************************************************************************/
 
 INTERRUPT_GEN_MEMBER(thunderx_state::scontra_interrupt)
 {
@@ -605,20 +602,13 @@ MACHINE_START_MEMBER(thunderx_state,thunderx)
 	save_item(NAME(m_pmcram));
 }
 
-MACHINE_RESET_MEMBER(thunderx_state,scontra)
+MACHINE_RESET_MEMBER(thunderx_state, scontra)
 {
 	m_priority = 0;
 	m_1f98_data = 0;
 	m_palette_selected = 0;
 	m_rambank = 0;
 	m_pmcbank = 0;
-}
-
-MACHINE_RESET_MEMBER(thunderx_state,thunderx)
-{
-	konami_configure_set_lines(m_maincpu, thunderx_banking);
-
-	MACHINE_RESET_CALL_MEMBER(scontra);
 }
 
 static MACHINE_CONFIG_START( scontra, thunderx_state )
@@ -631,8 +621,8 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(thunderx_state,scontra)
-	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state,scontra)
+	MCFG_MACHINE_START_OVERRIDE(thunderx_state, scontra)
+	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state, scontra)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -669,18 +659,25 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 MACHINE_CONFIG_END
 
 
+KONAMICPU_LINE_CB_MEMBER( thunderx_state::thunderx_banking_callback )
+{
+	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), lines);
+	membank("bank1")->set_entry(((lines & 0x0f) ^ 0x08));
+}
+
 static MACHINE_CONFIG_START( thunderx, thunderx_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(thunderx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  scontra_interrupt)
+	MCFG_KONAMICPU_LINE_CB(thunderx_state, thunderx_banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(thunderx_state,thunderx)
-	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state,thunderx)
+	MCFG_MACHINE_START_OVERRIDE(thunderx_state, thunderx)
+	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state, scontra)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -961,12 +958,6 @@ ROM_START( thunderxj )
 ROM_END
 
 /***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( thunderx_banking )
-{
-	//logerror("thunderx %04x: bank select %02x\n", device->cpu->safe_pc(), lines);
-	device->machine().root_device().membank("bank1")->set_entry(((lines & 0x0f) ^ 0x08));
-}
 
 GAME( 1988, scontra,   0,        scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )
 GAME( 1988, scontraj,  scontra,  scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra (Japan)", GAME_SUPPORTS_SAVE )

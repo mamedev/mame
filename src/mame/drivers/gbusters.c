@@ -15,9 +15,6 @@
 #include "includes/konamipt.h"
 #include "includes/gbusters.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( gbusters_banking );
-
 INTERRUPT_GEN_MEMBER(gbusters_state::gbusters_interrupt)
 {
 	if (m_k052109->is_irq_enabled())
@@ -254,13 +251,25 @@ void gbusters_state::machine_reset()
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 
-	konami_configure_set_lines(m_maincpu, gbusters_banking);
-
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);
 
 	m_palette_selected = 0;
 	m_priority = 0;
+}
+
+KONAMICPU_LINE_CB_MEMBER( gbusters_state::banking_callback )
+{
+	/* bits 0-3 ROM bank */
+	membank("bank1")->set_entry(lines & 0x0f);
+	
+	if (lines & 0xf0)
+	{
+		//logerror("%04x: (lines) write %02x\n",device->safe_pc(), lines);
+		//popmessage("lines = %02x", lines);
+	}
+	
+	/* other bits unknown */
 }
 
 static MACHINE_CONFIG_START( gbusters, gbusters_state )
@@ -269,6 +278,7 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Konami custom 052526 */
 	MCFG_CPU_PROGRAM_MAP(gbusters_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gbusters_state,  gbusters_interrupt)
+	MCFG_KONAMICPU_LINE_CB(gbusters_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gbusters_sound_map)
@@ -386,20 +396,6 @@ ROM_START( crazycop )
 	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
 ROM_END
 
-
-static KONAMI_SETLINES_CALLBACK( gbusters_banking )
-{
-	/* bits 0-3 ROM bank */
-	device->machine().root_device().membank("bank1")->set_entry(lines & 0x0f);
-
-	if (lines & 0xf0)
-	{
-		//logerror("%04x: (lines) write %02x\n",device->safe_pc(), lines);
-		//popmessage("lines = %02x", lines);
-	}
-
-	/* other bits unknown */
-}
 
 
 GAME( 1988, gbusters,  0,        gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 1)", GAME_SUPPORTS_SAVE ) /* N02 & J03 program roms */

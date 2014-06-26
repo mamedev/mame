@@ -17,9 +17,6 @@
 #include "sound/k053260.h"
 #include "includes/rollerg.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( rollerg_banking );
-
 WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 {
 	logerror("%04x: write %02x to 0010\n",space.device().safe_pc(), data);
@@ -235,17 +232,22 @@ void rollerg_state::machine_start()
 
 void rollerg_state::machine_reset()
 {
-	konami_configure_set_lines(m_maincpu, rollerg_banking);
-
 	m_readzoomroms = 0;
 }
+
+KONAMICPU_LINE_CB_MEMBER( rollerg_state::banking_callback )
+{
+	membank("bank1")->set_entry(lines & 0x07);
+}
+
 
 static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(rollerg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollerg_state,  irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollerg_state, irq0_line_assert)
+	MCFG_KONAMICPU_LINE_CB(rollerg_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(rollerg_sound_map)
@@ -343,12 +345,6 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( rollerg_banking )
-{
-	device->machine().root_device().membank("bank1")->set_entry(lines & 0x07);
-}
-
 
 GAME( 1991, rollerg,  0,       rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (US)", GAME_SUPPORTS_SAVE )
 GAME( 1991, rollergj, rollerg, rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (Japan)", GAME_SUPPORTS_SAVE )

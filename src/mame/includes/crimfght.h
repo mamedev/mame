@@ -3,6 +3,7 @@
     Crime Fighters
 
 *************************************************************************/
+#include "cpu/m6809/konami.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -41,11 +42,11 @@ public:
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	DECLARE_WRITE8_MEMBER(crimfght_snd_bankswitch_w);
 	virtual void machine_start();
-	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(crimfght_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+	KONAMICPU_LINE_CB_MEMBER(banking_callback);
 };

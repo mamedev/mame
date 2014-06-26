@@ -96,9 +96,6 @@
 #include "includes/konamipt.h"
 #include "includes/vendetta.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( vendetta_banking );
-
 /***************************************************************************
 
   EEPROM
@@ -435,11 +432,7 @@ void vendetta_state::machine_start()
 
 void vendetta_state::machine_reset()
 {
-	int i;
-
-	konami_configure_set_lines(m_maincpu, vendetta_banking);
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_layerpri[i] = 0;
 		m_layer_colorbase[i] = 0;
@@ -452,12 +445,21 @@ void vendetta_state::machine_reset()
 	vendetta_video_banking(0);
 }
 
+KONAMICPU_LINE_CB_MEMBER( vendetta_state::banking_callback )
+{
+	if (lines >= 0x1c)
+		logerror("PC = %04x : Unknown bank selected %02x\n", machine().device("maincpu")->safe_pc(), lines);
+	else
+		membank("bank1")->set_entry(lines);
+}
+
 static MACHINE_CONFIG_START( vendetta, vendetta_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  vendetta_irq)
+	MCFG_KONAMICPU_LINE_CB(vendetta_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -743,14 +745,6 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( vendetta_banking )
-{
-	if (lines >= 0x1c)
-		logerror("PC = %04x : Unknown bank selected %02x\n", device->safe_pc(), lines);
-	else
-		device->machine().root_device().membank("bank1")->set_entry(lines);
-}
 
 DRIVER_INIT_MEMBER(vendetta_state,vendetta)
 {

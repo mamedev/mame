@@ -18,9 +18,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// callbacks
-typedef void (*konami_set_lines_func)(device_t *device, int lines);
-#define KONAMI_SETLINES_CALLBACK(name) void name(device_t *device, int lines)
+typedef device_delegate<void (int lines)> konami_line_cb_delegate;
+#define KONAMICPU_LINE_CB_MEMBER(_name)   void _name(int lines)
+
+#define MCFG_KONAMICPU_LINE_CB(_class, _method) \
+	konami_cpu_device::set_line_callback(*device, konami_line_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
 
 // device type definition
 extern const device_type KONAMI;
@@ -34,7 +37,7 @@ public:
 	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// configuration
-	void configure_set_lines(konami_set_lines_func func) { m_set_lines = func; }
+	static void set_line_callback(device_t &device, konami_line_cb_delegate callback) { downcast<konami_cpu_device &>(device).m_set_lines = callback; }
 
 protected:
 	// device-level overrides
@@ -50,7 +53,7 @@ private:
 	typedef m6809_base_device super;
 
 	// incidentals
-	konami_set_lines_func m_set_lines;
+	konami_line_cb_delegate m_set_lines;
 
 	// konami-specific addressing modes
 	UINT16 &ireg();
@@ -75,12 +78,5 @@ private:
 
 #define KONAMI_IRQ_LINE 0   /* IRQ line number */
 #define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
-
-
-//**************************************************************************
-//  FUNCTIONS
-//**************************************************************************
-
-void konami_configure_set_lines(device_t *device, konami_set_lines_func func);
 
 #endif /* __KONAMI_CPU_H__ */

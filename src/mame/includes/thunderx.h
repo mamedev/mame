@@ -3,6 +3,7 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
+#include "cpu/m6809/konami.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -66,7 +67,6 @@ public:
 	DECLARE_MACHINE_START(scontra);
 	DECLARE_MACHINE_RESET(scontra);
 	DECLARE_MACHINE_START(thunderx);
-	DECLARE_MACHINE_RESET(thunderx);
 	UINT32 screen_update_scontra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(scontra_interrupt);
 	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
@@ -74,6 +74,7 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+	KONAMICPU_LINE_CB_MEMBER(thunderx_banking_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

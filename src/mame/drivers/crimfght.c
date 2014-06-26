@@ -19,9 +19,6 @@
 #include "includes/konamipt.h"
 #include "includes/crimfght.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( crimfght_banking );
-
 INTERRUPT_GEN_MEMBER(crimfght_state::crimfght_interrupt)
 {
 	if (m_k051960->k051960_is_irq_enabled())
@@ -233,9 +230,22 @@ void crimfght_state::machine_start()
 	membank("bank2")->set_entry(0);
 }
 
-void crimfght_state::machine_reset()
+KONAMICPU_LINE_CB_MEMBER( crimfght_state::banking_callback )
 {
-	konami_configure_set_lines(m_maincpu, crimfght_banking);
+	/* bit 5 = select work RAM or palette */
+	if (lines & 0x20)
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), m_palette.target()));
+		membank("bank3")->set_base(m_paletteram);
+	}
+	else
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */
+	
+	/* bit 6 = enable char ROM reading through the video RAM */
+	m_k052109->set_rmrd_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+
+	membank("bank2")->set_entry(lines & 0x0f);
 }
 
 static MACHINE_CONFIG_START( crimfght, crimfght_state )
@@ -244,6 +254,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", crimfght_state,  crimfght_interrupt)
+	MCFG_KONAMICPU_LINE_CB(crimfght_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
@@ -365,26 +376,6 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( crimfght_banking )
-{
-	crimfght_state *state = device->machine().driver_data<crimfght_state>();
-
-	/* bit 5 = select work RAM or palette */
-	if (lines & 0x20)
-	{
-		device->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
-		device->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), state->m_palette.target()));
-		state->membank("bank3")->set_base(state->m_paletteram);
-	}
-	else
-		device->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */
-
-	/* bit 6 = enable char ROM reading through the video RAM */
-	state->m_k052109->set_rmrd_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-
-	state->membank("bank2")->set_entry(lines & 0x0f);
-}
 
 GAME( 1989, crimfght,  0,        crimfght, crimfght, driver_device, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )
 GAME( 1989, crimfght2, crimfght, crimfght, crimfghtj, driver_device,0, ROT0, "Konami", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )

@@ -26,8 +26,6 @@
 #include "includes/konamipt.h"
 #include "includes/blockhl.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( blockhl_banking );
 
 INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 {
@@ -179,10 +177,32 @@ void blockhl_state::machine_start()
 
 void blockhl_state::machine_reset()
 {
-	konami_configure_set_lines(m_maincpu, blockhl_banking);
-
 	m_palette_selected = 0;
 	m_rombank = 0;
+}
+
+KONAMICPU_LINE_CB_MEMBER( blockhl_state::banking_callback )
+{
+	/* bits 0-1 = ROM bank */
+	m_rombank = lines & 0x03;
+	membank("bank1")->set_entry(m_rombank);
+	
+	/* bits 3/4 = coin counters */
+	coin_counter_w(machine(), 0, lines & 0x08);
+	coin_counter_w(machine(), 1, lines & 0x10);
+	
+	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
+	m_palette_selected = ~lines & 0x20;
+	
+	/* bit 6 = enable char ROM reading through the video RAM */
+	m_k052109->set_rmrd_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	
+	/* bit 7 used but unknown */
+	
+	/* other bits unknown */
+	
+	if ((lines & 0x84) != 0x80)
+		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), lines);
 }
 
 static MACHINE_CONFIG_START( blockhl, blockhl_state )
@@ -191,6 +211,7 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_CPU_ADD("maincpu", KONAMI,3000000)     /* Konami custom 052526 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blockhl_state,  blockhl_interrupt)
+	MCFG_KONAMICPU_LINE_CB(blockhl_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -285,33 +306,6 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( blockhl_banking )
-{
-	blockhl_state *state = device->machine().driver_data<blockhl_state>();
-
-	/* bits 0-1 = ROM bank */
-	state->m_rombank = lines & 0x03;
-	state->membank("bank1")->set_entry(state->m_rombank);
-
-	/* bits 3/4 = coin counters */
-	coin_counter_w(device->machine(), 0, lines & 0x08);
-	coin_counter_w(device->machine(), 1, lines & 0x10);
-
-	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
-	state->m_palette_selected = ~lines & 0x20;
-
-	/* bit 6 = enable char ROM reading through the video RAM */
-	state->m_k052109->set_rmrd_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-
-	/* bit 7 used but unknown */
-
-	/* other bits unknown */
-
-	if ((lines & 0x84) != 0x80)
-		logerror("%04x: setlines %02x\n", device->safe_pc(), lines);
-}
-
 
 GAME( 1989, blockhl, 0,       blockhl, blockhl, driver_device, 0, ROT0, "Konami", "Block Hole", GAME_SUPPORTS_SAVE )
 GAME( 1989, quarth,  blockhl, blockhl, blockhl, driver_device, 0, ROT0, "Konami", "Quarth (Japan)", GAME_SUPPORTS_SAVE )

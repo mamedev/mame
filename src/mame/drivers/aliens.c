@@ -14,9 +14,6 @@ Preliminary driver by:
 #include "includes/konamipt.h"
 #include "includes/aliens.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( aliens_banking );
-
 INTERRUPT_GEN_MEMBER(aliens_state::aliens_interrupt)
 {
 	if (m_k051960->k051960_is_irq_enabled())
@@ -186,18 +183,21 @@ void aliens_state::machine_start()
 
 void aliens_state::machine_reset()
 {
-	konami_configure_set_lines(m_maincpu, aliens_banking);
-
 	m_bank0000->set_bank(0);
+}
+
+KONAMICPU_LINE_CB_MEMBER( aliens_state::banking_callback )
+{
+	membank("bank1")->set_entry(lines & 0x1f);
 }
 
 static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aliens_state,  aliens_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aliens_state, aliens_interrupt)
+	MCFG_KONAMICPU_LINE_CB(aliens_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)
@@ -474,11 +474,6 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( aliens_banking )
-{
-	device->machine().root_device().membank("bank1")->set_entry(lines & 0x1f);
-}
 
 GAME( 1990, aliens,   0,      aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, aliens2,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 2)", GAME_SUPPORTS_SAVE )

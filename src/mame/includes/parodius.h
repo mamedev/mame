@@ -58,6 +58,7 @@ public:
 	INTERRUPT_GEN_MEMBER(parodius_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
+	KONAMICPU_LINE_CB_MEMBER(banking_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

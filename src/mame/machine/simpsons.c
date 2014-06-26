@@ -60,9 +60,9 @@ READ8_MEMBER(simpsons_state::simpsons_sound_r)
 
 ***************************************************************************/
 
-static KONAMI_SETLINES_CALLBACK( simpsons_banking )
+KONAMICPU_LINE_CB_MEMBER( simpsons_state::banking_callback )
 {
-	device->machine().root_device().membank("bank1")->set_entry(lines & 0x3f);
+	membank("bank1")->set_entry(lines & 0x3f);
 }
 
 void simpsons_state::machine_start()
@@ -83,11 +83,7 @@ void simpsons_state::machine_start()
 
 void simpsons_state::machine_reset()
 {
-	int i;
-
-	konami_configure_set_lines(m_maincpu, simpsons_banking);
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_layerpri[i] = 0;
 		m_layer_colorbase[i] = 0;

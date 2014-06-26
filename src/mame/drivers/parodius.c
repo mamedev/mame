@@ -15,10 +15,6 @@
 #include "includes/konamipt.h"
 #include "includes/parodius.h"
 
-/* prototypes */
-static KONAMI_SETLINES_CALLBACK( parodius_banking );
-
-
 INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
 {
 	if (m_k052109->is_irq_enabled())
@@ -210,11 +206,7 @@ void parodius_state::machine_start()
 
 void parodius_state::machine_reset()
 {
-	int i;
-
-	konami_configure_set_lines(m_maincpu, parodius_banking);
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_layerpri[i] = 0;
 		m_layer_colorbase[i] = 0;
@@ -225,12 +217,21 @@ void parodius_state::machine_reset()
 	m_bank2000->set_bank(0);
 }
 
+KONAMICPU_LINE_CB_MEMBER( parodius_state::banking_callback )
+{
+	if (lines & 0xf0)
+		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), lines);
+	
+	membank("bank1")->set_entry((lines & 0x0f) ^ 0x0f);
+}
+
 static MACHINE_CONFIG_START( parodius, parodius_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
 	MCFG_CPU_PROGRAM_MAP(parodius_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
+	MCFG_KONAMICPU_LINE_CB(parodius_state, banking_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)
@@ -377,14 +378,6 @@ ROM_END
   Game driver(s)
 
 ***************************************************************************/
-
-static KONAMI_SETLINES_CALLBACK( parodius_banking )
-{
-	if (lines & 0xf0)
-		logerror("%04x: setlines %02x\n", device->safe_pc(), lines);
-
-	device->machine().root_device().membank("bank1")->set_entry((lines & 0x0f) ^ 0x0f);
-}
 
 GAME( 1990, parodius,  0,        parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, parodiuse, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", GAME_SUPPORTS_SAVE )
