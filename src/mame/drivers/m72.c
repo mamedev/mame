@@ -2619,80 +2619,217 @@ ROM_START( mrheli )
 	ROM_LOAD( "c-v0-b.rom",   0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
 ROM_END
 
+/*
+
+Ninja Spirit
+Irem, 1988
+
+This game runs on Irem M72 hardware.
+
+
+Top Board
+---------
+
+M72-C
+|-------------------------------|
+| 8MHz  J3 NIN_C-L3.6A   J4  J5 |
+|     J1   NIN_C-L2.6B NIN-V0.7A|
+|8751 J2   NIN_C-L1.6C   J12    |
+|          NIN_C-L0.6D   J6     |
+|                     NIN-R30.7D|
+|      NIN_C-3F.3F              |
+|            4364     NIN-R20.7F|
+|            4364 J8          J9|
+|                   J10         |
+| LM358     NIN_C-H0.H6         |
+|           NIN_C-H1.J6         |
+|----|   MB8431     J11         |
+     | CN3                  CN4 |
+     |   MB8421       NIN-R10.7J|
+     |     NIN_C-H2.6L NIN-R00.7M
+     |     NIN_C-H3.6M   J7     |
+     |--------------------------|
+Notes:
+      NIN_C-3F.3F - Ti TBP16L8 PAL
+      All other NIN_C* - 27C512 EPROM
+      NIN-R* - 28-pin 1Mb maskROM
+      J1   - Jumper set to A
+      J2   - Jumper set to A
+      J3   - Jumper set to A
+      J4   - Jumper set to A
+      J5   - Jumper set to B
+      J6   - Jumper set to A
+      J7   - Jumper set to A
+      J8   - Open
+      J9   - Jumper set to A
+      J10  - Jumper set to A
+      J11  - Jumper set to B
+      J12  - Jumper set to A
+      8751 - MCU with label 'NIN C-PR' at location 1C. Clock input 8MHz
+      4364 - 8kb x8-bit SRAM
+      MB8431 - Fujitsu 2k x 8-bit CMOS Dual-Port SRAM
+      MB8421 - Fujitsu 2k x 8-bit CMOS Dual-Port SRAM
+      LM358  - Low power dual operational amplifier IC
+
+
+Middle Board
+------------
+
+M72-A-C
+|-----------------------------------------------------------|
+|M51516L     YM2151                                         |
+|VOL         Y3014B                3.579545KHz             |--|
+|                                               43256      |  |
+|         CN3                                              |  |
+|           M72_A-3D.3D  M72_A-4D.4D   D780     43256      |  |
+|                                                          |  |
+|                                                          |  |
+|J   DSW1(8)                                               |  |
+|A                 2016                                    |  |
+|M   DSW2(8)                               D71011   D71088 |--|
+|M                 2016                                     |
+|A                                       V30     D71059    |--|
+|                  2018   KNA70H016(12)                    |  |
+|                                          M72_A-8L.8L     |  |
+|                  2018                         M72_A-9L.9L|  |
+|                              2018                        |  |
+|         KNA71H010(14)        2018           KNA70H015(11)|  |
+|                              2018                        |  |
+|         CN4                  2018         32MHz          |  |
+|         KNA71H009(13)                                    |--|
+|KNA71H010(15)                    KNA65005(17)  KNA91H014   |
+|-----------------------------------------------------------|
+Notes:
+      KNA*     - NANAO custom chips
+      M72*.*L  - Bipolar PROMs type TBP24S10 (==82S129)
+      M72*.*D  - Ti TBP16L8 PALs
+      2016     - 2kb x8-bit SRAM
+      2018     - 2kb x8-bit SRAM
+      43256    - 32kb x8-bit SRAM
+      CN3/CN4  - Joining connectors for top board
+
+
+Bottom Board
+------------
+
+M72-B-D
+|-----------------------------------------------------------|
+|                                                           |
+|            NIN_B-A2.4B                                   |--|
+|                                                          |  |
+| KNA6034201             J2                                |  |
+|            NIN_B-A0.4C J3                                |  |
+|                                                          |  |
+|                                                          |  |
+|            NIN_B-A1.4D  4364                             |  |
+|                                                          |  |
+|            NIN_B-A3.4E  4364                             |--|
+|                                                           |
+|            B3.4F        4364                             |--|
+|                                                          |  |
+|            B2.4H        4364                             |  |
+|                                                          |  |
+| KNA6034201 B0.4J                                         |  |
+|                                                          |  |
+|                        J4                                |  |
+|            B1.4K       J5                                |  |
+| KNA91H014                                                |--|
+|                                                           |
+|-----------------------------------------------------------|
+Notes:
+      KNA* - NANAO custom chips
+      NIN* - 27C512 EPROMs
+      B*   - 512kb mask ROMs (no labels, just B and a number)
+      4364 - 8kb x8-bit SRAM
+      J*   - 3-pin jumpers. All set to the B position
+*/
+
 ROM_START( nspirit )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "nin-c-h0.rom", 0x00001, 0x10000, CRC(035692fa) SHA1(d5ab54488344bf405063737ed55d68ff1e64b55f) )
-	ROM_LOAD16_BYTE( "nin-c-l0.rom", 0x00000, 0x10000, CRC(9a405898) SHA1(b28d71c1a6410720a37e6b6518b3cc66d4c32972) )
-	ROM_LOAD16_BYTE( "nin-c-h1.rom", 0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
-	ROM_LOAD16_BYTE( "nin-c-l1.rom", 0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
-	ROM_LOAD16_BYTE( "nin-c-h2.rom", 0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
-	ROM_LOAD16_BYTE( "nin-c-l2.rom", 0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
-	ROM_LOAD16_BYTE( "nin-c-h3.rom", 0x60001, 0x10000, CRC(501104ef) SHA1(e44e060c072affd359e52bf6606b1dd565368d44) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "nin-c-l3.rom", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "nin_c-h0.6h", 0x00001, 0x10000, CRC(035692fa) SHA1(d5ab54488344bf405063737ed55d68ff1e64b55f) )
+	ROM_LOAD16_BYTE( "nin_c-l0.6d", 0x00000, 0x10000, CRC(9a405898) SHA1(b28d71c1a6410720a37e6b6518b3cc66d4c32972) )
+	ROM_LOAD16_BYTE( "nin_c-h1.6j", 0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
+	ROM_LOAD16_BYTE( "nin_c-l1.6c", 0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
+	ROM_LOAD16_BYTE( "nin_c-h2.6l", 0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
+	ROM_LOAD16_BYTE( "nin_c-l2.6b", 0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
+	ROM_LOAD16_BYTE( "nin_c-h3.6m", 0x60001, 0x10000, CRC(501104ef) SHA1(e44e060c072affd359e52bf6606b1dd565368d44) )
+	ROM_RELOAD(                     0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "nin_c-l3.6a", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
+	ROM_RELOAD(                     0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "nspirit_i8751.mcu",  0x00000, 0x01000, NO_DUMP ) // read protected
+	ROM_LOAD( "nin_c-pr(__nodump).1c", 0x00000, 0x01000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */
-	ROM_LOAD( "nin-r10.rom",  0x20000, 0x20000, CRC(0caad107) SHA1(c4eff00327313e05ac8f7c6dbee3a0de1c83fadd) )
-	ROM_LOAD( "nin-r20.rom",  0x40000, 0x20000, CRC(ef3617d3) SHA1(16c175cf45559aacdea6e4002dd8a87f16817cfb) )
-	ROM_LOAD( "nin-r30.rom",  0x60000, 0x20000, CRC(175d2a24) SHA1(d1887efd4d8e74c38c53dbbc541ca8d17f29eb59) )
+	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */
+	ROM_LOAD( "nin-r10.7j",  0x20000, 0x20000, CRC(0caad107) SHA1(c4eff00327313e05ac8f7c6dbee3a0de1c83fadd) )
+	ROM_LOAD( "nin-r20.7f",  0x40000, 0x20000, CRC(ef3617d3) SHA1(16c175cf45559aacdea6e4002dd8a87f16817cfb) )
+	ROM_LOAD( "nin-r30.7d",  0x60000, 0x20000, CRC(175d2a24) SHA1(d1887efd4d8e74c38c53dbbc541ca8d17f29eb59) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "nin-b-a0.rom", 0x00000, 0x10000, CRC(63f8f658) SHA1(82c02d0f7a2d95dfd8d300c46312d511524775ce) )  /* tiles #1 */
-	ROM_LOAD( "nin-b-a1.rom", 0x10000, 0x10000, CRC(75eb8306) SHA1(2abc359a0bb2863759a68ed60e730761b9751829) )
-	ROM_LOAD( "nin-b-a2.rom", 0x20000, 0x10000, CRC(df532172) SHA1(58b5a79a57e71405b3e1abd41d54cf6a4d12873a) )
-	ROM_LOAD( "nin-b-a3.rom", 0x30000, 0x10000, CRC(4dedd64c) SHA1(8a5c73a024d95e6fe3ab70daafcd5b235418ad36) )
+	ROM_LOAD( "nin_b-a0.4c", 0x00000, 0x10000, CRC(63f8f658) SHA1(82c02d0f7a2d95dfd8d300c46312d511524775ce) )  /* tiles #1 */
+	ROM_LOAD( "nin_b-a1.4d", 0x10000, 0x10000, CRC(75eb8306) SHA1(2abc359a0bb2863759a68ed60e730761b9751829) )
+	ROM_LOAD( "nin_b-a2.4b", 0x20000, 0x10000, CRC(df532172) SHA1(58b5a79a57e71405b3e1abd41d54cf6a4d12873a) )
+	ROM_LOAD( "nin_b-a3.4e", 0x30000, 0x10000, CRC(4dedd64c) SHA1(8a5c73a024d95e6fe3ab70daafcd5b235418ad36) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "nin-b0.rom",   0x00000, 0x10000, CRC(1b0e08a6) SHA1(892686594970c264babbe8673c258929a5e480f6) )  /* tiles #2 */
-	ROM_LOAD( "nin-b1.rom",   0x10000, 0x10000, CRC(728727f0) SHA1(2f594c77a847ebee71c9da8a644f83ea2a1313d7) )
-	ROM_LOAD( "nin-b2.rom",   0x20000, 0x10000, CRC(f87efd75) SHA1(16474c7ab57b4fbb5cb50799ea6a2326c66706b5) )
-	ROM_LOAD( "nin-b3.rom",   0x30000, 0x10000, CRC(98856cb4) SHA1(aa4fbae972d2e827c75650a71ab4ef73a33cd018) )
+	ROM_LOAD( "b0.4j",       0x00000, 0x10000, CRC(1b0e08a6) SHA1(892686594970c264babbe8673c258929a5e480f6) )  /* tiles #2 */
+	ROM_LOAD( "b1.4k",       0x10000, 0x10000, CRC(728727f0) SHA1(2f594c77a847ebee71c9da8a644f83ea2a1313d7) )
+	ROM_LOAD( "b2.4h",       0x20000, 0x10000, CRC(f87efd75) SHA1(16474c7ab57b4fbb5cb50799ea6a2326c66706b5) )
+	ROM_LOAD( "b3.4f",       0x30000, 0x10000, CRC(98856cb4) SHA1(aa4fbae972d2e827c75650a71ab4ef73a33cd018) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "nin-v0.rom",   0x00000, 0x10000, CRC(a32e8caf) SHA1(63d56ad3a63fb089056e4a170159120287594ea8) )
+	ROM_LOAD( "nin-v0.7a",   0x00000, 0x10000, CRC(a32e8caf) SHA1(63d56ad3a63fb089056e4a170159120287594ea8) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on M72-A-C CPU/Sound board */
+	ROM_LOAD( "m72_a-8l.8l", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) /* TBP24S10 */
+	ROM_LOAD( "m72_a-9l.9l", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) /* TBP24S10 */
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	/* Located on M72-ROM-C rom board */
+	ROM_LOAD( "nin_c-3f.3f", 0x0000, 0x0100, CRC(5402fc07) SHA1(fa4284710b31be62ab99b0e1d60844db9a8d843e) ) /* TBP16L8 */
+	/* Located on M72-A-C CPU/Sound board */
+	ROM_LOAD( "m72_a-3d.3d", 0x0100, 0x0100, CRC(de85dac3) SHA1(af83b0325f28fbb1bcc424c1b58ff0f4b49f6b67) ) /* TBP16L8 */
+	ROM_LOAD( "m72_a-4d.4d", 0x0200, 0x0100, CRC(59676de1) SHA1(fcf35f5463c14a4b06d58684c47ea9de5216d1da) ) /* TBP16L8 */
+
 ROM_END
 
 ROM_START( nspiritj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "c-h0",         0x00001, 0x10000, CRC(8603fab2) SHA1(2c5bc97b6c9648156969b4a9f139081dca19fa24) )
-	ROM_LOAD16_BYTE( "c-l0",         0x00000, 0x10000, CRC(e520fa35) SHA1(05f7e5a1a5ada95809ffd941080fb2c2b54363b7) )
-	ROM_LOAD16_BYTE( "nin-c-h1.rom", 0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
-	ROM_LOAD16_BYTE( "nin-c-l1.rom", 0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
-	ROM_LOAD16_BYTE( "nin-c-h2.rom", 0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
-	ROM_LOAD16_BYTE( "nin-c-l2.rom", 0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
-	ROM_LOAD16_BYTE( "c-h3",         0x60001, 0x10000, CRC(95b63a61) SHA1(bd5ec35fffe6d4898e6712eb6add7c51077b58d2) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "c-l3",         0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "c-h0",        0x00001, 0x10000, CRC(8603fab2) SHA1(2c5bc97b6c9648156969b4a9f139081dca19fa24) )
+	ROM_LOAD16_BYTE( "c-l0",        0x00000, 0x10000, CRC(e520fa35) SHA1(05f7e5a1a5ada95809ffd941080fb2c2b54363b7) )
+	ROM_LOAD16_BYTE( "nin_c-h1.6j", 0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
+	ROM_LOAD16_BYTE( "nin_c-l1.6c", 0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
+	ROM_LOAD16_BYTE( "nin_c-h2.6l", 0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
+	ROM_LOAD16_BYTE( "nin_c-l2.6b", 0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
+	ROM_LOAD16_BYTE( "c-h3",        0x60001, 0x10000, CRC(95b63a61) SHA1(bd5ec35fffe6d4898e6712eb6add7c51077b58d2) )
+	ROM_RELOAD(                     0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "c-l3",        0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
+	ROM_RELOAD(                     0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "nin_c-pr.bin", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) )  /* checksum correct for Japan version only (see test mode) */
+	ROM_LOAD( "nin_c-pr.1c", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) )  /* checksum correct for Japan version only (see test mode) */
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */
-	ROM_LOAD( "nin-r10.rom",  0x20000, 0x20000, CRC(0caad107) SHA1(c4eff00327313e05ac8f7c6dbee3a0de1c83fadd) )
-	ROM_LOAD( "nin-r20.rom",  0x40000, 0x20000, CRC(ef3617d3) SHA1(16c175cf45559aacdea6e4002dd8a87f16817cfb) )
-	ROM_LOAD( "nin-r30.rom",  0x60000, 0x20000, CRC(175d2a24) SHA1(d1887efd4d8e74c38c53dbbc541ca8d17f29eb59) )
+	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */
+	ROM_LOAD( "nin-r10.7j",  0x20000, 0x20000, CRC(0caad107) SHA1(c4eff00327313e05ac8f7c6dbee3a0de1c83fadd) )
+	ROM_LOAD( "nin-r20.7f",  0x40000, 0x20000, CRC(ef3617d3) SHA1(16c175cf45559aacdea6e4002dd8a87f16817cfb) )
+	ROM_LOAD( "nin-r30.7d",  0x60000, 0x20000, CRC(175d2a24) SHA1(d1887efd4d8e74c38c53dbbc541ca8d17f29eb59) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "nin-b-a0.rom", 0x00000, 0x10000, CRC(63f8f658) SHA1(82c02d0f7a2d95dfd8d300c46312d511524775ce) )  /* tiles #1 */
-	ROM_LOAD( "nin-b-a1.rom", 0x10000, 0x10000, CRC(75eb8306) SHA1(2abc359a0bb2863759a68ed60e730761b9751829) )
-	ROM_LOAD( "nin-b-a2.rom", 0x20000, 0x10000, CRC(df532172) SHA1(58b5a79a57e71405b3e1abd41d54cf6a4d12873a) )
-	ROM_LOAD( "nin-b-a3.rom", 0x30000, 0x10000, CRC(4dedd64c) SHA1(8a5c73a024d95e6fe3ab70daafcd5b235418ad36) )
+	ROM_LOAD( "nin_b-a0.4c", 0x00000, 0x10000, CRC(63f8f658) SHA1(82c02d0f7a2d95dfd8d300c46312d511524775ce) )  /* tiles #1 */
+	ROM_LOAD( "nin_b-a1.4d", 0x10000, 0x10000, CRC(75eb8306) SHA1(2abc359a0bb2863759a68ed60e730761b9751829) )
+	ROM_LOAD( "nin_b-a2.4b", 0x20000, 0x10000, CRC(df532172) SHA1(58b5a79a57e71405b3e1abd41d54cf6a4d12873a) )
+	ROM_LOAD( "nin_b-a3.4e", 0x30000, 0x10000, CRC(4dedd64c) SHA1(8a5c73a024d95e6fe3ab70daafcd5b235418ad36) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "nin-b0.rom",   0x00000, 0x10000, CRC(1b0e08a6) SHA1(892686594970c264babbe8673c258929a5e480f6) )  /* tiles #2 */
-	ROM_LOAD( "nin-b1.rom",   0x10000, 0x10000, CRC(728727f0) SHA1(2f594c77a847ebee71c9da8a644f83ea2a1313d7) )
-	ROM_LOAD( "nin-b2.rom",   0x20000, 0x10000, CRC(f87efd75) SHA1(16474c7ab57b4fbb5cb50799ea6a2326c66706b5) )
-	ROM_LOAD( "nin-b3.rom",   0x30000, 0x10000, CRC(98856cb4) SHA1(aa4fbae972d2e827c75650a71ab4ef73a33cd018) )
+	ROM_LOAD( "b0.4j",       0x00000, 0x10000, CRC(1b0e08a6) SHA1(892686594970c264babbe8673c258929a5e480f6) )  /* tiles #2 */
+	ROM_LOAD( "b1.4k",       0x10000, 0x10000, CRC(728727f0) SHA1(2f594c77a847ebee71c9da8a644f83ea2a1313d7) )
+	ROM_LOAD( "b2.4h",       0x20000, 0x10000, CRC(f87efd75) SHA1(16474c7ab57b4fbb5cb50799ea6a2326c66706b5) )
+	ROM_LOAD( "b3.4f",       0x30000, 0x10000, CRC(98856cb4) SHA1(aa4fbae972d2e827c75650a71ab4ef73a33cd018) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "nin-v0.rom",   0x00000, 0x10000, CRC(a32e8caf) SHA1(63d56ad3a63fb089056e4a170159120287594ea8) )
+	ROM_LOAD( "nin-v0.7a",   0x00000, 0x10000, CRC(a32e8caf) SHA1(63d56ad3a63fb089056e4a170159120287594ea8) )
 ROM_END
 
 ROM_START( imgfight )
