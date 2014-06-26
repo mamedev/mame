@@ -60,9 +60,9 @@ READ8_MEMBER(simpsons_state::simpsons_sound_r)
 
 ***************************************************************************/
 
-KONAMICPU_LINE_CB_MEMBER( simpsons_state::banking_callback )
+WRITE8_MEMBER( simpsons_state::banking_callback )
 {
-	membank("bank1")->set_entry(lines & 0x3f);
+	membank("bank1")->set_entry(data & 0x3f);
 }
 
 void simpsons_state::machine_start()

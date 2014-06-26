@@ -186,9 +186,9 @@ void aliens_state::machine_reset()
 	m_bank0000->set_bank(0);
 }
 
-KONAMICPU_LINE_CB_MEMBER( aliens_state::banking_callback )
+WRITE8_MEMBER( aliens_state::banking_callback )
 {
-	membank("bank1")->set_entry(lines & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
 static MACHINE_CONFIG_START( aliens, aliens_state )
@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aliens_state, aliens_interrupt)
-	MCFG_KONAMICPU_LINE_CB(aliens_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(aliens_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)

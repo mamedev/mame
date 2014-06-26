@@ -659,10 +659,10 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 MACHINE_CONFIG_END
 
 
-KONAMICPU_LINE_CB_MEMBER( thunderx_state::thunderx_banking_callback )
+WRITE8_MEMBER( thunderx_state::thunderx_banking_callback )
 {
-	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), lines);
-	membank("bank1")->set_entry(((lines & 0x0f) ^ 0x08));
+	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
+	membank("bank1")->set_entry(((data & 0x0f) ^ 0x08));
 }
 
 static MACHINE_CONFIG_START( thunderx, thunderx_state )
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( thunderx, thunderx_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(thunderx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  scontra_interrupt)
-	MCFG_KONAMICPU_LINE_CB(thunderx_state, thunderx_banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, thunderx_banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)

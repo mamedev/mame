@@ -258,15 +258,15 @@ void gbusters_state::machine_reset()
 	m_priority = 0;
 }
 
-KONAMICPU_LINE_CB_MEMBER( gbusters_state::banking_callback )
+WRITE8_MEMBER( gbusters_state::banking_callback )
 {
 	/* bits 0-3 ROM bank */
-	membank("bank1")->set_entry(lines & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 	
-	if (lines & 0xf0)
+	if (data & 0xf0)
 	{
-		//logerror("%04x: (lines) write %02x\n",device->safe_pc(), lines);
-		//popmessage("lines = %02x", lines);
+		//logerror("%04x: (lines) write %02x\n",device->safe_pc(), data);
+		//popmessage("lines = %02x", data);
 	}
 	
 	/* other bits unknown */
@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Konami custom 052526 */
 	MCFG_CPU_PROGRAM_MAP(gbusters_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gbusters_state,  gbusters_interrupt)
-	MCFG_KONAMICPU_LINE_CB(gbusters_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(gbusters_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gbusters_sound_map)

@@ -154,10 +154,10 @@ void surpratk_state::machine_reset()
 	m_sprite_colorbase = 0;
 }
 
-KONAMICPU_LINE_CB_MEMBER( surpratk_state::banking_callback )
+WRITE8_MEMBER( surpratk_state::banking_callback )
 {
-//	logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), lines);
-	membank("bank1")->set_entry(lines & 0x1f);
+//	logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
 static MACHINE_CONFIG_START( surpratk, surpratk_state )
@@ -166,7 +166,7 @@ static MACHINE_CONFIG_START( surpratk, surpratk_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	MCFG_CPU_PROGRAM_MAP(surpratk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
-	MCFG_KONAMICPU_LINE_CB(surpratk_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(surpratk_state, banking_callback))
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)

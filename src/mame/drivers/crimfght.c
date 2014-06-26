@@ -230,10 +230,10 @@ void crimfght_state::machine_start()
 	membank("bank2")->set_entry(0);
 }
 
-KONAMICPU_LINE_CB_MEMBER( crimfght_state::banking_callback )
+WRITE8_MEMBER( crimfght_state::banking_callback )
 {
 	/* bit 5 = select work RAM or palette */
-	if (lines & 0x20)
+	if (data & 0x20)
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), m_palette.target()));
@@ -243,9 +243,9 @@ KONAMICPU_LINE_CB_MEMBER( crimfght_state::banking_callback )
 		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */
 	
 	/* bit 6 = enable char ROM reading through the video RAM */
-	m_k052109->set_rmrd_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
-	membank("bank2")->set_entry(lines & 0x0f);
+	membank("bank2")->set_entry(data & 0x0f);
 }
 
 static MACHINE_CONFIG_START( crimfght, crimfght_state )
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", crimfght_state,  crimfght_interrupt)
-	MCFG_KONAMICPU_LINE_CB(crimfght_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(crimfght_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)

@@ -85,7 +85,8 @@ const device_type KONAMI = &device_creator<konami_cpu_device>;
 //-------------------------------------------------
 
 konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: m6809_base_device(mconfig, "KONAMI CPU", tag, owner, clock, KONAMI, 1, "konami_cpu", __FILE__)
+		: m6809_base_device(mconfig, "KONAMI CPU", tag, owner, clock, KONAMI, 1, "konami_cpu", __FILE__),
+			m_set_lines(*this)
 {
 }
 
@@ -98,8 +99,8 @@ void konami_cpu_device::device_start()
 {
 	super::device_start();
 	
-	// bind callbacks
-	m_set_lines.bind_relative_to(*owner());
+	// resolve callbacks
+	m_set_lines.resolve();
 }
 
 
@@ -347,7 +348,7 @@ ATTR_FORCE_INLINE void konami_cpu_device::divx()
 void konami_cpu_device::set_lines(UINT8 data)
 {
 	if (!m_set_lines.isnull())
-		m_set_lines(data);
+		m_set_lines((offs_t)0, data);
 }
 
 

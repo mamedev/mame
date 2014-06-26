@@ -251,25 +251,25 @@ INPUT_PORTS_END
  *
  *************************************/
 
-KONAMICPU_LINE_CB_MEMBER( _88games_state::banking_callback )
+WRITE8_MEMBER( _88games_state::banking_callback )
 {
-	logerror("%04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), lines);
+	logerror("%04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */
 	/* bit 4: when 0, 051316 RAM at 3800-3fff; when 1, work RAM at 2000-3fff (NVRAM 3700-37ff) */
-	int rombank = lines & 0x07;
+	int rombank = data & 0x07;
 	m_bank0000->set_entry(rombank);
-	m_bank1000->set_entry((lines & 0x08) ? 8 : rombank);
-	m_videobank = lines & 0x10;
+	m_bank1000->set_entry((data & 0x08) ? 8 : rombank);
+	m_videobank = data & 0x10;
 
 	/* bit 5 = enable char ROM reading through the video RAM */
-	m_k052109->set_rmrd_line((lines & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 is unknown, 1 most of the time */
 
 	/* bit 7 controls layer priority */
-	m_k88games_priority = lines & 0x80;
+	m_k88games_priority = data & 0x80;
 }
 
 void _88games_state::machine_start()
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( 88games, _88games_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _88games_state,  k88games_interrupt)
-	MCFG_KONAMICPU_LINE_CB(_88games_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(_88games_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

@@ -18,11 +18,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (int lines)> konami_line_cb_delegate;
-#define KONAMICPU_LINE_CB_MEMBER(_name)   void _name(int lines)
-
-#define MCFG_KONAMICPU_LINE_CB(_class, _method) \
-	konami_cpu_device::set_line_callback(*device, konami_line_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+#define MCFG_KONAMICPU_LINE_CB(_devcb) \
+	devcb = &konami_cpu_device::set_line_callback(*device, DEVCB_##_devcb);
 
 
 // device type definition
@@ -37,7 +34,7 @@ public:
 	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// configuration
-	static void set_line_callback(device_t &device, konami_line_cb_delegate callback) { downcast<konami_cpu_device &>(device).m_set_lines = callback; }
+	template<class _Object> static devcb_base &set_line_callback(device_t &device, _Object object) { return downcast<konami_cpu_device &>(device).m_set_lines.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -53,7 +50,7 @@ private:
 	typedef m6809_base_device super;
 
 	// incidentals
-	konami_line_cb_delegate m_set_lines;
+	devcb_write8 m_set_lines;
 
 	// konami-specific addressing modes
 	UINT16 &ireg();

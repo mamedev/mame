@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpsons_state,  simpsons_irq) /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
-	MCFG_KONAMICPU_LINE_CB(simpsons_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(simpsons_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(z80_map)

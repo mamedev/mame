@@ -445,12 +445,12 @@ void vendetta_state::machine_reset()
 	vendetta_video_banking(0);
 }
 
-KONAMICPU_LINE_CB_MEMBER( vendetta_state::banking_callback )
+WRITE8_MEMBER( vendetta_state::banking_callback )
 {
-	if (lines >= 0x1c)
-		logerror("PC = %04x : Unknown bank selected %02x\n", machine().device("maincpu")->safe_pc(), lines);
+	if (data >= 0x1c)
+		logerror("PC = %04x : Unknown bank selected %02x\n", machine().device("maincpu")->safe_pc(), data);
 	else
-		membank("bank1")->set_entry(lines);
+		membank("bank1")->set_entry(data);
 }
 
 static MACHINE_CONFIG_START( vendetta, vendetta_state )
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  vendetta_irq)
-	MCFG_KONAMICPU_LINE_CB(vendetta_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(vendetta_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

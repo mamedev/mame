@@ -217,12 +217,12 @@ void parodius_state::machine_reset()
 	m_bank2000->set_bank(0);
 }
 
-KONAMICPU_LINE_CB_MEMBER( parodius_state::banking_callback )
+WRITE8_MEMBER( parodius_state::banking_callback )
 {
-	if (lines & 0xf0)
-		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), lines);
+	if (data & 0xf0)
+		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
 	
-	membank("bank1")->set_entry((lines & 0x0f) ^ 0x0f);
+	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }
 
 static MACHINE_CONFIG_START( parodius, parodius_state )
@@ -231,11 +231,10 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
 	MCFG_CPU_PROGRAM_MAP(parodius_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
-	MCFG_KONAMICPU_LINE_CB(parodius_state, banking_callback)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(parodius_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)
-								/* NMIs are triggered by the 053260 */
+	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)	/* NMIs are triggered by the 053260 */
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
