@@ -1221,7 +1221,6 @@ VIDEO_START_MEMBER(konamigx_state, le2)
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
 
 	gx_le2_textcolour_hack = 1; // force text layer to use the right palette
-	m_k055555->K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON?
 }
 
 VIDEO_START_MEMBER(konamigx_state, konamigx_6bpp)

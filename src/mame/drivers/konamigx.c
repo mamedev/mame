@@ -3652,6 +3652,13 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 		m_maincpu->set_clock_scale(0.66f);
 		boothack_timer->adjust(attotime::from_seconds(10));
 	}
+
+	if (!strcmp(setname, "le2") ||
+		!strcmp(setname, "le2u")||
+		!strcmp(setname, "le2j"))
+		m_k055555->K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON for all games
+
+
 }
 
 struct GXGameInfoT
