@@ -33,8 +33,7 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
 
 
-class k056832_device : public device_t,
-										public k056832_interface
+class k056832_device : public device_t
 {
 public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
