@@ -189,7 +189,12 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_videoram(NULL),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
-	m_rom_half(0),
+	m_gfx_memory_region(NULL),
+	m_gfx_num(0),
+	m_bpp(-1),
+	m_big(0),
+	m_djmain_hack(0),
+	m_k055555_tag(NULL),
 	//m_layer_assoc_with_page[K056832_PAGE_COUNT],
 	//m_layer_offs[8][2],
 	//m_lsram_page[8][2],
@@ -213,7 +218,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_use_ext_linescroll(0),
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0),
-	m_k055555(0),
+	m_k055555(NULL),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
@@ -238,32 +243,6 @@ void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 void k056832_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<k056832_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k056832_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k056832_interface *intf = reinterpret_cast<const k056832_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k056832_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_gfx_memory_region = "";
-	m_gfx_num = 0;
-	m_bpp = -1;
-	m_big = 0;
-	m_djmain_hack = 0;
-	m_callback = NULL;
-	m_k055555_tag = "";
-	};
 }
 
 void k056832_device::create_tilemaps(running_machine &machine)
@@ -387,11 +366,8 @@ void k056832_device::device_start()
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
-	// for non-interface cases we still use the vh_start call
-	if (m_bpp == -1)
-		return;
-
-	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
+	if (m_k055555_tag)
+		m_k055555 = machine().device<k055555_device>(m_k055555_tag);
 
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
@@ -401,7 +377,9 @@ void k056832_device::device_start()
 	create_tilemaps(machine());
 
 	finalize_init(machine());
-
+	
+	// bind callbacks
+	m_k056832_cb.bind_relative_to(*owner());
 }
 
 /*****************************************************************************
@@ -557,7 +535,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 	color = (attr & smptr->palm1) | (attr >> smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	m_callback(machine(), layer, &code, &color, &flags);
+	m_k056832_cb(layer, &code, &color, &flags);
 
 	SET_TILE_INFO_MEMBER(m_gfx_num,
 			code,
@@ -2185,25 +2163,6 @@ void k056832_device::create_gfx(running_machine &machine, const char *gfx_memory
 }
 
 
-
-void k056832_device::altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
-	int (*scrolld)[4][2],
-	void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
-	int djmain_hack)
-{
-	m_k055555 = 0;
-	m_callback = callback;
-	m_djmain_hack = djmain_hack;
-
-	create_gfx(machine, gfx_memory_region, bpp, big);
-
-	create_tilemaps(machine);
-
-	finalize_init(machine);
-}
-
-
-
 int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags)
 {
 	if (m_page_tile_mode[page]) return(0);
@@ -2614,7 +2573,3 @@ int k056832_device::get_layer_association(void)
 	return(m_layer_association);
 }
 
-void k056832_device::K056832_set_k055555(k055555_device * mode)
-{
-	m_k055555 = mode;
-}

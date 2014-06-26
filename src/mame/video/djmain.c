@@ -127,7 +127,7 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 }
 
 
-void djmain_tile_callback(running_machine& machine, int layer, int *code, int *color, int *flags)
+K056832_CB_MEMBER(djmain_state::tile_callback)
 {
 }
 

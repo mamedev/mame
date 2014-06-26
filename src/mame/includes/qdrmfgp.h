@@ -64,8 +64,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(gp2_ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
+	K056832_CB_MEMBER(qdrmfgp_tile_callback);
+	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 };
-
-/*----------- defined in video/qdrmfgp.c -----------*/
-void qdrmfgp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
-void qdrmfgp2_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);

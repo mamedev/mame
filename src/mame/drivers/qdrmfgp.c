@@ -547,22 +547,6 @@ static const k054539_interface k054539_config =
  *
  *************************************/
 
-static const k056832_interface qdrmfgp_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_4dj,
-	1, 0,
-	qdrmfgp_tile_callback, "none"
-};
-
-static const k056832_interface qdrmfgp2_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_4dj,
-	1, 0,
-	qdrmfgp2_tile_callback, "none"
-};
-
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
 	save_item(NAME(m_control));
@@ -620,7 +604,10 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp_tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
@@ -664,7 +651,10 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp2_tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

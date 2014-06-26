@@ -295,14 +295,6 @@ static const k054539_interface k054539_config =
 	NULL,
 };
 
-static const k056832_interface gijoe_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_4,
-	1, 0,
-	gijoe_tile_callback, "none"
-};
-
 static const k053247_interface gijoe_k053247_intf =
 {
 	"gfx2", 1,
@@ -350,9 +342,13 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K056832_ADD("k056832", gijoe_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(gijoe_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
+
 	MCFG_K053246_ADD("k053246", gijoe_k053247_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")

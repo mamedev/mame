@@ -1390,14 +1390,6 @@ void djmain_state::machine_reset()
  *
  *************************************/
 
-static const k056832_interface djmain_k056832_intf =
-{
-	"gfx2", 1,
-	K056832_BPP_4dj,
-	1, 1,
-	djmain_tile_callback, "none"
-};
-
 static MACHINE_CONFIG_START( djmain, djmain_state )
 
 	/* basic machine hardware */
@@ -1406,7 +1398,6 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 32000000/4)   /*  8.000 MHz!? */
 	MCFG_CPU_PROGRAM_MAP(memory_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
-
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(djmain_state, ide_interrupt))
@@ -1422,9 +1413,12 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_PALETTE_ADD("palette", 0x4440/4)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djmain)
 
-	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(djmain_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx2", 1, K056832_BPP_4dj, 1, 1, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
+
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */

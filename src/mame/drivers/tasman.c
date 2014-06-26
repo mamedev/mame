@@ -40,6 +40,7 @@ public:
 	DECLARE_VIDEO_START(kongambl);
 	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
+	K056832_CB_MEMBER(tile_callback);
 };
 
 
@@ -538,7 +539,7 @@ static void kongambl_sprite_callback( running_machine &machine, int *code, int *
 }
 
 
-static void kongambl_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
+K056832_CB_MEMBER(kongambl_state::tile_callback)
 {
 }
 
@@ -558,15 +559,6 @@ static const gfx_layout charlayout8_tasman =
 static GFXDECODE_START( tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/256 )
 GFXDECODE_END
-
-
-static const k056832_interface k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_8TASMAN,
-	0, 0,
-	kongambl_tile_callback, "none"
-};
 
 
 static const k053247_interface k053247_intf =
@@ -621,7 +613,9 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
 
-	MCFG_K056832_ADD("k056832", k056832_intf)
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(kongambl_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8TASMAN, 0, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

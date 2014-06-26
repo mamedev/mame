@@ -75,7 +75,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	K056832_CB_MEMBER(tile_callback);
 };
-
-/*----------- defined in video/djmain.c -----------*/
-void djmain_tile_callback(running_machine& machine, int layer, int *code, int *color, int *flags);

@@ -40,10 +40,9 @@ K05324X_CB_MEMBER(lethal_state::sprite_callback)
 	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
 }
 
-void lethalen_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
+K056832_CB_MEMBER(lethal_state::tile_callback)
 {
-	lethal_state *state = machine.driver_data<lethal_state>();
-	*color = state->m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
+	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
 }
 
 void lethal_state::video_start()

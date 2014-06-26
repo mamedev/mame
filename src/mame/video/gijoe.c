@@ -20,9 +20,8 @@ void gijoe_sprite_callback( running_machine &machine, int *code, int *color, int
 	*color = state->m_sprite_colorbase | (*color & 0x001f);
 }
 
-void gijoe_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
+K056832_CB_MEMBER(gijoe_state::tile_callback)
 {
-	gijoe_state *state = machine.driver_data<gijoe_state>();
 	int tile = *code;
 
 	if (tile >= 0xf000 && tile <= 0xf4ff)
@@ -30,23 +29,23 @@ void gijoe_tile_callback( running_machine &machine, int layer, int *code, int *c
 		tile &= 0x0fff;
 		if (tile < 0x0310)
 		{
-			state->m_avac_occupancy[layer] |= 0x0f00;
-			tile |= state->m_avac_bits[0];
+			m_avac_occupancy[layer] |= 0x0f00;
+			tile |= m_avac_bits[0];
 		}
 		else if (tile < 0x0470)
 		{
-			state->m_avac_occupancy[layer] |= 0xf000;
-			tile |= state->m_avac_bits[1];
+			m_avac_occupancy[layer] |= 0xf000;
+			tile |= m_avac_bits[1];
 		}
 		else
 		{
-			state->m_avac_occupancy[layer] |= 0x00f0;
-			tile |= state->m_avac_bits[2];
+			m_avac_occupancy[layer] |= 0x00f0;
+			tile |= m_avac_bits[2];
 		}
 		*code = tile;
 	}
 
-	*color = (*color >> 2 & 0x0f) | state->m_layer_colorbase[layer];
+	*color = (*color >> 2 & 0x0f) | m_layer_colorbase[layer];
 }
 
 void gijoe_state::video_start()

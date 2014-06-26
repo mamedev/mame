@@ -133,6 +133,8 @@ public:
 	TIMER_CALLBACK_MEMBER(boothack_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 	ADC083X_INPUT_CB(adc0834_callback);
+	K056832_CB_MEMBER(type2_tile_callback);
+	K056832_CB_MEMBER(alpha_tile_callback);
 
 	void _gxcommoninitnosprites(running_machine &machine);
 	void _gxcommoninit(running_machine &machine);

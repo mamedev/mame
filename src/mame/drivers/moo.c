@@ -514,14 +514,6 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-static const k056832_interface moo_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_4,
-	1, 0,
-	moo_tile_callback, "none"
-};
-
 static const k053247_interface moo_k053247_intf =
 {
 	"gfx2", 1,
@@ -578,7 +570,10 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_K053246_ADD("k053246", moo_k053247_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
-	MCFG_K056832_ADD("k056832", moo_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(moo_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
@@ -630,7 +625,10 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_K053246_ADD("k053246", moo_k053247_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
-	MCFG_K056832_ADD("k056832", moo_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(moo_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

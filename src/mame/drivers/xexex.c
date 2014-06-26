@@ -454,14 +454,6 @@ static const k054539_interface k054539_config =
 	ym_set_mixing
 };
 
-static const k056832_interface xexex_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_4,
-	1, 0,
-	xexex_tile_callback, "none"
-};
-
 static const k053247_interface xexex_k053246_intf =
 {
 	"gfx2", 1,
@@ -543,9 +535,13 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K056832_ADD("k056832", xexex_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(xexex_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
+
 	MCFG_K053246_ADD("k053246", xexex_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")

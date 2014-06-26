@@ -253,6 +253,7 @@ public:
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
 	ADC083X_INPUT_CB(adc0838_callback);
+	K056832_CB_MEMBER(tile_callback);
 
 protected:
 	virtual void machine_start();
@@ -298,7 +299,7 @@ WRITE32_MEMBER(zr107_state::paletteram32_w)
 
 #define NUM_LAYERS  2
 
-static void game_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
+K056832_CB_MEMBER(zr107_state::tile_callback)
 {
 	*color += layer * 0x40;
 }
@@ -737,14 +738,6 @@ WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
 }
 
 
-static const k056832_interface zr107_k056832_intf =
-{
-	"gfx2", 1,
-	K056832_BPP_8,
-	1, 0,
-	game_tile_callback, "none"
-};
-
 /* PowerPC interrupts
 
     IRQ0:  Vblank
@@ -796,7 +789,9 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(zr107_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx2", 1, K056832_BPP_8, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

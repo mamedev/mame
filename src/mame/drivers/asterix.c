@@ -215,14 +215,6 @@ static INPUT_PORTS_START( asterix )
 INPUT_PORTS_END
 
 
-static const k056832_interface asterix_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_4,
-	1, 1,
-	asterix_tile_callback, "none"
-};
-
 void asterix_state::machine_start()
 {
 	save_item(NAME(m_cur_control2));
@@ -238,8 +230,6 @@ void asterix_state::machine_start()
 
 void asterix_state::machine_reset()
 {
-	int i;
-
 	m_cur_control2 = 0;
 	m_prot[0] = 0;
 	m_prot[1] = 0;
@@ -250,7 +240,7 @@ void asterix_state::machine_reset()
 	m_layerpri[1] = 0;
 	m_layerpri[2] = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_layer_colorbase[i] = 0;
 		m_tilebanks[i] = 0;
@@ -284,7 +274,10 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K056832_ADD("k056832", asterix_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(asterix_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 1, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

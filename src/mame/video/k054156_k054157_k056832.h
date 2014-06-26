@@ -8,7 +8,15 @@
 #include "video/k055555.h"// still needs k055555_get_palette_index
 
 
-typedef void (*k056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
+typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
+#define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)
+
+#define MCFG_K056832_CB(_class, _method) \
+	k056832_device::set_k056832_callback(*device, k056832_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_K056832_CONFIG(_gfx_reg, _gfx_num, _bpp, _big, _djmain_hack, _k055555) \
+	k056832_device::set_config(*device, _gfx_reg, _gfx_num, _bpp, _big, _djmain_hack, _k055555);
+
 
 
 #define MCFG_K056832_ADD(_tag, _interface) \
@@ -21,14 +29,6 @@ typedef void (*k056832_callback)(running_machine &machine, int layer, int *code,
 
 struct k056832_interface
 {
-	const char         *m_gfx_memory_region;
-	int                m_gfx_num;
-	int                m_bpp;
-	int                m_big;
-	int                m_djmain_hack;
-	k056832_callback   m_callback;
-
-	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555
 };
 
 
@@ -58,6 +58,18 @@ public:
 		m_k055555 = 0;
 	}
 
+	static void set_k056832_callback(device_t &device, k056832_cb_delegate callback) { downcast<k056832_device &>(device).m_k056832_cb = callback; }
+	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int bpp, int big, int djmain_hack, const char *k055555)
+	{
+		k056832_device &dev = downcast<k056832_device &>(device);
+		dev.m_gfx_memory_region = gfx_reg;
+		dev.m_gfx_num = gfx_num;
+		dev.m_bpp = bpp;
+		dev.m_big = big;
+		dev.m_djmain_hack = djmain_hack;
+		dev.m_k055555_tag = k055555;
+	}
+	
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -122,7 +134,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
@@ -138,13 +149,17 @@ private:
 	int       m_num_gfx_banks;    // depends on size of graphics ROMs
 	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
 
+	k056832_cb_delegate   m_k056832_cb;
 
-
-
-
-
-
-
+	//FIXME: device should be updated to use device_gfx_interface to get rid of most of these!
+	const char         *m_gfx_memory_region;
+	int                m_gfx_num;
+	int                m_bpp;
+	int                m_big;
+	int                m_djmain_hack;
+	
+	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555
+	
 
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
@@ -174,10 +189,6 @@ private:
 	int       m_linemap_enabled;
 	int       m_use_ext_linescroll;
 	int       m_uses_tile_banks, m_cur_tile_bank;
-
-
-
-
 
 
 
@@ -222,22 +233,12 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
 public:
-
-	// todo: collapse these into above
-	void altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
-				int (*scrolld)[4][2],
-				void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
-				int djmain_hack);
-
-	void K056832_set_k055555(k055555_device* mode); // k055555 hook
-
-
 	void m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+
 private:
 	int altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags);
-
-
 };
 
 extern const device_type K056832;

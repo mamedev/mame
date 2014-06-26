@@ -11,16 +11,14 @@
 #include "includes/bishi.h"
 
 
-void bishi_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
+K056832_CB_MEMBER(bishi_state::tile_callback)
 {
-	bishi_state *state = machine.driver_data<bishi_state>();
-
 //  *code -= '0';
-//  *color = state->m_layer_colorbase[layer] | (*color>>2 & 0x0f);
+//  *color = m_layer_colorbase[layer] | (*color>>2 & 0x0f);
 //  K055555GX_decode_vmixcolor(layer, color);
 //  if (*color) osd_printf_debug("plane %x col %x [55 %x %x]\n", layer, *color, layer_colorbase[layer], K055555_get_palette_index(layer));
 
-	*color = state->m_layer_colorbase[layer] + ((*color & 0xf0));
+	*color = m_layer_colorbase[layer] + ((*color & 0xf0));
 }
 
 void bishi_state::video_start()

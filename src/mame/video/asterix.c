@@ -34,13 +34,11 @@ K05324X_CB_MEMBER(asterix_state::sprite_callback)
 }
 
 
-void asterix_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
+K056832_CB_MEMBER(asterix_state::tile_callback)
 {
-	asterix_state *state = machine.driver_data<asterix_state>();
-
 	*flags = *code & 0x1000 ? TILE_FLIPX : 0;
-	*color = (state->m_layer_colorbase[layer] + ((*code & 0xe000) >> 13)) & 0x7f;
-	*code = (*code & 0x03ff) | state->m_tilebanks[(*code >> 10) & 3];
+	*color = (m_layer_colorbase[layer] + ((*code & 0xe000) >> 13)) & 0x7f;
+	*code = (*code & 0x03ff) | m_tilebanks[(*code >> 10) & 3];
 }
 
 UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

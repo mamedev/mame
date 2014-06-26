@@ -491,15 +491,6 @@ void lethal_state::machine_reset()
 	m_bank4800->set_bank(0);
 }
 
-static const k056832_interface lethalen_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_8LE,
-	1, 0,
-	lethalen_tile_callback, "none"
-};
-
-
 static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	/* basic machine hardware */
@@ -534,7 +525,9 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(lethal_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8LE, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

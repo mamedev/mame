@@ -24,10 +24,9 @@ void xexex_sprite_callback( running_machine &machine, int *code, int *color, int
 	*color = state->m_sprite_colorbase | (*color & 0x001f);
 }
 
-void xexex_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
+K056832_CB_MEMBER(xexex_state::tile_callback)
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
-	*color = state->m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
 void xexex_state::video_start()

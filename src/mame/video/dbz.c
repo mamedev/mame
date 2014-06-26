@@ -12,10 +12,9 @@
 #include "includes/dbz.h"
 
 
-void dbz_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
+K056832_CB_MEMBER(dbz_state::tile_callback)
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
-	*color = (state->m_layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
+	*color = (m_layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
 }
 
 void dbz_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )

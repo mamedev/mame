@@ -363,14 +363,6 @@ WRITE_LINE_MEMBER(bishi_state::sound_irq_gen)
 }
 
 
-static const k056832_interface bishi_k056832_intf =
-{
-	"gfx1", 0,
-	K056832_BPP_8,
-	1, 0,
-	bishi_tile_callback, "none"
-};
-
 void bishi_state::machine_start()
 {
 	save_item(NAME(m_cur_control));
@@ -390,7 +382,6 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bishi_state, bishi_scanline, "screen", 0, 1)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -406,7 +397,10 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K056832_ADD("k056832", bishi_k056832_intf)
+
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(bishi_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 1, 0, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 

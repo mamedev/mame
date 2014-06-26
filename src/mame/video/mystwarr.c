@@ -56,26 +56,22 @@ static void mystwarr_decode_tiles(running_machine &machine)
 
 
 // Mystic Warriors requires tile based blending.
-static void mystwarr_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
+K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	if (layer==1) {if ((*code&0xff00)+(*color)==0x4101) state->m_cbparam++; else state->m_cbparam--;} //* water hack (TEMPORARY)
-
-	*color = state->m_layer_colorbase[layer] | (*color>>1 & 0x1e);
+	if (layer == 1) {if ((*code & 0xff00) + (*color) == 0x4101) m_cbparam++; else m_cbparam--;} //* water hack (TEMPORARY)
+	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x1e);
 }
 
 // for games with 5bpp tile data
-static void game5bpp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
+K056832_CB_MEMBER(mystwarr_state::game5bpp_tile_callback)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	*color = state->m_layer_colorbase[layer] | (*color>>1 & 0x1e);
+	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x1e);
 }
 
 // for games with 4bpp tile data
-static void game4bpp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
+K056832_CB_MEMBER(mystwarr_state::game4bpp_tile_callback)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	*color = state->m_layer_colorbase[layer] | (*color>>2 & 0x0f);
+	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
 static void mystwarr_sprite_callback(running_machine &machine, int *code, int *color, int *priority)
@@ -160,8 +156,6 @@ VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 {
 	m_gametype = 0;
 
-	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
-
 	mystwarr_decode_tiles(machine());
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
@@ -197,8 +191,6 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 {
 	m_gametype = 1;
 
-	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
-
 	mystwarr_decode_tiles(machine());
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -42, -22, gaiapols_sprite_callback);
@@ -223,8 +215,6 @@ VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 {
 	m_gametype = 0;
 
-	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
-
 	mystwarr_decode_tiles(machine());
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -48, -24, mystwarr_sprite_callback);
@@ -243,8 +233,6 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 {
 	m_gametype = 0;
 
-	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
-
 	mystwarr_decode_tiles(machine());
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -51, -24, metamrph_sprite_callback);
@@ -262,8 +250,6 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 {
 	m_gametype = 0;
 
-	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
-
 	mystwarr_decode_tiles(machine());
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -62, -23, metamrph_sprite_callback);
@@ -279,8 +265,6 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 VIDEO_START_MEMBER(mystwarr_state,martchmp)
 {
 	m_gametype = 0;
-
-	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 

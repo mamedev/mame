@@ -53,7 +53,5 @@ public:
 	UINT32 screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
+	K056832_CB_MEMBER(tile_callback);
 };
-
-/*----------- defined in video/lethal.c -----------*/
-extern void lethalen_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);

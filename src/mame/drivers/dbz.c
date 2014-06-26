@@ -289,14 +289,6 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static const k056832_interface dbz_k056832_intf =
-{
-	"gfx1", 2,
-	K056832_BPP_4,
-	1, 1,
-	dbz_tile_callback, "none"
-};
-
 static const k053247_interface dbz_k053246_intf =
 {
 	"gfx2", 3,
@@ -343,7 +335,6 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_CPU_PROGRAM_MAP(dbz_sound_map)
 	MCFG_CPU_IO_MAP(dbz_sound_io_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55)
@@ -359,7 +350,9 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_K056832_ADD("k056832", dbz_k056832_intf)
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(dbz_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", 2, K056832_BPP_4, 1, 1, "none")
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
