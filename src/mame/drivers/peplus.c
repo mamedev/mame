@@ -6233,7 +6233,7 @@ PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
   % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 30.1%
      Programs Available: X000550P
 
-Internally the program erroneously reports a 95.50% return. Supersede by X002338P
+Internally the program erroneously reports a 95.50% return. Superseded by X002338P
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
