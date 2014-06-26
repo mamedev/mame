@@ -206,6 +206,9 @@ void k052109_device::device_start()
 		m_char_size = ROM->bytes();
 	}
 
+	decode_gfx();
+	gfx(0)->set_colors(palette()->entries() / gfx(0)->depth());
+
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x6000);
 
 	m_colorram_F = &m_ram[0x0000];
