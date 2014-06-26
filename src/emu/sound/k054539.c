@@ -18,21 +18,11 @@ const device_type K054539 = &device_creator<k054539_device>;
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054539, "K054539 ADPCM", tag, owner, clock, "k054539", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_timer_handler(*this)
+		m_timer_handler(*this),
+		m_rgnoverride(NULL)
 {
 }
 
-
-//-------------------------------------------------
-//  static_set_interface - configuration helper
-//  to set the interface
-//-------------------------------------------------
-
-void k054539_device::static_set_interface(device_t &device, const k054539_interface &interface)
-{
-	k054539_device &k = downcast<k054539_device &>(device);
-	static_cast<k054539_interface &>(k) = interface;
-}
 
 /* Registers:
    00..ff: 20 bytes/channel, 8 channels
@@ -318,7 +308,7 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram, 0, 0x4000);
 
-	memory_region *reg = (rgnoverride != NULL) ? machine().root_device().memregion(rgnoverride) : region();
+	memory_region *reg = (m_rgnoverride != NULL) ? machine().root_device().memregion(m_rgnoverride) : region();
 	rom = *reg;
 	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;
@@ -376,8 +366,8 @@ WRITE8_MEMBER(k054539_device::write)
 		switch(offset) {
 		case 0x13f: {
 			int pan = data >= 0x11 && data <= 0x1f ? data - 0x11 : 0x18 - 0x11;
-			if(apan)
-				apan(this, pantab[pan], pantab[0xe - pan]);
+			if (!m_apan_cb.isnull())
+				m_apan_cb(pantab[pan], pantab[0xe - pan]);
 			break;
 		}
 
@@ -501,9 +491,11 @@ READ8_MEMBER(k054539_device::read)
 void k054539_device::device_start()
 {
 	m_timer = timer_alloc(0);
-
+	
+	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();
-
+	m_apan_cb.bind_relative_to(*owner());
+	
 	for (int i = 0; i < 8; i++)
 		gain[i] = 1.0;
 

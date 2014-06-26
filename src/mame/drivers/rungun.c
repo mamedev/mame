@@ -323,13 +323,6 @@ static GFXDECODE_START( rungun )
 GFXDECODE_END
 
 
-
-static const k054539_interface k054539_config =
-{
-	"shared"
-};
-
-
 void rungun_state::machine_start()
 {
 	UINT8 *ROM = memregion("soundcpu")->base();
@@ -399,12 +392,14 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(rungun_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

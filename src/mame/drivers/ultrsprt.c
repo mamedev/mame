@@ -208,9 +208,6 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-static k054539_interface k054539_config;
-
-
 static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
@@ -239,7 +236,7 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

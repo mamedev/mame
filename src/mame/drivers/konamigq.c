@@ -228,11 +228,6 @@ WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
 	m_sound_intck = state;
 }
 
-static const k054539_interface k054539_config =
-{
-	"shared"
-};
-
 /* SCSI */
 
 void konamigq_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
@@ -331,12 +326,14 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
 
-	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigq_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

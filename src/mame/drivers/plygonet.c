@@ -574,12 +574,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 ADDRESS_MAP_END
 
 
-static const k054539_interface k054539_config =
-{
-	"shared",
-	NULL,
-};
-
 /**********************************************************************************/
 static const gfx_layout bglayout =
 {
@@ -678,7 +672,8 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(polygonet_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)

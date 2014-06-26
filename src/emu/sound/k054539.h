@@ -9,18 +9,17 @@
 #ifndef __K054539_H__
 #define __K054539_H__
 
-#define MCFG_K054539_ADD(_tag, _clock, _interface) \
-	MCFG_DEVICE_ADD(_tag, K054539, _clock) \
-	k054539_device::static_set_interface(*device, _interface);
+typedef device_delegate<void (double left, double right)> k054539_cb_delegate;
+#define K054539_CB_MEMBER(_name)   void _name(double left, double right)
+
+#define MCFG_K054539_APAN_CB(_class, _method) \
+	k054539_device::set_analog_callback(*device, k054539_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_K054539_REGION_OVERRRIDE(_region) \
+	k054539_device::set_override(*device, _region);
 
 #define MCFG_K054539_TIMER_HANDLER(_devcb) \
 	devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
-
-struct k054539_interface
-{
-	const char *rgnoverride;
-	void (*apan)(device_t *, double, double);   /* Callback for analog output mixing levels (0..1 for each channel) */
-};
 
 
 //* control flags, may be set at DRIVER_INIT().
@@ -29,13 +28,8 @@ struct k054539_interface
 #define K054539_DISABLE_REVERB  2
 #define K054539_UPDATE_AT_KEYON 4
 
-void k054539_init_flags(device_t *device, int flags);
-
-void k054539_set_gain(device_t *device, int channel, double gain);
-
 class k054539_device : public device_t,
-						public device_sound_interface,
-						public k054539_interface
+						public device_sound_interface
 {
 public:
 	enum {
@@ -49,7 +43,8 @@ public:
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void static_set_interface(device_t &device, const k054539_interface &interface);
+	static void set_analog_callback(device_t &device, k054539_cb_delegate callback) { downcast<k054539_device &>(device).m_apan_cb = callback; }
+	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rgnoverride = rgnoverride; }
 	template<class _Object> static devcb_base &set_timer_handler(device_t &device, _Object object) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(object); }
 
 
@@ -110,9 +105,11 @@ private:
 	channel channels[8];
 	sound_stream *stream;
 
-	emu_timer           *m_timer;
-	UINT32              m_timer_state;
+	emu_timer          *m_timer;
+	UINT32             m_timer_state;
 	devcb_write_line   m_timer_handler;
+	const char         *m_rgnoverride;
+	k054539_cb_delegate m_apan_cb;
 
 	bool regupdate();
 	void keyon(int channel);

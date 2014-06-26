@@ -292,13 +292,12 @@ WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 0x07);
 }
 
-static void ym_set_mixing(device_t *device, double left, double right)
+K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 {
-	xexex_state *state = device->machine().driver_data<xexex_state>();
-	state->m_filter1l->flt_volume_set_volume((71.0 * left) / 55.0);
-	state->m_filter1r->flt_volume_set_volume((71.0 * right) / 55.0);
-	state->m_filter2l->flt_volume_set_volume((71.0 * left) / 55.0);
-	state->m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
+	m_filter1l->flt_volume_set_volume((71.0 * left) / 55.0);
+	m_filter1r->flt_volume_set_volume((71.0 * right) / 55.0);
+	m_filter2l->flt_volume_set_volume((71.0 * left) / 55.0);
+	m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
 }
 
 TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
@@ -448,12 +447,6 @@ INPUT_PORTS_END
 
 
 
-static const k054539_interface k054539_config =
-{
-	NULL,
-	ym_set_mixing
-};
-
 void xexex_state::xexex_postload()
 {
 	parse_control2();
@@ -557,7 +550,8 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_SOUND_ROUTE(1, "filter2l", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2r", 0.50)
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_K054539_APAN_CB(xexex_state, ym_set_mixing)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)

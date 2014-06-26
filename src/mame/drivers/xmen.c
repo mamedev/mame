@@ -320,8 +320,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 
 }
 
-static k054539_interface k054539_config;
-
 static MACHINE_CONFIG_START( xmen, xmen_state )
 
 	/* basic machine hardware */
@@ -368,7 +366,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -432,7 +430,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END

@@ -1335,19 +1335,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interfaces
- *
- *************************************/
-
-static const k054539_interface k054539_config =
-{
-	"shared"
-};
-
-
-
-/*************************************
- *
  *  Machine-specific init
  *
  *************************************/
@@ -1424,13 +1411,13 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

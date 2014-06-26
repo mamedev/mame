@@ -534,13 +534,6 @@ WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
 	m_sound_intck = state;
 }
 
-static const k054539_interface k054539_config =
-{
-	NULL,
-	NULL,
-};
-
-
 /*************************************
  *
  *  Machine-specific init
@@ -617,7 +610,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(qdrmfgp_state, k054539_irq1_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -664,7 +657,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -514,8 +514,6 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-static k054539_interface k054539_config;
-
 static MACHINE_CONFIG_START( moo, moo_state )
 
 	/* basic machine hardware */
@@ -575,7 +573,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

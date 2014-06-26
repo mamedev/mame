@@ -2384,12 +2384,6 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static const k054539_interface k054539_config =
-{
-	NULL,
-	NULL,
-};
-
 MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 {
 	MACHINE_START_CALL_MEMBER(common);
@@ -2449,7 +2443,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

@@ -289,12 +289,6 @@ static INPUT_PORTS_START( gijoe )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:4" )    /* Listed as "Unused" */
 INPUT_PORTS_END
 
-static const k054539_interface k054539_config =
-{
-	NULL,
-	NULL,
-};
-
 void gijoe_state::machine_start()
 {
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gijoe_state::dmaend_callback),this));
@@ -352,7 +346,7 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

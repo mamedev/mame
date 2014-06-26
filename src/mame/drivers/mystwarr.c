@@ -643,11 +643,6 @@ WRITE_LINE_MEMBER(mystwarr_state::k054539_nmi_gen)
 	m_sound_nmi_clk = state;
 }
 
-static const k054539_interface k054539_config =
-{
-	"shared"
-};
-
 /**********************************************************************************/
 
 static INPUT_PORTS_START( mystwarr )
@@ -1031,12 +1026,14 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(mystwarr_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
+	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
