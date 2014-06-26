@@ -18,21 +18,6 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 	k056832_device::set_config(*device, _gfx_reg, _gfx_num, _bpp, _big, _djmain_hack, _k055555);
 
 
-
-#define MCFG_K056832_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K056832, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_K056832_ADD_NOINTF(_tag ) \
-	MCFG_DEVICE_ADD(_tag, K056832, 0)
-
-
-struct k056832_interface
-{
-};
-
-
-
 #define K056832_PAGE_COUNT 16
 
 /* bit depths for the 56832 */
