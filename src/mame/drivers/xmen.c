@@ -308,14 +308,6 @@ void xmen_state::machine_reset()
 	m_vblank_irq_mask = 0;
 }
 
-static const k053247_interface xmen_k053246_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	53, -2,
-	xmen_sprite_callback
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 {
 	int scanline = param;
@@ -361,9 +353,12 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(xmen_state, tile_callback)
 
-	MCFG_K053246_ADD("k053246", xmen_k053246_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(xmen_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, 53, -2)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -378,14 +373,6 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static const k053247_interface xmen6p_k053246_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	53, -2,
-	xmen_sprite_callback
-};
-
 static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	/* basic machine hardware */
@@ -395,7 +382,6 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -430,10 +416,13 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(xmen_state, tile_callback)
 
-	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(xmen_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, 53, -2)
 	MCFG_K053246_SET_SCREEN("screen")
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

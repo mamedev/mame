@@ -25,10 +25,9 @@ TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
 }
 
-void rng_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+K055673_CB_MEMBER(rungun_state::sprite_callback)
 {
-	rungun_state *state = machine.driver_data<rungun_state>();
-	*color = state->m_sprite_colorbase | (*color & 0x001f);
+	*color = m_sprite_colorbase | (*color & 0x001f);
 }
 
 READ16_MEMBER(rungun_state::rng_ttl_ram_r)

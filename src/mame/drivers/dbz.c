@@ -289,14 +289,6 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static const k053247_interface dbz_k053246_intf =
-{
-	"gfx2", 3,
-	NORMAL_PLANE_ORDER,
-	-52, 16,
-	dbz_sprite_callback
-};
-
 WRITE_LINE_MEMBER(dbz_state::dbz_irq2_ack_w)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
@@ -356,7 +348,9 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K053246_ADD("k053246", dbz_k053246_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(dbz_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 3, NORMAL_PLANE_ORDER, -87, 32)	// or -52, 16?
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
 

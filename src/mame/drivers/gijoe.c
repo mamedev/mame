@@ -295,14 +295,6 @@ static const k054539_interface k054539_config =
 	NULL,
 };
 
-static const k053247_interface gijoe_k053247_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	-37, 20,
-	gijoe_sprite_callback
-};
-
 void gijoe_state::machine_start()
 {
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gijoe_state::dmaend_callback),this));
@@ -349,9 +341,12 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K053246_ADD("k053246", gijoe_k053247_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(gijoe_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -37, 20)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

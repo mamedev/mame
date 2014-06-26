@@ -72,7 +72,5 @@ public:
 	UINT32 screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
 	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/dbz.c -----------*/
-extern void dbz_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);

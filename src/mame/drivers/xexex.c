@@ -454,14 +454,6 @@ static const k054539_interface k054539_config =
 	ym_set_mixing
 };
 
-static const k053247_interface xexex_k053246_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	-48, 32,
-	xexex_sprite_callback
-};
-
 void xexex_state::xexex_postload()
 {
 	parse_control2();
@@ -542,10 +534,14 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K053246_ADD("k053246", xexex_k053246_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(xexex_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48, 32)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
+
 	MCFG_K053251_ADD("k053251")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)

@@ -9,7 +9,21 @@
 #define NORMAL_PLANE_ORDER 0x0123
 #define TASMAN_PLANE_ORDER 0x1616
 
-typedef void (*k05324x_callback)(running_machine &machine, int *code, int *color, int *priority);
+typedef device_delegate<void (int *code, int *color, int *priority_mask)> k053247_cb_delegate;
+#define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
+#define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
+
+#define MCFG_K053246_CB(_class, _method) \
+	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_K053246_CONFIG(_gfx_reg, _gfx_num, _order, _dx, _dy) \
+	k053247_device::set_config(*device, _gfx_reg, _gfx_num, _order, _dx, _dy);
+
+#define MCFG_K055673_CB(_class, _method) \
+	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_K055673_CONFIG(_gfx_reg, _gfx_num, _order, _dx, _dy) \
+	k053247_device::set_config(*device, _gfx_reg, _gfx_num, _order, _dx, _dy);
 
 
 /**  Konami 053246 / 053247 / 055673  **/
@@ -42,18 +56,8 @@ Callback procedures for non-standard shadows:
 #endif
 
 
-struct k053247_interface
-{
-	const char         *m_intf_gfx_memory_region;
-	int                m_intf_gfx_num;
-	int                m_intf_plane_order;
-	int                m_intf_dx, m_intf_dy;
-	k05324x_callback   m_intf_callback;
-};
-
 class k053247_device : public device_t,
-						public device_video_interface,
-						public k053247_interface
+						public device_video_interface
 {
 public:
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -64,7 +68,17 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-
+	static void set_k053247_callback(device_t &device, k053247_cb_delegate callback) { downcast<k053247_device &>(device).m_k053247_cb = callback; }
+	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int order, int dx, int dy)
+	{
+		k053247_device &dev = downcast<k053247_device &>(device);
+		dev.m_memory_region = gfx_reg;
+		dev.m_gfx_num = gfx_num;
+		dev.m_plane_order = order;
+		dev.m_dx = dx;
+		dev.m_dy = dy;
+	}
+	
 	void clear_all();
 
 	DECLARE_READ16_MEMBER( k055673_rom_word_r );
@@ -82,7 +96,6 @@ public:
 	void k053247_sprites_draw( bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void k053247_sprites_draw( bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	int k053247_read_register( int regnum);
-	void k053247_set_sprite_offs( int offsx, int offsy);
 	void k053247_set_z_rejection( int zcode); // common to k053246/7
 	void k053247_get_ram( UINT16 **ram);
 	int k053247_get_dx( void );
@@ -113,18 +126,16 @@ public:
 	UINT8    m_objcha_line;
 	int      m_z_rejection;
 
-	k05324x_callback m_callback;
+	k053247_cb_delegate m_k053247_cb;
 
+	//FIXME: device should be updated to use device_gfx_interface to get rid of most of these!
 	const char *m_memory_region;
+	int m_gfx_num;
+	int m_plane_order;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	/* alt implementation - to be collapsed */
-	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
-			void (*callback)(running_machine &machine, int *code,int *color,int *priority));
-
-	void alt_k053247_export_config(void (**callback)(running_machine &, int *, int *, int *));
-
 	void zdrawgfxzoom32GP(
 		bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
@@ -469,7 +480,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 private:
@@ -487,7 +497,6 @@ public:
 
 protected:
 	// device-level overrides
-//  virtual void device_config_complete();
 	virtual void device_start();
 //  virtual void device_reset();
 private:
@@ -496,10 +505,6 @@ private:
 
 extern const device_type K055673;
 
-
-#define MCFG_K053246_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K053246, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
 
 #define MCFG_K053246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
@@ -510,13 +515,6 @@ extern const device_type K055673;
 	k053247_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 
-#define MCFG_K055673_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K055673, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_K055673_ADD_NOINTF(_tag ) \
-	MCFG_DEVICE_ADD(_tag, K055673, 0)
-
 #define MCFG_K055673_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_K055673_GFXDECODE(_gfxtag) \
@@ -524,13 +522,6 @@ extern const device_type K055673;
 
 #define MCFG_K055673_PALETTE(_palette_tag) \
 	k055673_device::static_set_palette_tag(*device, "^" _palette_tag);
-
-
-/* old non-device stuff */
-
-
-
-
 
 
 #endif

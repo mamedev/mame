@@ -7,16 +7,15 @@
 
 ***************************************************************************/
 
-void overdriv_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+K053246_CB_MEMBER(overdriv_state::sprite_callback)
 {
-	overdriv_state *state = machine.driver_data<overdriv_state>();
 	int pri = (*color & 0xffe0) >> 5;   /* ??????? */
 	if (pri)
 		*priority_mask = 0x02;
 	else
 		*priority_mask = 0x00;
 
-	*color = state->m_sprite_colorbase + (*color & 0x001f);
+	*color = m_sprite_colorbase + (*color & 0x001f);
 }
 
 

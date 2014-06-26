@@ -41,6 +41,7 @@ public:
 	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
 };
 
 
@@ -534,15 +535,14 @@ static INPUT_PORTS_START( kongambl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
-static void kongambl_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+
+K053246_CB_MEMBER(kongambl_state::sprite_callback)
 {
 }
-
 
 K056832_CB_MEMBER(kongambl_state::tile_callback)
 {
 }
-
 
 
 static const gfx_layout charlayout8_tasman =
@@ -560,14 +560,6 @@ static GFXDECODE_START( tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/256 )
 GFXDECODE_END
 
-
-static const k053247_interface k053247_intf =
-{
-	"gfx2", 1,
-	TASMAN_PLANE_ORDER,
-	-48+1, 23,
-	kongambl_sprite_callback
-};
 
 TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 {
@@ -603,11 +595,18 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
-	MCFG_K053246_ADD("k053246", k053247_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(kongambl_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, TASMAN_PLANE_ORDER, -48+1, 23)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K055555_ADD("k055555")
-	MCFG_K055673_ADD_NOINTF("k055673")
+
+	MCFG_DEVICE_ADD("k055673", K055673, 0)
+	// FIXME: for the moment copy the same cb & config as k053246, not being sure which chips has access to the gfx2 roms
+	MCFG_K055673_CB(kongambl_state, sprite_callback)
+	MCFG_K055673_CONFIG("gfx2", 1, K055673_LAYOUT_GX, -48+1, -23)
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
 

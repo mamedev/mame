@@ -1,27 +1,24 @@
 #include "emu.h"
 #include "includes/xexex.h"
 
-void xexex_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+K053246_CB_MEMBER(xexex_state::sprite_callback)
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
-	int pri;
-
 	// Xexex doesn't seem to use bit8 and 9 as effect selectors so this should be safe.
 	// (pdrawgfx() still needs change to fix Elaine's end-game graphics)
-	pri = (*color & 0x3e0) >> 4;
+	int pri = (*color & 0x3e0) >> 4;
 
-	if (pri <= state->m_layerpri[3])
+	if (pri <= m_layerpri[3])
 		*priority_mask = 0;
-	else if (pri > state->m_layerpri[3] && pri <= state->m_layerpri[2])
+	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
 		*priority_mask = 0xff00;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
 		*priority_mask = 0xff00 | 0xf0f0;
-	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
 		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
 	else
 		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
 
-	*color = state->m_sprite_colorbase | (*color & 0x001f);
+	*color = m_sprite_colorbase | (*color & 0x001f);
 }
 
 K056832_CB_MEMBER(xexex_state::tile_callback)

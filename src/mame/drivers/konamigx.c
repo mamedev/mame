@@ -1647,12 +1647,14 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_K054338_SET_SCREEN("screen")
 	MCFG_K054338_ALPHAINV(1)
 
-	MCFG_K055673_ADD_NOINTF("k055673")
+	MCFG_DEVICE_ADD("k055673", K055673, 0)
+	MCFG_K055673_CB(konamigx_state, type2_sprite_callback)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -26, -23)
 	MCFG_K055673_SET_SCREEN("screen")
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_5bpp)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_5bpp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1678,9 +1680,17 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( gokuparo, konamigx )
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -46, -23)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( sexyparo, konamigx )
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -42, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tbyahhoo, konamigx )
@@ -1691,31 +1701,44 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( dragoonj, konamigx )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,dragoonj)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_5, 1, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CB(konamigx_state, dragoonj_sprite_callback)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_RNG, -53, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( le2, konamigx )
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,le2)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 1, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CB(konamigx_state, le2_sprite_callback)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_LE2, -46, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konamigx_6bpp, konamigx )
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_6bpp)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 0, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -46, -23)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( konamigx_6bpp_2, konamigx )
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_6bpp_2)
-
+static MACHINE_CONFIG_DERIVED( salmndr2, konamigx )
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 1, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CB(konamigx_state, salmndr2_sprite_callback)
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -48, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
@@ -1723,7 +1746,10 @@ static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", opengolf)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,opengolf)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -53, -23)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
@@ -1737,10 +1763,13 @@ static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", racinfrc)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,racinfrc)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 0, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -53, -23)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
@@ -1757,10 +1786,13 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type3)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 0, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -132, -23)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16384)
@@ -1810,10 +1842,13 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", type4)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 0, 0, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -79, -24) // -23 looks better in intro
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
@@ -1827,26 +1862,32 @@ static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4_vsn)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_vsn)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 0, 2, "none")   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -132, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype4sd2, gxtype4 )
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4_sd2)
+	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX6, -81, -23)
 MACHINE_CONFIG_END
-
-
 
 static MACHINE_CONFIG_DERIVED( winspike, konamigx )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state,winspike)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 0, 2, "none")
+
+	MCFG_DEVICE_MODIFY("k055673")
+	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_LE2, -53, -23)
 MACHINE_CONFIG_END
 
 
@@ -3801,12 +3842,12 @@ GAME( 1994, le2,      konamigx, le2,      le2, konamigx_state,      konamigx, RO
 GAME( 1994, le2u,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, le2j,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1994, fantjour, konamigx, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantjoura,fantjour, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo, fantjour, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjour, konamigx, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjoura,fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo, fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1994, crzcross, konamigx, konamigx, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Crazy Cross (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, puzldama, crzcross, konamigx, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, crzcross, konamigx, gokuparo, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Crazy Cross (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, puzldama, crzcross, gokuparo, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1995, tbyahhoo, konamigx, tbyahhoo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
@@ -3823,8 +3864,8 @@ GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx_state, konamigx, RO
 GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
 /* protection controls player ship direction in attract mode - doesn't impact playability */
-GAME( 1996, salmndr2, konamigx, konamigx_6bpp_2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, salmndr2a,salmndr2, konamigx_6bpp_2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2, konamigx, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2a,salmndr2, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
 
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
 GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )

@@ -67,11 +67,8 @@ public:
 	void simpsons_objdma();
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
+	K053246_CB_MEMBER(sprite_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/simpsons.c -----------*/
-extern void simpsons_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);

@@ -17,21 +17,20 @@ K056832_CB_MEMBER(dbz_state::tile_callback)
 	*color = (m_layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
 }
 
-void dbz_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
+K053246_CB_MEMBER(dbz_state::sprite_callback)
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
 	int pri = (*color & 0x3c0) >> 5;
 
-	if (pri <= state->m_layerpri[3])
+	if (pri <= m_layerpri[3])
 		*priority_mask = 0xff00;
-	else if (pri > state->m_layerpri[3] && pri <= state->m_layerpri[2])
+	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
 		*priority_mask = 0xfff0;
-	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
 		*priority_mask = 0xfffc;
 	else
 		*priority_mask = 0xfffe;
 
-	*color = (state->m_sprite_colorbase << 1) + (*color & 0x1f);
+	*color = (m_sprite_colorbase << 1) + (*color & 0x1f);
 }
 
 /* Background Tilemaps */
@@ -85,8 +84,6 @@ void dbz_state::video_start()
 
 	m_k056832->set_layer_offs(1, -31, -16);
 	m_k056832->set_layer_offs(3, -31, -16); //?
-
-	m_k053246->k053247_set_sprite_offs( -87, 32);
 }
 
 UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

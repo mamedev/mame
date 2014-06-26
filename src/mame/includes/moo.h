@@ -83,7 +83,5 @@ public:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	void moo_objdma();
 	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/moo.c -----------*/
-extern void moo_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);

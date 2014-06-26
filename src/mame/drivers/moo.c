@@ -514,22 +514,6 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-static const k053247_interface moo_k053247_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	-48+1, 23,
-	moo_sprite_callback
-};
-
-static const k053247_interface bucky_k053247_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	-48, 23,
-	moo_sprite_callback
-};
-
 static k054539_interface k054539_config;
 
 static MACHINE_CONFIG_START( moo, moo_state )
@@ -567,7 +551,10 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K053246_ADD("k053246", moo_k053247_intf)
+
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(moo_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48+1, 23)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
 
@@ -622,7 +609,10 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K053246_ADD("k053246", moo_k053247_intf)
+
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(moo_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48+1, 23)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
 
@@ -651,10 +641,9 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 
 	MCFG_K054000_ADD("k054000")
 
-	MCFG_DEVICE_REMOVE("k053246")
-	MCFG_K053246_ADD("k053246", bucky_k053247_intf)     // diff x offset
-	MCFG_K053246_GFXDECODE("gfxdecode")
-	MCFG_K053246_PALETTE("palette")
+	MCFG_DEVICE_MODIFY("k053246")
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48, 23)
+
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)

@@ -41,7 +41,6 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap;
@@ -69,6 +68,7 @@ public:
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	K055673_CB_MEMBER(sprite_callback);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -77,6 +77,3 @@ public:
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 };
-/*----------- defined in video/rungun.c -----------*/
-
-extern void rng_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);

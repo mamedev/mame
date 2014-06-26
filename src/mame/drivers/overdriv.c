@@ -260,14 +260,6 @@ static INPUT_PORTS_START( overdriv )
 INPUT_PORTS_END
 
 
-static const k053247_interface overdriv_k053246_intf =
-{
-	"gfx1", 0,
-	NORMAL_PLANE_ORDER,
-	77, 22,
-	overdriv_sprite_callback
-};
-
 void overdriv_state::machine_start()
 {
 	save_item(NAME(m_cpuB_ctrl));
@@ -328,7 +320,9 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K053246_ADD("k053246", overdriv_k053246_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(overdriv_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx1", 0, NORMAL_PLANE_ORDER, 77, 22)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
 

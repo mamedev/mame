@@ -396,23 +396,6 @@ INTERRUPT_GEN_MEMBER(vendetta_state::vendetta_irq)
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static const k053247_interface vendetta_k053246_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	53, 6,
-	vendetta_sprite_callback
-};
-
-static const k053247_interface esckids_k053246_intf =
-{
-	"gfx2", 1,
-	NORMAL_PLANE_ORDER,
-	101, 6,
-	vendetta_sprite_callback
-};
-
-
 void vendetta_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -486,10 +469,14 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
 
-	MCFG_K053246_ADD("k053246", vendetta_k053246_intf)
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(vendetta_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, 53, 6)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
+
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
@@ -522,10 +509,9 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
 
-	MCFG_DEVICE_REMOVE("k053246")
-	MCFG_K053246_ADD("k053246", esckids_k053246_intf)
-	MCFG_K053246_GFXDECODE("gfxdecode")
-	MCFG_K053246_PALETTE("palette")
+	MCFG_DEVICE_MODIFY("k053246")
+	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, 101, 6)
+
 	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
 	MCFG_K053252_OFFSETS(12*8, 1*8)
 MACHINE_CONFIG_END

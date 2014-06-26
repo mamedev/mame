@@ -115,14 +115,12 @@ public:
 	DECLARE_VIDEO_START(dragoonj);
 	DECLARE_VIDEO_START(le2);
 	DECLARE_VIDEO_START(konamigx_6bpp);
-	DECLARE_VIDEO_START(konamigx_6bpp_2);
 	DECLARE_VIDEO_START(opengolf);
 	DECLARE_VIDEO_START(racinfrc);
 	DECLARE_VIDEO_START(konamigx_type3);
 	DECLARE_VIDEO_START(konamigx_type4);
 	DECLARE_VIDEO_START(konamigx_type4_vsn);
 	DECLARE_VIDEO_START(konamigx_type4_sd2);
-	DECLARE_VIDEO_START(winspike);
 	UINT32 screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -135,9 +133,12 @@ public:
 	ADC083X_INPUT_CB(adc0834_callback);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
+	K055673_CB_MEMBER(type2_sprite_callback);
+	K055673_CB_MEMBER(dragoonj_sprite_callback);
+	K055673_CB_MEMBER(salmndr2_sprite_callback);
+	K055673_CB_MEMBER(le2_sprite_callback);
 
-	void _gxcommoninitnosprites(running_machine &machine);
-	void _gxcommoninit(running_machine &machine);
+	void common_init();
 	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
 	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
 	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,

@@ -71,7 +71,5 @@ public:
 	DECLARE_WRITE16_MEMBER( overdriv_k053246_word_w );
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
+	K053246_CB_MEMBER(sprite_callback);
 };
-
-/*----------- defined in video/overdriv.c -----------*/
-extern void overdriv_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
