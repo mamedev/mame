@@ -44,29 +44,51 @@ bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int bps = 256;
 	int cell_count = 100000;
 	int offset = 0;
+	int head_num = 1;
+	int total_tracks = info.last_trk+1;
+	bool double_sided = false;
 
-	for(int track=0; track < info.last_trk+1; track++)
+	if(total_tracks == 40 && spt == 36)
+		double_sided = true;
+	if(total_tracks == 77 && spt == 30)
+		double_sided = true;
+	if(total_tracks == 80 && spt == 40)  // 800kB
+		double_sided = true;
+	if(total_tracks == 80 && spt == 72)  // 1.44MB
+		double_sided = true;
+
+	if(double_sided)
 	{
-		desc_pc_sector sects[80];
-		UINT8 sect_data[20000];
-		int sdatapos = 0;
-		for(int i=0; i<spt; i++)
-		{
-			sects[i].track       = track;
-			sects[i].head        = 0;  // no side select?
-			sects[i].sector      = i+1;
-			sects[i].size        = 1;
-			sects[i].actual_size = bps;
-			sects[i].deleted     = false;
-			sects[i].bad_crc     = false;
-			sects[i].data        = &sect_data[sdatapos];
-			io_generic_read(io, sects[i].data, offset, bps);
-			offset += bps;
-			sdatapos += bps;
-		}
-		// gap sizes unverified
-		build_wd_track_fm(track, 0, image, cell_count, spt, sects, 24, 16, 11);
+		spt = spt / 2;
+		head_num = 2;
 	}
+
+	for(int track=0; track < total_tracks; track++)
+		for(int head=0;head < head_num;head++)
+		{
+			desc_pc_sector sects[80];
+			UINT8 sect_data[20000];
+			int sdatapos = 0;
+			for(int i=0; i<spt; i++)
+			{
+				sects[i].track       = track;
+				sects[i].head        = head;  // no side select?
+				if(head == 0)
+					sects[i].sector      = i+1;
+				else
+					sects[i].sector      = i+1+spt;
+				sects[i].actual_size = bps;
+				sects[i].size        = 1;
+				sects[i].deleted     = false;
+				sects[i].bad_crc     = false;
+				sects[i].data        = &sect_data[sdatapos];
+				io_generic_read(io, sects[i].data, offset, bps);
+				offset += bps;
+				sdatapos += bps;
+			}
+			// gap sizes unverified
+			build_wd_track_fm(track, head, image, cell_count, spt, sects, 24, 16, 11);
+		}
 	return true;
 }
 

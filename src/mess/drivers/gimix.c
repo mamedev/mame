@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
 	AM_RANGE(0x0e001, 0x0e001) AM_DEVREADWRITE("acia1",acia6850_device,data_r,data_w)
 	AM_RANGE(0x0e004, 0x0e004) AM_DEVREADWRITE("acia2",acia6850_device,status_r,control_w)
 	AM_RANGE(0x0e005, 0x0e005) AM_DEVREADWRITE("acia2",acia6850_device,data_r,data_w)
-	AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
+	//AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
 	AM_RANGE(0x0e100, 0x0e1ff) AM_RAM
 	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
 	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer",ptm6840_device,read,write)
