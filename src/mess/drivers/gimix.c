@@ -27,7 +27,7 @@
 #include "machine/terminal.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
-#include "formats/pc_dsk.h"
+#include "formats/flex_dsk.h"
 
 #define DMA_DRQ         (m_dma_status & 0x80)
 #define DMA_INTRQ       (m_dma_status & 0x40)
@@ -60,6 +60,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "roms")
 		, m_acia1(*this, "acia1")
@@ -116,6 +118,9 @@ private:
 	UINT32 m_dma_current_addr;
 	UINT8 m_task;
 	UINT8 m_task_banks[16][16];
+	UINT8 m_selected_drive;
+	bool m_floppy0_ready;
+	bool m_floppy1_ready;
 
 	UINT8 m_pia1_pa;
 	UINT8 m_pia1_pb;
@@ -128,6 +133,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1797_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_device<acia6850_device> m_acia1;
@@ -159,12 +166,12 @@ private:
 };
 
 static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
-	//AM_RANGE(0x00000, 0x0dfff) AM_RAM
+	AM_RANGE(0x00000, 0x0dfff) AM_RAMBANK("lower_ram")
 	AM_RANGE(0x0e000, 0x0e000) AM_DEVREADWRITE("acia1",acia6850_device,status_r,control_w)
 	AM_RANGE(0x0e001, 0x0e001) AM_DEVREADWRITE("acia1",acia6850_device,data_r,data_w)
 	AM_RANGE(0x0e004, 0x0e004) AM_DEVREADWRITE("acia2",acia6850_device,status_r,control_w)
 	AM_RANGE(0x0e005, 0x0e005) AM_DEVREADWRITE("acia2",acia6850_device,data_r,data_w)
-	AM_RANGE(0x0e018, 0x0e01b) AM_RAM  // this area is used for "PROGRAMMED I/O BOOTSTRAP"
+	AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
 	AM_RANGE(0x0e100, 0x0e1ff) AM_RAM
 	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
 	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer",ptm6840_device,read,write)
@@ -294,15 +301,27 @@ WRITE8_MEMBER(gimix_state::dma_w)
 	case 0:
 		logerror("DMA: Drive select %02x\n",data);
 		m_dma_drive_select = data;
-		m_fdc->dden_w(DMA_DENSITY);
+		m_fdc->dden_w(DMA_DENSITY ? 1 : 0);
 		if(data & 0x40)  // 8" / 5.25" connector select
 			m_dma_status |= 0x04;
 		else
 			m_dma_status &= ~0x04;
 		if(data & 0x01)
-			m_fdc->set_floppy(m_fdc->subdevice<floppy_connector>("0")->get_device());
+		{
+			m_fdc->set_floppy(m_floppy0->get_device());
+			m_selected_drive = 1;
+			m_floppy1->get_device()->mon_w(1);  // switch off the motor of other drives...
+			m_floppy1_ready = false;
+			logerror("FDC: Floppy drive 1 motor off\n");
+		}
 		if(data & 0x02)
-			m_fdc->set_floppy(m_fdc->subdevice<floppy_connector>("1")->get_device());
+		{
+			m_fdc->set_floppy(m_floppy1->get_device());
+			m_selected_drive = 2;
+			m_floppy0->get_device()->mon_w(1);  // switch off the motor of other drives...
+			m_floppy0_ready = false;
+			logerror("FDC: Floppy drive 0 motor off\n");
+		}
 		break;
 	case 1:
 		logerror("DMA: DMA control %02x\n",data);
@@ -311,6 +330,20 @@ WRITE8_MEMBER(gimix_state::dma_w)
 			m_dma_status |= 0x12;
 		else
 			m_dma_status &= ~0x12;
+		if(data & 0x40)
+		{
+			if(m_selected_drive == 1)
+				m_floppy0->get_device()->ss_w(1);
+			if(m_selected_drive == 2)
+				m_floppy1->get_device()->ss_w(1);
+		}
+		else
+		{
+			if(m_selected_drive == 1)
+				m_floppy0->get_device()->ss_w(0);
+			if(m_selected_drive == 2)
+				m_floppy1->get_device()->ss_w(0);
+		}
 		break;
 	case 2:
 		logerror("DMA: DMA start address MSB %02x\n",data);
@@ -330,16 +363,28 @@ WRITE8_MEMBER(gimix_state::dma_w)
 READ8_MEMBER(gimix_state::fdc_r)
 {
 	// motors are switched on on FDC access
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(0);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(0);
+	if(m_selected_drive == 1 && m_floppy0_ready == false)
+	{
+		m_floppy0->get_device()->mon_w(0);
+		m_floppy0_ready = true;
+		logerror("FDC: Floppy drive 0 motor on\n");
+	}
+	if(m_selected_drive == 2 && m_floppy1_ready == false)
+	{
+		m_floppy1->get_device()->mon_w(0);
+		m_floppy1_ready = true;
+		logerror("FDC: Floppy drive 1 motor on\n");
+	}
 	return m_fdc->read(space,offset);
 }
 
 WRITE8_MEMBER(gimix_state::fdc_w)
 {
 	// motors are switched on on FDC access
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(0);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(0);
+	if(m_selected_drive == 1)
+		m_floppy0->get_device()->mon_w(0);
+	if(m_selected_drive == 2)
+		m_floppy1->get_device()->mon_w(0);
 	m_fdc->write(space,offset,data);
 }
 
@@ -381,7 +426,7 @@ WRITE_LINE_MEMBER(gimix_state::fdc_irq_w)
 
 WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 {
-	if(state)
+	if(state && DMA_ENABLED)
 	{
 		m_dma_status |= 0x80;
 		// do a DMA transfer
@@ -389,19 +434,18 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		{
 			// write to disk
 			m_fdc->data_w(m_ram->read(m_dma_current_addr));
-			logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
+//			logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
 		}
 		else
 		{
 			// read from disk
 			m_ram->write(m_dma_current_addr,m_fdc->data_r());
-			logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
+//			logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
 		}
 		m_dma_current_addr++;
 	}
 	else
 		m_dma_status &= ~0x80;
-	logerror("DMA: DRQ set to %i\n",state);
 }
 
 void gimix_state::machine_reset()
@@ -414,6 +458,11 @@ void gimix_state::machine_reset()
 	m_dma_status = 0x00;
 	m_dma_ctrl = 0x00;
 	m_task = 0x00;
+	m_selected_drive = 0;
+	m_floppy0_ready = false;
+	m_floppy1_ready = false;
+	membank("lower_ram")->set_base(m_ram->pointer());
+	membank("upper_ram")->set_base(m_ram->pointer()+0x10000);
 }
 
 void gimix_state::machine_start()
@@ -427,43 +476,28 @@ void gimix_state::machine_start()
 	m_rombank2->set_entry(1);
 	m_rombank3->set_entry(2);
 	m_fixedrombank->set_entry(0);
-	// install first 56k RAM
-	m_bank1->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank2->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank3->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank4->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank5->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank6->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank7->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank8->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank9->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank10->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank11->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank12->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank13->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank14->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank15->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
-	m_bank16->space(AS_PROGRAM).install_ram(0x0000,0xe000,0xffff,0,NULL);
 	// install any extra RAM
 	if(m_ram->size() > 65536)
 	{
-		m_bank1->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank2->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank3->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank4->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank5->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank6->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank7->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank8->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank9->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank10->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank11->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank12->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank13->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank14->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank15->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
-		m_bank16->space(AS_PROGRAM).install_ram(0x10000,m_ram->size()-1,0xffff,0,NULL);
+		m_bank1->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank2->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank3->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank4->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank5->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank6->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank7->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank8->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank9->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank10->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank11->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank12->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank13->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank14->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank15->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank16->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
 	}
+	m_floppy0->get_device()->set_rpm(300);
+	m_floppy1->get_device()->set_rpm(300);
 }
 
 void gimix_state::driver_start()
@@ -479,7 +513,7 @@ WRITE_LINE_MEMBER(gimix_state::write_acia_clock)
 }
 
 FLOPPY_FORMATS_MEMBER( gimix_state::floppy_formats )
-	FLOPPY_PC_FORMAT
+	FLOPPY_FLEX_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( gimix_floppies )
@@ -508,9 +542,10 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_PTM6840_IRQ_CB(WRITELINE(gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_FD1797x_ADD("fdc",XTAL_2MHz)
+	MCFG_FD1797x_ADD("fdc",XTAL_8MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(gimix_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(gimix_state,fdc_drq_w))
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525dd", gimix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525dd", gimix_state::floppy_formats)
 
