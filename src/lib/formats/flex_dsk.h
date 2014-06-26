@@ -20,8 +20,6 @@ public:
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
 private:
-//	static const format formats[];
-
 	struct sysinfo_sector
 	{
 		UINT8 unused1[16];

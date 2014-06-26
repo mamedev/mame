@@ -87,7 +87,10 @@ bool flex_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				sdatapos += bps;
 			}
 			// gap sizes unverified
-			build_wd_track_fm(track, head, image, cell_count, spt, sects, 24, 16, 11);
+			if(total_tracks == 35 && spt == 18 && (track >= 1 && track <= 2))  // handle Gimix Flex 3.6 disk image, which the boot sector loads tracks 1 and 2 as MFM
+				build_wd_track_mfm(track, head, image, cell_count*2, spt, sects, 50, 32, 22);
+			else
+				build_wd_track_fm(track, head, image, cell_count, spt, sects, 24, 16, 11);
 		}
 	return true;
 }
