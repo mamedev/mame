@@ -27,6 +27,8 @@ SOUND     : YM3438
 #include "video/h63484.h"
 #include "video/ramdac.h"
 
+#include "segajw.lh"
+
 class segajw_state : public driver_device
 {
 public:
@@ -40,6 +42,8 @@ public:
 	DECLARE_WRITE16_MEMBER(coin_counter_w);
 	DECLARE_READ16_MEMBER(hopper_r);
 	DECLARE_WRITE16_MEMBER(hopper_w);
+	DECLARE_READ8_MEMBER(lamps_r);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_READ16_MEMBER(coinlockout_r);
 	DECLARE_WRITE16_MEMBER(coinlockout_w);
 	DECLARE_WRITE8_MEMBER(audiocpu_cmd_w);
@@ -59,8 +63,9 @@ protected:
 	UINT64      m_coin_start_cycles;
 	UINT64      m_hopper_start_cycles;
 	UINT8       m_coin_counter;
-	UINT16      m_coin_lockout;
+	UINT8       m_coin_lockout;
 	UINT8       m_hopper_ctrl;
+	UINT8       m_lamps[2];
 };
 
 
@@ -89,6 +94,19 @@ WRITE16_MEMBER(segajw_state::hopper_w)
 	}
 }
 
+READ8_MEMBER(segajw_state::lamps_r)
+{
+	return m_lamps[offset];
+}
+
+WRITE8_MEMBER(segajw_state::lamps_w)
+{
+	for(int i=0; i<8; i++)
+		output_set_lamp_value((offset * 8) + i, BIT(data, i));
+
+	m_lamps[offset] = data;
+}
+
 READ16_MEMBER(segajw_state::coinlockout_r)
 {
 	return m_coin_lockout;
@@ -98,6 +116,9 @@ WRITE16_MEMBER(segajw_state::coinlockout_w)
 {
 	coin_lockout_w(machine(), 0, data & 1);
 	m_coin_lockout = data;
+
+	for(int i=0; i<3; i++)
+		output_set_indexed_value("towerlamp", i, BIT(data, 3 + i));
 }
 
 WRITE8_MEMBER(segajw_state::audiocpu_cmd_w)
@@ -167,7 +188,7 @@ static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(coin_counter_w)
-	AM_RANGE(0x1a0002, 0x1a0005) AM_NOP // TODO: lamps
+	AM_RANGE(0x1a0002, 0x1a0005) AM_READWRITE8(lamps_r, lamps_w, 0x00ff)
 	AM_RANGE(0x1a0006, 0x1a0007) AM_READWRITE(hopper_r, hopper_w)
 	AM_RANGE(0x1a000a, 0x1a000b) AM_READ(coin_counter_r)
 
@@ -417,4 +438,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAME( 198?, segajw,  0,   segajw,  segajw, driver_device,  0, ROT0, "Sega", "Golden Poker Series \"Joker's Wild\" (Rev. B)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS ) // TODO: correct title
+GAMEL( 198?, segajw,  0,   segajw,  segajw, driver_device,  0, ROT0, "Sega", "Golden Poker Series \"Joker's Wild\" (Rev. B)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS, layout_segajw ) // TODO: correct title

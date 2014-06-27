@@ -132,6 +132,7 @@
 #include "sound/3812intf.h"
 #include "video/h63484.h"
 
+#include "sigmab52.lh"
 
 class sigmab52_state : public driver_device
 {
@@ -155,6 +156,9 @@ public:
 	DECLARE_WRITE8_MEMBER(audiocpu_cmd_irq_w);
 	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE8_MEMBER(tower_lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_enable_w);
 	DECLARE_DRIVER_INIT(jwildb52);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
@@ -252,6 +256,21 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 	m_hopper_start_cycles = data & 0x01 ? m_maincpu->total_cycles() : 0;
 }
 
+WRITE8_MEMBER(sigmab52_state::lamps1_w)
+{
+	output_set_lamp_value(offset, data & 1);
+}
+
+WRITE8_MEMBER(sigmab52_state::lamps2_w)
+{
+	output_set_lamp_value(6 + offset, data & 1);
+}
+
+WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
+{
+	output_set_indexed_value("towerlamp", offset, data & 1);
+}
+
 WRITE8_MEMBER(sigmab52_state::coin_enable_w)
 {
 	coin_lockout_w(machine(), 0, data & 0x01 ? 0 : 1);
@@ -314,11 +333,16 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0xf760, 0xf760) AM_READ(unk_f760_r)
 
+//  AM_RANGE(0xf770, 0xf77f)  Bill validator
+
 	AM_RANGE(0xf780, 0xf780) AM_WRITE(audiocpu_cmd_irq_w)
 	AM_RANGE(0xf790, 0xf790) AM_WRITE(soundlatch_byte_w)
 
 	AM_RANGE(0xf7b0, 0xf7b0) AM_WRITE(coin_enable_w)
 	AM_RANGE(0xf7d5, 0xf7d5) AM_WRITE(hopper_w)
+	AM_RANGE(0xf7b2, 0xf7b7) AM_WRITE(lamps1_w)
+	AM_RANGE(0xf7c0, 0xf7c3) AM_WRITE(lamps2_w)
+	AM_RANGE(0xf7d6, 0xf7d7) AM_WRITE(tower_lamps_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -651,6 +675,6 @@ DRIVER_INIT_MEMBER(sigmab52_state,jwildb52)
 *************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY  FULLNAME                                  FLAGS */
-GAME( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", GAME_NO_SOUND | GAME_NOT_WORKING, layout_sigmab52 )

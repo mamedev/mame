@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="DEALDRAW" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="DEAL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DRAW">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="HOLD" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.2" blue="0.0" />
+		</rect>
+		<text string="HOLD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="BET" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="1 BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="MAXBET" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="MAX BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="DOUBLE" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="WHITELAMP" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<element name="REDLAMP" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp0" element="HOLD" inputtag="IN0" inputmask="0x0001">
+			<bounds x="0.45" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+		<bezel name="lamp1" element="HOLD" inputtag="IN0" inputmask="0x0002">
+			<bounds x="0.80" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+		<bezel name="lamp2" element="HOLD" inputtag="IN0" inputmask="0x0004">
+			<bounds x="1.15" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+		<bezel name="lamp3" element="HOLD" inputtag="IN0" inputmask="0x0008">
+			<bounds x="1.50" y="3.05" width="0.30" height="0.15" />
+		</bezel>4
+		<bezel name="lamp4" element="HOLD" inputtag="IN0" inputmask="0x0010">
+			<bounds x="1.85" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+
+		<bezel name="lamp7" element="DEALDRAW" inputtag="IN0" inputmask="0x0080">
+			<bounds x="0.10" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+		<bezel name="lamp5" element="BET" inputtag="IN0" inputmask="0x0020">
+			<bounds x="2.20" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+		<bezel name="lamp6" element="MAXBET" inputtag="IN0" inputmask="0x0040">
+			<bounds x="2.55" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+		<bezel name="lamp9" element="DOUBLE" inputtag="IN1" inputmask="0x0002">
+			<bounds x="2.90" y="3.05" width="0.30" height="0.15" />
+		</bezel>
+
+		<bezel name="towerlamp0" element="WHITELAMP">
+			<bounds x="3.8" y="3.05" width="0.15" height="0.05" />
+		</bezel>
+		<bezel name="towerlamp1" element="REDLAMP">
+			<bounds x="3.8" y="3.10" width="0.15" height="0.05" />
+		</bezel>
+		<bezel name="towerlamp2" element="REDLAMP">
+			<bounds x="3.8" y="3.15" width="0.15" height="0.05" />
+		</bezel>
+	</view>
+
+	<view name="Screen">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+</mamelayout>

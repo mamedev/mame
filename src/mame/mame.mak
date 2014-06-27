@@ -2787,11 +2787,15 @@ $(DRIVERS)/sderby.o:    $(LAYOUT)/sderby.lh \
 
 $(DRIVERS)/seabattl.o:  $(LAYOUT)/seabattl.lh
 
+$(DRIVERS)/segajw.o:    $(LAYOUT)/segajw.lh
+
 $(DRIVERS)/segaorun.o:  $(LAYOUT)/outrun.lh
 
 $(DRIVERS)/segas32.o:   $(LAYOUT)/radr.lh
 
 $(DRIVERS)/segaybd.o:   $(LAYOUT)/pdrift.lh
+
+$(DRIVERS)/sigmab52.o:  $(LAYOUT)/sigmab52.lh
 
 $(DRIVERS)/skydiver.o:  $(LAYOUT)/skydiver.lh
 
