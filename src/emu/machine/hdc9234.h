@@ -8,8 +8,36 @@
 #define __HDC9234_H__
 
 #include "emu.h"
+#include "imagedev/floppy.h"
 
 extern const device_type HDC9234;
+
+/*
+    Enumeration of the latches outside of the controller
+*/
+enum
+{
+	HDC_INPUT_STATUS    = 0x00,
+	HDC_OUTPUT_DMA_ADDR = 0x01,
+	HDC_OUTPUT_1        = 0x02,
+	HDC_OUTPUT_2        = 0x03
+};
+
+
+/*
+    Definition of bits in the Disk-Status register
+*/
+enum
+{
+	HDC_DS_ECCERR  = 0x80,        // ECC error
+	HDC_DS_INDEX   = 0x40,        // index hole
+	HDC_DS_SKCOM   = 0x20,        // seek complete
+	HDC_DS_TRK00   = 0x10,        // track 0
+	HDC_DS_UDEF    = 0x08,        // user-defined
+	HDC_DS_WRPROT  = 0x04,        // write-protected
+	HDC_DS_READY   = 0x02,        // drive ready bit
+	HDC_DS_WRFAULT = 0x01         // write fault
+};
 
 //===================================================================
 
@@ -53,6 +81,7 @@ public:
 	// Accesors from the CPU side
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( reset );
 
 	// Callbacks
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_intrq.set_callback(object); }
@@ -61,6 +90,11 @@ public:
 	template<class _Object> static devcb_base &set_auxbus_rd_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_in_auxbus.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_in_dma.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dma.set_callback(object); }
+
+	// Used to reconfigure the drive connections. Floppy drive selection is done
+	// using the user-programmable outputs. Hence, the connection
+	// is changed outside of the controller, and by this way we let it know.
+	void connect_floppy_drive(floppy_image_device *floppy);
 
 protected:
 	void device_start();
@@ -73,6 +107,51 @@ private:
 	devcb_read8        m_in_auxbus;    // AB0-7 lines (S0=S1=0)
 	devcb_read8        m_in_dma;       // DMA read access to the cache buffer
 	devcb_write8       m_out_dma;      // DMA write access to the cache buffer
+
+	// Internal register pointer used for sequential register loading
+	int m_register_pointer;
+
+	// Read and write registers
+	UINT8 m_register_r[12];
+	UINT8 m_register_w[12];
+
+	// Command processing
+	void  process_command(UINT8 opcode);
+
+	// Recent command.
+	UINT8 m_command;
+
+	// Interrupt management (outgoing INT pin)
+	void set_interrupt(line_state intr);
+
+	// Currently connected floppy
+	floppy_image_device* m_floppy;
+
+	// internal register OUTPUT1
+	UINT8 m_output1;
+
+	// internal register OUTPUT2
+	UINT8 m_output2;
+
+	// Sample the values of the incoming status bits
+	void sync_status_in();
+
+	// Write the output registers to the latches
+	void sync_latches_out();
+
+	// Utility routine to set or reset bits
+	void set_bits(UINT8& byte, int mask, bool set);
+
+	// Drive type that has been selected in drive_select
+	int m_selected_drive_type;
+
+	// Enable head load delays
+	bool m_head_load_delay_enable;
+
+	// ===================================================
+	//   Commands
+	// ===================================================
+	void drive_select(int driveparm);
 };
 
 #endif
