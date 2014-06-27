@@ -439,8 +439,8 @@ int myarc_hfdc_device::slog2(int value)
 */
 READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 {
-	UINT8 reply = 0;
-	int index = 0;
+	//UINT8 reply = 0;
+	//int index = 0;
 
 	if ((m_output1_latch & 0xf0)==0)
 	{
@@ -463,7 +463,7 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 */
 WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 {
-	int index;
+	//int index;
 	switch (offset)
 	{
 	case HDC_INPUT_STATUS:
