@@ -12,7 +12,6 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
 #include "sound/speaker.h"
 #include "sound/tms5220.h"
 

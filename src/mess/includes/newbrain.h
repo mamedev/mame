@@ -14,7 +14,6 @@
 #include "machine/6850acia.h"
 #include "machine/adc0808.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
