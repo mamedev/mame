@@ -1834,7 +1834,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 
-	MCFG_CPU_ADD("mcu",I8751, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  m72_mcu_int)
 
