@@ -91,6 +91,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
+			m_keyboard(*this, "KEY"),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2"),
 			m_bank3(*this, "bank3"),
@@ -100,6 +101,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_ioport_array<16> m_keyboard;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
@@ -112,9 +114,20 @@ public:
 	UINT8 m_mousex;
 	UINT8 m_mousey;
 	UINT8 *m_vram;
+	struct
+	{
+		UINT16  addr1;
+		UINT16  addr2;
+		UINT8   lcd_w;
+		UINT8   lcd_h;
+		UINT8   fb_width;
+		UINT8   split_pos;
+	} m_lcdc;
 
 	virtual void machine_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -122,7 +135,9 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_w );
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
+	DECLARE_WRITE8_MEMBER( lcdc_w );
 	DECLARE_PALETTE_INIT(prestige);
+	DECLARE_PALETTE_INIT(glcolor);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 };
@@ -166,7 +181,14 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 5:
-		if (ioport("CART_TYPE")->read() == 0x01)
+		if (m_bank[5] == data)
+			break;
+
+		if (data & 0x20)
+		{
+			program.install_ram(0x8000, 0xbfff, m_vram);
+		}
+		else if (ioport("CART_TYPE")->read() == 0x01)
 		{
 			//cartridge memory is writable
 			if (data & 0x02)
@@ -183,6 +205,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		{
 			//cartridge memory is read-only
 			program.unmap_write(0x4000, 0xbfff);
+			program.install_read_bank(0x8000, 0xbfff, "bank3");
 		}
 		break;
 	case 6:
@@ -194,17 +217,11 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 
 READ8_MEMBER( prestige_state::kb_r )
 {
-	static const char *const bitnames[2][8] =
-	{
-		{"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7"},
-		{"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"}
-	};
-
 	UINT8 data = 0xff;
 
 	for (int line=0; line<8; line++)
 		if (!(m_kb_matrix & (1<<line)))
-			data &= ioport(bitnames[offset][line])->read();
+			data &= m_keyboard[offset * 8 + line]->read();
 
 	return data;
 }
@@ -228,6 +245,9 @@ READ8_MEMBER( prestige_state::mouse_r )
 			break;
 	}
 
+	data = MIN(data, +127);
+	data = MAX(data, -127);
+
 	return 0x80 + data;
 }
 
@@ -244,6 +264,40 @@ WRITE8_MEMBER( prestige_state::mouse_w )
 	}
 }
 
+WRITE8_MEMBER( prestige_state::lcdc_w )
+{
+	switch(offset)
+	{
+		case 0x02:
+			m_lcdc.lcd_w = data;
+			break;
+		case 0x04:
+			m_lcdc.lcd_h = data;
+			break;
+		case 0x06:
+			m_lcdc.addr1 = (m_lcdc.addr1 & 0xff00) | data;
+			break;
+		case 0x07:
+			m_lcdc.addr1 = (m_lcdc.addr1 & 0x00ff) | (data << 8);
+			break;
+		case 0x08:
+			m_lcdc.addr2 = (m_lcdc.addr2 & 0xff00) | data;
+			break;
+		case 0x09:
+			m_lcdc.addr2 = (m_lcdc.addr2 & 0x00ff) | (data << 8);
+			break;
+		case 0x0a:
+			m_lcdc.split_pos = data;
+			break;
+		case 0x0d:
+			m_lcdc.fb_width = data;
+			break;
+		default:
+			logerror("Unknown LCDC reg write %x = %x\n", offset, data);
+	}
+}
+
+
 static ADDRESS_MAP_START(prestige_mem, AS_PROGRAM, 8, prestige_state)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
@@ -256,9 +310,19 @@ static ADDRESS_MAP_START( prestige_io , AS_IO, 8, prestige_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(mouse_r, mouse_w)
-	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
+	AM_RANGE(0x30, 0x3f) AM_WRITE(lcdc_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(kb_w)
 	AM_RANGE(0x41, 0x42) AM_READ(kb_r)
+	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( glcolor_io , AS_IO, 8, prestige_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x30, 0x3f) AM_WRITE(lcdc_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(kb_w)
+	AM_RANGE(0x41, 0x42) AM_READ(kb_r)
+	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -274,7 +338,7 @@ INPUT_PORTS_START( prestige )
 	PORT_START("MOUSEY")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(2)
 
-	PORT_START("LINE0")
+	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left mouse button")  PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")  PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")  PORT_CODE(KEYCODE_9)
@@ -284,7 +348,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")  PORT_CODE(KEYCODE_COMMA)
 
-	PORT_START("LINE1")
+	PORT_START("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")  PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")  PORT_CODE(KEYCODE_0)
@@ -294,7 +358,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z")  PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".")  PORT_CODE(KEYCODE_STOP)
 
-	PORT_START("LINE2")
+	PORT_START("KEY.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Up (KB)")  PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")  PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'")  PORT_CODE(KEYCODE_QUOTE)
@@ -304,7 +368,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x")  PORT_CODE(KEYCODE_X)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")  PORT_CODE(KEYCODE_MINUS)
 
-	PORT_START("LINE3")
+	PORT_START("KEY.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Left (KB)")    PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")  PORT_CODE(KEYCODE_4)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xa1")   PORT_CODE(KEYCODE_CLOSEBRACE)
@@ -314,7 +378,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c")  PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 
-	PORT_START("LINE4")
+	PORT_START("KEY.4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Right (KB)")   PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")  PORT_CODE(KEYCODE_5)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace")  PORT_CODE(KEYCODE_BACKSPACE)
@@ -324,7 +388,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v")  PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift")    PORT_CODE(KEYCODE_RSHIFT)
 
-	PORT_START("LINE5")
+	PORT_START("KEY.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Down (KB)")    PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")  PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
@@ -334,7 +398,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b")  PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help")   PORT_CODE(KEYCODE_PGUP)
 
-	PORT_START("LINE6")
+	PORT_START("KEY.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")  PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q")  PORT_CODE(KEYCODE_Q)
@@ -344,7 +408,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n")  PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Symbol") PORT_CODE(KEYCODE_PGDN)
 
-	PORT_START("LINE7")
+	PORT_START("KEY.7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF")    PORT_CODE(KEYCODE_F9)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")  PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w")  PORT_CODE(KEYCODE_W)
@@ -354,47 +418,163 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m")  PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Answer") PORT_CODE(KEYCODE_END)
 
-	PORT_START("LINE8")
+	PORT_START("KEY.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")  PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Word Games") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Player") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE9")
+	PORT_START("KEY.9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alt")    PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mathematics")    PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Level")      PORT_CODE(KEYCODE_F4)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINEA")
+	PORT_START("KEY.10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Trivia") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cartridge")  PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINEB")
+	PORT_START("KEY.11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left")   PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Logic Games")    PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Business Basics")    PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINEC")
+	PORT_START("KEY.12")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down")   PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINED")
+	PORT_START("KEY.13")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right")  PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINEE")
+	PORT_START("KEY.14")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left mouse button (KB)") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINEF")
+	PORT_START("KEY.15")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right mouse button (KB)")    PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
 INPUT_PORTS_END
+
+INPUT_PORTS_START( glcolor )
+	PORT_START("CART_TYPE")
+	PORT_CONFNAME( 0x01, 0x00, "Cartridge Type" )
+	PORT_CONFSETTING( 0x00, "ROM" )
+	PORT_CONFSETTING( 0x01, "RAM" )
+
+	PORT_START("KEY.0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('^')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
+
+	PORT_START("KEY.1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("Help")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)  PORT_CHAR(0x00df) PORT_CHAR('?')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
+
+	PORT_START("KEY.2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+
+	PORT_START("KEY.3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+
+	PORT_START("KEY.4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("Spieler 1")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+
+	PORT_START("KEY.5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("Spielers")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("Stufe")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("Symbols")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
+
+	PORT_START("KEY.6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Button 1")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_NAME("Button 2")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_NAME("Button 3")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Button 4")
+
+	PORT_START("KEY.7")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Backspace") PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00fc) PORT_CHAR(0x00dc)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.10")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00e4) PORT_CHAR(0x00c4)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.11")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.12")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00f6) PORT_CHAR(0x00d6)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("Spieler 2")
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.13")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.14")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY.15")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+INPUT_PORTS_END
+
 
 IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 {
@@ -402,7 +582,7 @@ IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
-	if (m_irq_counter == 0x02)
+	if (m_irq_counter == 0x04)
 	{
 		m_irq_counter = 0;
 		vector = 0x0020;
@@ -448,28 +628,55 @@ PALETTE_INIT_MEMBER(prestige_state, prestige)
 	palette.set_pen_color(1, rgb_t(16, 37, 84));
 }
 
-UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+PALETTE_INIT_MEMBER(prestige_state, glcolor)
 {
-	UINT16 addr = 0;
+	palette.set_pen_color(0, rgb_t(0x3f,0xbf,0x3f));
+	palette.set_pen_color(1, rgb_t(0xff,0x3f,0x5f));
+	palette.set_pen_color(2, rgb_t(0x1f,0x1f,0x3f));
+	palette.set_pen_color(3, rgb_t(0xff,0xdf,0x1f));
+}
 
-	for (int y = 0; y < 100; y++)
+UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int width = m_lcdc.fb_width + m_lcdc.lcd_w + 1;
+
+	for (int y = 0; y <= m_lcdc.lcd_h; y++)
 	{
-		for (int sx = 0; sx < 30; sx++)
+		int line_start;
+		if (y <= m_lcdc.split_pos)
+			line_start = m_lcdc.addr1 + y * width;
+		else
+			line_start = m_lcdc.addr2 + (y - m_lcdc.split_pos - 1) * width;
+
+		for (int sx = 0; sx <= m_lcdc.lcd_w; sx++)
 		{
-			UINT8 data = m_vram[addr];
+			UINT8 data = m_vram[(line_start + sx) & 0x1fff];
 
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < 8 / bpp; x++)
 			{
-				bitmap.pix16(y, (sx * 8) + x) = BIT(data, 7);
+				int pix = 0;
+				for (int b=0; b<bpp; b++)
+					pix |= BIT(data, 7 - b) << b;
 
-				data <<= 1;
+				if (cliprect.contains(sx * 8 / bpp + x, y))
+					bitmap.pix16(y, sx * 8 / bpp + x) = pix;
+
+				data <<= bpp;
 			}
-
-			addr++;
 		}
 	}
 
 	return 0;
+}
+
+UINT32 prestige_state::screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return screen_update(1, screen, bitmap, cliprect);
+}
+
+UINT32 prestige_state::screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return screen_update(2, screen, bitmap, cliprect);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
@@ -479,7 +686,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 
 static MACHINE_CONFIG_START( prestige_base, prestige_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz)  // Z84C008
 	MCFG_CPU_PROGRAM_MAP(prestige_mem)
 	MCFG_CPU_IO_MAP(prestige_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
@@ -490,7 +697,7 @@ static MACHINE_CONFIG_START( prestige_base, prestige_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update_1bpp)
 	MCFG_SCREEN_SIZE( 240, 100 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
@@ -509,6 +716,23 @@ static MACHINE_CONFIG_START( prestige_base, prestige_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( glcolor, prestige_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(glcolor_io)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update_2bpp)
+	MCFG_SCREEN_SIZE( 160, 80 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 160-1, 0, 80-1 )
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(4)
+	MCFG_PALETTE_INIT_OWNER(prestige_state, glcolor)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "glcolor")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prestige, prestige_base )
@@ -565,7 +789,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1994, glcolor,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)
