@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   a2bus.h - Apple II slot bus and card emulation
@@ -75,6 +77,8 @@ class device_a2bus_card_interface;
 // ======================> a2bus_device
 class a2bus_device : public device_t
 {
+	// multi-card devices need to access m_device_list, so they get friend'ed here.
+	friend class a2bus_mcms2_device;
 public:
 	// construction/destruction
 	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
