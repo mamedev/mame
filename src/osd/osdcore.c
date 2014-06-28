@@ -232,16 +232,23 @@ osd_midi_device *osd_open_midi_input(const char *devname)
 	PortMidiStream *stm;
 	osd_midi_device *ret;
 
-	for (int i = 0; i < num_devs; i++)
+	if (!strcmp("default", devname))
 	{
-		pmInfo = Pm_GetDeviceInfo(i);
-
-		if (pmInfo->input)
+		found_dev = Pm_GetDefaultInputDeviceID();
+	}
+	else
+	{
+		for (int i = 0; i < num_devs; i++)
 		{
-			if (!strcmp(devname, pmInfo->name))
+			pmInfo = Pm_GetDeviceInfo(i);
+
+			if (pmInfo->input)
 			{
-				found_dev = i;
-				break;
+				if (!strcmp(devname, pmInfo->name))
+				{
+					found_dev = i;
+					break;
+				}
 			}
 		}
 	}
@@ -279,16 +286,23 @@ osd_midi_device *osd_open_midi_output(const char *devname)
 	PortMidiStream *stm;
 	osd_midi_device *ret;
 
-	for (int i = 0; i < num_devs; i++)
+	if (!strcmp("default", devname))
 	{
-		pmInfo = Pm_GetDeviceInfo(i);
-
-		if (pmInfo->output)
+		found_dev = Pm_GetDefaultOutputDeviceID();
+	}
+	else
+	{
+		for (int i = 0; i < num_devs; i++)
 		{
-			if (!strcmp(devname, pmInfo->name))
+			pmInfo = Pm_GetDeviceInfo(i);
+
+			if (pmInfo->output)
 			{
-				found_dev = i;
-				break;
+				if (!strcmp(devname, pmInfo->name))
+				{
+					found_dev = i;
+					break;
+				}
 			}
 		}
 	}
