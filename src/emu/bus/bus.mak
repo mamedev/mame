@@ -700,6 +700,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2corvus.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2diskiing.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2mcms.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2dx1.o
 endif
 
 #-------------------------------------------------
