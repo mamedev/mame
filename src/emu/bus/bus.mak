@@ -891,6 +891,42 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/neogeo/neogeo_slot.h,BUSES += NEOGEO
+#-------------------------------------------------
+
+ifneq ($(filter NEOGEO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/neogeo
+BUSOBJS += $(BUSOBJ)/neogeo/neogeo_slot.o
+BUSOBJS += $(BUSOBJ)/neogeo/neogeo_intf.o
+BUSOBJS += $(BUSOBJ)/neogeo/neogeo_carts.o
+BUSOBJS += $(BUSOBJ)/neogeo/neogeo_helper.o
+BUSOBJS += $(BUSOBJ)/neogeo/banked_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/mslugx_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/mslugx_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/sma_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/sma_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/cmc_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/cmc_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/pcm2_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/pcm2_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/kof2002_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/kof2002_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/pvc_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/pvc_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/fatfury2_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/fatfury2_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/kof98_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/kof98_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/bootleg_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/bootleg_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/bootleg_hybrid_cart.o
+BUSOBJS += $(BUSOBJ)/neogeo/sbp_prot.o
+BUSOBJS += $(BUSOBJ)/neogeo/rom.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/saturn/sat_slot.h,BUSES += SATURN
 #-------------------------------------------------
 

@@ -53,7 +53,6 @@
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/megacdcd.h"
@@ -411,7 +410,8 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 				// writes 00 / 01 / ff
 				printf("MapVectorTable? %04x %04x\n",data,mem_mask);
 
-				m_bank_vectors->set_entry(data == 0 ? 0 : 1);
+				//m_bank_vectors->set_entry(data == 0 ? 0 : 1);
+				m_use_cart_vectors = (data == 0 ? 0 : 1);
 			}
 
 //extern INT32 bRunPause;
@@ -994,7 +994,7 @@ void ng_aes_state::common_machine_start()
 	neogeo_main_cpu_banking_init();
 
 	/* set the initial audio CPU ROM banks */
-	neogeo_audio_cpu_banking_init();
+	neogeo_audio_cpu_banking_init(1);
 
 	create_interrupt_timers();
 
@@ -1012,13 +1012,23 @@ void ng_aes_state::common_machine_start()
 	save_item(NAME(m_display_position_interrupt_pending));
 	save_item(NAME(m_irq3_pending));
 	save_item(NAME(m_controller_select));
-	save_item(NAME(m_main_cpu_bank_address));
+	//save_item(NAME(m_main_cpu_bank_address));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(ng_aes_state::neogeo_postload), this));
 
+
+	m_cartslots[0] = m_cartslot1;
+	m_cartslots[1] = m_cartslot2;
+	m_cartslots[2] = m_cartslot3;
+	m_cartslots[3] = m_cartslot4;
+	m_cartslots[4] = m_cartslot5;
+	m_cartslots[5] = m_cartslot6;
+
 	m_sprgen->set_screen(m_screen);
-	m_sprgen->set_sprite_region(m_region_sprites);
-	m_sprgen->set_fixed_regions(m_region_fixed, m_region_fixedbios);
+
+	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
+	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
+
 }
 
 MACHINE_START_MEMBER(ng_aes_state,neogeo)
@@ -1042,7 +1052,8 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data, 0x2000);
 	save_pointer(NAME(m_meminternal_data), 0x2000);
 
-	m_bank_vectors->set_entry(0); // default to the BIOS vectors
+	//m_bank_vectors->set_entry(0); // default to the BIOS vectors
+	m_use_cart_vectors = 0;
 
 	m_tempcdc->reset_cd();
 }
@@ -1070,9 +1081,6 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 
 	m_maincpu->reset();
 
-	// FIXME: this doesn't belong in the base system
-	reset_sma_rng();
-
 	start_interrupt_timers();
 
 	/* trigger the IRQ3 that was set by MACHINE_START */
@@ -1082,6 +1090,11 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 
 	/* AES has no SFIX ROM and always uses the cartridge's */
 	m_sprgen->neogeo_set_fixed_layer_source(1);
+
+	if (m_cartslots[0]) // if thie system has cart slots then do some extra initialization
+	{
+		set_slot_number(0);
+	}
 
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
@@ -1109,12 +1122,13 @@ MACHINE_RESET_MEMBER(ng_aes_state,neocd)
  *************************************/
 
 static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
-	AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
+//	AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
+	AM_RANGE(0x000000, 0x00007f) AM_READ(neogeo_slot_rom_low_bectors_r)
 	AM_RANGE(0x000080, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
-	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
-	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
+	//AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
+	//AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
@@ -1135,7 +1149,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
-	AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
+//	AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
+	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)	
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)
@@ -1378,10 +1393,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_LOAD(ng_aes_state,neo_cartridge)
-	MCFG_CARTSLOT_INTERFACE("neo_cart")
-	MCFG_CARTSLOT_MANDATORY
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")
@@ -1598,6 +1610,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
 {
+	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
 }
 
 

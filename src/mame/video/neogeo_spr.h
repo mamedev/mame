@@ -23,6 +23,8 @@ public:
 //	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void optimize_sprite_data();
+	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
+
 	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
 	void draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline );
 	void set_videoram_offset( UINT16 data );
@@ -42,8 +44,8 @@ public:
 	void parse_sprites( int scanline );
 	void create_sprite_line_timer(  );
 	void start_sprite_line_timer(  );
-	virtual void set_sprite_region(memory_region* region_sprites);
-	void set_fixed_regions(memory_region* fix_cart, memory_region* fix_bios);
+	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size);
+	void set_fixed_regions(UINT8* fix_cart, UINT32 fix_cart_size, memory_region* fix_bios);
 	void set_screen(screen_device* screen);
 	void set_pens(const pen_t* pens);
 
@@ -78,9 +80,9 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
-	UINT32 get_region_mask(memory_region* rgn);
-	memory_region* m_region_sprites;
-	memory_region* m_region_fixed;
+	UINT32 get_region_mask(UINT8* rgn, UINT32 rgn_size);
+	UINT8* m_region_sprites; UINT32 m_region_sprites_size;
+	UINT8* m_region_fixed; UINT32 m_region_fixed_size;
 	memory_region* m_region_fixedbios;
 	screen_device* m_screen;
 	const pen_t   *m_pens;
@@ -97,7 +99,7 @@ class neosprite_regular_device : public neosprite_base_device
 public:
 	neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
-	virtual void set_sprite_region(memory_region* region_sprites);
+	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size);
 
 };
 
@@ -109,8 +111,10 @@ class neosprite_optimized_device : public neosprite_base_device
 public:
 	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void optimize_sprite_data();
+	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
 	dynamic_array<UINT8> m_sprite_gfx;
+	UINT8* m_spritegfx8;
 
 };
 
@@ -130,7 +134,7 @@ public:
 	UINT16* m_videoram_buffer;
 	void buffer_vram();
 	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
-	virtual void set_sprite_region(memory_region* region_sprites);
+	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size);
 
 	protected:
 	virtual void device_start();
