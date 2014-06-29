@@ -13,30 +13,34 @@
 
 NETLIB_START(VCCS)
 {
-	register_param("G", m_G, 1.0);
-	register_param("RI", m_RI, 1.0 / netlist().gmin());
-
-	register_terminal("IP", m_IP);
-	register_terminal("IN", m_IN);
-	register_terminal("OP", m_OP);
-	register_terminal("ON", m_ON);
-
-	register_terminal("_OP1", m_OP1);
-	register_terminal("_ON1", m_ON1);
-
-	m_IP.m_otherterm = &m_IN; // <= this should be NULL and terminal be filtered out prior to solving...
-	m_IN.m_otherterm = &m_IP; // <= this should be NULL and terminal be filtered out prior to solving...
-
-	m_OP.m_otherterm = &m_IP;
-	m_OP1.m_otherterm = &m_IN;
-
-	m_ON.m_otherterm = &m_IP;
-	m_ON1.m_otherterm = &m_IN;
-
-	connect(m_OP, m_OP1);
-	connect(m_ON, m_ON1);
-
+    start_internal(1.0 / netlist().gmin());
 	m_gfac = 1.0;
+}
+
+void NETLIB_NAME(VCCS)::start_internal(const double def_RI)
+{
+    register_param("G", m_G, 1.0);
+    register_param("RI", m_RI, def_RI);
+
+    register_terminal("IP", m_IP);
+    register_terminal("IN", m_IN);
+    register_terminal("OP", m_OP);
+    register_terminal("ON", m_ON);
+
+    register_terminal("_OP1", m_OP1);
+    register_terminal("_ON1", m_ON1);
+
+    m_IP.m_otherterm = &m_IN; // <= this should be NULL and terminal be filtered out prior to solving...
+    m_IN.m_otherterm = &m_IP; // <= this should be NULL and terminal be filtered out prior to solving...
+
+    m_OP.m_otherterm = &m_IP;
+    m_OP1.m_otherterm = &m_IN;
+
+    m_ON.m_otherterm = &m_IP;
+    m_ON1.m_otherterm = &m_IN;
+
+    connect(m_OP, m_OP1);
+    connect(m_ON, m_ON1);
 }
 
 NETLIB_RESET(VCCS)
@@ -70,6 +74,31 @@ NETLIB_UPDATE(VCCS)
 		m_OP.schedule_solve();
 	else if (!m_ON.net().isRailNet())
 		m_ON.schedule_solve();
+}
+
+// ----------------------------------------------------------------------------------------
+// nld_CCCS
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(CCCS)
+{
+    start_internal(1.0);
+    m_gfac = 1.0 / m_RI.Value();
+}
+
+NETLIB_RESET(CCCS)
+{
+    NETLIB_NAME(VCCS)::reset();
+}
+
+NETLIB_UPDATE_PARAM(CCCS)
+{
+    NETLIB_NAME(VCCS)::update_param();
+}
+
+NETLIB_UPDATE(CCCS)
+{
+    NETLIB_NAME(VCCS)::update();
 }
 
 // ----------------------------------------------------------------------------------------

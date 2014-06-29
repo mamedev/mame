@@ -88,6 +88,7 @@ class NETLIB_NAME(twoterm) : public netlist_device_t
 {
 public:
 	ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily);
+    ATTR_COLD NETLIB_NAME(twoterm)();
 
 	netlist_terminal_t m_P;
 	netlist_terminal_t m_N;

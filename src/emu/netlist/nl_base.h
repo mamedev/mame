@@ -336,10 +336,12 @@ public:
 		RESISTOR,   // Resistor
 		CAPACITOR,  // Capacitor
 		DIODE,      // Diode
+        DUMMY,      // DUMMY device without function
         BJT_EB,     // BJT(Ebers-Moll)
 		BJT_SWITCH, // BJT(Switch)
 		VCVS,       // Voltage controlled voltage source
 		VCCS,       // Voltage controlled current source
+        CCCS,       // Current controlled current source
 		GND,        // GND device
 	};
 

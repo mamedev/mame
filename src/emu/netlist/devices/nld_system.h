@@ -13,32 +13,35 @@
 #include "../nl_base.h"
 #include "../analog/nld_twoterm.h"
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Macros
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#define TTL_INPUT(_name, _v)                                                 \
-		NET_REGISTER_DEV(ttl_input, _name)                                   \
+#define TTL_INPUT(_name, _v)                                                   \
+		NET_REGISTER_DEV(ttl_input, _name)                                     \
 		PARAM(_name.IN, _v)
 
-#define ANALOG_INPUT(_name, _v)                                              \
-		NET_REGISTER_DEV(analog_input, _name)                                \
+#define ANALOG_INPUT(_name, _v)                                                \
+		NET_REGISTER_DEV(analog_input, _name)                                  \
 		PARAM(_name.IN, _v)
 
-#define MAINCLOCK(_name, _freq)                                              \
-		NET_REGISTER_DEV(mainclock, _name)                                   \
+#define MAINCLOCK(_name, _freq)                                                \
+		NET_REGISTER_DEV(mainclock, _name)                                     \
 		PARAM(_name.FREQ, _freq)
 
-#define CLOCK(_name, _freq)                                                  \
-		NET_REGISTER_DEV(clock, _name)                                       \
+#define CLOCK(_name, _freq)                                                    \
+		NET_REGISTER_DEV(clock, _name)                                         \
 		PARAM(_name.FREQ, _freq)
 
-#define GNDA()                                                                \
+#define GNDA()                                                                 \
 		NET_REGISTER_DEV(gnd, GND)
 
-// ----------------------------------------------------------------------------------------
+#define DUMMY_INPUT(_name)                                                     \
+        NET_REGISTER_DEV(dummy_input, _name)
+
+// -----------------------------------------------------------------------------
 // mainclock
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(mainclock,
 public:
@@ -50,9 +53,9 @@ public:
 	ATTR_HOT inline static void mc_update(netlist_logic_net_t &net);
 );
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // clock
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(clock,
 	netlist_ttl_input_t m_feedback;
@@ -63,9 +66,9 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 );
 
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Special support devices ...
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(ttl_input,
 	netlist_ttl_output_t m_Q;
@@ -79,17 +82,17 @@ NETLIB_DEVICE_WITH_PARAMS(analog_input,
 	netlist_param_double_t m_IN;
 );
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // nld_gnd
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-class nld_gnd : public netlist_device_t
+class NETLIB_NAME(gnd) : public netlist_device_t
 {
 public:
-	ATTR_COLD nld_gnd()
+	ATTR_COLD NETLIB_NAME(gnd)()
 			: netlist_device_t(GND) { }
 
-	ATTR_COLD virtual ~nld_gnd() {}
+	ATTR_COLD virtual ~NETLIB_NAME(gnd)() {}
 
 protected:
 
@@ -112,10 +115,42 @@ private:
 
 };
 
+// -----------------------------------------------------------------------------
+// nld_dummy_input
+// -----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------------------
+class NETLIB_NAME(dummy_input) : public netlist_device_t
+{
+public:
+    ATTR_COLD NETLIB_NAME(dummy_input)()
+            : netlist_device_t(DUMMY) { }
+
+    ATTR_COLD virtual ~NETLIB_NAME(dummy_input)() {}
+
+protected:
+
+    ATTR_COLD void start()
+    {
+        register_input("I", m_I);
+    }
+
+    ATTR_COLD void reset()
+    {
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+    }
+
+private:
+    netlist_analog_input_t m_I;
+
+};
+
+
+// -----------------------------------------------------------------------------
 // netdev_a_to_d
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 class nld_a_to_d_proxy : public netlist_device_t
 {
@@ -155,9 +190,9 @@ protected:
 
 };
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // nld_base_d_to_a_proxy
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 class nld_base_d_to_a_proxy : public netlist_device_t
 {

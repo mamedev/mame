@@ -33,6 +33,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/analog/nld_solver.o \
 	$(NETLISTOBJ)/analog/nld_switches.o \
 	$(NETLISTOBJ)/analog/nld_twoterm.o \
+	$(NETLISTOBJ)/analog/nld_opamps.o \
 	$(NETLISTOBJ)/devices/nld_4020.o \
 	$(NETLISTOBJ)/devices/nld_4066.o \
 	$(NETLISTOBJ)/devices/nld_7400.o \
@@ -60,6 +61,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_74ls629.o \
 	$(NETLISTOBJ)/devices/nld_9316.o \
 	$(NETLISTOBJ)/devices/nld_ne555.o \
+	$(NETLISTOBJ)/devices/nld_r2r_dac.o \
 	$(NETLISTOBJ)/devices/nld_legacy.o \
 	$(NETLISTOBJ)/devices/net_lib.o \
 	$(NETLISTOBJ)/devices/nld_log.o \

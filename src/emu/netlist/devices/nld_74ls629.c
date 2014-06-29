@@ -103,7 +103,7 @@ NETLIB_RESET(SN74LS629)
 NETLIB_UPDATE(SN74LS629)
 {
 	{
-		// recompute
+	    // recompute
 		double  freq;
 		double  v_freq_2, v_freq_3, v_freq_4;
 		double  v_freq = INPANALOG(m_FC);
@@ -124,6 +124,7 @@ NETLIB_UPDATE(SN74LS629)
 		/* scale due to input resistance */
 
 		/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
+
 		v_freq_2 = v_freq * v_freq;
 		v_freq_3 = v_freq_2 * v_freq;
 		v_freq_4 = v_freq_3 * v_freq;

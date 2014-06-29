@@ -17,33 +17,11 @@
 #define VCCS(_name)                                                                \
 		NET_REGISTER_DEV(VCCS, _name)
 
+#define CCCS(_name)                                                                \
+        NET_REGISTER_DEV(CCCS, _name)
+
 #define VCVS(_name)                                                                \
 		NET_REGISTER_DEV(VCVS, _name)
-
-// ----------------------------------------------------------------------------------------
-// nld_CCCS
-// ----------------------------------------------------------------------------------------
-
-/*
- *   Current controlled current source
- *
- *   IP ---+           +------> OP
- *         |           |
- *         RI          I
- *         RI => G =>  I    IOut = (V(IP)-V(IN)) / RI  * G
- *         RI          I
- *         |           |
- *   IN ---+           +------< ON
- *
- *   G=1 ==> 1A ==> 1A
- *
- *   RI = 1
- *
- *   FIXME: This needs extremely high levels of accuracy to work
- *          With the current default of 1mv we can only measure
- *          currents of 1mA. Therefore not yet implemented.
- *
- */
 
 
 // ----------------------------------------------------------------------------------------
@@ -81,6 +59,8 @@ protected:
 	ATTR_COLD virtual void update_param();
 	ATTR_HOT ATTR_ALIGN void update();
 
+	ATTR_COLD void start_internal(const double def_RI);
+
 	netlist_terminal_t m_OP;
 	netlist_terminal_t m_ON;
 
@@ -95,6 +75,49 @@ protected:
 
 	double m_gfac;
 };
+
+// ----------------------------------------------------------------------------------------
+// nld_CCCS
+// ----------------------------------------------------------------------------------------
+
+/*
+ *   Current controlled current source
+ *
+ *   IP ---+           +------> OP
+ *         |           |
+ *         RI          I
+ *         RI => G =>  I    IOut = (V(IP)-V(IN)) / RI  * G
+ *         RI          I
+ *         |           |
+ *   IN ---+           +------< ON
+ *
+ *   G=1 ==> 1A ==> 1A
+ *
+ *   RI = 1
+ *
+ *   FIXME: This needs extremely high levels of accuracy to work
+ *          With the current default of 1mv we can only measure
+ *          currents of 1mA.
+ *
+ */
+
+class NETLIB_NAME(CCCS) : public NETLIB_NAME(VCCS)
+{
+public:
+    ATTR_COLD NETLIB_NAME(CCCS)()
+    : NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
+    //ATTR_COLD NETLIB_NAME(CCCS)(const family_t afamily)
+    //: netlist_device_t(afamily), m_gfac(1.0) {  }
+
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
+    ATTR_COLD virtual void update_param();
+    ATTR_HOT ATTR_ALIGN void update();
+
+    double m_gfac;
+};
+
 
 // ----------------------------------------------------------------------------------------
 // nld_VCVS

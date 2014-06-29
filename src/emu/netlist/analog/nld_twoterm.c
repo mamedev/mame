@@ -46,6 +46,13 @@ ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily)
 	m_N.m_otherterm = &m_P;
 }
 
+ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)()
+        : netlist_device_t(TWOTERM)
+{
+    m_P.m_otherterm = &m_N;
+    m_N.m_otherterm = &m_P;
+}
+
 NETLIB_START(twoterm)
 {
 }
