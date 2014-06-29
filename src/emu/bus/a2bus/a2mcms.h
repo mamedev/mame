@@ -20,8 +20,39 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declaration
-class mcms_device;
+class mcms_device : public device_t, public device_sound_interface
+{
+public:
+	// construction/destruction
+	mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE8_MEMBER(voiceregs_w);
+	DECLARE_WRITE8_MEMBER(control_w);
+	UINT8 get_pen_rand(void) { m_stream->update(); return m_rand; }
+
+	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mcms_device &>(device).m_write_irq.set_callback(wr); }
+	devcb_write_line m_write_irq;
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	sound_stream *m_stream;
+	address_space *m_6502space;
+	emu_timer *m_timer, *m_clrtimer;
+	bool m_enabled;
+	UINT8 m_vols[16];
+	UINT8 m_table[16];
+	UINT16 m_freq[16];
+	UINT16 m_acc[16];
+	UINT8 m_mastervol;
+	UINT8 m_rand;
+};
 
 // card 1
 class a2bus_mcms1_device:
@@ -76,7 +107,7 @@ protected:
 
 private:
 	a2bus_mcms1_device *m_card1;	// card 1 for passthrough
-	class mcms_device *m_engine;
+	mcms_device *m_engine;
 };
 
 // device type definition
