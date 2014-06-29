@@ -352,16 +352,26 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 				m_ram_page[(bit-4)/5] |= 1 << ((bit-9)%5);
 			else
 				m_ram_page[(bit-4)/5] &= ~(1 << ((bit-9)%5));
+
+			if (TRACE_CRU)
+			{
+				if (bit==0x0d) logerror("%s: RAM page @5400 = %d\n", tag(), m_ram_page[1]);
+				if (bit==0x12) logerror("%s: RAM page @5800 = %d\n", tag(), m_ram_page[2]);
+				if (bit==0x17) logerror("%s: RAM page @5C00 = %d\n", tag(), m_ram_page[3]);
+			}
 			return;
 		}
 
 		switch (bit)
 		{
 		case 0:
-			m_selected = (data!=0);
-			if (TRACE_CRU) logerror("%s: selected = %d\n", tag(), m_selected);
-			break;
-
+			{
+				bool turnOn = (data!=0);
+				// Avoid too many meaningless log outputs
+				if (TRACE_CRU) if (m_selected != turnOn) logerror("%s: card %s\n", tag(), turnOn? "selected" : "unselected");
+				m_selected = turnOn;
+				break;
+			}
 		case 1:
 			if (TRACE_CRU) if (data==0) logerror("%s: trigger HDC reset\n", tag());
 			m_hdc9234->reset((data == 0)? ASSERT_LINE : CLEAR_LINE);
@@ -382,11 +392,13 @@ WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 		case 3:
 			m_CD = (data != 0)? (m_CD | 2) : (m_CD & 0xfd);
 			m_rom_page = (data != 0)? (m_rom_page | 2) : (m_rom_page & 0xfd);
+			if (TRACE_CRU) logerror("%s: ROM page = %d, CD = %d\n", tag(), m_rom_page, m_CD);
 			break;
 
 		case 4:
 			m_see_switches = (data != 0);
 			m_rom_page = (data != 0)? (m_rom_page | 1) : (m_rom_page & 0xfe);
+			if (TRACE_CRU) logerror("%s: ROM page = %d, see_switches = %d\n", tag(), m_rom_page, m_see_switches);
 			break;
 
 		default:
@@ -411,6 +423,7 @@ void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int s
 	logerror("%s: Index callback level=%d\n", tag(), state);
 	// m_status_latch = (state==ASSERT_LINE)? (m_status_latch | HDC_DS_INDEX) :  (m_status_latch & ~HDC_DS_INDEX);
 	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
+	signal_drive_status();
 }
 
 void myarc_hfdc_device::set_bits(UINT8& byte, int mask, bool set)
@@ -435,23 +448,36 @@ int myarc_hfdc_device::slog2(int value)
 }
 
 /*
-    Read the selected latch via the auxbus. This is always the status register.
+    Notify the controller about the status change
 */
-READ8_MEMBER( myarc_hfdc_device::auxbus_in )
+void myarc_hfdc_device::signal_drive_status()
 {
-	//UINT8 reply = 0;
+	UINT8 reply = 0;
 	//int index = 0;
 
-	if ((m_output1_latch & 0xf0)==0)
-	{
-		logerror("%s: no drive selected, returning 0\n", tag());
-		// No HD and no floppy
-		return 0; /* is that the correct default value? */
-	}
+	// Status byte as defined by HDC9234
+	// +------+------+------+------+------+------+------+------+
+	// | ECC  |Index | SeekC| Tr00 | User | WrPrt| Ready|Fault |
+	// +------+------+------+------+------+------+------+------+
+	//
+	// Set by HFDC
+	// 74LS240 is used for driving the lines; it also inverts the inputs
+	// If no hard drive or floppy is connected, all lines are 0
+	// +------+------+------+------+------+------+------+------+
+	// |  0   | Index| SeekC| Tr00 |   0  | WrPrt| Ready|Fault |
+	// +------+------+------+------+------+------+------+------+
+	//
+	//  Ready = WDS.ready | DSK
+	//  SeekComplete = WDS.seekComplete | DSK
 
-	return m_status_latch;
+	// If DSK is selected, set Ready and SeekComplete to 1
+	// If WDS is selected but not connected, Ready and SeekComplete are 1
+	if ((m_output1_latch & 0x10)!=0) reply |= 0x22;
+
+	reply |= m_status_latch;
+
+	m_hdc9234->auxbus_in(reply);
 }
-
 
 /*
     When the HDC outputs a byte via its AB (auxiliary bus), we need to latch it.
@@ -463,7 +489,7 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 */
 WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 {
-	//int index;
+	int index;
 	switch (offset)
 	{
 	case HDC_INPUT_STATUS:
@@ -496,18 +522,49 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		else
 		{
 			// HD selected
-//          index = slog2((data>>4) & 0x0f);
-//          if (index>=0) m_hdc9234->connect_hard_drive(m_harddisk_unit[index-1]);
-			set_bits(m_status_latch, HDC_DS_READY, false);
+			index = slog2((data>>4) & 0x0f);
+			if (index == -1)
+			{
+				logerror("%s: Unselect all drives\n", tag());
+			}
+			else
+			{
+				logerror("%s: Select hard disk WDS%d\n", tag(), index);
+				//          if (index>=0) m_hdc9234->connect_hard_drive(m_harddisk_unit[index-1]);
+			}
+			if (m_current_harddisk==NULL)
+			{
+				set_bits(m_status_latch, HDC_DS_READY | HDC_DS_SKCOM, true);
+			}
 		}
 		break;
 
 	case HDC_OUTPUT_2:
 		// value is output2
+		// DS3* = /WDS3
+		// WCur = Reduced Write Current
+		// Dir = Step direction
+		// Step = Step pulse
+		// Head = Selected head number (floppy: 0000 or 0001)
+		// +------+------+------+------+------+------+------+------+
+		// | DS3* | WCur | Dir  | Step |           Head            |
+		// +------+------+------+------+------+------+------+------+
 		logerror("%s: Setting OUTPUT2 latch to %02x\n", tag(), data);
 		m_output2_latch = data;
+
+		// Output the step pulse to the selected floppy drive
+		if (m_current_floppy != NULL)
+		{
+			m_current_floppy->dir_w((data & 0x20)==0);
+			m_current_floppy->stp_w(0);
+			m_current_floppy->stp_w(1);
+		}
+
 		break;
 	}
+
+	// We are pushing the drive status after every output
+	signal_drive_status();
 }
 
 enum
@@ -523,7 +580,7 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 	{
 		if (m_floppy_unit[index] != m_current_floppy)
 		{
-			logerror("%s: Connect floppy drive %d\n", tag(), index);
+			logerror("%s: Select floppy drive DSK%d\n", tag(), index);
 			if (m_current_floppy != NULL)
 			{
 				// Disconnect old drive from index line
@@ -539,33 +596,27 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 			}
 			m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
 		}
-		set_ready(HFDC_FLOPPY, true);
 	}
 	else
 	{
-		logerror("%s: Disconnect all floppy drives\n", tag());
+		logerror("%s: Unselect all floppy drives\n", tag());
 		// Disconnect current floppy
 		if (m_current_floppy != NULL)
 		{
 			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 			m_current_floppy = NULL;
 		}
-		set_ready(HFDC_FLOPPY, false);
 	}
+	signal_drive_status();
 }
 
 void myarc_hfdc_device::connect_harddisk_unit(int index)
 {
-	set_ready(HFDC_HARDDISK, false);
-}
-
-/*
-    Joins the ready lines from the floppy drives and the hard drives
-*/
-void myarc_hfdc_device::set_ready(int dev, bool ready)
-{
-	m_readyflags = ready? (m_readyflags | dev) : (m_readyflags & ~dev);
-	set_bits(m_status_latch, HDC_DS_READY, (m_readyflags != 0));
+//  if (index < 0)
+//  {
+		m_current_harddisk = NULL;
+//  }
+	signal_drive_status();
 }
 
 /*
@@ -638,6 +689,7 @@ void myarc_hfdc_device::device_start()
 	m_buffer_ram = memregion(BUFFER)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	// The HFDC does not use READY; it has on-board RAM for DMA
+	m_current_floppy = NULL;
 }
 
 void myarc_hfdc_device::device_reset()
@@ -665,6 +717,9 @@ void myarc_hfdc_device::device_reset()
 	for (int i=1; i < 4; i++) m_ram_page[i] = 0;
 
 	m_output1_latch = m_output2_latch = 0;
+
+	m_status_latch = 0x00;
+
 	m_dip = m_irq = CLEAR_LINE;
 	m_see_switches = false;
 	m_CD = 0;
@@ -742,7 +797,6 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_HDC9234_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
 	MCFG_HDC9234_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
 	MCFG_HDC9234_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
-	MCFG_HDC9234_AUXBUS_IN_CALLBACK(READ8(myarc_hfdc_device, auxbus_in))
 	MCFG_HDC9234_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
 	MCFG_HDC9234_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 

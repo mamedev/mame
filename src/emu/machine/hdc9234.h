@@ -55,10 +55,6 @@ enum
 #define MCFG_HDC9234_AUXBUS_OUT_CALLBACK(_write) \
 	devcb = &hdc9234_device::set_auxbus_wr_callback(*device, DEVCB_##_write);
 
-/* Auxiliary Bus. This is only used for S0=S1=0. */
-#define MCFG_HDC9234_AUXBUS_IN_CALLBACK(_read) \
-	devcb = &hdc9234_device::set_auxbus_rd_callback(*device, DEVCB_##_read);
-
 /* Callback to read the contents of the external RAM via the data bus.
    Note that the address must be set and automatically increased
    by external circuitry. */
@@ -87,9 +83,13 @@ public:
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_intrq.set_callback(object); }
 	template<class _Object> static devcb_base &set_dip_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dip.set_callback(object); }
 	template<class _Object> static devcb_base &set_auxbus_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_auxbus.set_callback(object); }
-	template<class _Object> static devcb_base &set_auxbus_rd_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_in_auxbus.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_in_dma.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<hdc9234_device &>(device).m_out_dma.set_callback(object); }
+
+	// auxbus_in is intended to read events from the drives
+	// In the real chip the status is polled; to avoid unnecessary load
+	// we implement it as a push call
+	void auxbus_in( UINT8 data );
 
 	// Used to reconfigure the drive connections. Floppy drive selection is done
 	// using the user-programmable outputs. Hence, the connection
@@ -104,7 +104,6 @@ private:
 	devcb_write_line   m_out_intrq;    // INT line
 	devcb_write_line   m_out_dip;      // DMA in progress line
 	devcb_write8       m_out_auxbus;   // AB0-7 lines (using S0,S1 as address)
-	devcb_read8        m_in_auxbus;    // AB0-7 lines (S0=S1=0)
 	devcb_read8        m_in_dma;       // DMA read access to the cache buffer
 	devcb_write8       m_out_dma;      // DMA write access to the cache buffer
 
@@ -117,6 +116,10 @@ private:
 
 	// Command processing
 	void  process_command(UINT8 opcode);
+
+	// Command is done
+	void set_command_done(int flags);
+	void set_command_done();
 
 	// Recent command.
 	UINT8 m_command;
@@ -132,9 +135,6 @@ private:
 
 	// internal register OUTPUT2
 	UINT8 m_output2;
-
-	// Sample the values of the incoming status bits
-	void sync_status_in();
 
 	// Write the output registers to the latches
 	void sync_latches_out();

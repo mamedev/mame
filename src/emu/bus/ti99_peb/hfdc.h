@@ -43,7 +43,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( dip_w );
 	DECLARE_WRITE8_MEMBER( auxbus_out );
-	DECLARE_READ8_MEMBER( auxbus_in );
 	DECLARE_READ8_MEMBER( read_buffer );
 	DECLARE_WRITE8_MEMBER( write_buffer );
 
@@ -71,6 +70,9 @@ private:
 	// Connect or disconnect harddisk drives
 	void connect_harddisk_unit(int index);
 
+	// Pushes the drive status to the HDC
+	void signal_drive_status();
+
 	// Motor monoflop (4.23 sec)
 	emu_timer*      m_motor_on_timer;
 
@@ -85,6 +87,9 @@ private:
 
 	// Currently selected floppy drive
 	floppy_image_device*    m_current_floppy;
+
+	// Currently selected hard drive
+	void*    m_current_harddisk;
 
 	// True: Access to DIP switch settings, false: access to line states
 	bool    m_see_switches;
