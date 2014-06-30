@@ -8796,12 +8796,13 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,jockeygp)
 
 DRIVER_INIT_MEMBER(neogeo_noslot_state,vliner)
 {
+	DRIVER_INIT_CALL(neogeo);
+
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x201fff);
 
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x280000, 0x280001, "IN5");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 
-	DRIVER_INIT_CALL(neogeo);
 }
 
 
@@ -8884,19 +8885,19 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,samsho5b) // copied to slot
 
 DRIVER_INIT_MEMBER(neogeo_noslot_state,kof97oro) // copied to slot
 {
+	DRIVER_INIT_CALL(neogeo);
 	m_bootleg_prot->kof97oro_px_decode(cpuregion, cpuregion_size);
 	m_bootleg_prot->neogeo_bootleg_sx_decrypt(fix_region, fix_region_size,1);
 	m_bootleg_prot->neogeo_bootleg_cx_decrypt(spr_region, spr_region_size);
-	DRIVER_INIT_CALL(neogeo);
 }
 
 DRIVER_INIT_MEMBER(neogeo_noslot_state,lans2004) // copied to slot
 {
+	DRIVER_INIT_CALL(neogeo);
 	m_bootleg_prot->lans2004_decrypt_68k(cpuregion, cpuregion_size);
 	m_bootleg_prot->lans2004_vx_decrypt(ym_region, ym_region_size);
 	m_bootleg_prot->neogeo_bootleg_sx_decrypt(fix_region, fix_region_size,1);
 	m_bootleg_prot->neogeo_bootleg_cx_decrypt(spr_region, spr_region_size);
-	DRIVER_INIT_CALL(neogeo);
 }
 
 DRIVER_INIT_MEMBER(neogeo_noslot_state,kof10th) // copied to slot
@@ -8909,13 +8910,13 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,kof10th) // copied to slot
 
 DRIVER_INIT_MEMBER(neogeo_noslot_state,kog) // copied to slot
 {
+	DRIVER_INIT_CALL(neogeo);
 	/* overlay cartridge ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0ffffe, 0x0fffff, "JUMPER");
 
 	m_bootleg_prot->kog_px_decrypt(cpuregion, cpuregion_size);
 	m_bootleg_prot->neogeo_bootleg_sx_decrypt(fix_region, fix_region_size,1);
 	m_bootleg_prot->neogeo_bootleg_cx_decrypt(spr_region, spr_region_size);
-	DRIVER_INIT_CALL(neogeo);
 }
 
 
