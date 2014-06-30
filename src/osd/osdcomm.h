@@ -62,7 +62,7 @@
 #define ATTR_MALLOC
 #define ATTR_PURE
 #define ATTR_CONST
-#define ATTR_FORCE_INLINE
+#define ATTR_FORCE_INLINE		__forceinline 
 #define ATTR_NONNULL(...)
 #define ATTR_DEPRECATED         __declspec(deprecated)
 #define ATTR_HOT
